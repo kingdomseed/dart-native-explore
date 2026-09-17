@@ -9,10 +9,12 @@
 // `showcase_loader.dart` directly.
 // ignore_for_file: implementation_imports
 
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:dart3d/src/fsceneb_reader.dart';
 import 'package:dart3d/src/scene_model.dart';
 import 'package:dart3d_example/dice_table_scene.dart';
 import 'package:dart3d_example/showcase_loader.dart';
@@ -199,6 +201,118 @@ void main() {
       final scene = load('playground');
       // Box + ball + tower within ±2 — not the 12-unit Floor.
       expect(scene.frameRadius, lessThan(6));
+    });
+
+    // W21: the `.fscene` text path normalizes the upstream `n` light
+    // field at load (the `.fsceneb` path does it inside readFsceneb).
+    test('.fscene light field n normalizes to intensity at load', () {
+      final doc = SceneDocument();
+      doc.addNode(
+        NodeSpec(
+          id: const LocalId(9, 7),
+          name: 'sun',
+          components: [
+            ComponentSpec(
+              'directionalLight',
+              properties: {
+                // White 1.0-lux glTF directional → n = 1/683.
+                'n': DoubleValue(1.0 / 683.0),
+                'color': Vec3Value(Vector3(1, 1, 1)),
+              },
+            ),
+          ],
+        ),
+        root: true,
+      );
+      const item = ShowcaseItem('nlight', 'test/nlight.fscene', 'n field');
+      final scene = loadShowcaseScene(
+        item,
+        bytesFor: (key) => key == item.assetKey
+            ? utf8.encode(writeFscene(doc))
+            : null,
+      );
+      expect(scene, isNotNull);
+      final light = scene!.document.nodes.values.firstWhere(
+        (n) => n.name == 'sun',
+      );
+      final props = light.components.single.properties;
+      expect(
+        (props['intensity'] as DoubleValue).value,
+        closeTo(kGltfToSceneKitLightScale, 1),
+      );
+    });
+
+    // W21 conformance lane: the builtin materials scene carries the
+    // blend/mask/UV-set surfaces the native realizers realize.
+    test('materials: builtin scene carries the W21 lanes', () {
+      final scene = load('materials');
+      final doc = scene.document;
+
+      MaterialResource materialOf(String name) {
+        final node = doc.nodes.values.firstWhere(
+          (n) => n.name == name,
+          orElse: () => throw StateError('node $name missing'),
+        );
+        final mesh = node.components.singleWhere((c) => c.type == 'mesh');
+        final matId = (mesh.properties['material'] as ResourceRefValue).id;
+        return doc.resources[matId]! as MaterialResource;
+      }
+
+      // Blend lane: alphaMode blend + fractional-alpha baseColor.
+      final blend = materialOf('materials.blend').properties;
+      expect((blend['alphaMode'] as StringValue).value, 'blend');
+      expect((blend['baseColor'] as ColorValue).a, lessThan(1.0));
+      // An opaque control and a backdrop sit beside it.
+      expect(
+        materialOf('materials.opaque').properties.containsKey('alphaMode'),
+        isFalse,
+      );
+      expect(
+        materialOf('materials.backdrop').properties['baseColorTexture'],
+        isA<ResourceRefValue>(),
+      );
+
+      // Mask lane: alphaMode mask + cutoff over a real alpha texture —
+      // the lattice payload is attached rgba8.
+      final mask = materialOf('materials.mask').properties;
+      expect((mask['alphaMode'] as StringValue).value, 'mask');
+      expect((mask['alphaCutoff'] as DoubleValue).value, 0.5);
+      final maskTex =
+          doc.resources[(mask['baseColorTexture'] as ResourceRefValue).id]!
+              as TextureResource;
+      final maskPixels = doc.payload(maskTex.payload!)!;
+      expect(maskPixels.format, 'rgba8');
+      // The lattice really has holes — some texels at a=0, some a=255.
+      final alphas = <int>{};
+      final bytes = maskPixels.bytes!;
+      for (var i = 3; i < bytes.length; i += 4) {
+        alphas.add(bytes[i]);
+      }
+      expect(alphas, containsAll([0, 255]));
+
+      // UV-set lane: the uv1 twin's texture transform selects set 1,
+      // and its vertex payload really carries a nonzero uv1 channel.
+      final uv1 = materialOf('materials.uv1').properties;
+      final transform =
+          (uv1['baseColorTextureTransform'] as MapValue).values;
+      expect((transform['texCoord'] as IntValue).value, 1);
+      final uv1Node = doc.nodes.values.firstWhere(
+        (n) => n.name == 'materials.uv1',
+      );
+      final geoId =
+          (uv1Node.components
+                      .singleWhere((c) => c.type == 'mesh')
+                      .properties['geometry']
+                  as ResourceRefValue)
+              .id;
+      final geo = doc.resources[geoId]! as GeometryResource;
+      final verts = doc.payload(geo.vertices!)!;
+      expect(verts.layout, 'unskinned_uv1_tangent');
+      // uv1 sits at floats 8-9 of the 72 B interleave — nonzero here.
+      final uv1u = ByteData.sublistView(
+        verts.bytes!,
+      ).getFloat32(8 * 4, Endian.little);
+      expect(uv1u, closeTo(0.19, 1e-6));
     });
   });
 }

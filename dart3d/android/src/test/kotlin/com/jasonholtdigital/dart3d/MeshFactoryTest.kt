@@ -12,21 +12,21 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * Vertex-layout invariants for [MeshFactory] — the shared 13-float
- * `[pos3 | tangent-quat4 | uv2 | color4]` record (52-byte stride) that
- * both the procedural generators and the payload decoders emit, plus
- * the 76-byte skinned repack. Pure JVM; no Filament needed.
+ * Vertex-layout invariants for [MeshFactory] — the shared 15-float
+ * `[pos3 | tangent-quat4 | uv0-2 | color4 | uv1-2]` record (60-byte
+ * stride) that both the procedural generators and the payload decoders
+ * emit, plus the 84-byte skinned repack. Pure JVM; no Filament needed.
  */
 class MeshFactoryTest {
 
     @Test
-    fun `stride constants match the 13-float record`() {
-        assertEquals(13, MeshFactory.FLOATS_PER_VERTEX)
-        assertEquals(13, MeshFactory.PAYLOAD_FLOATS_PER_VERTEX)
-        assertEquals(52, MeshFactory.PROCEDURAL_VERTEX_STRIDE_BYTES)
-        assertEquals(52, MeshFactory.PAYLOAD_VERTEX_STRIDE_BYTES)
-        // Base record + [joints u16x4 | weights f32x4] = 52 + 8 + 16.
-        assertEquals(76, MeshFactory.PAYLOAD_SKINNED_VERTEX_STRIDE_BYTES)
+    fun `stride constants match the 15-float record`() {
+        assertEquals(15, MeshFactory.FLOATS_PER_VERTEX)
+        assertEquals(15, MeshFactory.PAYLOAD_FLOATS_PER_VERTEX)
+        assertEquals(60, MeshFactory.PROCEDURAL_VERTEX_STRIDE_BYTES)
+        assertEquals(60, MeshFactory.PAYLOAD_VERTEX_STRIDE_BYTES)
+        // Base record + [joints u16x4 | weights f32x4] = 60 + 8 + 16.
+        assertEquals(84, MeshFactory.PAYLOAD_SKINNED_VERTEX_STRIDE_BYTES)
     }
 
     @Test
@@ -59,8 +59,8 @@ class MeshFactoryTest {
             MeshFactory.Topology.TRIANGLES, false, null)
 
         assertEquals(2, mesh.vertexCount)
-        assertEquals(52, mesh.vertexStrideBytes)
-        assertEquals(2 * 52, mesh.vertices.capacity())
+        assertEquals(60, mesh.vertexStrideBytes)
+        assertEquals(2 * 60, mesh.vertices.capacity())
         assertTrue(mesh.hasUvColor)
         assertFalse(mesh.hasSkinning)
         // No index payload → sequential uint16 indices.
@@ -77,6 +77,9 @@ class MeshFactoryTest {
         assertEquals(0f, a[7], 0f)
         assertEquals(0f, a[8], 0f)
         for (c in 9 until 13) assertEquals(1f, a[c], 0f)
+        // uv1 fabricates to [0,0].
+        assertEquals(0f, a[13], 0f)
+        assertEquals(0f, a[14], 0f)
 
         val b = record(mesh, 1)
         val vb = floatArrayOf(-4f, 0.5f, 7f, 0.9f, 0.8f, -0.7f, 0.6f)
@@ -91,7 +94,7 @@ class MeshFactoryTest {
     @Test
     fun `interleaved payload decodes channels at the declared offsets`() {
         // `unskinned` wire record: [pos3 | normal3 | uv2 | color4]
-        // (48 bytes) → the same 52-byte record, with the tangent quat
+        // (48 bytes) → the same 60-byte record, with the tangent quat
         // derived from the normal and z mirrored into native space.
         val mesh = MeshFactory.fromPayload(
             wire(
@@ -104,8 +107,8 @@ class MeshFactoryTest {
             MeshFactory.Topology.TRIANGLES, false, null)
 
         assertEquals(1, mesh.vertexCount)
-        assertEquals(52, mesh.vertexStrideBytes)
-        assertEquals(52, mesh.vertices.capacity())
+        assertEquals(60, mesh.vertexStrideBytes)
+        assertEquals(60, mesh.vertices.capacity())
         assertFalse(mesh.hasSkinning)
 
         val r = record(mesh, 0)
@@ -121,6 +124,9 @@ class MeshFactoryTest {
         assertEquals(0.25f, r[10], 0f)
         assertEquals(0.125f, r[11], 0f)
         assertEquals(1f, r[12], 0f)
+        // A uv1-less wire layout zero-fills the record tail.
+        assertEquals(0f, r[13], 0f)
+        assertEquals(0f, r[14], 0f)
 
         // Single decoded (mirrored) position → degenerate bounds.
         assertArrayEquals(
@@ -128,10 +134,70 @@ class MeshFactoryTest {
     }
 
     @Test
+    fun `uv1 layouts carry the second UV channel into the record tail`() {
+        // `unskinned_uv1_tangent` wire record: [pos3 | normal3 | uv0-2 |
+        // uv1-2 | color4 | tangent4] (72 bytes) → 60-byte repack.
+        val mesh = MeshFactory.fromPayload(
+            wire(
+                1f, 2f, 3f,
+                0f, 0f, 1f,
+                0.25f, 0.75f,
+                0.6f, 0.4f,
+                0.5f, 0.25f, 0.125f, 1f,
+                0f, 0f, -1f, -1f,
+            ),
+            "unskinned_uv1_tangent", null, null,
+            MeshFactory.Topology.TRIANGLES, false, null)
+
+        assertEquals(1, mesh.vertexCount)
+        assertEquals(60, mesh.vertexStrideBytes)
+        assertEquals(60, mesh.vertices.capacity())
+        val r = record(mesh, 0)
+        assertEquals(0.25f, r[7], 0f)
+        assertEquals(0.75f, r[8], 0f)
+        assertEquals(0.5f, r[9], 0f)
+        assertEquals(0.6f, r[13], 0f)
+        assertEquals(0.4f, r[14], 0f)
+
+        // The SoA twin puts the uv1 slab after uv0's:
+        // [pos | n | uv0 | uv1 | color | tangent] per-vertex-width slabs.
+        val soa = ByteBuffer.allocate(2 * 72).order(ByteOrder.LITTLE_ENDIAN)
+        for (i in 0 until 2) {            // pos
+            soa.putFloat(i.toFloat()); soa.putFloat(0f); soa.putFloat(0f)
+        }
+        for (i in 0 until 2) {            // normal
+            soa.putFloat(0f); soa.putFloat(0f); soa.putFloat(1f)
+        }
+        for (i in 0 until 2) {            // uv0
+            soa.putFloat(0.1f * i); soa.putFloat(0f)
+        }
+        for (i in 0 until 2) {            // uv1
+            soa.putFloat(0.3f * (i + 1)); soa.putFloat(0.5f)
+        }
+        for (i in 0 until 2) {            // color
+            repeat(4) { soa.putFloat(1f) }
+        }
+        for (i in 0 until 2) {            // tangent
+            soa.putFloat(0f); soa.putFloat(0f); soa.putFloat(-1f)
+            soa.putFloat(-1f)
+        }
+        val soaMesh = MeshFactory.fromPayload(
+            soa.array(), "unskinned_soa_uv1_tangent", null, null,
+            MeshFactory.Topology.TRIANGLES, false, null)
+        assertEquals(2, soaMesh.vertexCount)
+        val s0 = record(soaMesh, 0)
+        val s1 = record(soaMesh, 1)
+        assertEquals(0.3f, s0[13], EPS)
+        assertEquals(0.5f, s0[14], EPS)
+        assertEquals(0.6f, s1[13], EPS)
+        assertEquals(0.5f, s1[14], EPS)
+    }
+
+    @Test
     fun `skinned payload appends the joints and weights tail`() {
         // `skinned` wire record: [pos3 | normal3 | uv2 | color4 |
-        // joints f32x4 | weights f32x4] (80 bytes) → 76-byte repack:
-        // the 52-byte base + [joints u16x4 | weights f32x4].
+        // joints f32x4 | weights f32x4] (80 bytes) → 84-byte repack:
+        // the 60-byte base + [joints u16x4 | weights f32x4].
         val mesh = MeshFactory.fromPayload(
             wire(
                 0f, 0f, 0f,
@@ -148,18 +214,18 @@ class MeshFactoryTest {
         assertEquals(
             MeshFactory.PAYLOAD_SKINNED_VERTEX_STRIDE_BYTES,
             mesh.vertexStrideBytes)
-        assertEquals(76, mesh.vertices.capacity())
+        assertEquals(84, mesh.vertices.capacity())
         assertTrue(mesh.hasSkinning)
         // Joint ids arrive as whole-valued f32 and land as u16 — the
         // shader reads BONE_INDICES as uvec4.
-        assertEquals(3, mesh.vertices.getShort(52).toInt() and 0xFFFF)
-        assertEquals(5, mesh.vertices.getShort(54).toInt() and 0xFFFF)
-        assertEquals(7, mesh.vertices.getShort(56).toInt() and 0xFFFF)
-        assertEquals(9, mesh.vertices.getShort(58).toInt() and 0xFFFF)
-        assertEquals(0.5f, mesh.vertices.getFloat(60), 0f)
-        assertEquals(0.25f, mesh.vertices.getFloat(64), 0f)
-        assertEquals(0.125f, mesh.vertices.getFloat(68), 0f)
-        assertEquals(0.125f, mesh.vertices.getFloat(72), 0f)
+        assertEquals(3, mesh.vertices.getShort(60).toInt() and 0xFFFF)
+        assertEquals(5, mesh.vertices.getShort(62).toInt() and 0xFFFF)
+        assertEquals(7, mesh.vertices.getShort(64).toInt() and 0xFFFF)
+        assertEquals(9, mesh.vertices.getShort(66).toInt() and 0xFFFF)
+        assertEquals(0.5f, mesh.vertices.getFloat(68), 0f)
+        assertEquals(0.25f, mesh.vertices.getFloat(72), 0f)
+        assertEquals(0.125f, mesh.vertices.getFloat(76), 0f)
+        assertEquals(0.125f, mesh.vertices.getFloat(80), 0f)
     }
 
     @Test
@@ -265,7 +331,7 @@ class MeshFactoryTest {
         assertEquals(indexCount, mesh.indexCount)
         assertEquals(
             MeshFactory.PROCEDURAL_VERTEX_STRIDE_BYTES, mesh.vertexStrideBytes)
-        assertEquals(vertexCount * 52, mesh.vertices.capacity())
+        assertEquals(vertexCount * 60, mesh.vertices.capacity())
         assertTrue(mesh.hasUvColor)
         assertFalse(mesh.hasSkinning)
         assertArrayEquals(bounds, mesh.bounds, EPS)
