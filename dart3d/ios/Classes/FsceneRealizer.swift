@@ -1,4 +1,7 @@
+import CoreImage
 import Foundation
+import Metal
+import MetalKit
 import ModelIO
 import SceneKit
 import simd
@@ -57,12 +60,24 @@ enum FsceneRealizer {
     /// bakes and channel splits skip a GPU round-trip. Encoded
     /// containers and `ref` assets leave `rgba` nil — `sourcePixels`
     /// re-decodes the image when a slot needs raw bytes.
+    ///
+    /// W21: `mtlTexture` carries a Metal-side copy when one was
+    /// uploaded — a KTX2 container decode (which may be the ONLY
+    /// realized form, e.g. ASTC blocks with no CPU image) or the
+    /// renormalized mip chain sRGB sources get. `image` is nil for
+    /// GPU-only textures, and `contents` is what a slot binds.
     struct DecodedTexture {
-        let image: UIImage
+        let key: UInt64
+        let image: UIImage?      // nil on GPU-only (compressed) decodes
+        let mtlTexture: MTLTexture?
         let rgba: Data?          // straight RGBA8, rgba8 payloads only
         let width: Int
         let height: Int
         let content: String      // 'color' | 'data' | 'normal'
+
+        /// What a material slot binds: the MTLTexture when one exists
+        /// (it carries the mip chain), else the UIImage.
+        var contents: Any? { mtlTexture ?? image }
     }
 
     /// One material slot's texture dependency. `upsertResource`
@@ -459,6 +474,10 @@ enum FsceneRealizer {
             var positions: [Float] = []
             var normals: [Float] = []
             var uv0: [Float] = []
+            /// TEXCOORD_1 — populated only by the `*_uv1_tangent`
+            /// layouts; lands as the geometry's second `.texcoord`
+            /// source so `mappingChannel` 1 selects it.
+            var uv1: [Float] = []
             var colors: [Float] = []
             var tangents: [Float] = []
             /// JOINTS — the four bone indices per vertex the
@@ -554,6 +573,13 @@ enum FsceneRealizer {
                 floatSource(decoded.colors, .color, decoded.count, 4),
                 floatSource(decoded.tangents, .tangent, decoded.count, 4),
             ]
+            // W21: a second `.texcoord` source is UV set 1 —
+            // `SCNMaterialProperty.mappingChannel` indexes texcoord
+            // sources in declaration order.
+            if decoded.uv1.count == decoded.count * 2 {
+                sources.append(
+                    floatSource(decoded.uv1, .texcoord, decoded.count, 2))
+            }
             if decoded.boneWeights.count == decoded.count * 4,
                decoded.boneIndices.count == decoded.count * 4 {
                 sources.append(floatSource(
@@ -635,6 +661,10 @@ enum FsceneRealizer {
                 out.uv0.append(f(offset))
                 out.uv0.append(f(offset + 4))
             }
+            func appendUv1(_ offset: Int) {
+                out.uv1.append(f(offset))
+                out.uv1.append(f(offset + 4))
+            }
             func appendColor(_ offset: Int) {
                 for j in 0..<4 { out.colors.append(f(offset + j * 4)) }
             }
@@ -668,12 +698,13 @@ enum FsceneRealizer {
                     out.boneIndices.reserveCapacity(count * 4)
                     out.boneWeights.reserveCapacity(count * 4)
                 }
+                out.uv1.reserveCapacity(count * 2)
                 for i in 0..<count {
                     let base = i * stride
                     appendPosition(base)
                     appendNormal(base + 12)
                     appendUv(base + 24)
-                    _ = f(base + 32); _ = f(base + 36) // uv1
+                    appendUv1(base + 32)
                     appendColor(base + 40)
                     appendTangent(base + 56)
                     if skinned {
@@ -687,12 +718,12 @@ enum FsceneRealizer {
                 let uv1Base = uv0Base + count * 8
                 let colorBase = uv1Base + count * 8
                 let tangentBase = colorBase + count * 16
+                out.uv1.reserveCapacity(count * 2)
                 for i in 0..<count {
                     appendPosition(i * 12)
                     appendNormal(normalBase + i * 12)
                     appendUv(uv0Base + i * 8)
-                    _ = f(uv1Base + i * 8)
-                    _ = f(uv1Base + i * 8 + 4)
+                    appendUv1(uv1Base + i * 8)
                     appendColor(colorBase + i * 16)
                     appendTangent(tangentBase + i * 16)
                 }
@@ -1143,11 +1174,44 @@ enum FsceneRealizer {
             }
             if let c = d3Color(props["emissive"]) { m.emission.contents = c }
             if d3Bool(props["doubleSided"]) == true { m.isDoubleSided = true }
-            if let mode = d3String(props["alphaMode"]), mode != "opaque" {
-                // `alphaCutoff` decodes alongside but has no SceneKit
-                // home either — mask/blend need W7's shader work.
-                host.logOnce("material.\(key).alphaMode.\(mode)",
-                    "material \(key): alphaMode '\(mode)' is deferred to W7")
+            // W21: glTF alphaMode (wire values are lowercase
+            // 'opaque|mask|blend'; compared case-insensitively).
+            // `blend` puts the material in SceneKit's alpha-blended
+            // transparent pass with depth writes OFF — a blended
+            // surface that writes depth occludes the surfaces sorted
+            // behind it and visibly disappears; depth reads stay on
+            // so it still hides behind opaque geometry.
+            // `mask` is a true alpha test: SCNTransparencyMode has no
+            // alpha-test mode (.aOne/.rgbZero pick a transparency
+            // source, they don't discard), so a `.fragment` shader
+            // modifier drops texels below `alphaCutoff` and pins the
+            // survivors to a=1 — a mask is binary-opaque where it
+            // survives even if the material still lands in the blend
+            // pass on texture-alpha contents.
+            let alphaMode = d3String(props["alphaMode"])
+                ?? (props["alphaMode"] as? String)
+            switch (alphaMode ?? "opaque").lowercased() {
+            case "opaque":
+                break
+            case "blend":
+                m.blendMode = .alpha
+                m.transparencyMode = .aOne
+                m.writesToDepthBuffer = false
+                m.readsFromDepthBuffer = true
+            case "mask":
+                let cutoff = d3Double(props["alphaCutoff"])
+                    ?? (props["alphaCutoff"] as? NSNumber)?.doubleValue
+                    ?? 0.5
+                m.shaderModifiers = [
+                    .fragment: String(format:
+                        "if (_output.color.a < %.6f) "
+                        + "{ discard_fragment(); }\n"
+                        + "_output.color.a = 1.0;", cutoff)
+                ]
+            default:
+                host.logOnce("material.\(key).alphaMode.\(alphaMode ?? "?")",
+                    "material \(key): unknown alphaMode "
+                    + "'\(alphaMode ?? "?")'; kept opaque")
             }
             for slot in ["baseColorTexture", "metallicRoughnessTexture",
                          "normalTexture", "occlusionTexture",
@@ -1193,7 +1257,7 @@ enum FsceneRealizer {
                 if let tex {
                     m.diffuse.contents = bakeFactor(
                         tex, color: d3ColorComponents(props["baseColor"]),
-                        rgbOnly: false) ?? tex.image
+                        rgbOnly: false) ?? tex.contents
                     applyContentsTransform(
                         m.diffuse, transform, materialKey: materialKey,
                         slot: slot)
@@ -1222,8 +1286,21 @@ enum FsceneRealizer {
                         .map { NSNumber(value: $0) }
                 }
             case "normalTexture":
-                m.normal.contents = tex?.image
+                // W21: upstream ships renormalized mips for normal
+                // maps — a box-filtered mip shrinks average normal
+                // length, softening the map at distance. SceneKit
+                // generates its own chain and can't steer it, so the
+                // chain is built CPU-side with renormalized texels
+                // and bound as an MTLTexture. Falls back to the plain
+                // image (SceneKit's unrenormalized mips) when pixels
+                // or Metal are unavailable — `renormalizedNormalMips`
+                // logs once per cause.
+                m.normal.contents = tex.flatMap {
+                    $0.mtlTexture
+                        ?? renormalizedNormalMips($0, materialKey: materialKey)
+                } ?? tex?.contents
                 if tex != nil {
+                    m.normal.mipFilter = .linear
                     applyContentsTransform(
                         m.normal, transform, materialKey: materialKey,
                         slot: slot)
@@ -1232,7 +1309,7 @@ enum FsceneRealizer {
                     m.normal.intensity = CGFloat(v)
                 }
             case "occlusionTexture":
-                m.ambientOcclusion.contents = tex?.image
+                m.ambientOcclusion.contents = tex?.contents
                 if tex != nil {
                     applyContentsTransform(
                         m.ambientOcclusion, transform,
@@ -1247,7 +1324,7 @@ enum FsceneRealizer {
                     // emissiveTexture emits nothing (glTF semantics).
                     m.emission.contents = bakeFactor(
                         tex, color: d3ColorComponents(props["emissive"])
-                            ?? [0, 0, 0, 1], rgbOnly: true) ?? tex.image
+                            ?? [0, 0, 0, 1], rgbOnly: true) ?? tex.contents
                     applyContentsTransform(
                         m.emission, transform, materialKey: materialKey,
                         slot: slot)
@@ -1304,8 +1381,12 @@ enum FsceneRealizer {
         /// after scale+rotation). `SCNMatrix4` uses the row-vector
         /// convention — `SCNMatrix4Mult(a, b)` applies `a` first — so
         /// the chain is scale → rotate → translate, built left to
-        /// right. Only uv0 is realized; a nonzero `texCoord` logs once
-        /// and is treated as 0.
+        /// right. `texCoord` selects the UV set: `mappingChannel` N
+        /// samples the geometry's Nth `.texcoord` source (uv1-carrying
+        /// layouts land one — `decodeVertexPayload`). The wire tops
+        /// out at two sets, so `texCoord` ≥ 2 can't resolve today; it
+        /// is passed through unclamped rather than silently sampled as
+        /// uv0, and logged once.
         func applyContentsTransform(
             _ prop: SCNMaterialProperty, _ any: Any?,
             materialKey: UInt64, slot: String
@@ -1318,11 +1399,13 @@ enum FsceneRealizer {
                 ?? (tm["rotation"] as? NSNumber)?.doubleValue ?? 0
             let texCoord = d3Int(tm["texCoord"])
                 ?? (tm["texCoord"] as? NSNumber)?.intValue ?? 0
-            if texCoord != 0 {
+            if texCoord >= 2 {
                 host.logOnce("material.\(materialKey).\(slot).texCoord",
                     "material \(materialKey) \(slot): texCoord \(texCoord) "
-                    + "needs a second UV channel — using uv0")
+                    + "exceeds the wire's two UV sets — passed through; "
+                    + "a geometry without that UV set won't resolve it")
             }
+            prop.mappingChannel = texCoord
             var t = SCNMatrix4MakeScale(Float(scale[0]), Float(scale[1]), 1)
             t = SCNMatrix4Mult(
                 t, SCNMatrix4MakeRotation(Float(rotation), 0, 0, 1))
@@ -1335,13 +1418,16 @@ enum FsceneRealizer {
         /// Realizes one `texture` resource. A `payload` source resolves
         /// against `payloadStore` by the spec's `format`: `rgba8` wraps
         /// the raw bytes in a CGImage (dims from the payload spec),
-        /// `ktx2` defers (no transcoder in W4), and anything else —
-        /// png/jpg or an absent format — goes through `UIImage`'s
-        /// container sniffing. A `ref` source loads from the asset
-        /// catalog, then the main bundle. A payload whose bytes haven't
-        /// landed defers (re-realized when they do); malformed content
-        /// logs once and leaves the slot empty — the material keeps its
-        /// factor-only fallback.
+        /// `ktx2` goes through `decodeKTX2` (W21 — MTKTextureLoader or
+        /// the in-tree non-supercompressed upload; BasisU warns once),
+        /// and anything else — png/jpg or an absent format — goes
+        /// through `UIImage`'s container sniffing. A `ref` source loads
+        /// from the asset catalog, then the main bundle. `color`
+        /// contents also get a GPU upload carrying a renormalized mip
+        /// chain (`mipRenormalizedTexture`, W21). A payload whose bytes
+        /// haven't landed defers (re-realized when they do); malformed
+        /// content logs once and leaves the slot empty — the material
+        /// keeps its factor-only fallback.
         func decodeTexture(_ key: UInt64, _ r: [String: Any]) {
             let started = DispatchTime.now().uptimeNanoseconds
             let content = r["content"] as? String ?? "color"
@@ -1381,15 +1467,24 @@ enum FsceneRealizer {
                             "texture \(key): rgba8 CGImage failed")
                         return
                     }
+                    let image = UIImage(cgImage: cg)
                     recordTexture(key, DecodedTexture(
-                        image: UIImage(cgImage: cg), rgba: data,
+                        key: key, image: image,
+                        mtlTexture: content == "color"
+                            ? mipRenormalizedTexture(
+                                image, logKey: "texture.\(key).mips")
+                            : nil,
+                        rgba: data,
                         width: w, height: h, content: content),
                         format: "rgba8", bytes: data.count,
                         since: started)
                 case "ktx2":
-                    host.logOnce("texture.\(key).ktx2",
-                        "texture \(key): ktx2 needs a basisu/ASTC path "
-                        + "— deferred")
+                    if let tex = decodeKTX2(data, key: key,
+                                            content: content) {
+                        recordTexture(key, tex, format: "ktx2",
+                                      bytes: data.count,
+                                      since: started)
+                    }
                 default:
                     // Encoded container (png/jpg) or an undeclared
                     // format — UIImage decides by the magic bytes and
@@ -1401,7 +1496,12 @@ enum FsceneRealizer {
                         return
                     }
                     recordTexture(key, DecodedTexture(
-                        image: image, rgba: nil, width: cg.width,
+                        key: key, image: image,
+                        mtlTexture: content == "color"
+                            ? mipRenormalizedTexture(
+                                image, logKey: "texture.\(key).mips")
+                            : nil,
+                        rgba: nil, width: cg.width,
                         height: cg.height, content: content),
                         format: spec?.format ?? "encoded",
                         bytes: data.count, since: started)
@@ -1421,7 +1521,12 @@ enum FsceneRealizer {
                     return
                 }
                 recordTexture(key, DecodedTexture(
-                    image: image, rgba: nil, width: cg.width,
+                    key: key, image: image,
+                    mtlTexture: content == "color"
+                        ? mipRenormalizedTexture(
+                            image, logKey: "texture.\(key).mips")
+                        : nil,
+                    rgba: nil, width: cg.width,
                     height: cg.height, content: content),
                     format: "ref", bytes: 0, since: started)
                 return
@@ -1453,7 +1558,8 @@ enum FsceneRealizer {
             if let rgba = tex.rgba {
                 return (rgba, tex.width, tex.height, false)
             }
-            guard let (data, w, h) = rgbaPixels(tex.image, alpha: wantAlpha)
+            guard let image = tex.image,
+                  let (data, w, h) = rgbaPixels(image, alpha: wantAlpha)
             else { return nil }
             return (data, w, h, wantAlpha)
         }
@@ -1535,6 +1641,106 @@ enum FsceneRealizer {
         /// Byte channel × unit factor, clamped to 0…255.
         func scaleByte(_ b: UInt8, _ f: Double) -> UInt8 {
             UInt8(clamping: Int((Double(b) * f).rounded()))
+        }
+
+        /// Builds a full mip chain for a normal-map texture CPU-side
+        /// and returns it as an `MTLTexture` (W21). Each level is a
+        /// 2×2 box average of the previous one with the averaged
+        /// normal renormalized — decode → [-1,1], normalize,
+        /// re-encode — so distant mips keep unit-length normals
+        /// instead of the shrunken vectors a plain box filter
+        /// produces. A degenerate (near-zero) average falls back to
+        /// the flat +z normal rather than inventing a direction.
+        /// Alpha is box-averaged unrenormalized. Level 0 ships
+        /// verbatim. Returns nil (caller binds `tex.contents`) when the
+        /// pixels are unreachable or Metal can't make the texture —
+        /// each cause logs once.
+        func renormalizedNormalMips(_ tex: DecodedTexture,
+                                  materialKey: UInt64) -> MTLTexture? {
+            guard let src = sourcePixels(tex, wantAlpha: false)
+            else {
+                host.logOnce("material.\(materialKey).normal.mips.pixels",
+                    "material \(materialKey): normal texture pixels "
+                    + "unreachable; SceneKit's unrenormalized mips "
+                    + "(approximation — upstream renormalizes)")
+                return nil
+            }
+            guard let device = host.renderDevice() else {
+                host.logOnce("material.\(materialKey).normal.mips.device",
+                    "material \(materialKey): no Metal device; "
+                    + "SceneKit's unrenormalized mips (approximation — "
+                    + "upstream renormalizes)")
+                return nil
+            }
+            var levels: [[UInt8]] = [[UInt8](src.data)]
+            var w = src.width, h = src.height
+            while w > 1 || h > 1 {
+                let prev = levels[levels.count - 1]
+                let nw = max(1, w / 2), nh = max(1, h / 2)
+                var next = [UInt8](repeating: 0, count: nw * nh * 4)
+                for y in 0..<nh {
+                    for x in 0..<nw {
+                        var sx = 0.0, sy = 0.0, sz = 0.0
+                        var sa = 0
+                        // Clamped taps: odd dims reweight the edge
+                        // texel — a small bias at NPOT edges, noted.
+                        for dy in 0..<2 {
+                            for dx in 0..<2 {
+                                let px = min(x * 2 + dx, w - 1)
+                                let py = min(y * 2 + dy, h - 1)
+                                let o = (py * w + px) * 4
+                                sx += Double(prev[o]) / 127.5 - 1.0
+                                sy += Double(prev[o + 1]) / 127.5 - 1.0
+                                sz += Double(prev[o + 2]) / 127.5 - 1.0
+                                sa += Int(prev[o + 3])
+                            }
+                        }
+                        let d = (y * nw + x) * 4
+                        let len = (sx * sx + sy * sy + sz * sz)
+                            .squareRoot()
+                        if len > 1e-6 {
+                            next[d] = UInt8(clamping: Int(
+                                ((sx / len + 1.0) * 127.5).rounded()))
+                            next[d + 1] = UInt8(clamping: Int(
+                                ((sy / len + 1.0) * 127.5).rounded()))
+                            next[d + 2] = UInt8(clamping: Int(
+                                ((sz / len + 1.0) * 127.5).rounded()))
+                        } else {
+                            // Cancelled-out average — flat +z normal.
+                            next[d] = 128; next[d + 1] = 128
+                            next[d + 2] = 255
+                        }
+                        next[d + 3] = UInt8(clamping: sa / 4)
+                    }
+                }
+                levels.append(next)
+                w = nw; h = nh
+            }
+            let desc = MTLTextureDescriptor.texture2DDescriptor(
+                pixelFormat: .rgba8Unorm,  // linear — normal data, no sRGB
+                width: src.width, height: src.height, mipmapped: true)
+            desc.storageMode = .shared
+            desc.usage = .shaderRead
+            desc.mipmapLevelCount = levels.count
+            guard let mtl = device.makeTexture(descriptor: desc) else {
+                host.logOnce("material.\(materialKey).normal.mips.mtl",
+                    "material \(materialKey): MTLTexture creation "
+                    + "failed; SceneKit's unrenormalized mips "
+                    + "(approximation — upstream renormalizes)")
+                return nil
+            }
+            for (level, pixels) in levels.enumerated() {
+                let lw = max(1, src.width >> level)
+                let lh = max(1, src.height >> level)
+                pixels.withUnsafeBytes { buf in
+                    guard let base = buf.baseAddress else { return }
+                    mtl.replace(
+                        region: MTLRegionMake2D(0, 0, lw, lh),
+                        mipmapLevel: level, withBytes: base,
+                        bytesPerRow: lw * 4)
+                }
+            }
+            return mtl
         }
 
         /// Re-decodes an encoded/`ref` image to raw 8-bit RGBA.
@@ -3359,19 +3565,16 @@ enum FsceneRealizer {
         }
 
         /// Equirect bytes — decoder picked by magic: Radiance HDR
-        /// (`#?RADIANCE`/`#?RGBE`) decodes to float32, OpenEXR warns
-        /// once (deferred), everything else goes through `UIImage`'s
-        /// container sniffing (png/jpg/…; the spec `format` tag is
-        /// informational).
+        /// (`#?RADIANCE`/`#?RGBE`) decodes to float32, OpenEXR goes
+        /// through the platform HDR loaders (`decodeEXR`), everything
+        /// else goes through `UIImage`'s container sniffing (png/jpg/…;
+        /// the spec `format` tag is informational).
         func envPixels(fromBytes data: Data, tag: String) -> EnvPixels? {
             if isRadianceHDR(data) {
                 return decodeRadianceHDR(data, tag: tag)
             }
             if isOpenEXR(data) {
-                host.logOnce("env.exr.\(tag)",
-                    "\(tag): OpenEXR equirect is deferred — use .hdr "
-                    + "or an LDR image")
-                return nil
+                return decodeEXR(data, tag: tag)
             }
             guard let image = UIImage(data: data),
                   let pixels = envPixels(from: image) else {
@@ -3514,6 +3717,135 @@ enum FsceneRealizer {
             }
             return EnvPixels(width: width, height: height,
                              isFloat: true,
+                             data: floats.withUnsafeBufferPointer {
+                                 Data(bytes: $0.baseAddress!,
+                                      count: $0.count
+                                        * MemoryLayout<Float>.size)
+                             })
+        }
+
+        /// OpenEXR equirect → linear float32 RGBA `EnvPixels` (W21) —
+        /// the same float storage the .hdr decoder produces, so the
+        /// mirror/rotate/intensity bakes and `envContents`' MDLTexture
+        /// binding apply unchanged. Primary path is
+        /// `MTKTextureLoader` (ImageIO's EXR codec under Metal,
+        /// `.SRGB: false` keeps the linear values); when it can't
+        /// produce a readable texture, `CIImage` → `CIContext` RGBAf
+        /// in extended-linear-sRGB is the fallback. Both verified to
+        /// preserve >1.0 texels. No decoder on the OS → warn-once +
+        /// nil (the env keeps whatever the stage defaults to — the
+        /// pre-W21 behavior, now logged from the loader failures).
+        func decodeEXR(_ data: Data, tag: String) -> EnvPixels? {
+            if let device = host.renderDevice(),
+               let env = exrMetalPixels(data, device: device, tag: tag) {
+                return env
+            }
+            if let env = exrCoreImagePixels(data) {
+                return env
+            }
+            host.logOnce("env.exr.\(tag).unsupported",
+                "\(tag): EXR equirect undecodable on this OS — "
+                + "MTKTextureLoader and CIImage both failed")
+            return nil
+        }
+
+        /// EXR via `MTKTextureLoader` → `getBytes` readback. Handles
+        /// the float formats ImageIO's codec emits (rgba16Float,
+        /// rgba32Float); an 8-bit delivery means the loader clamped
+        /// HDR — converted anyway and warn-onced rather than silently
+        /// flattened. `.topLeft` origin keeps row 0 = image top (the
+        /// `EnvPixels` convention). Row pitch is w·component-count·
+        /// component-size — Metal rows are tightly packed here.
+        func exrMetalPixels(_ data: Data, device: MTLDevice, tag: String)
+            -> EnvPixels?
+        {
+            guard let tex = try? MTKTextureLoader(device: device)
+                .newTexture(data: data, options: [
+                    .SRGB: NSNumber(value: false),
+                    .generateMipmaps: NSNumber(value: false),
+                    .origin: MTKTextureLoader.Origin.topLeft as NSString,
+                ]),
+                tex.textureType == .type2D,
+                tex.storageMode != .private   // getBytes needs CPU access
+            else { return nil }
+            let w = tex.width, h = tex.height
+            var floats = [Float](repeating: 0, count: w * h * 4)
+            switch tex.pixelFormat {
+            case .rgba16Float:
+                var halfs = [Float16](repeating: 0, count: w * h * 4)
+                halfs.withUnsafeMutableBytes { buf in
+                    tex.getBytes(buf.baseAddress!, bytesPerRow: w * 8,
+                                 from: MTLRegionMake2D(0, 0, w, h),
+                                 mipmapLevel: 0)
+                }
+                for i in 0..<w * h * 4 { floats[i] = Float(halfs[i]) }
+            case .rgba32Float:
+                floats.withUnsafeMutableBytes { buf in
+                    tex.getBytes(buf.baseAddress!, bytesPerRow: w * 16,
+                                 from: MTLRegionMake2D(0, 0, w, h),
+                                 mipmapLevel: 0)
+                }
+            case .rgba8Unorm, .rgba8Unorm_srgb,
+                 .bgra8Unorm, .bgra8Unorm_srgb:
+                var bytes = [UInt8](repeating: 0, count: w * h * 4)
+                bytes.withUnsafeMutableBytes { buf in
+                    tex.getBytes(buf.baseAddress!, bytesPerRow: w * 4,
+                                 from: MTLRegionMake2D(0, 0, w, h),
+                                 mipmapLevel: 0)
+                }
+                let bgra = tex.pixelFormat == .bgra8Unorm
+                    || tex.pixelFormat == .bgra8Unorm_srgb
+                host.logOnce("env.exr.\(tag).ldr",
+                    "\(tag): EXR decoded to \(tex.pixelFormat) — HDR "
+                    + "range clamped by the loader (approximation)")
+                for i in 0..<w * h {
+                    let o = i * 4
+                    floats[o]     = Float(bytes[o + (bgra ? 2 : 0)]) / 255
+                    floats[o + 1] = Float(bytes[o + 1]) / 255
+                    floats[o + 2] = Float(bytes[o + (bgra ? 0 : 2)]) / 255
+                    floats[o + 3] = Float(bytes[o + 3]) / 255
+                }
+            default:
+                host.logOnce("env.exr.\(tag).fmt.\(tex.pixelFormat.rawValue)",
+                    "\(tag): EXR decoded to unhandled pixelFormat "
+                    + "\(tex.pixelFormat)")
+                return nil
+            }
+            return EnvPixels(width: w, height: h, isFloat: true,
+                             data: floats.withUnsafeBufferPointer {
+                                 Data(bytes: $0.baseAddress!,
+                                      count: $0.count
+                                        * MemoryLayout<Float>.size)
+                             })
+        }
+
+        /// EXR via `CIImage` → `CIContext` RGBAf — the fallback when
+        /// Metal can't produce a readable texture. Rendering into
+        /// extended-linear-sRGB keeps values >1.0 (a clamped working
+        /// space would flatten HDR). `render(toBitmap:)` writes
+        /// top-down rows, matching the `EnvPixels` convention.
+        func exrCoreImagePixels(_ data: Data) -> EnvPixels? {
+            guard let ci = CIImage(data: data),
+                  ci.extent.width > 0, ci.extent.height > 0,
+                  let space = CGColorSpace(
+                      name: CGColorSpace.extendedLinearSRGB)
+            else { return nil }
+            let w = Int(ci.extent.width.rounded())
+            let h = Int(ci.extent.height.rounded())
+            // The render bounds are rect-anchored — move a non-zero
+            // extent origin to (0,0) so the whole image renders.
+            let moved = ci.extent.origin == .zero ? ci :
+                ci.transformed(by: CGAffineTransform(
+                    translationX: -ci.extent.minX, y: -ci.extent.minY))
+            var floats = [Float](repeating: 0, count: w * h * 4)
+            floats.withUnsafeMutableBytes { buf in
+                CIContext().render(
+                    moved, toBitmap: buf.baseAddress!,
+                    rowBytes: w * 4 * MemoryLayout<Float>.size,
+                    bounds: CGRect(x: 0, y: 0, width: w, height: h),
+                    format: .RGBAf, colorSpace: space)
+            }
+            return EnvPixels(width: w, height: h, isFloat: true,
                              data: floats.withUnsafeBufferPointer {
                                  Data(bytes: $0.baseAddress!,
                                       count: $0.count
