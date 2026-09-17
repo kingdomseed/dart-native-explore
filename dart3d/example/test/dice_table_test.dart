@@ -313,6 +313,28 @@ void main() {
         verts.bytes!,
       ).getFloat32(8 * 4, Endian.little);
       expect(uv1u, closeTo(0.19, 1e-6));
+
+      // KTX2 lane: the quad's texture payload is a real bundled .ktx2
+      // (the test VM takes the non-iOS asset pick — ETC1S).
+      final ktx2 = materialOf('materials.ktx2').properties;
+      final ktx2Tex =
+          doc.resources[(ktx2['baseColorTexture'] as ResourceRefValue).id]!
+              as TextureResource;
+      final ktx2Payload = doc.payload(ktx2Tex.payload!)!;
+      expect(ktx2Payload.format, 'ktx2');
+      expect(ktx2Payload.bytes!.length, greaterThan(80));
+      // KTX2 magic «KTX 20».
+      expect(ktx2Payload.bytes!.sublist(1, 7), 'KTX 20'.codeUnits);
+
+      // HDR env lane: the payload environment resolves to a real
+      // equirect file (hdr on this host — non-iOS pick).
+      final envRes = doc.resources[doc.stage.environmentRef]!
+          as EnvironmentResource;
+      expect(envRes.environment, isA<PayloadEnvironment>());
+      final envPayload =
+          doc.payload((envRes.environment as PayloadEnvironment).payload)!;
+      expect(envPayload.format, 'hdr');
+      expect(envPayload.bytes, isNotEmpty);
     });
   });
 }
