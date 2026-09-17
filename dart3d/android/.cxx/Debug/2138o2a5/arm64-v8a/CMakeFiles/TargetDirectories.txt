@@ -1,0 +1,3 @@
+/Users/jasonholt/repos/dart-native-explore/dart3d/android/.cxx/Debug/2138o2a5/arm64-v8a/CMakeFiles/dart3d_jni.dir
+/Users/jasonholt/repos/dart-native-explore/dart3d/android/.cxx/Debug/2138o2a5/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/jasonholt/repos/dart-native-explore/dart3d/android/.cxx/Debug/2138o2a5/arm64-v8a/CMakeFiles/rebuild_cache.dir

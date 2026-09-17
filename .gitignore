@@ -1,0 +1,37 @@
+# Nested repositories — tracked in their own remotes
+/dartnative/
+/mythic_gme_apps/
+
+# Dart / build output
+.dart_tool/
+**/build/
+.packages
+*.iml
+
+# Android / Gradle
+.gradle/
+**/local.properties
+**/android/.idea/
+*.keystore
+*.jks
+key.properties
+
+# iOS / Xcode
+**/Pods/
+**/.symlinks/
+**/xcuserdata/
+**/DerivedData/
+*.mobileprovision
+*.p12
+*.p8
+GoogleService-Info.plist
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Secrets
+.env
+.env.*

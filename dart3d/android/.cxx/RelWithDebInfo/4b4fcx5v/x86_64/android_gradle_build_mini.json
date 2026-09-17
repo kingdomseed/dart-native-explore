@@ -1,0 +1,27 @@
+{
+  "buildFiles": [
+    "/Users/jasonholt/repos/dart-native-explore/dart3d/android/src/main/cpp/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/jasonholt/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/jasonholt/repos/dart-native-explore/dart3d/android/.cxx/RelWithDebInfo/4b4fcx5v/x86_64",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/jasonholt/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/jasonholt/repos/dart-native-explore/dart3d/android/.cxx/RelWithDebInfo/4b4fcx5v/x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "dart3d_jni::@6890427a1f51a3e7e1df": {
+      "artifactName": "dart3d_jni",
+      "abi": "x86_64",
+      "output": "/Users/jasonholt/repos/dart-native-explore/dart3d/example/build/dart3d/intermediates/cxx/RelWithDebInfo/4b4fcx5v/obj/x86_64/libdart3d_jni.so",
+      "runtimeFiles": []
+    }
+  }
+}

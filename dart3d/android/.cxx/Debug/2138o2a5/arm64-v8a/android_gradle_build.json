@@ -1,0 +1,38 @@
+{
+  "buildFiles": [
+    "/Users/jasonholt/repos/dart-native-explore/dart3d/android/src/main/cpp/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/jasonholt/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/jasonholt/repos/dart-native-explore/dart3d/android/.cxx/Debug/2138o2a5/arm64-v8a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/jasonholt/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/jasonholt/repos/dart-native-explore/dart3d/android/.cxx/Debug/2138o2a5/arm64-v8a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "dart3d_jni::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "dart3d_jni",
+      "output": "/Users/jasonholt/repos/dart-native-explore/dart3d/example/build/dart3d/intermediates/cxx/Debug/2138o2a5/obj/arm64-v8a/libdart3d_jni.so",
+      "runtimeFiles": []
+    }
+  },
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "/Users/jasonholt/Library/Android/sdk/ndk/28.2.13676358/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang.lld",
+      "cppCompilerExecutable": "/Users/jasonholt/Library/Android/sdk/ndk/28.2.13676358/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++.lld"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}
