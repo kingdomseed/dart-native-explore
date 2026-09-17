@@ -1,0 +1,3 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 3D scene rendering requires no special permissions. -->
+</manifest>

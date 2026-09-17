@@ -1,0 +1,10 @@
+09-15 22:33:50.475 12119 12119 I dart3d  : upsertResource texture 706349423851995157: rebound 2 consumer(s)
+09-15 22:33:52.517 12119 12119 I dart3d  : cmd removeNode
+09-15 22:33:52.518 12119 12119 I dart3d  : cmd removeNode
+09-15 22:33:52.518 12119 12119 W dart3d  : removeNode: node 706349423851995215 not live — no-op
+09-15 22:33:52.518 12119 12119 I dart3d  : cmd removeNode
+09-15 22:33:52.518 12119 12119 W dart3d  : removeNode: node 706349423851995216 not live — no-op
+09-15 22:33:52.518 12119 12119 I dart3d  : geometry 706349423851995161: rebuilt, rebound 1 consumer(s)
+09-15 22:33:52.519 12119 12119 I dart3d  : geometry 706349423851995161: rebuilt, rebound 1 consumer(s)
+09-15 22:33:52.520 12119 12119 I dart3d  : geometry 706349423851995201: rebuilt, rebound 1 consumer(s)
+09-15 22:33:52.523 12119 12119 W dart3d  : updateNode: node 706349423851995215 not live — no-op

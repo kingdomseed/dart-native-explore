@@ -1,0 +1,35 @@
+name: dart3d
+description: >
+  General-purpose 3D scene plugin for DartNative (iOS + Android).
+  Renders the engine-agnostic .fscene document model on native
+  renderers — SceneKit on iOS, Filament + Jolt on Android — with
+  scene updates delivered over PluginMutation bytes.
+version: 0.1.0
+publish_to: 'none'
+
+environment:
+  sdk: ^3.9.0-0
+
+dependencies:
+  dartnative: ^1.0.0
+  ffi: ^2.1.0
+  scene: ^0.3.0
+  vector_math: ^2.1.4
+
+# dartnative plugin registrant — consumed by the SDK's injectPlugins
+# pass on every `dn pub get`.
+dartnative:
+  plugin:
+    platforms:
+      ios:
+        ffiPlugin: true
+      android:
+        # Declared with pluginClass (not ffiPlugin) on Android, so the
+        # plugin class loads the native library and JNI_OnLoad fires.
+        package: com.jasonholtdigital.dart3d
+        pluginClass: DartNativeDart3dPlugin
+  registrant:
+    imports:
+      - package:dart3d/dart3d.dart
+    calls:
+      - Dart3dFFIBindings.loadSymbols();

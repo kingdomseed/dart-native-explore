@@ -1,0 +1,98 @@
+// dart3d Android library module.
+// Mirrors the iOS surface in ios/Classes/.
+
+group 'com.jasonholtdigital.dart3d'
+version '0.1-SNAPSHOT'
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.11.1'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0'
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+android {
+    ndkVersion = "28.2.13676358" // 16 KB page-size compliance (Play/Android 15+)
+    namespace 'com.jasonholtdigital.dart3d'
+    compileSdkVersion 35
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    // dart3d_jni: the DartNative dispatcher bridge — a tiny shim that
+    // stores the Dart event callback pointer (same pattern as
+    // Dart3dSetDispatcher on iOS) and fires physics events into Dart.
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+            version "3.22.1"
+        }
+    }
+
+    defaultConfig {
+        minSdkVersion 26
+        // jolt-jni Custom* listener methods are JNI-looked-up by name —
+        // shipped to consumers so app-side R8 doesn't strip them.
+        consumerProguardFiles 'proguard-rules.pro'
+        externalNativeBuild {
+            cmake {
+                abiFilters "arm64-v8a", "x86_64"
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.12.0'
+
+    // Renderer: Filament (plan-locked). filament-utils brings UiHelper
+    // (surface/swapchain lifecycle) and math types; filamat compiles the
+    // lit material from a source string at startup — self-contained, no
+    // matc toolchain step.
+    implementation 'com.google.android.filament:filament-android:1.71.6'
+    implementation 'com.google.android.filament:filament-utils-android:1.71.6'
+    implementation 'com.google.android.filament:filamat-android:1.71.6'
+
+    // Physics: Jolt via stephengold's JNI bindings (plan-locked).
+    // The upstream Android AARs split oddly: SpDebug carries the JVM
+    // library + debug natives; SpRelease carries release natives ONLY
+    // (its classes.jar holds compute shaders, no .class files — checked
+    // on 6.0.0 and 5.2.0). The JVM API is platform-independent and also
+    // published under the eight desktop artifact names, so we pair the
+    // Windows64-named API jar with the SpRelease natives AAR — release
+    // physics without hauling debug .so files into the APK.
+    implementation 'com.github.stephengold:jolt-jni-Windows64:6.0.0'
+    implementation(
+        group: "com.github.stephengold",
+        name: "jolt-jni-Android",
+        version: "6.0.0",
+        classifier: "SpRelease",
+        ext: "aar"
+    )
+
+    compileOnly project(':dartnative_android')
+
+    // MeshFactory is pure JVM Kotlin — its vertex-layout invariants are
+    // covered by src/test with no device or engine artifacts needed.
+    // The real org.json (not android.jar's not-mocked stubs) lets the
+    // wire-shape tests exercise D3Wire helpers.
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.json:json:20240303'
+}

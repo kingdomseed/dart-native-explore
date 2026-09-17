@@ -1,0 +1,5 @@
+name: scene_probe
+environment:
+  sdk: ^3.10.0
+dependencies:
+  scene: ^0.3.0

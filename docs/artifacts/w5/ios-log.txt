@@ -1,0 +1,8 @@
+2026-09-15 22:30:35.442588+0200 0xc394d4   Default     0x0                  21566  0    Runner: (dart3d) [com.jasonholtdigital.dart3d:scene] mesh node 'missingTexQuad': geometry unresolved
+2026-09-15 22:30:35.528320+0200 0xc394d4   Default     0x0                  21566  0    Runner: (dart3d) [com.jasonholtdigital.dart3d:scene] mesh node 'missingTexQuad': geometry unresolved
+2026-09-15 22:30:35.541569+0200 0xc394d4   Default     0x0                  21566  0    Runner: (dart3d) [com.jasonholtdigital.dart3d:scene] mesh node 'missingTexQuad': geometry unresolved
+2026-09-15 22:30:35.547581+0200 0xc394d4   Default     0x0                  21566  0    Runner: (dart3d) [com.jasonholtdigital.dart3d:scene] mesh node 'missingTexQuad': geometry unresolved
+2026-09-15 22:30:35.552945+0200 0xc394d4   Default     0x0                  21566  0    Runner: (dart3d) [com.jasonholtdigital.dart3d:scene] mesh node 'missingTexQuad': geometry unresolved
+2026-09-15 22:30:43.292207+0200 0xc394d4   Default     0x0                  21566  0    Runner: (dart3d) [com.jasonholtdigital.dart3d:scene] removeNode on missing node 5541544655599960143; ignoring
+2026-09-15 22:30:43.292250+0200 0xc394d4   Default     0x0                  21566  0    Runner: (dart3d) [com.jasonholtdigital.dart3d:scene] removeNode on missing node 5541544655599960144; ignoring
+2026-09-15 22:30:43.308332+0200 0xc394d4   Default     0x0                  21566  0    Runner: (dart3d) [com.jasonholtdigital.dart3d:scene] updateNode on missing node 5541544655599960143; ignoring

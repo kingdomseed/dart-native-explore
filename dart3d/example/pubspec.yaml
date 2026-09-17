@@ -1,0 +1,69 @@
+name: dart3d_example
+description: "A new DartNative project."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.12.0-192.0.dev
+
+# Plain version deps: `dn pub get` resolves DartNative packages from your
+# installed SDK (closed resolution) — no registry setup, works offline.
+dependencies:
+  dartnative: ^1.0.0
+  dartnative_ios: ^1.0.0
+  dartnative_android: ^1.0.0
+  vector_math: ^2.1.4
+  dart3d:
+    path: ../
+  # Skia GPU canvas: SkSL runtime shaders and rich shaped text. Adds about
+  # 9 MB to an iPhone app; on Android the library is already in the platform
+  # binding. For shapes, paths and charts use CustomPaint, which is native
+  # and free. Uncomment here, then in lib/main.dart:
+  #
+  #   import 'package:dartnative_skia/dartnative_skia.dart';
+  #
+  #   void main() {
+  #     DartNativePluginRegistrant.registerAll();
+  #     registerSkiaFactories();          // without this a CanvasSurface throws
+  #     runApp(const HomeScreen());
+  #   }
+  #
+  # dartnative_skia: ^1.0.0
+
+dev_dependencies:
+  lints: ^6.0.0
+  image: ^4.0.0
+  test: ^1.25.0
+
+# Which Skia binary ships with the app. Pick one; see the Skia page.
+#
+#   bare  canvas, SkSL shaders and Latin text        about 4 MB on iPhone
+#   full  bare, plus shaped text drawn inside a      about 9 MB on iPhone
+#         Skia canvas: Arabic, CJK, right-to-left
+#
+# dartnative_skia:
+#   variant: bare
+#   # variant: full
+
+dartnative:
+  assets:
+    - assets/dn-logo.png
+    - assets/dice/scene.d4.dbe53cde.fsceneb
+    - assets/dice/scene.d6.dbe505b8.fsceneb
+    - assets/dice/scene.d8.dbe51f72.fsceneb
+    - assets/dice/scene.d10t.862039c2.fsceneb
+    - assets/dice/scene.d10u.86203b0d.fsceneb
+    - assets/dice/scene.d12.a5cbecd0.fsceneb
+    - assets/dice/scene.d20.a5fdb0b1.fsceneb
+    - assets/dice/dice_faces.json
+    - assets/showcase/dash.fsceneb
+    - assets/showcase/fcar.fsceneb
+    - assets/showcase/flutter_logo_baked.fsceneb
+    - assets/showcase/two_triangles.fsceneb
+    - assets/showcase/cube.fscene
+    - assets/showcase/playground.fscene
+    - assets/showcase/prefab_demo.fscene
+    - assets/showcase/tree_prefab.fscene
+
+# Branded launch splash + app icon: add the dartnative_splash plugin from
+# dartpub.dev, then see tool/generate_app_assets.dart.
