@@ -13,21 +13,24 @@ import kotlin.math.sqrt
  * `.fscene` geometry → Filament vertex/index data.
  *
  * Procedural generators are authored in native right-handed space and emit
- * `[position3 | tangent-frame-quaternion4 | uv0-2 | color4]` — the same
- * 13-float record upstream payload layouts decode to, so textured materials
- * bind identically on procedural and payload meshes.
+ * `[position3 | tangent-frame-quaternion4 | uv0-2 | color4 | uv1-2]` — the
+ * same 15-float record upstream payload layouts decode to, so textured
+ * materials bind identically on procedural and payload meshes. uv1 rides
+ * the record's tail (W21: `texCoord` selects the UV set per texture
+ * slot); wire layouts without a second UV channel zero-fill it, matching
+ * upstream's `pack*` fills.
  */
 object MeshFactory {
 
-    // Procedural verts: [pos3 | tangent-quat4 | uv2 | color4] — the
-    // same 13-float record the payload path decodes, so textured
-    // materials (UV0) and vertex-color variants bind on procedural
+    // Procedural verts: [pos3 | tangent-quat4 | uv0-2 | color4 | uv1-2]
+    // — the same 15-float record the payload path decodes, so textured
+    // materials (UV0/UV1) and vertex-color variants bind on procedural
     // meshes the way they do on payload meshes.
-    const val FLOATS_PER_VERTEX = 13
-    const val PAYLOAD_FLOATS_PER_VERTEX = 13
+    const val FLOATS_PER_VERTEX = 15
+    const val PAYLOAD_FLOATS_PER_VERTEX = 15
     const val PROCEDURAL_VERTEX_STRIDE_BYTES = FLOATS_PER_VERTEX * 4
     const val PAYLOAD_VERTEX_STRIDE_BYTES = PAYLOAD_FLOATS_PER_VERTEX * 4
-    // Skinned payload repack: the 52-byte base record plus
+    // Skinned payload repack: the 60-byte base record plus
     // `[joints u16x4 | weights f32x4]` (8 + 16 bytes).
     const val PAYLOAD_SKINNED_VERTEX_STRIDE_BYTES =
         PAYLOAD_VERTEX_STRIDE_BYTES + 24
@@ -86,6 +89,9 @@ object MeshFactory {
         val form: LayoutForm,
         val hasTangents: Boolean,
         val skinned: Boolean,
+        // Wire layouts carrying a TEXCOORD_1 channel (`*_uv1_tangent`).
+        // Absent → the decoded record's uv1 tail is zero-filled.
+        val hasUv1: Boolean = false,
     )
 
     private data class VertexFields(
@@ -94,6 +100,8 @@ object MeshFactory {
         val u: Float, val v: Float,
         val r: Float, val g: Float, val b: Float, val a: Float,
         val tx: Float, val ty: Float, val tz: Float, val tw: Float,
+        // TEXCOORD_1 — only the `*_uv1_tangent` layouts carry it.
+        val u1: Float = 0f, val v1: Float = 0f,
         // JOINTS_0/WEIGHTS_0 — wire-f32 on the skinned layouts; null
         // when the layout carries neither.
         val joints: IntArray? = null,
@@ -102,11 +110,14 @@ object MeshFactory {
 
     private fun layoutInfo(layout: String?): LayoutInfo = when (layout ?: "unskinned") {
         "unskinned_uv1_tangent" -> LayoutInfo(
-            "unskinned_uv1_tangent", 72, LayoutForm.INTERLEAVED, true, false)
+            "unskinned_uv1_tangent", 72, LayoutForm.INTERLEAVED, true,
+            false, hasUv1 = true)
         "unskinned_soa_uv1_tangent" -> LayoutInfo(
-            "unskinned_soa_uv1_tangent", 72, LayoutForm.SOA, true, false)
+            "unskinned_soa_uv1_tangent", 72, LayoutForm.SOA, true,
+            false, hasUv1 = true)
         "skinned_uv1_tangent" -> LayoutInfo(
-            "skinned_uv1_tangent", 104, LayoutForm.INTERLEAVED, true, true)
+            "skinned_uv1_tangent", 104, LayoutForm.INTERLEAVED, true,
+            true, hasUv1 = true)
         "unskinned" -> LayoutInfo(
             "unskinned", 48, LayoutForm.INTERLEAVED, false, false)
         "unskinned_soa" -> LayoutInfo(
@@ -255,7 +266,7 @@ object MeshFactory {
         val vertexCount = vertexBytes.size / info.strideBytes
         val vertices = if (info.form == LayoutForm.P3T4) {
             // p3t4's wire record is [pos3 | quat4] in native space
-            // (no z-mirror). Expand into the 52-byte record with
+            // (no z-mirror). Expand into the 60-byte record with
             // fabricated [0,0] uvs + white color — the same fills
             // iOS's decodeVertexPayload p3t4 branch appends.
             val input = ByteBuffer.wrap(vertexBytes)
@@ -267,8 +278,9 @@ object MeshFactory {
                         for (c in 0 until 7) {
                             out.putFloat(input.getFloat(base + c * 4))
                         }
-                        out.putFloat(0f); out.putFloat(0f)
-                        repeat(4) { out.putFloat(1f) }
+                        out.putFloat(0f); out.putFloat(0f)   // uv0
+                        repeat(4) { out.putFloat(1f) }       // color
+                        out.putFloat(0f); out.putFloat(0f)   // uv1
                     }
                     out.flip()
                 }
@@ -405,6 +417,10 @@ object MeshFactory {
             output.putFloat(v.g)
             output.putFloat(v.b)
             output.putFloat(v.a)
+            // uv1 tails the base record — zero when the wire layout
+            // lacks a second UV channel (upstream's pack* fill).
+            output.putFloat(v.u1)
+            output.putFloat(v.v1)
             if (info.skinned) {
                 // BONE_INDICES is an integer attribute (the shader
                 // reads uvec4) — the wire's whole-valued f32s convert
@@ -429,6 +445,8 @@ object MeshFactory {
             val pos = 0
             val normal = count * 3
             val uv0 = count * 6
+            // `unskinned_soa_uv1_tangent` slabs: pos|n|uv0|uv1|color|tan
+            val uv1 = count * 8
             val color = if (info.hasTangents) count * 10 else count * 8
             val tangent = count * 14
             return VertexFields(
@@ -441,6 +459,8 @@ object MeshFactory {
                 if (info.hasTangents) f(input, tangent + i * 4 + 1) else 0f,
                 if (info.hasTangents) f(input, tangent + i * 4 + 2) else 0f,
                 if (info.hasTangents) f(input, tangent + i * 4 + 3) else 1f,
+                u1 = if (info.hasUv1) f(input, uv1 + i * 2) else 0f,
+                v1 = if (info.hasUv1) f(input, uv1 + i * 2 + 1) else 0f,
             )
         }
         val base = i * (info.strideBytes / 4)
@@ -462,6 +482,10 @@ object MeshFactory {
             if (info.hasTangents) f(input, tangent + 1) else 0f,
             if (info.hasTangents) f(input, tangent + 2) else 0f,
             if (info.hasTangents) f(input, tangent + 3) else 1f,
+            // Interleaved uv1 sits between uv0 and color (floats 8-9)
+            // on the *_uv1_tangent layouts; zero otherwise.
+            u1 = if (info.hasUv1) f(input, base + 8) else 0f,
+            v1 = if (info.hasUv1) f(input, base + 9) else 0f,
             joints = if (jointBase >= 0) IntArray(4) {
                 // Whole-valued f32s → integer indices; iOS clamps
                 // negatives away and rounds (appendJoints).
@@ -671,9 +695,10 @@ object MeshFactory {
                 verts.add(f.c[2] + f.t[2] * su * eu + f.b[2] * sv * ev)
                 verts.addAll(q.toList())
                 // Per-face [0,1]² UVs — SCNBox maps each face the
-                // same way; white vertex color = neutral.
+                // same way; white vertex color = neutral; no uv1.
                 verts.add((su + 1f) / 2f); verts.add((sv + 1f) / 2f)
                 for (k in 0 until 4) verts.add(1f)
+                verts.add(0f); verts.add(0f)
             }
             idx.addAll(listOf(base, base + 1, base + 2, base, base + 2, base + 3))
         }
@@ -706,9 +731,10 @@ object MeshFactory {
                     packTangentFrame(tx, ty, tz, bx, by, bz, nx, ny, nz).toList()
                 )
                 // Spherical UVs — u along the sector, v down the ring
-                // (SCNSphere convention); white vertex color.
+                // (SCNSphere convention); white vertex color; no uv1.
                 verts.add(u); verts.add(v)
                 for (k in 0 until 4) verts.add(1f)
+                verts.add(0f); verts.add(0f)
             }
         }
         for (r in 0 until rings) {
@@ -743,6 +769,7 @@ object MeshFactory {
             verts.addAll(corners[i].toList()); verts.addAll(q.toList())
             verts.addAll(uvs[i].toList())
             for (k in 0 until 4) verts.add(1f)
+            verts.add(0f); verts.add(0f)
         }
         val idx = listOf(0, 1, 2, 0, 2, 3)
         return MeshData(
@@ -772,10 +799,12 @@ object MeshFactory {
                 verts.addAll(
                     packTangentFrame(tx, ty, tz, bx, by, bz, nx, ny, nz).toList()
                 )
-                // u around the ring, v along the tube; white color.
+                // u around the ring, v along the tube; white color;
+                // no uv1.
                 verts.add(u / (2f * PI.toFloat()))
                 verts.add(v / (2f * PI.toFloat()))
                 for (k in 0 until 4) verts.add(1f)
+                verts.add(0f); verts.add(0f)
             }
         }
         for (r in 0 until rings) {
