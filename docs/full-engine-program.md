@@ -14,8 +14,8 @@ Tests alone are not sufficient verification. A PR is verified only when its unit
 
 ### Arm the program
 
-- [ ] State the protocol and this plan to the operator, then stop. Start execution only on her explicit go.
-- [ ] On her go, write the goal line into this file with this exact text. "docs/full-engine-program.md, workstreams W15 through W34 in the dependency order below, the verification rule above, the operator lands each PR, done when every box carries evidence." This line is the playbook's `/goal` marker carried as a plan line.
+- [x] State the protocol and this plan to the operator, then stop. Start execution only on her explicit go. (Go given 2026-09-17: "Approved. Good luck Commander.")
+- [x] On her go, write the goal line into this file with this exact text. "docs/full-engine-program.md, workstreams W15 through W34 in the dependency order below, the verification rule above, the operator lands each PR, done when every box carries evidence." This line is the playbook's `/goal` marker carried as a plan line.
 - [ ] Read these from trunk at program start. Re-read them at every tick. When pstack is not vendored in this repo, read them from the installed plugin directory at `~/.local/share/devin/cli/plugins/cache/github.com_kingdomseed_pstack-devin_plugins_pstack-26c983c8/0.15.2/` instead of `git show origin/main:`.
   - [ ] `git show origin/main:pstack/skills/poteto-mode/playbooks/orchestrate.md`
   - [ ] `git show origin/main:pstack/skills/swarm/SKILL.md`
