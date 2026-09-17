@@ -2,7 +2,6 @@ import CoreImage
 import Foundation
 import Metal
 import MetalKit
-import ModelIO
 import SceneKit
 import simd
 import UIKit
@@ -2149,6 +2148,30 @@ enum FsceneRealizer {
                            intent: .defaultIntent)
         }
 
+        /// Float RGBA CGImage for HDR environment pixels — 32bpc/128bpp
+        /// linear sRGB. `floatComponents` requires premultiplied alpha;
+        /// env pixels are opaque, so the flag is a no-op on the data.
+        /// Preferred over `MDLTexture` for env contents: the CGImage
+        /// path keeps full float range through SceneKit's radiance
+        /// conversion and needs no extra framework surface.
+        func rgbaFloatCGImage(_ data: Data, width w: Int, height h: Int)
+            -> CGImage?
+        {
+            guard let provider = CGDataProvider(data: data as CFData),
+                  let space = CGColorSpace(name: CGColorSpace.linearSRGB)
+            else { return nil }
+            let info = CGBitmapInfo(rawValue:
+                CGImageAlphaInfo.premultipliedLast.rawValue
+                | CGBitmapInfo.floatComponents.rawValue
+                | CGBitmapInfo.byteOrder32Little.rawValue)
+            return CGImage(width: w, height: h,
+                           bitsPerComponent: 32, bitsPerPixel: 128,
+                           bytesPerRow: w * 16, space: space,
+                           bitmapInfo: info, provider: provider,
+                           decode: nil, shouldInterpolate: true,
+                           intent: .defaultIntent)
+        }
+
         /// One-channel gray image for the metallic/roughness split —
         /// scalar data, so linear gray (no sRGB decode).
         func grayCGImage(_ data: Data, width w: Int, height h: Int)
@@ -4078,8 +4101,8 @@ enum FsceneRealizer {
 
         /// OpenEXR equirect → linear float32 RGBA `EnvPixels` (W21) —
         /// the same float storage the .hdr decoder produces, so the
-        /// mirror/rotate/intensity bakes and `envContents`' MDLTexture
-        /// binding apply unchanged. Primary path is
+        /// mirror/rotate/intensity bakes and `envContents`' float
+        /// CGImage binding apply unchanged. Primary path is
         /// `MTKTextureLoader` (ImageIO's EXR codec under Metal,
         /// `.SRGB: false` keeps the linear values); when it can't
         /// produce a readable texture, `CIImage` → `CIContext` RGBAf
@@ -4211,22 +4234,107 @@ enum FsceneRealizer {
 
         // MARK: Environment pixel transforms
 
-        /// The object SceneKit binds: `UIImage` for sRGB8 sources, an
-        /// `MDLTexture` (linear float) for HDR — both equirect, both
-        /// cube-converted internally by SceneKit.
+        /// The object SceneKit binds as env contents: HDR sources go
+        /// through `rgbaFloatCGImage`, LDR through `rgbaCGImage` — both
+        /// equirect, both cube-converted internally by SceneKit.
+        /// Sources below the floor size are bilinear-upscaled first so
+        /// the radiance chain has enough mip levels.
         func envContents(_ env: EnvPixels) -> Any? {
+            let env = upscaledForRadiance(env)
             if env.isFloat {
-                return MDLTexture(
-                    data: env.data, topLeftOrigin: true, name: nil,
-                    dimensions: vector_int2(Int32(env.width),
-                                            Int32(env.height)),
-                    rowStride: env.width * 4 * MemoryLayout<Float>.size,
-                    channelCount: 4, channelEncoding: .float32,
-                    isCube: false)
+                return rgbaFloatCGImage(env.data, width: env.width,
+                                        height: env.height)
             }
             return rgbaCGImage(env.data, width: env.width,
                                height: env.height, content: "color")
                 .map { UIImage(cgImage: $0) }
+        }
+
+        /// Bilinear upsample to the smallest env size verified to pass
+        /// SceneKit's radiance chain. Below it (observed at 4×2 and
+        /// 8×4) SceneKit builds the radiance texture with one mip level
+        /// fewer than the view range it then requests — Metal aborts.
+        /// 256×128 matches the studio env's proven-good size; the
+        /// upscale is a no-op for sources already at or above it.
+        func upscaledForRadiance(_ env: EnvPixels) -> EnvPixels {
+            let minW = 256, minH = 128
+            guard env.width < minW || env.height < minH else {
+                return env
+            }
+            let w = max(env.width, minW), h = max(env.height, minH)
+            host.logOnce(
+                "env.upscale",
+                "environment \(env.width)x\(env.height) upscaled to "
+                    + "\(w)x\(h): below the radiance mip floor")
+            let scaleX = Double(env.width) / Double(w)
+            let scaleY = Double(env.height) / Double(h)
+            var out = Data(count: w * h * 4 * (env.isFloat ? 4 : 1))
+            env.data.withUnsafeBytes { src in
+                out.withUnsafeMutableBytes { dst in
+                    if env.isFloat {
+                        let s = src.bindMemory(to: Float.self)
+                        let d = dst.bindMemory(to: Float.self)
+                        for y in 0..<h {
+                            for x in 0..<w {
+                                // Bilinear taps at pixel centers.
+                                let fx = (Double(x) + 0.5) * scaleX - 0.5
+                                let fy = (Double(y) + 0.5) * scaleY - 0.5
+                                let x0 = max(0, Int(fx.rounded(.down)))
+                                let y0 = max(0, Int(fy.rounded(.down)))
+                                let x1 = min(x0 + 1, env.width - 1)
+                                let y1 = min(y0 + 1, env.height - 1)
+                                let tx = Float(max(0, fx - Double(x0)))
+                                let ty = Float(max(0, fy - Double(y0)))
+                                let i00 = (y0 * env.width + x0) * 4
+                                let i10 = (y0 * env.width + x1) * 4
+                                let i01 = (y1 * env.width + x0) * 4
+                                let i11 = (y1 * env.width + x1) * 4
+                                for c in 0..<4 {
+                                    let a = s[i00 + c]
+                                        + (s[i10 + c] - s[i00 + c]) * tx
+                                    let b = s[i01 + c]
+                                        + (s[i11 + c] - s[i01 + c]) * tx
+                                    d[(y * w + x) * 4 + c] =
+                                        a + (b - a) * ty
+                                }
+                            }
+                        }
+                    } else {
+                        let s = src.bindMemory(to: UInt8.self)
+                        let d = dst.bindMemory(to: UInt8.self)
+                        for y in 0..<h {
+                            for x in 0..<w {
+                                let fx = (Double(x) + 0.5) * scaleX - 0.5
+                                let fy = (Double(y) + 0.5) * scaleY - 0.5
+                                let x0 = max(0, Int(fx.rounded(.down)))
+                                let y0 = max(0, Int(fy.rounded(.down)))
+                                let x1 = min(x0 + 1, env.width - 1)
+                                let y1 = min(y0 + 1, env.height - 1)
+                                let tx = max(0, fx - Double(x0))
+                                let ty = max(0, fy - Double(y0))
+                                let i00 = (y0 * env.width + x0) * 4
+                                let i10 = (y0 * env.width + x1) * 4
+                                let i01 = (y1 * env.width + x0) * 4
+                                let i11 = (y1 * env.width + x1) * 4
+                                for c in 0..<4 {
+                                    let a = Double(s[i00 + c])
+                                        + (Double(s[i10 + c])
+                                            - Double(s[i00 + c])) * tx
+                                    let b = Double(s[i01 + c])
+                                        + (Double(s[i11 + c])
+                                            - Double(s[i01 + c])) * tx
+                                    let v = (a + (b - a) * ty)
+                                        .rounded()
+                                    d[(y * w + x) * 4 + c] =
+                                        UInt8(min(255, max(0, v)))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return EnvPixels(width: w, height: h,
+                             isFloat: env.isFloat, data: out)
         }
 
         /// Bakes the LH→RH z-mirror plus `environmentRotationY` — both
