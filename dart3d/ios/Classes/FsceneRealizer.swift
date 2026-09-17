@@ -1255,9 +1255,13 @@ enum FsceneRealizer {
             switch slot {
             case "baseColorTexture":
                 if let tex {
-                    m.diffuse.contents = bakeFactor(
-                        tex, color: d3ColorComponents(props["baseColor"]),
-                        rgbOnly: false) ?? tex.contents
+                    bindTextureContents(
+                        m.diffuse, tex: tex,
+                        baked: bakeFactor(
+                            tex,
+                            color: d3ColorComponents(props["baseColor"]),
+                            rgbOnly: false),
+                        logKey: "material.\(materialKey).diffuse.mips")
                     applyContentsTransform(
                         m.diffuse, transform, materialKey: materialKey,
                         slot: slot)
@@ -1322,9 +1326,14 @@ enum FsceneRealizer {
                 if let tex {
                     // The emissive factor default is black — a lone
                     // emissiveTexture emits nothing (glTF semantics).
-                    m.emission.contents = bakeFactor(
-                        tex, color: d3ColorComponents(props["emissive"])
-                            ?? [0, 0, 0, 1], rgbOnly: true) ?? tex.contents
+                    bindTextureContents(
+                        m.emission, tex: tex,
+                        baked: bakeFactor(
+                            tex,
+                            color: d3ColorComponents(props["emissive"])
+                                ?? [0, 0, 0, 1],
+                            rgbOnly: true),
+                        logKey: "material.\(materialKey).emission.mips")
                     applyContentsTransform(
                         m.emission, transform, materialKey: materialKey,
                         slot: slot)
@@ -1336,6 +1345,30 @@ enum FsceneRealizer {
                 }
             default:
                 break
+            }
+        }
+
+        /// Binds a texture's contents on `prop` (W21). An unbaked
+        /// bind takes `tex.contents` — the MTLTexture when one was
+        /// uploaded (a KTX2 decode, or the sRGB renormalized mip
+        /// chain `color` contents get) so the GPU chain is what
+        /// samples. A `baked` factor×texture image re-uploads
+        /// through `mipRenormalizedTexture` so the slot keeps the
+        /// renorm semantic; a failed upload keeps the UIImage and
+        /// SceneKit's own chain. `mipFilter` pins `.linear` whenever
+        /// a GPU chain backs the slot (a mipmapped MTLTexture with
+        /// `mipFilter == .none` would alias at distance).
+        func bindTextureContents(_ prop: SCNMaterialProperty,
+                                 tex: DecodedTexture, baked: UIImage?,
+                                 logKey: String) {
+            if let baked {
+                prop.contents = mipRenormalizedTexture(
+                    baked, srgb: tex.content == "color",
+                    logKey: logKey) ?? baked
+                prop.mipFilter = .linear
+            } else {
+                prop.contents = tex.contents
+                if tex.mtlTexture != nil { prop.mipFilter = .linear }
             }
         }
 
@@ -1545,6 +1578,299 @@ enum FsceneRealizer {
                 + "(\(bytes) B in \(String(format: "%.2f", ms)) ms)")
         }
 
+        /// W21 mip renormalization for sRGB sources that ship without
+        /// a chain (`rgba8`, encoded, `ref`): `MTKTextureLoader`
+        /// uploads the image with `generateMipmaps` — on the
+        /// `*_srgb` pixel format Metal produces, each downsample
+        /// filters the decoded (linear) values and re-encodes, which
+        /// is upstream's renormalizing-mip semantic. SceneKit's own
+        /// implicit chain makes no sRGB-filtering guarantee, so the
+        /// uploaded texture is what material slots bind. Returns nil
+        /// when Metal can't take the image — the caller keeps the
+        /// `UIImage` contents and SceneKit generates its own chain;
+        /// `logKey` scopes the warn-once.
+        func mipRenormalizedTexture(_ image: UIImage, srgb: Bool = true,
+                                    logKey: String) -> MTLTexture? {
+            guard let cg = image.cgImage else {
+                host.logOnce("\(logKey).cg",
+                    "\(logKey): no CGImage — SceneKit's own mip chain "
+                    + "(sRGB-aware filtering not guaranteed)")
+                return nil
+            }
+            guard let device = host.renderDevice() else {
+                host.logOnce("\(logKey).device",
+                    "\(logKey): no Metal device — SceneKit's own mip "
+                    + "chain (sRGB-aware filtering not guaranteed)")
+                return nil
+            }
+            guard let tex = try? MTKTextureLoader(device: device)
+                .newTexture(cgImage: cg, options: [
+                    .generateMipmaps: NSNumber(value: true),
+                    .SRGB: NSNumber(value: srgb),
+                    .textureUsage: NSNumber(
+                        value: MTLTextureUsage.shaderRead.rawValue),
+                ])
+            else {
+                host.logOnce("\(logKey).mtl",
+                    "\(logKey): MTK mip upload failed — SceneKit's own "
+                    + "mip chain (sRGB-aware filtering not guaranteed)")
+                return nil
+            }
+            return tex
+        }
+
+        /// Level-0 readback of an uncompressed 8-bit MTLTexture into
+        /// straight RGBA8 — the `sourcePixels` lane for textures that
+        /// only exist GPU-side (a decoded KTX2). BGRA swaps to RGBA;
+        /// the sRGB variants' bytes are already encoded like the
+        /// `rgba8` path's. Private or non-8-bit formats return nil.
+        func rgbaPixels(fromMetal tex: MTLTexture)
+            -> (data: Data, width: Int, height: Int)?
+        {
+            guard tex.storageMode != .private else { return nil }
+            let bgra: Bool
+            switch tex.pixelFormat {
+            case .rgba8Unorm, .rgba8Unorm_srgb: bgra = false
+            case .bgra8Unorm, .bgra8Unorm_srgb: bgra = true
+            default: return nil
+            }
+            let w = tex.width, h = tex.height
+            var data = Data(count: w * h * 4)
+            data.withUnsafeMutableBytes { ptr in
+                guard let base = ptr.baseAddress else { return }
+                tex.getBytes(base, bytesPerRow: w * 4,
+                             from: MTLRegionMake2D(0, 0, w, h),
+                             mipmapLevel: 0)
+            }
+            if bgra {
+                data.withUnsafeMutableBytes { ptr in
+                    guard let p = ptr.baseAddress?
+                        .assumingMemoryBound(to: UInt8.self)
+                    else { return }
+                    for i in stride(from: 0, to: w * h * 4, by: 4) {
+                        let b = p[i]
+                        p[i] = p[i + 2]
+                        p[i + 2] = b
+                    }
+                }
+            }
+            return (data, w, h)
+        }
+
+        /// One parsed KTX2 level-index row.
+        struct KTX2Level {
+            let offset: Int
+            let length: Int
+        }
+
+        /// Parsed KTX2 fixed header (Khronos KTX 2.0 spec §3.2): the
+        /// 12-byte identifier, then `vkFormat`/`typeSize`, the pixel
+        /// dims, `layerCount`/`faceCount`/`levelCount`,
+        /// `supercompressionScheme`, DFD/KVD/SGD offsets, and at byte
+        /// 80 the `levelCount` × 24-byte levelIndex rows (offset,
+        /// length, uncompressedLength — level 0 is the base/largest
+        /// level regardless of file order). All little-endian.
+        struct KTX2Header {
+            let vkFormat: UInt32
+            let pixelWidth, pixelHeight, pixelDepth: Int
+            let layerCount, faceCount: Int
+            let supercompression: UInt32
+            let levels: [KTX2Level]
+        }
+
+        /// KTX2 (Basis Universal container) — W21. Dispatch order:
+        /// `MTKTextureLoader` first — it reads any texture container
+        /// the SDK understands natively — then an in-tree upload for
+        /// NON-supercompressed 2D files whose `vkFormat` maps to an
+        /// `MTLPixelFormat` (uncompressed RGBA 8/16/32-bit and ASTC
+        /// LDR blocks, each mip level landed via `replace`).
+        /// BasisU-supercompressed payloads — ETC1S
+        /// (`supercompressionScheme` 1) and UASTC (`vkFormat`
+        /// UNDEFINED) — need a transcoder the pod doesn't vendor;
+        /// they warn once and the slot keeps its factor-only
+        /// fallback. No silent drop at any stage.
+        func decodeKTX2(_ data: Data, key: UInt64, content: String)
+            -> DecodedTexture?
+        {
+            if let device = host.renderDevice(),
+               let tex = try? MTKTextureLoader(device: device)
+                   .newTexture(data: data, options: [
+                       .SRGB: NSNumber(value: content == "color"),
+                       .textureUsage: NSNumber(
+                           value: MTLTextureUsage.shaderRead.rawValue),
+                   ]) {
+                return DecodedTexture(key: key, image: nil,
+                                      mtlTexture: tex, rgba: nil,
+                                      width: tex.width,
+                                      height: tex.height,
+                                      content: content)
+            }
+            guard let h = parseKTX2(data) else {
+                host.logOnce("texture.\(key).ktx2.parse",
+                    "texture \(key): malformed KTX2 container")
+                return nil
+            }
+            guard h.vkFormat != 0, h.supercompression == 0 else {
+                host.logOnce("texture.\(key).ktx2.basisu",
+                    "texture \(key): KTX2 carries BasisU "
+                    + "supercompression (vkFormat \(h.vkFormat), "
+                    + "scheme \(h.supercompression)) — a transcode "
+                    + "path isn't vendored; slot keeps factor-only")
+                return nil
+            }
+            guard h.pixelDepth == 0, h.layerCount == 0,
+                  h.faceCount == 1 else {
+                host.logOnce("texture.\(key).ktx2.dims",
+                    "texture \(key): KTX2 cubes/arrays/3D unsupported "
+                    + "(faces \(h.faceCount), layers \(h.layerCount), "
+                    + "depth \(h.pixelDepth))")
+                return nil
+            }
+            guard let fmt = ktx2PixelFormat(h.vkFormat) else {
+                host.logOnce("texture.\(key).ktx2.vk\(h.vkFormat)",
+                    "texture \(key): KTX2 vkFormat \(h.vkFormat) has "
+                    + "no MTLPixelFormat mapping")
+                return nil
+            }
+            guard let device = host.renderDevice() else {
+                host.logOnce("texture.\(key).ktx2.device",
+                    "texture \(key): no Metal device for KTX2 upload")
+                return nil
+            }
+            let desc = MTLTextureDescriptor.texture2DDescriptor(
+                pixelFormat: fmt.format, width: h.pixelWidth,
+                height: h.pixelHeight, mipmapped: h.levels.count > 1)
+            desc.storageMode = .shared   // CPU readback for factor bakes
+            desc.usage = .shaderRead
+            desc.mipmapLevelCount = h.levels.count
+            guard let mtl = device.makeTexture(descriptor: desc) else {
+                host.logOnce("texture.\(key).ktx2.alloc",
+                    "texture \(key): MTLTexture allocation failed")
+                return nil
+            }
+            // KTX2 stores level rows tightly packed; `bytesPerRow` is
+            // the row-of-blocks pitch for block formats, w·bpp for
+            // uncompressed.
+            var rgba: Data? = nil
+            for (i, level) in h.levels.enumerated() {
+                let lw = max(1, h.pixelWidth >> i)
+                let lh = max(1, h.pixelHeight >> i)
+                let blocksW = (lw + fmt.blockW - 1) / fmt.blockW
+                let blocksH = (lh + fmt.blockH - 1) / fmt.blockH
+                let rowBytes = blocksW * fmt.blockBytes
+                let needed = rowBytes * blocksH
+                guard level.length >= needed else {
+                    host.logOnce("texture.\(key).ktx2.level\(i)",
+                        "texture \(key): KTX2 level \(i) is "
+                        + "\(level.length) B, expected ≥ \(needed) B")
+                    return nil
+                }
+                let start = data.startIndex + level.offset
+                let bytes = data.subdata(in: start..<start + needed)
+                bytes.withUnsafeBytes { buf in
+                    guard let base = buf.baseAddress else { return }
+                    mtl.replace(region: MTLRegionMake2D(0, 0, lw, lh),
+                                mipmapLevel: i, withBytes: base,
+                                bytesPerRow: rowBytes)
+                }
+                if i == 0, fmt.format == .rgba8Unorm
+                    || fmt.format == .rgba8Unorm_srgb {
+                    rgba = bytes   // already straight RGBA8
+                }
+            }
+            return DecodedTexture(key: key, image: nil,
+                                  mtlTexture: mtl, rgba: rgba,
+                                  width: h.pixelWidth,
+                                  height: h.pixelHeight,
+                                  content: content)
+        }
+
+        /// Parses the KTX2 fixed header + level index. Returns nil on
+        /// a bad identifier, a truncated header, `levelCount` < 1, or
+        /// a level range running past the data. `typeSize`, DFD, KVD
+        /// and SGD fields are skipped — vkFormat carries the format.
+        func parseKTX2(_ data: Data) -> KTX2Header? {
+            let magic: [UInt8] = [0xAB, 0x4B, 0x54, 0x58, 0x20, 0x32,
+                                  0x30, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A]
+            guard data.count >= 80 else { return nil }
+            for (i, b) in magic.enumerated()
+            where data[data.startIndex + i] != b {
+                return nil
+            }
+            func u32(_ o: Int) -> UInt32 {
+                D3Wire.u32LE(data, data.startIndex + o)
+            }
+            func u64(_ o: Int) -> UInt64 {
+                UInt64(u32(o)) | UInt64(u32(o + 4)) << 32
+            }
+            let levelCount = Int(u32(40))
+            guard levelCount >= 1,
+                  levelCount <= 64,   // sanity — caps the index walk
+                  data.count >= 80 + levelCount * 24
+            else { return nil }
+            var levels: [KTX2Level] = []
+            for i in 0..<levelCount {
+                let off = u64(80 + i * 24)
+                let len = u64(80 + i * 24 + 8)
+                guard len <= UInt64(Int.max), off <= UInt64(Int.max),
+                      off + len <= UInt64(data.count)
+                else { return nil }
+                levels.append(KTX2Level(offset: Int(off),
+                                        length: Int(len)))
+            }
+            return KTX2Header(
+                vkFormat: u32(12),
+                pixelWidth: Int(u32(20)), pixelHeight: Int(u32(24)),
+                pixelDepth: Int(u32(28)),
+                layerCount: Int(u32(32)), faceCount: Int(u32(36)),
+                supercompression: u32(44), levels: levels)
+        }
+
+        /// KTX2 `vkFormat` → `MTLPixelFormat` plus the block geometry
+        /// `replace` needs. Covers uncompressed RGBA 8/16/32-bit and
+        /// every ASTC LDR block size (Vulkan's ASTC range is
+        /// contiguous UNORM/sRGB pairs in the same block-size order as
+        /// Metal's). Everything else — BCn, ETC, PVRTC, HDR ASTC —
+        /// returns nil and the caller warns.
+        func ktx2PixelFormat(_ vk: UInt32)
+            -> (format: MTLPixelFormat, blockW: Int, blockH: Int,
+                blockBytes: Int)?
+        {
+            switch vk {
+            // VK_FORMAT_R8G8B8A8_{UNORM,SRGB}, B8G8R8A8_{UNORM,SRGB},
+            // R16G16B16A16_SFLOAT, R32G32B32A32_SFLOAT.
+            case 37:  return (.rgba8Unorm,      1, 1, 4)
+            case 43:  return (.rgba8Unorm_srgb, 1, 1, 4)
+            case 44:  return (.bgra8Unorm,      1, 1, 4)
+            case 50:  return (.bgra8Unorm_srgb, 1, 1, 4)
+            case 97:  return (.rgba16Float,     1, 1, 8)
+            case 109: return (.rgba32Float,     1, 1, 16)
+            case 157...184:   // VK_FORMAT_ASTC_{4x4…12x12}_{UNORM,SRGB}
+                let i = Int(vk - 157) / 2
+                let srgb = (vk - 157) % 2 == 1
+                let blocks: [(Int, Int)] = [
+                    (4, 4), (5, 4), (5, 5), (6, 5), (6, 6), (8, 5),
+                    (8, 6), (8, 8), (10, 5), (10, 6), (10, 8),
+                    (10, 10), (12, 10), (12, 12)]
+                let ldrFormats: [MTLPixelFormat] = [
+                    .astc_4x4_ldr, .astc_5x4_ldr, .astc_5x5_ldr,
+                    .astc_6x5_ldr, .astc_6x6_ldr, .astc_8x5_ldr,
+                    .astc_8x6_ldr, .astc_8x8_ldr, .astc_10x5_ldr,
+                    .astc_10x6_ldr, .astc_10x8_ldr, .astc_10x10_ldr,
+                    .astc_12x10_ldr, .astc_12x12_ldr]
+                let srgbFormats: [MTLPixelFormat] = [
+                    .astc_4x4_srgb, .astc_5x4_srgb, .astc_5x5_srgb,
+                    .astc_6x5_srgb, .astc_6x6_srgb, .astc_8x5_srgb,
+                    .astc_8x6_srgb, .astc_8x8_srgb, .astc_10x5_srgb,
+                    .astc_10x6_srgb, .astc_10x8_srgb, .astc_10x10_srgb,
+                    .astc_12x10_srgb, .astc_12x12_srgb]
+                let f = srgb ? srgbFormats[i] : ldrFormats[i]
+                return (f, blocks[i].0, blocks[i].1, 16)
+            default:
+                return nil
+            }
+        }
+
         /// Raw RGBA8 access for a decoded texture — the payload buffer
         /// for `rgba8` sources, a CPU re-decode of the UIImage for
         /// encoded/`ref` ones. `wantAlpha` picks the re-decode format:
@@ -1558,6 +1884,15 @@ enum FsceneRealizer {
             if let rgba = tex.rgba {
                 return (rgba, tex.width, tex.height, false)
             }
+            // GPU-only textures (a KTX2 that never made a UIImage)
+            // read back level 0 when the pixel format is an
+            // uncompressed 8-bit one — bakes and channel splits keep
+            // working. Compressed/float formats return nil here and
+            // the caller's fallback (factor-only) logs itself.
+            if let mt = tex.mtlTexture,
+               let p = rgbaPixels(fromMetal: mt) {
+                return (p.data, p.width, p.height, false)
+            }
             guard let image = tex.image,
                   let (data, w, h) = rgbaPixels(image, alpha: wantAlpha)
             else { return nil }
@@ -1568,12 +1903,21 @@ enum FsceneRealizer {
         /// `SCNMaterialProperty` never multiplies a color factor.
         /// `rgbOnly` leaves alpha alone (emissive); otherwise the
         /// factor's alpha multiplies too (baseColor). Returns nil when
-        /// no factor is given (texture binds unbaked) or the pixels are
-        /// unreachable.
+        /// no factor is given (texture binds unbaked); when a factor
+        /// IS given but the pixels are unreachable (a GPU-only
+        /// compressed decode) the bind falls back to the raw texture
+        /// and the factor is lost — logged once.
         func bakeFactor(_ tex: DecodedTexture, color fc: [Double]?,
                         rgbOnly: Bool) -> UIImage? {
-            guard let fc, let src = sourcePixels(tex, wantAlpha: !rgbOnly)
-            else { return nil }
+            guard let fc else { return nil }
+            guard let src = sourcePixels(tex, wantAlpha: !rgbOnly)
+            else {
+                host.logOnce("texture.\(tex.key).bake",
+                    "texture \(tex.key): factor×texture bake needs CPU "
+                    + "pixels — binding the texture unbaked "
+                    + "(approximation)")
+                return nil
+            }
             var data = src.data
             let fa = fc[3]
             data.withUnsafeMutableBytes { ptr in
@@ -1606,14 +1950,22 @@ enum FsceneRealizer {
         /// `metalness`/`roughness` as scalars, so the channels split
         /// into two gray images CPU-side — with the factors baked in,
         /// since a texture-backed property can't multiply them either.
-        /// A nil half keeps the factor-only contents.
+        /// A nil half keeps the factor-only contents — for a GPU-only
+        /// texture (a compressed KTX2) that drops the map entirely,
+        /// so the miss warns once.
         func splitMetallicRoughness(_ tex: DecodedTexture,
                                     metallic mf: Double,
                                     roughness rf: Double)
             -> (metal: UIImage?, rough: UIImage?)
         {
             guard let src = sourcePixels(tex, wantAlpha: false)
-            else { return (nil, nil) }
+            else {
+                host.logOnce("texture.\(tex.key).mrSplit",
+                    "texture \(tex.key): metallic/roughness channel "
+                    + "split needs CPU pixels — binding factors only "
+                    + "(approximation)")
+                return (nil, nil)
+            }
             var metal = Data(count: src.width * src.height)
             var rough = Data(count: src.width * src.height)
             src.data.withUnsafeBytes { ptr in
@@ -3772,13 +4124,17 @@ enum FsceneRealizer {
             var floats = [Float](repeating: 0, count: w * h * 4)
             switch tex.pixelFormat {
             case .rgba16Float:
-                var halfs = [Float16](repeating: 0, count: w * h * 4)
+                // `Float16` is iOS 14+ and the pod targets 13 —
+                // decode the halfs manually (halfToFloat below).
+                var halfs = [UInt16](repeating: 0, count: w * h * 4)
                 halfs.withUnsafeMutableBytes { buf in
                     tex.getBytes(buf.baseAddress!, bytesPerRow: w * 8,
                                  from: MTLRegionMake2D(0, 0, w, h),
                                  mipmapLevel: 0)
                 }
-                for i in 0..<w * h * 4 { floats[i] = Float(halfs[i]) }
+                for i in 0..<w * h * 4 {
+                    floats[i] = halfToFloat(halfs[i])
+                }
             case .rgba32Float:
                 floats.withUnsafeMutableBytes { buf in
                     tex.getBytes(buf.baseAddress!, bytesPerRow: w * 16,
@@ -4101,6 +4457,22 @@ enum FsceneRealizer {
         func srgbToLinear(_ c: Double) -> Double {
             c <= 0.04045 ? c / 12.92
                 : pow((c + 0.055) / 1.055, 2.4)
+        }
+
+        /// IEEE-754 half → float32. Hand-rolled because `Float16`
+        /// needs iOS 14 and the pod targets 13. Sign, 5-bit exponent
+        /// (bias 15), 10-bit mantissa; subnormals scale by 2⁻²⁴,
+        /// exp=31 maps to inf/NaN.
+        func halfToFloat(_ h: UInt16) -> Float {
+            let sign: Float = (h & 0x8000) != 0 ? -1 : 1
+            let exp = Int((h >> 10) & 0x1F)
+            let mant = Int(h & 0x3FF)
+            if exp == 0 { return sign * Float(mant) * powf(2, -24) }
+            if exp == 31 {
+                return mant != 0 ? .nan : sign * .infinity
+            }
+            return sign * (1 + Float(mant) / 1024)
+                * powf(2, Float(exp - 15))
         }
 
         // MARK: Tagged property values
