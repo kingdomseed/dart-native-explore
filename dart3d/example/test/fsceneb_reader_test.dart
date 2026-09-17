@@ -14,6 +14,7 @@ import 'dart:typed_data';
 import 'package:dart3d/src/fsceneb_reader.dart';
 import 'package:dart3d/src/scene_model.dart';
 import 'package:test/test.dart';
+import 'package:vector_math/vector_math.dart';
 
 /// Emits a `.fsceneb` container byte-for-byte per upstream's format
 /// (lib/src/binary/fsceneb.dart): 16-byte header, one JSON chunk, then
@@ -185,5 +186,161 @@ void main() {
         expect(p.bytes, isNotNull, reason: '${f.path} ${p.id}');
       }
     }
+  });
+
+  // W21 light-units contract: upstream's importer bakes glTF
+  // photometric intensity to `n = photometric / (683 · luminance)`;
+  // the reader translates it back to SceneKit-scale `intensity`
+  // (n · 683 · luminance · kGltfToSceneKitLightScale).
+  group('light field n → intensity (W21)', () {
+    SceneDocument lightDoc(
+      Map<String, PropertyValue> props, {
+      String type = 'directionalLight',
+    }) {
+      final doc = SceneDocument();
+      doc.addNode(
+        NodeSpec(
+          id: const LocalId(9, 0),
+          name: 'light',
+          components: [ComponentSpec(type, properties: props)],
+        ),
+        root: true,
+      );
+      return doc;
+    }
+
+    Map<String, PropertyValue> lightProps(SceneDocument doc) =>
+        doc.nodes.values.single.components.single.properties;
+
+    double? intensityOf(SceneDocument doc) =>
+        switch (lightProps(doc)['intensity']) {
+          DoubleValue(:final value) => value,
+          _ => null,
+        };
+
+    test('n-only light converts to SceneKit-scale intensity', () {
+      // A white 2.0-lux glTF directional ships n = 2/683.
+      final doc = lightDoc({
+        'n': DoubleValue(2.0 / 683.0),
+        'color': Vec3Value(Vector3(1, 1, 1)),
+      });
+      final read = readFsceneb(emitFsceneb(doc));
+      expect(
+        intensityOf(read),
+        closeTo(2.0 * kGltfToSceneKitLightScale, 1e-2),
+      );
+      // `n` is preserved — a re-encode keeps the upstream field.
+      expect(lightProps(read)['n'], isA<DoubleValue>());
+    });
+
+    test('absent color reads as white (luminance 1)', () {
+      final doc = lightDoc({'n': DoubleValue(1.5 / 683.0)});
+      final read = readFsceneb(emitFsceneb(doc));
+      expect(
+        intensityOf(read),
+        closeTo(1.5 * kGltfToSceneKitLightScale, 1e-2),
+      );
+    });
+
+    test('color luminance scales the recovered intensity', () {
+      // Same n, saturated red (luma 0.2126): upstream divided the
+      // photometric value by that luma, so decode multiplies it back.
+      final red = lightDoc({
+        'n': DoubleValue(2.0 / (683.0 * 0.2126)),
+        'color': Vec3Value(Vector3(1, 0, 0)),
+      });
+      final white = lightDoc({'n': DoubleValue(2.0 / 683.0)});
+      expect(
+        intensityOf(readFsceneb(emitFsceneb(red))),
+        closeTo(2.0 * kGltfToSceneKitLightScale, 1e-2),
+      );
+      // And a bare n with a non-unit luminance does scale by it.
+      expect(
+        intensityOf(
+          readFsceneb(
+            emitFsceneb(
+              lightDoc({
+                'n': DoubleValue(0.01),
+                'color': Vec3Value(Vector3(1, 0, 0)),
+              }),
+            ),
+          ),
+        ),
+        closeTo(0.01 * 683.0 * 0.2126 * kGltfToSceneKitLightScale, 1e-3),
+      );
+      expect(intensityOf(readFsceneb(emitFsceneb(white))), isNotNull);
+    });
+
+    test('ColorValue colors read the same luminance', () {
+      final doc = lightDoc({
+        'n': DoubleValue(2.0 / (683.0 * 0.2126)),
+        'color': const ColorValue(1, 0, 0, 1),
+      });
+      expect(
+        intensityOf(readFsceneb(emitFsceneb(doc))),
+        closeTo(2.0 * kGltfToSceneKitLightScale, 1e-2),
+      );
+    });
+
+    test('intensity-only light is untouched', () {
+      final doc = lightDoc({'intensity': DoubleValue(1400)});
+      final read = readFsceneb(emitFsceneb(doc));
+      expect(intensityOf(read), 1400);
+      expect(lightProps(read).containsKey('n'), isFalse);
+    });
+
+    test('both fields present: authored intensity wins', () {
+      final doc = lightDoc({
+        'n': DoubleValue(0.01),
+        'intensity': DoubleValue(1400),
+      });
+      final read = readFsceneb(emitFsceneb(doc));
+      expect(intensityOf(read), 1400);
+    });
+
+    test('neither field: no intensity synthesized', () {
+      final doc = lightDoc({'castsShadow': BoolValue(true)});
+      final read = readFsceneb(emitFsceneb(doc));
+      expect(lightProps(read).containsKey('intensity'), isFalse);
+    });
+
+    test('point and spot lights translate; non-light n does not', () {
+      for (final type in ['pointLight', 'spotLight']) {
+        final doc = lightDoc(
+          {'n': DoubleValue(1.0 / 683.0)},
+          type: type,
+        );
+        expect(
+          intensityOf(readFsceneb(emitFsceneb(doc))),
+          closeTo(kGltfToSceneKitLightScale, 1),
+          reason: type,
+        );
+      }
+      // `n` on a non-light component is not the light field — left alone.
+      final mesh = lightDoc(
+        {'n': DoubleValue(0.5)},
+        type: 'mesh',
+      );
+      final read = readFsceneb(emitFsceneb(mesh));
+      expect(lightProps(read).containsKey('intensity'), isFalse);
+      expect(lightProps(read)['n'], isA<DoubleValue>());
+    });
+
+    test('n as IntValue translates', () {
+      final doc = lightDoc({'n': const IntValue(1)});
+      final read = readFsceneb(emitFsceneb(doc));
+      expect(
+        intensityOf(read),
+        closeTo(683.0 * kGltfToSceneKitLightScale, 1),
+      );
+    });
+
+    test('normalizeLightIntensity is idempotent', () {
+      final doc = lightDoc({'n': DoubleValue(2.0 / 683.0)});
+      final read = readFsceneb(emitFsceneb(doc));
+      final once = intensityOf(read);
+      normalizeLightIntensity(read);
+      expect(intensityOf(read), once);
+    });
   });
 }
