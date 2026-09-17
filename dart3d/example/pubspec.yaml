@@ -64,6 +64,13 @@ dartnative:
     - assets/showcase/playground.fscene
     - assets/showcase/prefab_demo.fscene
     - assets/showcase/tree_prefab.fscene
+    # W21 conformance lanes (upstream fixture corpus, KTX2 + HDR envs)
+    - assets/etc1s_srgb_mips_64.ktx2
+    - assets/uastc_srgb_mips_zstd_64.ktx2
+    - assets/uastc_alpha_srgb_32.ktx2
+    - assets/uncompressed_rgba8_64.ktx2
+    - assets/rgb_4x2.exr
+    - assets/rgb_4x2.hdr
 
 # Branded launch splash + app icon: add the dartnative_splash plugin from
 # dartpub.dev, then see tool/generate_app_assets.dart.

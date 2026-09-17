@@ -6,6 +6,7 @@
 library;
 
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -110,7 +111,7 @@ ShowcaseScene? loadShowcaseScene(
   SceneDocument doc;
   try {
     if (item.assetKey == kBuiltinMaterialsKey) {
-      doc = buildMaterialsDocument();
+      doc = buildMaterialsDocument(bytesOf: bytesOf);
     } else {
       final bytes = bytesOf(item.assetKey);
       if (bytes == null) {
@@ -319,12 +320,20 @@ ShowcaseScene? loadShowcaseScene(
 ///   a single dark cell) drawn twice, the pair differing only in
 ///   `baseColorTextureTransform.texCoord`. The `texCoord:1` twin
 ///   renders flat where `texCoord:0` shows the checker.
+/// - `materials.ktx2` — a quad sampling a bundled `.ktx2` payload:
+///   ETC1S on Android (real Basis transcode through gltfio) and an
+///   uncompressed vkFormat-37 file on iOS (the container-parse path;
+///   supercompressed formats warn there until a transcoder ships).
+/// - `stage.environmentRef` — a `PayloadEnvironment` carrying the
+///   bundled `rgb_4x2` equirect: `.exr` on iOS (the W21 decode lane)
+///   and `.hdr` on Android (the pre-existing HDR path).
 ///
-/// There is no KTX2 sample — no KTX2/Basis asset exists in the bundle
-/// (W21 lane gap; the `format:'ktx2'` payload path stays a
-/// manifest-level decode). Textures are generated rgba8 payloads, the
-/// same decode path feature_scene's probes use.
-SceneDocument buildMaterialsDocument() {
+/// [bytesOf] is the asset resolver injected by `loadShowcaseScene`;
+/// when it cannot supply a file the corresponding lane node/env is
+/// skipped rather than faked.
+SceneDocument buildMaterialsDocument({
+  Uint8List? Function(String key)? bytesOf,
+}) {
   final doc = SceneDocument();
   const texSize = 64;
 
@@ -553,6 +562,76 @@ SceneDocument buildMaterialsDocument() {
       'roughness': DoubleValue(0.8),
     }),
   );
+
+  // ── KTX2 lane ─────────────────────────────────────────────────────
+  // Platform-picked asset: Android decodes real ETC1S through gltfio;
+  // iOS exercises its container-parse path with an uncompressed
+  // vkFormat-37 file (supercompressed payloads warn-once there until a
+  // transcoder ships). Missing bytes skip the node, not fake it.
+  if (bytesOf != null) {
+    final ktx2Bytes = bytesOf(
+      Platform.isIOS
+          ? 'assets/uncompressed_rgba8_64.ktx2'
+          : 'assets/etc1s_srgb_mips_64.ktx2',
+    );
+    if (ktx2Bytes != null) {
+      final ktx2Tex = doc.addResource(
+        TextureResource(
+          doc.newId(),
+          payload: doc
+              .addPayload(
+                PayloadSpec(
+                  doc.newId(),
+                  encoding: PayloadEncoding.image,
+                  format: 'ktx2',
+                  bytes: ktx2Bytes,
+                ),
+              )
+              .id,
+        ),
+      );
+      meshQuad(
+        name: 'materials.ktx2',
+        at: Vector3(3.3, 0.55, 0),
+        material: mat({
+          'baseColor': ColorValue(1, 1, 1, 1),
+          'baseColorTexture': ResourceRefValue(ktx2Tex.id),
+          'doubleSided': BoolValue(true),
+          'roughness': DoubleValue(0.8),
+        }),
+      );
+    }
+
+    // ── HDR environment lane ────────────────────────────────────────
+    // iOS gets the EXR file (W21 decode lane); Android the .hdr
+    // (pre-existing radiance path). 4×2 RGB is tiny but a real HDR
+    // equirect — the row visibly re-lights under it.
+    final envBytes = bytesOf(
+      Platform.isIOS ? 'assets/rgb_4x2.exr' : 'assets/rgb_4x2.hdr',
+    );
+    if (envBytes != null) {
+      final envPayload = doc.addPayload(
+        PayloadSpec(
+          doc.newId(),
+          encoding: PayloadEncoding.image,
+          format: Platform.isIOS ? 'exr' : 'hdr',
+          bytes: envBytes,
+        ),
+      );
+      doc.stage.environmentRef = doc
+          .addResource(
+            EnvironmentResource(
+              doc.newId(),
+              environment: PayloadEnvironment(envPayload.id),
+              environmentIntensity: 1.0,
+              exposure: 1.0,
+              toneMapping: 'pbrNeutral',
+              skybox: SkyboxSpec(EnvironmentSkySpec()),
+            ),
+          )
+          .id;
+    }
+  }
   return doc;
 }
 
