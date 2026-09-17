@@ -130,3 +130,64 @@ Corrections to this spec's assumptions found during verification:
   realizes as a fixed concave body on both platforms, but a body
   resting inside the bowl is a luck-based bounce — tracked with the
   W3 margin evidence in loose ends.
+
+## Light units (W21)
+
+The wire semantic is **SceneKit-scale `intensity`** — the unitless
+multiplier `SCNLight.intensity` reads (platform default 1000). All
+authored dart3d scenes use it directly: directional keys run
+1300–2400 (`showcase_loader.dart`, `imported_scene.dart`,
+`dice_table_scene.dart`), point fills `700–900 × radius`.
+
+Upstream's glTF importer does not emit that convention. Its
+`gltfLightIntensity` bakes the `KHR_lights_punctual` photometric value
+down to a radiometric multiplier:
+
+```text
+n = photometric / (683 · luminance(color))
+```
+
+(`683` lm/W is the peak photopic luminous efficacy; dividing by the
+color's luminance keeps `color · n` at the authored luminance, so
+saturated colors get a larger multiplier.) `.fsceneb` manifests from
+the importer therefore carry `n` on `directionalLight`/`pointLight`/
+`spotLight` component properties instead of a usable `intensity`.
+
+**Decode boundary (Dart, landed):** `readFsceneb` runs
+`normalizeLightIntensity` after the manifest decode, and the `.fscene`
+text path applies it in `showcase_loader.dart`. For each punctual-light
+component carrying `n` but no `intensity`:
+
+```text
+intensity = n · 683 · luminance(color) · kGltfToSceneKitLightScale
+```
+
+- `n · 683 · luminance(color)` inverts upstream's normalization —
+  the product is the glTF photometric value (lux for directional,
+  candela for point/spot).
+- `kGltfToSceneKitLightScale = 1000.0` maps photometric units onto the
+  SceneKit scale. **Derivation:** SCNLight's own default intensity is
+  1000, so a unit glTF directional lands on the platform default;
+  glTF assets commonly ship directional intensities of ~1–3 lux, which
+  map to 1000–3000 — inside dart3d's authored 1300–2400 key band and
+  the plausible 500–1400 conversion window. Point/spot candela ride
+  the same constant (upstream's `n` normalization is type-agnostic).
+- `color` may be `Vec3Value` (upstream's emit) or `ColorValue`
+  (dart3d-authored); absent → white (luminance 1); non-positive
+  luminance clamps to 0 rather than inventing a negative photometric.
+- An authored `intensity` always wins — a document carrying both keeps
+  `intensity` and `n` is left unread; `n` itself is preserved in the
+  property bag so re-encodes stay upstream-true, which also makes the
+  pass idempotent.
+- Non-light `n` properties and `rectAreaLight` do not translate —
+  the field convention is punctual-only.
+
+**Platform rows (integrator's lane):** both realizers consume the same
+`intensity` — the `n` inversion happens once, upstream of the wire, so
+imported documents carry the same SceneKit-scale semantic as authored
+ones. What remains per-platform is the wire→engine factor: iOS reads
+`intensity` directly, Android's `decodeLight` scales directional by
+`×10` (`FsceneRealizer.kt:1497`) toward Filament's lux expectation.
+That factor is now part of this spec's unit story — lane 9 verifies
+the exposure match within a stop and the constant stays documented
+here rather than buried as a heuristic.
