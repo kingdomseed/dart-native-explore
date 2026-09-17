@@ -15,7 +15,8 @@ Pod::Spec.new do |s|
   s.source           = { :path => '.' }
 
   s.source_files     = 'Classes/**/*.swift'
-  s.frameworks       = 'UIKit', 'SceneKit', 'Foundation', 'Metal'
+  s.frameworks       = 'UIKit', 'SceneKit', 'Foundation', 'Metal',
+                       'MetalKit', 'CoreImage', 'ModelIO'
 
   s.swift_version    = '5.9'
 
