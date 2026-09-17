@@ -300,3 +300,26 @@ contradicted — the report scoped to the W6 gap list):
 - **`skin`/`anim`/`rt` id prefixes** — reserved in the wire since W5
   (`diff_apply.dart:160`); the audit confirms all three blocks already
   serialize in the canonical manifest.
+
+## W21 landed — Dart-side semantics
+
+Recorded where the Dart half of the materials/textures conformance
+workstream settled; platform-row edits belong to the integrator.
+
+- **Light field `n` → `intensity`** — upstream importer manifests carry
+  `n = photometric / (683 · luminance)` on punctual lights;
+  `fsceneb_reader.dart`'s `normalizeLightIntensity` inverts it at
+  decode (`n · 683 · luminance · kGltfToSceneKitLightScale`, constant
+  `1000.0`) for `.fsceneb`, and `showcase_loader.dart` applies the same
+  pass to `.fscene` documents + prefab grafts. Authored `intensity`
+  wins; `n` is preserved (idempotent). Full contract:
+  `android-parity-spec.md` §Light units.
+- **uv1 vertex channel** — `VertexPack.unskinned`/`skinned` accept
+  `uv1s`; the `unskinned_uv1_tangent` interleave now carries a real
+  second UV set for `texCoord: 1` materials (was always zero-filled).
+- **`materials` showcase lane** — builtin procedural scene
+  (`kBuiltinMaterialsKey` in `showcase_loader.dart`): blend sphere over
+  a checker backdrop, mask quad on a generated alpha-lattice rgba8
+  payload (`alphaCutoff 0.5`), and a two-UV-set quad pair differing only
+  in `baseColorTextureTransform.texCoord`. No KTX2 sample asset exists —
+  that lane stays a manifest-level gap pending a bundled `.ktx2`.
