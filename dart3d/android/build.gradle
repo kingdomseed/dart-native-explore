@@ -69,6 +69,14 @@ dependencies {
     implementation 'com.google.android.filament:filament-android:1.71.6'
     implementation 'com.google.android.filament:filament-utils-android:1.71.6'
     implementation 'com.google.android.filament:filamat-android:1.71.6'
+    // W21 KTX2: no Java-side standalone KTX2 decoder exists in the
+    // pinned Filament (filament-utils ships KTX1Loader only). gltfio's
+    // AAR carries libgltfio-jni.so, whose exported createKtx2Provider
+    // drives the same ktxreader::Ktx2Reader Filament uses for glTF —
+    // TextureFactory reaches it through a dlsym shim in dart3d_jni.cpp.
+    // None of gltfio's Java API is referenced; the dep only needs to
+    // package the .so.
+    implementation 'com.google.android.filament:gltfio-android:1.71.6'
 
     // Physics: Jolt via stephengold's JNI bindings (plan-locked).
     // The upstream Android AARs split oddly: SpDebug carries the JVM
