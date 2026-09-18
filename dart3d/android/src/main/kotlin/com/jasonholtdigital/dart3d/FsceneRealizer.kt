@@ -320,6 +320,12 @@ object FsceneRealizer {
         // weights channels; pushed through
         // RenderableManager.setMorphWeights.
         var morphWeights: FloatArray? = null,
+        // W15: the node's raw `instance` spec member — non-null only
+        // on lazy prefab placeholders. Recorded, never decoded here:
+        // loadSubtree's nested updateNode re-spec clears it and
+        // unloadSubtree's restore re-tags it; the Dart layer composes
+        // the subtree and streams it as ordinary ops.
+        var instanceSpec: JSONObject? = null,
     )
 
     /**
@@ -1110,6 +1116,10 @@ object FsceneRealizer {
             spec.optString("skin").takeIf { it.isNotEmpty() }
                 ?.let { D3Wire.localIdKey(it) }
                 ?.let { nodeSkinKeys[key] = it }
+            // W15: a surviving `instance` member tags the node as a
+            // lazy prefab placeholder — kept raw on the rec; the
+            // streaming layer resolves it.
+            rec.instanceSpec = spec.optJSONObject("instance")
             val comps = spec.optJSONArray("components")
             if (comps != null) {
                 for (i in 0 until comps.length()) {
@@ -2478,6 +2488,9 @@ object FsceneRealizer {
                         "updateNode flag '$f' not implemented")
                 }
             }
+            // W15: the spec is complete — its `instance` member is the
+            // placeholder tag's post-update state (absent → cleared).
+            rec.instanceSpec = spec.optJSONObject("instance")
             applyVisibility(key)
         }
 

@@ -217,6 +217,12 @@ enum FsceneRealizer {
         /// W8 contact events and query hits report (absent → 0).
         var colliderIndexByKey: [UInt64: Int] = [:]
 
+        /// W15: node key → the raw `instance` spec member — the lazy
+        /// prefab placeholder tag. Recorded at node decode and
+        /// refreshed by spec-carrying updates; never decoded here
+        /// (Dart composes the subtree and streams it as standard ops).
+        var instanceSpecs: [UInt64: [String: Any]] = [:]
+
         /// Raw manifest entry per resource id — the surgical ops
         /// (`upsertResource`, `upsertPayload`) re-decode a single
         /// resource out of this map, and slot rebinding reads material
@@ -389,6 +395,7 @@ enum FsceneRealizer {
                                      textures: textures,
                                      defs: resourceDefs,
                                      payloadSpecs: payloadSpecs,
+                                     instanceSpecs: instanceSpecs,
                                      textureConsumers: textureConsumers,
                                      materialConsumers: materialConsumers,
                                      geometryConsumers: geometryConsumers,
@@ -2255,6 +2262,14 @@ enum FsceneRealizer {
                 nodeSkinKeys[key] = skinKey
             } else {
                 nodeSkinKeys.removeValue(forKey: key)
+            }
+            // W15: a surviving `instance` member tags the node as a
+            // lazy prefab placeholder — recorded raw, resolved by the
+            // streaming layer (Dart-side compose → standard ops).
+            if let inst = spec["instance"] as? [String: Any] {
+                instanceSpecs[key] = inst
+            } else {
+                instanceSpecs.removeValue(forKey: key)
             }
             let comps = spec["components"] as? [Any] ?? []
             colliderIndexByKey[key] = comps.firstIndex {
