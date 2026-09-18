@@ -28,6 +28,14 @@ final class SceneViewHost: SCNView {
     /// events and query hits report (best-effort: absent → 0).
     private(set) var colliderIndexByKey: [UInt64: Int] = [:]
 
+    /// W15: node key → the node's raw `instance` spec member, present
+    /// only on lazy prefab placeholders. The natives never resolve it
+    /// — `SceneController.loadSubtree` composes the subtree Dart-side
+    /// and ships it as ordinary ops; this registry is the tag check
+    /// (`loadSubtree` on an untagged node warns) and survives until
+    /// the placeholder's own re-spec or a `removeNode` drops it.
+    private(set) var instanceSpecs: [UInt64: [String: Any]] = [:]
+
     /// Raw payload chunks received via `payload` mutations, keyed by
     /// payload id. Document-scoped — `loadScene` clears it since the
     /// (session,index) keys are document-local and collide across
@@ -609,6 +617,10 @@ final class SceneViewHost: SCNView {
                 // light objects.
                 shadowAuthored.removeAll()
                 FsceneRealizer.realize(manifest: manifest, into: self)
+                // W15: the re-realize discarded the surgically
+                // streamed subtrees with the rest of the scene —
+                // rebuild each from its recorded load batch.
+                replayStreamedSubtrees()
             }
         }
     }
@@ -663,6 +675,9 @@ final class SceneViewHost: SCNView {
         // and every payload claim defers until its own bytes land.
         payloadStore.removeAll()
         realizePending = false
+        // W15: the new document's session keys invalidate every
+        // recorded subtree batch — drop them before the realize.
+        streamedSubtreeOps.removeAll()
         // Shadow-tier registry is per-scene — repopulated by the
         // coming decode's light pass.
         shadowAuthored.removeAll()
@@ -746,8 +761,15 @@ final class SceneViewHost: SCNView {
     /// `diffScene` output rather than sending flags.
     func applyCommand(_ data: Data) {
         guard let json = try? JSONSerialization.jsonObject(with: data)
-                as? [String: Any],
-              let op = json["op"] as? String else { return }
+                as? [String: Any] else { return }
+        applyCommandJson(json)
+    }
+
+    /// The decoded-op dispatch — also the recursion point for the W15
+    /// `loadSubtree`/`unloadSubtree` envelopes, whose nested `ops` run
+    /// through the same handlers.
+    private func applyCommandJson(_ json: [String: Any]) {
+        guard let op = json["op"] as? String else { return }
         switch op {
         case "removeNode":
             guard let token = json["node"] as? String,
@@ -829,8 +851,108 @@ final class SceneViewHost: SCNView {
             applyRenderOp(json)
         case "updateViews":
             applyUpdateViews(json)
+        case "loadSubtree":
+            applySubtree(json, loading: true)
+        case "unloadSubtree":
+            applySubtree(json, loading: false)
         default:
             d3Log("unknown command op '\(op)'")
+        }
+    }
+
+    /// `{"op":"loadSubtree"|"unloadSubtree","node":"<token>",
+    /// "ops":[<op>,…]}` — the W15 streaming envelope. `node` must be
+    /// live (it is the placeholder); the nested ops apply in order
+    /// through the ordinary dispatch inside this one drain, so the
+    /// subtree lands or drops atomically between frames. A tag state
+    /// that disagrees with the op (load on an untagged node, unload
+    /// on a still-tagged one) means the Dart-side bookkeeping
+    /// disagrees with the wire — warn and apply anyway, since the
+    /// batch is self-describing.
+    private func applySubtree(_ json: [String: Any], loading: Bool) {
+        let opName = loading ? "loadSubtree" : "unloadSubtree"
+        guard let token = json["node"] as? String,
+              let key = D3Wire.localIdKey(token),
+              let ops = json["ops"] as? [Any] else {
+            logOnce("\(opName).malformed",
+                "\(opName): missing node/ops")
+            return
+        }
+        // The batch doubles as this subtree's replay record — a
+        // payload-arrival re-realize wipes surgical adds along with
+        // the manifest's nodes, and the drain-end replay rebuilds
+        // each live subtree from its recorded load batch. An unload
+        // drops the record first so a wiped placeholder can't
+        // resurrect its subtree; a load records only once the
+        // placeholder is known live.
+        streamedSubtreeOps.removeAll { $0.key == key }
+        guard nodesById[key] != nil else {
+            logOnce("\(opName).missing.\(key)",
+                "\(opName) on missing node \(key); ignoring")
+            return
+        }
+        if loading { streamedSubtreeOps.append((key: key, ops: ops)) }
+        // The tag state that disagrees with the op is the mismatch —
+        // a load expects the placeholder still tagged (its first
+        // nested op clears it); an unload expects it cleared already
+        // (the batch re-tags it last).
+        if loading, instanceSpecs[key] == nil {
+            logOnce("loadSubtree.untagged.\(key)",
+                "loadSubtree on node \(key) without an instance tag; "
+                + "applying anyway")
+        } else if !loading, instanceSpecs[key] != nil {
+            logOnce("unloadSubtree.tagged.\(key)",
+                "unloadSubtree on node \(key) still tagged; "
+                + "applying anyway")
+        }
+        for case let opJson as [String: Any] in ops {
+            applyCommandJson(opJson)
+        }
+        // The drain applying a subtree runs inside updateAtTime — the
+        // frame rendered right after is the first it's visible in;
+        // `didRenderScene` stamps it for the latency lane.
+        subtreeVisibleStamp = (node: key,
+                               applied: ProcessInfo.processInfo.systemUptime,
+                               op: opName, count: ops.count)
+    }
+
+    /// W15: set by `applySubtree`, consumed by the next
+    /// `didRenderScene` — the first frame the landed/cleared subtree
+    /// is on screen, logged for the manifest-to-visible latency lane.
+    private var subtreeVisibleStamp:
+        (node: UInt64, applied: TimeInterval, op: String, count: Int)?
+
+    /// W15: live subtree replay records — (placeholder key, the load
+    /// batch's nested ops) in load order. A payload-arrival
+    /// re-realize (the deferred-resource retry) rebuilds the
+    /// manifest scene wholesale, discarding every surgical add; the
+    /// recorded batches replay after `realize` to restore what was
+    /// streamed. A `removeNode` that dooms a placeholder drops its
+    /// record, and `applyLoadScene` clears the list — a new
+    /// document's session keys invalidate the old batches.
+    private var streamedSubtreeOps: [(key: UInt64, ops: [Any])] = []
+
+    /// Guards the deferred-resource re-realize during a subtree
+    /// replay: a replayed `upsertPayload` that leaves unrelated
+    /// pending refs must not re-arm `realizePending` — that would
+    /// rebuild the scene once per frame.
+    private var subtreeReplayActive = false
+
+    /// Replays each live subtree's recorded load batch through the
+    /// ordinary op dispatch — called right after a payload-arrival
+    /// re-realize has rebuilt the manifest scene.
+    private func replayStreamedSubtrees() {
+        if streamedSubtreeOps.isEmpty { return }
+        subtreeReplayActive = true
+        defer { subtreeReplayActive = false }
+        for (key, ops) in streamedSubtreeOps {
+            for case let opJson as [String: Any] in ops {
+                applyCommandJson(opJson)
+            }
+            if nodesById[key] == nil {
+                d3Log("subtree replay: placeholder \(key) missing"
+                    + " after re-realize")
+            }
         }
     }
 
@@ -865,7 +987,12 @@ final class SceneViewHost: SCNView {
             nodesById.removeValue(forKey: k)
             dynamicBodyKeys.remove(k)
             colliderIndexByKey.removeValue(forKey: k)
+            instanceSpecs.removeValue(forKey: k)
             deferredResourceIds.remove(k)
+            // W15: a doomed placeholder's replay record dies with it
+            // — otherwise the next payload-arrival re-realize would
+            // resurrect the streamed subtree.
+            streamedSubtreeOps.removeAll { $0.key == k }
             // Node ids can't collide with the resource ids keying the
             // consumer maps — these drops are defensive; the real
             // cleanup is the value-list pass below.
@@ -1066,6 +1193,15 @@ final class SceneViewHost: SCNView {
             logOnce("updateNode.flag.\(f)",
                 "updateNode flag '\(f)' not implemented")
         }
+        // W15: the spec is complete — its `instance` member is the
+        // placeholder tag's post-update state. A loadSubtree's
+        // instance update arrives without the member (clearing the
+        // tag); an unloadSubtree's restore carries it (re-tagging).
+        if let inst = spec["instance"] as? [String: Any] {
+            ctx.instanceSpecs[key] = inst
+        } else {
+            ctx.instanceSpecs.removeValue(forKey: key)
+        }
         publish(ctx)
         promoteCamera(ctx)
         if pointOfView === node, node.camera == nil {
@@ -1184,6 +1320,7 @@ final class SceneViewHost: SCNView {
         geometryConsumers = ctx.geometryConsumers
         dynamicBodyKeys = ctx.dynamicBodyKeys
         colliderIndexByKey = ctx.colliderIndexByKey
+        instanceSpecs = ctx.instanceSpecs
         deferredResourceIds = ctx.deferredResourceIds
         environmentPayloadKeys = ctx.environmentPayloadKeys
         resourceDefs = ctx.resourceDefs
@@ -1407,10 +1544,14 @@ final class SceneViewHost: SCNView {
                     redecodeAnimation(animKey, def)
                 }
             }
-        } else if !deferredResourceIds.isEmpty, lastManifest != nil {
+        } else if !deferredResourceIds.isEmpty, lastManifest != nil,
+                  !subtreeReplayActive {
             // A non-image payload chunk that unblocks deferred
             // resources — same deferred re-realize as a `payload`
-            // mutation.
+            // mutation. W15: a chunk replayed after a
+            // subtree-restoring re-realize must not re-arm the next
+            // one — the pending set can outlive the replay when
+            // other refs still wait.
             realizePending = true
         } else {
             logOnce("upsertPayload.\(key)",
@@ -1431,6 +1572,7 @@ final class SceneViewHost: SCNView {
             scene: scene ?? SCNScene())
         ctx.payloadSpecs = payloadSpecs
         ctx.resourceDefs = resourceDefs
+        ctx.instanceSpecs = instanceSpecs
         ctx.textures = texturesById
         ctx.materials = materialsById
         ctx.geometries = geometriesById
@@ -3039,6 +3181,7 @@ final class SceneViewHost: SCNView {
                     defs: [UInt64: [String: Any]],
                     payloadSpecs:
                         [UInt64: FsceneRealizer.Context.PayloadSpec],
+                    instanceSpecs: [UInt64: [String: Any]],
                     textureConsumers:
                         [UInt64: [FsceneRealizer.TextureBinding]],
                     materialConsumers: [UInt64: [SCNGeometry]],
@@ -3095,6 +3238,7 @@ final class SceneViewHost: SCNView {
         resourceDefs = resources.defs
         payloadSpecs = resources.payloadSpecs
             .merging(opPayloadSpecs) { _, op in op }
+        instanceSpecs = resources.instanceSpecs
         textureConsumers = resources.textureConsumers
         materialConsumers = resources.materialConsumers
         geometryConsumers = resources.geometryConsumers
@@ -3201,6 +3345,19 @@ extension SceneViewHost: SCNSceneRendererDelegate {
                   willRenderScene scene: SCNScene,
                   atTime time: TimeInterval) {
         renderDueTargets(at: time)
+    }
+
+    /// W15: the frame carrying a just-applied subtree is the first
+    /// it's visible in — stamped for the latency measurement (the
+    /// Dart side logs the send time against this).
+    func renderer(_ renderer: SCNSceneRenderer,
+                  didRenderScene scene: SCNScene,
+                  atTime time: TimeInterval) {
+        guard let stamp = subtreeVisibleStamp else { return }
+        subtreeVisibleStamp = nil
+        d3Log("\(stamp.op) node=\(stamp.node) ops=\(stamp.count)"
+            + " visible t=\(time)"
+            + " applyToVisible=\((time - stamp.applied) * 1000)ms")
     }
 
     func renderer(_ renderer: SCNSceneRenderer,

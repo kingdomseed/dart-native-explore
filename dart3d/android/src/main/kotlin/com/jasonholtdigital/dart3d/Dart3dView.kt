@@ -1205,6 +1205,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // payload claim defers until its own bytes land.
         payloadStore.clear()
         realizePending = false
+        // W15: the new document's session keys invalidate every
+        // recorded subtree batch — drop them before the realize.
+        streamedSubtreeOps.clear()
         FsceneRealizer.realize(data, this)
     }
 
@@ -1321,6 +1324,15 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         val json = try { JSONObject(String(data, Charsets.UTF_8)) }
             catch (e: Exception) {
                 Log.w(TAG, "command parse failed: ${data.size}B"); return }
+        applyCommandJson(json)
+    }
+
+    /**
+     * The decoded-op dispatch — also the recursion point for the W15
+     * `loadSubtree`/`unloadSubtree` envelopes, whose nested `ops` run
+     * through the same handlers.
+     */
+    private fun applyCommandJson(json: JSONObject) {
         when (val op = json.optString("op")) {
             "removeNode" -> {
                 Log.i(TAG, "cmd removeNode")
@@ -1397,6 +1409,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 pendingParents.entries.removeAll {
                     it.key in doomed || it.value in doomed
                 }
+                // W15: a doomed placeholder's replay record dies with
+                // it — otherwise the next payload-arrival re-realize
+                // would resurrect the streamed subtree.
+                streamedSubtreeOps.keys.removeAll(doomed)
                 if (cameraNodeKey != null && cameraNodeKey in doomed) {
                     cameraNodeKey = null
                 }
@@ -1484,7 +1500,98 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             "setMorphWeights" -> applySetMorphWeights(json)
             "render" -> applyRender(json)
             "updateViews" -> applyUpdateViews(json)
+            "loadSubtree" -> applySubtree(json, loading = true)
+            "unloadSubtree" -> applySubtree(json, loading = false)
             else -> Log.w(TAG, "unknown command op '$op'")
+        }
+    }
+
+    /**
+     * `{"op":"loadSubtree"|"unloadSubtree","node":"<token>",
+     * "ops":[<op>,…]}` — the W15 streaming envelope. `node` must be
+     * live (it is the placeholder); the nested ops apply in order
+     * through the ordinary dispatch inside this one drain, so the
+     * subtree lands or drops atomically between frames. A tag state
+     * that disagrees with the op (load on an untagged node, unload
+     * on a still-tagged one) means the Dart-side bookkeeping
+     * disagrees with the wire — warn and apply anyway, since the
+     * batch is self-describing.
+     */
+    private fun applySubtree(json: JSONObject, loading: Boolean) {
+        val opName = if (loading) "loadSubtree" else "unloadSubtree"
+        val key = jsonKey(json) ?: run {
+            Log.w(TAG, "$opName: bad node token"); return }
+        val ops = json.optJSONArray("ops") ?: run {
+            Log.w(TAG, "$opName: missing ops"); return }
+        // The batch doubles as this subtree's replay record — a
+        // payload-arrival re-realize wipes surgical adds along with
+        // the manifest's nodes, and the drain-end replay rebuilds
+        // each live subtree from its recorded load batch. An unload
+        // drops the record first so a wiped placeholder can't
+        // resurrect its subtree; a load records only once the
+        // placeholder is known live.
+        if (!loading) streamedSubtreeOps.remove(key)
+        val rec = nodesById[key] ?: run {
+            Log.w(TAG, "$opName: node $key not live — no-op"); return }
+        if (loading) streamedSubtreeOps[key] = ops
+        // The tag state that disagrees with the op is the mismatch —
+        // a load expects the placeholder still tagged (its first
+        // nested op clears it); an unload expects it cleared already
+        // (the batch re-tags it last).
+        if (loading && rec.instanceSpec == null) {
+            Log.w(TAG, "$opName: node $key has no instance tag; applying")
+        } else if (!loading && rec.instanceSpec != null) {
+            Log.w(TAG, "$opName: node $key still tagged; applying")
+        }
+        for (i in 0 until ops.length()) {
+            ops.optJSONObject(i)?.let { applyCommandJson(it) }
+        }
+        // The drain applying a subtree runs at the top of stepFrame —
+        // the frame rendered after this drain is the first it's
+        // visible in; stepFrame stamps it for the latency lane.
+        subtreeVisibleStamp = Triple(key, System.nanoTime(), "$opName:${ops.length()}")
+    }
+
+    /** W15: (node key, apply nanoTime, label) set by applySubtree and
+     * consumed by the next stepFrame render — the first frame the
+     * landed/cleared subtree is on screen, logged for the latency
+     * measurement (the Dart side logs the send time against this). */
+    private var subtreeVisibleStamp: Triple<Long, Long, String>? = null
+
+    /** W15: live subtree replay records — placeholder key → the load
+     * batch's nested ops, in load order. A payload-arrival re-realize
+     * (the deferred-resource retry) rebuilds the manifest scene
+     * wholesale, discarding every surgical add; the recorded batches
+     * replay after `realize` to restore what was streamed. A plain
+     * `removeNode` that dooms a placeholder also drops its record,
+     * and `applyLoadScene` clears the map — a new document's session
+     * keys invalidate the old batches. */
+    private val streamedSubtreeOps = LinkedHashMap<Long, JSONArray>()
+
+    /** Guards the deferred-resource re-realize during a subtree
+     * replay: a replayed `upsertPayload` that leaves unrelated
+     * pending refs must not re-arm `realizePending` — that would
+     * rebuild the scene once per frame. */
+    private var subtreeReplayActive = false
+
+    /** Replays each live subtree's recorded load batch through the
+     * ordinary op dispatch — called right after a payload-arrival
+     * re-realize has rebuilt the manifest scene. */
+    private fun replayStreamedSubtrees() {
+        if (streamedSubtreeOps.isEmpty()) return
+        subtreeReplayActive = true
+        try {
+            for ((key, ops) in streamedSubtreeOps) {
+                for (i in 0 until ops.length()) {
+                    ops.optJSONObject(i)?.let { applyCommandJson(it) }
+                }
+                if (nodesById[key] == null) {
+                    Log.w(TAG, "subtree replay: placeholder $key" +
+                        " missing after re-realize")
+                }
+            }
+        } finally {
+            subtreeReplayActive = false
         }
     }
 
@@ -2212,7 +2319,12 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             return
         }
         if (pendingPayloadRefs.isNotEmpty()) {
-            if (lastManifest != null) realizePending = true
+            // W15: a chunk replayed after a subtree-restoring
+            // re-realize must not re-arm the next one — the pending
+            // set can outlive the replay when other refs still wait.
+            if (lastManifest != null && !subtreeReplayActive) {
+                realizePending = true
+            }
             return
         }
         val enc = resources.payloadSpecs[key]?.encoding ?: "unknown"
@@ -3347,6 +3459,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             val manifest = lastManifest
             if (manifest != null && pendingPayloadRefs.isNotEmpty()) {
                 FsceneRealizer.realize(manifest, this)
+                // W15: the re-realize discarded the surgically
+                // streamed subtrees with the rest of the scene —
+                // rebuild each from its recorded load batch.
+                replayStreamedSubtrees()
             }
         }
 
@@ -3381,6 +3497,18 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // node write-back so a view camera sees this frame's pose.
         updateViewCameras()
         render(tNanos)
+        // W15: this frame is the first a just-applied subtree is
+        // visible in — stamp it for the latency lane (the Dart side
+        // logs the send time against this). tNanos is the vsync
+        // schedule time — the wall stamp is a fresh nanoTime taken
+        // after render().
+        subtreeVisibleStamp?.let { (key, appliedNanos, label) ->
+            subtreeVisibleStamp = null
+            val now = System.nanoTime()
+            val dtMs = (now - appliedNanos) / 1e6
+            Log.i(TAG, "$label node=$key visible t=${now / 1e9}s" +
+                " applyToVisible=${dtMs}ms")
+        }
     }
 
     /** Writes each dynamic body's world pose into its node transform. */

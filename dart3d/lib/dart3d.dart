@@ -19,6 +19,7 @@ export 'src/fsceneb_reader.dart';
 export 'src/scene_model.dart';
 export 'src/scene_controller.dart' show NodeTransform, SceneController;
 export 'src/scene_view.dart' show SceneQuality, SceneView;
+export 'src/subtree_stream.dart';
 export 'src/ffi_bindings.dart' show Dart3dFFIBindings;
 export 'src/physics.dart';
 export 'src/vertex_pack.dart' show VertexPack;
