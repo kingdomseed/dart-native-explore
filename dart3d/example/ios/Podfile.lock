@@ -23,8 +23,8 @@ EXTERNAL SOURCES:
     :path: DartNative
 
 SPEC CHECKSUMS:
-  dart3d: cd05dc1212ecdf1cf9c99c267781ee68094968db
-  dartnative_ios: 0b0315594e991ca36b75937f6a72cb6a25bd331d
+  dart3d: e8d2f34edf6d7cb04ee34eaf03d9495347aa7e36
+  dartnative_ios: 88d434758a21de28291d1ca70f9a144bd28548c7
   DartNativeCore: 97106aef3a975e6b1a268568d58dfb74dcbebd9f
   FlexLayout: ea94491c923485f7f28891cb5b10245d22df380b
 

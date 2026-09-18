@@ -425,6 +425,42 @@ off, `medium` = shadows 1024 + MSAA×2+FXAA, `high` = shadows 2048 +
 MSAA×4+FXAA, `default`/unset = the widget's `antialiasingMode` +
 per-light `castsShadow`. Boot lane: `--dart-define=DART3D_QUALITY=`.
 
+## W21 — materials conformance + decode scheduling (live-verified both platforms)
+
+A procedural conformance doc (`--dart-define=DART3D_MODEL=materials`)
+drives ten lanes through one scene: opaque vs `alphaMode:blend` spheres
+(blend shows the checker through it), a `maskThreshold` lattice quad
+with real alpha holes, UV0-vs-UV1 texture transforms, a KTX2 texture
+lane, and a payload-driven HDR environment (skybox + SH irradiance +
+specular reflections). The env fixture is a 4×2 Radiance `.hdr` on
+Android / `.exr` on iOS — deliberately hostile: tiny dimensions and
+saturated primaries up to 10.0.
+
+| Lane | iOS sim — observed | Android A142 — observed |
+|---|---|---|
+| Material lanes | pass — opaque/blend/mask/UV0/UV1 quads all distinct; mask discards below cutoff | pass — same |
+| KTX2 texture | pass — `64x64 ktx2 (22184 B)` decodes via the iOS parse path | pass — `ktx2 64x64 ETC2_EAC_SRGBA8 levels=7` — real Basis transcode through the gltfio provider for the Mali GPU |
+| HDR env (payload) | pass — `environment 4x2 upscaled to 256x128: below the radiance mip floor`; skybox + IBL live | pass — `environment …: 4×2 equirect → 256² cube + SH3 in 26ms` |
+| iOS env crash | **fixed** (`786c8de`) — small equirects SIGABRT'd in `newRadianceTextureForEnvironmentTexture`: SceneKit's radiance chain builds one mip level fewer than the view range it requests (wants 3 on a 4×2's 2, 4 on an 8×4's 3 — reproduces on `MDLTexture` *and* `CGImage`). Fix: `upscaledForRadiance` bilinear floor at 256×128 (the proven-good studio size) + HDR envs bind through a 32bpc float `CGImage` (`rgbaFloatCGImage`) instead of `MDLTexture` — size was the trigger, not the wrapper | n/a |
+| Env claim lifecycle | n/a | **fixed** (`5095649`) — `decodeStage`'s fingerprint early-return fired before re-registering `environmentPayloadIds`/`pendingPayloadRefs`, so the first re-realize installed a fresh Context with no env claim and the chunk arrived with nothing to claim it. Claims re-register before the skip; `applyPayload` checks env claims directly like `upsertPayload` does |
+| float→half upload | n/a | **fixed** (`74cb132`) — `floatToHalfBits` shifted raw float bits without rebiasing the exponent (127→15 needs `−0x38000000`): `1.0`→`+Inf`, `0.5`→`32768`, `2.0`→`0.0`. Every texel ≥ ~0.5 poisoned the RGBA16F equirect → specular cube → white frame at *any* intensity. The studio env escaped it (sRGB8 never touches the float path) |
+| Env authoring | `environmentIntensity: 1.0` | `0.08` — `Platform.isIOS` pick in the doc; saturated primaries stay visible without washing the material lanes |
+
+### Decode scheduling (threading + the scene-switch freeze)
+
+Two fixes landed on the realize path itself — "when does the decode
+run" correctness, not visual:
+
+| Item | iOS | Android |
+|---|---|---|
+| Cross-scene callback mutation | **fixed** (`fcf945a`) — `realize` built a fresh `SCNScene` inside the drain at `updateAtTime`; SceneKit's guard fires for *any* scene mutation inside another scene's callback, bound or not. The manifest path now decodes into the **bound scene in place** (the surgical ops' existing pattern) after `beginSceneReset` returns it to defaults: joint behaviors detach before the node sweep kills their bodies, `worldAnchorNode` drops, and `background`/`lightingEnvironment` contents + gravity/timestep/fog clear — a deferred env leaves both contents slots untouched, so the replaced doc's look must not linger. `install` drops the old-world joint detach (it would kill the decode's own new joints on the same world) and only retires the scene when actually swapped | n/a — Filament scene is host-owned, no equivalent guard |
+| Payload-per-chunk re-realize storm | same fix — `realizePending` flag, one decode per drain (dice's 29 payloads were 29 full decodes) | **fixed** (`f93a274`) — `applyPayload`/`upsertPayload` ran a full `realize` per chunk while deferred refs remained: a doc's N chunks in one frame cost N whole-manifest decodes on the main thread. fcar's 39 chunks ≈ 7s of main-thread blocking — the user-reported scene-switch freeze. Now chunks flag `realizePending`; the drain runs one decode after all queued mutations — fcar loads in 2 realizes (32ms+188ms), zero `Skipped N frames` |
+
+Live sweep post-fix: iOS sim — dice (7 settled, total 107) + materials,
+zero `modified within a rendering callback` warnings; Android A142 —
+dash→fcar→logo→dice switches instant (`realize:` logs 3–333ms each),
+dice 7 settled total 42. `dn test` 150/150.
+
 ## Notes
 
 - **Runtime-minted payloads need their spec on the op** — the W11

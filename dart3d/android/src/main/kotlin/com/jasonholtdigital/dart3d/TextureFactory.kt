@@ -14,15 +14,39 @@ import java.nio.ByteOrder
  * `.fscene` texture resources → Filament textures (W4).
  *
  * Three byte forms per the wire spec: `rgba8` (raw, needs width/height
- * from the payload manifest entry), `ktx2` (deferred — no transcoder),
- * and anything else as an encoded container (PNG/JPEG) decoded through
+ * from the payload manifest entry), `ktx2` (Basis Universal transcoded
+ * through gltfio's native Ktx2Provider — see dart3d_jni.cpp; W21), and
+ * anything else as an encoded container (PNG/JPEG) decoded through
  * `BitmapFactory`. `ref` resources read from `context.assets` and take
  * the encoded path. Uploads are `RGBA8`/`SRGB8_A8` by `content` with a
- * generated mip chain.
+ * generated mip chain; ktx2 keeps its authored chain and whichever
+ * compressed internal format the device supports.
  */
 object TextureFactory {
 
     private const val TAG = "dart3d"
+
+    init {
+        // dart3d_jni carries nKtx2Decode; gltfio-jni carries the
+        // exported createKtx2Provider it dlsyms. Both resolve lazily at
+        // first call — a missing gltfio lib degrades ktx2 payloads to
+        // the Failed result (with a warnOnce), not a crash.
+        System.loadLibrary("dart3d_jni")
+        try {
+            System.loadLibrary("gltfio-jni")
+        } catch (e: UnsatisfiedLinkError) {
+            Log.w(TAG, "libgltfio-jni.so not packaged —" +
+                " ktx2 textures will fail to decode", e)
+        }
+    }
+
+    /**
+     * JNI entry into gltfio's Ktx2Provider (dart3d_jni.cpp). Returns
+     * the native `filament::Texture*` — wrapped by `Texture(ptr)` — or
+     * 0 on failure (reason already logged natively).
+     */
+    private external fun nKtx2Decode(
+        nativeEngine: Long, bytes: ByteArray, srgb: Boolean): Long
 
     /** Outcome of one texture-resource decode. */
     sealed class Result {
@@ -99,12 +123,42 @@ object TextureFactory {
         format: String?, width: Int?, height: Int?, content: String,
     ): Result = when (format) {
         "rgba8" -> uploadRgba8(host, key, bytes, width, height, content)
-        "ktx2" -> {
-            logOnce("texture:$key:ktx2",
-                "texture $key: ktx2 needs a basisu/ASTC path — deferred")
-            Result.Failed
-        }
+        "ktx2" -> uploadKtx2(host, key, bytes, content)
         else -> uploadEncoded(host, key, bytes, content)
+    }
+
+    /**
+     * KTX2 (Basis Universal) via gltfio's native Ktx2Provider — the
+     * pinned Filament ships no Java-side KTX2 reader, so dart3d_jni.cpp
+     * dlsyms `filament::gltfio::createKtx2Provider` out of
+     * libgltfio-jni.so and drives push→wait→updateQueue→pop on this
+     * (Filament) thread. The reader picks the best supported internal
+     * format (ETC2/BC/uncompressed fallback) and uploads the file's own
+     * mip chain; sRGB follows `content` like the uncompressed paths.
+     */
+    private fun uploadKtx2(
+        host: Dart3dView, key: Long, bytes: ByteArray, content: String,
+    ): Result {
+        val start = SystemClock.uptimeMillis()
+        val ptr = try {
+            nKtx2Decode(host.engine.getNativeObject(), bytes,
+                content == "color")
+        } catch (e: UnsatisfiedLinkError) {
+            warnOnce("texture:$key:ktx2:jni",
+                "texture $key: ktx2 JNI unavailable: ${e.message}")
+            return Result.Failed
+        }
+        if (ptr == 0L) {
+            warnOnce("texture:$key:ktx2",
+                "texture $key: ktx2 transcode failed (see native log)")
+            return Result.Failed
+        }
+        val tex = Texture(ptr)
+        Log.i(TAG, "texture $key: ktx2 ${tex.getWidth(0)}x" +
+            "${tex.getHeight(0)} ${tex.getFormat()} " +
+            "levels=${tex.getLevels()} in " +
+            "${SystemClock.uptimeMillis() - start}ms")
+        return Result.Ready(tex)
     }
 
     /** Raw RGBA8 payload — `length == width*height*4` per the wire spec. */

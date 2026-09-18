@@ -112,8 +112,20 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     private var statsWindowStart = 0L
     private var statsFrames = 0
 
+    /**
+     * W21: Filament bakes the blending mode into the compiled Material
+     * (MaterialInstance can only vary the mask threshold), so each
+     * shading family compiles three alphaMode variants — `opaque`,
+     * `mask` (alpha-test discard at the instance's maskThreshold), and
+     * `blend` (src-over transparency). `litMaterial`/`unlitMaterial`
+     * stay the opaque defaults every existing reference expects.
+     */
     val litMaterial: Material
+    val litMaskedMaterial: Material
+    val litBlendMaterial: Material
     val unlitMaterial: Material
+    val unlitMaskedMaterial: Material
+    val unlitBlendMaterial: Material
 
     // MARK: - Jolt world
 
@@ -396,12 +408,24 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         surfaceView.setOnTouchListener { _, event ->
             gestureDetector?.let { it.onTouchEvent(event); true } ?: false
         }
-        litMaterial = buildMaterial(unlit = false)
-        unlitMaterial = buildMaterial(unlit = true)
+        litMaterial = buildMaterial(unlit = false,
+            MaterialBuilder.BlendingMode.OPAQUE)
+        litMaskedMaterial = buildMaterial(unlit = false,
+            MaterialBuilder.BlendingMode.MASKED)
+        litBlendMaterial = buildMaterial(unlit = false,
+            MaterialBuilder.BlendingMode.TRANSPARENT)
+        unlitMaterial = buildMaterial(unlit = true,
+            MaterialBuilder.BlendingMode.OPAQUE)
+        unlitMaskedMaterial = buildMaterial(unlit = true,
+            MaterialBuilder.BlendingMode.MASKED)
+        unlitBlendMaterial = buildMaterial(unlit = true,
+            MaterialBuilder.BlendingMode.TRANSPARENT)
         // The materials are compiled double-sided-capable; keep the
         // default single-sided unless a resource's doubleSided says so.
-        litMaterial.defaultInstance.setDoubleSided(false)
-        unlitMaterial.defaultInstance.setDoubleSided(false)
+        for (m in arrayOf(litMaterial, litMaskedMaterial, litBlendMaterial,
+            unlitMaterial, unlitMaskedMaterial, unlitBlendMaterial)) {
+            m.defaultInstance.setDoubleSided(false)
+        }
 
         fallbackWhite = TextureFactory.solid(engine, 255, 255, 255, 255)
         fallbackNormal = TextureFactory.solid(engine, 128, 128, 255, 255)
@@ -452,28 +476,56 @@ class Dart3dView(context: Context) : FrameLayout(context) {
 
     // MARK: - Materials
 
-    private fun buildMaterial(unlit: Boolean): Material {
+    /**
+     * Picks the compiled variant for a material resource's alphaMode —
+     * `opaque`/`mask`/`blend` (wire strings, lowercase; anything else
+     * reads as opaque). `mask` needs a `maskThreshold` on the instance
+     * — the caller sets it from `alphaCutoff`.
+     */
+    fun materialForAlphaMode(unlit: Boolean, alphaMode: String): Material =
+        when (alphaMode.lowercase()) {
+            "mask" -> if (unlit) unlitMaskedMaterial else litMaskedMaterial
+            "blend" -> if (unlit) unlitBlendMaterial else litBlendMaterial
+            else -> if (unlit) unlitMaterial else litMaterial
+        }
+
+    private fun buildMaterial(
+        unlit: Boolean,
+        blending: MaterialBuilder.BlendingMode,
+    ): Material {
         // MaterialBuilder.init() is a one-time static init of the
         // filamat backend — the builder itself is a fresh instance.
         if (!filamatReady) {
             MaterialBuilder.init()
             filamatReady = true
         }
+        val blendSuffix = when (blending) {
+            MaterialBuilder.BlendingMode.OPAQUE -> ""
+            MaterialBuilder.BlendingMode.MASKED -> "_mask"
+            else -> "_blend"
+        }
         val b = MaterialBuilder()
             .platform(MaterialBuilder.Platform.MOBILE)
-            .name(if (unlit) "d3_unlit" else "d3_lit")
+            .name((if (unlit) "d3_unlit" else "d3_lit") + blendSuffix)
             .shading(if (unlit) MaterialBuilder.Shading.UNLIT
                 else MaterialBuilder.Shading.LIT)
             // Baked capability so MaterialInstance.setDoubleSided works —
             // every instance is reset to single-sided at decode unless the
             // resource opts in (glTF/SceneKit default).
             .doubleSided(true)
+            .blending(blending)
+            // W21: every mesh record carries uv1 (zero-filled when the
+            // wire layout lacks it), so the slot's `texCoord` can pick
+            // either channel per texture.
             .require(MaterialBuilder.VertexAttribute.UV0)
+            .require(MaterialBuilder.VertexAttribute.UV1)
             .uniformParameter(MaterialBuilder.UniformType.FLOAT4, "baseColor")
             .uniformParameter(MaterialBuilder.UniformType.FLOAT4,
                 "baseColorUVTransform")
             .uniformParameter(MaterialBuilder.UniformType.FLOAT,
                 "baseColorUVRotation")
+            .uniformParameter(MaterialBuilder.UniformType.FLOAT,
+                "baseColorUVSet")
             .samplerParameter(MaterialBuilder.SamplerType.SAMPLER_2D,
                 MaterialBuilder.SamplerFormat.FLOAT,
                 MaterialBuilder.ParameterPrecision.DEFAULT, "baseColorMap")
@@ -493,18 +545,26 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     "normalUVTransform")
                 .uniformParameter(MaterialBuilder.UniformType.FLOAT,
                     "normalUVRotation")
+                .uniformParameter(MaterialBuilder.UniformType.FLOAT,
+                    "normalUVSet")
                 .uniformParameter(MaterialBuilder.UniformType.FLOAT4,
                     "mrUVTransform")
                 .uniformParameter(MaterialBuilder.UniformType.FLOAT,
                     "mrUVRotation")
+                .uniformParameter(MaterialBuilder.UniformType.FLOAT,
+                    "mrUVSet")
                 .uniformParameter(MaterialBuilder.UniformType.FLOAT4,
                     "occlusionUVTransform")
                 .uniformParameter(MaterialBuilder.UniformType.FLOAT,
                     "occlusionUVRotation")
+                .uniformParameter(MaterialBuilder.UniformType.FLOAT,
+                    "occlusionUVSet")
                 .uniformParameter(MaterialBuilder.UniformType.FLOAT4,
                     "emissiveUVTransform")
                 .uniformParameter(MaterialBuilder.UniformType.FLOAT,
                     "emissiveUVRotation")
+                .uniformParameter(MaterialBuilder.UniformType.FLOAT,
+                    "emissiveUVSet")
                 .samplerParameter(MaterialBuilder.SamplerType.SAMPLER_2D,
                     MaterialBuilder.SamplerFormat.FLOAT,
                     MaterialBuilder.ParameterPrecision.DEFAULT, "normalMap")
@@ -528,6 +588,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         val body = StringBuilder()
             .append("void material(inout MaterialInputs material) {\n")
             .append("    vec2 uv0 = getUV0();\n")
+            .append("    vec2 uv1 = getUV1();\n")
             .append(uvBlock("baseColor"))
             .append("    material.baseColor = materialParams.baseColor" +
                 " * texture(materialParams_baseColorMap, baseColorUv);\n")
@@ -564,12 +625,17 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             .build(engine)
     }
 
-    /** Emits `vec2 <slot>Uv = offset + R(rot)·(scale ⊙ getUV0())`. */
+    /**
+     * Emits `vec2 <slot>Uv = offset + R(rot)·(scale ⊙ uvSet)` where the
+     * `<slot>UVSet` uniform selects getUV0()/getUV1() — the wire's
+     * `texCoord` channel index (0 → uv0, ≥1 → uv1).
+     */
     private fun uvBlock(slot: String): String {
         val t = "materialParams.${slot}UVTransform"
         val r = "materialParams.${slot}UVRotation"
+        val s = "materialParams.${slot}UVSet"
         return "    vec2 ${slot}Uv = $t.xy + mat2(cos($r), sin($r)," +
-            " -sin($r), cos($r)) * ($t.zw * uv0);\n"
+            " -sin($r), cos($r)) * ($t.zw * ($s > 0.5 ? uv1 : uv0));\n"
     }
 
     private fun applyClearColor() {
@@ -982,7 +1048,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             engine.destroyTexture(fallbackNormal)
             engine.destroyTexture(fallbackEmissive)
             engine.destroyMaterial(litMaterial)
+            engine.destroyMaterial(litMaskedMaterial)
+            engine.destroyMaterial(litBlendMaterial)
             engine.destroyMaterial(unlitMaterial)
+            engine.destroyMaterial(unlitMaskedMaterial)
+            engine.destroyMaterial(unlitBlendMaterial)
             engine.destroyRenderer(renderer)
             engine.destroyView(view)
             engine.destroyScene(scene)
@@ -1004,6 +1074,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      * ordering identical to the old inline apply.
      */
     private val pendingWork = ConcurrentLinkedQueue<() -> Unit>()
+
+    // Payload arrivals flag a re-realize instead of running one
+    // inline: a doc's N chunks drained in one frame then cost one
+    // decode, not N. Only touched on the drain thread.
+    private var realizePending = false
 
     fun onMutation(id: Long, eventTag: Int, data: ByteArray) {
         if (detached) return
@@ -1129,6 +1204,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // chunks arrive next, so the store starts empty and every
         // payload claim defers until its own bytes land.
         payloadStore.clear()
+        realizePending = false
         FsceneRealizer.realize(data, this)
     }
 
@@ -1136,6 +1212,14 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         if (data.size <= 8) return
         val id = D3Wire.readLocalId(data, 0)
         payloadStore[id] = data.copyOfRange(8, data.size)
+        // W7: an environment equirect chunk re-runs decodeStage on the
+        // live scene — the same early-out `upsertPayload` takes, and
+        // the only path that doesn't depend on other resources still
+        // being pending. No early return: a chunk the env shares with
+        // another claimant must still reach the checks below.
+        if (resources.environmentPayloadIds.values.contains(id)) {
+            FsceneRealizer.surgicalContext(this).decodeStage(lastStage)
+        }
         // W11 claims run surgically first — a skin's IBM chunk or an
         // animation's timeline/keyframes chunk re-decodes just its
         // owner, like the `upsertPayload` path (and keeps live clips
@@ -1148,12 +1232,12 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             if (id !in pids) continue
             resources.animDefs[animKey]?.let { redecodeAnimation(animKey, it) }
         }
-        val manifest = lastManifest
-        if (pendingPayloadRefs.isNotEmpty() && manifest != null) {
+        if (pendingPayloadRefs.isNotEmpty() && lastManifest != null) {
             // The deferred set holds resource ids, not payload ids —
-            // retry them all; a decoder whose payload is still missing
-            // re-marks itself pending.
-            FsceneRealizer.realize(manifest, this)
+            // one re-realize at the end of the drain retries them all;
+            // a decoder whose payload is still missing re-marks itself
+            // pending.
+            realizePending = true
         }
     }
 
@@ -2128,10 +2212,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             return
         }
         if (pendingPayloadRefs.isNotEmpty()) {
-            val manifest = lastManifest
-            if (manifest != null) {
-                FsceneRealizer.realize(manifest, this)
-            }
+            if (lastManifest != null) realizePending = true
             return
         }
         val enc = resources.payloadSpecs[key]?.encoding ?: "unknown"
@@ -3257,6 +3338,16 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         while (true) {
             val work = pendingWork.poll() ?: break
             work()
+        }
+        // Payload chunks in this drain may have unblocked deferred
+        // resources — a single re-realize resolves every landed claim
+        // at once (previously one full decode ran per chunk).
+        if (realizePending) {
+            realizePending = false
+            val manifest = lastManifest
+            if (manifest != null && pendingPayloadRefs.isNotEmpty()) {
+                FsceneRealizer.realize(manifest, this)
+            }
         }
 
         // W11: the animation sampler runs before physics — iOS's
