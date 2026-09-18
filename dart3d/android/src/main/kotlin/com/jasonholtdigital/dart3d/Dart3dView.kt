@@ -1075,6 +1075,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      */
     private val pendingWork = ConcurrentLinkedQueue<() -> Unit>()
 
+    // Payload arrivals flag a re-realize instead of running one
+    // inline: a doc's N chunks drained in one frame then cost one
+    // decode, not N. Only touched on the drain thread.
+    private var realizePending = false
+
     fun onMutation(id: Long, eventTag: Int, data: ByteArray) {
         if (detached) return
         pendingWork.offer {
@@ -1199,6 +1204,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // chunks arrive next, so the store starts empty and every
         // payload claim defers until its own bytes land.
         payloadStore.clear()
+        realizePending = false
         FsceneRealizer.realize(data, this)
     }
 
@@ -1226,12 +1232,12 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             if (id !in pids) continue
             resources.animDefs[animKey]?.let { redecodeAnimation(animKey, it) }
         }
-        val manifest = lastManifest
-        if (pendingPayloadRefs.isNotEmpty() && manifest != null) {
+        if (pendingPayloadRefs.isNotEmpty() && lastManifest != null) {
             // The deferred set holds resource ids, not payload ids —
-            // retry them all; a decoder whose payload is still missing
-            // re-marks itself pending.
-            FsceneRealizer.realize(manifest, this)
+            // one re-realize at the end of the drain retries them all;
+            // a decoder whose payload is still missing re-marks itself
+            // pending.
+            realizePending = true
         }
     }
 
@@ -2206,10 +2212,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             return
         }
         if (pendingPayloadRefs.isNotEmpty()) {
-            val manifest = lastManifest
-            if (manifest != null) {
-                FsceneRealizer.realize(manifest, this)
-            }
+            if (lastManifest != null) realizePending = true
             return
         }
         val enc = resources.payloadSpecs[key]?.encoding ?: "unknown"
@@ -3335,6 +3338,16 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         while (true) {
             val work = pendingWork.poll() ?: break
             work()
+        }
+        // Payload chunks in this drain may have unblocked deferred
+        // resources — a single re-realize resolves every landed claim
+        // at once (previously one full decode ran per chunk).
+        if (realizePending) {
+            realizePending = false
+            val manifest = lastManifest
+            if (manifest != null && pendingPayloadRefs.isNotEmpty()) {
+                FsceneRealizer.realize(manifest, this)
+            }
         }
 
         // W11: the animation sampler runs before physics — iOS's

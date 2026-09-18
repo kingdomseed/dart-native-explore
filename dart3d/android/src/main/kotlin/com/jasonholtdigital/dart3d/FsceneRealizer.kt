@@ -121,6 +121,7 @@ object FsceneRealizer {
     }
 
     fun realize(manifest: ByteArray, host: Dart3dView) {
+        val realizeStart = System.nanoTime()
         val json = try {
             JSONObject(String(manifest, Charsets.UTF_8))
         } catch (e: Exception) {
@@ -150,6 +151,8 @@ object FsceneRealizer {
         // because decodeResources already built them.
         ctx.decodeViews(json.optJSONArray("views"))
         ctx.install()
+        Log.i(TAG, "realize: ${(System.nanoTime() - realizeStart) /
+            1_000_000}ms")
     }
 
     // Upstream NodeChange field names updateNode applies.
