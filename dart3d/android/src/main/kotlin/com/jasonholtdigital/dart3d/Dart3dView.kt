@@ -1206,6 +1206,14 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         if (data.size <= 8) return
         val id = D3Wire.readLocalId(data, 0)
         payloadStore[id] = data.copyOfRange(8, data.size)
+        // W7: an environment equirect chunk re-runs decodeStage on the
+        // live scene — the same early-out `upsertPayload` takes, and
+        // the only path that doesn't depend on other resources still
+        // being pending.
+        if (resources.environmentPayloadIds.values.contains(id)) {
+            FsceneRealizer.surgicalContext(this).decodeStage(lastStage)
+            return
+        }
         // W11 claims run surgically first — a skin's IBM chunk or an
         // animation's timeline/keyframes chunk re-decodes just its
         // owner, like the `upsertPayload` path (and keeps live clips
