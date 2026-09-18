@@ -25,12 +25,28 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:scene/src/id.dart';
-import 'package:scene/src/json/fscene_json.dart';
-import 'package:scene/src/scene_document.dart';
+import 'scene_model.dart';
 
 /// The newest `.fsceneb` container version this reader accepts.
 const int kFscenebReaderVersion = 2;
+
+/// glTF photometric intensity → dart3d's SceneKit-scale `intensity`
+/// multiplier (W21 light-units contract).
+///
+/// dart3d's wire `intensity` is SceneKit-scale: `SCNLight.intensity`
+/// is unitless with a platform default of 1000, and the authored
+/// scenes run directional keys at 1300–2400 (`showcase_loader.dart`,
+/// `imported_scene.dart`, `dice_table_scene.dart`). glTF's
+/// `KHR_lights_punctual` directional intensity is lux, and shipped
+/// assets commonly use ~1–3. `1000` anchors a unit glTF directional to
+/// SceneKit's own default intensity and lands the common 1–3 lux band
+/// at 1000–3000 — inside the authored range and the plausible
+/// 500–1400 mapping window.
+///
+/// Point and spot lights recover candela through the same constant —
+/// upstream's `n` normalization is type-agnostic, so the scale is too.
+/// The derivation lives in `docs/android-parity-spec.md` §Light units.
+const double kGltfToSceneKitLightScale = 1000.0;
 
 const List<int> _kMagic = [0x46, 0x53, 0x43, 0x42]; // "FSCB"
 const int _kHeaderBytes = 16;
@@ -119,7 +135,88 @@ SceneDocument readFsceneb(Uint8List bytes) {
   blobs.forEach((id, payload) {
     document.payload(id)?.bytes = payload;
   });
+  normalizeLightIntensity(document);
   return document;
+}
+
+/// The punctual-light component types upstream's glTF importer emits —
+/// `KHR_lights_punctual` has no area-light kind, so `rectAreaLight` is
+/// deliberately absent: an `n` on it wouldn't carry the photometric
+/// convention this translation inverts.
+const Set<String> _kPunctualLightTypes = {
+  'directionalLight',
+  'pointLight',
+  'spotLight',
+};
+
+/// Translates upstream's normalized light field `n` into dart3d's
+/// `intensity` convention, in place (W21).
+///
+/// Upstream's importer (`fscene_emitter.dart` / `gltf_light_units.dart`)
+/// bakes glTF photometric intensity down to a radiometric multiplier:
+/// `n = photometric / (683 · luminance(color))`, where 683 lm/W is the
+/// peak photopic luminous efficacy and the luminance division keeps
+/// `color · n` at the authored luminance. dart3d's wire `intensity` is
+/// SceneKit-scale instead, so decode recovers the photometric value and
+/// rescales:
+///
+/// ```text
+/// intensity = n · 683 · luminance(color) · kGltfToSceneKitLightScale
+/// ```
+///
+/// Rules: only punctual light components translate; an authored
+/// `intensity` always wins over `n` (both present → `n` is left
+/// unread); `color` may be a `Vec3Value` (upstream's emit) or a
+/// `ColorValue` (dart3d-authored) and defaults to white (luminance 1);
+/// `n` may be `DoubleValue` or `IntValue`. The `n` property is left in
+/// place — re-encoding keeps it, and a second decode is a no-op since
+/// `intensity` then exists (idempotent).
+///
+/// This is dart3d's decode boundary for the light-units contract — the
+/// natives read only `intensity`. Called by [readFsceneb]; the
+/// `.fscene` text path applies it at its own decode site
+/// (`showcase_loader.dart`).
+void normalizeLightIntensity(SceneDocument document) {
+  for (final node in document.nodes.values) {
+    for (var i = 0; i < node.components.length; i++) {
+      final component = node.components[i];
+      if (!_kPunctualLightTypes.contains(component.type)) continue;
+      final props = component.properties;
+      if (props.containsKey('intensity')) continue;
+      final n = switch (props['n']) {
+        DoubleValue(:final value) => value,
+        IntValue(:final value) => value.toDouble(),
+        _ => null,
+      };
+      if (n == null) continue;
+      final luminance = _lightColorLuminance(props['color']);
+      // Rebuild rather than mutate — a caller-authored properties map
+      // may be unmodifiable.
+      node.components[i] = ComponentSpec(
+        component.type,
+        properties: {
+          ...props,
+          'intensity': DoubleValue(
+            n * 683.0 * luminance * kGltfToSceneKitLightScale,
+          ),
+        },
+      );
+    }
+  }
+}
+
+/// Rec. 709 luma of a light's `color` property — the same weights
+/// upstream's `gltfLightIntensity` divides by. Absent color reads as
+/// white (luminance 1); a non-positive luminance clamps to 0 rather
+/// than recovering a meaningless negative photometric value.
+double _lightColorLuminance(PropertyValue? color) {
+  final (r, g, b) = switch (color) {
+    Vec3Value(:final value) => (value.x, value.y, value.z),
+    ColorValue(:final r, :final g, :final b) => (r, g, b),
+    _ => (1.0, 1.0, 1.0),
+  };
+  final luminance = r * 0.2126 + g * 0.7152 + b * 0.0722;
+  return luminance < 0.0 ? 0.0 : luminance;
 }
 
 (LocalId, Uint8List) _decodeBlob(Uint8List data) {

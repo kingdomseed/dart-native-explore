@@ -9,8 +9,8 @@ import 'package:vector_math/vector_math.dart';
 /// `pos3 | normal3 | uv0-2 | uv1-2 | color4 | tangent4` (18 f32, 72 B
 /// per vertex, little-endian). Channels left null get upstream's
 /// neutral fill — normal (0,0,1), uv (0,0), color (1,1,1,1), tangent
-/// (1,0,0,1) — and uv1 is always zero-filled. `skinned_uv1_tangent`
-/// appends `joints4 | weights4` (26 f32, 104 B).
+/// (1,0,0,1) — and uv1 zero-fills when [uv1s] is omitted.
+/// `skinned_uv1_tangent` appends `joints4 | weights4` (26 f32, 104 B).
 abstract final class VertexPack {
   /// Bytes per vertex in the `unskinned_uv1_tangent` interleave.
   static const int unskinnedUv1TangentStride = 72;
@@ -23,11 +23,13 @@ abstract final class VertexPack {
   /// [positions] fixes the vertex count; every non-null channel must
   /// have the same length. [tangents] is a vec4 per vertex — xyz
   /// tangent plus `w` bitangent handedness (±1), not the `p3t4`
-  /// quaternion.
+  /// quaternion. [uv1s] is the second UV set (`texCoord: 1` in
+  /// KHR_texture_transform), zero-filled when omitted.
   static Uint8List unskinned({
     required List<Vector3> positions,
     List<Vector3>? normals,
     List<Vector2>? uvs,
+    List<Vector2>? uv1s,
     List<Vector4>? colors,
     List<Vector4>? tangents,
   }) {
@@ -44,6 +46,7 @@ abstract final class VertexPack {
 
     check('normals', normals);
     check('uvs', uvs);
+    check('uv1s', uv1s);
     check('colors', colors);
     check('tangents', tangents);
 
@@ -53,13 +56,14 @@ abstract final class VertexPack {
       final p = positions[i];
       final nrm = normals?[i];
       final uv = uvs?[i];
+      final uv1 = uv1s?[i];
       final c = colors?[i];
       final t = tangents?[i];
       for (final v in <double>[
         p.x, p.y, p.z, // pos3
         nrm?.x ?? 0.0, nrm?.y ?? 0.0, nrm?.z ?? 1.0, // normal3
         uv?.x ?? 0.0, uv?.y ?? 0.0, // uv0-2
-        0.0, 0.0, // uv1-2 — zero-filled
+        uv1?.x ?? 0.0, uv1?.y ?? 0.0, // uv1-2
         c?.x ?? 1.0, c?.y ?? 1.0, c?.z ?? 1.0, c?.w ?? 1.0, // color4
         t?.x ?? 1.0, t?.y ?? 0.0, t?.z ?? 0.0, t?.w ?? 1.0, // tangent4
       ]) {
@@ -85,6 +89,7 @@ abstract final class VertexPack {
     required List<Vector4> weights,
     List<Vector3>? normals,
     List<Vector2>? uvs,
+    List<Vector2>? uv1s,
     List<Vector4>? colors,
     List<Vector4>? tangents,
   }) {
@@ -101,6 +106,7 @@ abstract final class VertexPack {
 
     check('normals', normals);
     check('uvs', uvs);
+    check('uv1s', uv1s);
     check('colors', colors);
     check('tangents', tangents);
     check('joints', joints);
@@ -112,6 +118,7 @@ abstract final class VertexPack {
       final p = positions[i];
       final nrm = normals?[i];
       final uv = uvs?[i];
+      final uv1 = uv1s?[i];
       final c = colors?[i];
       final t = tangents?[i];
       final j = joints[i];
@@ -120,7 +127,7 @@ abstract final class VertexPack {
         p.x, p.y, p.z, // pos3
         nrm?.x ?? 0.0, nrm?.y ?? 0.0, nrm?.z ?? 1.0, // normal3
         uv?.x ?? 0.0, uv?.y ?? 0.0, // uv0-2
-        0.0, 0.0, // uv1-2 — zero-filled
+        uv1?.x ?? 0.0, uv1?.y ?? 0.0, // uv1-2
         c?.x ?? 1.0, c?.y ?? 1.0, c?.z ?? 1.0, c?.w ?? 1.0, // color4
         t?.x ?? 1.0, t?.y ?? 0.0, t?.z ?? 0.0, t?.w ?? 1.0, // tangent4
         j.x, j.y, j.z, j.w, // joints4

@@ -90,6 +90,26 @@ closest approximation and logs once:
 Full detail lives in `docs/verification-matrix.md` and the per-
 workstream specs under `docs/`.
 
+## Scheduling + threading
+
+Scene/physics mutations only run inside each platform's pre-step
+window — iOS drains queued work at `renderer(_:updateAtTime:)`,
+Android at `stepFrame`'s top — because the solver and the in-flight
+render pass walk native state with no external lock. Two consequences
+worth knowing:
+
+- iOS decodes replacement documents **into the bound scene in place**
+  (reset to defaults first): SceneKit forbids mutating one scene
+  inside a rendering callback of another, so a fresh `SCNScene`
+  cannot be built inside the drain.
+- Payload-driven re-realizes **coalesce to one per drain** on both
+  platforms: a document's N payload chunks cost one decode, not N —
+  this is what keeps multi-chunk scenes (dozens of deferred geometry
+  buffers) from blocking the frame loop on load.
+
+Both behaviors are load-bearing; `docs/verification-matrix.md` (W21)
+has the failure modes they replaced.
+
 ## Exploratory directions (deferred exclusions)
 
 Five upstream surface areas were deliberately excluded from the

@@ -84,6 +84,23 @@ void main() {
       expect(v.tangent, tangents[2]); // xyz + handedness w
     });
 
+    test('uv1s packs the second UV set; omitted still zero-fills', () {
+      // W21: the texCoord:1 lane needs a real uv1 channel.
+      final uv1s = [
+        Vector2(0.19, 0.06),
+        Vector2(0.19, 0.06),
+        Vector2(0.19, 0.06),
+        Vector2(0.19, 0.06),
+      ];
+      final packed = VertexPack.unskinned(positions: positions, uv1s: uv1s);
+      expect(unpackVertex(packed, 1).uv1, uv1s[1]);
+      expect(unpackVertex(vertices, 1).uv1, Vector2.zero());
+      expect(
+        () => VertexPack.unskinned(positions: positions, uv1s: [uv1s[0]]),
+        throwsArgumentError,
+      );
+    });
+
     test('omitted channels get the upstream neutral fill', () {
       final sparse = VertexPack.unskinned(positions: positions);
       final v = unpackVertex(sparse, 0);

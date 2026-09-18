@@ -46,6 +46,31 @@ import java.nio.FloatBuffer
 
 private const val TAG = "dart3d"
 
+// W21 light-unit contract. The wire `intensity` is SceneKit-scale — a
+// unitless multiplier — while Filament consumes photometric units, so
+// decode converts rather than passes through:
+//
+//  * DIRECTIONAL → lux. DIRECTIONAL_LUX_PER_UNIT keeps the value the
+//    retired bare `×10` heuristic was tuned to: a SceneKit intensity
+//    of 1.0 lands at 10 lx and the ~1400 "studio key" lands at
+//    14 000 lx — indoor floodlight range, short of Filament's ~110 000
+//    lx full-sun reference but matching the demos' authored look.
+//  * POINT / FOCUSED_SPOT → candela. The wire value is total luminous
+//    flux in lumens; candela is lumen/sr, and an isotropic emitter
+//    spreads its flux over the 4π sr sphere: candela = lumens / 4π.
+//    (A spot concentrates the same flux inside its cone — Filament's
+//    candela is axial luminous intensity and spotLightCone carries the
+//    shape, so the /4π applies unchanged.)
+//  * environmentIntensity → lux at ENVIRONMENT_LUX_PER_UNIT, Filament's
+//    own IndirectLight/Skybox default baseline (30 000 lx) that the
+//    unitless wire value scales.
+private const val DIRECTIONAL_LUX_PER_UNIT = 10.0
+private const val ENVIRONMENT_LUX_PER_UNIT = 30_000.0
+private const val FOUR_PI_STERADIANS = 4.0 * kotlin.math.PI
+
+/** Wire `alphaMode` vocabulary (lowercase in the spec). */
+private val ALPHA_MODES = setOf("opaque", "mask", "blend")
+
 /** GPU-side mesh: engine objects plus the CPU data physics hulls read. */
 class GpuMesh(
     val vertexBuffer: VertexBuffer,
@@ -96,6 +121,7 @@ object FsceneRealizer {
     }
 
     fun realize(manifest: ByteArray, host: Dart3dView) {
+        val realizeStart = System.nanoTime()
         val json = try {
             JSONObject(String(manifest, Charsets.UTF_8))
         } catch (e: Exception) {
@@ -125,6 +151,8 @@ object FsceneRealizer {
         // because decodeResources already built them.
         ctx.decodeViews(json.optJSONArray("views"))
         ctx.install()
+        Log.i(TAG, "realize: ${(System.nanoTime() - realizeStart) /
+            1_000_000}ms")
     }
 
     // Upstream NodeChange field names updateNode applies.
@@ -1385,18 +1413,23 @@ object FsceneRealizer {
                     VertexBuffer.AttributeType.FLOAT2, 28, md.vertexStrideBytes)
                 vbBuilder.attribute(VertexBuffer.VertexAttribute.COLOR, 0,
                     VertexBuffer.AttributeType.FLOAT4, 36, md.vertexStrideBytes)
+                // W21: uv1 tails the 60-byte base record (zero-filled
+                // when the wire layout lacks TEXCOORD_1) — a slot's
+                // `texCoord` selects between UV0/UV1 at sample time.
+                vbBuilder.attribute(VertexBuffer.VertexAttribute.UV1, 0,
+                    VertexBuffer.AttributeType.FLOAT2, 52, md.vertexStrideBytes)
             }
             if (md.hasSkinning) {
-                // The skinned repack tails each 52-byte record with
-                // [joints u16x4 @52 | weights f32x4 @60]. BONE_INDICES
+                // The skinned repack tails each 60-byte record with
+                // [joints u16x4 @60 | weights f32x4 @68]. BONE_INDICES
                 // must be an integer attribute — the shader consumes
                 // uvec4 (Filament's VertexBuffer.attribute forces
                 // FLAG_INTEGER_TARGET for it).
                 vbBuilder.attribute(VertexBuffer.VertexAttribute.BONE_INDICES,
-                    0, VertexBuffer.AttributeType.USHORT4, 52,
+                    0, VertexBuffer.AttributeType.USHORT4, 60,
                     md.vertexStrideBytes)
                 vbBuilder.attribute(VertexBuffer.VertexAttribute.BONE_WEIGHTS,
-                    0, VertexBuffer.AttributeType.FLOAT4, 60,
+                    0, VertexBuffer.AttributeType.FLOAT4, 68,
                     md.vertexStrideBytes)
             }
             val vb = vbBuilder.build(host.engine)
@@ -1491,11 +1524,15 @@ object FsceneRealizer {
                 builder.color(it[0], it[1], it[2])
             }
             p.tag("intensity").d3Double()?.let {
-                // SceneKit intensity is a raw multiplier; Filament uses
-                // physical units (lux directional, candela point/spot).
-                // ×10 brings a ~1400 "studio key" into a sane range.
-                val v = if (type == LightManager.Type.DIRECTIONAL) it * 10.0 else it
-                builder.intensity(v.toFloat())
+                // SceneKit-scale unitless intensity → photometric units
+                // (see the W21 constants at file top): directional lux,
+                // point/spot lumens→candela.
+                when (type) {
+                    LightManager.Type.DIRECTIONAL -> builder.intensity(
+                        (it * DIRECTIONAL_LUX_PER_UNIT).toFloat())
+                    else -> builder.intensityCandela(
+                        (it / FOUR_PI_STERADIANS).toFloat())
+                }
             }
             p.tag("range").d3Double()?.let {
                 builder.falloff(it.toFloat())
@@ -1551,8 +1588,12 @@ object FsceneRealizer {
             val h = (p.tag("height").d3Double() ?: 1.0).toFloat()
             val color = p.tag("color").d3Color()
                 ?: floatArrayOf(1f, 1f, 1f, 1f)
-            val intensity =
-                (p.tag("intensity").d3Double() ?: 1.0).toFloat() / 4f
+            // Each cluster member takes a quarter of the declared
+            // lumens, then the same lumens→candela conversion decodeLight
+            // applies to point lights (flux over the 4π sr sphere).
+            val intensityCandela =
+                ((p.tag("intensity").d3Double() ?: 1.0) / 4.0 /
+                    FOUR_PI_STERADIANS).toFloat()
             val range = (p.tag("range").d3Double() ?: 10.0).toFloat()
             val identQ = floatArrayOf(0f, 0f, 0f, 1f)
             val unitS = floatArrayOf(1f, 1f, 1f)
@@ -1561,7 +1602,7 @@ object FsceneRealizer {
                 val child = em.create()
                 LightManager.Builder(LightManager.Type.POINT)
                     .color(color[0], color[1], color[2])
-                    .intensity(intensity)
+                    .intensityCandela(intensityCandela)
                     .falloff(range)
                     .build(host.engine, child)
                 tcm.setTransform(
@@ -2728,6 +2769,19 @@ object FsceneRealizer {
             val envPayloadKey = envRes.optJSONObject("environment")
                 ?.optString("payload")?.takeIf { it.isNotEmpty() }
                 ?.let { D3Wire.localIdKey(it) }
+            // The claim must be re-registered before the skip below:
+            // each re-realize installs this Context's registries
+            // wholesale, so an early return would drop the deferred
+            // env's claim from `environmentPayloadIds` and its marker
+            // from `pendingPayloadRefs` — an env chunk landing after
+            // every other payload would then trigger no re-decode and
+            // the env would stay unapplied forever.
+            if (envPayloadKey != null) {
+                envKey?.let { environmentPayloadIds[it] = envPayloadKey }
+                if (host.payloadStore[envPayloadKey] == null) {
+                    envKey?.let { pendingPayloadRefs.add(it) }
+                }
+            }
             val envFingerprint = listOf(
                 stage?.toString() ?: "∅", envRes.toString(),
                 envPayloadKey?.let {
@@ -2852,13 +2906,13 @@ object FsceneRealizer {
                     if (cube != null) {
                         // Filament measures env skybox/IBL intensity
                         // in lux — upstream's unitless
-                        // environmentIntensity needs the physical
-                        // scale (30000 lx ≈ Filament's C++ default)
+                        // environmentIntensity scales Filament's own
+                        // 30 000 lx baseline (ENVIRONMENT_LUX_PER_UNIT)
                         // or the env renders ~15 stops under.
                         skybox = Skybox.Builder()
                             .environment(cube)
                             .intensity((intensity * skyIntensity *
-                                30000.0).toFloat())
+                                ENVIRONMENT_LUX_PER_UNIT).toFloat())
                             .build(host.engine)
                     }
                 }
@@ -2878,7 +2932,8 @@ object FsceneRealizer {
                         skyTextures.add(gc)
                         skybox = Skybox.Builder()
                             .environment(gc)
-                            .intensity((skyIntensity * 30000.0).toFloat())
+                            .intensity((skyIntensity *
+                                ENVIRONMENT_LUX_PER_UNIT).toFloat())
                             .build(host.engine)
                     } else {
                         host.engine.destroyTexture(gt)
@@ -2903,7 +2958,8 @@ object FsceneRealizer {
                 val il = sh?.let {
                     val b = IndirectLight.Builder()
                         .irradiance(3, it)
-                        .intensity((intensity * 30000.0).toFloat())
+                        .intensity((intensity *
+                            ENVIRONMENT_LUX_PER_UNIT).toFloat())
                     if (envCube != null) b.reflections(envCube)
                     b.build(host.engine)
                 }
@@ -3066,9 +3122,24 @@ object FsceneRealizer {
     ): MaterialInstance {
         val type = r.optString("type").ifEmpty { "physicallyBased" }
         val unlit = type == "unlit"
-        val mi = (if (unlit) host.unlitMaterial else host.litMaterial)
-            .createInstance()
         val props = r.optJSONObject("properties") ?: JSONObject()
+        // W21 alphaMode: Filament bakes the blending mode into the
+        // compiled Material, so the wire string picks the host's
+        // variant; `mask` adds the per-instance discard threshold.
+        // Filament sorts TRANSPARENT renderables back-to-front itself,
+        // so `blend` needs no render-order fix-up here.
+        val alphaMode = props.tag("alphaMode").d3String() ?: "opaque"
+        if (alphaMode.lowercase() !in ALPHA_MODES) {
+            warnOnce("alphaMode:$alphaMode",
+                "material $key: alphaMode '$alphaMode' unknown;" +
+                    " treating as opaque")
+        }
+        val mi = host.materialForAlphaMode(unlit, alphaMode)
+            .createInstance()
+        if (alphaMode.equals("mask", ignoreCase = true)) {
+            mi.setMaskThreshold(
+                (props.tag("alphaCutoff").d3Double() ?: 0.5).toFloat())
+        }
 
         // Factor × texture always applies — never texture-instead-of —
         // and uniforms zero-init, so every parameter is written with its
@@ -3082,12 +3153,6 @@ object FsceneRealizer {
             consumers)
 
         mi.setDoubleSided(props.tag("doubleSided").d3Bool() ?: false)
-        val alphaMode = props.tag("alphaMode").d3String() ?: "opaque"
-        if (alphaMode != "opaque") {
-            logOnce("alphaMode:$alphaMode",
-                "material $key: alphaMode '$alphaMode' deferred to W7" +
-                    " (mask/blend need a blending-mode variant)")
-        }
 
         if (!unlit) {
             mi.setParameter("metallic",
@@ -3128,9 +3193,12 @@ object FsceneRealizer {
 
     /**
      * `<slot>TextureTransform` (KHR_texture_transform vocabulary) → the
-     * `<prefix>UVTransform`/`UVRotation` uniforms. The map's tagged values
-     * are `offset`/`scale` (`v2`), `rotation` (`d`), `texCoord` (`i`) —
-     * only uv channel 0 is realized in W4.
+     * `<prefix>UVTransform`/`UVRotation`/`UVSet` uniforms. The map's
+     * tagged values are `offset`/`scale` (`v2`), `rotation` (`d`),
+     * `texCoord` (`i`). W21 realizes `texCoord`: 0 → uv0, ≥1 → uv1 —
+     * the vertex record always carries both channels (zero-filled when
+     * the wire layout lacks TEXCOORD_1); a value above 1 clamps to the
+     * highest realized set with a warning.
      */
     private fun setUvTransform(
         mi: MaterialInstance, props: JSONObject,
@@ -3139,6 +3207,7 @@ object FsceneRealizer {
         var tx = 0f; var ty = 0f
         var sx = 1f; var sy = 1f
         var rot = 0f
+        var uvSet = 0f
         val map = props.tag(propName).d3Map()
         if (map != null) {
             map.tag("offset").d3Vec2()?.let {
@@ -3149,14 +3218,16 @@ object FsceneRealizer {
             }
             rot = (map.tag("rotation").d3Double() ?: 0.0).toFloat()
             val tc = map.tag("texCoord").d3Int() ?: 0
-            if (tc != 0) {
-                logOnce("texCoord:$tc",
-                    "textureTransform texCoord=$tc: only uv0 is realized;" +
-                        " treating as 0")
+            if (tc > 1) {
+                warnOnce("texCoord:$tc",
+                    "textureTransform texCoord=$tc: uv1 is the highest" +
+                        " realized set; clamped to 1")
             }
+            if (tc > 0) uvSet = 1f
         }
         mi.setParameter("${prefix}UVTransform", tx, ty, sx, sy)
         mi.setParameter("${prefix}UVRotation", rot)
+        mi.setParameter("${prefix}UVSet", uvSet)
     }
 
     private fun bindTextureSlot(
