@@ -3349,15 +3349,19 @@ extension SceneViewHost: SCNSceneRendererDelegate {
 
     /// W15: the frame carrying a just-applied subtree is the first
     /// it's visible in — stamped for the latency measurement (the
-    /// Dart side logs the send time against this).
+    /// Dart side logs the send time against this). `atTime` is the
+    /// frame's scheduled time — it can precede the apply wall stamp
+    /// by a few ms, so the delta measures against a fresh uptime
+    /// taken inside the callback (the Android twin does the same).
     func renderer(_ renderer: SCNSceneRenderer,
                   didRenderScene scene: SCNScene,
                   atTime time: TimeInterval) {
         guard let stamp = subtreeVisibleStamp else { return }
         subtreeVisibleStamp = nil
+        let now = ProcessInfo.processInfo.systemUptime
         d3Log("\(stamp.op) node=\(stamp.node) ops=\(stamp.count)"
-            + " visible t=\(time)"
-            + " applyToVisible=\((time - stamp.applied) * 1000)ms")
+            + " visible t=\(now)"
+            + " applyToVisible=\((now - stamp.applied) * 1000)ms")
     }
 
     func renderer(_ renderer: SCNSceneRenderer,
