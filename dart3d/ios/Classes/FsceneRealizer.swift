@@ -33,7 +33,15 @@ enum FsceneRealizer {
         }
 
         let version = (json["fscene"] as? NSNumber)?.intValue ?? 5
-        let ctx = Context(host: host, formatVersion: version)
+        // The decode writes into the bound scene itself, cleared back
+        // to defaults first. SceneKit forbids mutating one scene
+        // inside a rendering callback of another — a fresh SCNScene
+        // built on this drain is still 'another scene' to it — while
+        // mutating the rendered scene in its own update callback is
+        // the sanctioned window.
+        host.beginSceneReset()
+        let ctx = Context(host: host, formatVersion: version,
+                          scene: host.scene ?? SCNScene())
         // W12: the installing document re-declares its component
         // joints — drop the previous document's registrations so a
         // re-install never duplicates them.
@@ -360,9 +368,13 @@ enum FsceneRealizer {
         /// claim).
         var variantComponents: [UInt64: VariantComponentSpec] = [:]
 
-        /// `scene` defaults to a fresh scene for the manifest path; the
-        /// surgical ops pass the host's live scene so a `physicsWorld`
-        /// component or a `pointOfView` camera lands on the real graph.
+        /// `scene` is the host's bound scene for every caller — the
+        /// manifest path decodes into it in place (a second SCNScene
+        /// built inside the render callback trips SceneKit's
+        /// cross-scene mutation guard) and the surgical ops need the
+        /// live graph so a `physicsWorld` component or a `pointOfView`
+        /// camera lands on the real scene. The `SCNScene()` default
+        /// only backs a pre-setup call where the view has none yet.
         init(host: SceneViewHost, formatVersion: Int,
              scene: SCNScene = SCNScene()) {
             self.host = host
