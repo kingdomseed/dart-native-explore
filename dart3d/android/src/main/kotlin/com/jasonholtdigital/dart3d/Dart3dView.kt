@@ -1215,10 +1215,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // W7: an environment equirect chunk re-runs decodeStage on the
         // live scene — the same early-out `upsertPayload` takes, and
         // the only path that doesn't depend on other resources still
-        // being pending.
+        // being pending. No early return: a chunk the env shares with
+        // another claimant must still reach the checks below.
         if (resources.environmentPayloadIds.values.contains(id)) {
             FsceneRealizer.surgicalContext(this).decodeStage(lastStage)
-            return
         }
         // W11 claims run surgically first — a skin's IBM chunk or an
         // animation's timeline/keyframes chunk re-decodes just its
