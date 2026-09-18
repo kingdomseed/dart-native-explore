@@ -605,7 +605,10 @@ SceneDocument buildMaterialsDocument({
     // ── HDR environment lane ────────────────────────────────────────
     // iOS gets the EXR file (W21 decode lane); Android the .hdr
     // (pre-existing radiance path). 4×2 RGB is tiny but a real HDR
-    // equirect — the row visibly re-lights under it.
+    // equirect — the row visibly re-lights under it. The .hdr's
+    // saturated primaries run to 10.0: at Filament's 30 000 lx env
+    // baseline Android authors the intensity down so the material
+    // lanes stay readable under the colored IBL.
     final envBytes = bytesOf(
       Platform.isIOS ? 'assets/rgb_4x2.exr' : 'assets/rgb_4x2.hdr',
     );
@@ -623,7 +626,7 @@ SceneDocument buildMaterialsDocument({
             EnvironmentResource(
               doc.newId(),
               environment: PayloadEnvironment(envPayload.id),
-              environmentIntensity: 1.0,
+              environmentIntensity: Platform.isIOS ? 1.0 : 0.08,
               exposure: 1.0,
               toneMapping: 'pbrNeutral',
               skybox: SkyboxSpec(EnvironmentSkySpec()),
