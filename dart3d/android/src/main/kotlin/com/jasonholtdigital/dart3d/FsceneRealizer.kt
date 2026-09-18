@@ -2766,6 +2766,19 @@ object FsceneRealizer {
             val envPayloadKey = envRes.optJSONObject("environment")
                 ?.optString("payload")?.takeIf { it.isNotEmpty() }
                 ?.let { D3Wire.localIdKey(it) }
+            // The claim must be re-registered before the skip below:
+            // each re-realize installs this Context's registries
+            // wholesale, so an early return would drop the deferred
+            // env's claim from `environmentPayloadIds` and its marker
+            // from `pendingPayloadRefs` — an env chunk landing after
+            // every other payload would then trigger no re-decode and
+            // the env would stay unapplied forever.
+            if (envPayloadKey != null) {
+                envKey?.let { environmentPayloadIds[it] = envPayloadKey }
+                if (host.payloadStore[envPayloadKey] == null) {
+                    envKey?.let { pendingPayloadRefs.add(it) }
+                }
+            }
             val envFingerprint = listOf(
                 stage?.toString() ?: "∅", envRes.toString(),
                 envPayloadKey?.let {
