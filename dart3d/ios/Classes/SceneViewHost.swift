@@ -574,6 +574,11 @@ final class SceneViewHost: SCNView {
     private var retiredThisFrame: [AnyObject] = []
     private var retiredLastFrame: [AnyObject] = []
 
+    /// Payload arrivals flag a re-realize instead of running one
+    /// inline: a doc's N chunks drained in one pass then cost one
+    /// decode, not N. Only touched on the render queue.
+    private var realizePending = false
+
     func retire(_ obj: AnyObject) { retiredThisFrame.append(obj) }
 
     func enqueueSceneWork(_ work: @escaping () -> Void) {
@@ -594,6 +599,18 @@ final class SceneViewHost: SCNView {
         pendingWork.removeAll()
         pendingWorkLock.unlock()
         for item in work { item() }
+        // Payload chunks in this drain may have unblocked deferred
+        // resources — a single re-realize resolves every landed claim
+        // at once (previously one full decode ran per chunk).
+        if realizePending {
+            realizePending = false
+            if !deferredResourceIds.isEmpty, let manifest = lastManifest {
+                // The shadow registry repopulates with this pass's
+                // light objects.
+                shadowAuthored.removeAll()
+                FsceneRealizer.realize(manifest: manifest, into: self)
+            }
+        }
     }
 
     func applyHello(_ data: Data) {
@@ -645,6 +662,7 @@ final class SceneViewHost: SCNView {
         // manifest's own chunks arrive next, so the store starts empty
         // and every payload claim defers until its own bytes land.
         payloadStore.removeAll()
+        realizePending = false
         // Shadow-tier registry is per-scene — repopulated by the
         // coming decode's light pass.
         shadowAuthored.removeAll()
@@ -670,12 +688,11 @@ final class SceneViewHost: SCNView {
                 redecodeAnimation(animKey, def)
             }
         }
-        if !deferredResourceIds.isEmpty, let manifest = lastManifest {
-            // Any deferred resource may now resolve — re-realize the
-            // doc; ones still missing a payload re-defer. The shadow
-            // registry repopulates with this pass's light objects.
-            shadowAuthored.removeAll()
-            FsceneRealizer.realize(manifest: manifest, into: self)
+        if !deferredResourceIds.isEmpty, lastManifest != nil {
+            // Any deferred resource may now resolve — one re-realize
+            // at the end of the drain retries them all; ones still
+            // missing a payload re-defer.
+            realizePending = true
         }
     }
 
@@ -1390,10 +1407,11 @@ final class SceneViewHost: SCNView {
                     redecodeAnimation(animKey, def)
                 }
             }
-        } else if !deferredResourceIds.isEmpty, let manifest = lastManifest {
+        } else if !deferredResourceIds.isEmpty, lastManifest != nil {
             // A non-image payload chunk that unblocks deferred
-            // resources — same re-realize as a `payload` mutation.
-            FsceneRealizer.realize(manifest: manifest, into: self)
+            // resources — same deferred re-realize as a `payload`
+            // mutation.
+            realizePending = true
         } else {
             logOnce("upsertPayload.\(key)",
                 "upsertPayload \(key): encoding "
@@ -2975,6 +2993,39 @@ final class SceneViewHost: SCNView {
 
     // MARK: - Realizer interface
 
+    /// Returns the bound scene to a clean slate so `realize` can
+    /// decode the replacement document into it in place. Runs inside
+    /// the drain — every write targets the rendered scene from its own
+    /// update callback, the mutation window SceneKit sanctions.
+    /// Joint behaviors detach while their bodies are certainly alive
+    /// — the sweep below kills the nodes they constrain — and
+    /// stage-owned fields clear to `SCNScene()` defaults: a deferred
+    /// env leaves both contents slots untouched until its payload
+    /// lands, so the replaced document's look must not linger.
+    func beginSceneReset() {
+        guard let scene else { return }
+        jointLock.lock()
+        for (id, rec) in joints where rec.behavior != nil {
+            scene.physicsWorld.removeBehavior(rec.behavior!)
+            retire(rec.behavior!)
+            joints[id]?.behavior = nil
+        }
+        jointLock.unlock()
+        for child in scene.rootNode.childNodes {
+            child.removeFromParentNode()
+            retire(child)
+        }
+        scene.background.contents = nil
+        scene.lightingEnvironment.contents = nil
+        scene.fogStartDistance = 0
+        scene.fogEndDistance = 0
+        scene.fogDensityExponent = 1
+        scene.physicsWorld.gravity = SCNVector3(0, -9.8, 0)
+        scene.physicsWorld.timeStep = 1.0 / 60.0
+        worldGravityScale = 9.8
+        worldAnchorNode = nil
+    }
+
     /// Installs a freshly realized scene. Called by `FsceneRealizer`.
     /// The resource registries are retained so `upsertResource`/
     /// `upsertPayload` can re-decode and rebind single resources
@@ -3021,20 +3072,12 @@ final class SceneViewHost: SCNView {
                 renderScale: Double, filterQuality: String),
         views: [ViewRec]
     ) {
-        // Detach every joint behavior from the world being replaced
-        // while both are certainly alive — a dealloc-time detach after
-        // the swap could free a constraint this pass's solver still
-        // walks. The old scene then goes to the graveyard: the
-        // in-flight pass's frozen storage and captured pointOfView
-        // still reach into it, so it must outlive the swap.
-        jointLock.lock()
-        for (id, rec) in joints where rec.behavior != nil {
-            scene?.physicsWorld.removeBehavior(rec.behavior!)
-            retire(rec.behavior!)
-            joints[id]?.behavior = nil
-        }
-        jointLock.unlock()
-        if let old = scene { retire(old) }
+        // Joint behaviors were detached from the world at reset —
+        // before the node sweep killed their bodies and before this
+        // decode's own joints registered. The scene object itself is
+        // only retired when it is actually replaced (a pre-setup
+        // fallback): in-place realizes keep it bound.
+        if let old = scene, old !== newScene { retire(old) }
         // W14: the outgoing offscreen machinery dies with the replaced
         // scene — its SCNRenderers hold that scene's graph, and its
         // textures may still be bound as material contents sampled by
@@ -3075,12 +3118,9 @@ final class SceneViewHost: SCNView {
         skinDefs = resources.skinDefs
         animDefs = resources.animDefs
         // W12: variant bindings belong to the installing document;
-        // unresolved ones stay pending and retry on landings. The
-        // world anchor belonged to the replaced scene — recreated
-        // lazily by the next world-anchored joint.
+        // unresolved ones stay pending and retry on landings.
         variantComponents = resources.variantComponents
         disabledComponents = resources.disabledComponents
-        worldAnchorNode = nil
         animLock.lock()
         animClips.removeAll()
         animTargets.removeAll()
