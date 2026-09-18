@@ -68,12 +68,23 @@ void main(List<String> args) {
 
   final buf = ByteData(off);
   const magic = [
-    0xAB, 0x4B, 0x54, 0x58, 0x20, 0x32, 0x30, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A
+    0xAB,
+    0x4B,
+    0x54,
+    0x58,
+    0x20,
+    0x32,
+    0x30,
+    0xBB,
+    0x0D,
+    0x0A,
+    0x1A,
+    0x0A,
   ];
   for (var i = 0; i < 12; i++) {
     buf.setUint8(i, magic[i]);
   }
-  buf.setUint32(12, 37, Endian.little); // vkFormat R8G8B8A8_SRGB
+  buf.setUint32(12, 43, Endian.little); // vkFormat R8G8B8A8_SRGB
   buf.setUint32(16, 4, Endian.little); // typeSize
   buf.setUint32(20, w, Endian.little);
   buf.setUint32(24, h, Endian.little);
@@ -94,12 +105,20 @@ void main(List<String> args) {
     buf.setUint64(b + 8, levelLens[i], Endian.little);
     buf.setUint64(b + 16, levelLens[i], Endian.little);
   }
-  buf.buffer.asUint8List().setRange(dfdOff, dfdOff + dfdTotal, dfd.buffer.asUint8List());
+  buf.buffer.asUint8List().setRange(
+    dfdOff,
+    dfdOff + dfdTotal,
+    dfd.buffer.asUint8List(),
+  );
 
   var cursor = 0;
   for (var i = 0; i < levels; i++) {
     buf.buffer.asUint8List().setRange(
-        levelOffsets[i], levelOffsets[i] + levelLens[i], rgba, cursor);
+      levelOffsets[i],
+      levelOffsets[i] + levelLens[i],
+      rgba,
+      cursor,
+    );
     cursor += levelLens[i];
   }
   out.writeAsBytesSync(buf.buffer.asUint8List());
