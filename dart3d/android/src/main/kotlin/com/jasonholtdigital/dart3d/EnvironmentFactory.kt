@@ -838,7 +838,12 @@ object EnvironmentFactory {
             if (roundBit != 0 && (sticky != 0 || (half and 1) != 0)) half++
             return sign or half
         }
-        var half = (value + 0x00001000 +
+        // Normal range: rebias the exponent (float 127 → half 15, i.e.
+        // subtract 112 from the exponent field) before the 13-bit
+        // mantissa shift. Without the rebias every texel ≥ ~0.5
+        // decodes as Inf or a wildly wrong value — the specular cube
+        // then whites out the scene at any intensity.
+        var half = (value - 0x38000000 + 0x00001000 +
             ((value ushr 13) and 1)) ushr 13  // round-to-nearest-even
         return sign or (half and 0x7FFF)
     }
