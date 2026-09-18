@@ -1203,7 +1203,13 @@ enum FsceneRealizer {
                 ?? (props["alphaMode"] as? String)
             switch (alphaMode ?? "opaque").lowercased() {
             case "opaque":
-                break
+                // glTF OPAQUE ignores source alpha entirely. SceneKit's
+                // default `.alpha` blendMode would composite contents
+                // alpha, so a semi-alpha texture on an opaque material
+                // renders translucent — `.replace` writes the shaded
+                // color as-is and keeps the material out of the blend
+                // pass.
+                m.blendMode = .replace
             case "blend":
                 m.blendMode = .alpha
                 m.transparencyMode = .aOne
