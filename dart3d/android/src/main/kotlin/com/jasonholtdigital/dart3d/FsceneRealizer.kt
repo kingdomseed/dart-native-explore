@@ -1537,7 +1537,13 @@ object FsceneRealizer {
                     .also { b -> b.asShortBuffer().put(indices) }
                     .also { it.rewind() })
             RenderableManager.Builder(1)
-                .boundingBox(Box(0f, 0f, 0f, 0f, 0f, 0f))
+                // The verts are dynamic world-space data — no static
+                // AABB describes them (a zero box at the unparented
+                // entity's identity transform is a point at the world
+                // origin, which would frustum-cull every off-axis
+                // trail). Culling off is the always-correct answer
+                // for a ribbon rewritten per frame.
+                .culling(false)
                 .layerMask(0xFF, rec.layers and 0xFF)
                 .castShadows(false)
                 .geometry(0, RenderableManager.PrimitiveType.TRIANGLES,
@@ -1620,7 +1626,11 @@ object FsceneRealizer {
                     val m = list.opt(i).d3Map() ?: continue
                     val g = m.tag("geometry").d3Ref() ?: continue
                     val mat = m.tag("material").d3Ref() ?: continue
-                    val s = m.tag("screenSize").d3Double() ?: continue
+                    // Upstream's _levelEntries drops a level only for
+                    // a missing/mistyped geometry or material ref; an
+                    // absent/malformed screenSize decodes as 0.0 —
+                    // the never-cull threshold, NOT a dropped level.
+                    val s = m.tag("screenSize").d3Double() ?: 0.0
                     levels.add(LodLevelSpec(g, mat, s))
                 }
             }

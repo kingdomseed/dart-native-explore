@@ -80,6 +80,62 @@ void main() {
     });
   });
 
+  group('decodeLodLevels', () {
+    test('an absent screenSize survives as the 0.0 never-cull '
+        'threshold', () {
+      // Upstream LodCodec._levelEntries drops a level only for a
+      // missing/mistyped geometry or material ref — an absent
+      // screenSize decodes as 0.0. The natives port this rule;
+      // dropping the level instead would turn the previous
+      // threshold into a cull floor upstream never has.
+      final levels = decodeLodLevels({
+        'levels': ListValue([
+          MapValue({
+            'geometry': ResourceRefValue(geoId),
+            'material': ResourceRefValue(matId),
+            'screenSize': DoubleValue(0.3),
+          }),
+          MapValue({
+            'geometry': ResourceRefValue(geoId),
+            'material': ResourceRefValue(matId),
+          }),
+        ]),
+      });
+      expect(levels, hasLength(2));
+      expect(levels[1].screenSize, 0.0);
+      // The 0.0 tail threshold never culls, however small the
+      // projected size reads.
+      expect(selectLodLevel(0.001, [for (final l in levels) l.screenSize]), 1);
+    });
+
+    test('a malformed screenSize falls back to 0.0; bad refs still '
+        'drop the level', () {
+      final levels = decodeLodLevels({
+        'levels': ListValue([
+          MapValue({
+            'geometry': ResourceRefValue(geoId),
+            'material': ResourceRefValue(matId),
+            // Mistyped (non-numeric) — upstream's `_ => 0.0` arm.
+            'screenSize': StringValue('wide'),
+          }),
+          MapValue({
+            'geometry': ResourceRefValue(geoId),
+            // No material ref — the entry drops like upstream.
+            'screenSize': DoubleValue(0.5),
+          }),
+          MapValue({
+            'geometry': IntValue(4), // not a ResourceRefValue
+            'material': ResourceRefValue(matId),
+            'screenSize': DoubleValue(0.5),
+          }),
+        ]),
+      });
+      expect(levels, hasLength(1));
+      expect(levels.single.screenSize, 0.0);
+      expect(levels.single.geometry, geoId);
+    });
+  });
+
   group('TrailPointBuffer', () {
     TrailPointBuffer buffer({
       double lifetime = 0.6,

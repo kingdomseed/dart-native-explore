@@ -3516,19 +3516,22 @@ enum FsceneRealizer {
         /// `levels` entries carry geometry+material refs and a
         /// `screenSize` threshold (fraction of viewport height,
         /// descending); entries missing either ref are skipped like
-        /// upstream's codec. `hysteresis`/`blendRange` decode for wire
-        /// parity but are documented no-ops — dart3d hard-switches.
+        /// upstream's codec, while an absent/malformed `screenSize`
+        /// decodes as `0.0` — upstream's fallback, the never-cull
+        /// threshold (NOT a dropped level). `hysteresis`/`blendRange`
+        /// decode for wire parity but are documented no-ops — dart3d
+        /// hard-switches.
         func decodeLod(_ key: UInt64, _ node: SCNNode,
                        _ p: [String: Any]) {
             let spec = LodSpec()
             for e in d3List(p["levels"]) ?? [] {
                 guard let m = d3Map(e),
                       let g = d3Ref(m["geometry"]),
-                      let mat = d3Ref(m["material"]),
-                      let s = d3Double(m["screenSize"])
+                      let mat = d3Ref(m["material"])
                 else { continue }
                 spec.levels.append(.init(
-                    geoKey: g, matKey: mat, screenSize: s))
+                    geoKey: g, matKey: mat,
+                    screenSize: d3Double(m["screenSize"]) ?? 0.0))
             }
             spec.lodBias = d3Double(p["lodBias"]) ?? 1.0
             spec.hysteresis = d3Double(p["hysteresis"]) ?? 0.0
