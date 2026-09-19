@@ -62,6 +62,37 @@ SceneDocument serializeScene(SceneDocument live) {
   return snapshot;
 }
 
+/// Upstream's `readFscene` plus the migration lane log (W29): peeks at
+/// [source]'s encoded `fscene` version — `stripJsonc` loosens the
+/// source the same way the reader does — decodes, and calls [log] with
+/// `dart3d: migrated fscene vN → vM` when the encoded version differs
+/// from the decoded document's, i.e. the `migrateFscene` chain ran.
+/// A same-version source logs nothing; a source the peek can't parse
+/// leaves [log] uncalled and lets `readFscene` throw the real error.
+///
+/// The sink is injected because `dnLog` isn't reachable everywhere the
+/// decode is — the showcase loader stays `dart test`-compatible and
+/// passes its own `log` parameter through.
+SceneDocument readFsceneLogged(
+  String source, {
+  void Function(String message)? log,
+}) {
+  int? encodedVersion;
+  try {
+    if (jsonDecode(stripJsonc(source)) case {'fscene': int v}) {
+      encodedVersion = v;
+    }
+  } catch (_) {
+    // `readFscene` reports the parse failure.
+  }
+  final doc = readFscene(source);
+  final from = encodedVersion;
+  if (from != null && from != doc.formatVersion) {
+    log?.call('dart3d: migrated fscene v$from → v${doc.formatVersion}');
+  }
+  return doc;
+}
+
 /// Folds one outgoing `command` [op] into [doc], keeping the document a
 /// mirror of the live scene. Ops not in [commandAffectsDocument]'s set
 /// are ignored.
