@@ -10,6 +10,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:dart3d/src/doc_layer.dart';
 import 'package:dart3d/src/fsceneb_reader.dart';
 import 'package:dart3d/src/glb_import.dart';
 import 'package:dart3d/src/scene_model.dart';
@@ -146,7 +147,9 @@ ShowcaseScene? loadShowcaseScene(
           ? readFsceneb(bytes)
           : item.assetKey.endsWith('.glb')
           ? importGlbToSceneDocument(bytes)
-          : readFscene(utf8.decode(bytes));
+          // `readFsceneLogged` keeps the vN→vM migration lane log on
+          // the bundled-asset path (loadFscene never runs here).
+          : readFsceneLogged(utf8.decode(bytes), log: log);
       // Prefab instances expand host-side — prefab_demo.fscene
       // references tree_prefab.fscene by bare filename.
       doc = composeScene(
@@ -158,7 +161,7 @@ ShowcaseScene? loadShowcaseScene(
           }
           return ref.key.endsWith('.fsceneb')
               ? readFsceneb(prefabBytes)
-              : readFscene(utf8.decode(prefabBytes));
+              : readFsceneLogged(utf8.decode(prefabBytes), log: log);
         },
       );
     }
