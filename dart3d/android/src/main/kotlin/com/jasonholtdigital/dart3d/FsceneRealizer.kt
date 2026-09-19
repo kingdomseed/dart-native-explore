@@ -43,6 +43,7 @@ import org.json.JSONObject
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
+import kotlin.math.ln
 
 private const val TAG = "dart3d"
 
@@ -118,6 +119,201 @@ object FsceneRealizer {
 
     private fun warnOnce(tag: String, msg: String) {
         if (warnedOnce.add(tag)) Log.w(TAG, msg)
+    }
+
+    // ── W22: KHR_materials_* ────────────────────────────────────────
+    // Feature bits pick the lazily-compiled Material variant
+    // (Dart3dView.materialForVariant). The slot/factor rows below are
+    // the single registry both sides walk — buildMaterial declares
+    // the uniforms+samplers these rows name; buildMaterialInstance
+    // writes and binds them — so shader vocabulary can't drift from
+    // the wire decode.
+    const val EXT_CLEARCOAT = 1 shl 0
+    const val EXT_SHEEN = 1 shl 1
+    const val EXT_SPECULAR = 1 shl 2
+    const val EXT_ANISOTROPY = 1 shl 3
+    const val EXT_IOR = 1 shl 4
+    const val EXT_TRANSMISSION = 1 shl 5
+    const val EXT_VOLUME_SOLID = 1 shl 6
+    const val EXT_DISPERSION = 1 shl 7
+
+    /** Wire texture prop → shader slot prefix (`<prefix>Map` +
+     * `<prefix>UVTransform`/`UVRotation`/`UVSet`). */
+    data class ExtTextureSlot(
+        val flag: Int, val prop: String, val prefix: String)
+
+    val EXT_TEXTURE_SLOTS = listOf(
+        ExtTextureSlot(EXT_CLEARCOAT, "clearcoatTexture", "clearCoat"),
+        ExtTextureSlot(EXT_CLEARCOAT, "clearcoatRoughnessTexture",
+            "clearCoatRoughness"),
+        ExtTextureSlot(EXT_CLEARCOAT, "clearcoatNormalTexture",
+            "clearCoatNormal"),
+        ExtTextureSlot(EXT_SHEEN, "sheenColorTexture", "sheenColor"),
+        ExtTextureSlot(EXT_SHEEN, "sheenRoughnessTexture",
+            "sheenRoughness"),
+        ExtTextureSlot(EXT_SPECULAR, "specularTexture", "specular"),
+        ExtTextureSlot(EXT_SPECULAR, "specularColorTexture",
+            "specularColor"),
+        ExtTextureSlot(EXT_ANISOTROPY, "anisotropyTexture", "anisotropy"),
+        ExtTextureSlot(EXT_TRANSMISSION, "transmissionTexture",
+            "transmission"),
+        ExtTextureSlot(EXT_TRANSMISSION, "thicknessTexture", "thickness"),
+    )
+
+    /**
+     * Wire factor prop → uniform. [mask] is the flag set under which
+     * the uniform is declared and written (`ior` lives under
+     * TRANSMISSION *or* IOR — Filament also accepts `material.ior` as
+     * an alternative to reflectance on non-refractive lit materials).
+     */
+    data class ExtFactor(
+        val mask: Int, val prop: String, val uniform: String,
+        val isColor: Boolean, val default: FloatArray)
+
+    val EXT_FACTORS = listOf(
+        ExtFactor(EXT_CLEARCOAT, "clearcoat", "clearCoat",
+            false, floatArrayOf(0f)),
+        ExtFactor(EXT_CLEARCOAT, "clearcoatRoughness",
+            "clearCoatRoughness", false, floatArrayOf(0f)),
+        ExtFactor(EXT_CLEARCOAT, "clearcoatNormalScale",
+            "clearCoatNormalScale", false, floatArrayOf(1f)),
+        ExtFactor(EXT_SHEEN, "sheenColor", "sheenColor",
+            true, floatArrayOf(0f, 0f, 0f, 0f)),
+        ExtFactor(EXT_SHEEN, "sheenRoughness", "sheenRoughness",
+            false, floatArrayOf(0f)),
+        ExtFactor(EXT_SPECULAR, "specular", "specularFactor",
+            false, floatArrayOf(1f)),
+        ExtFactor(EXT_SPECULAR, "specularColor", "specularColorFactor",
+            true, floatArrayOf(1f, 1f, 1f, 1f)),
+        ExtFactor(EXT_ANISOTROPY, "anisotropy", "anisotropy",
+            false, floatArrayOf(0f)),
+        ExtFactor(EXT_ANISOTROPY, "anisotropyRotation",
+            "anisotropyRotation", false, floatArrayOf(0f)),
+        ExtFactor(EXT_TRANSMISSION, "transmission", "transmission",
+            false, floatArrayOf(0f)),
+        ExtFactor(EXT_TRANSMISSION, "thickness", "thickness",
+            false, floatArrayOf(0f)),
+        ExtFactor(EXT_TRANSMISSION or EXT_IOR, "ior", "ior",
+            false, floatArrayOf(1.5f)),
+        ExtFactor(EXT_DISPERSION, "dispersion", "dispersion",
+            false, floatArrayOf(0f)),
+    )
+
+    /** Every wire property name material decode claims — the
+     * pre-W22 vocabulary plus the extension registry above
+     * (`<slot>Transform` rides its base slot). Anything else on a
+     * material resource warn-onces as unhandled: that warn is what
+     * the conformance matrix's `warn` row means. */
+    private val handledMaterialProps = setOf(
+        "baseColor", "baseColorTexture",
+        "metallic", "roughness", "metallicRoughnessTexture",
+        "normalTexture", "normalScale",
+        "occlusionTexture", "occlusionStrength",
+        "emissive", "emissiveStrength", "emissiveTexture",
+        "doubleSided", "alphaMode", "alphaCutoff",
+        "clearcoat", "clearcoatRoughness", "clearcoatTexture",
+        "clearcoatRoughnessTexture", "clearcoatNormalTexture",
+        "clearcoatNormalScale",
+        "sheenColor", "sheenRoughness",
+        "sheenColorTexture", "sheenRoughnessTexture",
+        "specular", "specularColor",
+        "specularTexture", "specularColorTexture",
+        "anisotropy", "anisotropyRotation", "anisotropyTexture",
+        "iridescence", "iridescenceIor", "iridescenceThicknessMinimum",
+        "iridescenceThicknessMaximum", "iridescenceTexture",
+        "iridescenceThicknessTexture",
+        "transmission", "transmissionTexture",
+        "thickness", "thicknessTexture",
+        "attenuationColor", "attenuationDistance",
+        "dispersion", "ior",
+        "diffuseTransmission", "diffuseTransmissionColor",
+        "diffuseTransmissionTexture", "diffuseTransmissionColorTexture",
+    )
+
+    private fun warnUnhandledMaterialProps(key: Long, props: JSONObject) {
+        for (name in props.keys()) {
+            val base = if (name.endsWith("Transform"))
+                name.removeSuffix("Transform") else name
+            if (base !in handledMaterialProps) {
+                warnOnce("mat.$key.unhandled.$name",
+                    "material $key: unhandled property '$name'")
+            }
+        }
+    }
+
+    /**
+     * Extension presence → feature bits. An extension's props only
+     * land on the wire when its glTF block existed; a feature is
+     * *active* when a factor deviates from its no-op default or a
+     * texture slot is referenced — a present-but-default extension
+     * needs no variant. Extensions with no Filament input
+     * (iridescence, diffuse transmission) warn once per material.
+     */
+    private fun extFlagsFor(key: Long, props: JSONObject): Int {
+        fun num(p: String, d: Double = 0.0) = props.tag(p).d3Double() ?: d
+        fun ref(p: String) = props.tag(p).d3Ref() != null
+        var f = 0
+        if (num("clearcoat") > 0.0 || ref("clearcoatTexture") ||
+            ref("clearcoatRoughnessTexture") || ref("clearcoatNormalTexture")) {
+            f = f or EXT_CLEARCOAT
+        }
+        val sheen = props.tag("sheenColor").d3Color()
+        if ((sheen != null &&
+             (sheen[0] > 0f || sheen[1] > 0f || sheen[2] > 0f)) ||
+            ref("sheenColorTexture") || ref("sheenRoughnessTexture")) {
+            f = f or EXT_SHEEN
+        }
+        val specColor = props.tag("specularColor").d3Color()
+        if (num("specular", 1.0) != 1.0 ||
+            (specColor != null && (specColor[0] != 1f ||
+                specColor[1] != 1f || specColor[2] != 1f)) ||
+            ref("specularTexture") || ref("specularColorTexture")) {
+            f = f or EXT_SPECULAR
+        }
+        if (num("anisotropy") != 0.0 || ref("anisotropyTexture")) {
+            f = f or EXT_ANISOTROPY
+        }
+        val hasTransmission = num("transmission") > 0.0 ||
+            ref("transmissionTexture")
+        if (hasTransmission) f = f or EXT_TRANSMISSION
+        if (num("ior", 1.5) != 1.5) f = f or EXT_IOR
+        val thickness = num("thickness")
+        if (hasTransmission && thickness > 0.0) f = f or EXT_VOLUME_SOLID
+        val dispersion = num("dispersion")
+        if (dispersion != 0.0) {
+            if (f and EXT_VOLUME_SOLID != 0) {
+                f = f or EXT_DISPERSION
+            } else {
+                // Filament has no `dispersion` field outside SOLID
+                // refraction — documented drop, matching the matrix.
+                warnOnce("mat.$key.dispersion",
+                    "material $key: dispersion=$dispersion needs a" +
+                        " solid refraction volume (transmission +" +
+                        " thickness) — dropped")
+            }
+        }
+        if (num("iridescence") > 0.0 || ref("iridescenceTexture") ||
+            ref("iridescenceThicknessTexture")) {
+            warnOnce("mat.$key.iridescence",
+                "material $key: iridescence has no Filament input" +
+                    " — dropped")
+        }
+        if (num("diffuseTransmission") > 0.0 ||
+            ref("diffuseTransmissionTexture") ||
+            ref("diffuseTransmissionColorTexture")) {
+            warnOnce("mat.$key.diffuseTransmission",
+                "material $key: diffuse transmission has no Filament" +
+                    " input — dropped")
+        }
+        if (!hasTransmission &&
+            (thickness > 0.0 || ref("thicknessTexture") ||
+             props.has("attenuationColor") ||
+             props.has("attenuationDistance"))) {
+            warnOnce("mat.$key.volume",
+                "material $key: volume props without transmission are" +
+                    " inert — dropped")
+        }
+        return f
     }
 
     fun realize(manifest: ByteArray, host: Dart3dView) {
@@ -3346,7 +3542,10 @@ object FsceneRealizer {
                 "material $key: alphaMode '$alphaMode' unknown;" +
                     " treating as opaque")
         }
-        val mi = host.materialForAlphaMode(unlit, alphaMode)
+        // W22: active KHR_materials_* features select a lazily
+        // compiled variant — a base material stays on the prebuilts.
+        val extFlags = if (unlit) 0 else extFlagsFor(key, props)
+        val mi = host.materialForVariant(unlit, alphaMode, extFlags)
             .createInstance()
         if (alphaMode.equals("mask", ignoreCase = true)) {
             mi.setMaskThreshold(
@@ -3399,7 +3598,59 @@ object FsceneRealizer {
             bindTextureSlot(host, mi, props, textures, samplers,
                 "emissiveTexture", "emissiveMap", host.fallbackEmissive,
                 consumers)
+
+            // W22: extension writes ride the same registry the
+            // variant declares — flag-gated so a base-variant instance
+            // never writes a uniform its shader lacks. Spec defaults
+            // fill absent props (uniforms zero-init otherwise).
+            for (f in EXT_FACTORS) {
+                if (extFlags and f.mask == 0) continue
+                if (f.isColor) {
+                    val c = props.tag(f.prop).d3Color() ?: f.default
+                    mi.setParameter(f.uniform, c[0], c[1], c[2], c[3])
+                } else {
+                    // clearcoatNormalScale travels as a duplicated v2 —
+                    // read the scalar from either wire form.
+                    val v = props.tag(f.prop).d3Vec2()?.get(0)?.toDouble()
+                        ?: props.tag(f.prop).d3Double()
+                        ?: f.default[0].toDouble()
+                    mi.setParameter(f.uniform, v.toFloat())
+                }
+            }
+            if (extFlags and EXT_ANISOTROPY != 0) {
+                mi.setParameter("anisotropyUseMap",
+                    if (props.tag("anisotropyTexture").d3Ref() != null)
+                        1f else 0f)
+            }
+            if (extFlags and EXT_TRANSMISSION != 0) {
+                // KHR_materials_volume → Beer–Lambert: transmittance is
+                // attenuationColor^(d/attenuationDistance), so the
+                // absorption coefficient is -ln(color)/distance.
+                val ac = props.tag("attenuationColor").d3Color()
+                    ?: floatArrayOf(1f, 1f, 1f, 1f)
+                val ad = props.tag("attenuationDistance").d3Double()
+                    ?: Double.POSITIVE_INFINITY
+                mi.setParameter("absorption",
+                    (-ln(ac[0].toDouble().coerceAtLeast(1e-5)) / ad)
+                        .toFloat(),
+                    (-ln(ac[1].toDouble().coerceAtLeast(1e-5)) / ad)
+                        .toFloat(),
+                    (-ln(ac[2].toDouble().coerceAtLeast(1e-5)) / ad)
+                        .toFloat())
+            }
+            for (slot in EXT_TEXTURE_SLOTS) {
+                if (extFlags and slot.flag == 0) continue
+                setUvTransform(mi, props, "${slot.prop}Transform",
+                    slot.prefix)
+                bindTextureSlot(host, mi, props, textures, samplers,
+                    slot.prop, "${slot.prefix}Map",
+                    if (slot.prop == "clearcoatNormalTexture" ||
+                        slot.prop == "anisotropyTexture")
+                        host.fallbackNormal else host.fallbackWhite,
+                    consumers)
+            }
         }
+        warnUnhandledMaterialProps(key, props)
         return mi
     }
 
