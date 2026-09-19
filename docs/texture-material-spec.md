@@ -187,3 +187,105 @@ runtime texture swap. Slice of W5 pulled forward:
 
 Perf: log upload ms; 1k texture < 1s; frame time within 15% of the
 W3 baseline (iOS ~60fps, Android ~90fps).
+
+## W22 — `KHR_materials_*` extension family
+
+The importer already emits every extension's material properties into
+the resource `properties` bag (upstream `fscene_emitter` vocabulary —
+factors, texture refs, and `<slot>Transform` maps for
+`KHR_texture_transform`). W22 teaches both realizers that vocabulary:
+what a platform can map natively it maps; what it can't lands on a
+documented approximation, each logged once per material
+(`material <key>: <ext> → …`). A property name outside the handled
+set warn-onces as *unhandled* — that warn is the conformance matrix's
+`warn` row. `unlit` materials ignore extensions, matching the
+importer (which never emits extension props for `KHR_materials_unlit`).
+
+### Support matrix
+
+`realized` = native mapping, no log. `approx` = documented
+approximation or drop, logged once — the material still renders.
+
+| Wire property | iOS (SceneKit) | Android (Filament 1.71.6) |
+|---|---|---|
+| `clearcoat` | approx — environment-reflection intensity on `reflective` | realized — `material.clearCoat` (+`clearCoatIorChange`) |
+| `clearcoatTexture` | approx — R×factor baked into `reflective` intensity map | realized — `clearCoat × map.r` |
+| `clearcoatRoughness` | approx — dropped | realized — `material.clearCoatRoughness` |
+| `clearcoatRoughnessTexture` | approx — dropped | realized — `× map.g` |
+| `clearcoatNormalTexture` | approx — dropped | realized — `material.clearCoatNormal` |
+| `clearcoatNormalScale` | approx — dropped | realized — scales coat-normal xy |
+| `sheenColor` | approx — `reflective` tint + material `fresnelExponent` (yields to clearcoat) | realized — `material.sheenColor` |
+| `sheenRoughness` | approx — folded into `fresnelExponent` | realized — `material.sheenRoughness` |
+| `sheenColorTexture` | approx — dropped | realized — `× map.rgb` |
+| `sheenRoughnessTexture` | approx — dropped | realized — `× map.a` |
+| `specular` | approx — no dielectric-F0 lever under `.physicallyBased` | realized — `material.specularFactor` |
+| `specularColor` | approx — dropped | realized — `material.specularColorFactor` |
+| `specularTexture` | approx — dropped | realized — `× map.a` |
+| `specularColorTexture` | approx — dropped | realized — `× map.rgb` |
+| `anisotropy` | approx — no anisotropic lobe | realized — `material.anisotropy` |
+| `anisotropyRotation` | approx — dropped | realized — rotates `anisotropyDirection` |
+| `anisotropyTexture` | approx — dropped | realized — `rg`→direction ([0,1]→[-1,1]), `b`→strength |
+| `iridescence*` (6 props) | approx — logged drop | approx — logged drop (no Filament input) |
+| `transmission` | approx — alpha-blend via `transparent` (α = 1−t), blend-pass depth rules | realized — `refractionMode: SCREEN_SPACE`, `material.transmission` |
+| `transmissionTexture` | approx — baked α = 1−R×factor | realized — `× map.r` |
+| `thickness` | approx — dropped (no refraction volume) | realized — SOLID→`thickness`, THIN→`microThickness` |
+| `thicknessTexture` | approx — dropped | realized — `× map.g` |
+| `attenuationColor`/`attenuationDistance` | approx — dropped | realized — `absorption = −ln(color)/distance` |
+| `dispersion` | approx — logged drop | realized — `material.dispersion`, **SOLID refraction only**; otherwise warn+drop |
+| `ior` | approx — no IOR lever | realized — `material.ior` (refraction, or reflectance alternative when lit) |
+| `diffuseTransmission*` (4 props) | approx — logged drop | approx — logged drop (no Filament input) |
+
+glTF `KHR_materials_volume` props without `transmission` are inert
+(spec-consistent); both platforms warn-once and drop. An extension
+present at its no-op defaults (e.g. `ior:1.5`, `dispersion:0`) needs
+no variant and logs nothing.
+
+### Android variant mechanics
+
+Filament bakes feature availability into the compiled `Material`, so
+each material resource computes an `extFlags` bitset at decode
+(`FsceneRealizer.extFlagsFor` — a feature is *active* when a factor
+deviates from its no-op default or a texture slot resolves).
+`Dart3dView.materialForVariant(unlit, alphaMode, extFlags)` lazily
+compiles `d3_lit_<blend>_e<flags>` on first use inside the render
+callback — the same lane every decode runs — and caches it;
+zero-flag materials stay on the six prebuilt variants. One registry
+(`EXT_TEXTURE_SLOTS`/`EXT_FACTORS`) names every extension uniform,
+sampler, and UV-transform prefix so the builder's declarations and
+the instance writes can't drift. `view.setScreenSpaceRefractionEnabled(true)`
+is set once at init — without it Filament skips the refraction pass.
+
+### iOS approximation notes
+
+SceneKit's `.physicallyBased` exposes one specular lobe and no
+refraction/sheen/anisotropy/iridescence inputs, so the iOS column is
+mostly approximation: clearcoat rides `reflective` (environment
+intensity, factor-gray or baked map), sheen reuses the same slot with
+a fresnel exponent when clearcoat didn't claim it, and transmission
+becomes straight alpha blend through `transparent` (per-texel alpha
+bake, `.aOne`, depth reads on / writes off — the `blend` alphaMode
+rules). Every drop is named in its once-per-material log.
+
+### `KHR_texture_transform` on extension slots
+
+Every extension texture slot decodes `<slot>Transform`: Android gets
+per-slot `UVTransform`/`UVRotation`/`UVSet` uniforms (uv0/uv1 select,
+same as the base slots); iOS gets `contentsTransform` +
+`mappingChannel` on the bound property. Transforms on dropped
+textures drop with them.
+
+### Conformance harness
+
+`dart3d/example/tool/conformance_runner.dart` walks the vendored
+Khronos glTF-Sample-Assets catalog (`assets/conformance/catalog.json`
+— a distilled manifest, not binary assets), encodes every catalog
+material through the real `writeFscene` path, and classifies each
+wire property against the support table above
+(`kMaterialPropertySupport` — the doc and the table share one
+contract). `dart run tool/conformance_runner.dart` emits the
+per-asset pass/approx/warn matrix plus golden fixtures under
+`dart3d/example/build/conformance/`; `test/material_extensions_test.dart`
+asserts the matrix stays clean (no `warn` rows on either platform).
+Upstream's 37 `smoke_render` scenes are classified for dart3d
+applicability — 19 apply, 16 get generated fixture manifests; the
+live golden comparison is the verify swarm's lane.
