@@ -131,5 +131,31 @@ exercise the real diff path, not hand-written ops:
 - Skins/animations wiring (`skin` flag on `addNode`/`updateNode`)
   — no skin decode on the wire yet (W10).
 - `stageChanged` re-application — env/IBL lands in W7.
-- Prefab `instance` fields inside node specs — no prefab compose
-  support in dart3d's doc model today.
+
+## The `instance` placeholder tag (W15)
+
+A node spec's `instance` member marks a lazy prefab placeholder.
+Natives record the member raw (`instanceSpecs` /
+`NodeRec.instanceSpec`) without realizing content;
+`SceneController.loadSubtree`/`unloadSubtree` stream the expansion
+in and out through `loadSubtree`/`unloadSubtree` envelope ops whose
+nested batch is the op vocabulary above.
+
+`updateNode` tag semantics, both platforms: an `instance` dict sets
+the tag (the unload's restore update), explicit `null` clears it
+(the load's instance update), and an absent key preserves it — a
+reparent-only update (`spec: {}`, as the graft/ungraft ops send)
+must not strip the tag.
+
+Nested lazy instances inside a streamed subtree keep the member on
+their `addNode` spec (prefab-local id space, upstream's unremapped
+rule) and resolve through the public `loadSubtree` — each stream
+record carries `placeholders` (composed id → spec) because streamed
+members never join the tracked document.
+
+`unloadSubtree` emits `removeSkin`/`removeAnimation` for the pools
+the load upserted. Upserted payloads and resources persist by
+design: their ids derive from the prefab's document identity, so
+the host document and sibling instances may legitimately consume
+them — and the vocabulary has no `removePayload`/`removeResource`
+to retract them anyway.

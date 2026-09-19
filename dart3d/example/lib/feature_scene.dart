@@ -69,6 +69,14 @@ import 'package:vector_math/vector_math.dart';
 /// oversized-bounds collider), reads their rest poses back through
 /// `poseOf`, then removes `w5NoRest` so the all-asleep `settled`
 /// event fires again and times three roll→rest cycles on the die.
+/// W15 lands the subtree-streaming lane through the returned
+/// `w15Phase` closure — fired at +112 s — which realizes two lazy
+/// `streamA`/`streamB` prefab placeholders (a 100-cell grid with a
+/// payload-deferred peak; B carries the override/removedNodes/
+/// addedComponents/attachments delta), lands the deferred vertex
+/// chunk, then drops and re-streams streamA three times for the
+/// no-stale-nodes lane. Send and native-visible timestamps log for
+/// the manifest-to-visible latency measurement.
 ///
 /// [ortho] flips the camera's `projection` manifest field; the toggle
 /// is a document reload, the only camera write the protocol carries
@@ -96,6 +104,7 @@ final class FeatureScene {
     void Function() w13Phase,
     void Function() w14Phase,
     void Function() wLoosePhase,
+    void Function() w15Phase,
   })
   build({bool ortho = false, int env = 1, SceneController? controller}) {
     final doc = SceneDocument();
@@ -1507,7 +1516,77 @@ final class FeatureScene {
       root: true,
     );
 
-    // ── W9 joint rig ────────────────────────────────────────────────
+    // ── W15 lazy prefab placeholders ────────────────────────────────
+    // Two lazy instances of the same grid prefab — tagged, contentless
+    // nodes until the +112 s phase streams them (the `instance` member
+    // rides the manifest and the natives record it). `streamB` carries
+    // the per-instance delta lane: a material override retinting the
+    // prefab's `peak` marker the die's red, one corner cell removed, a
+    // point light added on the instance root, and `beacon` grafted
+    // under the peak. The prefab builds in code — `resolve` closures
+    // ARE the host-layer asset resolution (the same contract a bundle
+    // read satisfies); no asset file needed for the harness.
+    final w15 = _w15Prefab();
+    // A host node grafted under streamB's peak at load time and
+    // reparented home on unload — the attachment lane. Before the
+    // stream lands it rests as a plain scene node above the slab.
+    final beacon = doc.createNode(
+      name: 'w15Beacon',
+      transform: TrsTransform(translation: Vector3(0, 0.7, 0)),
+      components: [
+        ComponentSpec(
+          'mesh',
+          properties: {
+            'geometry': ResourceRefValue(ballGeo.id),
+            'material': ResourceRefValue(emissiveMat.id),
+          },
+        ),
+      ],
+      root: true,
+    );
+    final streamA = doc.addNode(
+      NodeSpec(
+        id: doc.newId(),
+        name: 'streamA',
+        transform: TrsTransform(translation: Vector3(-2.9, -0.42, 1.5)),
+        instance: PrefabInstanceSpec(
+          source: const AssetRef('w15-grid'),
+          load: LoadPolicy.lazy,
+        ),
+      ),
+      root: true,
+    );
+    final streamB = doc.addNode(
+      NodeSpec(
+        id: doc.newId(),
+        name: 'streamB',
+        transform: TrsTransform(translation: Vector3(2.9, -0.42, 1.5)),
+        instance: PrefabInstanceSpec(
+          source: const AssetRef('w15-grid'),
+          load: LoadPolicy.lazy,
+          overrides: [
+            PropertyOverride(
+              target: w15.peak,
+              path: 'components.mesh.material',
+              value: ResourceRefValue(material.id),
+            ),
+          ],
+          removedNodes: [w15.cornerCell],
+          addedComponents: [
+            ComponentSpec(
+              'pointLight',
+              properties: {
+                'color': ColorValue(1.0, 0.8, 0.5, 1),
+                'intensity': DoubleValue(60),
+                'range': DoubleValue(6),
+              },
+            ),
+          ],
+          attachments: [Attachment(beacon.id, parent: w15.peak)],
+        ),
+      ),
+      root: true,
+    );
     // Fired by the app's +12 s timer (after the W8 query battery). A
     // back-row of small bodies hung off static anchors — one lane per
     // joint type — shipped end to end through `command` ops: one
@@ -3329,6 +3408,94 @@ final class FeatureScene {
       });
     }
 
+    // W15 phase (+112 s): the subtree-streaming lane. streamA loads
+    // the 100-cell grid plain; streamB loads it with the authored
+    // delta (red peak, missing corner, added light, grafted beacon).
+    // The peak's vertex chunk is declared byte-less in the prefab, so
+    // both peaks stay unrealized until the +2.4 s `upsertPayload`
+    // lands it on every consumer at once — the post-manifest payload
+    // lane. streamA then drops and re-streams three times for the
+    // no-stale-nodes lane. Send-side timestamps pair with the natives'
+    // `apply`/`visible` stamps for the manifest-to-visible metric.
+    void addW15Phase() {
+      final c = controller;
+      if (c == null) return;
+      // The streamed deferred chunk's wire id is the composed doc's —
+      // upstream's _sharedId remap is private, so discover it by
+      // running the same expansion the load runs (deterministic ids,
+      // so this compose is the exact one the ops carry).
+      final discovery = SceneDocument();
+      discovery.addNode(
+        NodeSpec(
+          id: streamA.id,
+          instance: streamA.instance!.copyWith(load: LoadPolicy.eager),
+        ),
+      );
+      final peakChunk = composeScene(
+        discovery,
+        resolve: (ref) => _w15Resolve(w15.document, ref),
+      ).payloads.values.firstWhere((p) => p.bytes == null).id;
+      var loads = 0;
+      var unloads = 0;
+      void load(LocalId id, String label) {
+        loads++;
+        dnLog(
+          'dart3d: w15 loadSubtree $label sent '
+          't=${DateTime.now().millisecondsSinceEpoch}',
+        );
+        c.loadSubtree(id, resolve: (ref) => _w15Resolve(w15.document, ref));
+      }
+
+      void unload(LocalId id, String label) {
+        unloads++;
+        dnLog(
+          'dart3d: w15 unloadSubtree $label sent '
+          't=${DateTime.now().millisecondsSinceEpoch}',
+        );
+        c.unloadSubtree(id);
+      }
+
+      load(streamA.id, 'A#1');
+      Timer(const Duration(milliseconds: 1200), () => load(streamB.id, 'B#1'));
+      Timer(const Duration(milliseconds: 2400), () {
+        dnLog(
+          'dart3d: w15 deferred peak chunk sent '
+          't=${DateTime.now().millisecondsSinceEpoch}',
+        );
+        c.applyCommands([
+          {
+            'op': 'upsertPayload',
+            'id': 'chunk:${peakChunk.toToken()}',
+            'bytes': base64Encode(w15.peakBytes),
+            'encoding': PayloadEncoding.vertexBuffer.name,
+            'layout': 'unskinned_uv1_tangent',
+            'length': w15.peakBytes.lengthInBytes,
+          },
+        ]);
+      });
+      Timer(
+        const Duration(milliseconds: 3600),
+        () => unload(streamA.id, 'A#1'),
+      );
+      Timer(const Duration(milliseconds: 4800), () => load(streamA.id, 'A#2'));
+      Timer(
+        const Duration(milliseconds: 6000),
+        () => unload(streamA.id, 'A#2'),
+      );
+      Timer(const Duration(milliseconds: 7200), () => load(streamA.id, 'A#3'));
+      Timer(
+        const Duration(milliseconds: 8400),
+        () => unload(streamA.id, 'A#3'),
+      );
+      Timer(const Duration(milliseconds: 9600), () => load(streamA.id, 'A#4'));
+      Timer(const Duration(seconds: 12), () {
+        dnLog(
+          'dart3d: w15 lane complete — $loads loads, $unloads unloads '
+          '(3 cycles on streamA; expected final state: both grids live)',
+        );
+      });
+    }
+
     return (
       document: doc,
       die: die.id,
@@ -3340,6 +3507,7 @@ final class FeatureScene {
       w13Phase: addW13Phase,
       w14Phase: addW14Phase,
       wLoosePhase: addWLoosePhase,
+      w15Phase: addW15Phase,
     );
   }
 
@@ -3464,6 +3632,150 @@ final class FeatureScene {
         max: Vector3(0.4, 0.55, 0.45),
       ),
     );
+  }
+
+  /// The W15 streamed prefab — a 10×10 cell grid under a container
+  /// root (the ~100-node perf lane) plus `peak`, a payload-geometry
+  /// marker whose vertex chunk is declared byte-less: the streamed
+  /// subtree's peak geometry stays unresolved until a post-load
+  /// `upsertPayload` lands it (the post-manifest payload lane). The
+  /// returned ids are prefab-local — overrides/attachments name them,
+  /// and `peakBytes` is the chunk the phase ships under the composed
+  /// id upstream's shared-resource remap produces.
+  static ({
+    SceneDocument document,
+    LocalId peak,
+    LocalId cornerCell,
+    Uint8List peakBytes,
+  })
+  _w15Prefab() {
+    final prefab = SceneDocument();
+    final cellGeo = prefab.addResource(
+      GeometryResource(
+        prefab.newId(),
+        procedural: CuboidGeometrySpec(extents: Vector3.all(0.16)),
+      ),
+    );
+    final cellMat = prefab.addResource(
+      MaterialResource(
+        prefab.newId(),
+        type: 'physicallyBased',
+        properties: {
+          'baseColor': ColorValue(0.2, 0.45, 0.95, 1.0),
+          'metallic': DoubleValue(0.0),
+          'roughness': DoubleValue(0.6),
+        },
+      ),
+    );
+    final peakQuad = _quad(0.3);
+    final peakVerts = prefab.addPayload(
+      PayloadSpec(
+        prefab.newId(),
+        encoding: PayloadEncoding.vertexBuffer,
+        layout: 'unskinned_uv1_tangent',
+        length: peakQuad.vertices.lengthInBytes,
+        // bytes stay null — the deferred-arrival lane.
+      ),
+    );
+    final peakIndices = prefab.addPayload(
+      PayloadSpec(
+        prefab.newId(),
+        encoding: PayloadEncoding.indexBuffer,
+        format: 'uint16',
+        length: peakQuad.indices.lengthInBytes,
+        bytes: peakQuad.indices,
+      ),
+    );
+    final peakGeo = prefab.addResource(
+      GeometryResource(
+        prefab.newId(),
+        vertices: peakVerts.id,
+        indices: peakIndices.id,
+        bounds: peakQuad.bounds,
+      ),
+    );
+    final peakMat = prefab.addResource(
+      MaterialResource(
+        prefab.newId(),
+        type: 'physicallyBased',
+        properties: {
+          'baseColor': ColorValue(0.95, 0.75, 0.2, 1.0),
+          'emissive': ColorValue(0.6, 0.45, 0.08, 1.0),
+          'metallic': DoubleValue(0.1),
+          'roughness': DoubleValue(0.4),
+        },
+      ),
+    );
+
+    final cells = <NodeSpec>[];
+    for (var i = 0; i < 100; i++) {
+      cells.add(
+        prefab.addNode(
+          NodeSpec(
+            id: prefab.newId(),
+            name: 'w15.cell$i',
+            transform: TrsTransform(
+              translation: Vector3(
+                (i % 10 - 4.5) * 0.26,
+                0.08,
+                (i ~/ 10 - 4.5) * 0.26,
+              ),
+            ),
+            components: [
+              ComponentSpec(
+                'mesh',
+                properties: {
+                  'geometry': ResourceRefValue(cellGeo.id),
+                  'material': ResourceRefValue(cellMat.id),
+                },
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    final peak = prefab.addNode(
+      NodeSpec(
+        id: prefab.newId(),
+        name: 'w15.peak',
+        transform: TrsTransform(translation: Vector3(0, 0.75, 0)),
+        components: [
+          ComponentSpec(
+            'mesh',
+            properties: {
+              'geometry': ResourceRefValue(peakGeo.id),
+              'material': ResourceRefValue(peakMat.id),
+            },
+          ),
+        ],
+      ),
+    );
+    prefab.addNode(
+      NodeSpec(
+        id: prefab.newId(),
+        name: 'w15.root',
+        children: [for (final c in cells) c.id, peak.id],
+      ),
+      root: true,
+    );
+    return (
+      document: prefab,
+      peak: peak.id,
+      cornerCell: cells[0].id,
+      peakBytes: peakQuad.vertices,
+    );
+  }
+
+  /// The W15 host-layer resolve — the built [prefab] stands in for a
+  /// bundle `.fscene` read (same `PrefabResolver` contract). The doc
+  /// identity matters: shared resource/payload ids derive from the
+  /// prefab's `documentId`, so every resolve must return the same
+  /// object or the deferred-chunk claim lands on a different id.
+  static SceneDocument _w15Resolve(SceneDocument prefab, AssetRef ref) {
+    if (ref.key != 'w15-grid') {
+      throw FsceneFormatException('w15: unknown prefab "${ref.key}"');
+    }
+    return prefab;
   }
 
   /// A face-up quad of edge `2 * half` packed into the upstream

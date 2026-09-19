@@ -154,6 +154,36 @@ import 'scene_model.dart';
 ///    for a `RenderTextureResource` whose `update` is `'manual'`
 ///    (also valid for `interval` — forces an early refresh).
 ///
+/// W15 streams lazy prefab subtrees. A node whose spec carries an
+/// `instance` member (manifest `nodes` entry, `addNode`, or
+/// `updateNode` — the member always travels with the full spec) is a
+/// placeholder: the native records the tag but realizes no content
+/// for it until the subtree lands. `SceneController.loadSubtree`
+/// composes the instance's prefab upstream and ships the result as
+/// the standard structural batch nested under an envelope op;
+/// `unloadSubtree` ships the reverse batch:
+///
+/// - `{"op":"loadSubtree","node":"<id>","ops":[<op>,…]}` — requires
+///    `node` to exist (it is the placeholder; a node without the
+///    `instance` tag warns and still applies — the batch is
+///    self-describing). `ops` are applied in order through the same
+///    dispatch as top-level commands: the first `updateNode` re-specs
+///    the instance without the `instance` member, which clears the
+///    placeholder tag; payload/resource upserts land before the
+///    member `addNode`s (parents precede children); `Attachment`
+///    grafts arrive as reparent-only `updateNode`s.
+/// - `{"op":"unloadSubtree","node":"<id>","ops":[<op>,…]}` — same
+///    envelope around the reverse batch: attachment targets reparent
+///    to their authored parents first (so grafted host nodes leave
+///    the doomed subtree), `removeNode` drops each streamed root,
+///    and a final `updateNode` restores the placeholder spec — the
+///    `instance` member rides the wire again and the node re-tags.
+///
+/// The envelope keeps one subtree mutation atomic inside the mutation
+/// queue's drain — no partial subtree is observable between commands.
+/// Repeating either op is safe by the same idempotency rules as the
+/// ops it carries.
+///
 /// Physics ops act on nodes' rigid bodies and carry `.fscene`-space
 /// vectors (the native side applies the same LH→RH z-mirror as for
 /// transforms; torque/angular axes are pseudovectors and mirror like

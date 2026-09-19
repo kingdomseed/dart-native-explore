@@ -237,7 +237,7 @@ verification additionally used a `readPixels(RenderTarget)` probe
 identity matched `rec.colorTex`. No `w14.*` warnings on either
 platform.
 
-## W15 — Prefabs and subtree streaming
+## W15 — Prefabs and subtree streaming — DONE (implemented, live-verified)
 
 **Scope.**
 
@@ -254,6 +254,63 @@ platform.
 
 **Verification.** Lazy subtree streams in/out live on both platforms;
 overrides apply.
+
+**As built.** A node whose spec carries `instance` is a lazy prefab
+placeholder: it rides the manifest (or an `addNode`) tagged and
+contentless, and the natives record the member raw
+(`instanceSpecs`/`NodeRec.instanceSpec`) without realizing content.
+`SceneController.loadSubtree`/`loadSubtreeAsync` compose the
+placeholder's prefab through upstream `composeScene`/`composeSceneAsync`
+on a scratch document (load flipped to eager; compose's in-place
+mutations stay off the tracked document) and ship the expansion as the
+standard structural batch inside one envelope op —
+`{"op":"loadSubtree","node":"<id>","ops":[…]}` — so the subtree lands
+through the same decode paths a diff uses: payload/resource upserts
+first, then the instance's own `updateNode` (an explicit
+`instance: null` in the spec clears the tag — absent preserves it,
+which is what keeps the reparent-only graft/ungraft updates from
+stripping it), member `addNode`s parent-before-child,
+`Attachment` grafts as reparent-only `updateNode`s, then
+skin/animation upserts. `unloadSubtree` ships the reverse batch:
+attachment targets reparent to their authored parents,
+`removeSkin`/`removeAnimation` retract the pools the load upserted,
+`removeNode` drops each streamed root, and a final `updateNode`
+restores the placeholder spec so the node re-tags for the next
+load. Upserted payloads and resources persist across unload by
+design — their ids are shared per prefab document and the
+vocabulary has no remove ops for them. Per-instance
+ids derive from (instance id, prefab-local id) and shared
+resource/payload ids from the prefab's document identity, exactly as a
+pre-realize compose produces — a streamed subtree is
+indistinguishable on the wire from one that arrived expanded.
+`removedComponentTypes` is honored too. Nested lazy instances inside a
+streamed prefab keep their `instance` member (prefab-local id space
+per upstream's unremapped rule) and arrive as placeholders a later
+`loadSubtree` resolves — the stream record's `placeholders` map
+carries their specs since streamed members never join the tracked
+document. Nested ops dispatch through the same command
+handler inside one mutation-queue drain, so a subtree lands/drops
+atomically between frames; repeated ops follow the carried ops'
+idempotency rules. Wire contract documented in `protocol.dart` (W15
+section). New API: `loadSubtree`, `loadSubtreeAsync`,
+`unloadSubtree`, `loadDocumentComposed`, `encodeSubtreeLoad`,
+`encodeSubtreeLoadAsync`, `encodeSubtreeUnload`, `StreamedSubtree`
+(`subtree_stream.dart`, exported via the barrel).
+
+**Evidence.** 157 `dn test` (7 new in
+`example/test/subtree_stream_test.dart`: placeholder-tag encoding, the
+canonical batch shape, overrides/memberComponents/addedComponents/
+removedComponentTypes/attachments inside the emitted ops, nested lazy
+passthrough, priorRoots replacement, the unload reversal, and the
+diff bridge); `dn analyze` clean. Live lane in the example harness at
++112 s: `streamA`/`streamB` lazy placeholders for a 100-cell grid
+prefab — A streams plain, B streams with a material override on the
+peak, one corner cell removed, an added point light, and the `beacon`
+host node grafted under the peak; the peak's vertex chunk is declared
+byte-less and lands via a post-load `upsertPayload` (deferred-arrival
+lane); streamA then unloads/re-streams three times for the
+no-stale-nodes check. Dart logs send timestamps; both natives log
+apply→first-visible-frame stamps for the manifest-to-visible metric.
 
 ## W16 — Trails and LOD
 
