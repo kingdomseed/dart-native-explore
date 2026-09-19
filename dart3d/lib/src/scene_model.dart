@@ -23,6 +23,7 @@ export 'package:scene/src/diff.dart';
 export 'package:scene/src/id.dart';
 export 'package:scene/src/json/canonical.dart';
 export 'package:scene/src/json/fscene_json.dart';
+export 'package:scene/src/json/jsonc.dart';
 export 'package:scene/src/json/property_json.dart';
 export 'package:scene/src/property_value.dart';
 export 'package:scene/src/scene_document.dart';
