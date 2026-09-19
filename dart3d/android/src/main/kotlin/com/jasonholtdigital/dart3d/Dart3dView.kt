@@ -1,6 +1,7 @@
 package com.jasonholtdigital.dart3d
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Typeface
 import android.opengl.Matrix
 import android.util.Base64
@@ -67,7 +68,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
 
     // MARK: - Filament objects (created eagerly — none need the surface)
 
-    val engine: Engine = Engine.create()
+    val engine: Engine = createEngine()
     private val renderer: Renderer = engine.createRenderer()
     val scene: Scene = engine.createScene()
     private val view: View = engine.createView()
@@ -75,6 +76,37 @@ class Dart3dView(context: Context) : FrameLayout(context) {
 
     private val surfaceView = SurfaceView(context)
     private val uiHelper = UiHelper(UiHelper.ContextErrorPolicy.DONT_CHECK)
+
+    /**
+     * W30 backend selection, resolved once per engine. An explicit
+     * `Dart3dSetBackend` pref (the example's `DART3D_BACKEND` define)
+     * wins; `auto` takes [DEFAULT_BACKEND] when the device declares
+     * Vulkan and falls back to OpenGL when it does not. A backend that
+     * fails to build (Vulkan claimed but unusable) retries on OpenGL.
+     */
+    private fun createEngine(): Engine {
+        val pref = Dart3dJni.nativeBackendPref()
+        var backend = when (pref) {
+            BACKEND_OPENGL -> Engine.Backend.OPENGL
+            BACKEND_VULKAN -> Engine.Backend.VULKAN
+            else -> if (context.packageManager.hasSystemFeature(
+                    PackageManager.FEATURE_VULKAN_HARDWARE_VERSION)) {
+                DEFAULT_BACKEND
+            } else {
+                Engine.Backend.OPENGL
+            }
+        }
+        val engine = try {
+            Engine.Builder().backend(backend).build()
+        } catch (e: Exception) {
+            if (backend == Engine.Backend.OPENGL) throw e
+            Log.w(TAG, "Filament $backend engine failed, retrying on OpenGL", e)
+            backend = Engine.Backend.OPENGL
+            Engine.Builder().backend(backend).build()
+        }
+        Log.i(TAG, "Filament engine backend: $backend (pref=$pref)")
+        return engine
+    }
 
     private val cameraEntity: Int
     private val camera: Camera
@@ -506,6 +538,12 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         }
         val b = MaterialBuilder()
             .platform(MaterialBuilder.Platform.MOBILE)
+            // W30: SPIR-V under Vulkan, GLSL under OpenGL — matched to
+            // the backend the engine actually resolved (incl. fallback).
+            // (TargetApi.ALL would be tempting; it doesn't emit Vulkan.)
+            .targetApi(if (engine.backend == Engine.Backend.VULKAN)
+                MaterialBuilder.TargetApi.VULKAN
+                else MaterialBuilder.TargetApi.OPENGL)
             .name((if (unlit) "d3_unlit" else "d3_lit") + blendSuffix)
             .shading(if (unlit) MaterialBuilder.Shading.UNLIT
                 else MaterialBuilder.Shading.LIT)
@@ -2222,6 +2260,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             tv.text = String.format(Locale.US,
                 "%.0f fps  %.1f ms\n%d entities  %d bodies",
                 fps, ms, nodesById.size, bodies.size)
+            // Same numbers in logcat so the W30 backend A/B and perf
+            // lanes read frame times without watching the screen.
+            Log.i(TAG, String.format(Locale.US,
+                "stats %.0f fps  %.1f ms/frame  %d entities  %d bodies",
+                fps, ms, nodesById.size, bodies.size))
             statsWindowStart = tNanos
             statsFrames = 0
         }
@@ -3735,6 +3778,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             "fixed", "spherical", "revolute", "prismatic", "generic")
         private val JOINT_MOTIONS = setOf("locked", "free", "limited")
         private const val PI_F = 3.1415927f
+        // W30: Dart3dSetBackend wire values, shared with the Dart caller.
+        private const val BACKEND_OPENGL = 1
+        private const val BACKEND_VULKAN = 2
+        /** Auto-mode default, set from the W30 A142 A/B measurement. */
+        private val DEFAULT_BACKEND = Engine.Backend.VULKAN
         const val D3_MSG_HELLO = 1
         const val D3_MSG_LOAD_SCENE = 2
         const val D3_MSG_PAYLOAD = 3
