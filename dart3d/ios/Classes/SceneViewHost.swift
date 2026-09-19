@@ -676,8 +676,11 @@ final class SceneViewHost: SCNView {
         payloadStore.removeAll()
         realizePending = false
         // W15: the new document's session keys invalidate every
-        // recorded subtree batch — drop them before the realize.
+        // recorded subtree batch — drop them before the realize, and
+        // any pending visible-stamp with them (its node id belongs to
+        // the outgoing scene).
         streamedSubtreeOps.removeAll()
+        subtreeVisibleStamp = nil
         // Shadow-tier registry is per-scene — repopulated by the
         // coming decode's light pass.
         shadowAuthored.removeAll()
@@ -884,14 +887,26 @@ final class SceneViewHost: SCNView {
         // each live subtree from its recorded load batch. An unload
         // drops the record first so a wiped placeholder can't
         // resurrect its subtree; a load records only once the
-        // placeholder is known live.
-        streamedSubtreeOps.removeAll { $0.key == key }
+        // placeholder is known live. A re-load replaces the record
+        // in place — replay order stays load order, so a subtree
+        // another stream's members parent into still replays before
+        // its dependents (Android's LinkedHashMap re-put semantics).
+        let existing = streamedSubtreeOps.firstIndex { $0.key == key }
         guard nodesById[key] != nil else {
+            if let i = existing { streamedSubtreeOps.remove(at: i) }
             logOnce("\(opName).missing.\(key)",
                 "\(opName) on missing node \(key); ignoring")
             return
         }
-        if loading { streamedSubtreeOps.append((key: key, ops: ops)) }
+        if loading {
+            if let i = existing {
+                streamedSubtreeOps[i] = (key: key, ops: ops)
+            } else {
+                streamedSubtreeOps.append((key: key, ops: ops))
+            }
+        } else if let i = existing {
+            streamedSubtreeOps.remove(at: i)
+        }
         // The tag state that disagrees with the op is the mismatch —
         // a load expects the placeholder still tagged (its first
         // nested op clears it); an unload expects it cleared already
@@ -945,7 +960,18 @@ final class SceneViewHost: SCNView {
         if streamedSubtreeOps.isEmpty { return }
         subtreeReplayActive = true
         defer { subtreeReplayActive = false }
+        var dead: Set<UInt64> = []
         for (key, ops) in streamedSubtreeOps {
+            // A replayed batch can doom a later record's placeholder
+            // (a priorRoots `removeNode` taking a placeholder grafted
+            // into the doomed subtree): `removeSubtree` drops the
+            // record from the live list but the loop still iterates
+            // the COW snapshot, and its addNodes would resolve a dead
+            // parent — rooting the resurrected members at scene root.
+            guard nodesById[key] != nil else {
+                dead.insert(key)
+                continue
+            }
             for case let opJson as [String: Any] in ops {
                 applyCommandJson(opJson)
             }
@@ -953,6 +979,9 @@ final class SceneViewHost: SCNView {
                 d3Log("subtree replay: placeholder \(key) missing"
                     + " after re-realize")
             }
+        }
+        if !dead.isEmpty {
+            streamedSubtreeOps.removeAll { dead.contains($0.key) }
         }
     }
 
@@ -1193,14 +1222,17 @@ final class SceneViewHost: SCNView {
             logOnce("updateNode.flag.\(f)",
                 "updateNode flag '\(f)' not implemented")
         }
-        // W15: the spec is complete — its `instance` member is the
-        // placeholder tag's post-update state. A loadSubtree's
-        // instance update arrives without the member (clearing the
-        // tag); an unloadSubtree's restore carries it (re-tagging).
-        if let inst = spec["instance"] as? [String: Any] {
-            ctx.instanceSpecs[key] = inst
-        } else {
-            ctx.instanceSpecs.removeValue(forKey: key)
+        // W15: `instance` in the spec is the placeholder tag's
+        // post-update state — a dict sets it (an unload's restore),
+        // explicit null clears it (the load's instance update), and
+        // an absent key preserves it: a reparent-only update carries
+        // no spec fields and must not strip the tag.
+        if spec.keys.contains("instance") {
+            if let inst = spec["instance"] as? [String: Any] {
+                ctx.instanceSpecs[key] = inst
+            } else {
+                ctx.instanceSpecs.removeValue(forKey: key)
+            }
         }
         publish(ctx)
         promoteCamera(ctx)

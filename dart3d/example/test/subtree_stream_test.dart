@@ -11,6 +11,8 @@
 // encoders are what these assertions exercise.
 // ignore_for_file: implementation_imports
 
+import 'dart:typed_data';
+
 import 'package:dart3d/src/diff_apply.dart';
 import 'package:dart3d/src/scene_model.dart';
 import 'package:dart3d/src/subtree_stream.dart';
@@ -30,6 +32,9 @@ void main() {
   const matId = LocalId(7, 21);
   const hostMatId = LocalId(9, 20);
   const lazyInnerId = LocalId(7, 5);
+  const ibmId = LocalId(7, 30);
+  const skinId = LocalId(7, 40);
+  const animId = LocalId(7, 41);
 
   ComponentSpec mesh(LocalId geo, LocalId mat) => ComponentSpec(
     'mesh',
@@ -108,6 +113,31 @@ void main() {
         ],
       ),
       root: true,
+    );
+    // A skin + animation pool entry — the unload reversal must
+    // retract what the load upserts.
+    prefab.addPayload(
+      PayloadSpec(
+        ibmId,
+        encoding: PayloadEncoding.floats,
+        length: 64,
+        bytes: Uint8List(64),
+      ),
+    );
+    prefab.addSkin(SkinSpec(skinId, joints: [aId], inverseBindMatrices: ibmId));
+    prefab.addAnimation(
+      AnimationSpec(
+        animId,
+        name: 'spin',
+        channels: [
+          AnimationChannelSpec(
+            target: aId,
+            property: AnimationProperty.rotation,
+            timeline: ibmId,
+            keyframes: ibmId,
+          ),
+        ],
+      ),
     );
 
     final host = SceneDocument();
@@ -274,13 +304,16 @@ void main() {
     final upserts = ops.where((o) => o['op'] == 'upsertResource');
     expect(upserts.length, 2); // prefab geometry + material
 
-    // The instance's own update re-specs it without `instance` — that
-    // absence is what clears the native placeholder tag.
+    // The instance's own update carries explicit `instance: null` —
+    // the wire's clear-the-tag signal. An absent member would read as
+    // "unchanged" natively (a reparent-only update must not strip the
+    // tag).
     final instUpdate = ops.firstWhere(
       (o) => o['op'] == 'updateNode' && o['node'] == instId.toToken(),
     );
     final spec = opSpec(instUpdate);
-    expect(spec.containsKey('instance'), isFalse);
+    expect(spec.containsKey('instance'), isTrue);
+    expect(spec['instance'], isNull);
     // The single-root prefab merges its root into the instance: the
     // root's mesh lands on the instance's components, plus the added
     // pointLight; the `marker` type is stripped.
@@ -332,6 +365,9 @@ void main() {
     );
     expect(reparent['flags'], ['reparented']);
     expect(reparent['parent'], aAdd['node']);
+    // The reparent spec carries no `instance` member — the counterpart
+    // of the explicit-null contract: absent means preserve the tag.
+    expect(opSpec(reparent).containsKey('instance'), isFalse);
 
     // Streamed roots = just `a` (b removed; beacon is an attachment,
     // not a root; the merged single-root prefab has no separate root).
@@ -343,13 +379,27 @@ void main() {
   test('priorRoots not re-produced get a removeNode first', () {
     final d = docs();
     const stale = LocalId(3, 99);
+    const stale2 = LocalId(3, 100);
     final result = encodeSubtreeLoad(
       d.host.nodes[instId]!,
       resolve: resolve,
       hostDoc: d.host,
-      priorRoots: [stale],
+      priorRoots: [stale, stale2],
     );
     expect(result.ops.first, {'op': 'removeNode', 'node': stale.toToken()});
+    // Every doomed root's removeNode lands before the batch's first
+    // add/update — the order the native replay fix relies on: a
+    // re-load can doom another stream's placeholder, and its record
+    // must be dead before any member re-realizes (F1).
+    final firstAdd = result.ops.indexWhere(
+      (o) => o['op'] == 'addNode' || o['op'] == 'updateNode',
+    );
+    final removes = result.ops
+        .where((o) => o['op'] == 'removeNode')
+        .map((o) => o['node'])
+        .toList();
+    expect(removes, [stale.toToken(), stale2.toToken()]);
+    expect(firstAdd, greaterThan(removes.length - 1));
   });
 
   test('unloadSubtree reverses the load: reparent, removes, retag', () {
@@ -448,5 +498,97 @@ void main() {
       {for (final id in reachable) id.toToken()},
       reason: 'streamed adds must match the reachable composed members',
     );
+  });
+
+  test('loadSubtree throws when removedNodes deletes the merged root', () {
+    final d = docs();
+    final inst = d.host.nodes[instId]!;
+    // The prefab's single root merges into the instance node — a
+    // removedNodes entry naming it deletes the merged node upstream,
+    // leaving nothing to stream. The encoder rejects it rather than
+    // null-crashing on the absent composed node.
+    final doomed = NodeSpec(
+      id: inst.id,
+      name: inst.name,
+      transform: inst.transform,
+      instance: inst.instance!.copyWith(removedNodes: [rootId]),
+    );
+    expect(
+      () => encodeSubtreeLoad(doomed, resolve: resolve, hostDoc: d.host),
+      throwsArgumentError,
+    );
+  });
+
+  test('unloadSubtree retracts the skins and animations it added', () {
+    final d = docs();
+    final loaded = encodeSubtreeLoad(
+      d.host.nodes[instId]!,
+      resolve: resolve,
+      hostDoc: d.host,
+    );
+    // The stream upserts the prefab's skin/animation pools under
+    // their per-instance composed ids, and the record keeps them.
+    expect(loaded.streamed.skins, isNotEmpty);
+    expect(loaded.streamed.animations, isNotEmpty);
+    expect(
+      loaded.ops.where((o) => o['op'] == 'upsertSkin').map((o) => o['id']),
+      [for (final s in loaded.streamed.skins) 'skin:${s.toToken()}'],
+    );
+    expect(
+      loaded.ops.where((o) => o['op'] == 'upsertAnimation').map((o) => o['id']),
+      [for (final a in loaded.streamed.animations) 'anim:${a.toToken()}'],
+    );
+    final unload = encodeSubtreeUnload(
+      d.host.nodes[instId]!,
+      streamed: loaded.streamed,
+      attachmentHomes: {beaconId: null},
+      hostDoc: d.host,
+    );
+    // Dependents detach before the nodes they reference — the
+    // canonical remove order: reparents out, skin/clip removes, then
+    // the streamed roots' removeNode.
+    final kinds = unload.map((o) => o['op']).toList();
+    expect(kinds.first, 'updateNode');
+    final firstRemoveNode = kinds.indexOf('removeNode');
+    expect(
+      kinds.sublist(1, firstRemoveNode),
+      everyElement(isIn(['removeSkin', 'removeAnimation'])),
+    );
+    expect(unload.where((o) => o['op'] == 'removeSkin').map((o) => o['id']), [
+      for (final s in loaded.streamed.skins) 'skin:${s.toToken()}',
+    ]);
+    expect(
+      unload.where((o) => o['op'] == 'removeAnimation').map((o) => o['id']),
+      [for (final a in loaded.streamed.animations) 'anim:${a.toToken()}'],
+    );
+  });
+
+  test('nested lazy placeholders resolve through the stream record', () {
+    final d = docs();
+    final loaded = encodeSubtreeLoad(
+      d.host.nodes[instId]!,
+      resolve: resolve,
+      hostDoc: d.host,
+    );
+    final innerAdd = loaded.ops.firstWhere((o) {
+      return o['op'] == 'addNode' && opSpec(o)['name'] == 'inner';
+    });
+    final innerId = LocalId.parse(innerAdd['node']! as String);
+    // Streamed members never join the tracked document — the record's
+    // placeholders map is what the public loadSubtree resolves them
+    // through. The recorded spec is the emitted addNode's: `instance`
+    // intact, prefab-local id space.
+    final nested = loaded.streamed.placeholders[innerId];
+    expect(nested, isNotNull);
+    expect(nested!.instance!.source.key, 'nested');
+    expect(nested.instance!.load, LoadPolicy.lazy);
+    // The recorded spec feeds encodeSubtreeLoad directly — the same
+    // call SceneController.loadSubtree makes on the resolved node.
+    final inner = encodeSubtreeLoad(nested, resolve: resolve);
+    final innerUpdate = inner.ops.firstWhere(
+      (o) => o['op'] == 'updateNode' && o['node'] == innerId.toToken(),
+    );
+    expect(opSpec(innerUpdate).containsKey('instance'), isTrue);
+    expect(opSpec(innerUpdate)['instance'], isNull);
   });
 }

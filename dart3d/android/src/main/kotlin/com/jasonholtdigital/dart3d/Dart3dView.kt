@@ -1206,8 +1206,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         payloadStore.clear()
         realizePending = false
         // W15: the new document's session keys invalidate every
-        // recorded subtree batch — drop them before the realize.
+        // recorded subtree batch — drop them before the realize, and
+        // any pending visible-stamp with them (its node id belongs to
+        // the outgoing scene).
         streamedSubtreeOps.clear()
+        subtreeVisibleStamp = null
         FsceneRealizer.realize(data, this)
     }
 
@@ -1532,7 +1535,15 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // placeholder is known live.
         if (!loading) streamedSubtreeOps.remove(key)
         val rec = nodesById[key] ?: run {
+            // A stale record must not survive a dead placeholder —
+            // unload already removed above; a load on a missing node
+            // drops whatever lingered (iOS removes for both).
+            streamedSubtreeOps.remove(key)
             Log.w(TAG, "$opName: node $key not live — no-op"); return }
+        // A re-load's re-put keeps the record's load-order slot —
+        // replay order stays load order, so a subtree another stream's
+        // members parent into still replays before its dependents
+        // (iOS replaces the record in place — same semantics).
         if (loading) streamedSubtreeOps[key] = ops
         // The tag state that disagrees with the op is the mismatch —
         // a load expects the placeholder still tagged (its first
@@ -1581,7 +1592,19 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         if (streamedSubtreeOps.isEmpty()) return
         subtreeReplayActive = true
         try {
-            for ((key, ops) in streamedSubtreeOps) {
+            // A replayed batch can doom a later record's placeholder
+            // (a priorRoots removeNode taking a placeholder grafted
+            // into the doomed subtree): removeNode prunes the map
+            // inline, so iterate a snapshot — and skip records whose
+            // placeholder is already dead, since their addNodes would
+            // resolve a dead parent and root the resurrected members
+            // at scene root.
+            val dead = HashSet<Long>()
+            for ((key, ops) in streamedSubtreeOps.toList()) {
+                if (nodesById[key] == null) {
+                    dead += key
+                    continue
+                }
                 for (i in 0 until ops.length()) {
                     ops.optJSONObject(i)?.let { applyCommandJson(it) }
                 }
@@ -1590,6 +1613,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                         " missing after re-realize")
                 }
             }
+            streamedSubtreeOps.keys.removeAll(dead)
         } finally {
             subtreeReplayActive = false
         }

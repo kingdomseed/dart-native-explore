@@ -3646,7 +3646,6 @@ final class FeatureScene {
     SceneDocument document,
     LocalId peak,
     LocalId cornerCell,
-    LocalId peakVerts,
     Uint8List peakBytes,
   })
   _w15Prefab() {
@@ -3763,7 +3762,6 @@ final class FeatureScene {
       document: prefab,
       peak: peak.id,
       cornerCell: cells[0].id,
-      peakVerts: peakVerts.id,
       peakBytes: peakQuad.vertices,
     );
   }
