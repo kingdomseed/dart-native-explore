@@ -14,8 +14,17 @@
 library;
 
 export 'src/animation.dart';
+export 'src/components.dart'
+    show
+        encodeRenderCommand,
+        encodeSelectVariantCommand,
+        kRealizedFeatures,
+        missingRequiredFeatures,
+        unrealizedFeatureWarnings;
 export 'src/diff_apply.dart';
+export 'src/doc_layer.dart';
 export 'src/fsceneb_reader.dart';
+export 'src/glb_import.dart';
 export 'src/scene_model.dart';
 export 'src/scene_controller.dart' show NodeTransform, SceneController;
 export 'src/scene_view.dart' show SceneQuality, SceneView;
