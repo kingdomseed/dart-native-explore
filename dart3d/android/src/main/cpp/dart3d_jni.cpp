@@ -13,6 +13,7 @@
 #include <jni.h>
 #include <stdint.h>
 #include <dlfcn.h>
+#include <atomic>
 #include <mutex>
 #include <android/log.h>
 
@@ -45,6 +46,24 @@ Dart3dSetDispatcher(int64_t fnPtr) {
     D3IsolateGenFn gen = isolateGen();
     g_dispatchGen = gen ? gen() : 0;
     LOGI("Dart3dSetDispatcher: slot %s", fnPtr ? "armed" : "cleared");
+}
+
+// W30 Filament backend pref. The app's Dart side writes it through
+// Dart3dSetBackend during boot (before any view exists); Dart3dView
+// reads it once at Engine construction via the JNI getter below.
+// Values: 0 = auto, 1 = force OpenGL, 2 = force Vulkan.
+static std::atomic<int32_t> g_backendPref{0};
+
+extern "C" JNIEXPORT void JNICALL
+Dart3dSetBackend(int32_t pref) {
+    g_backendPref.store(pref);
+    LOGI("Dart3dSetBackend: %d", pref);
+}
+
+extern "C" JNIEXPORT jint JNICALL
+Java_com_jasonholtdigital_dart3d_Dart3dJni_nativeBackendPref(
+        JNIEnv*, jclass) {
+    return g_backendPref.load();
 }
 
 extern "C" JNIEXPORT void JNICALL
