@@ -306,8 +306,8 @@ void main() {
       // 13=transmission 14=thickness; bits 0-4 are the base slots.
       final cases = <String, (int, int, int?)>{
         'physical_layered _e3 — factor-only cc+sheen': (0x03, 0, 0),
-        'xt_cb_cs _e5 — baseColor map + factor lobes': (0x05, 0x01, 1),
-        'xt_cb_ct _e33 — baseColor map + factor lobes': (0x21, 0x01, 1),
+        'crash-variant _e5 — one bound base slot': (0x05, 0x01, 1),
+        'crash-variant _e33 — one bound base slot': (0x21, 0x01, 1),
         'StainedGlassLamp _e33 — 5 base + cc + transmission maps': (
           0x21,
           0x1F | (1 << 5) | (1 << 13),
