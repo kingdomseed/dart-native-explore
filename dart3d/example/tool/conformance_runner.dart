@@ -289,6 +289,174 @@ String _baseSlot(String prop) =>
     ? prop.substring(0, prop.length - 'Transform'.length)
     : prop;
 
+// ── Android variant sampler budget (W22-r3) ───────────────────────────
+//
+// Mirrors the Kotlin side: FsceneRealizer's EXT_* feature bits,
+// BASE/EXT_TEXTURE_SLOTS, and boundTextureMask, plus Dart3dView's
+// bound-only sampler emission. A compiled `d3_lit_e<flags>` variant
+// declares one sampler per *bound* texture slot — Filament's feature
+// level 1 caps declarations at 9 (8 when the transmission flag arms
+// screen-space refraction, which reserves one sampler). A bound set
+// that still exceeds the cap degrades to the base `d3_lit` prebuilt
+// (warn-once at decode; the extension lobes drop) — never a fatal.
+
+/// KHR_materials_* feature bits — mirror FsceneRealizer's EXT_*.
+const extClearcoat = 1 << 0;
+const extSheen = 1 << 1;
+const extSpecular = 1 << 2;
+const extAnisotropy = 1 << 3;
+const extIor = 1 << 4;
+const extTransmission = 1 << 5;
+const extVolumeSolid = 1 << 6;
+const extDispersion = 1 << 7;
+
+/// The five base texture slots — mirror BASE_TEXTURE_SLOTS order;
+/// bound-mask bits 0-4.
+const kBaseTextureProps = [
+  'baseColorTexture',
+  'normalTexture',
+  'metallicRoughnessTexture',
+  'occlusionTexture',
+  'emissiveTexture',
+];
+
+/// (flag, wire prop) per extension texture slot — mirror
+/// EXT_TEXTURE_SLOTS order; bound-mask bits 5+.
+const kExtTextureSlots = <(int, String)>[
+  (extClearcoat, 'clearcoatTexture'),
+  (extClearcoat, 'clearcoatRoughnessTexture'),
+  (extClearcoat, 'clearcoatNormalTexture'),
+  (extSheen, 'sheenColorTexture'),
+  (extSheen, 'sheenRoughnessTexture'),
+  (extSpecular, 'specularTexture'),
+  (extSpecular, 'specularColorTexture'),
+  (extAnisotropy, 'anisotropyTexture'),
+  (extTransmission, 'transmissionTexture'),
+  (extTransmission, 'thicknessTexture'),
+];
+
+/// Filament FL1 declared-sampler cap for a variant carrying
+/// [extFlags] — 8 when screen-space refraction reserves a sampler,
+/// else 9. Mirrors Dart3dView.samplerCapFor.
+int androidSamplerCap(int extFlags) => extFlags & extTransmission != 0 ? 8 : 9;
+
+/// Wire props → active feature bits. Mirrors extFlagsFor: a feature
+/// arms when a factor deviates from its no-op default or a texture
+/// slot is referenced; dispersion additionally needs the solid
+/// volume, which needs transmission + nonzero thickness.
+int androidExtFlags(Map<String, Object?> props) {
+  num n(String p, [num d = 0]) {
+    final v = props[p];
+    return v is num ? v : d;
+  }
+
+  bool ref(String p) {
+    final v = props[p];
+    return v is Map && v['texture'] == true;
+  }
+
+  var f = 0;
+  if (n('clearcoat') > 0 ||
+      ref('clearcoatTexture') ||
+      ref('clearcoatRoughnessTexture') ||
+      ref('clearcoatNormalTexture')) {
+    f |= extClearcoat;
+  }
+  final sheen = props['sheenColor'];
+  if ((sheen is List &&
+          ((sheen[0] as num) > 0 ||
+              (sheen[1] as num) > 0 ||
+              (sheen[2] as num) > 0)) ||
+      ref('sheenColorTexture') ||
+      ref('sheenRoughnessTexture')) {
+    f |= extSheen;
+  }
+  final spec = props['specularColor'];
+  if (n('specular', 1) != 1 ||
+      (spec is List && (spec[0] != 1 || spec[1] != 1 || spec[2] != 1)) ||
+      ref('specularTexture') ||
+      ref('specularColorTexture')) {
+    f |= extSpecular;
+  }
+  if (n('anisotropy') != 0 || ref('anisotropyTexture')) {
+    f |= extAnisotropy;
+  }
+  final hasTransmission = n('transmission') > 0 || ref('transmissionTexture');
+  if (hasTransmission) f |= extTransmission;
+  if (n('ior', 1.5) != 1.5) f |= extIor;
+  if (hasTransmission && n('thickness') > 0) f |= extVolumeSolid;
+  if (n('dispersion') != 0 && f & extVolumeSolid != 0) f |= extDispersion;
+  return f;
+}
+
+/// Wire props → bound-slot mask. Mirrors boundTextureMask: bits 0-4
+/// are the base slots, bits 5+ index kExtTextureSlots; ext bits count
+/// only under an armed flag.
+int androidBoundSlotMask(Map<String, Object?> props, int extFlags) {
+  var m = 0;
+  for (var i = 0; i < kBaseTextureProps.length; i++) {
+    final v = props[kBaseTextureProps[i]];
+    if (v is Map && v['texture'] == true) m |= 1 << i;
+  }
+  for (var i = 0; i < kExtTextureSlots.length; i++) {
+    final slot = kExtTextureSlots[i];
+    if (extFlags & slot.$1 == 0) continue;
+    final v = props[slot.$2];
+    if (v is Map && v['texture'] == true) {
+      m |= 1 << (kBaseTextureProps.length + i);
+    }
+  }
+  return m;
+}
+
+int _popcount(int v) {
+  var n = 0;
+  while (v != 0) {
+    n += v & 1;
+    v >>= 1;
+  }
+  return n;
+}
+
+/// Declared samplers a `d3_lit_e<extFlags>` variant emits for
+/// [boundMask], or null when the bound set exceeds the FL1 cap — the
+/// host then degrades to base `d3_lit` instead of compiling.
+/// Mirrors Dart3dView.materialForVariant.
+int? androidVariantSamplers(int extFlags, int boundMask) {
+  if (extFlags == 0) return null;
+  final declared = _popcount(boundMask);
+  return declared <= androidSamplerCap(extFlags) ? declared : null;
+}
+
+/// True when [props] binds more texture slots than the variant may
+/// declare — the material renders as base `d3_lit` (extension lobes
+/// dropped, warn-once) rather than compiling.
+bool androidVariantDegrades(Map<String, Object?> props) {
+  final flags = androidExtFlags(props);
+  return flags != 0 &&
+      androidVariantSamplers(flags, androidBoundSlotMask(props, flags)) == null;
+}
+
+/// Props the base `d3_lit` material still realizes — everything else
+/// drops with the extension lobes on the degrade path.
+const _androidBaseVocabulary = {
+  'baseColor',
+  'baseColorTexture',
+  'metallic',
+  'roughness',
+  'metallicRoughnessTexture',
+  'normalTexture',
+  'normalScale',
+  'occlusionTexture',
+  'occlusionStrength',
+  'emissive',
+  'emissiveStrength',
+  'emissiveTexture',
+  'doubleSided',
+  'alphaMode',
+  'alphaCutoff',
+};
+
 /// The KHR_materials_volume slots `extFlagsFor` guards when no
 /// transmission arms the material — its warn is "volume props
 /// without transmission are inert — dropped". `thickness` trips it
@@ -303,7 +471,10 @@ const _volumeProps = {
 /// Per-property classification. [value] is the catalog's declared
 /// property value; [hasTransmission] says the owning material carries
 /// transmission>0 or a transmission texture; [solidVolume] says it
-/// additionally carries thickness>0.
+/// additionally carries thickness>0. [degraded] says the material's
+/// bound texture set exceeds the Android FL1 sampler cap — the
+/// variant falls back to base `d3_lit` (warn-once), so every
+/// non-base property is a documented drop rather than a realization.
 ///
 /// `ior` and `dispersion` are the two properties upstream emits on
 /// EVERY material — at their no-op defaults (1.5 / 0) they classify
@@ -321,11 +492,17 @@ Support? _classify(
   Object? value, {
   required bool hasTransmission,
   required bool solidVolume,
+  required bool degraded,
 }) {
   final row =
       kMaterialPropertySupport[prop] ??
       kMaterialPropertySupport[_baseSlot(prop)];
   if (row == null) return null;
+  if (platform == 'android' &&
+      degraded &&
+      !_androidBaseVocabulary.contains(_baseSlot(prop))) {
+    return Support.approximated;
+  }
   if (prop == 'ior' && (value as num?)?.toDouble() == 1.5) {
     return Support.realized;
   }
@@ -471,6 +648,7 @@ class AssetRow {
     Object? value, {
     required bool hasTransmission,
     required bool solidVolume,
+    required bool degraded,
   }) {
     final s = _statusOf(
       _classify(
@@ -479,6 +657,7 @@ class AssetRow {
         value,
         hasTransmission: hasTransmission,
         solidVolume: solidVolume,
+        degraded: degraded,
       ),
     );
     final cur = status[platform]!;
@@ -556,6 +735,11 @@ ConformanceReport runConformance(Map<String, dynamic> catalog) {
       final solidVolume =
           hasTransmission && (declared['thickness'] as num? ?? 0) > 0;
       final manifest = materialManifest(mat['type'] as String, declared);
+      // W22-r3: bound-only sampler emission keeps every catalog
+      // material under the FL1 cap today — degrade stays modeled so a
+      // future over-bound material classifies honestly (approx: it
+      // still renders, as base d3_lit) instead of falsely passing.
+      final degraded = androidVariantDegrades(declared);
       for (final prop in manifestPropNames(manifest)) {
         row.classify(
           'ios',
@@ -563,6 +747,7 @@ ConformanceReport runConformance(Map<String, dynamic> catalog) {
           declared[prop],
           hasTransmission: hasTransmission,
           solidVolume: solidVolume,
+          degraded: false,
         );
         row.classify(
           'android',
@@ -570,6 +755,7 @@ ConformanceReport runConformance(Map<String, dynamic> catalog) {
           declared[prop],
           hasTransmission: hasTransmission,
           solidVolume: solidVolume,
+          degraded: degraded,
         );
       }
     }
