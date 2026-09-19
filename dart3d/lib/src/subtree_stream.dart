@@ -15,9 +15,11 @@
 /// own update re-specs it without `instance`, which is what clears
 /// the placeholder tag natively. [encodeSubtreeUnload] emits the
 /// reverse batch: attachment reparents home first (so grafted host
-/// nodes leave the doomed subtree), then `removeNode` per streamed
-/// root, then a restore `updateNode` carrying the placeholder spec —
-/// `instance` member back on the wire — which re-tags the node.
+/// nodes leave the doomed subtree), then `removeSkin`/
+/// `removeAnimation` for the pools the stream upserted and
+/// `removeNode` per streamed root, then a restore `updateNode`
+/// carrying the placeholder spec — `instance` member back on the
+/// wire — which re-tags the node.
 ///
 /// Compose runs on a scratch document holding a copy of the instance
 /// node with `load` flipped to eager — upstream only expands eager
@@ -35,7 +37,17 @@
 /// only translate the composed result into ops. A nested lazy
 /// instance inside a streamed prefab keeps its `instance` member on
 /// its `addNode` spec (upstream's unremapped-id-space rule), arriving
-/// as a placeholder a later `loadSubtree` can resolve.
+/// as a placeholder a later `loadSubtree` resolves — the stream
+/// record's [StreamedSubtree.placeholders] makes those members
+/// reachable through the public API even though streamed nodes never
+/// join the tracked document.
+///
+/// Two persistence lines are deliberate: the unload emits
+/// `removeSkin`/`removeAnimation` for the pools the stream upserted,
+/// but payloads and resources stay — shared ids derive from the
+/// prefab's document identity, so the host document and sibling
+/// instances may legitimately consume them, and the op vocabulary
+/// has no `removePayload`/`removeResource` to retract them anyway.
 library;
 
 import 'dart:convert';
@@ -47,14 +59,19 @@ import 'scene_model.dart';
 /// What one [encodeSubtreeLoad] created — the bookkeeping
 /// [encodeSubtreeUnload] needs to reverse exactly that stream-in:
 /// which child ids were grafted under the instance node, which host
-/// nodes were reparented into the subtree, and which instance-node
-/// fields the merge changed (the restore update's flag set).
+/// nodes were reparented into the subtree, which skin/animation ids
+/// the batch upserted, which nested lazy placeholders the subtree
+/// carries, and which instance-node fields the merge changed (the
+/// restore update's flag set).
 final class StreamedSubtree {
   /// Creates a stream record.
   const StreamedSubtree({
     required this.roots,
     required this.attachments,
     required this.flags,
+    this.skins = const [],
+    this.animations = const [],
+    this.placeholders = const {},
   });
 
   /// The composed child ids attached directly under the instance
@@ -71,6 +88,22 @@ final class StreamedSubtree {
   /// the fields compose's merge changed, which are exactly the fields
   /// the unload's restore update writes back.
   final List<String> flags;
+
+  /// The composed skin ids the load upserted — unload retracts them
+  /// via `removeSkin`, since the pool entries would outlive the
+  /// subtree they were streamed for.
+  final List<LocalId> skins;
+
+  /// The composed animation ids the load upserted — unload retracts
+  /// them via `removeAnimation`, same as [skins].
+  final List<LocalId> animations;
+
+  /// Nested lazy placeholders inside the streamed subtree, keyed by
+  /// their composed (remapped) ids — the spec is the one the member's
+  /// `addNode` carried, `instance` intact in the prefab-local id
+  /// space. Streamed members never join the tracked document, so this
+  /// map is what `SceneController.loadSubtree` resolves them through.
+  final Map<LocalId, NodeSpec> placeholders;
 }
 
 /// Composes [placeholder]'s prefab subtree and returns the op list
@@ -170,7 +203,17 @@ _encodeFromComposed(
   required List<LocalId> priorRoots,
 }) {
   final instance = placeholder.instance!;
-  final composedInstance = composed.nodes[placeholder.id]!;
+  // A single-root prefab merges its root INTO the instance node, so a
+  // `removedNodes` entry naming that root deletes the merged node
+  // (upstream `_removeNode` runs on `remapId(root) == placeholder.id`)
+  // — nothing is left to re-spec or hang members under.
+  final composedInstance = composed.nodes[placeholder.id];
+  if (composedInstance == null) {
+    throw ArgumentError(
+      'loadSubtree: node ${placeholder.id.toToken()}\'s removedNodes '
+      'deletes the prefab root it merges into',
+    );
+  }
   final parents = _parents(composed);
   final idKey = manifestIdKey(composed);
 
@@ -200,6 +243,12 @@ _encodeFromComposed(
   reachable.removeAll(attachmentTargets);
 
   final specAfter = encodeNodeCommandSpec(composedInstance, composed);
+  if (composedInstance.instance == null) {
+    // The explicit null is what clears the placeholder tag natively —
+    // an absent `instance` member reads as "unchanged" so a
+    // reparent-only update (`spec: {}`) never strips the tag.
+    specAfter['instance'] = null;
+  }
   final flags = _changedFlags(placeholder, composedInstance);
 
   final ops = <Map<String, Object?>>[];
@@ -310,16 +359,27 @@ _encodeFromComposed(
       roots: roots,
       attachments: [for (final a in instance.attachments) a.node],
       flags: flags,
+      skins: [for (final s in composed.skins.values) s.id],
+      animations: [for (final a in composed.animations.values) a.id],
+      placeholders: {
+        for (final id in reachable)
+          if (composed.nodes[id]?.instance != null) id: composed.nodes[id]!,
+      },
     ),
   );
 }
 
 /// The reverse batch for one [encodeSubtreeLoad]: reparent attachment
-/// targets back to their authored homes, `removeNode` each streamed
-/// root, then restore the instance node's placeholder spec (the
-/// `instance` member rides back on the wire, re-tagging it).
-/// [attachmentHomes] maps each streamed attachment target to the
-/// parent it had in the host document (absent → scene root).
+/// targets back to their authored homes, retract the pools the stream
+/// upserted (`removeSkin`/`removeAnimation` — dependents detach
+/// before the nodes they reference, the canonical remove order),
+/// `removeNode` each streamed root, then restore the instance node's
+/// placeholder spec (the `instance` member rides back on the wire,
+/// re-tagging it). Upserted payloads and resources persist by design
+/// — their ids are shared per prefab document, and the vocabulary
+/// has no remove ops for them. [attachmentHomes] maps each streamed
+/// attachment target to the parent it had in the host document
+/// (absent → scene root).
 List<Map<String, Object?>> encodeSubtreeUnload(
   NodeSpec placeholder, {
   required StreamedSubtree streamed,
@@ -337,6 +397,10 @@ List<Map<String, Object?>> encodeSubtreeUnload(
         'spec': <String, Object?>{},
         'parent': attachmentHomes[t]?.toToken(),
       },
+    for (final s in streamed.skins)
+      {'op': 'removeSkin', 'id': 'skin:${s.toToken()}'},
+    for (final a in streamed.animations)
+      {'op': 'removeAnimation', 'id': 'anim:${a.toToken()}'},
     for (final r in streamed.roots) {'op': 'removeNode', 'node': r.toToken()},
     {
       'op': 'updateNode',

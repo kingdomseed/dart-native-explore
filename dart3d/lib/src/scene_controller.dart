@@ -213,6 +213,21 @@ final class SceneController {
 
   // MARK: - Prefab subtree streaming (W15)
 
+  /// The node [id] as the live scene knows it — the tracked
+  /// document's spec, or a nested placeholder recorded by the stream
+  /// that delivered it. Streamed members never join [_document], so a
+  /// lazy instance inside a streamed subtree resolves through the
+  /// parent stream's [StreamedSubtree.placeholders].
+  NodeSpec? _liveNode(LocalId id) {
+    final tracked = _document?.nodes[id];
+    if (tracked != null) return tracked;
+    for (final s in _streamed.values) {
+      final p = s.placeholders[id];
+      if (p != null) return p;
+    }
+    return null;
+  }
+
   /// Realizes the lazy prefab instance at [id] — expands the subtree
   /// the placeholder tags and sends it as one `loadSubtree` command.
   ///
@@ -230,10 +245,10 @@ final class SceneController {
   /// re-sends; roots the previous stream created that the new compose
   /// no longer produces are removed first, so a re-load replaces
   /// rather than piles up. Throws [ArgumentError] when [id] is not a
-  /// tracked node or carries no `instance`.
+  /// tracked node or streamed member, or carries no `instance`.
   void loadSubtree(LocalId id, {required PrefabResolver resolve}) {
     final doc = _document;
-    final node = doc?.nodes[id];
+    final node = _liveNode(id);
     if (node == null) {
       throw ArgumentError('loadSubtree: no node ${id.toToken()}');
     }
@@ -258,7 +273,7 @@ final class SceneController {
     required AsyncPrefabLoader loadPrefab,
   }) async {
     final doc = _document;
-    final node = doc?.nodes[id];
+    final node = _liveNode(id);
     if (node == null) {
       throw ArgumentError('loadSubtreeAsync: no node ${id.toToken()}');
     }
@@ -283,10 +298,12 @@ final class SceneController {
     final streamed = _streamed.remove(id);
     if (streamed == null) return;
     final doc = _document;
-    final node = doc?.nodes[id];
-    if (node == null) return;
+    final node = _liveNode(id);
+    // A live stream implies a document — but [_liveNode] now resolves
+    // through stream records too, so guard rather than force.
+    if (doc == null || node == null) return;
     final parents = <LocalId, LocalId?>{
-      for (final n in doc!.nodes.keys) n: null,
+      for (final n in doc.nodes.keys) n: null,
     };
     for (final n in doc.nodes.values) {
       for (final c in n.children) {

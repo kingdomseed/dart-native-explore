@@ -266,13 +266,19 @@ mutations stay off the tracked document) and ship the expansion as the
 standard structural batch inside one envelope op —
 `{"op":"loadSubtree","node":"<id>","ops":[…]}` — so the subtree lands
 through the same decode paths a diff uses: payload/resource upserts
-first, then the instance's own `updateNode` (re-specced without
-`instance`, clearing the tag), member `addNode`s parent-before-child,
+first, then the instance's own `updateNode` (an explicit
+`instance: null` in the spec clears the tag — absent preserves it,
+which is what keeps the reparent-only graft/ungraft updates from
+stripping it), member `addNode`s parent-before-child,
 `Attachment` grafts as reparent-only `updateNode`s, then
 skin/animation upserts. `unloadSubtree` ships the reverse batch:
-attachment targets reparent to their authored parents, `removeNode`
-drops each streamed root, and a final `updateNode` restores the
-placeholder spec so the node re-tags for the next load. Per-instance
+attachment targets reparent to their authored parents,
+`removeSkin`/`removeAnimation` retract the pools the load upserted,
+`removeNode` drops each streamed root, and a final `updateNode`
+restores the placeholder spec so the node re-tags for the next
+load. Upserted payloads and resources persist across unload by
+design — their ids are shared per prefab document and the
+vocabulary has no remove ops for them. Per-instance
 ids derive from (instance id, prefab-local id) and shared
 resource/payload ids from the prefab's document identity, exactly as a
 pre-realize compose produces — a streamed subtree is
@@ -280,7 +286,9 @@ indistinguishable on the wire from one that arrived expanded.
 `removedComponentTypes` is honored too. Nested lazy instances inside a
 streamed prefab keep their `instance` member (prefab-local id space
 per upstream's unremapped rule) and arrive as placeholders a later
-`loadSubtree` resolves. Nested ops dispatch through the same command
+`loadSubtree` resolves — the stream record's `placeholders` map
+carries their specs since streamed members never join the tracked
+document. Nested ops dispatch through the same command
 handler inside one mutation-queue drain, so a subtree lands/drops
 atomically between frames; repeated ops follow the carried ops'
 idempotency rules. Wire contract documented in `protocol.dart` (W15

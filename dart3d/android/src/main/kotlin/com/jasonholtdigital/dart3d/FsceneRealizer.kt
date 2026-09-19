@@ -2488,9 +2488,15 @@ object FsceneRealizer {
                         "updateNode flag '$f' not implemented")
                 }
             }
-            // W15: the spec is complete — its `instance` member is the
-            // placeholder tag's post-update state (absent → cleared).
-            rec.instanceSpec = spec.optJSONObject("instance")
+            // W15: `instance` in the spec is the placeholder tag's
+            // post-update state — a dict sets it (an unload's
+            // restore), explicit null clears it (the load's instance
+            // update), and an absent key preserves it: a reparent-only
+            // update carries no spec fields and must not strip the
+            // tag.
+            if (spec.has("instance")) {
+                rec.instanceSpec = spec.optJSONObject("instance")
+            }
             applyVisibility(key)
         }
 
