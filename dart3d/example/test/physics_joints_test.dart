@@ -1,7 +1,11 @@
 // W9 joint checks: the SceneJoint → wire encode per type (fields,
 // defaults, the generic axes order), the joint-id sequence behind
 // SceneController.addJoint, and the D3Event.joint "broke" decode —
-// pinned by docs/joints-spec.md. Same constraint as the W3–W8 tests:
+// pinned by docs/joints-spec.md. W23 adds the semantics tripwires:
+// signed limits/motors pass through verbatim (each native owns its
+// handedness conversion — the wire never mirrors), and `collide`
+// defaults false on every type (the pairwise-exclusion path). Same
+// constraint as the W3–W8 tests:
 // package:dart3d/dart3d.dart is unreachable under `dart test` (the
 // barrel transitively imports package:dartnative, which needs
 // DartNative's patched SDK), so this pulls the pure-Dart libraries
@@ -28,8 +32,11 @@ void main() {
 
   // The controller's op envelope: `{"op":…,"id":…}` merged over the
   // joint's wire fields — kept identical to addJoint/updateJoint.
-  Map<String, Object?> op(String name, int id, SceneJoint joint) =>
-      {'op': name, 'id': id, ...joint.toWire()};
+  Map<String, Object?> op(String name, int id, SceneJoint joint) => {
+    'op': name,
+    'id': id,
+    ...joint.toWire(),
+  };
 
   // vector_math stores components as f32 — expected lists are built
   // from the same Vector3s so the doubles match exactly.
@@ -39,13 +46,11 @@ void main() {
   group('SceneJoint → wire', () {
     test('fixed carries the pair, defaults, and both anchors', () {
       final anchorA = Vector3(0, 0.2, 0);
-      final wire =
-          SceneJoint.fixed(
-                bodyA: anchorId,
-                bodyB: bodyId,
-                localAnchorA: anchorA,
-              )
-              .toWire();
+      final wire = SceneJoint.fixed(
+        bodyA: anchorId,
+        bodyB: bodyId,
+        localAnchorA: anchorA,
+      ).toWire();
       expect(wire, {
         'type': 'fixed',
         'a': anchorId.toToken(),
@@ -96,18 +101,16 @@ void main() {
 
     test('revolute emits axes plus optional limits and motor', () {
       final axis = Vector3(0, 1, 0);
-      final wire =
-          SceneJoint.revolute(
-                bodyA: anchorId,
-                bodyB: bodyId,
-                localAxisA: axis,
-                localAxisB: axis,
-                lowerLimit: -1.745,
-                upperLimit: 1.745,
-                motorTargetVelocity: 2.0,
-                motorMaxForce: 50.0,
-              )
-              .toWire();
+      final wire = SceneJoint.revolute(
+        bodyA: anchorId,
+        bodyB: bodyId,
+        localAxisA: axis,
+        localAxisB: axis,
+        lowerLimit: -1.745,
+        upperLimit: 1.745,
+        motorTargetVelocity: 2.0,
+        motorMaxForce: 50.0,
+      ).toWire();
       expect(wire['type'], 'revolute');
       expect(wire['axisA'], xyz(axis));
       expect(wire['axisB'], xyz(axis));
@@ -120,14 +123,12 @@ void main() {
     });
 
     test('revolute omits unset limits and motor fields', () {
-      final wire =
-          SceneJoint.revolute(
-                bodyA: anchorId,
-                bodyB: bodyId,
-                localAxisA: Vector3(0, 0, 1),
-                localAxisB: Vector3(0, 0, 1),
-              )
-              .toWire();
+      final wire = SceneJoint.revolute(
+        bodyA: anchorId,
+        bodyB: bodyId,
+        localAxisA: Vector3(0, 0, 1),
+        localAxisB: Vector3(0, 0, 1),
+      ).toWire();
       expect(wire['axisA'], [0.0, 0.0, 1.0]);
       for (final key in ['lower', 'upper', 'motorVelocity', 'motorMaxForce']) {
         expect(wire.containsKey(key), isFalse, reason: key);
@@ -135,19 +136,17 @@ void main() {
     });
 
     test('prismatic shares the revolute field set', () {
-      final wire =
-          SceneJoint.prismatic(
-                bodyA: anchorId,
-                bodyB: bodyId,
-                localAxisA: Vector3(0, 1, 0),
-                localAxisB: Vector3(0, 1, 0),
-                localAnchorB: Vector3(0, 0.5, 0),
-                lowerLimit: -0.3,
-                upperLimit: 0.6,
-                motorTargetVelocity: 0.5,
-                motorMaxForce: 60,
-              )
-              .toWire();
+      final wire = SceneJoint.prismatic(
+        bodyA: anchorId,
+        bodyB: bodyId,
+        localAxisA: Vector3(0, 1, 0),
+        localAxisB: Vector3(0, 1, 0),
+        localAnchorB: Vector3(0, 0.5, 0),
+        lowerLimit: -0.3,
+        upperLimit: 0.6,
+        motorTargetVelocity: 0.5,
+        motorMaxForce: 60,
+      ).toWire();
       expect(wire['type'], 'prismatic');
       expect(wire['lower'], -0.3);
       expect(wire['upper'], 0.6);
@@ -157,8 +156,7 @@ void main() {
     });
 
     test('generic defaults to identity bases and six free axes', () {
-      final wire =
-          SceneJoint.generic(bodyA: anchorId, bodyB: bodyId).toWire();
+      final wire = SceneJoint.generic(bodyA: anchorId, bodyB: bodyId).toWire();
       expect(wire['type'], 'generic');
       expect(wire['basisA'], [0.0, 0.0, 0.0, 1.0]);
       expect(wire['basisB'], [0.0, 0.0, 0.0, 1.0]);
@@ -176,21 +174,19 @@ void main() {
         maxForce: 40,
         model: SceneJointMotorModel.force,
       );
-      final wire =
-          SceneJoint.generic(
-                bodyA: anchorId,
-                bodyB: bodyId,
-                localBasisA: basisA,
-                axes: const [
-                  SceneJointAxisConfig.locked(),
-                  SceneJointAxisConfig.free(motor: motor),
-                  SceneJointAxisConfig.limited(-0.3, 0.6),
-                  SceneJointAxisConfig.locked(),
-                  SceneJointAxisConfig.limited(-0.9, 0.9),
-                  SceneJointAxisConfig.free(),
-                ],
-              )
-              .toWire();
+      final wire = SceneJoint.generic(
+        bodyA: anchorId,
+        bodyB: bodyId,
+        localBasisA: basisA,
+        axes: const [
+          SceneJointAxisConfig.locked(),
+          SceneJointAxisConfig.free(motor: motor),
+          SceneJointAxisConfig.limited(-0.3, 0.6),
+          SceneJointAxisConfig.locked(),
+          SceneJointAxisConfig.limited(-0.9, 0.9),
+          SceneJointAxisConfig.free(),
+        ],
+      ).toWire();
       expect(wire['basisA'], xyzw(basisA));
       expect(wire['basisB'], [0.0, 0.0, 0.0, 1.0]);
       expect(wire['axes'], [
@@ -213,6 +209,99 @@ void main() {
       ]);
     });
 
+    // W23: signed values go over the wire verbatim — mirroring is a
+    // native concern (SceneKit folds it into the axis direction; Jolt
+    // into its constraint-space scalars), so a Dart-side normalize or
+    // sign fix would double up. Asymmetric magnitudes are what make a
+    // regression visible.
+    test('revolute signed limits and motor pass through verbatim', () {
+      final wire = SceneJoint.revolute(
+        bodyA: anchorId,
+        bodyB: bodyId,
+        localAxisA: Vector3(0, 1, 0),
+        localAxisB: Vector3(0, 1, 0),
+        lowerLimit: -0.35,
+        upperLimit: 1.745,
+        motorTargetVelocity: -2.0,
+        motorMaxForce: 40,
+      ).toWire();
+      expect(wire['lower'], -0.35);
+      expect(wire['upper'], 1.745);
+      expect(wire['motorVelocity'], -2.0);
+      expect(wire['motorMaxForce'], 40);
+    });
+
+    test('generic angular axes keep signed limits and motor verbatim', () {
+      // Axes 3/4/5 are angular (twist X, swing Y, swing Z) — the same
+      // signed-value rule as revolute applies per axis.
+      final wire = SceneJoint.generic(
+        bodyA: anchorId,
+        bodyB: bodyId,
+        axes: const [
+          SceneJointAxisConfig.locked(),
+          SceneJointAxisConfig.locked(),
+          SceneJointAxisConfig.locked(),
+          SceneJointAxisConfig.limited(-0.1, 1.2),
+          SceneJointAxisConfig.free(
+            motor: SceneJointMotor(targetVelocity: -3.0, maxForce: 25),
+          ),
+          SceneJointAxisConfig.limited(-1.4, 0.2),
+        ],
+      ).toWire();
+      expect(wire['axes'], [
+        {'motion': 'locked'},
+        {'motion': 'locked'},
+        {'motion': 'locked'},
+        {'motion': 'limited', 'lower': -0.1, 'upper': 1.2},
+        {
+          'motion': 'free',
+          'motor': {
+            'targetPosition': 0.0,
+            'targetVelocity': -3.0,
+            'stiffness': 0.0,
+            'damping': 0.0,
+            'maxForce': 25.0,
+            'model': 'acceleration',
+          },
+        },
+        {'motion': 'limited', 'lower': -1.4, 'upper': 0.2},
+      ]);
+    });
+
+    test('collide defaults false on every type (the exclusion path)', () {
+      // `collisionsEnabled` defaults false upstream; the wire's
+      // `collide:false` is what drives iOS's category-bit carve and
+      // Jolt's constraint collide-bodies flag.
+      for (final joint in [
+        SceneJoint.fixed(bodyA: anchorId, bodyB: bodyId),
+        SceneJoint.spherical(bodyA: anchorId, bodyB: bodyId),
+        SceneJoint.revolute(
+          bodyA: anchorId,
+          bodyB: bodyId,
+          localAxisA: Vector3(0, 1, 0),
+          localAxisB: Vector3(0, 1, 0),
+        ),
+        SceneJoint.prismatic(
+          bodyA: anchorId,
+          bodyB: bodyId,
+          localAxisA: Vector3(0, 1, 0),
+          localAxisB: Vector3(0, 1, 0),
+        ),
+        SceneJoint.generic(bodyA: anchorId, bodyB: bodyId),
+      ]) {
+        expect(joint.toWire()['collide'], isFalse);
+      }
+      // The opt-in still ships — exclusion only applies to false.
+      expect(
+        SceneJoint.fixed(
+          bodyA: anchorId,
+          bodyB: bodyId,
+          collisionsEnabled: true,
+        ).toWire()['collide'],
+        isTrue,
+      );
+    });
+
     test('a motor with no force cap omits maxForce (JSON has no inf)', () {
       const motor = SceneJointMotor(targetVelocity: 2);
       expect(motor.toWire(), {
@@ -225,17 +314,15 @@ void main() {
     });
 
     test('non-finite force caps and break distances are omitted', () {
-      final wire =
-          SceneJoint.prismatic(
-                bodyA: anchorId,
-                bodyB: bodyId,
-                localAxisA: Vector3(0, 1, 0),
-                localAxisB: Vector3(0, 1, 0),
-                motorTargetVelocity: 1.0,
-                motorMaxForce: double.infinity,
-                breakDistance: double.infinity,
-              )
-              .toWire();
+      final wire = SceneJoint.prismatic(
+        bodyA: anchorId,
+        bodyB: bodyId,
+        localAxisA: Vector3(0, 1, 0),
+        localAxisB: Vector3(0, 1, 0),
+        motorTargetVelocity: 1.0,
+        motorMaxForce: double.infinity,
+        breakDistance: double.infinity,
+      ).toWire();
       expect(wire['motorVelocity'], 1.0);
       expect(wire.containsKey('motorMaxForce'), isFalse);
       expect(wire.containsKey('breakDistance'), isFalse);
@@ -256,15 +343,9 @@ void main() {
       );
       // Round-trip through commandBytes' JSON encode — what the
       // natives actually parse.
-      final decoded =
-          jsonDecode(
-                jsonEncode({
-                  'op': 'addJoint',
-                  'id': 7,
-                  ...joint.toWire(),
-                }),
-              )
-              as Map<String, Object?>;
+      final decoded = jsonDecode(
+        jsonEncode({'op': 'addJoint', 'id': 7, ...joint.toWire()}),
+      ) as Map<String, Object?>;
       expect(decoded, {
         'op': 'addJoint',
         'id': 7,

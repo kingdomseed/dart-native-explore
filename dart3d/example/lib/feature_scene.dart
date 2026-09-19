@@ -1601,9 +1601,11 @@ final class FeatureScene {
         dynamicBody(),
       );
 
-      // Door — revolute on a vertical axis, ±100° limits: the panel
-      // spawns beside the frame's edge and starts spinning, so it
-      // swings and bangs into its stops.
+      // Door — revolute on a vertical axis with ASYMMETRIC limits
+      // (−20°/+100°): the panel spawns beside the frame's edge and
+      // starts spinning, so it swings into the stops — and a limit
+      // sign/mirror regression shows as the door parking on the
+      // wrong side.
       final doorFrame = body(
         'j9.doorFrame',
         Vector3(-2.5, 1.7, z),
@@ -1644,8 +1646,10 @@ final class FeatureScene {
         dynamicBody(mass: 0.5),
       );
 
-      // Welded pair — fixed: two stacked dynamic boxes that drop onto
-      // the slab's back edge and move as one.
+      // Welded pair — fixed with collide:false (the default): the
+      // boxes spawn 0.25 apart while their 0.4 colliders need 0.4, so
+      // they interpenetrate — the pairwise exclusion is what keeps
+      // them welded instead of popping apart.
       final weldA = body(
         'j9.weldA',
         Vector3(-0.4, 1.8, z),
@@ -1656,7 +1660,7 @@ final class FeatureScene {
       );
       final weldB = body(
         'j9.weldB',
-        Vector3(-0.4, 2.2, z),
+        Vector3(-0.4, 2.05, z),
         smallBoxGeo.id,
         sliderMat.id,
         boxCollider(),
@@ -1751,7 +1755,7 @@ final class FeatureScene {
           localAxisB: Vector3(0, 1, 0),
           localAnchorA: Vector3(0.2, 0, 0),
           localAnchorB: Vector3(-0.2, 0, 0),
-          lowerLimit: -1.745,
+          lowerLimit: -0.35,
           upperLimit: 1.745,
         ),
       );
@@ -1776,8 +1780,8 @@ final class FeatureScene {
         SceneJoint.fixed(
           bodyA: weldA,
           bodyB: weldB,
-          localAnchorA: Vector3(0, 0.2, 0),
-          localAnchorB: Vector3(0, -0.2, 0),
+          localAnchorA: Vector3(0, 0.125, 0),
+          localAnchorB: Vector3(0, -0.125, 0),
         ),
       );
       joints++;
@@ -3100,9 +3104,7 @@ final class FeatureScene {
         }
         dnLog(
           'dart3d: wloose ccd pose=${ccdPos == null ? 'null' : v(ccdPos)} '
-          '${ccdPos != null && ccdPos.y > 0.3 && ccdPos.y < 0.6
-              ? 'PASS rests on slab'
-              : 'FAIL tunneled'}',
+          '${ccdPos != null && ccdPos.y > 0.3 && ccdPos.y < 0.6 ? 'PASS rests on slab' : 'FAIL tunneled'}',
         );
 
         Vector3? bowlPos;
@@ -3113,7 +3115,8 @@ final class FeatureScene {
         }
         // Bowl cavity: center (-2.6, 1.6), inner half 0.6, floor at
         // -0.46 — contained reads inside the footprint under the rim.
-        final contained = bowlPos != null &&
+        final contained =
+            bowlPos != null &&
             (bowlPos.x + 2.6).abs() < 0.5 &&
             (bowlPos.z - 1.6).abs() < 0.5 &&
             bowlPos.y > -0.45 &&
@@ -3123,7 +3126,6 @@ final class FeatureScene {
           'pose=${bowlPos == null ? 'null' : v(bowlPos)} '
           '${contained ? 'PASS contained' : 'FAIL escaped'}',
         );
-
       });
 
       // The margin drop waits for the scene to go quiet: the demo's
@@ -3162,7 +3164,8 @@ final class FeatureScene {
         // ≈-0.30, a miss lands on the catcher at ≈-4.35, and no
         // collider falls forever — so anything still aloft is the
         // authored-margin proof.
-        final onMargin = marginPos != null &&
+        final onMargin =
+            marginPos != null &&
             marginPos.y > -0.1 &&
             (marginPos.x - 5.5).abs() < 0.5 &&
             (marginPos.z - 0.5).abs() < 0.5;
@@ -3208,8 +3211,7 @@ final class FeatureScene {
           '(roll $rolls via $via, die ${diePos == null ? '?' : v(diePos)})',
         );
         if (rolls < 3) {
-          Timer(const Duration(milliseconds: 1500),
-              () => throwDie?.call());
+          Timer(const Duration(milliseconds: 1500), () => throwDie?.call());
         } else {
           sub?.cancel();
         }
@@ -3260,9 +3262,11 @@ final class FeatureScene {
             }
             polls++;
             if (polls % 8 == 0 || err != null) {
-              dnLog('dart3d: wloose poll die '
-                  'pose=${p == null ? (err ?? 'null') : v(p)} '
-                  'stable=$stable');
+              dnLog(
+                'dart3d: wloose poll die '
+                'pose=${p == null ? (err ?? 'null') : v(p)} '
+                'stable=$stable',
+              );
             }
             final d = (p != null && last != null)
                 ? (p - last!).length
@@ -3295,9 +3299,9 @@ final class FeatureScene {
         dnLog(
           retiring.isEmpty
               ? 'dart3d: wloose no perpetual movers found — '
-                  'settle events already live'
+                    'settle events already live'
               : 'dart3d: wloose removed ${retiring.keys.join(',')} — '
-                  'settle events live',
+                    'settle events live',
         );
         sub = c.physicsEvents.listen((event) {
           if (event is! SceneSettledEvent) return;
@@ -3310,8 +3314,7 @@ final class FeatureScene {
         });
         // The removal's settle-flush gets 800 ms to land before the
         // first throw arms the metric.
-        Timer(const Duration(milliseconds: 800),
-            () => throwDie?.call());
+        Timer(const Duration(milliseconds: 800), () => throwDie?.call());
       });
       // A world that can't sleep (a probe still falling despite the
       // catcher, a joint that never rests) must not leak the
@@ -3441,20 +3444,9 @@ final class FeatureScene {
       }
     }
 
-    final indices = Uint16List.fromList([
-      0,
-      2,
-      1,
-      0,
-      1,
-      3,
-      0,
-      3,
-      2,
-      1,
-      2,
-      3,
-    ]).buffer.asUint8List();
+    final indices = Uint16List.fromList([0, 2, 1, 0, 1, 3, 0, 3, 2, 1, 2, 3])
+        .buffer
+        .asUint8List();
 
     return (
       vertices: verts.buffer.asUint8List(),

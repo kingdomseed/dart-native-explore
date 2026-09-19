@@ -191,3 +191,77 @@ ones. What remains per-platform is the wire→engine factor: iOS reads
 That factor is now part of this spec's unit story — lane 9 verifies
 the exposure match within a stop and the constant stays documented
 here rather than buried as a heuristic.
+
+## Physics fidelity (W23)
+
+What Android maps where the wire and Jolt disagree, and the two
+places jolt-jni 6.0.0 simply cannot reach the upstream semantic —
+recorded here so the divergence is claimed, not silent.
+
+### Joint scalars under the mirror
+
+`decodeJoint` (Dart3dView) mirrors signed scalars into Jolt's
+constraint space — the wire never does it:
+
+- **revolute**: `lower`/`upper` arrive swapped (`[−upper, −lower]`,
+  clamped to Jolt's `[−π,0]`/`[0,π]` limits brackets around the zero
+  angle — Jolt requires the zero position inside the range) and
+  `motorVelocity` negates. The axis itself is direction-mapped
+  (`(x,y,−z)`), so a wire rotation θ about the wire axis measures −θ
+  about the Jolt axis. iOS takes the equivalent other half of the
+  representation — a pseudovector axis `(−x,−y,+z)` with scalars
+  verbatim.
+- **prismatic**: limits/velocity are along-axis distances — axis and
+  displacement mirror together, so they pass through (clamped to
+  bracket the zero position).
+- **generic**: per-index negation in constraint space — linearZ
+  (axis 2) and angularX/Y (axes 3–4) negate, a negated interval
+  arriving swapped; linear X/Y and angular Z keep sign. SixDoF runs
+  `ESwingType.Pyramid` so the two swing axes limit independently
+  (Cone would fold them into one symmetric limit).
+
+### `collide:false` pair disable
+
+jolt-jni's `ConstraintSettings` exposes no pair flag, so every body
+owns a sub-group in the shared `GroupFilterTable` (the same table
+layer/mask feeds) and `disableJointPair` calls
+`groupTable.disableCollision(sgA, sgB)`. `jointDisabledPairs`
+refcounts the pair — several joints can share it, and teardown only
+re-enables when the last record leaves. A pair already excluded by
+the upstream `(a.layer & b.mask) && (b.layer & a.mask)` rule is never
+disabled — and therefore never wrongly re-enabled. iOS implements
+the same semantic with private category bits (bits 40–63, above the
+wire's `<<2` layer space) and derived masks; the 24-bit cap and
+derive-don't-patch details live in `physics-schema.md`.
+
+### Raycast normals
+
+`JoltWorld.surfaceNormal` streams the hit shape's triangles in a
+small `AaBox` around the hit point and returns the closest
+triangle's normal — exact wherever the surface IS triangles (mesh,
+heightfield, hull, box, compound). Jolt tessellates the smooth
+primitives too, and a tessellation facet would be reported as the
+normal — so the leaf subtype is resolved first
+(`getLeafShape(subShapeId2)` walks compounds and decorator shapes to
+the shape actually hit) and `Sphere`/`Capsule`/`TaperedCapsule`/
+`Cylinder` skip the stream: `normalProbe` (a ~1 cm sphere collide
+just short of the hit point, penetration axis flipped toward the
+ray) reports the exact smooth normal instead. `null` from either
+path omits `n` from the wire hit.
+
+### Contact manifold — platform limitation
+
+Upstream `began` frames carry `points[]` — one entry per manifold
+point. jolt-jni 6.0.0's `ContactManifold` exposes only a base offset,
+penetration depth, sub-shape IDs, and the world-space normal — no
+per-point list — so Android emits at most one point. iOS's
+`SCNPhysicsContact` reports the full manifold. When a future jolt-jni
+exposes the point list, Android can widen without a wire change.
+
+### `clearForces` — permanent no-op
+
+Jolt has no persistent-force accumulator (impulses only), so the op
+can never express upstream's "drop accumulated forces" — it logs and
+returns. Clearing velocity would be the closest analogue but fights
+`setVelocity` sends and overshoots the semantic. iOS maps to
+`SCNPhysicsBody.clearAllForces()` — expressible there.
