@@ -1595,16 +1595,38 @@ object FsceneRealizer {
                     " bias=${so.constantBias} normalBias=${so.normalBias}" +
                     " bulbRadius=${so.shadowBulbRadius}")
             }
+            if (type == LightManager.Type.DIRECTIONAL) {
+                // Unmapped upstream `DirectionalLightCodec` members —
+                // warned here, outside the castsShadow gate, since
+                // they aren't shadow fields: `priority` (feature
+                // priority) and `localDirection` (travel dir; dart3d
+                // aims lights by node transform).
+                for (field in listOf("priority", "localDirection")) {
+                    if (p.tag(field) != null) {
+                        warnOnce("w24.directional.$field",
+                            "directionalLight '$field' is an " +
+                                "upstream field with no dart3d " +
+                                "mapping; ignored")
+                    }
+                }
+            }
             builder.build(host.engine, rec.entity)
         }
 
         /**
          * W24: the upstream directional-light shadow vocabulary
-         * (flutter_scene `DirectionalLightCodec`). Filament maps the
-         * breadth onto `ShadowOptions` + the sun knobs; fields with no
-         * Filament counterpart warn once instead of pretending parity.
-         * Runs inside the `castsShadow` guard — the options are only
-         * meaningful on a casting light.
+         * (flutter_scene `DirectionalLightCodec`) plus three dart3d
+         * wire extensions upstream keeps on
+         * `stage.skyEnvironment.sunLight` (`SunLightSpec`):
+         * `contactShadows`, `contactShadowDistance`, `angularRadius`
+         * — the sun block stays deferred on both platforms, so the
+         * fields ride the light component here. `priority` and
+         * `localDirection` are upstream codec members dart3d doesn't
+         * map — they warn below like the other unmapped fields.
+         * Filament maps the breadth onto `ShadowOptions` + the sun
+         * knobs; fields with no Filament counterpart warn once
+         * instead of pretending parity. Runs inside the `castsShadow`
+         * guard — the options are only meaningful on a casting light.
          */
         private fun decodeDirectionalShadow(
             host: Dart3dView,
@@ -1627,13 +1649,17 @@ object FsceneRealizer {
                 so.normalBias = it.toFloat()
             }
             p.tag("contactShadows").d3Bool()?.let {
-                // Exact — Filament's screen-space contact-shadow
-                // chain. `contactShadowDistance` has no distance knob
-                // (the march's reach is fixed by the light), so an
+                // dart3d wire extension — upstream carries it on
+                // `sunLight`, deferred here. Exact — Filament's
+                // screen-space contact-shadow chain.
+                // `contactShadowDistance` has no distance knob (the
+                // march's reach is fixed by the light), so an
                 // authored value only rides the approximation note.
                 so.screenSpaceContactShadows = it
             }
             if (p.tag("contactShadowDistance").d3Double() != null) {
+                // dart3d wire extension — upstream carries it on
+                // `sunLight`, deferred here.
                 warnOnce("w24.contactShadowDistance",
                     "contactShadowDistance has no Filament equivalent " +
                         "— screen-space contact shadows march a fixed " +
@@ -1644,11 +1670,16 @@ object FsceneRealizer {
                 // filters scale by; DPCF (the view's shadow type)
                 // doesn't consume it — softening stays an
                 // approximation until a soft shadow type is chosen.
+                // Precedence: `shadowRadius` (W6) and `shadowSoftness`
+                // (W24) write the same knob — this decode runs second,
+                // so softness wins when a document authors both.
                 so.shadowBulbRadius = it.toFloat()
             }
             p.tag("angularRadius").d3Double()?.let {
-                // Exact — the sun's angular radius (radians) Filament
-                // uses for the sun disk and PCSS penumbra scale.
+                // dart3d wire extension — upstream carries it on
+                // `sunLight`, deferred here. Exact — the sun's angular
+                // radius (radians) Filament uses for the sun disk and
+                // PCSS penumbra scale.
                 builder.sunAngularRadius(it.toFloat())
             }
             p.tag("shadowCascadeSplitLambda").d3Double()?.let { lambda ->

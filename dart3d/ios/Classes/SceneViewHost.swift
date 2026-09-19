@@ -427,6 +427,15 @@ final class SceneViewHost: SCNView {
     /// decodes a camera promotes it over this placeholder.
     private var fallbackCameraNode: SCNNode?
 
+    /// The document pick — the doc camera, a diff-promoted camera,
+    /// or the install-time fallback — that owns `pointOfView` while
+    /// no screen view is declared. Written at the same sites the
+    /// fallback path picks `pointOfView` (install, `promoteCamera`,
+    /// `restoreFallbackCamera`), so an emptied `views` list can hand
+    /// the host's pass back to it (W24 fix-round). Non-private like
+    /// `blankPov` — `teardownRenderTargets` clears it cross-file.
+    var docPov: SCNNode?
+
     /// Warnings already emitted, keyed by caller-chosen tag, so
     /// payload-triggered re-realization can't repeat them.
     private var loggedOnce: Set<String> = []
@@ -1463,6 +1472,7 @@ final class SceneViewHost: SCNView {
         guard let cam = ctx.firstCameraNode, let fb = fallbackCameraNode
         else { return }
         pointOfView = cam
+        docPov = cam
         fb.removeFromParentNode()
         retire(fb)
         fallbackCameraNode = nil
@@ -1482,8 +1492,29 @@ final class SceneViewHost: SCNView {
         scene?.rootNode.addChildNode(cam)
         pointOfView = cam
         fallbackCameraNode = cam
+        docPov = cam
         applyStageExposure(stageExposure)
         applyStageEffects()
+    }
+
+    /// W24 fix-round: an emptied screen-view set hands the host's
+    /// pass back to the document pick — leaving `pointOfView` on
+    /// `blankPov` (category mask 0) or a retired view camera drew the
+    /// mask-0 clear pass every vsync. Reuses the fallback path's own
+    /// picks: `docPov` while it's still a live scene camera, else
+    /// `restoreFallbackCamera` installs the default — a removed or
+    /// camera-less pick gets the same default the camera-drop path
+    /// installs.
+    private func restoreDocumentPov() {
+        if let pov = docPov, pov.camera != nil, pov.parent != nil {
+            pointOfView = pov
+            applyStageExposure(stageExposure)
+            applyStageEffects()
+            return
+        }
+        // The pick is gone or camera-less — the same default the
+        // camera-drop path installs (it applies the stage itself).
+        restoreFallbackCamera()
     }
 
     /// `{"op":"upsertResource","id":"<token>","resource":{…}}` — a
@@ -1901,7 +1932,15 @@ final class SceneViewHost: SCNView {
     /// `{"op":"updateViews","views":[<entries>]}` — wholesale replace
     /// of the view list: re-decode against the live registries, then
     /// re-distribute onto the rt records and re-pick the screen view.
+    /// An absent or non-array `views` member warns and no-ops — the
+    /// same `updateViews.malformed` shape Android logs (silently
+    /// clearing a live list on a decode hiccup hid real bugs).
     private func applyUpdateViews(_ json: [String: Any]) {
+        guard json["views"] is [Any] else {
+            logOnce("updateViews.malformed",
+                "updateViews: missing views array")
+            return
+        }
         let ctx = surgicalContext()
         ctx.decodeViews(json["views"])
         publish(ctx)
@@ -1951,8 +1990,14 @@ final class SceneViewHost: SCNView {
     /// W24: in split mode the host's point-of-view is the blank
     /// camera instead — its pass contributes clear/background under
     /// the sibling views, which carry every declared screen view.
+    /// An empty resolved set hands `pointOfView` back to the document
+    /// pick (`restoreDocumentPov`) — the split-mode blank pass must
+    /// not outlive the views that justified it.
     func applyScreenViewCamera() {
-        guard let v = screenViews.first else { return }
+        guard let v = screenViews.first else {
+            restoreDocumentPov()
+            return
+        }
         if multiScreenMode {
             // Split: the host's pass is clear/background under the
             // siblings — the blank pov is set whether or not the
@@ -3661,6 +3706,7 @@ final class SceneViewHost: SCNView {
             pointOfView = cam
             fallbackCameraNode = cam
         }
+        docPov = pointOfView
         // W14: distribute the decoded views onto their rt records, let
         // a screen view's camera take the point of view (displacing
         // the doc/fallback pick), then apply stage quality before the

@@ -79,9 +79,12 @@ import 'package:vector_math/vector_math.dart';
 /// the manifest-to-visible latency measurement.
 /// W24 lands the views-and-shadow-breadth lane through the returned
 /// `w24Phase` closure — fired at +126 s — which re-decodes `key` with
-/// the full upstream directional shadow vocabulary (cascades, split
-/// lambda, max distance, contact shadows, biases, softness, caster
-/// faces), drops a `shadowCatcher` plane and a layer-bit-8 marker
+/// the directional shadow vocabulary: the upstream
+/// `DirectionalLightCodec` fields (cascades, split lambda, max
+/// distance, biases, softness, caster faces) plus the three
+/// `sunLight` fields dart3d accepts on the light as wire extensions
+/// (contact shadows, distance, angular radius). It drops a
+/// `shadowCatcher` plane and a layer-bit-8 marker
 /// sphere into the arena, then walks the screen-view lanes through
 /// `updateViews`: a two-camera split, a single inset `viewport` rect,
 /// a high-bit `layerMask` pair, and the pre-phase restore. The
@@ -3511,10 +3514,12 @@ final class FeatureScene {
     }
 
     // W24 phase (+126 s): the views-and-shadow-breadth lane. One
-    // component re-decode arms the full upstream directional shadow
-    // vocabulary on `key` (cascades, split lambda, max distance,
-    // contact shadows, biases, softness, caster faces — each native
-    // maps what it supports and logs the rest), a `shadowCatcher`
+    // component re-decode arms the directional shadow vocabulary on
+    // `key` (upstream `DirectionalLightCodec` fields — cascades,
+    // split lambda, max distance, biases, softness, caster faces —
+    // plus the `sunLight` fields dart3d accepts as extensions:
+    // contact shadows, distance, angular radius. Each native maps
+    // what it supports and logs the rest), a `shadowCatcher`
     // plane slides under the dice area, and a layer-bit-8 marker
     // sphere lands for the 8-bit layerMask lane. Then the view list
     // walks the screen-target lanes: a two-view split (each view its
@@ -3551,12 +3556,15 @@ final class FeatureScene {
       final prePhaseViews = List<RenderViewSpec>.of(live.views);
 
       // ── t+0: shadow breadth + the catcher + the layer marker ──
-      // The `key` light re-decodes with the full upstream
-      // directionalLight shadow vocabulary — one `updateNode`
-      // components pass. SceneKit maps mapSize/softness/maxDistance
-      // (ortho projection)/back-face casters and logs the rest;
-      // Filament maps cascades/splits/maxDistance/contact/biases/
-      // angularRadius and logs the rest.
+      // The `key` light re-decodes with the directionalLight shadow
+      // vocabulary — one `updateNode` components pass. SceneKit maps
+      // mapSize/softness/maxDistance (ortho projection)/back-face
+      // casters and logs the rest; Filament maps cascades/splits/
+      // maxDistance/contact/biases/angularRadius and logs the rest.
+      // `shadowRadius` (W6) and `shadowSoftness` (W24) drive the same
+      // native knob — both are authored here on purpose: softness
+      // decodes second and wins (0.08 beats 3.0), so the pass also
+      // exercises the documented precedence.
       keyNode.components
         ..clear()
         ..add(
@@ -3569,7 +3577,8 @@ final class FeatureScene {
               // W6 fields — kept so the pass is a superset, not a swap.
               'shadowRadius': DoubleValue(3.0),
               'shadowDepthBias': DoubleValue(0.005),
-              // W24 vocabulary (upstream DirectionalLightCodec names).
+              // W24 vocabulary — upstream DirectionalLightCodec
+              // names first, the sunLight wire extensions last.
               'shadowCascadeCount': IntValue(4),
               'shadowCascadeSplitLambda': DoubleValue(0.7),
               'shadowMaxDistance': DoubleValue(60),
@@ -3581,6 +3590,9 @@ final class FeatureScene {
               'shadowFilter': StringValue('rotatedPoisson'),
               'shadowCasterFaces': StringValue('front'),
               'cacheStaticShadows': BoolValue(true),
+              // dart3d wire extensions — upstream carries these on
+              // `stage.skyEnvironment.sunLight` (deferred); dart3d
+              // accepts them on the light component.
               'contactShadows': BoolValue(true),
               'contactShadowDistance': DoubleValue(0.3),
               'angularRadius': DoubleValue(0.005),

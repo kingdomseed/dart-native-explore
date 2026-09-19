@@ -52,6 +52,11 @@ only) or maps onto a named engine feature.
   semantic to SceneKit's blur radius; record the approximation in the
   matrix, do not claim equality). Always set a sane `mapSize`
   (≥1024) when shadows are enabled.
+- Precedence (W24): the directional-only `shadowSoftness` field
+  writes the same native knob — `light.shadowRadius` iOS,
+  `shadowBulbRadius` Android — and decodes after `shadowRadius` in
+  `decodeDirectionalShadow`, so it wins when a document authors
+  both.
 
 ### `allowsResting` (rigidBody)
 

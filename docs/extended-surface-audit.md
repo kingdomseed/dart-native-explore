@@ -327,7 +327,7 @@ workstream settled; platform-row edits belong to the integrator.
 ## W24 landed — views breadth and shadow breadth
 
 Where the views/shadow workstream settled. Verification: `dn test`
-(170 pass incl. 18 new `views_viewport_test.dart` cases), `dn analyze`
+(207 pass incl. 10 new `views_viewport_test.dart` cases), `dn analyze`
 (13 pre-existing `example/tool` findings only), iOS
 `swiftc -typecheck -target arm64-apple-ios16.0-simulator` clean,
 Android `:dart3d:compileReleaseKotlin` green. No device run — the
@@ -361,21 +361,34 @@ harness phase is the driveable lane.
   bits are set (`RenderTargets.kt:274-281`,
   `FsceneRealizer.kt:1110-1117`). Layer bit ≥8 is iOS-visible only.
 - **Directional shadow vocabulary** — the harness re-decodes `key`
-  with the full upstream `DirectionalLightCodec` field set. iOS maps
-  `shadowMapResolution`→`shadowMapSize`, `shadowSoftness`→
-  `shadowRadius`, `shadowMaxDistance`→`orthographicScale` (auto-fit
-  off), `shadowCasterFaces 'back'`→`forcesBackFaceCasters`; cascades,
-  split lambda, fade range, ambient strength, normal bias,
-  cacheStatic, contact shadows/distance, angular radius, and non-
-  rotatedPoisson filters `logOnce` per field — SceneKit renders one
-  shadow map per directional (`FsceneRealizer.swift:3339-3410`).
-  Android maps `shadowCascadeCount`/`shadowCascadeSplitLambda`
-  (computed split positions), `shadowMaxDistance`, `shadowNormalBias`,
+  with the upstream `DirectionalLightCodec` field set plus three
+  dart3d wire extensions upstream keeps on
+  `stage.skyEnvironment.sunLight` (`SunLightSpec`:
+  `contactShadows`/`contactShadowDistance`/`angularRadius`). The sun
+  block stays deferred on both platforms (the `skyEnvironment`
+  relighting row above), so dart3d accepts the fields on the light
+  component instead — decode sites mark them extensions. Upstream's
+  `priority`/`localDirection` members stay unmapped and warn once on
+  receipt both platforms. iOS maps `shadowMapResolution`→
+  `shadowMapSize`, `shadowSoftness`→`shadowRadius`,
+  `shadowMaxDistance`→`orthographicScale` (auto-fit off),
+  `shadowCasterFaces 'back'`→`forcesBackFaceCasters`; cascades, split
+  lambda, fade range, ambient strength, normal bias, cacheStatic,
+  the three sun extensions, and non-rotatedPoisson filters `logOnce`
+  per field — SceneKit renders one shadow map per directional
+  (`FsceneRealizer.swift:3342-3433`). Android maps
+  `shadowCascadeCount`/`shadowCascadeSplitLambda` (computed split
+  positions), `shadowMaxDistance`, `shadowNormalBias`,
   `contactShadows`→`screenSpaceContactShadows`, `shadowSoftness`→
   `shadowBulbRadius` (DPCF approximation), `angularRadius`→
   `sunAngularRadius`; fade/ambient/caster-faces/cacheStatic/
-  contactShadowDistance/shadowFilter warn once
-  (`FsceneRealizer.kt:1601-1677`).
+  `contactShadowDistance`/`shadowFilter` warn once
+  (`FsceneRealizer.kt:1618-1708`).
+- **`shadowRadius` vs `shadowSoftness` precedence** — both write the
+  same native knob (`light.shadowRadius` iOS, `shadowBulbRadius`
+  Android). The W24 field decodes second in `decodeDirectionalShadow`
+  and wins when a document authors both; the `key` re-decode
+  exercises it on purpose (3.0 then 0.08).
 - **`shadowCatcher` material** — dart3d extension `type` on
   `MaterialResource`, upstream `ShadowCatcherMaterial`'s live mode:
   the surface draws only its received shadow. iOS realizes
