@@ -34,6 +34,9 @@ dev_dependencies:
   lints: ^6.0.0
   image: ^4.0.0
   test: ^1.25.0
+  # Direct dep for tool/*.dart — the decode/dump scripts import
+  # package:scene (transitively pinned via dart3d otherwise).
+  scene: ^0.3.0
 
 # Which Skia binary ships with the app. Pick one; see the Skia page.
 #
@@ -65,6 +68,9 @@ dartnative:
     - assets/showcase/playground.fscene
     - assets/showcase/prefab_demo.fscene
     - assets/showcase/tree_prefab.fscene
+    # W25 stage-effects lane (`.cube` LUT the colorGradingLut asset
+    # path resolves through the native bundle/asset fallback)
+    - assets/luts/cool.cube
     # W21 conformance lanes (upstream fixture corpus, KTX2 + HDR envs)
     - assets/etc1s_srgb_mips_64.ktx2
     - assets/uastc_srgb_mips_zstd_64.ktx2

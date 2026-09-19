@@ -407,6 +407,178 @@ struct StageEffects {
     }
 }
 
+// MARK: - W20 groundwork: per-volume blending
+
+extension StageEffects {
+
+    /// One resolved environment contribution to blend over the base —
+    /// upstream `EnvironmentContribution` (`environment_volume.dart`).
+    /// `weight` is the effective 0..1 strength (volume coverage ×
+    /// master weight, already folded by the caller); `priority` orders
+    /// the fold so a higher-priority volume applies later (on top).
+    struct Contribution {
+        var effects: StageEffects
+        var weight: Double
+        var priority: Double
+    }
+
+    /// Upstream `blendEnvironmentContributions`: drops weight-0
+    /// contributions, sorts ascending by priority, folds `lerp` left
+    /// over `base` so the strongest, highest-priority look lands last.
+    static func blendContributions(
+        _ base: StageEffects,
+        _ contributions: [Contribution]
+    ) -> StageEffects {
+        let active = contributions
+            .filter { $0.weight > 0 }
+            .sorted { $0.priority < $1.priority }
+        var result = base
+        for c in active {
+            result = lerp(result, c.effects, t: min(max(c.weight, 0), 1))
+        }
+        return result
+    }
+
+    /// Upstream `EnvironmentSettings.lerp`: every numeric leaf
+    /// interpolates `a + (b - a) * t`; discrete fields — `enabled`
+    /// flags, mode/quality strings, sample/step counts, LUT identity,
+    /// the GI resolution/extents — switch to `b` once `t >= 0.5`.
+    /// Starting from `d` (the discrete pick) then overwriting the
+    /// continuous leaves keeps the split a per-field list instead of
+    /// a per-field constructor.
+    static func lerp(_ a: StageEffects, _ b: StageEffects, t: Double) -> StageEffects {
+        var r = t >= 0.5 ? b : a
+
+        r.colorGrading.brightness = fxLerp(a.colorGrading.brightness, b.colorGrading.brightness, t)
+        r.colorGrading.contrast = fxLerp(a.colorGrading.contrast, b.colorGrading.contrast, t)
+        r.colorGrading.saturation = fxLerp(a.colorGrading.saturation, b.colorGrading.saturation, t)
+        r.colorGrading.temperature = fxLerp(a.colorGrading.temperature, b.colorGrading.temperature, t)
+        r.colorGrading.tint = fxLerp(a.colorGrading.tint, b.colorGrading.tint, t)
+        r.colorGrading.lift = fxLerp3(a.colorGrading.lift, b.colorGrading.lift, t)
+        r.colorGrading.gamma = fxLerp3(a.colorGrading.gamma, b.colorGrading.gamma, t)
+        r.colorGrading.gain = fxLerp3(a.colorGrading.gain, b.colorGrading.gain, t)
+        r.colorGrading.lutBlend = fxLerp(a.colorGrading.lutBlend, b.colorGrading.lutBlend, t)
+
+        r.bloom.threshold = fxLerp(a.bloom.threshold, b.bloom.threshold, t)
+        r.bloom.intensity = fxLerp(a.bloom.intensity, b.bloom.intensity, t)
+        r.bloom.scatter = fxLerp(a.bloom.scatter, b.bloom.scatter, t)
+
+        r.lensFlare.intensity = fxLerp(a.lensFlare.intensity, b.lensFlare.intensity, t)
+        r.lensFlare.ghostSpacing = fxLerp(a.lensFlare.ghostSpacing, b.lensFlare.ghostSpacing, t)
+        r.lensFlare.haloRadius = fxLerp(a.lensFlare.haloRadius, b.lensFlare.haloRadius, t)
+        r.lensFlare.haloIntensity = fxLerp(a.lensFlare.haloIntensity, b.lensFlare.haloIntensity, t)
+        r.lensFlare.chromaticAberration = fxLerp(
+            a.lensFlare.chromaticAberration, b.lensFlare.chromaticAberration, t)
+
+        r.vignette.intensity = fxLerp(a.vignette.intensity, b.vignette.intensity, t)
+        r.vignette.radius = fxLerp(a.vignette.radius, b.vignette.radius, t)
+        r.vignette.smoothness = fxLerp(a.vignette.smoothness, b.vignette.smoothness, t)
+
+        r.chromaticAberration.intensity = fxLerp(
+            a.chromaticAberration.intensity, b.chromaticAberration.intensity, t)
+
+        r.filmGrain.intensity = fxLerp(a.filmGrain.intensity, b.filmGrain.intensity, t)
+
+        r.ambientOcclusion.radius = fxLerp(a.ambientOcclusion.radius, b.ambientOcclusion.radius, t)
+        r.ambientOcclusion.intensity = fxLerp(
+            a.ambientOcclusion.intensity, b.ambientOcclusion.intensity, t)
+        r.ambientOcclusion.bias = fxLerp(a.ambientOcclusion.bias, b.ambientOcclusion.bias, t)
+        r.ambientOcclusion.power = fxLerp(a.ambientOcclusion.power, b.ambientOcclusion.power, t)
+        r.ambientOcclusion.detail = fxLerp(a.ambientOcclusion.detail, b.ambientOcclusion.detail, t)
+        r.ambientOcclusion.horizonAngle = fxLerp(
+            a.ambientOcclusion.horizonAngle, b.ambientOcclusion.horizonAngle, t)
+        r.ambientOcclusion.directLightAffect = fxLerp(
+            a.ambientOcclusion.directLightAffect, b.ambientOcclusion.directLightAffect, t)
+        r.ambientOcclusion.multiBounce = fxLerp(
+            a.ambientOcclusion.multiBounce, b.ambientOcclusion.multiBounce, t)
+        r.ambientOcclusion.thickness = fxLerp(
+            a.ambientOcclusion.thickness, b.ambientOcclusion.thickness, t)
+        r.ambientOcclusion.thicknessHeuristic = fxLerp(
+            a.ambientOcclusion.thicknessHeuristic, b.ambientOcclusion.thicknessHeuristic, t)
+        r.ambientOcclusion.indirectLight = fxLerp(
+            a.ambientOcclusion.indirectLight, b.ambientOcclusion.indirectLight, t)
+
+        r.screenSpaceReflections.intensity = fxLerp(
+            a.screenSpaceReflections.intensity, b.screenSpaceReflections.intensity, t)
+        r.screenSpaceReflections.maxDistance = fxLerp(
+            a.screenSpaceReflections.maxDistance, b.screenSpaceReflections.maxDistance, t)
+        r.screenSpaceReflections.thickness = fxLerp(
+            a.screenSpaceReflections.thickness, b.screenSpaceReflections.thickness, t)
+        r.screenSpaceReflections.stride = fxLerp(
+            a.screenSpaceReflections.stride, b.screenSpaceReflections.stride, t)
+        r.screenSpaceReflections.blur = fxLerp(
+            a.screenSpaceReflections.blur, b.screenSpaceReflections.blur, t)
+        r.screenSpaceReflections.distanceFadeStart = fxLerp(
+            a.screenSpaceReflections.distanceFadeStart,
+            b.screenSpaceReflections.distanceFadeStart, t)
+        r.screenSpaceReflections.resolutionScale = fxLerp(
+            a.screenSpaceReflections.resolutionScale,
+            b.screenSpaceReflections.resolutionScale, t)
+
+        r.globalIllumination.intensity = fxLerp(
+            a.globalIllumination.intensity, b.globalIllumination.intensity, t)
+        r.globalIllumination.visibility = fxLerp(
+            a.globalIllumination.visibility, b.globalIllumination.visibility, t)
+
+        r.temporalAntiAliasing.minimumCurrentWeight = fxLerp(
+            a.temporalAntiAliasing.minimumCurrentWeight,
+            b.temporalAntiAliasing.minimumCurrentWeight, t)
+        r.temporalAntiAliasing.varianceGamma = fxLerp(
+            a.temporalAntiAliasing.varianceGamma, b.temporalAntiAliasing.varianceGamma, t)
+        r.temporalAntiAliasing.sharpness = fxLerp(
+            a.temporalAntiAliasing.sharpness, b.temporalAntiAliasing.sharpness, t)
+        r.temporalAntiAliasing.jitterScale = fxLerp(
+            a.temporalAntiAliasing.jitterScale, b.temporalAntiAliasing.jitterScale, t)
+
+        r.fog.color = fxLerp3(a.fog.color, b.fog.color, t)
+        r.fog.skyColorInfluence = fxLerp(a.fog.skyColorInfluence, b.fog.skyColorInfluence, t)
+        r.fog.density = fxLerp(a.fog.density, b.fog.density, t)
+        r.fog.start = fxLerp(a.fog.start, b.fog.start, t)
+        r.fog.end = fxLerp(a.fog.end, b.fog.end, t)
+        r.fog.maxOpacity = fxLerp(a.fog.maxOpacity, b.fog.maxOpacity, t)
+        r.fog.cutoffDistance = fxLerp(a.fog.cutoffDistance, b.fog.cutoffDistance, t)
+        r.fog.height = fxLerp(a.fog.height, b.fog.height, t)
+        r.fog.heightFalloff = fxLerp(a.fog.heightFalloff, b.fog.heightFalloff, t)
+        r.fog.sunInScatter = fxLerp(a.fog.sunInScatter, b.fog.sunInScatter, t)
+        r.fog.sunInScatterExponent = fxLerp(
+            a.fog.sunInScatterExponent, b.fog.sunInScatterExponent, t)
+
+        r.godRays.intensity = fxLerp(a.godRays.intensity, b.godRays.intensity, t)
+        r.godRays.density = fxLerp(a.godRays.density, b.godRays.density, t)
+        r.godRays.anisotropy = fxLerp(a.godRays.anisotropy, b.godRays.anisotropy, t)
+        r.godRays.maxDistance = fxLerp(a.godRays.maxDistance, b.godRays.maxDistance, t)
+        r.godRays.jitter = fxLerp(a.godRays.jitter, b.godRays.jitter, t)
+        r.godRays.color = fxLerp3(a.godRays.color, b.godRays.color, t)
+
+        r.depthOfField.focusDistance = fxLerp(
+            a.depthOfField.focusDistance, b.depthOfField.focusDistance, t)
+        r.depthOfField.fStop = fxLerp(a.depthOfField.fStop, b.depthOfField.fStop, t)
+        r.depthOfField.focalLength = fxLerp(
+            a.depthOfField.focalLength, b.depthOfField.focalLength, t)
+        r.depthOfField.sensorHeight = fxLerp(
+            a.depthOfField.sensorHeight, b.depthOfField.sensorHeight, t)
+        r.depthOfField.blurScale = fxLerp(a.depthOfField.blurScale, b.depthOfField.blurScale, t)
+        r.depthOfField.maxForegroundBlur = fxLerp(
+            a.depthOfField.maxForegroundBlur, b.depthOfField.maxForegroundBlur, t)
+        r.depthOfField.maxBackgroundBlur = fxLerp(
+            a.depthOfField.maxBackgroundBlur, b.depthOfField.maxBackgroundBlur, t)
+        r.depthOfField.bladeRotation = fxLerp(
+            a.depthOfField.bladeRotation, b.depthOfField.bladeRotation, t)
+        r.depthOfField.bladeCurvature = fxLerp(
+            a.depthOfField.bladeCurvature, b.depthOfField.bladeCurvature, t)
+
+        r.autoExposure.strength = fxLerp(a.autoExposure.strength, b.autoExposure.strength, t)
+        r.autoExposure.compensation = fxLerp(
+            a.autoExposure.compensation, b.autoExposure.compensation, t)
+        r.autoExposure.minEv = fxLerp(a.autoExposure.minEv, b.autoExposure.minEv, t)
+        r.autoExposure.maxEv = fxLerp(a.autoExposure.maxEv, b.autoExposure.maxEv, t)
+        r.autoExposure.speedUp = fxLerp(a.autoExposure.speedUp, b.autoExposure.speedUp, t)
+        r.autoExposure.speedDown = fxLerp(a.autoExposure.speedDown, b.autoExposure.speedDown, t)
+
+        return r
+    }
+}
+
 // MARK: - Untagged JSON helpers
 
 /// The `effects` block serializes as plain JSON values (no `{'d':…}`
@@ -436,4 +608,12 @@ private func fxVec3(_ v: Any?, _ d: SIMD3<Float>) -> SIMD3<Float> {
           let z = (a[2] as? NSNumber)?.floatValue
     else { return d }
     return SIMD3<Float>(x, y, z)
+}
+
+private func fxLerp(_ a: Double, _ b: Double, _ t: Double) -> Double {
+    a + (b - a) * t
+}
+
+private func fxLerp3(_ a: SIMD3<Float>, _ b: SIMD3<Float>, _ t: Double) -> SIMD3<Float> {
+    a + (b - a) * Float(t)
 }

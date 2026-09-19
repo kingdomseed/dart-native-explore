@@ -433,6 +433,7 @@ object FsceneRealizer {
             geometryPayloadIds = res.geometryPayloadIds,
             environments = res.environments,
             environmentPayloadIds = res.environmentPayloadIds,
+            lutPayloadIds = res.lutPayloadIds,
             bodies = host.bodies,
             dynamicBodyKeys = host.dynamicBodyKeys,
             pendingParents = host.pendingParents,
@@ -699,6 +700,12 @@ object FsceneRealizer {
         // satisfies by re-running decodeStage.
         val environments: MutableMap<Long, JSONObject> = HashMap(),
         val environmentPayloadIds: MutableMap<Long, Long> = HashMap(),
+        // W25: envKey → payloadKey claims for the env resource's
+        // `effects.colorGrading.lut` `.cube` table — an arriving chunk
+        // re-runs decodeStage like an env equirect claim. Asset-path
+        // LUT refs don't claim; the host resolves them from the app
+        // assets at apply time.
+        val lutPayloadIds: MutableMap<Long, Long> = HashMap(),
         val bodies: MutableMap<Long, Body> = HashMap(),
         val dynamicBodyKeys: MutableSet<Long> = HashSet(),
         // Children whose addNode predated their parent's — childKey →
@@ -781,6 +788,7 @@ object FsceneRealizer {
                 MutableSet<Long>> = HashMap(),
             val environments: MutableMap<Long, JSONObject> = HashMap(),
             val environmentPayloadIds: MutableMap<Long, Long> = HashMap(),
+            val lutPayloadIds: MutableMap<Long, Long> = HashMap(),
             val payloadSpecs: MutableMap<Long, PayloadMeta> = HashMap(),
             val skins: MutableMap<Long, DecodedSkin> = HashMap(),
             val animations: MutableMap<Long, DecodedAnimation> = HashMap(),
@@ -4053,6 +4061,7 @@ object FsceneRealizer {
                 D3Wire.localIdKey(oldToken)?.let {
                     pendingPayloadRefs.remove(it)
                     environmentPayloadIds.remove(it)
+                    lutPayloadIds.remove(it)
                 }
             }
             host.lastStage = stage
@@ -4117,9 +4126,31 @@ object FsceneRealizer {
                     envKey?.let { pendingPayloadRefs.add(it) }
                 }
             }
+            // W25: the colorGrading LUT rides the env's claim path.
+            // A `chunk:`/id-token `lut` ref registers here — before
+            // the fingerprint skip, for the same wholesale-reinstall
+            // reason as the equirect claim above — and the chunk's
+            // arrival re-runs decodeStage through `lutPayloadIds`.
+            // An absent `effects` key keeps the prior claim (the
+            // decoded stack is retained); a present block without a
+            // token-shaped ref clears it (asset-path refs resolve at
+            // apply time, never claim). The LUT bytes' hash rides the
+            // fingerprint so a chunk rewritten under the same token
+            // still rebuilds.
+            val lutPayloadKey = envRes.optJSONObject("effects")
+                ?.optJSONObject("colorGrading")
+                ?.optString("lut")?.takeIf { it.isNotEmpty() }
+                ?.let { D3Wire.localIdKey(it) }
+            if (lutPayloadKey != null) {
+                envKey?.let { lutPayloadIds[it] = lutPayloadKey }
+            } else if (envRes.has("effects")) {
+                envKey?.let { lutPayloadIds.remove(it) }
+            }
             val envFingerprint = listOf(
                 stage?.toString() ?: "∅", envRes.toString(),
                 envPayloadKey?.let {
+                    host.payloadStore[it]?.contentHashCode() },
+                lutPayloadKey?.let {
                     host.payloadStore[it]?.contentHashCode() })
                 .hashCode()
             if (envFingerprint == host.lastEnvFingerprint) return
@@ -4415,6 +4446,7 @@ object FsceneRealizer {
                     geometryPayloadIds = geometryPayloadIds,
                     environments = environments,
                     environmentPayloadIds = environmentPayloadIds,
+                    lutPayloadIds = lutPayloadIds,
                     payloadSpecs = payloadSpecs,
                     skins = skins,
                     animations = animations,
