@@ -11,6 +11,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:dart3d/src/fsceneb_reader.dart';
+import 'package:dart3d/src/glb_import.dart';
 import 'package:dart3d/src/scene_model.dart';
 import 'package:dart3d/src/vertex_pack.dart';
 import 'package:dart3d/src/world_bounds.dart';
@@ -65,12 +66,28 @@ const showcaseItems = [
     kBuiltinMaterialsKey,
     'W21 lanes: alpha blend/mask · second UV set',
   ),
+  ShowcaseItem(
+    'glb',
+    'assets/showcase/cube.glb',
+    'W29 runtime glTF import · embedded PNG + light',
+  ),
+  ShowcaseItem(
+    'roundtrip',
+    kBuiltinDocRoundtripKey,
+    'W29: build → .fscene → re-realize',
+  ),
 ];
 
 /// The synthetic asset key for the W21 materials conformance scene —
 /// no bundled file; [loadShowcaseScene] builds the document
 /// procedurally (see [buildMaterialsDocument]).
 const String kBuiltinMaterialsKey = 'builtin:materials';
+
+/// The synthetic asset key for the W29 round-trip lane: builds the
+/// materials conformance document, serializes it through canonical
+/// `.fscene`, re-parses, and renders the re-realized document — the
+/// same scene must come back.
+const String kBuiltinDocRoundtripKey = 'builtin:docroundtrip';
 
 /// Dice stay in the gallery too — the [DART3D_MODEL] verification lane
 /// and anyone wanting a single die on the physics slab.
@@ -112,6 +129,10 @@ ShowcaseScene? loadShowcaseScene(
   try {
     if (item.assetKey == kBuiltinMaterialsKey) {
       doc = buildMaterialsDocument(bytesOf: bytesOf);
+    } else if (item.assetKey == kBuiltinDocRoundtripKey) {
+      // Serialize the same fixture through `.fscene` and re-parse —
+      // the re-realized document has to render identically.
+      doc = readFscene(writeFscene(buildMaterialsDocument(bytesOf: bytesOf)));
     } else {
       final bytes = bytesOf(item.assetKey);
       if (bytes == null) {
@@ -120,6 +141,8 @@ ShowcaseScene? loadShowcaseScene(
       }
       doc = item.assetKey.endsWith('.fsceneb')
           ? readFsceneb(bytes)
+          : item.assetKey.endsWith('.glb')
+          ? importGlbToSceneDocument(bytes)
           : readFscene(utf8.decode(bytes));
       // Prefab instances expand host-side — prefab_demo.fscene
       // references tree_prefab.fscene by bare filename.
@@ -211,7 +234,8 @@ ShowcaseScene? loadShowcaseScene(
     name: 'showcase.camera',
     transform: TrsTransform(
       translation: center + cameraDir * radius * 2.8,
-      rotation: Quaternion.axisAngle(Vector3(0, 1, 0), yaw) *
+      rotation:
+          Quaternion.axisAngle(Vector3(0, 1, 0), yaw) *
           Quaternion.axisAngle(Vector3(1, 0, 0), pitch),
     ),
     components: [
@@ -348,9 +372,7 @@ SceneDocument buildMaterialsDocument({
       encoding: PayloadEncoding.indexBuffer,
       format: 'uint16',
       length: 12,
-      bytes: Uint16List.fromList(const [0, 2, 1, 0, 3, 2])
-          .buffer
-          .asUint8List(),
+      bytes: Uint16List.fromList(const [0, 2, 1, 0, 3, 2]).buffer.asUint8List(),
     ),
   );
 
@@ -477,15 +499,14 @@ SceneDocument buildMaterialsDocument({
   );
 
   // ── Materials + row layout ──────────────────────────────────────
-  MaterialResource mat(
-    Map<String, PropertyValue> properties,
-  ) => doc.addResource(
-    MaterialResource(
-      doc.newId(),
-      type: 'physicallyBased',
-      properties: properties,
-    ),
-  );
+  MaterialResource mat(Map<String, PropertyValue> properties) =>
+      doc.addResource(
+        MaterialResource(
+          doc.newId(),
+          type: 'physicallyBased',
+          properties: properties,
+        ),
+      );
 
   // Backdrop first — an opaque checker wall so the blend lane's
   // translucency composites against a pattern.
@@ -541,9 +562,7 @@ SceneDocument buildMaterialsDocument({
     material: mat({
       'baseColor': ColorValue(1, 1, 1, 1),
       'baseColorTexture': ResourceRefValue(checkerTex.id),
-      'baseColorTextureTransform': MapValue({
-        'texCoord': IntValue(0),
-      }),
+      'baseColorTextureTransform': MapValue({'texCoord': IntValue(0)}),
       'doubleSided': BoolValue(true),
       'roughness': DoubleValue(0.8),
     }),
@@ -555,9 +574,7 @@ SceneDocument buildMaterialsDocument({
     material: mat({
       'baseColor': ColorValue(1, 1, 1, 1),
       'baseColorTexture': ResourceRefValue(checkerTex.id),
-      'baseColorTextureTransform': MapValue({
-        'texCoord': IntValue(1),
-      }),
+      'baseColorTextureTransform': MapValue({'texCoord': IntValue(1)}),
       'doubleSided': BoolValue(true),
       'roughness': DoubleValue(0.8),
     }),
@@ -669,8 +686,11 @@ Uint8List _latticePixels(int w, int h) {
     for (var x = 0; x < w; x++) {
       final lx = x % pitch;
       final ly = y % pitch;
-      final solid = lx >= edge && lx < pitch - edge && //
-          ly >= edge && ly < pitch - edge;
+      final solid =
+          lx >= edge &&
+          lx < pitch - edge && //
+          ly >= edge &&
+          ly < pitch - edge;
       if (solid) {
         final cell = (x ~/ pitch) + (y ~/ pitch) * 7;
         out[o] = 0x30;
@@ -683,4 +703,3 @@ Uint8List _latticePixels(int w, int h) {
   }
   return out;
 }
-

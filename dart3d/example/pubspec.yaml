@@ -61,6 +61,7 @@ dartnative:
     - assets/showcase/flutter_logo_baked.fsceneb
     - assets/showcase/two_triangles.fsceneb
     - assets/showcase/cube.fscene
+    - assets/showcase/cube.glb
     - assets/showcase/playground.fscene
     - assets/showcase/prefab_demo.fscene
     - assets/showcase/tree_prefab.fscene
