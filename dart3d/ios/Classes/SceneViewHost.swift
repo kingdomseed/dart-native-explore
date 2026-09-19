@@ -451,7 +451,7 @@ final class SceneViewHost: SCNView {
     /// W23 `collide:false` bookkeeping (all under `jointLock`).
     /// SceneKit exposes no per-pair collision switch, so exclusion
     /// borrows category bits the wire can't reach: the decoder shifts
-    /// wire layers <<2 (bits 2–33 on the 64-bit UInt), leaving bits
+    /// wire layers <<2 (bits 2–33 on the 64-bit Int), leaving bits
     /// 40–63 for private per-body categories. A privatized body's
     /// category is its dedicated bit; every body's masks are then
     /// DERIVED, never patched — `rebuildPairMasksLocked` re-runs the
@@ -470,12 +470,12 @@ final class SceneViewHost: SCNView {
     }
     /// Category bits reserved for pair exclusion — bits 40–63, above
     /// the wire's <<2 layer space.
-    private static let jointPrivateBits = UInt(0xFF_FFFF) << 40
+    private static let jointPrivateBits = Int(0xFF_FFFF) << 40
     /// Node key → its private category bit (implies a wire-masks save).
-    private var jointPrivBits: [UInt64: UInt] = [:]
+    private var jointPrivBits: [UInt64: Int] = [:]
     /// Privatized node key → (category, collision mask) as the wire
     /// authored it — the truth masks re-derive from.
-    private var jointWireMasks: [UInt64: (cat: UInt, mask: UInt)] = [:]
+    private var jointWireMasks: [UInt64: (cat: Int, mask: Int)] = [:]
     /// Body pair → count of live joint records excluding it.
     private var jointExcludedPairs: [JointPair: Int] = [:]
 
@@ -2427,15 +2427,27 @@ final class SceneViewHost: SCNView {
     /// the pair can collide at the wire level — idempotent, so a
     /// recorded pair retries here on every rebuild it touches. An
     /// already-excluded pair no-ops at the wire-collide check (the
-    /// wire truth doesn't move under carving). Caller holds
-    /// `jointLock`.
+    /// wire truth doesn't move under carving). Both private bits are
+    /// reserved before either installs: privatizing `lo` and then
+    /// hitting the 24-bit cap on `hi` would orphan `lo`'s private
+    /// category — no mask references it — leaving it colliding with
+    /// nothing until a rebuild heals it, instead of the pair
+    /// documentedly keeping colliding. Caller holds `jointLock`.
     private func carvePairLocked(_ pair: JointPair) {
         guard let wA = wireMasksLocked(pair.lo),
               let wB = wireMasksLocked(pair.hi),
               (wA.cat & wB.mask) != 0,
               (wB.cat & wA.mask) != 0 else { return }
-        guard privatizeLocked(pair.lo) != nil,
-              privatizeLocked(pair.hi) != nil else { return }
+        var reserved: [UInt64: Int] = [:]
+        for key in [pair.lo, pair.hi] where jointPrivBits[key] == nil {
+            guard nodesById[key]?.parent != nil,
+                  nodesById[key]?.physicsBody != nil,
+                  let bit = freePrivateBitLocked(
+                      excluding: Set(reserved.values))
+            else { return }
+            reserved[key] = bit
+        }
+        for (key, bit) in reserved { privatizeLocked(key, bit: bit) }
         rebuildPairMasksLocked()
     }
 
@@ -2446,7 +2458,7 @@ final class SceneViewHost: SCNView {
     /// (dead nodes that still hold a physicsBody) from answering.
     /// Caller holds `jointLock`.
     private func wireMasksLocked(_ key: UInt64)
-        -> (cat: UInt, mask: UInt)?
+        -> (cat: Int, mask: Int)?
     {
         if let w = jointWireMasks[key] { return w }
         guard let node = nodesById[key], node.parent != nil,
@@ -2455,30 +2467,34 @@ final class SceneViewHost: SCNView {
                 b.collisionBitMask & ~Self.jointPrivateBits)
     }
 
-    /// Allocates the node's private category bit (top-down from bit
-    /// 63, inside `jointPrivateBits`) and saves its wire masks.
-    /// Returns nil past 24 privatized bodies or for a detached node.
-    /// Caller holds `jointLock`.
-    private func privatizeLocked(_ key: UInt64) -> UInt? {
-        if let bit = jointPrivBits[key] { return bit }
-        guard let node = nodesById[key], node.parent != nil,
-              let body = node.physicsBody else { return nil }
-        var bit: UInt = 0
+    /// The first free private category bit (top-down from bit 63,
+    /// inside `jointPrivateBits`), skipping bits a carve has reserved
+    /// but not yet installed. Nil past 24 privatized bodies — the
+    /// pair then keeps colliding, and the recorded pair's carve
+    /// retries on every rebuild so a bit freed later still completes
+    /// it. Caller holds `jointLock`.
+    private func freePrivateBitLocked(excluding reserved: Set<Int>)
+        -> Int?
+    {
         for i in 0..<24 {
-            let cand = UInt(1) << (63 - i)
-            if !jointPrivBits.values.contains(cand) { bit = cand; break }
+            let cand = 1 << (63 - i)
+            if !jointPrivBits.values.contains(cand),
+               !reserved.contains(cand) { return cand }
         }
-        guard bit != 0 else {
-            logOnce("joint.collide.bits",
-                "collide=false joints exhausted the private category "
-                + "bits; the pair keeps colliding")
-            return nil
-        }
+        logOnce("joint.collide.bits",
+            "collide=false joints exhausted the private category "
+            + "bits; the pair keeps colliding")
+        return nil
+    }
+
+    /// Installs the node's reserved private category bit and saves
+    /// its wire masks. Caller holds `jointLock`.
+    private func privatizeLocked(_ key: UInt64, bit: Int) {
+        guard let body = nodesById[key]?.physicsBody else { return }
         jointPrivBits[key] = bit
         jointWireMasks[key] = (body.categoryBitMask,
             body.collisionBitMask & ~Self.jointPrivateBits)
         body.categoryBitMask = bit
-        return bit
     }
 
     /// Frees the node's private bit and restores its saved wire
@@ -2499,13 +2515,13 @@ final class SceneViewHost: SCNView {
     /// under the live exclusion state — pure: wire truth in, masks
     /// out. Caller holds `jointLock`.
     private func pairMasks(_ key: UInt64, _ body: SCNPhysicsBody)
-        -> (cat: UInt, mask: UInt, contact: UInt)
+        -> (cat: Int, mask: Int, contact: Int)
     {
         let wire = wireMasksLocked(key)
             ?? (body.categoryBitMask,
                 body.collisionBitMask & ~Self.jointPrivateBits)
         var mask = wire.mask
-        var contact: UInt = ~0
+        var contact: Int = ~0
         // See a privatized body exactly when the wire mask saw its
         // wire category; excluded partners lose their bit outright.
         for (k, bit) in jointPrivBits where k != key {
