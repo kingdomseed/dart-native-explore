@@ -246,14 +246,27 @@ Filament bakes feature availability into the compiled `Material`, so
 each material resource computes an `extFlags` bitset at decode
 (`FsceneRealizer.extFlagsFor` — a feature is *active* when a factor
 deviates from its no-op default or a texture slot resolves).
-`Dart3dView.materialForVariant(unlit, alphaMode, extFlags)` lazily
-compiles `d3_lit_<blend>_e<flags>` on first use inside the render
+`Dart3dView.materialForVariant(unlit, alphaMode, extFlags, boundSlots)`
+lazily compiles `d3_lit_<blend>_e<flags>` on first use inside the render
 callback — the same lane every decode runs — and caches it;
 zero-flag materials stay on the six prebuilt variants. One registry
 (`EXT_TEXTURE_SLOTS`/`EXT_FACTORS`) names every extension uniform,
 sampler, and UV-transform prefix so the builder's declarations and
 the instance writes can't drift. `view.setScreenSpaceRefractionEnabled(true)`
 is set once at init — without it Filament skips the refraction pass.
+
+**Sampler budget.** Filament's feature level 1 caps *declared*
+samplers at 9 (8 when the transmission flag arms screen-space
+refraction, which reserves one). A variant therefore declares — and
+the shader samples — only the texture slots the material binds:
+`boundTextureMask` computes the bound set (bits 0–4 base slots, bits
+5+ `EXT_TEXTURE_SLOTS`), it rides in the variant key, and unbound
+slots emit the factor-only term their 1×1 fallback used to produce.
+A bound set that still exceeds the cap, or any filamat/engine
+compile failure, warn-onces and degrades to the matching base
+`d3_lit` prebuilt — the material renders base-PBR (extension lobes
+dropped) instead of fataling on `check(pkg.isValid)` as it did
+before the round-3 fix.
 
 ### iOS approximation notes
 

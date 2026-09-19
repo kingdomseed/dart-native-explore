@@ -234,6 +234,159 @@ void main() {
     });
   });
 
+  group('android sampler budget (W22-r3)', () {
+    int popcount(int v) {
+      var n = 0;
+      while (v != 0) {
+        n += v & 1;
+        v >>= 1;
+      }
+      return n;
+    }
+
+    /// Bound-mask bits for every extension slot [flags] can declare —
+    /// the ext half of the mask when the material binds all of them.
+    int fullExtMask(int flags) {
+      var m = 0;
+      for (var i = 0; i < kExtTextureSlots.length; i++) {
+        if (flags & kExtTextureSlots[i].$1 != 0) {
+          m |= 1 << (kBaseTextureProps.length + i);
+        }
+      }
+      return m;
+    }
+
+    test('flag space: emitted declarations never exceed the FL1 cap', () {
+      // All 255 nonzero extension-flag combos. Worst case per combo
+      // = every slot of every set flag bound plus all five base
+      // slots. Bound-only emission declares popcount(mask)
+      // samplers; materialForVariant degrades to base d3_lit when
+      // that exceeds the cap, so the emitted declaration fits for
+      // every combo — an over-bound material renders degraded
+      // (warn-once), it never compiles an unloadable package.
+      var unconditionallySafe = 0;
+      var degradeBacked = 0;
+      final unsafe = <int>[];
+      for (var flags = 1; flags < 256; flags++) {
+        final cap = androidSamplerCap(flags);
+        final worstMask = 0x1F | fullExtMask(flags);
+        final emitted = androidVariantSamplers(flags, worstMask);
+        if (emitted == null) {
+          degradeBacked++;
+          unsafe.add(flags);
+        } else {
+          unconditionallySafe++;
+          expect(emitted, lessThanOrEqualTo(cap), reason: 'flags=$flags');
+          expect(emitted, popcount(worstMask));
+        }
+        // The empty bound set always fits — every flag combo can
+        // render factor-only.
+        expect(androidVariantSamplers(flags, 0), isNotNull);
+      }
+      expect(unconditionallySafe + degradeBacked, 255);
+      // 87 combos fit even fully bound (their ext slots total
+      // ≤ cap − 5 base); 168 — including the three crash variants —
+      // rely on bound-only emission plus the degrade backstop.
+      expect(unconditionallySafe, 87);
+      expect(degradeBacked, 168);
+      expect(unsafe, containsAll(<int>[0x03, 0x05, 0x21]));
+    });
+
+    test('the on-device crash variants now fit their bound sets', () {
+      // Nothing A142 (Mali-G610, FL1): all three died on
+      // check(pkg.isValid) after declaring every slot of every set
+      // flag — 5 base + all ext slots, bound or not. Bound-only
+      // emission declares what the material actually binds; a bound
+      // set that still overflows degrades (null → warn-once → base
+      // d3_lit) instead of compiling a >cap package.
+      //
+      // Ext slot bits: 5=clearCoat 6=clearCoatRoughness
+      // 7=clearCoatNormal 8=sheenColor 9=sheenRoughness
+      // 10=specular 11=specularColor 12=anisotropy
+      // 13=transmission 14=thickness; bits 0-4 are the base slots.
+      final cases = <String, (int, int, int?)>{
+        'physical_layered _e3 — factor-only cc+sheen': (0x03, 0, 0),
+        'xt_cb_cs _e5 — baseColor map + factor lobes': (0x05, 0x01, 1),
+        'xt_cb_ct _e33 — baseColor map + factor lobes': (0x21, 0x01, 1),
+        'StainedGlassLamp _e33 — 5 base + cc + transmission maps': (
+          0x21,
+          0x1F | (1 << 5) | (1 << 13),
+          7,
+        ),
+        'HeatDome _e64 — normal + thickness maps': (
+          0x64,
+          (1 << 1) | (1 << 14),
+          2,
+        ),
+        'IORTestGrid _e74 — factor-only spec+solid trans+ior': (0x74, 0, 0),
+        'FridgeGlass _e33 — mr map only': (0x21, 0x04, 1),
+        // Fully bound _e3 still can't fit — 10 over 9 — so it
+        // degrades rather than compiling.
+        '_e3 fully bound — degrade': (0x03, 0x1F | fullExtMask(0x03), null),
+      };
+      for (final e in cases.entries) {
+        expect(
+          androidVariantSamplers(e.value.$1, e.value.$2),
+          e.value.$3 ?? isNull,
+          reason: e.key,
+        );
+      }
+    });
+
+    test('every catalog material fits the cap under bound-only emission', () {
+      // The blast radius that crashed on device —
+      // CommercialRefrigerator, StainedGlassLamp ×2, IORTestGrid ×5,
+      // PotOfCoalsAnimationPointer — bound ≤7 slots each. Assert
+      // the whole catalog compiles: any future over-bound material
+      // trips this instead of an IllegalStateException on device.
+      final catalog = loadCatalog();
+      var extMaterials = 0;
+      for (final a in catalog['assets'] as List) {
+        for (final m in (a as Map)['materials'] as List? ?? []) {
+          final mat = m as Map;
+          final props = (mat['properties'] as Map).cast<String, Object?>();
+          final flags = androidExtFlags(props);
+          if (flags == 0) continue;
+          extMaterials++;
+          final mask = androidBoundSlotMask(props, flags);
+          expect(
+            androidVariantSamplers(flags, mask),
+            isNotNull,
+            reason:
+                '${a['name']} ${mat['name']} '
+                'flags=$flags mask=0x${mask.toRadixString(16)}',
+          );
+        }
+      }
+      expect(extMaterials, greaterThan(0));
+    });
+
+    test('a bound set over the cap takes the degrade path', () {
+      // Every texture slot of every flag bound — 15 samplers over
+      // a cap of 8 — degrades instead of compiling.
+      final props = <String, Object?>{
+        for (final p in [
+          ...kBaseTextureProps,
+          ...kExtTextureSlots.map((s) => s.$2),
+        ])
+          p: {'texture': true},
+        'clearcoat': 1.0,
+        'sheenColor': [1.0, 1.0, 1.0, 1.0],
+        'specular': 0.5,
+        'anisotropy': 1.0,
+        'transmission': 1.0,
+        'thickness': 0.5,
+        'ior': 1.2,
+      };
+      expect(androidVariantDegrades(props), isTrue);
+      // The same flags factor-only declare zero samplers — bound
+      // sets, not flags, drive the count.
+      final factors = Map<String, Object?>.of(props)
+        ..removeWhere((_, v) => v is Map);
+      expect(androidVariantDegrades(factors), isFalse);
+    });
+  });
+
   group('golden manifest', () {
     test('classifies the upstream smoke scenes and generates fixtures', () {
       expect(goldenScenes, hasLength(37));

@@ -161,6 +161,53 @@ object FsceneRealizer {
     )
 
     /**
+     * W22-r3: bound-only sampler emission. Filament's feature-level-1
+     * cap counts *declared* samplers (9 — 8 when screen-space
+     * refraction reserves one), so a variant declares — and the
+     * shader samples — only the texture slots the material actually
+     * binds. The bound set travels as a bitmask in the variant key:
+     * bits 0-4 index [BASE_TEXTURE_SLOTS], bits 5+ index
+     * [EXT_TEXTURE_SLOTS]. Unbound slots emit the factor-only term
+     * their 1×1 fallback used to produce.
+     */
+    data class BaseTextureSlot(
+        val prop: String, val prefix: String, val param: String)
+
+    val BASE_TEXTURE_SLOTS = listOf(
+        BaseTextureSlot("baseColorTexture", "baseColor", "baseColorMap"),
+        BaseTextureSlot("normalTexture", "normal", "normalMap"),
+        BaseTextureSlot("metallicRoughnessTexture", "mr",
+            "metallicRoughnessMap"),
+        BaseTextureSlot("occlusionTexture", "occlusion", "occlusionMap"),
+        BaseTextureSlot("emissiveTexture", "emissive", "emissiveMap"),
+    )
+
+    /** Every base slot bound — the prebuilt contract, whose instances
+     * still bind 1×1 fallbacks so all five samplers stay sampled. */
+    const val ALL_BASE_SLOTS = (1 shl 5) - 1
+
+    /** Slot bit for `EXT_TEXTURE_SLOTS[i]` in the bound mask. */
+    fun extSlotBit(i: Int) = 1 shl (BASE_TEXTURE_SLOTS.size + i)
+
+    /**
+     * Wire props → bound-slot mask. Only texture refs count — a
+     * factor-only material declares zero extension samplers. Ext
+     * slots whose flag isn't armed don't count either (e.g. an
+     * orphaned thicknessTexture with no transmission is inert).
+     */
+    fun boundTextureMask(props: JSONObject, extFlags: Int): Int {
+        var m = 0
+        for ((i, s) in BASE_TEXTURE_SLOTS.withIndex()) {
+            if (props.tag(s.prop).d3Ref() != null) m = m or (1 shl i)
+        }
+        for ((i, s) in EXT_TEXTURE_SLOTS.withIndex()) {
+            if (extFlags and s.flag == 0) continue
+            if (props.tag(s.prop).d3Ref() != null) m = m or extSlotBit(i)
+        }
+        return m
+    }
+
+    /**
      * Wire factor prop → uniform. [mask] is the flag set under which
      * the uniform is declared and written (`ior` lives under
      * TRANSMISSION *or* IOR — Filament also accepts `material.ior` as
@@ -3544,9 +3591,21 @@ object FsceneRealizer {
         }
         // W22: active KHR_materials_* features select a lazily
         // compiled variant — a base material stays on the prebuilts.
+        // W22-r3: the variant declares samplers only for bound slots;
+        // the pick reports the flags/slot mask the shader actually
+        // carries — a material that can't fit the sampler cap (or
+        // fails to compile) degrades to the base prebuilt and both
+        // collapse to the base contract, so instance writes never
+        // name a parameter the shader lacks.
         val extFlags = if (unlit) 0 else extFlagsFor(key, props)
-        val mi = host.materialForVariant(unlit, alphaMode, extFlags)
-            .createInstance()
+        val boundMask = if (extFlags == 0) 0
+            else boundTextureMask(props, extFlags)
+        val pick = host.materialForVariant(
+            unlit, alphaMode, extFlags, boundMask)
+        val mi = pick.material.createInstance()
+        val shaderFlags = pick.extFlags
+        fun slotBound(i: Int) = pick.boundSlots and (1 shl i) != 0
+        fun extBound(i: Int) = pick.boundSlots and extSlotBit(i) != 0
         if (alphaMode.equals("mask", ignoreCase = true)) {
             mi.setMaskThreshold(
                 (props.tag("alphaCutoff").d3Double() ?: 0.5).toFloat())
@@ -3554,14 +3613,19 @@ object FsceneRealizer {
 
         // Factor × texture always applies — never texture-instead-of —
         // and uniforms zero-init, so every parameter is written with its
-        // spec default when the property is absent.
+        // spec default when the property is absent. Sampler binds are
+        // bound-only on ext variants (unbound slots aren't declared);
+        // base prebuilts — and degrades reporting the base contract —
+        // keep the fallback binding on all five slots.
         val bc = props.tag("baseColor").d3Color()
             ?: floatArrayOf(1f, 1f, 1f, 1f)
         mi.setParameter("baseColor", bc[0], bc[1], bc[2], bc[3])
         setUvTransform(mi, props, "baseColorTextureTransform", "baseColor")
-        bindTextureSlot(host, mi, props, textures, samplers,
-            "baseColorTexture", "baseColorMap", host.fallbackWhite,
-            consumers)
+        if (slotBound(0)) {
+            bindTextureSlot(host, mi, props, textures, samplers,
+                "baseColorTexture", "baseColorMap", host.fallbackWhite,
+                consumers)
+        }
 
         mi.setDoubleSided(props.tag("doubleSided").d3Bool() ?: false)
 
@@ -3586,25 +3650,34 @@ object FsceneRealizer {
             setUvTransform(mi, props, "occlusionTextureTransform", "occlusion")
             setUvTransform(mi, props, "emissiveTextureTransform", "emissive")
 
-            bindTextureSlot(host, mi, props, textures, samplers,
-                "normalTexture", "normalMap", host.fallbackNormal,
-                consumers)
-            bindTextureSlot(host, mi, props, textures, samplers,
-                "metallicRoughnessTexture", "metallicRoughnessMap",
-                host.fallbackWhite, consumers)
-            bindTextureSlot(host, mi, props, textures, samplers,
-                "occlusionTexture", "occlusionMap", host.fallbackWhite,
-                consumers)
-            bindTextureSlot(host, mi, props, textures, samplers,
-                "emissiveTexture", "emissiveMap", host.fallbackEmissive,
-                consumers)
+            if (slotBound(1)) {
+                bindTextureSlot(host, mi, props, textures, samplers,
+                    "normalTexture", "normalMap", host.fallbackNormal,
+                    consumers)
+            }
+            if (slotBound(2)) {
+                bindTextureSlot(host, mi, props, textures, samplers,
+                    "metallicRoughnessTexture", "metallicRoughnessMap",
+                    host.fallbackWhite, consumers)
+            }
+            if (slotBound(3)) {
+                bindTextureSlot(host, mi, props, textures, samplers,
+                    "occlusionTexture", "occlusionMap",
+                    host.fallbackWhite, consumers)
+            }
+            if (slotBound(4)) {
+                bindTextureSlot(host, mi, props, textures, samplers,
+                    "emissiveTexture", "emissiveMap",
+                    host.fallbackEmissive, consumers)
+            }
 
             // W22: extension writes ride the same registry the
-            // variant declares — flag-gated so a base-variant instance
-            // never writes a uniform its shader lacks. Spec defaults
-            // fill absent props (uniforms zero-init otherwise).
+            // variant declares — gated on the pick's *effective* flags
+            // so a degraded instance never writes a uniform its
+            // (base) shader lacks. Spec defaults fill absent props
+            // (uniforms zero-init otherwise).
             for (f in EXT_FACTORS) {
-                if (extFlags and f.mask == 0) continue
+                if (shaderFlags and f.mask == 0) continue
                 if (f.isColor) {
                     val c = props.tag(f.prop).d3Color() ?: f.default
                     mi.setParameter(f.uniform, c[0], c[1], c[2], c[3])
@@ -3617,12 +3690,12 @@ object FsceneRealizer {
                     mi.setParameter(f.uniform, v.toFloat())
                 }
             }
-            if (extFlags and EXT_ANISOTROPY != 0) {
+            if (shaderFlags and EXT_ANISOTROPY != 0) {
                 mi.setParameter("anisotropyUseMap",
                     if (props.tag("anisotropyTexture").d3Ref() != null)
                         1f else 0f)
             }
-            if (extFlags and EXT_TRANSMISSION != 0) {
+            if (shaderFlags and EXT_TRANSMISSION != 0) {
                 // KHR_materials_volume → Beer–Lambert: transmittance is
                 // attenuationColor^(d/attenuationDistance), so the
                 // absorption coefficient is -ln(color)/distance.
@@ -3638,16 +3711,18 @@ object FsceneRealizer {
                     (-ln(ac[2].toDouble().coerceAtLeast(1e-5)) / ad)
                         .toFloat())
             }
-            for (slot in EXT_TEXTURE_SLOTS) {
-                if (extFlags and slot.flag == 0) continue
+            for ((i, slot) in EXT_TEXTURE_SLOTS.withIndex()) {
+                if (shaderFlags and slot.flag == 0) continue
                 setUvTransform(mi, props, "${slot.prop}Transform",
                     slot.prefix)
-                bindTextureSlot(host, mi, props, textures, samplers,
-                    slot.prop, "${slot.prefix}Map",
-                    if (slot.prop == "clearcoatNormalTexture" ||
-                        slot.prop == "anisotropyTexture")
-                        host.fallbackNormal else host.fallbackWhite,
-                    consumers)
+                if (extBound(i)) {
+                    bindTextureSlot(host, mi, props, textures, samplers,
+                        slot.prop, "${slot.prefix}Map",
+                        if (slot.prop == "clearcoatNormalTexture" ||
+                            slot.prop == "anisotropyTexture")
+                            host.fallbackNormal else host.fallbackWhite,
+                        consumers)
+                }
             }
         }
         warnUnhandledMaterialProps(key, props)
