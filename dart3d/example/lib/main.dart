@@ -253,11 +253,12 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     // clear of the streaming cycles.
     _w24Timer?.cancel();
     _w24Timer = Timer(const Duration(seconds: 126), _runW24);
-    // The W16 trails/LOD lane lands at +112 s — after wLoose's +30 s
-    // settle-metric window, so the mover's transform stream can't
-    // contend with the roll→rest timing.
+    // The W16 trails/LOD lane lands at +140 s — after W15's +112 s
+    // subtree-streaming lane closes its last inner timer (+12 s), so
+    // the mover's transform stream can't contend with the grid
+    // load/unload cycles.
     _w16Timer?.cancel();
-    _w16Timer = Timer(const Duration(seconds: 112), _runW16);
+    _w16Timer = Timer(const Duration(seconds: 140), _runW16);
     _jointsBroke = 0;
     _controller.loadDocument(scene.document);
     // W8: the query battery fires at +10 s — after the +8 s diff — and
@@ -392,8 +393,8 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     });
   }
 
-  /// The W16 trails/LOD phase at +112 s — after wLoose's cleanup
-  /// window. The phase drives `w16Mover` ~29.5 m out and back through
+  /// The W16 trails/LOD phase at +140 s — after W15's streaming
+  /// lane. The phase drives `w16Mover` ~29.5 m out and back through
   /// its three `lod` thresholds and the cull floor while the node's
   /// `trail` draws the camera-facing ribbon; it logs its own
   /// completion.
