@@ -192,6 +192,203 @@ enum FsceneRealizer {
         var endTime: Double
     }
 
+    /// W16: one live `trail` component — the decoded spec plus the
+    /// recorded world-space path (head-first) and the `d3trail:`
+    /// child node whose ribbon geometry the host rebuilds each frame.
+    /// The update policy ports upstream `TrailComponent.update`: the
+    /// head follows the node continuously, a new anchor drops once the
+    /// node travels `minVertexDistance`, and the tail expires by age
+    /// (`lifetime`) and capacity (`maxPoints`).
+    final class TrailState {
+        var width = 0.25
+        var lifetime = 0.6
+        var minVertexDistance = 0.05
+        let maxPoints: Int
+        /// While false no new points record; the path ages out.
+        var emitting = true
+        /// `widthOverTrail` decoded — (t, v) pairs sorted by t;
+        /// nil → upstream's `1 − t` taper.
+        var widthKeys: [(t: Double, v: Double)]?
+        /// `colorOverTrail` decoded — (t, r, g, b, a) sorted by t;
+        /// nil → upstream's white fading `1 − t` in alpha.
+        var colorStops:
+            [(t: Double, r: Double, g: Double, b: Double, a: Double)]?
+        /// Head-first world positions — `points[0]` follows the node.
+        var points: [simd_float3] = []
+        /// Parallel birth clock of `points` (accumulated seconds).
+        var born: [Double] = []
+        var time = 0.0
+        /// The `d3trail:` child — its geometry renders under the
+        /// node's transform while the verts rebase to node-local
+        /// each frame (upstream's world-anchored rebase).
+        let child: SCNNode
+        /// Static strip topology — 2 verts per anchor, upstream's
+        /// `_stripIndices` winding.
+        let indexElement: SCNGeometryElement
+        /// Static +Z normals, one per strip vertex (upstream
+        /// `_initialNormals`) — the constant-lit material doesn't
+        /// read them but SceneKit wants the semantic present.
+        let normalSource: SCNGeometrySource
+        /// The shared translucent unlit material — upstream's
+        /// `_TrailDefaultMaterial`: vertex color (incl. alpha)
+        /// drives base color, double-sided because a camera-facing
+        /// strip's winding flips where the path doubles back.
+        static let material: SCNMaterial = {
+            let m = SCNMaterial()
+            m.lightingModel = .constant
+            m.diffuse.contents = UIColor.white
+            m.isDoubleSided = true
+            m.transparencyMode = .default
+            return m
+        }()
+
+        init(maxPoints: Int) {
+            self.maxPoints = maxPoints
+            child = SCNNode()
+            // `d3prim:`-style prefix — clearComponentState/removal
+            // purge by name, and the child never enters nodesById.
+            child.name = "d3trail:"
+            child.castsShadow = false
+            var indices: [UInt16] = []
+            indices.reserveCapacity((maxPoints - 1) * 6)
+            for i in 0..<maxPoints - 1 {
+                let a = UInt16(i * 2)
+                indices.append(contentsOf:
+                    [a, a + 1, a + 2, a + 1, a + 3, a + 2])
+            }
+            indexElement = SCNGeometryElement(
+                data: indices.withUnsafeBytes { Data($0) },
+                primitiveType: .triangles,
+                primitiveCount: (maxPoints - 1) * 2,
+                bytesPerIndex: MemoryLayout<UInt16>.size)
+            var normals = [Float](repeating: 0, count: maxPoints * 6)
+            for i in 0..<maxPoints * 2 { normals[i * 3 + 2] = 1 }
+            normalSource = SCNGeometrySource(
+                data: normals.withUnsafeBytes { Data($0) },
+                semantic: .normal,
+                vectorCount: maxPoints * 2,
+                usesFloatComponents: true,
+                componentsPerVector: 3,
+                bytesPerComponent: 4,
+                dataOffset: 0,
+                dataStride: 12)
+        }
+
+        /// Forgets the recorded path — the ribbon disappears.
+        func clear() {
+            points.removeAll()
+            born.removeAll()
+        }
+
+        /// Records `world` at `time + dt` — upstream's update ported.
+        func record(dt: Double, world: simd_float3) {
+            time += dt
+            if emitting {
+                if points.isEmpty {
+                    points.insert(world, at: 0)
+                    born.insert(time, at: 0)
+                } else {
+                    points[0] = world
+                    born[0] = time
+                    let anchored = points.count > 1
+                        ? points[1] : points[0]
+                    if points.count == 1 ||
+                        simd_distance(anchored, world) >=
+                            Float(minVertexDistance) {
+                        points.insert(world, at: 0)
+                        born.insert(time, at: 0)
+                    }
+                }
+            }
+            while points.count > maxPoints ||
+                (born.last.map { time - $0 > lifetime } ?? false) {
+                points.removeLast()
+                born.removeLast()
+                if points.isEmpty { break }
+            }
+        }
+
+        /// `widthOverTrail` at the head-to-tail fraction — piecewise-
+        /// linear, clamped to the ends; `1 − t` when no curve shipped.
+        func widthAt(_ t: Double) -> Double {
+            guard let keys = widthKeys, !keys.isEmpty else {
+                return 1.0 - t
+            }
+            if t <= keys[0].t { return keys[0].v }
+            if t >= keys[keys.count - 1].t {
+                return keys[keys.count - 1].v
+            }
+            for i in 1..<keys.count where t <= keys[i].t {
+                let f = (t - keys[i - 1].t) / (keys[i].t - keys[i - 1].t)
+                return keys[i - 1].v + (keys[i].v - keys[i - 1].v) * f
+            }
+            return keys[keys.count - 1].v
+        }
+
+        /// `colorOverTrail` at the head-to-tail fraction — piecewise-
+        /// linear rgba; the absent gradient is white fading `1 − t`.
+        func colorAt(_ t: Double) -> simd_float4 {
+            guard let stops = colorStops, !stops.isEmpty else {
+                return simd_float4(1, 1, 1, Float(1.0 - t))
+            }
+            if t <= stops[0].t {
+                return simd_float4(Float(stops[0].r), Float(stops[0].g),
+                                   Float(stops[0].b), Float(stops[0].a))
+            }
+            let last = stops[stops.count - 1]
+            if t >= last.t {
+                return simd_float4(Float(last.r), Float(last.g),
+                                   Float(last.b), Float(last.a))
+            }
+            for i in 1..<stops.count where t <= stops[i].t {
+                let a = stops[i - 1], b = stops[i]
+                let f = Float((t - a.t) / (b.t - a.t))
+                return simd_float4(
+                    Float(a.r) + Float(b.r - a.r) * f,
+                    Float(a.g) + Float(b.g - a.g) * f,
+                    Float(a.b) + Float(b.b - a.b) * f,
+                    Float(a.a) + Float(b.a - a.a) * f)
+            }
+            return simd_float4(Float(last.r), Float(last.g),
+                               Float(last.b), Float(last.a))
+        }
+    }
+
+    /// W16: a decoded `lod` component — upstream `LodComponent`. The
+    /// level list is highest detail first with descending
+    /// `screenSize` thresholds (fraction of viewport height); the
+    /// realized mapping is SceneKit's `levelsOfDetail`: level 0 is the
+    /// node's geometry, each later level rides an `SCNLevelOfDetail`
+    /// keyed by the PREVIOUS level's threshold, and a nil-geometry
+    /// entry at the smallest threshold culls below the floor.
+    final class LodSpec {
+        struct Level {
+            let geoKey: UInt64
+            let matKey: UInt64
+            let screenSize: Double
+        }
+        var levels: [Level] = []
+        var lodBias = 1.0
+        /// Decoded for wire parity — documented no-ops (hard switch).
+        var hysteresis = 0.0
+        var blendRange = 0.0
+        /// False while a level's geometry/material hasn't landed —
+        /// `lodResourceConsumers` routes its arrival to `rebindLod`.
+        var resolved = false
+        /// The entry thresholds in `SCNLevelOfDetail` order —
+        /// [t_0 … t_{n-2}] for levels 1…n-1 plus the optional cull
+        /// floor t_{n-1}. The host's per-frame refresh derives pixel
+        /// radii from these (`screenSpaceRadius` is construction-
+        /// only, so a viewport/bias change rebuilds the entry array).
+        var ssrFractions: [Double] = []
+        /// The pixel radii currently attached — change detection for
+        /// the refresh's entry rebuild.
+        var appliedRadii: [Double] = []
+        /// The level geometry copies in force — kept so a teardown or
+        /// rebind can purge them from `materialConsumers`.
+        var geoCopies: [SCNGeometry] = []
+    }
+
     // MARK: - Context
 
     final class Context {
@@ -374,6 +571,29 @@ enum FsceneRealizer {
         /// claim).
         var variantComponents: [UInt64: VariantComponentSpec] = [:]
 
+        /// W16: node key → its live `trail` component state (decoded
+        /// spec + recorded path + the `d3trail:` child). The host's
+        /// per-frame pass records the world position and rebuilds the
+        /// ribbon geometry.
+        var trails: [UInt64: TrailState] = [:]
+
+        /// W16: node key → its decoded `lod` component. Level
+        /// resources resolve through `rebindLod` — unresolved specs
+        /// sit in `pendingLodNodes` and retry on resource landings.
+        var lods: [UInt64: LodSpec] = [:]
+
+        /// Resource id (geometry OR material) → node keys whose `lod`
+        /// references it — the consumer-map lane for surgical
+        /// rebinds, parallel to `geometryConsumers`/`materialConsumers`
+        /// (an LOD level can't ride those: a landing re-resolves the
+        /// whole level list, not a single slot).
+        var lodResourceConsumers: [UInt64: Set<UInt64>] = [:]
+
+        /// LOD nodes waiting on a level resource — retried by
+        /// `redecodeResource`/payload arrivals, the
+        /// `pendingSkinNodes` pattern.
+        var pendingLodNodes: Set<UInt64> = []
+
         /// `scene` is the host's bound scene for every caller — the
         /// manifest path decodes into it in place (a second SCNScene
         /// built inside the render callback trips SceneKit's
@@ -416,6 +636,11 @@ enum FsceneRealizer {
                                         variantComponents,
                                      disabledComponents:
                                         disabledComponents,
+                                     trails: trails,
+                                     lods: lods,
+                                     lodResourceConsumers:
+                                        lodResourceConsumers,
+                                     pendingLodNodes: pendingLodNodes,
                                      renderTargets: renderTargets),
                          deferred: deferredResourceIds,
                          camera: firstCameraNode,
@@ -2800,6 +3025,8 @@ enum FsceneRealizer {
                 jointComponentsDeferred.append((key, index, type, props))
             case "materialsVariants":
                 decodeMaterialsVariants(key: key, index: index, props: props)
+            case "trail":           decodeTrail(key, node, props)
+            case "lod":             decodeLod(key, node, props)
             default:
                 d3Log("unhandled component type '\(type)'")
             }
@@ -3705,6 +3932,157 @@ enum FsceneRealizer {
                 node.morpher = nil
             }
             attachSkin(key, node)
+        }
+
+        // MARK: Trails and LOD (W16)
+
+        /// Decodes a `trail` component (upstream `TrailComponent`):
+        /// spec fields into a `TrailState` and a `d3trail:` child to
+        /// carry the ribbon. The path is runtime state — upstream's
+        /// codec persists none of it, so a re-decode starts empty.
+        /// Upstream does not serialize a trail material; the natives
+        /// draw the translucent vertex-color unlit default.
+        func decodeTrail(_ key: UInt64, _ node: SCNNode,
+                         _ p: [String: Any]) {
+            let st = TrailState(
+                maxPoints: max(2, d3Int(p["maxPoints"]) ?? 48))
+            st.width = d3Double(p["width"]) ?? 0.25
+            st.lifetime = d3Double(p["lifetime"]) ?? 0.6
+            st.minVertexDistance =
+                d3Double(p["minVertexDistance"]) ?? 0.05
+            st.emitting = d3Bool(p["emitting"]) ?? true
+            // Upstream curve shape: `{keys: [{t, v}, …]}`.
+            if let curve = d3Map(p["widthOverTrail"]),
+               let keys = d3List(curve["keys"]) {
+                var parsed: [(t: Double, v: Double)] = []
+                for e in keys {
+                    guard let m = d3Map(e),
+                          let t = d3Double(m["t"]),
+                          let v = d3Double(m["v"]) else { continue }
+                    parsed.append((t, v))
+                }
+                st.widthKeys = parsed.isEmpty ? nil : parsed
+            }
+            // Upstream gradient shape: `{stops: [{t, color}, …]}`.
+            if let grad = d3Map(p["colorOverTrail"]),
+               let stops = d3List(grad["stops"]) {
+                var parsed:
+                    [(t: Double, r: Double, g: Double,
+                      b: Double, a: Double)] = []
+                for e in stops {
+                    guard let m = d3Map(e),
+                          let t = d3Double(m["t"]),
+                          let c = d3ColorComponents(m["color"])
+                    else { continue }
+                    parsed.append((t, c[0], c[1], c[2], c[3]))
+                }
+                st.colorStops = parsed.isEmpty ? nil : parsed
+            }
+            node.addChildNode(st.child)
+            trails[key] = st
+        }
+
+        /// Decodes an `lod` component (upstream `LodComponent`):
+        /// `levels` entries carry geometry+material refs and a
+        /// `screenSize` threshold (fraction of viewport height,
+        /// descending); entries missing either ref are skipped like
+        /// upstream's codec. `hysteresis`/`blendRange` decode for wire
+        /// parity but are documented no-ops — dart3d hard-switches.
+        func decodeLod(_ key: UInt64, _ node: SCNNode,
+                       _ p: [String: Any]) {
+            let spec = LodSpec()
+            for e in d3List(p["levels"]) ?? [] {
+                guard let m = d3Map(e),
+                      let g = d3Ref(m["geometry"]),
+                      let mat = d3Ref(m["material"]),
+                      let s = d3Double(m["screenSize"])
+                else { continue }
+                spec.levels.append(.init(
+                    geoKey: g, matKey: mat, screenSize: s))
+            }
+            spec.lodBias = d3Double(p["lodBias"]) ?? 1.0
+            spec.hysteresis = d3Double(p["hysteresis"]) ?? 0.0
+            spec.blendRange = d3Double(p["blendRange"]) ?? 0.0
+            guard !spec.levels.isEmpty else { return }
+            lods[key] = spec
+            for l in spec.levels {
+                lodResourceConsumers[l.geoKey, default: []].insert(key)
+                lodResourceConsumers[l.matKey, default: []].insert(key)
+            }
+            rebindLod(key, node)
+        }
+
+        /// (Re)resolves a node's `lod` levels against the resource
+        /// maps and rewrites `node.geometry` — level 0 becomes the
+        /// base, later levels ride `SCNLevelOfDetail`s keyed by the
+        /// previous threshold, and a nil-geometry entry at the
+        /// smallest threshold reproduces upstream's cull floor.
+        /// Called at decode and on every geometry/material landing
+        /// that the spec consumes; a partial resolve leaves the
+        /// node untouched and parks the key in `pendingLodNodes`.
+        func rebindLod(_ key: UInt64, _ node: SCNNode) {
+            guard let spec = lods[key] else { return }
+            var geos: [SCNGeometry] = []
+            geos.reserveCapacity(spec.levels.count)
+            for l in spec.levels {
+                guard let base = geometries[l.geoKey],
+                      let mat = materials[l.matKey]
+                else {
+                    spec.resolved = false
+                    pendingLodNodes.insert(key)
+                    return
+                }
+                let g = (base.copy() as? SCNGeometry) ?? base
+                g.materials = [mat]
+                geos.append(g)
+            }
+            // Fully resolved — swap the realized state wholesale: the
+            // outgoing level copies purge their material-consumer
+            // entries, the new copies register theirs.
+            for old in spec.geoCopies {
+                for mk in materialConsumers.keys {
+                    materialConsumers[mk]?.removeAll { $0 === old }
+                }
+            }
+            for (i, g) in geos.enumerated() {
+                let mk = spec.levels[i].matKey
+                if !(materialConsumers[mk] ?? []).contains(where: {
+                    $0 === g
+                }) {
+                    materialConsumers[mk] =
+                        (materialConsumers[mk] ?? []) + [g]
+                }
+            }
+            spec.geoCopies = geos
+            spec.resolved = true
+            pendingLodNodes.remove(key)
+            // SceneKit's contract: entries are ordered by DESCENDING
+            // screen-space radius and the smallest qualifying radius
+            // wins (the base draws when none qualify). Upstream draws
+            // level i while size ≥ t_i, so the SceneKit entry for
+            // level i ≥ 1 keys off the PREVIOUS threshold t_{i-1} —
+            // below it the next level's entry wins — and a nil
+            // geometry at t_{n-1} culls below the floor (a last
+            // threshold of 0 never culls → no entry). The host's
+            // per-frame refresh builds the entry array itself —
+            // `screenSpaceRadius` is construction-only, and the pixel
+            // conversion needs the live viewport height — so decode
+            // records only the fractions and forces the first build.
+            var fracs: [Double] = []
+            for i in 1..<geos.count {
+                fracs.append(spec.levels[i - 1].screenSize)
+            }
+            if spec.levels[spec.levels.count - 1].screenSize > 0 {
+                fracs.append(
+                    spec.levels[spec.levels.count - 1].screenSize)
+            }
+            spec.ssrFractions = fracs
+            spec.appliedRadii = []
+            if let old = node.geometry, old !== geos[0] {
+                host.retire(old)
+            }
+            node.geometry = geos[0]
+            node.geometry?.levelsOfDetail = []
         }
 
         func decodeCamera(_ node: SCNNode, _ p: [String: Any]) {

@@ -538,6 +538,22 @@ final class SceneViewHost: SCNView {
     /// parity reporting; upstream gates component ticks only.
     var disabledComponents: [UInt64: Set<Int>] = [:]
 
+    /// W16: node key → live `trail` state (spec + recorded path +
+    /// `d3trail:` child). The render-callback pass records the node's
+    /// world position and rebuilds the ribbon — inside the drain like
+    /// the animation sampler, never on the mutation thread.
+    private(set) var trailStates:
+        [UInt64: FsceneRealizer.TrailState] = [:]
+    /// W16: node key → decoded `lod` spec; `lodResourceConsumers`
+    /// routes resource landings to `rebindLod`, `pendingLodNodes`
+    /// holds the unresolved ones (`pendingSkinNodes` pattern).
+    private(set) var lodSpecs:
+        [UInt64: FsceneRealizer.LodSpec] = [:]
+    private(set) var lodResourceConsumers:
+        [UInt64: Set<UInt64>] = [:]
+    private(set) var pendingLodNodes: Set<UInt64> = []
+    private var lastTrailTime: TimeInterval?
+
     /// W11 animation runtime. A clip exists only after an `anim` op
     /// names its animation — upstream's `createAnimationClip` shape:
     /// no clip, no contribution (so doc load never snaps animated
@@ -1108,6 +1124,26 @@ final class SceneViewHost: SCNView {
             nodeSkinKeys.removeValue(forKey: k)
             pendingSkinNodes.remove(k)
             pendingColliderShapes.removeValue(forKey: k)
+            // W16: the trail child drops with the subtree (it rides
+            // the doomed node); the lod spec's level copies purge
+            // from materialConsumers below.
+            if let tr = trailStates.removeValue(forKey: k) {
+                if let g = tr.child.geometry { retire(g) }
+            }
+            pendingLodNodes.remove(k)
+        }
+        for (lk, spec) in lodSpecs where doomed.contains(lk) {
+            for copy in spec.geoCopies {
+                for mk in materialConsumers.keys {
+                    materialConsumers[mk]?.removeAll { $0 === copy }
+                }
+            }
+            lodSpecs.removeValue(forKey: lk)
+        }
+        for rk in lodResourceConsumers.keys {
+            for k in doomed {
+                lodResourceConsumers[rk]?.remove(k)
+            }
         }
         animLock.lock()
         for k in doomed { animTargets.removeValue(forKey: k) }
@@ -1366,6 +1402,29 @@ final class SceneViewHost: SCNView {
         jointLock.unlock()
         ctx.variantComponents.removeValue(forKey: key)
         ctx.disabledComponents.removeValue(forKey: key)
+        // W16: the `d3trail:` child dies like a `d3prim:` — its
+        // geometry retires and the state drops (the path is runtime
+        // state; a re-decode starts empty, matching upstream).
+        if let tr = ctx.trails.removeValue(forKey: key) {
+            if let g = tr.child.geometry { retire(g) }
+            tr.child.removeFromParentNode()
+            retire(tr.child)
+        }
+        // W16: the lod spec and its pending mark drop; the level
+        // geometry copies' material-consumer entries purge below
+        // (they ride `old`'s sweep only for level 0 — the
+        // SCNLevelOfDetail copies are not node.geometry).
+        if let spec = ctx.lods.removeValue(forKey: key) {
+            for copy in spec.geoCopies where copy !== old {
+                for mk in ctx.materialConsumers.keys {
+                    ctx.materialConsumers[mk]?.removeAll { $0 === copy }
+                }
+            }
+        }
+        ctx.pendingLodNodes.remove(key)
+        for rk in ctx.lodResourceConsumers.keys {
+            ctx.lodResourceConsumers[rk]?.remove(key)
+        }
         if let old {
             for mk in ctx.materialConsumers.keys {
                 ctx.materialConsumers[mk]?.removeAll { $0 === old }
@@ -1461,6 +1520,12 @@ final class SceneViewHost: SCNView {
         texturePayloadKeys = ctx.texturePayloadKeys
         variantComponents = ctx.variantComponents
         disabledComponents = ctx.disabledComponents
+        // W16: trail/lod state mutate through surgical decodes too —
+        // a components re-decode rebuilds both registries wholesale.
+        trailStates = ctx.trails
+        lodSpecs = ctx.lods
+        lodResourceConsumers = ctx.lodResourceConsumers
+        pendingLodNodes = ctx.pendingLodNodes
     }
 
     /// A node op that decoded a camera takes the point of view only
@@ -1743,6 +1808,12 @@ final class SceneViewHost: SCNView {
         // publish writes them back.
         ctx.variantComponents = variantComponents
         ctx.disabledComponents = disabledComponents
+        // W16 stores — a components re-decode rebuilds the trail/lod
+        // registries; publish writes them back.
+        ctx.trails = trailStates
+        ctx.lods = lodSpecs
+        ctx.lodResourceConsumers = lodResourceConsumers
+        ctx.pendingLodNodes = pendingLodNodes
         // W14 stores — an rt upsert mutates `renderTargets`, an
         // `updateViews` op wholesale-replaces `views`; the quality
         // fields ride along so publish's write-back is a no-op for
@@ -1763,6 +1834,22 @@ final class SceneViewHost: SCNView {
     /// factor×texture bake; a material re-attaches to every geometry
     /// that referenced it; a geometry rebuilds and swaps onto every
     /// consuming node, carrying its per-node materials over.
+    /// W16: resource `key` just (re)decoded — re-resolve every `lod`
+    /// spec that consumes it. `rebindLod` is a full rebuild, so a
+    /// geometry or material landing on ANY level rewrites the node's
+    /// level set; publishing happens in the caller's own write-back.
+    private func rebindLodConsumers(
+        _ key: UInt64, _ ctx: FsceneRealizer.Context
+    ) {
+        for nk in ctx.lodResourceConsumers[key] ?? [] {
+            guard let node = nodesById[nk] else { continue }
+            ctx.rebindLod(nk, node)
+        }
+        pendingLodNodes = ctx.pendingLodNodes
+        lodSpecs = ctx.lods
+        materialConsumers = ctx.materialConsumers
+    }
+
     private func redecodeResource(_ key: UInt64, _ r: [String: Any]) {
         let ctx = surgicalContext()
         ctx.resourceDefs[key] = r
@@ -1826,6 +1913,9 @@ final class SceneViewHost: SCNView {
             // rebind as the default).
             ctx.applyVariantComponents()
             variantComponents = ctx.variantComponents
+            // W16: a material an `lod` level references — re-resolve
+            // each consuming spec against the fresh instance.
+            rebindLodConsumers(key, ctx)
         case "geometry":
             // Same surgical contract as texture: drop the stale decode
             // first — a deferred or malformed upsert rebinds consumers
@@ -1875,6 +1965,10 @@ final class SceneViewHost: SCNView {
             // pending variant bindings against the fresh instance.
             ctx.applyVariantComponents()
             variantComponents = ctx.variantComponents
+            // W16: an `lod` level geometry — re-resolve each
+            // consuming spec (a pending spec builds its whole level
+            // set; a live one rebuilds on the fresh resource).
+            rebindLodConsumers(key, ctx)
         case "renderTexture":
             // W14: the old pixels die — a consumer may still be
             // sampling the colorTex in the in-flight pass, so retire,
@@ -3605,6 +3699,10 @@ final class SceneViewHost: SCNView {
                     variantComponents:
                         [UInt64: FsceneRealizer.VariantComponentSpec],
                     disabledComponents: [UInt64: Set<Int>],
+                    trails: [UInt64: FsceneRealizer.TrailState],
+                    lods: [UInt64: FsceneRealizer.LodSpec],
+                    lodResourceConsumers: [UInt64: Set<UInt64>],
+                    pendingLodNodes: Set<UInt64>,
                     renderTargets: [UInt64: RenderTargetRec]),
         deferred: Set<UInt64>,
         camera: SCNNode?,
@@ -3666,6 +3764,15 @@ final class SceneViewHost: SCNView {
         // unresolved ones stay pending and retry on landings.
         variantComponents = resources.variantComponents
         disabledComponents = resources.disabledComponents
+        // W16: trail/lod runtime state belongs to the installing
+        // document — the replaced scene's children and levels die
+        // with their nodes (the trail's path is runtime state and
+        // never persists, upstream's codec rule).
+        trailStates = resources.trails
+        lodSpecs = resources.lods
+        lodResourceConsumers = resources.lodResourceConsumers
+        pendingLodNodes = resources.pendingLodNodes
+        lastTrailTime = nil
         animLock.lock()
         animClips.removeAll()
         animTargets.removeAll()
@@ -3741,6 +3848,177 @@ extension SceneViewHost: SCNSceneRendererDelegate {
                   updateAtTime time: TimeInterval) {
         drainPendingWork()
         sampleAnimations(at: time)
+        // W16: trails record after the sampler — the head follows
+        // this frame's sampled pose; LOD thresholds refresh against
+        // the live viewport pixel height.
+        updateTrails(at: time)
+        refreshLodScreenRadii()
+    }
+
+    /// W16 per-frame trail pass — `TrailComponent.update` ported:
+    /// record the node's world position, then rebase the path into
+    /// node-local space and rebuild the camera-facing ribbon. The
+    /// ribbon geometry rebuilds each frame (a fresh `SCNGeometry`
+    /// gets fresh bounds — a shared geometry could cull on stale
+    /// ones); the outgoing one retires to the graveyard.
+    private func updateTrails(at time: TimeInterval) {
+        let dt = lastTrailTime.map { time - $0 } ?? 0
+        lastTrailTime = time
+        guard !trailStates.isEmpty, let pov = pointOfView else {
+            return
+        }
+        let camWorld = simd_float3(
+            Float(pov.simdWorldPosition.x),
+            Float(pov.simdWorldPosition.y),
+            Float(pov.simdWorldPosition.z))
+        for (key, st) in trailStates {
+            // Hidden nodes still tick upstream — the `d3trail:`
+            // child hides with the node's subtree for free.
+            guard let node = nodesById[key] else { continue }
+            let wm = node.simdWorldTransform
+            let world = simd_float3(
+                wm.columns.3.x, wm.columns.3.y, wm.columns.3.z)
+            st.record(dt: dt, world: world)
+            rebuildTrailRibbon(st, node: node, camWorld: camWorld)
+        }
+    }
+
+    /// Rebuilds the ribbon geometry for one frame: the recorded
+    /// world points transform into the node's local space (the
+    /// `d3trail:` child inherits the transform — the trail hangs in
+    /// the world where the node has been, upstream's rebase), then
+    /// each anchor expands toward the camera along
+    /// `normalize(tangent × view)` — upstream's `expandPolyline`
+    /// path. Dead strip verts (beyond the live tail) collapse onto
+    /// the last anchor with zero width/alpha, keeping the topology
+    /// fixed like upstream's `_TrailGeometry.setTrail`.
+    private func rebuildTrailRibbon(
+        _ st: FsceneRealizer.TrailState, node: SCNNode,
+        camWorld: simd_float3
+    ) {
+        let live = min(st.points.count, st.maxPoints)
+        st.child.isHidden = live < 2
+        guard live >= 2 else { return }
+        let inv = simd_inverse(node.simdWorldTransform)
+        let localCam = inv * simd_float4(camWorld, 1)
+        let n = st.maxPoints
+        var local = [simd_float3](
+            repeating: simd_float3(), count: n)
+        var widths = [Float](repeating: 0, count: n)
+        var colors = [simd_float4](
+            repeating: simd_float4(), count: n)
+        for i in 0..<n {
+            let c = min(i, live - 1)
+            let t = live > 1 ? Double(c) / Double(live - 1) : 0
+            let p = inv * simd_float4(st.points[c], 1)
+            local[i] = simd_float3(p.x, p.y, p.z)
+            if i < live {
+                widths[i] = Float(st.width * st.widthAt(t))
+                let col = st.colorAt(t)
+                colors[i] = col
+            } else {
+                // Beyond the tail: upstream writes the clamped
+                // position, zero width and zero alpha.
+                let col = st.colorAt(t)
+                colors[i] = simd_float4(col.x, col.y, col.z, 0)
+            }
+        }
+        var pos = [Float](repeating: 0, count: n * 6)
+        var col = [Float](repeating: 0, count: n * 8)
+        let cam3 = simd_float3(localCam.x, localCam.y, localCam.z)
+        var lastSide = simd_float3(1, 0, 0)
+        let up = simd_float3(0, 1, 0)
+        for i in 0..<n {
+            let prev = local[i == 0 ? 0 : i - 1]
+            let next = local[i == n - 1 ? n - 1 : i + 1]
+            var tangent = prev - next
+            if simd_length_squared(tangent) < 1e-12, n > 1 {
+                tangent = i == 0
+                    ? local[0] - local[1]
+                    : local[i - 1] - local[i]
+            }
+            var side = lastSide
+            if simd_length_squared(tangent) >= 1e-12 {
+                let view = cam3 - local[i]
+                let c = simd_cross(tangent, view)
+                if simd_length_squared(c) >= 1e-12 {
+                    side = simd_normalize(c)
+                } else {
+                    let f = simd_cross(tangent, up)
+                    side = simd_length_squared(f) >= 1e-12
+                        ? simd_normalize(f)
+                        : simd_normalize(
+                            simd_cross(tangent, simd_float3(1, 0, 0)))
+                }
+            }
+            lastSide = side
+            let half = widths[i] * 0.5
+            let l = local[i] + side * half
+            let r = local[i] - side * half
+            pos[i * 6] = l.x; pos[i * 6 + 1] = l.y
+            pos[i * 6 + 2] = l.z
+            pos[i * 6 + 3] = r.x; pos[i * 6 + 4] = r.y
+            pos[i * 6 + 5] = r.z
+            let c = colors[i]
+            col[i * 8] = c.x; col[i * 8 + 1] = c.y
+            col[i * 8 + 2] = c.z; col[i * 8 + 3] = c.w
+            col[i * 8 + 4] = c.x; col[i * 8 + 5] = c.y
+            col[i * 8 + 6] = c.z; col[i * 8 + 7] = c.w
+        }
+        let posSource = SCNGeometrySource(
+            data: pos.withUnsafeBytes { Data($0) },
+            semantic: .vertex, vectorCount: n * 2,
+            usesFloatComponents: true, componentsPerVector: 3,
+            bytesPerComponent: 4, dataOffset: 0, dataStride: 12)
+        let colSource = SCNGeometrySource(
+            data: col.withUnsafeBytes { Data($0) },
+            semantic: .color, vectorCount: n * 2,
+            usesFloatComponents: true, componentsPerVector: 4,
+            bytesPerComponent: 4, dataOffset: 0, dataStride: 16)
+        let geo = SCNGeometry(
+            sources: [posSource, colSource, st.normalSource],
+            elements: [st.indexElement])
+        geo.materials = [FsceneRealizer.TrailState.material]
+        if let old = st.child.geometry, old !== geo { retire(old) }
+        st.child.geometry = geo
+    }
+
+    /// W16: rebuilds each `lod`'s `SCNLevelOfDetail` array when the
+    /// derived pixel radii change — `screenSpaceRadius` is
+    /// construction-only, and the wire threshold is a fraction of
+    /// viewport height while SceneKit wants pixels:
+    /// `radius = fraction · viewportPxHeight / 2` (the fraction
+    /// covers the diameter), scaled by `1/lodBias` (a bigger size is
+    /// the same as a smaller threshold). An orthographic
+    /// point-of-view disables the metric like upstream — every
+    /// radius writes 0, so the base (highest detail) always draws.
+    /// Radii only move on a viewport resize, an ortho toggle, or a
+    /// rebind, so the array rebuild is rare.
+    private func refreshLodScreenRadii() {
+        guard !lodSpecs.isEmpty else { return }
+        let scale = Double(window?.screen.scale ?? 1.0)
+        let hPx = Double(bounds.height) * max(scale, 1.0)
+        let ortho =
+            pointOfView?.camera?.usesOrthographicProjection ?? false
+        for (_, spec) in lodSpecs where spec.resolved {
+            let bias = max(spec.lodBias, 1e-6)
+            let radii = spec.ssrFractions.map {
+                ortho ? 0.0 : $0 * hPx / (2 * bias)
+            }
+            guard radii != spec.appliedRadii,
+                  let base = spec.geoCopies.first else { continue }
+            spec.appliedRadii = radii
+            var lods: [SCNLevelOfDetail] = []
+            for (i, r) in radii.enumerated() {
+                // Entries map onto levels 1…n-1; the cull entry (i
+                // past the last copy) carries nil geometry.
+                lods.append(SCNLevelOfDetail(
+                    geometry: i + 1 < spec.geoCopies.count
+                        ? spec.geoCopies[i + 1] : nil,
+                    screenSpaceRadius: r))
+            }
+            base.levelsOfDetail = lods
+        }
     }
 
     /// W14: post-physics, pre-drawable — the offscreen passes draw the
