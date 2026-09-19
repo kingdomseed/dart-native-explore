@@ -163,6 +163,13 @@ void main() {
       expect(snapshot.nodes[nodeA]!.name, 'a');
       expect(snapshot.payloads[vertsId]!.bytes, hasLength(48));
     });
+
+    test('snapshot payload bytes survive in-place live-chunk mutation', () {
+      final doc = baseDoc();
+      final snapshot = serializeScene(doc);
+      doc.payloads[vertsId]!.bytes![0] = 0xFF;
+      expect(snapshot.payloads[vertsId]!.bytes![0], 0);
+    });
   });
 
   group('command-op fold', () {
@@ -292,6 +299,40 @@ void main() {
       expect(doc.nodes.keys, {nodeC, camId});
     });
 
+    test('updateNode without flags no-ops, matching both natives', () {
+      // Both native handlers decode a missing `flags` member to the
+      // empty set — nothing applies, including a reparent edge riding
+      // the op's `parent`.
+      final spec = encodeNodeCommandSpec(
+        NodeSpec(
+          id: nodeA,
+          name: 'renamed',
+          transform: TrsTransform(translation: Vector3(9, 9, 9)),
+        ),
+        baseDoc(),
+      );
+      for (final op in <Map<String, Object?>>[
+        {
+          'op': 'updateNode',
+          'node': nodeA.toToken(),
+          'spec': spec,
+          'parent': nodeC.toToken(),
+        },
+        // An explicit empty list applies just as little.
+        {
+          'op': 'updateNode',
+          'node': nodeA.toToken(),
+          'flags': <String>[],
+          'spec': spec,
+          'parent': nodeC.toToken(),
+        },
+      ]) {
+        final doc = baseDoc();
+        foldCommandIntoDocument(doc, op);
+        expect(writeFscene(doc), writeFscene(baseDoc()));
+      }
+    });
+
     test('reparented moves the node between roots and children', () {
       final doc = baseDoc();
       foldCommandIntoDocument(doc, {
@@ -323,6 +364,92 @@ void main() {
         'encoding': 'floats',
       });
       expect(doc.payloads[keysId]!.bytes, [5, 6]);
+    });
+
+    test('upsertPayload without decodable bytes no-ops entirely', () {
+      final doc = baseDoc();
+      for (final bytes in <Object?>[
+        null,
+        '%%%',
+        42,
+        {'x': 1},
+      ]) {
+        foldCommandIntoDocument(doc, {
+          'op': 'upsertPayload',
+          'id': 'chunk:${timeId.toToken()}',
+          'bytes': bytes,
+          'encoding': 'floats',
+          'format': 'bogus',
+        });
+      }
+      // Natives warn and return before any state changes — no entry
+      // mints, and no spec fields merge.
+      expect(doc.payloads[timeId], isNull);
+      foldCommandIntoDocument(doc, {
+        'op': 'upsertPayload',
+        'id': 'chunk:${vertsId.toToken()}',
+        'encoding': 'image',
+        'format': 'rgba8',
+      });
+      expect(writeFscene(doc), writeFscene(baseDoc()));
+    });
+
+    test('upsertPayload without encoding resends bytes under the spec', () {
+      final doc = baseDoc();
+      foldCommandIntoDocument(doc, {
+        'op': 'upsertPayload',
+        'id': 'chunk:${vertsId.toToken()}',
+        'bytes': base64Encode([9, 9, 9]),
+      });
+      final verts = doc.payloads[vertsId]!;
+      // Spec-less resend: the stored bytes update, the spec is
+      // untouched — as on the natives' `payloadStore` path.
+      expect(verts.encoding, PayloadEncoding.vertexBuffer);
+      expect(verts.layout, 'unskinned_uv1_tangent');
+      expect(verts.bytes, [9, 9, 9]);
+      // …and mints nothing when no spec exists to carry them.
+      foldCommandIntoDocument(doc, {
+        'op': 'upsertPayload',
+        'id': 'chunk:${timeId.toToken()}',
+        'bytes': base64Encode([9, 9, 9]),
+      });
+      expect(doc.payloads[timeId], isNull);
+    });
+
+    test('upsertPayload with encoding replaces the spec wholesale', () {
+      final doc = baseDoc();
+      // vertsId carries layout+length; an op naming `encoding` but
+      // omitting them replaces — the natives build the payload meta
+      // from the op's fields only.
+      foldCommandIntoDocument(doc, {
+        'op': 'upsertPayload',
+        'id': 'chunk:${vertsId.toToken()}',
+        'bytes': base64Encode([7, 7]),
+        'encoding': 'floats',
+      });
+      final verts = doc.payloads[vertsId]!;
+      expect(verts.encoding, PayloadEncoding.floats);
+      expect(verts.layout, isNull);
+      expect(verts.bytes, [7, 7]);
+      expect(verts.length, 2);
+    });
+
+    test('an unrepresentable encoding degrades to opaque bytes', () {
+      final doc = baseDoc();
+      foldCommandIntoDocument(doc, {
+        'op': 'upsertPayload',
+        'id': 'chunk:${timeId.toToken()}',
+        'bytes': base64Encode([1, 2, 3, 4]),
+        'encoding': 'ktx3', // outside PayloadEncoding.values
+        'format': 'etc2',
+      });
+      // Natives store the string verbatim where it sits inert; the
+      // document model's opaque marker is `bytes` — the chunk the
+      // send delivered is not dropped.
+      final chunk = doc.payloads[timeId]!;
+      expect(chunk.encoding, PayloadEncoding.bytes);
+      expect(chunk.format, 'etc2');
+      expect(chunk.bytes, [1, 2, 3, 4]);
     });
 
     test('non-document ops leave the mirror alone', () {

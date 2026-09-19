@@ -45,15 +45,19 @@ const _documentOps = {
 /// of upstream's `serializeScene(Node root)`, with the document playing
 /// the live graph's role.
 ///
-/// The snapshot is detached (re-encoded then decoded, so later live
-/// edits cannot reach into it) and carries this document's own id space:
-/// serializing, then realizing with `SceneController.loadDocument`
+/// The snapshot is detached — re-encoded then decoded, with chunk bytes
+/// copied back in, so later live edits (including in-place byte
+/// mutation) cannot reach into it — and carries this document's own id
+/// space: serializing, then realizing with `SceneController.loadDocument`
 /// reproduces the scene — including payload chunks, whose bytes ride the
 /// binary channel and so cannot appear in the JSON tree.
 SceneDocument serializeScene(SceneDocument live) {
   final snapshot = decodeDocument(encodeDocument(live));
   for (final entry in live.payloads.entries) {
-    snapshot.payloads[entry.key]?.bytes = entry.value.bytes;
+    final bytes = entry.value.bytes;
+    snapshot.payloads[entry.key]?.bytes = bytes == null
+        ? null
+        : Uint8List.fromList(bytes);
   }
   return snapshot;
 }
@@ -64,9 +68,10 @@ SceneDocument serializeScene(SceneDocument live) {
 ///
 /// Semantics track the wire contract (protocol.dart): `addNode` on a
 /// live id applies as a full update, `updateNode` applies only its
-/// `flags` fields (no `flags` member means a full update), `spec`'s
-/// `children` is inert — a node's children are whoever named it as
-/// `parent` — and node ops on missing ids no-op.
+/// `flags` fields — a missing `flags` member decodes to the empty set
+/// on both natives, so nothing applies, not even the reparent edge —
+/// `spec`'s `children` is inert (a node's children are whoever named
+/// it as `parent`), and node ops on missing ids no-op.
 void foldCommandIntoDocument(SceneDocument doc, Map<String, Object?> op) {
   switch (op['op']) {
     case 'addNode':
@@ -82,9 +87,14 @@ void foldCommandIntoDocument(SceneDocument doc, Map<String, Object?> op) {
     case 'updateNode':
       final node = doc.nodes[_opId(op, 'node')];
       if (node == null) return;
-      final spec = _decodeEntry<NodeSpec>(doc, 'nodes', op['node'], op['spec']);
+      // Both natives decode a missing `flags` member to the empty
+      // set — no field applies, including the reparent edge — so an
+      // op without one must no-op here the same way. `diffCommands`
+      // always emits `flags`; this only bites hand-rolled ops.
       final flags = (op['flags'] as List?)?.cast<String>();
-      bool flagged(String field) => flags == null || flags.contains(field);
+      if (flags == null || flags.isEmpty) return;
+      final spec = _decodeEntry<NodeSpec>(doc, 'nodes', op['node'], op['spec']);
+      bool flagged(String field) => flags.contains(field);
       if (flagged('name')) node.name = spec.name;
       if (flagged('transform')) node.transform = spec.transform;
       if (flagged('layers')) node.layers = spec.layers;
@@ -96,8 +106,7 @@ void foldCommandIntoDocument(SceneDocument doc, Map<String, Object?> op) {
           ..addAll(spec.components);
       }
       // The reparent edge is the wire's `parent`, not a spec field.
-      if (flagged('reparented') ||
-          (flags == null && op.containsKey('parent'))) {
+      if (flagged('reparented')) {
         _attach(doc, node.id, _opParent(op));
       }
     case 'upsertResource':
@@ -172,8 +181,9 @@ void foldPayloadIntoDocument(SceneDocument doc, PayloadSpec payload) {
 // `LocalId.parse` strips any readability prefix, so the bare `node`
 // token and the prefixed `geo:`/`skin:`/`chunk:` forms both work.
 T _decodeEntry<T>(SceneDocument doc, String pool, Object? key, Object? entry) {
+  final token = key as String;
   final decoded = _decodeFragment(doc, {
-    pool: <String, dynamic>{key as String: entry},
+    pool: <String, dynamic>{token: entry},
   });
   final map = switch (pool) {
     'nodes' => decoded.nodes,
@@ -182,7 +192,7 @@ T _decodeEntry<T>(SceneDocument doc, String pool, Object? key, Object? entry) {
     'animations' => decoded.animations,
     _ => throw ArgumentError.value(pool, 'pool'),
   };
-  return map[LocalId.parse(key as String)] as T;
+  return map[LocalId.parse(token)] as T;
 }
 
 // A document skeleton carrying [fragment]'s blocks, decoded by upstream.
@@ -241,36 +251,60 @@ void _removeSubtree(SceneDocument doc, LocalId id) {
 
 // `upsertPayload` is the one op whose spec fields arrive flattened on
 // the op (plus wire-only `bytes`) rather than as a manifest entry, so
-// it builds its spec directly. Missing spec fields keep an existing
-// entry's values — a bytes-only resend is legal.
+// it builds its spec directly. The fold tracks the native handlers:
+// undecodable `bytes` no-ops the whole op — they warn and return
+// before any state changes — an `encoding` member replaces the spec
+// wholesale (absent fields decode to null, not the old values), and
+// a resend without `encoding` updates the stored bytes only.
 void _upsertPayload(SceneDocument doc, Map<String, Object?> op) {
   final id = _opId(op, 'id');
   final bytes = _opBytes(op['bytes']);
+  if (bytes == null) return;
   final existing = doc.payloads[id];
-  final encodingName = op['encoding'] as String?;
-  if (existing == null && encodingName == null) return;
+  if (op['encoding'] is! String) {
+    // Spec-less resend: the natives update `payloadStore` and leave
+    // the spec alone, so the bytes fold into the existing entry — or
+    // nowhere when there isn't one to carry them (the document model
+    // has no spec-less payload).
+    if (existing == null) return;
+    existing.bytes = bytes;
+    return;
+  }
+  final encodingName = op['encoding'] as String;
   doc.payloads[id] = PayloadSpec(
     id,
-    encoding: encodingName == null
-        ? existing!.encoding
-        : PayloadEncoding.values.byName(encodingName),
-    layout: op['layout'] as String? ?? existing?.layout,
-    format: op['format'] as String? ?? existing?.format,
-    width: (op['width'] as num?)?.toInt() ?? existing?.width,
-    height: (op['height'] as num?)?.toInt() ?? existing?.height,
-    length:
-        (op['length'] as num?)?.toInt() ??
-        existing?.length ??
-        bytes?.lengthInBytes,
-    bytes: bytes ?? existing?.bytes,
+    // A name outside `PayloadEncoding.values` can't be represented —
+    // upstream `_decodePayload` throws on it too — so it degrades to
+    // `bytes`, the enum's own opaque marker: stored, byte-carrying,
+    // and unconsumable, which is the native state for a verbatim
+    // encoding no consumer decodes. Dropping the op would lose a
+    // chunk the send already delivered.
+    encoding: PayloadEncoding.values.any((e) => e.name == encodingName)
+        ? PayloadEncoding.values.byName(encodingName)
+        : PayloadEncoding.bytes,
+    layout: op['layout'] as String?,
+    format: op['format'] as String?,
+    width: (op['width'] as num?)?.toInt(),
+    height: (op['height'] as num?)?.toInt(),
+    length: (op['length'] as num?)?.toInt() ?? bytes.lengthInBytes,
+    bytes: bytes,
   );
 }
 
-Uint8List? _opBytes(Object? bytes) => switch (bytes) {
-  String s => base64Decode(s),
-  List l => Uint8List.fromList(l.cast<int>()),
-  _ => null,
-};
+// Both `bytes` forms decode to the chunk, or null when the wire value
+// can't — the same "missing/undecodable bytes → warn + return" gate
+// the natives apply before touching the payload store.
+Uint8List? _opBytes(Object? bytes) {
+  try {
+    return switch (bytes) {
+      String s => base64Decode(s),
+      List l => Uint8List.fromList(l.cast<int>()),
+      _ => null,
+    };
+  } catch (_) {
+    return null;
+  }
+}
 
 TrsTransform _decompose(Matrix4 matrix) {
   final translation = Vector3.zero();

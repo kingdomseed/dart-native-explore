@@ -100,7 +100,11 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
       return;
     }
     _scene = scene;
-    _controller.loadDocument(scene.document);
+    if (item.assetKey == kBuiltinDocRoundtripKey) {
+      _runDocRoundtrip(scene.document);
+    } else {
+      _controller.loadDocument(scene.document);
+    }
     _cameraNode = scene.cameraNode;
     _cameraTarget = scene.cameraTarget;
     _cameraDir = scene.cameraDir;
@@ -114,6 +118,35 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
     _frameRadius = scene.frameRadius;
     setState(() => _status = '${item.label} — ${item.note}');
     _installAnims();
+  }
+
+  /// The W29 round-trip lane (the `roundtrip` showcase item):
+  /// [document] loads, comes back through [SceneController.serializeScene]'s
+  /// mirror snapshot, and re-realizes from its canonical `.fscene` form
+  /// under strict feature negotiation. The JSON leg carries payload
+  /// specs only — chunk bytes ride the binary channel — so each
+  /// byte-carrying payload re-delivers through
+  /// [SceneController.sendPayload], the deferred-payload path a
+  /// manifest-only document uses natively.
+  void _runDocRoundtrip(SceneDocument document) {
+    _controller.loadDocument(document);
+    final snapshot = _controller.serializeScene();
+    if (snapshot == null) {
+      dnLog('dart3d: showcase — roundtrip: serializeScene returned null');
+      return;
+    }
+    _controller.loadFscene(writeFscene(snapshot), strictFeatures: true);
+    var resent = 0;
+    for (final payload in snapshot.payloads.values) {
+      if (payload.bytes == null) continue;
+      _controller.sendPayload(payload);
+      resent++;
+    }
+    dnLog(
+      'dart3d: showcase — roundtrip: ${snapshot.nodes.length} nodes · '
+      '$resent/${snapshot.payloads.length} chunks re-sent after the '
+      'JSON leg',
+    );
   }
 
   /// Reads the loaded document's clip pool and autoplays the first
