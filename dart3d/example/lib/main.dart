@@ -47,7 +47,7 @@ void _applyBackendDefine() {
 ///   the Flutter logo, skinning/animation/texture coverage) plus the
 ///   single-die physics lane.
 /// - **Harness** — the deterministic verification scene whose timed
-///   phases exercise the feature matrix (W0–W14, wloose).
+///   phases exercise the feature matrix (W0–W16, wloose, W18, W24, W25).
 ///
 /// Boot overrides: `--dart-define=DART3D_SCENE=dice|showcase|harness`
 /// picks the screen; `--dart-define=DART3D_MODEL=<label>` boots the
@@ -151,6 +151,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
   void Function()? _w15Phase;
   void Function(({double w, double h}) Function() targetPx)? _w24Phase;
   void Function()? _w16Phase;
+  void Function()? _w25Phase;
   void Function()? _w18Phase;
   Timer? _w11Timer;
   Timer? _w12Timer;
@@ -160,6 +161,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
   Timer? _w15Timer;
   Timer? _w24Timer;
   Timer? _w16Timer;
+  Timer? _w25Timer;
   Timer? _w18Timer;
   int _animsPlaying = 0;
   LocalId? _die;
@@ -221,6 +223,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     _w15Phase = scene.w15Phase;
     _w24Phase = scene.w24Phase;
     _w16Phase = scene.w16Phase;
+    _w25Phase = scene.w25Phase;
     _w18Phase = scene.w18Phase;
     _animsPlaying = 0;
     // The W11 lane lands at +14 s — after the joint rig — so its
@@ -262,6 +265,12 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     // load/unload cycles.
     _w16Timer?.cancel();
     _w16Timer = Timer(const Duration(seconds: 140), _runW16);
+    // W25's stage-effects matrix lane lands at +166 s — after W16's
+    // +140 s trails/LOD lane drives the mover home (+24 s of 100 ms
+    // ticks = +164 s), so the LUT and post-stack sweeps run on a
+    // settled scene.
+    _w25Timer?.cancel();
+    _w25Timer = Timer(const Duration(seconds: 166), _runW25);
     // W18's particle lane lands at +170 s — after W15's last inner
     // timer (+112 s + 12 s close), so the emitters run on a quiet
     // scene (the auto-reroll was already cancelled by wLoose).
@@ -409,6 +418,17 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
   void _runW16() {
     dnLog('dart3d: w16 phase — trail ribbon + screen-size lod drive');
     _w16Phase?.call();
+  }
+
+  /// The W25 stage-effects matrix phase at +166 s — the
+  /// `colorGradingLut` path both ways (deferred `chunk:` claim, then
+  /// the `assets/luts/cool.cube` bundle path), `lutBlend`, the
+  /// film-grain/auto-exposure, SSR+lens-flare, and god-rays+CA
+  /// blocks on a two-second cadence, an all-defaults reset, and the
+  /// dice-regression close-out. The phase logs each step itself.
+  void _runW25() {
+    dnLog('dart3d: w25 phase — LUT + effects matrix lanes');
+    _w25Phase?.call();
   }
 
   /// The W18 particle phase at +170 s — three live emitters (a
@@ -655,6 +675,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     _w15Timer?.cancel();
     _w24Timer?.cancel();
     _w16Timer?.cancel();
+    _w25Timer?.cancel();
     _w18Timer?.cancel();
     _queryBattery?.cancel();
     _jointTimer?.cancel();
@@ -677,6 +698,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     _w15Phase = null;
     _w24Phase = null;
     _w16Phase = null;
+    _w25Phase = null;
     _w18Phase = null;
     _animsPlaying = 0;
     _jointCount = 0;
@@ -717,6 +739,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     _w15Timer?.cancel();
     _w24Timer?.cancel();
     _w16Timer?.cancel();
+    _w25Timer?.cancel();
     _w18Timer?.cancel();
     super.dispose();
   }

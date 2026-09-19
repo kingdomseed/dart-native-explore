@@ -92,6 +92,16 @@ final class SceneViewHost: SCNView {
     /// `upsertPayload` chunk re-runs `decodeStage` on arrival (W7).
     private(set) var environmentPayloadKeys: [UInt64: UInt64] = [:]
 
+    /// W25: environment id → payload id backing its
+    /// `effects.colorGrading.lut` table — the chunk's arrival re-runs
+    /// `decodeStage` like an env equirect claim.
+    private(set) var lutPayloadKeys: [UInt64: UInt64] = [:]
+
+    /// W25: decoded LUT strip images, keyed by `ref + sep + blend`
+    /// (the blend bakes into the pixels). Entries drop when a
+    /// `payload`/`upsertPayload` chunk rewrites the ref's bytes.
+    private var lutImages: [String: CGImage] = [:]
+
     /// W11 stores — decoded skins, decoded animations, absolute morph
     /// targets per geometry, the node→skin bindings, and the raw defs
     /// surgical re-decodes replay. `pendingSkinNodes` holds nodes whose
@@ -260,6 +270,26 @@ final class SceneViewHost: SCNView {
                 CGFloat(fx.chromaticAberration.enabled
                     ? fx.chromaticAberration.intensity : 0)
 
+            // W25: SceneKit has no lens-flare pass — approximated.
+            // The flare's visible terms map onto the post knobs the
+            // camera already carries: intensity widens bloom (the
+            // halo body), haloRadius spreads it, and the flare's
+            // chromaticAberration adds a radial fringe. Ghost/halo
+            // geometry is a documented platform limit.
+            if fx.lensFlare.enabled {
+                let lf = fx.lensFlare
+                camera.bloomIntensity +=
+                    CGFloat(lf.intensity * 0.5)
+                camera.bloomBlurRadius +=
+                    CGFloat(lf.haloRadius * 24 * lf.haloIntensity)
+                camera.colorFringeStrength +=
+                    CGFloat(lf.chromaticAberration * 200)
+                logOnce("fx.lensFlare.approx",
+                    "lensFlare approximated on SceneKit as widened "
+                    + "bloom + color fringe; ghost/halo geometry is "
+                    + "a platform limit")
+            }
+
             let cg = fx.colorGrading
             camera.saturation =
                 CGFloat(cg.enabled ? cg.saturation : 1.0)
@@ -270,12 +300,15 @@ final class SceneViewHost: SCNView {
             camera.whiteBalanceTemperature =
                 CGFloat(cg.enabled ? cg.temperature : 0)
             camera.whiteBalanceTint = CGFloat(cg.enabled ? cg.tint : 0)
+            // W25: the LUT grades independently of `enabled`
+            // (upstream's rule). A `chunk:`/id-token ref resolves
+            // through the payload store — its decode-time claim
+            // re-runs the stage when the bytes land; an asset path
+            // resolves from the main bundle.
+            camera.colorGrading.contents =
+                (cg.lut.flatMap { $0.isEmpty ? nil : $0 })
+                    .flatMap { resolveLutImage($0, blend: cg.lutBlend) }
             if cg.enabled {
-                if let lut = cg.lut, !lut.isEmpty {
-                    logOnce("fx.colorGrading.lut",
-                        "colorGrading LUT assets aren't resolved by "
-                        + "dart3d yet; ignored")
-                }
                 if cg.lift != SIMD3<Float>(0, 0, 0)
                     || cg.gamma != SIMD3<Float>(1, 1, 1)
                     || cg.gain != SIMD3<Float>(1, 1, 1) {
@@ -390,22 +423,74 @@ final class SceneViewHost: SCNView {
             }
         }
 
+        // W25 documented platform limits — no SceneKit surface exists
+        // for these blocks; each logs once and the decoded value still
+        // participates in blending/parity.
         if fx.screenSpaceReflections.enabled {
-            logOnce("fx.screenSpaceReflections",
-                "screenSpaceReflections unsupported on SceneKit; "
-                + "ignored")
+            logOnce("fx.screenSpaceReflections.limit",
+                "screenSpaceReflections: platform limit — SceneKit "
+                + "has no screen-space reflection pass; ignored")
         }
         if fx.globalIllumination.enabled {
-            logOnce("fx.globalIllumination",
-                "globalIllumination unsupported on SceneKit; ignored")
+            logOnce("fx.globalIllumination.limit",
+                "globalIllumination: platform limit — SceneKit has "
+                + "no dynamic GI/probe-volume API; the IBL "
+                + "environment stands; ignored")
         }
         if fx.godRays.enabled {
-            logOnce("fx.godRays",
-                "godRays unsupported on SceneKit; ignored")
+            logOnce("fx.godRays.limit",
+                "godRays: platform limit — SceneKit has no "
+                + "light-shaft/volumetric post pass; ignored")
         }
-        if fx.lensFlare.enabled {
-            logOnce("fx.lensFlare",
-                "lensFlare unsupported on SceneKit; ignored")
+    }
+
+    /// W25: resolves a `colorGrading.lut` ref to the strip image
+    /// `SCNCamera.colorGrading.contents` samples. `chunk:`/id-token
+    /// refs read the payload store (nil while deferred — the
+    /// realizer's claim re-runs the stage on arrival); other strings
+    /// are bundle asset paths. Parses are cached by ref+blend (the
+    /// blend bakes into the strip); a `payload`/`upsertPayload`
+    /// landing on the ref's id drops the stale entries.
+    private func resolveLutImage(_ ref: String, blend: Double)
+        -> CGImage?
+    {
+        let cacheKey = "\(ref)\u{1F}\(blend)"
+        if let img = lutImages[cacheKey] { return img }
+        let data: Data?
+        if let pid = D3Wire.localIdKey(ref) {
+            data = payloadStore[pid]
+        } else if let url = Bundle.main.url(forResource: ref,
+                                            withExtension: nil) {
+            data = try? Data(contentsOf: url)
+            if data == nil {
+                logOnce("fx.lut.asset.\(ref)",
+                    "colorGrading LUT asset '\(ref)' unreadable")
+            }
+        } else {
+            data = nil
+            logOnce("fx.lut.asset.\(ref)",
+                "colorGrading LUT asset '\(ref)' not in bundle")
+        }
+        guard let data else { return nil }
+        guard let table = try? StageLut.parse(data: data) else {
+            logOnce("fx.lut.parse.\(ref)",
+                "colorGrading LUT '\(ref)' is not a valid 3D .cube")
+            return nil
+        }
+        guard let img = table.stripImage(blend: blend) else {
+            return nil
+        }
+        lutImages[cacheKey] = img
+        return img
+    }
+
+    /// Drops cached LUT strips whose ref names payload id [key] —
+    /// called when a `payload`/`upsertPayload` chunk rewrites those
+    /// bytes, so the next apply rebuilds from the new table.
+    private func invalidateLuts(backedBy key: UInt64) {
+        lutImages = lutImages.filter { entry in
+            let ref = entry.key.prefix { $0 != "\u{1F}" }
+            return D3Wire.localIdKey(String(ref)) != key
         }
     }
 
@@ -786,6 +871,8 @@ final class SceneViewHost: SCNView {
         let id = D3Wire.readLocalId(data, data.startIndex)
         let bytes = data.subdata(in: data.startIndex + 8..<data.endIndex)
         payloadStore[id] = bytes
+        // W25: a rewritten LUT chunk invalidates its cached strips.
+        invalidateLuts(backedBy: id)
         // W11 claims run surgically first — a skin's IBM chunk or an
         // animation's timeline/keyframes chunk re-decodes just its
         // owner, like the `upsertPayload` path (and keeps live clips
@@ -1500,6 +1587,7 @@ final class SceneViewHost: SCNView {
         instanceSpecs = ctx.instanceSpecs
         deferredResourceIds = ctx.deferredResourceIds
         environmentPayloadKeys = ctx.environmentPayloadKeys
+        lutPayloadKeys = ctx.lutPayloadKeys
         resourceDefs = ctx.resourceDefs
         lastStage = ctx.stageJSON
         // W14: rt registry + view list + stage quality fields — a
@@ -1699,9 +1787,14 @@ final class SceneViewHost: SCNView {
             opPayloadSpecs[key] = spec
         }
         payloadStore[key] = bytes
-        if environmentPayloadKeys.values.contains(key) {
-            // W7: an environment equirect chunk — re-run `decodeStage`
-            // on the live scene (its payload deferral unblocks here).
+        // W25: a rewritten LUT chunk invalidates its cached strips
+        // before the claim check below re-applies the stage.
+        invalidateLuts(backedBy: key)
+        if environmentPayloadKeys.values.contains(key)
+            || lutPayloadKeys.values.contains(key) {
+            // W7/W25: an environment equirect or LUT chunk — re-run
+            // `decodeStage` on the live scene (its payload deferral
+            // unblocks here).
             let ctx = surgicalContext()
             ctx.decodeStage(ctx.stageJSON)
             publish(ctx)
@@ -1793,6 +1886,7 @@ final class SceneViewHost: SCNView {
         ctx.texturePayloadKeys = texturePayloadKeys
         ctx.geometryPayloadKeys = geometryPayloadKeys
         ctx.environmentPayloadKeys = environmentPayloadKeys
+        ctx.lutPayloadKeys = lutPayloadKeys
         // Environment resources are raw defs — the environments map a
         // manifest decode fills is rebuilt from them here.
         ctx.environments = resourceDefs.compactMapValues {
@@ -3706,6 +3800,7 @@ final class SceneViewHost: SCNView {
                     texturePayloadKeys: [UInt64: UInt64],
                     geometryPayloadKeys: [UInt64: Set<UInt64>],
                     environmentPayloadKeys: [UInt64: UInt64],
+                    lutPayloadKeys: [UInt64: UInt64],
                     skins:
                         [UInt64: FsceneRealizer.DecodedSkin],
                     animations:
@@ -3766,6 +3861,7 @@ final class SceneViewHost: SCNView {
         texturePayloadKeys = resources.texturePayloadKeys
         geometryPayloadKeys = resources.geometryPayloadKeys
         environmentPayloadKeys = resources.environmentPayloadKeys
+        lutPayloadKeys = resources.lutPayloadKeys
         // W14: the rt records arrive with empty view lists — the
         // decoded views distribute onto them below.
         renderTargets = resources.renderTargets

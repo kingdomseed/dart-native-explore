@@ -477,6 +477,13 @@ enum FsceneRealizer {
         /// env it unblocks (W7).
         var environmentPayloadKeys: [UInt64: UInt64] = [:]
 
+        /// W25: environment id → payload id backing its
+        /// `effects.colorGrading.lut` `.cube` table, so the chunk's
+        /// arrival re-runs `decodeStage` (and the host re-applies the
+        /// effects stack). Asset-path LUT refs don't claim — they
+        /// resolve through the host's bundle lookup.
+        var lutPayloadKeys: [UInt64: UInt64] = [:]
+
         /// Decoded `skins` entries (W11) — joint keys, IBMs, optional
         /// skeleton. Populated by `decodeSkins` after the node pass.
         var skins: [UInt64: DecodedSkin] = [:]
@@ -643,6 +650,7 @@ enum FsceneRealizer {
                                      geometryPayloadKeys: geometryPayloadKeys,
                                      environmentPayloadKeys:
                                         environmentPayloadKeys,
+                                     lutPayloadKeys: lutPayloadKeys,
                                      skins: skins,
                                      animations: animations,
                                      morphTargets: morphTargets,
@@ -5117,6 +5125,7 @@ enum FsceneRealizer {
                (stage?["environmentRef"] as? String) != oldToken {
                 deferredResourceIds.remove(oldKey)
                 environmentPayloadKeys.removeValue(forKey: oldKey)
+                lutPayloadKeys.removeValue(forKey: oldKey)
             }
             stageJSON = stage
             stageEnvDeferred = false
@@ -5233,6 +5242,29 @@ enum FsceneRealizer {
                         + "unknown; background cleared")
                 }
                 scene.background.contents = nil
+            }
+
+            // W25: the colorGrading LUT rides the env's payload-claim
+            // path — a `chunk:`/id-token ref whose bytes haven't
+            // landed defers this env id so the chunk's arrival
+            // re-runs the stage decode (and the host's
+            // `applyStageEffects` picks the table up). Asset-path
+            // refs aren't claims; the host resolves them from the
+            // main bundle at apply time. An absent `effects` key
+            // keeps the prior claim (the decoded stack is retained).
+            if let envKey, let fx = stageEffects {
+                if let ref = fx.colorGrading.lut, !ref.isEmpty,
+                   let lutPid = D3Wire.localIdKey(ref) {
+                    lutPayloadKeys[envKey] = lutPid
+                    if host.payloadStore[lutPid] == nil {
+                        deferredResourceIds.insert(envKey)
+                        host.logOnce("env.\(envKey).lut.awaiting",
+                            "environment \(envKey): awaiting LUT "
+                            + "payload")
+                    }
+                } else {
+                    lutPayloadKeys.removeValue(forKey: envKey)
+                }
             }
         }
 

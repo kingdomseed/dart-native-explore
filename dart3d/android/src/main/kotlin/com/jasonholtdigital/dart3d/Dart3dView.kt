@@ -381,6 +381,13 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      * not re-run ~10ms of GPU work each time. */
     internal var lastEnvFingerprint: Int? = null
 
+    /** W25: decoded `.cube` tables → the direct `customLut` buffers,
+     * keyed by `ref + sep + blend` (the blend bakes into the texels).
+     * Entries drop when a `payload`/`upsertPayload` chunk rewrites the
+     * ref's bytes. */
+    private val lutBuffers =
+        HashMap<String, Pair<java.nio.ByteBuffer, Int>>()
+
     /** Filament objects owned by the applied stage env — swapped and
      * destroyed by [applyEnvironment]/[applySkybox] on every
      * non-deferred `decodeStage`. `envIblTextures` holds the equirect +
@@ -1482,13 +1489,22 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         agxWhite: Double, agxContrast: Double,
         fx: StageEffects? = null,
     ) {
-        camera.setExposure(16.0f, 1.0f / 125.0f, 100.0f * exposure)
+        // W25: autoExposure's static term — upstream adds
+        // `compensation` (EV) to the metered target; metering itself
+        // is a documented platform limit (see applyStageEffects), so
+        // the compensation folds into the base exposure as a ×2^c
+        // multiplier.
+        val aeComp = fx?.autoExposure
+            ?.takeIf { it.enabled }?.compensation ?: 0.0
+        val effExposure = (exposure *
+            Math.pow(2.0, aeComp)).toFloat()
+        camera.setExposure(16.0f, 1.0f / 125.0f, 100.0f * effExposure)
         // W14: exposure is a Camera property — every screen-bound view
         // camera takes it (offscreen views keep Filament's default,
         // the same policy as the per-View post stack).
         for (rec in screenViews) {
             rec.camera?.setExposure(16.0f, 1.0f / 125.0f,
-                100.0f * exposure)
+                100.0f * effExposure)
         }
         val mapper: ToneMapper = when (toneMapping) {
             "pbrNeutral" -> ToneMapper.PBRNeutralToneMapper()
@@ -1527,12 +1543,16 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     fxCg.tint.toFloat())
                 // ASC CDL: wire gain→slope, lift→offset, gamma→power.
                 .slopeOffsetPower(fxCg.gain, fxCg.lift, fxCg.gamma)
-            if (fxCg.lut.isNotEmpty()) {
-                logCommandOnce("fx.colorGrading.lut",
-                    "colorGrading LUT assets aren't resolved by dart3d" +
-                        " yet; ignored")
-            }
         }
+        // W25: the LUT grades independently of `enabled` (upstream's
+        // rule). A `chunk:`/id-token ref resolves through the payload
+        // store — its decode-time claim re-runs the stage when the
+        // bytes land; an asset path resolves from the app assets.
+        // `lutBlend` bakes into the uploaded texels (lerp toward the
+        // identity cell) since `customLut` has no mix knob.
+        fx?.colorGrading?.lut?.takeIf { it.isNotEmpty() }
+            ?.let { ref -> resolveLutBuffer(ref, fx.colorGrading.lutBlend) }
+            ?.let { (buf, size) -> cgBuilder.customLut(buf, size) }
         val cg = cgBuilder.build(engine)
         view.colorGrading = cg
         envColorGrading?.let {
@@ -1573,11 +1593,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             // thickness (Filament's default haloThickness is 0.1).
             haloThickness = fx.lensFlare.haloIntensity.toFloat() * 0.1f
         }
-        if (fx.chromaticAberration.enabled && !fx.lensFlare.enabled) {
-            logCommandOnce("fx.ca",
-                "chromaticAberration is bloom/lens-flare-scoped on" +
-                    " Filament; enable lensFlare to see it")
-        }
+        // W25: standalone chromaticAberration (enabled without
+        // lensFlare) has no Filament surface — the platform-limit
+        // note logs at the bottom of this function.
 
         view.vignetteOptions = View.VignetteOptions().apply {
             enabled = fx.vignette.enabled
@@ -1704,16 +1722,88 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     " (thickness/maxDistance/stride only)")
         }
 
-        // No Java-binding surface — decoded for parity, logged once.
-        if (fx.autoExposure.enabled) logCommandOnce("fx.autoExposure",
-            "autoExposure unsupported on Filament (no Java-binding" +
-                " auto-exposure)")
-        if (fx.filmGrain.enabled) logCommandOnce("fx.filmGrain",
-            "filmGrain unsupported on Filament")
-        if (fx.globalIllumination.enabled) logCommandOnce("fx.gi",
-            "globalIllumination volumes unsupported on Filament")
-        if (fx.godRays.enabled) logCommandOnce("fx.godRays",
-            "godRays unsupported on Filament")
+        // W25 film grain — Filament has no grain pass; approximated
+        // by temporal dithering (the post pipeline's animated noise,
+        // intensity unmapped).
+        view.dithering = if (fx.filmGrain.enabled)
+            View.Dithering.TEMPORAL else View.Dithering.NONE
+        if (fx.filmGrain.enabled) {
+            logCommandOnce("fx.filmGrain.approx",
+                "filmGrain approximated on Filament as temporal" +
+                    " dithering; grain intensity unmapped")
+        }
+
+        // W25 documented platform limits — no Java-binding surface
+        // exists for these blocks; each logs once and the decoded
+        // value still participates in blending/parity.
+        if (fx.chromaticAberration.enabled && !fx.lensFlare.enabled) {
+            logCommandOnce("fx.ca.limit",
+                "chromaticAberration standalone: platform limit —" +
+                    " Filament's CA only shades the lens-flare" +
+                    " ghosts/halo (flare.mat); no post-material" +
+                    " binding exists; ignored")
+        }
+        if (fx.autoExposure.enabled) {
+            logCommandOnce("fx.autoExposure.limit",
+                "autoExposure metering: platform limit — Filament's" +
+                    " readPixels is debug/testing-grade (in-frame," +
+                    " perf-heavy); `compensation` is applied as a" +
+                    " static EV offset in applyStageLook," +
+                    " strength/speeds/EV range unmapped")
+        }
+        if (fx.globalIllumination.enabled) logCommandOnce("fx.gi.limit",
+            "globalIllumination: platform limit — no dynamic" +
+                " GI/probe-volume API in the Java bindings; the IBL" +
+                " environment stands; ignored")
+        if (fx.godRays.enabled) logCommandOnce("fx.godRays.limit",
+            "godRays: platform limit — no light-shaft/volumetric" +
+                " post pass in the Java bindings; ignored")
+    }
+
+    /**
+     * W25: resolves a `colorGrading.lut` ref to the direct
+     * `float3`-cube buffer `ColorGrading.Builder.customLut` consumes.
+     * `chunk:`/id-token refs read the payload store (null while
+     * deferred — the realizer's claim re-runs the stage on arrival);
+     * other strings are app-asset paths (same lookup the `asset` env
+     * type uses). Results cache by ref+blend; a `payload`/
+     * `upsertPayload` landing on the ref's id drops stale entries.
+     */
+    private fun resolveLutBuffer(
+        ref: String, blend: Double,
+    ): Pair<java.nio.ByteBuffer, Int>? {
+        val cacheKey = "$ref\u001F$blend"
+        lutBuffers[cacheKey]?.let { return it }
+        val bytes: ByteArray? =
+            D3Wire.localIdKey(ref)?.let { payloadStore[it] }
+                ?: try {
+                    context.assets.open(ref).use { it.readBytes() }
+                } catch (e: Exception) {
+                    logCommandOnce("fx.lut.asset.$ref",
+                        "colorGrading LUT asset '$ref' not found")
+                    null
+                }
+        bytes ?: return null
+        val table = try {
+            StageLut.parse(bytes)
+        } catch (e: StageLut.ParseException) {
+            logCommandOnce("fx.lut.parse.$ref",
+                "colorGrading LUT '$ref': ${e.message}")
+            return null
+        }
+        val pair = table.directBuffer(blend) to table.size
+        lutBuffers[cacheKey] = pair
+        return pair
+    }
+
+    /** Drops cached LUT buffers whose ref names payload id [key] —
+     * called when a `payload`/`upsertPayload` chunk rewrites those
+     * bytes, so the next apply rebuilds from the new table. */
+    private fun invalidateLuts(backedBy: Long) {
+        lutBuffers.entries.removeIf { entry ->
+            val ref = entry.key.substringBefore('\u001F')
+            D3Wire.localIdKey(ref) == backedBy
+        }
     }
 
     // MARK: - Lifecycle
@@ -1982,12 +2072,17 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         if (data.size <= 8) return
         val id = D3Wire.readLocalId(data, 0)
         payloadStore[id] = data.copyOfRange(8, data.size)
+        // W25: a rewritten LUT chunk invalidates its cached tables.
+        invalidateLuts(backedBy = id)
         // W7: an environment equirect chunk re-runs decodeStage on the
         // live scene — the same early-out `upsertPayload` takes, and
         // the only path that doesn't depend on other resources still
         // being pending. No early return: a chunk the env shares with
         // another claimant must still reach the checks below.
-        if (resources.environmentPayloadIds.values.contains(id)) {
+        if (resources.environmentPayloadIds.values.contains(id) ||
+            resources.lutPayloadIds.values.contains(id)) {
+            // W7/W25: an env equirect or LUT chunk — decodeStage
+            // re-runs and the stage's deferred claim unblocks.
             FsceneRealizer.surgicalContext(this).decodeStage(lastStage)
         }
         // W11 claims run surgically first — a skin's IBM chunk or an
@@ -3052,10 +3147,14 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             opPayloadSpecs[key] = meta
         }
         payloadStore[key] = bytes
-        // W7: an environment equirect chunk re-runs decodeStage on the
-        // live scene (its payload deferral unblocks here). Checked
-        // first — env payloads also carry encoding:'image'.
-        if (resources.environmentPayloadIds.values.contains(key)) {
+        // W25: a rewritten LUT chunk invalidates its cached tables.
+        invalidateLuts(backedBy = key)
+        // W7/W25: an environment equirect or LUT chunk re-runs
+        // decodeStage on the live scene (its payload deferral unblocks
+        // here). Checked first — env payloads also carry
+        // encoding:'image'.
+        if (resources.environmentPayloadIds.values.contains(key) ||
+            resources.lutPayloadIds.values.contains(key)) {
             FsceneRealizer.surgicalContext(this).decodeStage(lastStage)
             return
         }

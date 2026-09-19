@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:scene/scene.dart';
 import 'package:vector_math/vector_math.dart';
 
@@ -48,10 +49,14 @@ void main(List<String> args) {
           }
         }
       }
-      for (final ch in n.children) walk(ch, world, depth + 1);
+      for (final ch in n.children) {
+        walk(ch, world, depth + 1);
+      }
     }
 
-    for (final r in doc.roots) walk(r, Matrix4.identity(), 0);
+    for (final r in doc.roots) {
+      walk(r, Matrix4.identity(), 0);
+    }
 
     // dump per-node local transforms for mesh nodes
     for (final n in doc.nodes.values) {
@@ -60,21 +65,31 @@ void main(List<String> args) {
       if (!hasMesh && n.children.isEmpty) continue;
       String ts;
       if (t is TrsTransform) {
-        ts = 't=${t.translation.storage.map((e) => e.toStringAsFixed(1)).join(",")} s=${t.scale.storage.map((e) => e.toStringAsFixed(2)).join(",")}';
+        ts =
+            't=${t.translation.storage.map((e) => e.toStringAsFixed(1)).join(",")} s=${t.scale.storage.map((e) => e.toStringAsFixed(2)).join(",")}';
       } else if (t is MatrixTransform) {
         final m = t.matrix;
-        ts = 'M[${m.entry(0, 0).toStringAsFixed(2)}..] t=${m.getTranslation().storage.map((e) => e.toStringAsFixed(1)).join(",")}';
+        ts =
+            'M[${m.entry(0, 0).toStringAsFixed(2)}..] t=${m.getTranslation().storage.map((e) => e.toStringAsFixed(1)).join(",")}';
       } else {
         ts = t.runtimeType.toString();
       }
-      print('  ${hasMesh ? "M" : " "} ${n.name.isEmpty ? n.id.toString() : n.name} kids=${n.children.length} $ts');
+      print(
+        '  ${hasMesh ? "M" : " "} ${n.name.isEmpty ? n.id.toString() : n.name} kids=${n.children.length} $ts',
+      );
     }
     print('meshed bounds: $boundCount');
     if (boundCount > 0) {
-      print('world min=${worldBoundsMin.storage.map((e) => e.toStringAsFixed(1)).join(",")}');
-      print('world max=${worldBoundsMax.storage.map((e) => e.toStringAsFixed(1)).join(",")}');
+      print(
+        'world min=${worldBoundsMin.storage.map((e) => e.toStringAsFixed(1)).join(",")}',
+      );
+      print(
+        'world max=${worldBoundsMax.storage.map((e) => e.toStringAsFixed(1)).join(",")}',
+      );
       final sz = worldBoundsMax - worldBoundsMin;
-      print('world size=${sz.storage.map((e) => e.toStringAsFixed(1)).join(",")}  r=${(sz.length * 0.5).toStringAsFixed(1)}');
+      print(
+        'world size=${sz.storage.map((e) => e.toStringAsFixed(1)).join(",")}  r=${(sz.length * 0.5).toStringAsFixed(1)}',
+      );
     }
     // local-only union (the current buggy approach) for comparison
     final lmin = Vector3.all(double.infinity);
@@ -88,7 +103,9 @@ void main(List<String> args) {
     }
     if (lmin.x.isFinite) {
       final sz = lmax - lmin;
-      print('local union r=${(sz.length * 0.5).toStringAsFixed(1)} center=${((lmin + lmax) * 0.5).storage.map((e) => e.toStringAsFixed(1)).join(",")}');
+      print(
+        'local union r=${(sz.length * 0.5).toStringAsFixed(1)} center=${((lmin + lmax) * 0.5).storage.map((e) => e.toStringAsFixed(1)).join(",")}',
+      );
     }
   }
 }

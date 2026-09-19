@@ -140,30 +140,57 @@ Android applies to the persistent `View`'s options objects, merging
 
 | Block | iOS SceneKit | Android Filament |
 |---|---|---|
-| colorGrading | approx — saturation/contrast/whiteBalance direct; brightness→`exposureOffset`; lift/gamma/gain+LUT no-op (`fx.colorGrading.*`) | applied — `contrast`/`saturation`/`whiteBalance`/`exposure(log2 brightness)`/`slopeOffsetPower`(ASC CDL); LUT no-op |
+| colorGrading | approx — saturation/contrast/whiteBalance direct; brightness→`exposureOffset`; lift/gamma/gain no-op (`fx.colorGrading.lgg`); **LUT applied** — `.cube`→RGBA8 strip on `camera.colorGrading` (W25) | applied — `contrast`/`saturation`/`whiteBalance`/`exposure(log2 brightness)`/`slopeOffsetPower`(ASC CDL); **LUT applied** — `ColorGrading.customLut` float³ cube (W25) |
 | bloom | applied — threshold/intensity/blurRadius←scatter | approx — `strength`/`highlight`/`levels`←scatter |
-| lensFlare | no-op (`fx.lensFlare`) | applied — full `BloomOptions` flare sub-stack |
+| lensFlare | approx — intensity→widened bloom + CA→colorFringe; ghost/halo geometry platform limit (`fx.lensFlare.approx`, W25) | applied — full `BloomOptions` flare sub-stack |
 | vignette | applied — `vignettingIntensity`/`Power` | approx — `midPoint`/`feather`/alpha-carried intensity |
-| chromaticAberration | applied — `colorFringeStrength` | flare-scoped only (`fx.ca` warns without lensFlare) |
-| filmGrain | applied — `grainIntensity` | no-op (`fx.filmGrain`) |
+| chromaticAberration | applied — `colorFringeStrength` | platform limit — Filament's CA only shades flare ghosts/halo; standalone logs `fx.ca.limit` (W25) |
+| filmGrain | applied — `grainIntensity` | approx — `View.Dithering.TEMPORAL`; intensity unmapped (`fx.filmGrain.approx`, W25) |
 | ambientOcclusion | applied — SSAO intensity/radius/bias | applied — full options incl. `groundTruth`→SSCT |
-| screenSpaceReflections | no-op (`fx.screenSpaceReflections`) | applied — `ScreenSpaceReflectionsOptions` |
-| globalIllumination | no-op | no-op |
+| screenSpaceReflections | platform limit — no SceneKit SSR pass (`fx.screenSpaceReflections.limit`, W25) | applied — `ScreenSpaceReflectionsOptions` |
+| globalIllumination | platform limit — no dynamic GI API (`fx.globalIllumination.limit`, W25) | platform limit — no GI/probe-volume binding (`fx.gi.limit`, W25) |
 | temporalAntiAliasing | applied (device; `fx.taa.sim` on simulator) | applied — feedback/filterWidth only |
 | fog | approx — color/start/end/densityExponent; no height/in-scatter | applied — `FogOptions` incl. height/falloff/in-scatter |
-| godRays | no-op | no-op |
+| godRays | platform limit — no light-shaft pass (`fx.godRays.limit`, W25) | platform limit — no volumetric post binding (`fx.godRays.limit`, W25) |
 | depthOfField | applied — wantsDoF/focusDistance/fStop/blades/samples | approx — `cocScale`/maxCoC/aperture←f/fStop/`camera.focusDistance` |
-| autoExposure | applied — `wantsExposureAdaptation`+min/max/speeds | no-op (`fx.autoExposure`) |
+| autoExposure | applied — `wantsExposureAdaptation`+min/max/speeds (strength/compensation warn, W25) | approx — `compensation`→×2^c EV offset on the camera exposure; metering platform limit (`fx.autoExposure.limit`, W25) |
+
+**W25 completion.** Every former no-op cell is now realized or a
+documented platform limit — nothing decodes silently. The LUT asset
+path landed: `effects.colorGrading.lut` takes an `AssetRef` — a
+`chunk:`/id-token ref claims the payload (a `.cube` chunk arriving
+late defers the env; `payload`/`upsertPayload` re-runs the stage
+decode on both platforms), anything else resolves through the
+bundle/app-asset fallback. Dart-side `resolveLutAssets`/
+`resolveLutAssetsAsync` (`lib/src/lut_assets.dart`, wired through
+`SceneController.resolveLuts`) convert asset-path refs into payload
+chunks before the manifest ships. `lutBlend` bakes into the packed
+texels (lerp toward the identity cell) since neither native LUT knob
+has a mix term. iOS packs the table into the `N·N × N` RGBA8 strip
+`SCNCamera.colorGrading` samples; Android uploads the direct
+little-endian float³ buffer `customLut` consumes — both parse the
+upstream `.cube` contract (`TITLE`/`DOMAIN_*` tolerated,
+`LUT_1D_SIZE` rejected, `LUT_3D_SIZE` 2…64, red-fastest). W20
+groundwork: `StageEffects.Contribution` +
+`blendContributions`/`lerp` mirror upstream
+`EnvironmentContribution`/`blendEnvironmentContributions` —
+weight-0 drops, ascending-priority fold, numeric lerp with discrete
+fields switching at `t ≥ 0.5`.
 
 **Scope decision.** `stage.renderScale`/`filterQuality`/
 `antiAliasing` folded to W14 — per-view config (views[] overrides),
 not environment look. `environmentVolume`/per-volume blending stays
-W20. LUT needs an asset-resolution path — deferred, warn-once both
-platforms.
+W20 — the fold machinery landed here; volume coverage/blendDistance
+geometry is W20's.
 
 **Verification.** Each effect toggled live on both surfaces via the
 8-step `w13` harness phase (+34 s); combined bloom+AO+fog+DoF frames
-captured at `w13/ios-stack2.png` and `w13/android-stack5.png`.
+captured at `w13/ios-stack2.png` and `w13/android-stack5.png`. The
+`w25` harness phase (+140 s) drives the completion lanes: the
+deferred `chunk:` LUT claim (bytes land ~800 ms after the env
+upsert), the `assets/luts/cool.cube` asset path, `lutBlend` 0.35,
+filmGrain+autoExposure, SSR+lensFlare, godRays+standalone CA, an
+all-defaults reset, and the dice-regression close-out.
 
 ## W14 — Render textures and views
 
