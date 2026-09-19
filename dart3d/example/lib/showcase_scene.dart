@@ -226,6 +226,15 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
                   child: SceneView(
                     controller: _controller,
                     quality: widget.quality,
+                    // W30 perf lanes read frame times off the stats
+                    // HUD's ~4 Hz `stats:` logcat line.
+                    // bool.fromEnvironment only honors "true"; the
+                    // lane docs write `=1`, so accept both.
+                    showsStatistics: switch (
+                        const String.fromEnvironment('DART3D_STATS')) {
+                      '1' || 'true' => true,
+                      _ => false,
+                    },
                   ),
                 );
               },

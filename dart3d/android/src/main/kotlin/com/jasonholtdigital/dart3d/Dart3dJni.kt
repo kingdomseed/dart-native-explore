@@ -21,6 +21,15 @@ object Dart3dJni {
     private external fun nativeFireToDart(token: Long, type: Int, payload: String)
 
     /**
+     * Filament backend pref written by `Dart3dSetBackend` from the Dart
+     * side at boot (0 = auto, 1 = force OpenGL, 2 = force Vulkan).
+     * Read once per Dart3dView engine construction. Stays public:
+     * `internal` would mangle the JNI symbol name.
+     */
+    @JvmStatic
+    external fun nativeBackendPref(): Int
+
+    /**
      * Fires one event frame through the plugin slot. The dispatcher
      * (a Dart NativeCallable) tolerates any calling thread, but the
      * physics loop already runs on the main Choreographer — hop to main

@@ -1,0 +1,5 @@
+# ninja log v5
+0	418	1789769363741923985	CMakeFiles/dart3d_jni.dir/dart3d_jni.cpp.o	a27d05f343f76735
+419	463	1789769363784403380	/Users/jasonholt/repos/dart-native-explore-wt/w30-vulkan/dart3d/example/build/dart3d/intermediates/cxx/RelWithDebInfo/2o25455e/obj/arm64-v8a/libdart3d_jni.so	bbc7e7769aa089b5
+24	790	1789811904482665516	CMakeFiles/dart3d_jni.dir/dart3d_jni.cpp.o	a27d05f343f76735
+790	975	1789811904665278727	/Users/jasonholt/repos/dart-native-explore-wt/w30-vulkan/dart3d/example/build/dart3d/intermediates/cxx/RelWithDebInfo/2o25455e/obj/arm64-v8a/libdart3d_jni.so	bbc7e7769aa089b5
