@@ -1293,6 +1293,12 @@ enum FsceneRealizer {
         /// conformance matrix's `approx` rows are these messages.
         func decodeMaterialExtensions(_ m: SCNMaterial, _ key: UInt64,
                                       _ props: [String: Any]) {
+            // `reflective.contents` is non-nil out of the box (a
+            // black hdrm(1) color), so a contents nil-check can never
+            // see whether an approximation already claimed the slot —
+            // this flag tracks the claim explicitly. clearcoat claims
+            // first; sheen applies its rim only while unclaimed.
+            var reflectiveClaimed = false
             // clearcoat → the coat's constant dielectric reflection
             // approximates as `reflective` environment intensity —
             // SceneKit has no coat lobe, so its roughness and normal
@@ -1307,10 +1313,8 @@ enum FsceneRealizer {
                     + "environment intensity (no coat lobe); "
                     + "clearcoatRoughness and the coat normal map "
                     + "drop")
-                if m.reflective.contents == nil {
-                    m.reflective.contents = UIColor(white: coat,
-                                                  alpha: 1)
-                }
+                m.reflective.contents = UIColor(white: coat, alpha: 1)
+                reflectiveClaimed = true
             }
             // sheen → tinted rim via `reflective` + fresnelExponent
             // (roughness → exponent: rougher sheen, tighter rim).
@@ -1322,12 +1326,13 @@ enum FsceneRealizer {
                 || d3Ref(props["sheenColorTexture"]) != nil
                 || d3Ref(props["sheenRoughnessTexture"]) != nil
             if sheenOn {
-                if m.reflective.contents == nil {
+                if !reflectiveClaimed {
                     let c = sheen ?? [1, 1, 1, 1]
                     let rough = d3Double(props["sheenRoughness"]) ?? 0
                     m.reflective.contents = UIColor(
                         red: c[0], green: c[1], blue: c[2], alpha: 1)
                     m.fresnelExponent = CGFloat(1 + (1 - rough) * 3)
+                    reflectiveClaimed = true
                     host.logOnce("material.\(key).sheen",
                         "material \(key): sheen → tinted `reflective` "
                         + "rim (fresnelExponent from sheenRoughness); "
