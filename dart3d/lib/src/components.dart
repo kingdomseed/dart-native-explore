@@ -31,6 +31,14 @@ const kRealizedFeatures = {'skinning', 'materialsVariants', 'renderTextures'};
 /// the plan so a degraded document says *where* the capability lands.
 const kPlannedFeatures = {'prefabInstances': 'W15', 'streaming': 'W15'};
 
+/// The `featuresRequired` names dart3d natives do not realize — the set
+/// a strict loader refuses on. Upstream's decoder already rejects
+/// required features outside `supportedFeatures`; this is the
+/// engine-level half: features upstream's format supports but this
+/// engine has not implemented (W29).
+Set<String> missingRequiredFeatures(SceneDocument doc) =>
+    doc.featuresRequired.difference(kRealizedFeatures);
+
 /// The `featuresRequired`/`featuresUsed` capability pass (W12).
 ///
 /// Upstream's decoder refuses *unknown* required features at parse

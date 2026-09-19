@@ -11,6 +11,8 @@ import 'animation.dart';
 import 'components.dart';
 import 'diff_apply.dart';
 import 'dispatch.dart';
+import 'doc_layer.dart' as doc_layer;
+import 'glb_import.dart';
 import 'physics.dart';
 import 'protocol.dart';
 import 'scene_view.dart';
@@ -97,7 +99,20 @@ final class SceneController {
   ///
   /// Sends the canonical `.fscene` manifest, then one `payload` mutation
   /// per payload chunk the document carries.
-  void loadDocument(SceneDocument doc) {
+  ///
+  /// Feature negotiation runs before anything sends: unrealized
+  /// `featuresRequired`/`featuresUsed` names always log, and with
+  /// [strictFeatures] a document requiring an unrealized feature is
+  /// refused with [FsceneUnsupportedFeatureException] — upstream's
+  /// required-means-refuse rule applied to the engine's realized set
+  /// (W29). The default is warn-only (W12).
+  void loadDocument(SceneDocument doc, {bool strictFeatures = false}) {
+    if (strictFeatures) {
+      final missing = missingRequiredFeatures(doc);
+      if (missing.isNotEmpty) {
+        throw FsceneUnsupportedFeatureException(missing.first);
+      }
+    }
     _document = doc;
     _streamed.clear();
     _warnUnrealizedFeatures(doc);
@@ -125,12 +140,67 @@ final class SceneController {
     loadDocument(await composeSceneAsync(doc, load: loadPrefab));
   }
 
+  /// Parses a `.fscene` JSON/JSONC [source] and loads it — upstream's
+  /// `readFscene`, which runs the `migrateFscene` chain so older schema
+  /// versions upgrade on load (W29). [strictFeatures] follows
+  /// [loadDocument].
+  void loadFscene(String source, {bool strictFeatures = false}) =>
+      loadDocument(readFscene(source), strictFeatures: strictFeatures);
+
+  /// Imports a single-file `.glb` in memory and loads it — the
+  /// `Node.fromGlbBytes` equivalent (W29). [onWarning] receives
+  /// non-fatal import issues; [strictFeatures] follows [loadDocument].
+  void loadGlb(
+    Uint8List glbBytes, {
+    GltfWarningCallback? onWarning,
+    bool strictFeatures = false,
+  }) => loadDocument(
+    importGlbToSceneDocument(glbBytes, onWarning: onWarning),
+    strictFeatures: strictFeatures,
+  );
+
+  /// Imports a multi-file `.gltf` (JSON plus external resources fetched
+  /// through [resolveUri]) and loads it. [strictFeatures] follows
+  /// [loadDocument].
+  void loadGltf(
+    Uint8List gltfBytes, {
+    required GltfUriResolver resolveUri,
+    GltfWarningCallback? onWarning,
+    bool strictFeatures = false,
+  }) => loadDocument(
+    importGltfToSceneDocument(
+      gltfBytes,
+      resolveUri: resolveUri,
+      onWarning: onWarning,
+    ),
+    strictFeatures: strictFeatures,
+  );
+
+  /// The live scene back as a standalone [SceneDocument] — upstream's
+  /// `serializeScene(Node root)` for dart3d's document-shaped graph
+  /// (W29). Everything sent since the last load is folded in:
+  /// [applyCommands] structural ops, [setNodeTransforms] writes, and
+  /// [sendPayload] deliveries, so a scene built or edited at runtime
+  /// serializes truthfully. Serialize the result with `writeFscene`;
+  /// reload it with [loadDocument] or [loadFscene].
+  ///
+  /// Returns null until the first document or structural op lands.
+  /// Runtime state the format doesn't model — animation playheads,
+  /// physics poses, joint constraints, morph weights — is not captured,
+  /// same as upstream.
+  SceneDocument? serializeScene() {
+    final doc = _document;
+    return doc == null ? null : doc_layer.serializeScene(doc);
+  }
+
   /// Sends one payload chunk to the native side — for payloads the
   /// document declared with `bytes: null` (loadDocument skips those;
   /// the manifest entry already went out, so the geometry that
   /// references it re-realizes when the chunk lands). Throws
   /// [ArgumentError] if [payload] still has no bytes.
   void sendPayload(PayloadSpec payload) {
+    final doc = _document;
+    if (doc != null) doc_layer.foldPayloadIntoDocument(doc, payload);
     _sendOrQueue(D3Protocol.payload, D3Protocol.payloadBytes(payload));
   }
 
@@ -140,9 +210,22 @@ final class SceneController {
   /// `upsertAnimation`, `removeSkin`, `removeAnimation`, `anim`,
   /// `setMorphWeights`, `updateViews`, `render`, `loadSubtree`,
   /// `unloadSubtree`, the physics/joint ops, and `query`.
+  ///
+  /// Ops that carry document state (`commandAffectsDocument`'s set)
+  /// fold into the tracked [document] as they go out — that fold is
+  /// what [serializeScene] reads back. A scene built entirely from ops
+  /// gets a fresh document to fold into; a fold that can't decode an
+  /// op logs and drops just that mirror update, never the send.
   void applyCommands(List<Map<String, Object?>> ops) {
     if (ops.isEmpty) return;
     for (final op in ops) {
+      if (doc_layer.commandAffectsDocument(op)) {
+        try {
+          doc_layer.foldCommandIntoDocument(_document ??= SceneDocument(), op);
+        } catch (e) {
+          dnLog('dart3d: document mirror dropped op ${op['op']} ($e)');
+        }
+      }
       _sendOrQueue(D3Protocol.command, D3Protocol.commandBytes(op));
     }
   }
@@ -168,7 +251,10 @@ final class SceneController {
     }
     _document = newDoc;
     _warnUnrealizedFeatures(newDoc);
-    applyCommands(ops);
+    // No document fold — newDoc is already the post-op state.
+    for (final op in ops) {
+      _sendOrQueue(D3Protocol.command, D3Protocol.commandBytes(op));
+    }
     return ops;
   }
 
@@ -179,6 +265,18 @@ final class SceneController {
   /// node's previous value on the native side.
   void setNodeTransforms(List<NodeTransform> updates) {
     if (updates.isEmpty) return;
+    final doc = _document;
+    if (doc != null) {
+      for (final u in updates) {
+        doc_layer.foldTransformIntoDocument(
+          doc,
+          u.node,
+          translation: u.translation,
+          rotation: u.rotation,
+          scale: u.scale,
+        );
+      }
+    }
     _sendOrQueue(
       D3Protocol.setTransforms,
       D3Protocol.transformsBytes([
@@ -727,8 +825,7 @@ final class SceneController {
     _element = element;
     final id = element.viewId;
     if (id != null) d3RegisterViewHandler(id, _onNativeEvent);
-    final pendingReload =
-        _pending.any((p) => p.tag == D3Protocol.loadScene);
+    final pendingReload = _pending.any((p) => p.tag == D3Protocol.loadScene);
     for (final p in _pending) {
       element.sendMutation(p.tag, p.data);
     }
