@@ -82,14 +82,8 @@ class _Dart3dExampleAppState extends State<Dart3dExampleApp> {
             : Dart3dExampleApp._bootModel,
         quality: Dart3dExampleApp.bootQuality,
       ),
-      2 => FeatureMatrixScreen(
-        nav: nav,
-        quality: Dart3dExampleApp.bootQuality,
-      ),
-      _ => DiceTableScreen(
-        nav: nav,
-        quality: Dart3dExampleApp.bootQuality,
-      ),
+      2 => FeatureMatrixScreen(nav: nav, quality: Dart3dExampleApp.bootQuality),
+      _ => DiceTableScreen(nav: nav, quality: Dart3dExampleApp.bootQuality),
     };
   }
 }
@@ -130,12 +124,14 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
   void Function()? _w14Phase;
   void Function()? _wLoosePhase;
   void Function()? _w15Phase;
+  void Function()? _w16Phase;
   Timer? _w11Timer;
   Timer? _w12Timer;
   Timer? _w13Timer;
   Timer? _w14Timer;
   Timer? _wLooseTimer;
   Timer? _w15Timer;
+  Timer? _w16Timer;
   int _animsPlaying = 0;
   LocalId? _die;
   LocalId? _ball;
@@ -194,6 +190,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     _w14Phase = scene.w14Phase;
     _wLoosePhase = scene.wLoosePhase;
     _w15Phase = scene.w15Phase;
+    _w16Phase = scene.w16Phase;
     _animsPlaying = 0;
     // The W11 lane lands at +14 s — after the joint rig — so its
     // skinned flag and morph blob don't contend with the +8 s diff
@@ -223,6 +220,12 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     // grid load/unload cycles are clear of every earlier probe.
     _w15Timer?.cancel();
     _w15Timer = Timer(const Duration(seconds: 112), _runW15);
+    // The W16 trails/LOD lane lands at +140 s — after W15's +112 s
+    // subtree-streaming lane closes its last inner timer (+12 s), so
+    // the mover's transform stream can't contend with the grid
+    // load/unload cycles.
+    _w16Timer?.cancel();
+    _w16Timer = Timer(const Duration(seconds: 140), _runW16);
     _jointsBroke = 0;
     _controller.loadDocument(scene.document);
     // W8: the query battery fires at +10 s — after the +8 s diff — and
@@ -336,6 +339,16 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
   void _runW15() {
     dnLog('dart3d: w15 phase — lazy prefab subtree streaming');
     _w15Phase?.call();
+  }
+
+  /// The W16 trails/LOD phase at +140 s — after W15's streaming
+  /// lane. The phase drives `w16Mover` ~29.5 m out and back through
+  /// its three `lod` thresholds and the cull floor while the node's
+  /// `trail` draws the camera-facing ribbon; it logs its own
+  /// completion.
+  void _runW16() {
+    dnLog('dart3d: w16 phase — trail ribbon + screen-size lod drive');
+    _w16Phase?.call();
   }
 
   void _onJointEvent(SceneJointBroke event) {
@@ -469,11 +482,11 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
         die,
         translation: imported
             ? _dieCenter +
-                Vector3(
-                  (_rng.nextDouble() - 0.5) * r * 0.6,
-                  r * 1.5,
-                  (_rng.nextDouble() - 0.5) * r * 0.6,
-                )
+                  Vector3(
+                    (_rng.nextDouble() - 0.5) * r * 0.6,
+                    r * 1.5,
+                    (_rng.nextDouble() - 0.5) * r * 0.6,
+                  )
             : Vector3(
                 (_rng.nextDouble() - 0.5) * 0.8,
                 1.4,
@@ -521,8 +534,9 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
         _rng.nextDouble() * 2 - 1,
         _rng.nextDouble() * 2 - 1,
       )..normalize(),
-      imported ? r * r * (0.8 + _rng.nextDouble() * 0.8)
-               : 0.8 + _rng.nextDouble() * 1.2,
+      imported
+          ? r * r * (0.8 + _rng.nextDouble() * 0.8)
+          : 0.8 + _rng.nextDouble() * 1.2,
     );
   }
 
@@ -569,6 +583,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     _w14Timer?.cancel();
     _wLooseTimer?.cancel();
     _w15Timer?.cancel();
+    _w16Timer?.cancel();
     _queryBattery?.cancel();
     _jointTimer?.cancel();
     _reroll?.cancel();
@@ -588,6 +603,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     _w14Phase = null;
     _wLoosePhase = null;
     _w15Phase = null;
+    _w16Phase = null;
     _animsPlaying = 0;
     _jointCount = 0;
     _jointsBroke = 0;
@@ -625,6 +641,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     _w14Timer?.cancel();
     _wLooseTimer?.cancel();
     _w15Timer?.cancel();
+    _w16Timer?.cancel();
     super.dispose();
   }
 
@@ -672,12 +689,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
             ),
           ),
           if (widget.nav != null)
-            Positioned(
-              left: 0,
-              right: 0,
-              top: 56,
-              child: widget.nav!,
-            ),
+            Positioned(left: 0, right: 0, top: 56, child: widget.nav!),
           Positioned(
             left: 0,
             right: 0,

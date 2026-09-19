@@ -126,6 +126,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     val unlitMaterial: Material
     val unlitMaskedMaterial: Material
     val unlitBlendMaterial: Material
+    /** W16: the `trail` ribbon material — vertex-color unlit + blend. */
+    val trailMaterial: Material
 
     // MARK: - Jolt world
 
@@ -426,6 +428,13 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             unlitMaterial, unlitMaskedMaterial, unlitBlendMaterial)) {
             m.defaultInstance.setDoubleSided(false)
         }
+        // W16: the trail ribbon's own material — upstream's default is
+        // translucent unlit driven fully by vertex color (incl. alpha),
+        // drawn without culling (a camera-facing strip's winding flips
+        // where the path doubles back). One shared instance: the
+        // shader has no parameters, so every trail binds the same one.
+        trailMaterial = buildTrailMaterial()
+        trailMaterial.defaultInstance.setDoubleSided(true)
 
         fallbackWhite = TextureFactory.solid(engine, 255, 255, 255, 255)
         fallbackNormal = TextureFactory.solid(engine, 128, 128, 255, 255)
@@ -620,6 +629,37 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         body.append("    prepareMaterial(material);\n}\n")
         val pkg = b.material(body.toString()).build()
         check(pkg.isValid) { "d3 material failed to compile" }
+        return Material.Builder()
+            .payload(pkg.buffer, pkg.buffer.remaining())
+            .build(engine)
+    }
+
+    /**
+     * W16: the trail ribbon material — upstream's
+     * `_TrailDefaultMaterial` port: translucent unlit, base color
+     * driven fully by the vertex color (`getColor()` carries rgba,
+     * so the colorOverTrail alpha fades the tail), double-sided via
+     * the instance flag (a camera-facing strip's winding flips where
+     * the path doubles back).
+     */
+    private fun buildTrailMaterial(): Material {
+        if (!filamatReady) {
+            MaterialBuilder.init()
+            filamatReady = true
+        }
+        val b = MaterialBuilder()
+            .platform(MaterialBuilder.Platform.MOBILE)
+            .name("d3_trail")
+            .shading(MaterialBuilder.Shading.UNLIT)
+            .doubleSided(true)
+            .blending(MaterialBuilder.BlendingMode.TRANSPARENT)
+            .require(MaterialBuilder.VertexAttribute.COLOR)
+        val pkg = b.material(
+            "void material(inout MaterialInputs material) {\n" +
+                "    prepareMaterial(material);\n" +
+                "    material.baseColor = getColor();\n" +
+                "}\n").build()
+        check(pkg.isValid) { "d3 trail material failed to compile" }
         return Material.Builder()
             .payload(pkg.buffer, pkg.buffer.remaining())
             .build(engine)
@@ -1005,7 +1045,12 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             iblSpecular = null
             iblPrefilter = null
             world.close()
+            val sweepCtx = FsceneRealizer.surgicalContext(this)
             for ((_, rec) in nodesById) {
+                // W16: trail entities/buffers and the lod consumer
+                // entry die with the node — the trail's unparented
+                // entity isn't covered by the entity sweep below.
+                sweepCtx.destroyTrailLod(rec)
                 scene.removeEntity(rec.entity)
                 engine.destroyEntity(rec.entity)
                 EntityManager.get().destroy(rec.entity)
@@ -1053,6 +1098,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             engine.destroyMaterial(unlitMaterial)
             engine.destroyMaterial(unlitMaskedMaterial)
             engine.destroyMaterial(unlitBlendMaterial)
+            engine.destroyMaterial(trailMaterial)
             engine.destroyRenderer(renderer)
             engine.destroyView(view)
             engine.destroyScene(scene)
@@ -1357,8 +1403,13 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 }
                 val doomed = ids.toSet()
                 val destroyedEntities = HashSet<Int>()
+                val rmCtx = FsceneRealizer.surgicalContext(this)
                 for (id in ids) {
                     val rec = nodesById.remove(id) ?: continue
+                    // W16: the trail's unparented entity + dynamic
+                    // buffers and the lod consumer entry die with the
+                    // node — neither rides rec.entity's teardown.
+                    rmCtx.destroyTrailLod(rec)
                     scene.removeEntity(rec.entity)
                     engine.destroyEntity(rec.entity)
                     EntityManager.get().destroy(rec.entity)
@@ -2912,7 +2963,12 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // body's addBody re-realizes it; LocalId session keys differ
         // across documents so a stale joint can't attach).
         world.retainJointsForNodes(nodes.keys)
+        val sweepCtx = FsceneRealizer.surgicalContext(this)
         for ((_, rec) in nodesById) {
+            // W16: trail entities/buffers + the lod consumer entry
+            // die with the replaced scene — the trail's unparented
+            // entity isn't covered by rec.entity's teardown.
+            sweepCtx.destroyTrailLod(rec)
             scene.removeEntity(rec.entity)
             engine.destroyEntity(rec.entity)
             EntityManager.get().destroy(rec.entity)
@@ -3520,6 +3576,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // transform + retained projection — after the manipulator's
         // node write-back so a view camera sees this frame's pose.
         updateViewCameras()
+        // W16: trails record/refill and lods rebind for this frame's
+        // camera — the same pre-render slot iOS's renderer delegate
+        // uses (node poses and camera are final here).
+        updateTrailsLods(dt)
         render(tNanos)
         // W15: this frame is the first a just-applied subtree is
         // visible in — stamp it for the latency lane (the Dart side
@@ -3533,6 +3593,36 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             Log.i(TAG, "$label node=$key visible t=${now / 1e9}s" +
                 " applyToVisible=${dtMs}ms")
         }
+    }
+
+    /**
+     * W16: advances every `trail`/`lod` for the frame — trails record
+     * world-space points and refill the camera-facing ribbon; lods
+     * project the level-0 bounding sphere and rebind the selected
+     * level (or cull). Camera inputs come from the camera node's
+     * world pose + the retained projection fields — the primary
+     * camera, matching iOS's point-of-view selection (per-view LOD
+     * is upstream's split-screen refinement, future work).
+     */
+    private fun updateTrailsLods(dt: Float) {
+        var has = false
+        for ((_, rec) in nodesById) {
+            if (rec.trail != null || rec.lod != null) {
+                has = true
+                break
+            }
+        }
+        if (!has) return
+        val camPos = FloatArray(3)
+        val camRec = cameraNodeKey?.let { nodesById[it] }
+        if (camRec != null) {
+            val tcm = engine.transformManager
+            val m = FloatArray(16)
+            tcm.getWorldTransform(tcm.getInstance(camRec.entity), m)
+            camPos[0] = m[12]; camPos[1] = m[13]; camPos[2] = m[14]
+        }
+        FsceneRealizer.surgicalContext(this).updateTrailsLods(
+            dt, camPos, cameraFovDeg * Math.PI / 180.0, !cameraOrtho)
     }
 
     /** Writes each dynamic body's world pose into its node transform. */

@@ -77,6 +77,10 @@ import 'package:vector_math/vector_math.dart';
 /// chunk, then drops and re-streams streamA three times for the
 /// no-stale-nodes lane. Send and native-visible timestamps log for
 /// the manifest-to-visible latency measurement.
+/// W16 lands the trails/LOD lane through the returned `w16Phase`
+/// closure — fired at +140 s — which drives `w16Mover` away and
+/// back through its `lod` thresholds (three screen-size levels plus
+/// the cull floor) while its `trail` draws the camera-facing ribbon.
 ///
 /// [ortho] flips the camera's `projection` manifest field; the toggle
 /// is a document reload, the only camera write the protocol carries
@@ -105,6 +109,7 @@ final class FeatureScene {
     void Function() w14Phase,
     void Function() wLoosePhase,
     void Function() w15Phase,
+    void Function() w16Phase,
   })
   build({bool ortho = false, int env = 1, SceneController? controller}) {
     final doc = SceneDocument();
@@ -457,6 +462,36 @@ final class FeatureScene {
     final quadMatDeferred = doc.addResource(probeMat(0.3, 0.4, 0.95));
     final boundsMat = doc.addResource(probeMat(0.55, 0.95, 0.35));
     final gridMat = doc.addResource(probeMat(0.5, 0.55, 0.7));
+
+    // ── W16 trails + LOD probe ────────────────────────────────────
+    // One mover carries both new components: the `lod` owns its draw
+    // slot (three levels on descending screen-size thresholds, the
+    // last a cull floor at ~32 m under the camera's fovY=1.0), the
+    // `trail` draws the camera-facing ribbon behind it. The
+    // `w16Phase` closure below drives it away and back through the
+    // threshold crossings — the geometry swaps and the cull are the
+    // lane's evidence.
+    final lodHiGeo = doc.addResource(
+      GeometryResource(
+        doc.newId(),
+        procedural: SphereGeometrySpec(radius: 0.5),
+      ),
+    );
+    final lodMidGeo = doc.addResource(
+      GeometryResource(
+        doc.newId(),
+        procedural: CuboidGeometrySpec(extents: Vector3.all(0.9)),
+      ),
+    );
+    final lodLoGeo = doc.addResource(
+      GeometryResource(
+        doc.newId(),
+        procedural: TorusGeometrySpec(radius: 0.5, tubeRadius: 0.1),
+      ),
+    );
+    final lodHiMat = doc.addResource(probeMat(0.2, 0.9, 0.5));
+    final lodMidMat = doc.addResource(probeMat(0.95, 0.6, 0.15));
+    final lodLoMat = doc.addResource(probeMat(0.85, 0.25, 0.7));
 
     // ── W4 texture-slot probes ──────────────────────────────────────
     // Generated rgba8 images ride the same payload stream as the
@@ -904,6 +939,46 @@ final class FeatureScene {
           linearDamping: 0.05,
           angularDamping: 0.05,
           ccdEnabled: true,
+        ),
+      ],
+      root: true,
+    );
+
+    // W16 probe — the `lod` component IS the mesh slot upstream (no
+    // `mesh` alongside it); `trail` hangs a camera-facing ribbon on
+    // the same node. Starts near the camera at level 0.
+    final w16Mover = doc.createNode(
+      name: 'w16Mover',
+      transform: TrsTransform(translation: Vector3(-3.2, 1.1, -2.5)),
+      components: [
+        lodComponent(
+          levels: [
+            LodLevel(
+              geometry: lodHiGeo.id,
+              material: lodHiMat.id,
+              screenSize: 0.15,
+            ),
+            LodLevel(
+              geometry: lodMidGeo.id,
+              material: lodMidMat.id,
+              screenSize: 0.08,
+            ),
+            LodLevel(
+              geometry: lodLoGeo.id,
+              material: lodLoMat.id,
+              screenSize: 0.05,
+            ),
+          ],
+        ),
+        trailComponent(
+          width: 0.22,
+          lifetime: 2.5,
+          minVertexDistance: 0.08,
+          maxPoints: 96,
+          colorOverTrail: [
+            TrailColorStop(0, ColorValue(0.2, 0.9, 1.0, 0.9)),
+            TrailColorStop(1, ColorValue(0.9, 0.2, 0.8, 0.0)),
+          ],
         ),
       ],
       root: true,
@@ -3179,9 +3254,7 @@ final class FeatureScene {
         }
         dnLog(
           'dart3d: wloose ccd pose=${ccdPos == null ? 'null' : v(ccdPos)} '
-          '${ccdPos != null && ccdPos.y > 0.3 && ccdPos.y < 0.6
-              ? 'PASS rests on slab'
-              : 'FAIL tunneled'}',
+          '${ccdPos != null && ccdPos.y > 0.3 && ccdPos.y < 0.6 ? 'PASS rests on slab' : 'FAIL tunneled'}',
         );
 
         Vector3? bowlPos;
@@ -3192,7 +3265,8 @@ final class FeatureScene {
         }
         // Bowl cavity: center (-2.6, 1.6), inner half 0.6, floor at
         // -0.46 — contained reads inside the footprint under the rim.
-        final contained = bowlPos != null &&
+        final contained =
+            bowlPos != null &&
             (bowlPos.x + 2.6).abs() < 0.5 &&
             (bowlPos.z - 1.6).abs() < 0.5 &&
             bowlPos.y > -0.45 &&
@@ -3202,7 +3276,6 @@ final class FeatureScene {
           'pose=${bowlPos == null ? 'null' : v(bowlPos)} '
           '${contained ? 'PASS contained' : 'FAIL escaped'}',
         );
-
       });
 
       // The margin drop waits for the scene to go quiet: the demo's
@@ -3241,7 +3314,8 @@ final class FeatureScene {
         // ≈-0.30, a miss lands on the catcher at ≈-4.35, and no
         // collider falls forever — so anything still aloft is the
         // authored-margin proof.
-        final onMargin = marginPos != null &&
+        final onMargin =
+            marginPos != null &&
             marginPos.y > -0.1 &&
             (marginPos.x - 5.5).abs() < 0.5 &&
             (marginPos.z - 0.5).abs() < 0.5;
@@ -3287,8 +3361,7 @@ final class FeatureScene {
           '(roll $rolls via $via, die ${diePos == null ? '?' : v(diePos)})',
         );
         if (rolls < 3) {
-          Timer(const Duration(milliseconds: 1500),
-              () => throwDie?.call());
+          Timer(const Duration(milliseconds: 1500), () => throwDie?.call());
         } else {
           sub?.cancel();
         }
@@ -3339,9 +3412,11 @@ final class FeatureScene {
             }
             polls++;
             if (polls % 8 == 0 || err != null) {
-              dnLog('dart3d: wloose poll die '
-                  'pose=${p == null ? (err ?? 'null') : v(p)} '
-                  'stable=$stable');
+              dnLog(
+                'dart3d: wloose poll die '
+                'pose=${p == null ? (err ?? 'null') : v(p)} '
+                'stable=$stable',
+              );
             }
             final d = (p != null && last != null)
                 ? (p - last!).length
@@ -3374,9 +3449,9 @@ final class FeatureScene {
         dnLog(
           retiring.isEmpty
               ? 'dart3d: wloose no perpetual movers found — '
-                  'settle events already live'
+                    'settle events already live'
               : 'dart3d: wloose removed ${retiring.keys.join(',')} — '
-                  'settle events live',
+                    'settle events live',
         );
         sub = c.physicsEvents.listen((event) {
           if (event is! SceneSettledEvent) return;
@@ -3389,8 +3464,7 @@ final class FeatureScene {
         });
         // The removal's settle-flush gets 800 ms to land before the
         // first throw arms the metric.
-        Timer(const Duration(milliseconds: 800),
-            () => throwDie?.call());
+        Timer(const Duration(milliseconds: 800), () => throwDie?.call());
       });
       // A world that can't sleep (a probe still falling despite the
       // catcher, a joint that never rests) must not leak the
@@ -3496,6 +3570,41 @@ final class FeatureScene {
       });
     }
 
+    /// W16 lane — fires at +140 s (after W15's +112 s streaming
+    /// lane closes its +12 s cycle). Drives `w16Mover` away and back through its
+    /// three `lod` thresholds and the cull floor — ~29.5 m out over
+    /// 12 s, then home — with an x sway that bends the `trail`
+    /// ribbon so the camera-facing expansion reads in a still
+    /// frame. No new wire ops: `setNodeTransforms` per 100 ms tick
+    /// for 24 s, then the timer cancels.
+    void addW16Phase() {
+      final c = controller;
+      if (c == null) return;
+      const startZ = -2.5;
+      const farZ = 27.0;
+      const total = 240; // 24 s at one 100 ms tick
+      var t = 0;
+      Timer.periodic(const Duration(milliseconds: 100), (timer) {
+        t++;
+        final phase = t / total;
+        final out = phase < 0.5 ? phase * 2 : (1 - phase) * 2;
+        c.setNodeTransforms([
+          NodeTransform(
+            w16Mover.id,
+            translation: Vector3(
+              -3.2 + 1.6 * sin(out * pi * 2),
+              1.1,
+              startZ + (farZ - startZ) * out,
+            ),
+          ),
+        ]);
+        if (t >= total) {
+          timer.cancel();
+          dnLog('dart3d: w16 mover home — lod/trail lane done');
+        }
+      });
+    }
+
     return (
       document: doc,
       die: die.id,
@@ -3508,6 +3617,7 @@ final class FeatureScene {
       w14Phase: addW14Phase,
       wLoosePhase: addWLoosePhase,
       w15Phase: addW15Phase,
+      w16Phase: addW16Phase,
     );
   }
 
@@ -3609,20 +3719,9 @@ final class FeatureScene {
       }
     }
 
-    final indices = Uint16List.fromList([
-      0,
-      2,
-      1,
-      0,
-      1,
-      3,
-      0,
-      3,
-      2,
-      1,
-      2,
-      3,
-    ]).buffer.asUint8List();
+    final indices = Uint16List.fromList([0, 2, 1, 0, 1, 3, 0, 3, 2, 1, 2, 3])
+        .buffer
+        .asUint8List();
 
     return (
       vertices: verts.buffer.asUint8List(),
