@@ -82,14 +82,8 @@ class _Dart3dExampleAppState extends State<Dart3dExampleApp> {
             : Dart3dExampleApp._bootModel,
         quality: Dart3dExampleApp.bootQuality,
       ),
-      2 => FeatureMatrixScreen(
-        nav: nav,
-        quality: Dart3dExampleApp.bootQuality,
-      ),
-      _ => DiceTableScreen(
-        nav: nav,
-        quality: Dart3dExampleApp.bootQuality,
-      ),
+      2 => FeatureMatrixScreen(nav: nav, quality: Dart3dExampleApp.bootQuality),
+      _ => DiceTableScreen(nav: nav, quality: Dart3dExampleApp.bootQuality),
     };
   }
 }
@@ -130,12 +124,14 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
   void Function()? _w14Phase;
   void Function()? _wLoosePhase;
   void Function()? _w15Phase;
+  void Function(({double w, double h}) Function() targetPx)? _w24Phase;
   Timer? _w11Timer;
   Timer? _w12Timer;
   Timer? _w13Timer;
   Timer? _w14Timer;
   Timer? _wLooseTimer;
   Timer? _w15Timer;
+  Timer? _w24Timer;
   int _animsPlaying = 0;
   LocalId? _die;
   LocalId? _ball;
@@ -194,6 +190,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     _w14Phase = scene.w14Phase;
     _wLoosePhase = scene.wLoosePhase;
     _w15Phase = scene.w15Phase;
+    _w24Phase = scene.w24Phase;
     _animsPlaying = 0;
     // The W11 lane lands at +14 s — after the joint rig — so its
     // skinned flag and morph blob don't contend with the +8 s diff
@@ -223,6 +220,11 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     // grid load/unload cycles are clear of every earlier probe.
     _w15Timer?.cancel();
     _w15Timer = Timer(const Duration(seconds: 112), _runW15);
+    // W24's views/shadow-breadth lane lands at +126 s — after W15's
+    // lane-complete log (+112 s + 12 s), so the view-list churn is
+    // clear of the streaming cycles.
+    _w24Timer?.cancel();
+    _w24Timer = Timer(const Duration(seconds: 126), _runW24);
     _jointsBroke = 0;
     _controller.loadDocument(scene.document);
     // W8: the query battery fires at +10 s — after the +8 s diff — and
@@ -336,6 +338,25 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
   void _runW15() {
     dnLog('dart3d: w15 phase — lazy prefab subtree streaming');
     _w15Phase?.call();
+  }
+
+  /// The W24 views/shadow-breadth phase at +126 s — the directional
+  /// shadow vocabulary re-decodes onto `key`, a shadowCatcher plane
+  /// and a layer-8 marker land, then `updateViews` walks the
+  /// split-screen, viewport-rect, and high-bit layerMask lanes before
+  /// restoring. The probe supplies viewports' target-pixel basis —
+  /// widget size × devicePixelRatio, read at fire time.
+  void _runW24() {
+    dnLog(
+      'dart3d: w24 phase — split-screen, viewport, cascades, '
+      'contact shadows, catcher, layerMask',
+    );
+    _w24Phase?.call(() {
+      final mq = MediaQuery.of(context);
+      final size = mq.size;
+      final dpr = mq.devicePixelRatio;
+      return (w: size.width * dpr, h: size.height * dpr);
+    });
   }
 
   void _onJointEvent(SceneJointBroke event) {
@@ -469,11 +490,11 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
         die,
         translation: imported
             ? _dieCenter +
-                Vector3(
-                  (_rng.nextDouble() - 0.5) * r * 0.6,
-                  r * 1.5,
-                  (_rng.nextDouble() - 0.5) * r * 0.6,
-                )
+                  Vector3(
+                    (_rng.nextDouble() - 0.5) * r * 0.6,
+                    r * 1.5,
+                    (_rng.nextDouble() - 0.5) * r * 0.6,
+                  )
             : Vector3(
                 (_rng.nextDouble() - 0.5) * 0.8,
                 1.4,
@@ -521,8 +542,9 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
         _rng.nextDouble() * 2 - 1,
         _rng.nextDouble() * 2 - 1,
       )..normalize(),
-      imported ? r * r * (0.8 + _rng.nextDouble() * 0.8)
-               : 0.8 + _rng.nextDouble() * 1.2,
+      imported
+          ? r * r * (0.8 + _rng.nextDouble() * 0.8)
+          : 0.8 + _rng.nextDouble() * 1.2,
     );
   }
 
@@ -569,6 +591,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     _w14Timer?.cancel();
     _wLooseTimer?.cancel();
     _w15Timer?.cancel();
+    _w24Timer?.cancel();
     _queryBattery?.cancel();
     _jointTimer?.cancel();
     _reroll?.cancel();
@@ -588,6 +611,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     _w14Phase = null;
     _wLoosePhase = null;
     _w15Phase = null;
+    _w24Phase = null;
     _animsPlaying = 0;
     _jointCount = 0;
     _jointsBroke = 0;
@@ -625,6 +649,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     _w14Timer?.cancel();
     _wLooseTimer?.cancel();
     _w15Timer?.cancel();
+    _w24Timer?.cancel();
     super.dispose();
   }
 
@@ -672,12 +697,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
             ),
           ),
           if (widget.nav != null)
-            Positioned(
-              left: 0,
-              right: 0,
-              top: 56,
-              child: widget.nav!,
-            ),
+            Positioned(left: 0, right: 0, top: 56, child: widget.nav!),
           Positioned(
             left: 0,
             right: 0,
