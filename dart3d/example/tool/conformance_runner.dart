@@ -289,20 +289,37 @@ String _baseSlot(String prop) =>
     ? prop.substring(0, prop.length - 'Transform'.length)
     : prop;
 
+/// The KHR_materials_volume slots `extFlagsFor` guards when no
+/// transmission arms the material — its warn is "volume props
+/// without transmission are inert — dropped". `thickness` trips it
+/// only when nonzero; the other three trip on presence alone.
+const _volumeProps = {
+  'thickness',
+  'thicknessTexture',
+  'attenuationColor',
+  'attenuationDistance',
+};
+
 /// Per-property classification. [value] is the catalog's declared
-/// property value; [solidVolume] says the owning material carries
-/// transmission>0 ∧ thickness>0.
+/// property value; [hasTransmission] says the owning material carries
+/// transmission>0 or a transmission texture; [solidVolume] says it
+/// additionally carries thickness>0.
 ///
 /// `ior` and `dispersion` are the two properties upstream emits on
 /// EVERY material — at their no-op defaults (1.5 / 0) they classify
 /// `pass` rather than approximating nothing. Android's `dispersion`
 /// field exists only under SOLID refraction, so a nonzero dispersion
 /// outside a transmissive solid volume is a documented drop
-/// (warn-once), not a realization.
+/// (warn-once), not a realization. The volume props share the
+/// transmission gate: on Android they realize only alongside it —
+/// without it `extFlagsFor` warn-onces the inert drop, which is
+/// `approx` under the matrix's own definition. iOS logs the volume
+/// lobe dropped either way, so its rows already read approximated.
 Support? _classify(
   String platform,
   String prop,
   Object? value, {
+  required bool hasTransmission,
   required bool solidVolume,
 }) {
   final row =
@@ -317,6 +334,12 @@ Support? _classify(
     return platform == 'android'
         ? (solidVolume ? Support.realized : Support.approximated)
         : Support.approximated;
+  }
+  if (platform == 'android' &&
+      !hasTransmission &&
+      _volumeProps.contains(prop) &&
+      (prop != 'thickness' || ((value as num?)?.toDouble() ?? 0) > 0)) {
+    return Support.approximated;
   }
   return switch (platform) {
     'ios' => row.ios,
@@ -446,10 +469,17 @@ class AssetRow {
     String platform,
     String prop,
     Object? value, {
+    required bool hasTransmission,
     required bool solidVolume,
   }) {
     final s = _statusOf(
-      _classify(platform, prop, value, solidVolume: solidVolume),
+      _classify(
+        platform,
+        prop,
+        value,
+        hasTransmission: hasTransmission,
+        solidVolume: solidVolume,
+      ),
     );
     final cur = status[platform]!;
     if (s.index > cur.index) status[platform] = s;
@@ -517,13 +547,30 @@ ConformanceReport runConformance(Map<String, dynamic> catalog) {
     for (final m in asset['materials'] as List<dynamic>? ?? []) {
       final mat = m as Map<String, dynamic>;
       final declared = (mat['properties'] as Map).cast<String, Object?>();
+      // Mirrors extFlagsFor: a transmission factor or texture arms
+      // the transmission feature; the solid-volume bit additionally
+      // needs nonzero thickness (it gates the dispersion rule).
+      final hasTransmission =
+          (declared['transmission'] as num? ?? 0) > 0 ||
+          declared.containsKey('transmissionTexture');
       final solidVolume =
-          (declared['transmission'] as num? ?? 0) > 0 &&
-          (declared['thickness'] as num? ?? 0) > 0;
+          hasTransmission && (declared['thickness'] as num? ?? 0) > 0;
       final manifest = materialManifest(mat['type'] as String, declared);
       for (final prop in manifestPropNames(manifest)) {
-        row.classify('ios', prop, declared[prop], solidVolume: solidVolume);
-        row.classify('android', prop, declared[prop], solidVolume: solidVolume);
+        row.classify(
+          'ios',
+          prop,
+          declared[prop],
+          hasTransmission: hasTransmission,
+          solidVolume: solidVolume,
+        );
+        row.classify(
+          'android',
+          prop,
+          declared[prop],
+          hasTransmission: hasTransmission,
+          solidVolume: solidVolume,
+        );
       }
     }
     report.rows.add(row);
@@ -550,7 +597,7 @@ class GoldenScene {
 }
 
 /// The 37 upstream `smoke_render` scenes (master @00b5870) vs the
-/// dart3d wire surface. 19 apply; 16 get generated fixtures.
+/// dart3d wire surface. 20 apply; 17 get generated fixtures.
 const goldenScenes = <GoldenScene>[
   GoldenScene('pbr_cuboid', applies: true, fixture: 'pbr_cuboid'),
   GoldenScene(
@@ -578,11 +625,7 @@ const goldenScenes = <GoldenScene>[
         'upstream screen-space GI pass; the `globalIllumination` '
         'block is platform-mapped, not parameter-equivalent',
   ),
-  GoldenScene(
-    'area_light',
-    applies: false,
-    reason: 'wire lights are punctual only',
-  ),
+  GoldenScene('area_light', applies: true, fixture: 'area_light'),
   GoldenScene(
     'soft_shadows',
     applies: false,
@@ -910,6 +953,74 @@ SceneDocument goldenFixture(String name) {
           root: true,
         );
       }
+    case 'area_light':
+      _meshNode(doc, 'cuboid', {}, {
+        'baseColor': ColorValue(0.7, 0.7, 0.72, 1),
+        'metallic': DoubleValue(0),
+        'roughness': DoubleValue(0.7),
+      });
+      // rectAreaLight is a wire component (W12): iOS decodes
+      // SCNLight.area with drawsArea (the emitter renders itself);
+      // Android approximates a 4-point cluster and leaves the visible
+      // emitter to the document — hence the emissive panel below.
+      // −90° about X turns the light's −Z emission axis down onto the
+      // subject, the orientation feature_scene's w12 panel verifies.
+      doc.createNode(
+        name: 'areaLight',
+        transform: TrsTransform(
+          translation: Vector3(0, 2.2, 0.6),
+          rotation: Quaternion.axisAngle(Vector3(1, 0, 0), -1.5708),
+        ),
+        components: [
+          ComponentSpec(
+            'rectAreaLight',
+            properties: {
+              'width': DoubleValue(2.0),
+              'height': DoubleValue(1.0),
+              'intensity': DoubleValue(240.0),
+              'color': ColorValue(1.0, 0.9, 0.75, 1.0),
+            },
+          ),
+        ],
+        root: true,
+      );
+      // The emitter panel — PlaneGeometrySpec is an XZ quad, already
+      // horizontal in the light's frame; doubleSided so it shows from
+      // below.
+      final emitterGeo = doc.addResource(
+        GeometryResource(
+          doc.newId(),
+          procedural: PlaneGeometrySpec(width: 2.0, depth: 1.0),
+        ),
+      );
+      final emitterMat = doc.addResource(
+        MaterialResource(
+          doc.newId(),
+          type: 'physicallyBased',
+          properties: {
+            'baseColor': ColorValue(0, 0, 0, 1),
+            'emissive': ColorValue(1.0, 0.9, 0.75, 1),
+            'emissiveStrength': DoubleValue(4),
+            'doubleSided': BoolValue(true),
+            'metallic': DoubleValue(0),
+            'roughness': DoubleValue(1),
+          },
+        ),
+      );
+      doc.createNode(
+        name: 'areaEmitter',
+        transform: TrsTransform(translation: Vector3(0, 2.2, 0.6)),
+        components: [
+          ComponentSpec(
+            'mesh',
+            properties: {
+              'geometry': ResourceRefValue(emitterGeo.id),
+              'material': ResourceRefValue(emitterMat.id),
+            },
+          ),
+        ],
+        root: true,
+      );
     case 'orthographic_camera':
       _meshNode(doc, 'cuboid', {}, {
         'baseColor': ColorValue(0.3, 0.7, 0.4, 1),
