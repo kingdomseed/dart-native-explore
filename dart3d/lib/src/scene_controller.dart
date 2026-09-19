@@ -142,10 +142,28 @@ final class SceneController {
 
   /// Parses a `.fscene` JSON/JSONC [source] and loads it — upstream's
   /// `readFscene`, which runs the `migrateFscene` chain so older schema
-  /// versions upgrade on load (W29). [strictFeatures] follows
-  /// [loadDocument].
-  void loadFscene(String source, {bool strictFeatures = false}) =>
-      loadDocument(readFscene(source), strictFeatures: strictFeatures);
+  /// versions upgrade on load (W29). An upgrade logs a one-line
+  /// `migrated fscene vN→vM` so lane runs can see it. [strictFeatures]
+  /// follows [loadDocument].
+  void loadFscene(String source, {bool strictFeatures = false}) {
+    // Peek at the encoded version for the lane log — `stripJsonc`
+    // loosens the source the same way `readFscene` does. A source the
+    // peek can't parse is ignored; `readFscene` throws the real error.
+    int? encodedVersion;
+    try {
+      if (jsonDecode(stripJsonc(source)) case {'fscene': int v}) {
+        encodedVersion = v;
+      }
+    } catch (_) {
+      // `readFscene` reports the parse failure.
+    }
+    final doc = readFscene(source);
+    final from = encodedVersion;
+    if (from != null && from != doc.formatVersion) {
+      dnLog('dart3d: migrated fscene v$from → v${doc.formatVersion}');
+    }
+    loadDocument(doc, strictFeatures: strictFeatures);
+  }
 
   /// Imports a single-file `.glb` in memory and loads it — the
   /// `Node.fromGlbBytes` equivalent (W29). [onWarning] receives
@@ -198,9 +216,13 @@ final class SceneController {
   /// the manifest entry already went out, so the geometry that
   /// references it re-realizes when the chunk lands). Throws
   /// [ArgumentError] if [payload] still has no bytes.
+  ///
+  /// A payload sent before any [loadDocument] still lands natively,
+  /// so it mints a fresh document to fold into — same as
+  /// [applyCommands] — rather than going missing from
+  /// [serializeScene].
   void sendPayload(PayloadSpec payload) {
-    final doc = _document;
-    if (doc != null) doc_layer.foldPayloadIntoDocument(doc, payload);
+    doc_layer.foldPayloadIntoDocument(_document ??= SceneDocument(), payload);
     _sendOrQueue(D3Protocol.payload, D3Protocol.payloadBytes(payload));
   }
 

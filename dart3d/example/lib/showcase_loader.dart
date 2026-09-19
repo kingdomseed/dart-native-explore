@@ -83,10 +83,12 @@ const showcaseItems = [
 /// procedurally (see [buildMaterialsDocument]).
 const String kBuiltinMaterialsKey = 'builtin:materials';
 
-/// The synthetic asset key for the W29 round-trip lane: builds the
-/// materials conformance document, serializes it through canonical
-/// `.fscene`, re-parses, and renders the re-realized document — the
-/// same scene must come back.
+/// The synthetic asset key for the W29 round-trip lane: the loader
+/// builds the same materials conformance document; the showcase
+/// screen then runs the live round trip — `serializeScene` →
+/// `writeFscene` → `loadFscene`, with `sendPayload` re-delivering the
+/// byte-carrying chunks the JSON leg cannot carry — and the
+/// re-realized document must render identically.
 const String kBuiltinDocRoundtripKey = 'builtin:docroundtrip';
 
 /// Dice stay in the gallery too — the [DART3D_MODEL] verification lane
@@ -127,12 +129,13 @@ ShowcaseScene? loadShowcaseScene(
   final bytesOf = bytesFor ?? (_) => null;
   SceneDocument doc;
   try {
-    if (item.assetKey == kBuiltinMaterialsKey) {
+    if (item.assetKey == kBuiltinMaterialsKey ||
+        item.assetKey == kBuiltinDocRoundtripKey) {
+      // The round-trip lane loads the same fixture — the screen runs
+      // it through `SceneController.serializeScene` and the `.fscene`
+      // leg itself (loadShowcaseScene stays controller-free so the
+      // path is reachable under `dart test`).
       doc = buildMaterialsDocument(bytesOf: bytesOf);
-    } else if (item.assetKey == kBuiltinDocRoundtripKey) {
-      // Serialize the same fixture through `.fscene` and re-parse —
-      // the re-realized document has to render identically.
-      doc = readFscene(writeFscene(buildMaterialsDocument(bytesOf: bytesOf)));
     } else {
       final bytes = bytesOf(item.assetKey);
       if (bytes == null) {
