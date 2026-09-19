@@ -1274,10 +1274,11 @@ class JoltWorld {
 
     /**
      * Raycast-normal stand-in: collide a ~1cm probe sphere centered
-     * just short of the hit point and take the hit's penetration axis,
-     * flipped to face the incoming ray (Jolt's axis sign follows its
-     * separate-shapes convention, not the ray). Null when the probe
-     * finds nothing — the wire omits `n` then.
+     * just short of the hit point and take the hit's penetration axis —
+     * depth-scaled, so [opposeDir] normalizes it — flipped to face the
+     * incoming ray (Jolt's axis sign follows its separate-shapes
+     * convention, not the ray). Null when the probe finds nothing —
+     * the wire omits `n` then.
      */
     private fun normalProbe(
         px: Double, py: Double, pz: Double,
@@ -1405,11 +1406,25 @@ class JoltWorld {
         }
     }
 
-    /** Flips (nx,ny,nz) to oppose [dir] — hit normals face the query. */
+    /**
+     * Unit hit normal facing the query: normalizes (nx,ny,nz), then
+     * flips it to oppose [dir]. Every normal the wire reports funnels
+     * here, and the normalize is load-bearing — Jolt's
+     * `penetrationAxis` carries penetration depth in its magnitude
+     * (device-verified on a sphere probe: |n|≈depth, not 1), so a raw
+     * sign flip shipped non-unit normals. Null on a near-zero axis —
+     * a grazing contact can report one — and the wire omits `n` then.
+     */
     private fun opposeDir(
         nx: Float, ny: Float, nz: Float, dir: Vec3,
-    ): FloatArray {
-        val s = if (nx * dir.x + ny * dir.y + nz * dir.z > 0f) -1f else 1f
-        return floatArrayOf(nx * s, ny * s, nz * s)
+    ): FloatArray? {
+        val l2 = nx * nx + ny * ny + nz * nz
+        if (l2 < 1e-16f) return null    // |axis| < 1e-8 — nothing to report
+        val inv = 1f / Math.sqrt(l2.toDouble()).toFloat()
+        val ux = nx * inv
+        val uy = ny * inv
+        val uz = nz * inv
+        val s = if (ux * dir.x + uy * dir.y + uz * dir.z > 0f) -1f else 1f
+        return floatArrayOf(ux * s, uy * s, uz * s)
     }
 }
