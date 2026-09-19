@@ -1792,11 +1792,14 @@ object FsceneRealizer {
                 // AABB describes them (a zero box at the unparented
                 // entity's identity transform is a point at the world
                 // origin, which would frustum-cull every off-axis
-                // trail). Culling off is the always-correct answer
-                // for a ribbon rewritten per frame.
+                // trail). Filament only exempts an empty AABB when
+                // culling is off AND the renderable is neither a
+                // shadow caster nor receiver — all three flags are
+                // required or build() throws.
                 .culling(false)
                 .layerMask(0xFF, rec.layers and 0xFF)
                 .castShadows(false)
+                .receiveShadows(false)
                 .geometry(0, RenderableManager.PrimitiveType.TRIANGLES,
                     vb, ib)
                 .material(0, host.trailMaterial.defaultInstance)
