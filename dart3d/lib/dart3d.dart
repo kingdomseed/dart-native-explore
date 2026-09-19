@@ -22,6 +22,7 @@ export 'src/scene_view.dart' show SceneQuality, SceneView;
 export 'src/subtree_stream.dart';
 export 'src/ffi_bindings.dart' show Dart3dFFIBindings;
 export 'src/physics.dart';
+export 'src/trail_lod.dart';
 export 'src/vertex_pack.dart' show VertexPack;
 export 'src/world_bounds.dart'
     show documentContentBounds, documentWorldBounds, meshNodeWorldBounds;
