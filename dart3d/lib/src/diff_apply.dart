@@ -206,8 +206,10 @@ List<Map<String, Object?>> diffCommands(
 /// shape `addNode`/`updateNode` carry (upstream's `_encodeNode` is
 /// private; this emits the identical fields). [doc] supplies the
 /// manifest id-key prefixes (`n:`/`geo:`/`skin:`/`chunk:`/…) used in
-/// `children`, `skin`, and `rref` property values. Prefab `instance`
-/// never appears — dart3d's document model has no prefab compose.
+/// `children`, `skin`, and `rref` property values. A surviving prefab
+/// `instance` (a lazy placeholder, or a nested lazy instance inside a
+/// streamed subtree — W15) emits through [encodeInstanceSpec]; its
+/// presence is the placeholder tag the natives record.
 Map<String, Object?> encodeNodeCommandSpec(NodeSpec node, SceneDocument doc) {
   final idKey = manifestIdKey(doc);
   return {
@@ -238,9 +240,75 @@ Map<String, Object?> encodeNodeCommandSpec(NodeSpec node, SceneDocument doc) {
       ],
     if (node.layers != 1) 'layers': node.layers,
     if (node.skin != null) 'skin': idKey(node.skin!),
+    if (node.instance != null)
+      'instance': encodeInstanceSpec(node.instance!, idKey),
     if (!node.visible) 'visible': false,
   };
 }
+
+/// A [PrefabInstanceSpec] encoded as the manifest node's `instance`
+/// member — upstream's `_encodeInstance` is private; this emits the
+/// identical fields. The id space is the PREFAB's, not the host's:
+/// override targets, removed node ids, and member ids all name prefab-
+/// local nodes, so [idKey] falls back to the `id:` prefix for them
+/// (matching what the manifest encoder produces for an unexpanded
+/// instance). Natives only record the member — the streaming layer
+/// resolves it.
+Map<String, Object?> encodeInstanceSpec(
+  PrefabInstanceSpec instance,
+  String Function(LocalId) idKey,
+) => {
+  'source': instance.source.key,
+  if (instance.load != LoadPolicy.eager) 'load': instance.load.name,
+  if (instance.overrides.isNotEmpty)
+    'overrides': [
+      for (final o in instance.overrides)
+        {
+          'target': idKey(o.target),
+          'path': o.path,
+          'value': encodePropertyValue(o.value, idKey),
+        },
+    ],
+  if (instance.attachments.isNotEmpty)
+    'attachments': [
+      for (final a in instance.attachments)
+        {
+          'node': idKey(a.node),
+          if (a.parent != null) 'parent': idKey(a.parent!),
+        },
+    ],
+  if (instance.removedNodes.isNotEmpty)
+    'removedNodes': [for (final id in instance.removedNodes) idKey(id)],
+  if (instance.addedComponents.isNotEmpty)
+    'addedComponents': [
+      for (final c in instance.addedComponents)
+        {
+          'type': c.type,
+          if (c.properties.isNotEmpty)
+            'properties': {
+              for (final e in c.properties.entries)
+                e.key: encodePropertyValue(e.value, idKey),
+            },
+        },
+    ],
+  if (instance.removedComponentTypes.isNotEmpty)
+    'removedComponentTypes': instance.removedComponentTypes,
+  if (instance.memberComponents.isNotEmpty)
+    'memberComponents': [
+      for (final mc in instance.memberComponents)
+        {
+          'member': idKey(mc.member),
+          'component': {
+            'type': mc.component.type,
+            if (mc.component.properties.isNotEmpty)
+              'properties': {
+                for (final e in mc.component.properties.entries)
+                  e.key: encodePropertyValue(e.value, idKey),
+              },
+          },
+        },
+    ],
+};
 
 /// A [SkinSpec] encoded as the manifest `skins` entry — the `skin`
 /// shape `upsertSkin` carries (upstream's `_encodeSkin` is private;

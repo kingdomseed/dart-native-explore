@@ -14,6 +14,7 @@ import 'dispatch.dart';
 import 'physics.dart';
 import 'protocol.dart';
 import 'scene_view.dart';
+import 'subtree_stream.dart';
 
 /// One node's transform write in a [SceneController.setNodeTransforms]
 /// batch. `null` fields keep their previous values.
@@ -54,6 +55,10 @@ final class SceneController {
   SceneViewElement? _element;
   SceneDocument? _document;
   final List<({int tag, Uint8List data})> _pending = [];
+  // W15: instance node id → the stream record unloadSubtree reverses.
+  // Entries live only while a subtree is streamed; loadDocument clears
+  // them with the rest of the scene.
+  final Map<LocalId, StreamedSubtree> _streamed = {};
   final StreamController<ScenePhysicsEvent> _physicsEvents =
       StreamController<ScenePhysicsEvent>.broadcast();
   final StreamController<SceneCollisionEvent> _contactEvents =
@@ -94,12 +99,30 @@ final class SceneController {
   /// per payload chunk the document carries.
   void loadDocument(SceneDocument doc) {
     _document = doc;
+    _streamed.clear();
     _warnUnrealizedFeatures(doc);
     _sendOrQueue(D3Protocol.loadScene, D3Protocol.loadSceneBytes(doc));
     for (final payload in doc.payloads.values) {
       if (payload.bytes == null) continue;
       _sendOrQueue(D3Protocol.payload, D3Protocol.payloadBytes(payload));
     }
+  }
+
+  /// Expands [doc]'s prefab instances via upstream `composeSceneAsync`
+  /// (W15) — every eager `instance` is resolved through [loadPrefab]
+  /// and inlined — then sends the result through [loadDocument]. Lazy
+  /// instances pass through untouched and arrive as tagged placeholder
+  /// nodes, resolvable later via [loadSubtree].
+  ///
+  /// Host asset resolution stays with the caller: [loadPrefab] maps
+  /// each `instance.source` AssetRef to its decoded (uncomposed)
+  /// document, exactly as `composeSceneAsync`'s `load` contract
+  /// specifies.
+  Future<void> loadDocumentComposed(
+    SceneDocument doc, {
+    required AsyncPrefabLoader loadPrefab,
+  }) async {
+    loadDocument(await composeSceneAsync(doc, load: loadPrefab));
   }
 
   /// Sends one payload chunk to the native side — for payloads the
@@ -115,8 +138,8 @@ final class SceneController {
   /// replacing it. Supported ops: `addNode`, `removeNode`, `updateNode`,
   /// `upsertResource`, `upsertPayload`, `updateStage`, `upsertSkin`,
   /// `upsertAnimation`, `removeSkin`, `removeAnimation`, `anim`,
-  /// `setMorphWeights`, `updateViews`, `render`, the physics/joint ops,
-  /// and `query`.
+  /// `setMorphWeights`, `updateViews`, `render`, `loadSubtree`,
+  /// `unloadSubtree`, the physics/joint ops, and `query`.
   void applyCommands(List<Map<String, Object?>> ops) {
     if (ops.isEmpty) return;
     for (final op in ops) {
@@ -138,6 +161,11 @@ final class SceneController {
   /// tracked [document], so chain the next diff against it.
   List<Map<String, Object?>> applyDiff(SceneDiff diff, SceneDocument newDoc) {
     final ops = diffCommands(diff, _document, newDoc);
+    // A streamed instance that is itself removed drops its stream
+    // record — the removeNode took the whole subtree with it.
+    for (final id in diff.removed) {
+      _streamed.remove(id);
+    }
     _document = newDoc;
     _warnUnrealizedFeatures(newDoc);
     applyCommands(ops);
@@ -177,8 +205,124 @@ final class SceneController {
 
   /// Removes [id] and its subtree from the live scene.
   void removeNode(LocalId id) {
+    _streamed.remove(id);
     applyCommands([
       {'op': 'removeNode', 'node': id.toToken()},
+    ]);
+  }
+
+  // MARK: - Prefab subtree streaming (W15)
+
+  /// The node [id] as the live scene knows it — the tracked
+  /// document's spec, or a nested placeholder recorded by the stream
+  /// that delivered it. Streamed members never join [_document], so a
+  /// lazy instance inside a streamed subtree resolves through the
+  /// parent stream's [StreamedSubtree.placeholders].
+  NodeSpec? _liveNode(LocalId id) {
+    final tracked = _document?.nodes[id];
+    if (tracked != null) return tracked;
+    for (final s in _streamed.values) {
+      final p = s.placeholders[id];
+      if (p != null) return p;
+    }
+    return null;
+  }
+
+  /// Realizes the lazy prefab instance at [id] — expands the subtree
+  /// the placeholder tags and sends it as one `loadSubtree` command.
+  ///
+  /// [resolve] maps the instance's `source` AssetRef to the prefab's
+  /// decoded (uncomposed) document — host asset resolution stays on
+  /// the host layer, the same contract `composeScene` gives its
+  /// `resolve`. The returned ops are upstream composition translated
+  /// into the standard structural batch: the placeholder's own
+  /// `updateNode` re-specs it without `instance` (clearing the native
+  /// placeholder tag), payloads and resources upsert first, member
+  /// `addNode`s follow parent-before-child, and `Attachment` grafts
+  /// ride `updateNode` reparents.
+  ///
+  /// Calling this on an already-streamed instance re-composes and
+  /// re-sends; roots the previous stream created that the new compose
+  /// no longer produces are removed first, so a re-load replaces
+  /// rather than piles up. Throws [ArgumentError] when [id] is not a
+  /// tracked node or streamed member, or carries no `instance`.
+  void loadSubtree(LocalId id, {required PrefabResolver resolve}) {
+    final doc = _document;
+    final node = _liveNode(id);
+    if (node == null) {
+      throw ArgumentError('loadSubtree: no node ${id.toToken()}');
+    }
+    final result = encodeSubtreeLoad(
+      node,
+      resolve: resolve,
+      hostDoc: doc,
+      priorRoots: _streamed[id]?.roots ?? const [],
+    );
+    applyCommands([
+      {'op': 'loadSubtree', 'node': id.toToken(), 'ops': result.ops},
+    ]);
+    _streamed[id] = result.streamed;
+  }
+
+  /// [loadSubtree] on upstream `composeSceneAsync` — [loadPrefab]
+  /// resolves each `source` AssetRef to its decoded document
+  /// transitively (eager prefabs inside the streamed prefab
+  /// included), for callers whose asset layer is async.
+  Future<void> loadSubtreeAsync(
+    LocalId id, {
+    required AsyncPrefabLoader loadPrefab,
+  }) async {
+    final doc = _document;
+    final node = _liveNode(id);
+    if (node == null) {
+      throw ArgumentError('loadSubtreeAsync: no node ${id.toToken()}');
+    }
+    final result = await encodeSubtreeLoadAsync(
+      node,
+      loadPrefab: loadPrefab,
+      hostDoc: doc,
+      priorRoots: _streamed[id]?.roots ?? const [],
+    );
+    applyCommands([
+      {'op': 'loadSubtree', 'node': id.toToken(), 'ops': result.ops},
+    ]);
+    _streamed[id] = result.streamed;
+  }
+
+  /// Reverses [loadSubtree] at [id]: attachment targets reparent to
+  /// their authored homes, streamed roots drop, and the placeholder
+  /// spec restores — the `instance` member rides the wire again, so
+  /// the node re-tags as a loadable placeholder. No-ops when [id] has
+  /// no live stream.
+  void unloadSubtree(LocalId id) {
+    final streamed = _streamed.remove(id);
+    if (streamed == null) return;
+    final doc = _document;
+    final node = _liveNode(id);
+    // A live stream implies a document — but [_liveNode] now resolves
+    // through stream records too, so guard rather than force.
+    if (doc == null || node == null) return;
+    final parents = <LocalId, LocalId?>{
+      for (final n in doc.nodes.keys) n: null,
+    };
+    for (final n in doc.nodes.values) {
+      for (final c in n.children) {
+        parents[c] = n.id;
+      }
+    }
+    applyCommands([
+      {
+        'op': 'unloadSubtree',
+        'node': id.toToken(),
+        'ops': encodeSubtreeUnload(
+          node,
+          streamed: streamed,
+          attachmentHomes: {
+            for (final t in streamed.attachments) t: parents[t],
+          },
+          hostDoc: doc,
+        ),
+      },
     ]);
   }
 
