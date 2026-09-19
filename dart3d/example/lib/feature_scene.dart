@@ -91,7 +91,7 @@ import 'package:vector_math/vector_math.dart';
 /// closure takes a `targetPx` probe — viewports are authored in
 /// target pixels, which only the widget tree knows (size × dpr).
 /// W16 lands the trails/LOD lane through the returned `w16Phase`
-/// closure — fired at +112 s — which drives `w16Mover` away and
+/// closure — fired at +140 s — which drives `w16Mover` away and
 /// back through its `lod` thresholds (three screen-size levels plus
 /// the cull floor) while its `trail` draws the camera-facing ribbon.
 ///
@@ -3860,8 +3860,8 @@ final class FeatureScene {
       });
     }
 
-    /// W16 lane — fires at +112 s (after wLoose's +30 s cleanup
-    /// window ends). Drives `w16Mover` away and back through its
+    /// W16 lane — fires at +140 s (after W15's +112 s streaming
+    /// lane closes its +12 s cycle). Drives `w16Mover` away and back through its
     /// three `lod` thresholds and the cull floor — ~29.5 m out over
     /// 12 s, then home — with an x sway that bends the `trail`
     /// ribbon so the camera-facing expansion reads in a still

@@ -339,12 +339,19 @@ verification is compile-level only (no live device run yet).**
   `VertexBuffer`/`IndexBuffer` (2 verts per anchor, POSITION+COLOR)
   filled world-space per frame — the verts ARE world space, so no
   rebase is needed; `stepFrame` ticks it after the camera update.
+  The renderable builds `.culling(false)` — no static AABB can
+  describe a per-frame ribbon, and a zero box at the unparented
+  entity's identity transform would frustum-cull every off-axis
+  trail.
 - `lod` component (upstream `LodComponent` — which extends
   MeshComponent, so the lod owns the node's draw slot): ordered
   `levels` each carrying `geometry`+`material` refs and a
   descending `screenSize` threshold; `lodBias` scales the
-  projected size. `hysteresis`/`blendRange` decode for wire
-  parity — documented no-ops (hard switch).
+  projected size. Level decode matches upstream `_levelEntries`:
+  an entry drops only on a missing/mistyped geometry or material
+  ref, while an absent/malformed `screenSize` decodes as `0.0` —
+  the never-cull threshold. `hysteresis`/`blendRange` decode for
+  wire parity — documented no-ops (hard switch).
 - iOS: `SCNGeometry.levelsOfDetail` — level 0 is the base
   geometry, level i keys off the PREVIOUS threshold, and a nil
   entry at the smallest threshold reproduces the cull floor (a
@@ -362,15 +369,17 @@ verification is compile-level only (no live device run yet).**
   perspective cameras draw level 0, matching upstream.
 - Shared Dart reference math in `dart3d/lib/src/trail_lod.dart`:
   `TrailPointBuffer` (upstream's update policy), the
-  `expandTrailRibbon` port, `lodScreenSize`, `selectLodLevel` —
-  the natives port these verbatim; 21 pure-Dart tests cover the
-  point buffer, ramps, expansion, and selection thresholds.
+  `expandTrailRibbon` port, `lodScreenSize`, `selectLodLevel`,
+  `decodeLodLevels` (upstream's `_levelEntries` fallback rule) —
+  the natives port these verbatim; 23 pure-Dart tests cover the
+  point buffer, ramps, expansion, selection thresholds, and the
+  screenSize fallback.
 - Harness: `w16Mover` carries `lod`+`trail`; the `w16Phase` lane
-  (+112 s) drives it ~29.5 m out and back through all three
-  thresholds and the cull floor with an x sway bending the
-  ribbon.
+  (+140 s — staggered past W15's +112 s slot) drives it ~29.5 m
+  out and back through all three thresholds and the cull floor
+  with an x sway bending the ribbon.
 
-**Verification.** `dn analyze` + `dn test` green (21 trail/lod
+**Verification.** `dn analyze` + `dn test` green (23 trail/lod
 tests); Android `assembleRelease` builds the Kotlin path; the iOS
 sources pass a syntax/typecheck pass. A trail following a moving
 node and the distance-based geometry swap exercise on both

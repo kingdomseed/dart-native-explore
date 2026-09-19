@@ -139,6 +139,39 @@ ComponentSpec lodComponent({
   );
 }
 
+/// Decodes an `lod` component's `levels` property the way upstream
+/// `LodCodec._levelEntries` does — the rule both natives port to
+/// their tagged-JSON decode: an entry drops only when its `geometry`
+/// or `material` isn't a [ResourceRefValue]; an absent or mistyped
+/// `screenSize` falls back to `0.0`, the never-cull threshold (so a
+/// last level omitting it keeps the spec from gaining a cull floor
+/// upstream wouldn't have).
+List<LodLevel> decodeLodLevels(Map<String, PropertyValue> properties) {
+  final levels = properties['levels'];
+  if (levels is! ListValue) return const [];
+  final out = <LodLevel>[];
+  for (final entry in levels.values) {
+    if (entry is! MapValue) continue;
+    final geometry = entry.values['geometry'];
+    final material = entry.values['material'];
+    if (geometry is! ResourceRefValue || material is! ResourceRefValue) {
+      continue;
+    }
+    out.add(
+      LodLevel(
+        geometry: geometry.id,
+        material: material.id,
+        screenSize: switch (entry.values['screenSize']) {
+          DoubleValue(:final value) => value,
+          IntValue(:final value) => value.toDouble(),
+          _ => 0.0,
+        },
+      ),
+    );
+  }
+  return out;
+}
+
 /// The trail's recorded path — the upstream `TrailComponent.update`
 /// policy ported verbatim. [points] are world-space, head-first: the
 /// head tracks the node every frame, a new anchor is inserted once the
