@@ -3093,6 +3093,9 @@ enum FsceneRealizer {
                     Float(-a[0]), Float(-a[1]), Float(a[2]), Float(a[3]))
             }
             node.physicsBody = body
+            // W23: a body rebuilt while a `collide:false` joint lives
+            // must re-take its private category / mask adjustments.
+            host.applyJointPairMasks(key, body)
             if type == .dynamic { dynamicBodyKeys.insert(key) }
         }
 
@@ -3487,9 +3490,18 @@ enum FsceneRealizer {
         /// `skeleton` property is weak, so the skeleton's registry
         /// entry (`nodesById` / `nodes`) is what keeps it alive.
         func attachSkin(_ nodeKey: UInt64, _ node: SCNNode) {
+            // Multi-primitive meshes park extra primitives on
+            // `d3prim:` children — upstream skins every primitive of a
+            // skinned mesh, so each child's skinner must come and go
+            // with the node's.
             func dropSkinner() {
                 if let old = node.skinner { host.retire(old) }
                 node.skinner = nil
+                for child in node.childNodes
+                where child.name?.hasPrefix("d3prim:") == true {
+                    if let old = child.skinner { host.retire(old) }
+                    child.skinner = nil
+                }
             }
             guard let skinKey = nodeSkinKeys[nodeKey] else {
                 dropSkinner()
@@ -3545,6 +3557,31 @@ enum FsceneRealizer {
             // pass's frozen storage can still reference it.
             if let old = node.skinner { host.retire(old) }
             node.skinner = skinner
+            // Extra primitives ride `d3prim:` children — each needs a
+            // skinner over the same bones/IBMs/skeleton, sourced from
+            // its own geometry's bone streams. A prim without bone
+            // sources stays rigid (upstream skins what it can).
+            for child in node.childNodes
+            where child.name?.hasPrefix("d3prim:") == true {
+                if let old = child.skinner { host.retire(old) }
+                child.skinner = nil
+                guard let cg = child.geometry,
+                      let cw = cg.sources.first(where: {
+                          $0.semantic == .boneWeights }),
+                      let ci = cg.sources.first(where: {
+                          $0.semantic == .boneIndices })
+                else { continue }
+                let cs = SCNSkinner(
+                    baseGeometry: cg,
+                    bones: bones,
+                    boneInverseBindTransforms: skin.ibms.map {
+                        NSValue(scnMatrix4: $0)
+                    },
+                    boneWeights: cw,
+                    boneIndices: ci)
+                cs.skeleton = skeleton
+                child.skinner = cs
+            }
             if complete {
                 pendingSkinNodes.remove(nodeKey)
             } else {

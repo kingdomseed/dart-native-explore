@@ -1,6 +1,7 @@
 package com.jasonholtdigital.dart3d
 
 import android.util.Log
+import com.github.stephengold.joltjni.AaBox
 import com.github.stephengold.joltjni.AllHitCastRayCollector
 import com.github.stephengold.joltjni.AllHitCollideShapeCollector
 import com.github.stephengold.joltjni.Body
@@ -17,6 +18,7 @@ import com.github.stephengold.joltjni.Constraint
 import com.github.stephengold.joltjni.ContactManifold
 import com.github.stephengold.joltjni.CustomContactListener
 import com.github.stephengold.joltjni.FixedConstraintSettings
+import com.github.stephengold.joltjni.GetTrianglesContext
 import com.github.stephengold.joltjni.GroupFilterTable
 import com.github.stephengold.joltjni.HingeConstraint
 import com.github.stephengold.joltjni.HingeConstraintSettings
@@ -53,10 +55,13 @@ import com.github.stephengold.joltjni.enumerate.EAxis
 import com.github.stephengold.joltjni.enumerate.EConstraintSpace
 import com.github.stephengold.joltjni.enumerate.EMotorState
 import com.github.stephengold.joltjni.enumerate.EPhysicsUpdateError
+import com.github.stephengold.joltjni.enumerate.EShapeSubType
 import com.github.stephengold.joltjni.enumerate.ESpringMode
 import com.github.stephengold.joltjni.enumerate.ESwingType
 import com.github.stephengold.joltjni.enumerate.ValidateResult
 import com.github.stephengold.joltjni.readonly.ConstShape
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 private const val TAG = "dart3d"
 
@@ -187,6 +192,11 @@ class JoltWorld {
         const val BP_MOVING = 1
         const val NUM_BP_LAYERS = 2
         const val MAX_BODIES = 1024
+
+        // Raycast-normal triangle fetch: the box half-extent around
+        // the hit point and the per-batch triangle cap.
+        private const val TRI_BOX_R = 0.10
+        private const val MAX_RAYCAST_TRIS = 256
     }
 
     /** `physicsWorld.fixedTimestep` — the stepper reads it per frame. */
@@ -318,8 +328,11 @@ class JoltWorld {
             val keyA = bodyNodeKeys[b1.id] ?: return
             val keyB = bodyNodeKeys[b2.id] ?: return
             // jolt-jni's ContactManifold exposes no per-point list and
-            // no impulse — emit ONE point at the world-space baseOffset
-            // (spec-documented approximation; the wire gets imp:0).
+            // no impulse (verified on the 6.0.0 jar — baseOffset,
+            // worldSpaceNormal, penetrationDepth, and the two subshape
+            // ids are the whole surface) — emit ONE point at the
+            // world-space baseOffset (spec-documented approximation;
+            // the wire gets imp:0).
             val manifold = ContactManifold(manifoldVa)
             val p = manifold.baseOffset
             val n = manifold.worldSpaceNormal
@@ -1113,9 +1126,150 @@ class JoltWorld {
         return QueryHit(
             nodeKey = key,
             point = doubleArrayOf(px, py, pz),
-            normal = normalProbe(px, py, pz, dirScaled, len, r.bodyId),
+            normal = surfaceNormal(
+                px, py, pz, dirScaled, r.bodyId, r.subShapeId2)
+                ?: normalProbe(px, py, pz, dirScaled, len, r.bodyId),
             distance = f * len,
         )
+    }
+
+    /**
+     * True surface normal for a raycast hit: streams the hit body's
+     * triangles in a small box around the hit point and takes the
+     * closest triangle's normal — exact for every shape whose
+     * surface IS triangles (meshes, heightfields, hulls, boxes,
+     * compounds). Jolt tessellates the smooth primitives too, but a
+     * streamed normal there is a tessellation facet — so leaf
+     * subtypes Sphere/Capsule/TaperedCapsule/Cylinder return null
+     * and the caller's analytic sphere probe answers instead.
+     */
+    private fun surfaceNormal(
+        px: Double, py: Double, pz: Double,
+        dirScaled: Vec3, hitBodyId: Int, subShapeId2: Int,
+    ): FloatArray? {
+        val ts = bodyInterface.getTransformedShape(hitBodyId)
+            ?: return null
+        // Resolve the leaf the ray actually hit (subShapeId2 walks
+        // compounds and decorator shapes to it). getLeafShape can
+        // return null for an id it can't resolve — that falls
+        // through to the triangle stream rather than failing.
+        val remainder = IntArray(1)
+        val leaf = ts.shape?.getLeafShape(subShapeId2, remainder)
+        val subType = leaf?.getSubType()
+        (leaf as? JoltPhysicsObject)?.close()
+        if (subType == EShapeSubType.Sphere ||
+            subType == EShapeSubType.Capsule ||
+            subType == EShapeSubType.TaperedCapsule ||
+            subType == EShapeSubType.Cylinder) {
+            ts.close()
+            return null
+        }
+        val base = RVec3(px, py, pz)
+        val box = AaBox(
+            RVec3(px - TRI_BOX_R, py - TRI_BOX_R, pz - TRI_BOX_R),
+            RVec3(px + TRI_BOX_R, py + TRI_BOX_R, pz + TRI_BOX_R))
+        val ctx = GetTrianglesContext()
+        // Vertices come back Float3s relative to `base` — the hit
+        // point is the origin in buffer space.
+        val buf = ByteBuffer
+            .allocateDirect(MAX_RAYCAST_TRIS * 9 * 4)
+            .order(ByteOrder.nativeOrder())
+            .asFloatBuffer()
+        try {
+            ts.getTrianglesStart(ctx, box, base)
+            var bestD2 = Float.MAX_VALUE
+            var bestN: FloatArray? = null
+            while (true) {
+                buf.clear()
+                val n = ts.getTrianglesNext(ctx, MAX_RAYCAST_TRIS, buf)
+                if (n <= 0) break
+                for (i in 0 until n) {
+                    val o = i * 9
+                    val ax = buf.get(o)
+                    val ay = buf.get(o + 1)
+                    val az = buf.get(o + 2)
+                    val bx = buf.get(o + 3)
+                    val by = buf.get(o + 4)
+                    val bz = buf.get(o + 5)
+                    val cx = buf.get(o + 6)
+                    val cy = buf.get(o + 7)
+                    val cz = buf.get(o + 8)
+                    val nx = (by - ay) * (cz - az) - (bz - az) * (cy - ay)
+                    val ny = (bz - az) * (cx - ax) - (bx - ax) * (cz - az)
+                    val nz = (bx - ax) * (cy - ay) - (by - ay) * (cx - ax)
+                    val nl = nx * nx + ny * ny + nz * nz
+                    if (nl < 1e-24f) continue    // degenerate sliver
+                    val d2 = triDist2(
+                        ax, ay, az, bx, by, bz, cx, cy, cz)
+                    if (d2 < bestD2) {
+                        bestD2 = d2
+                        val inv = 1f / Math.sqrt(nl.toDouble()).toFloat()
+                        bestN = floatArrayOf(nx * inv, ny * inv, nz * inv)
+                    }
+                }
+            }
+            return bestN?.let { opposeDir(it[0], it[1], it[2], dirScaled) }
+        } finally {
+            ctx.close()
+            box.close()
+            ts.close()
+        }
+    }
+
+    /**
+     * Squared distance from the origin to triangle (a,b,c) — the
+     * hit point is the origin in getTriangles buffer space. Ericson,
+     * Real-Time Collision Detection §5.1.5 (closest point on triangle
+     * to a point), specialized to p = 0.
+     */
+    private fun triDist2(
+        ax: Float, ay: Float, az: Float,
+        bx: Float, by: Float, bz: Float,
+        cx: Float, cy: Float, cz: Float,
+    ): Float {
+        val abx = bx - ax; val aby = by - ay; val abz = bz - az
+        val acx = cx - ax; val acy = cy - ay; val acz = cz - az
+        val d1 = -(abx * ax + aby * ay + abz * az)   // ab·(p−a), p=0
+        val d2 = -(acx * ax + acy * ay + acz * az)   // ac·(p−a)
+        if (d1 <= 0f && d2 <= 0f) return ax * ax + ay * ay + az * az
+        val d3 = -(abx * bx + aby * by + abz * bz)   // ab·(p−b)
+        val d4 = -(acx * bx + acy * by + acz * bz)   // ac·(p−b)
+        if (d3 >= 0f && d4 <= d3) return bx * bx + by * by + bz * bz
+        val vc = d1 * d4 - d3 * d2
+        if (vc <= 0f && d1 >= 0f && d3 <= 0f) {
+            val v = d1 / (d1 - d3)                 // closest on ab
+            val qx = ax + v * abx
+            val qy = ay + v * aby
+            val qz = az + v * abz
+            return qx * qx + qy * qy + qz * qz
+        }
+        val d5 = -(abx * cx + aby * cy + abz * cz)   // ab·(p−c)
+        val d6 = -(acx * cx + acy * cy + acz * cz)   // ac·(p−c)
+        if (d6 >= 0f && d5 <= d6) return cx * cx + cy * cy + cz * cz
+        val vb = d5 * d2 - d1 * d6
+        if (vb <= 0f && d2 >= 0f && d6 <= 0f) {
+            val w = d2 / (d2 - d6)                 // closest on ac
+            val qx = ax + w * acx
+            val qy = ay + w * acy
+            val qz = az + w * acz
+            return qx * qx + qy * qy + qz * qz
+        }
+        val va = d3 * d6 - d5 * d4
+        if (va <= 0f && d4 - d3 >= 0f && d5 - d6 >= 0f) {
+            val w = (d4 - d3) / ((d4 - d3) + (d5 - d6))  // closest on bc
+            val qx = bx + w * (cx - bx)
+            val qy = by + w * (cy - by)
+            val qz = bz + w * (cz - bz)
+            return qx * qx + qy * qy + qz * qz
+        }
+        // Interior: the plane distance (n·a)/|n| squared.
+        val nx = aby * acz - abz * acy
+        val ny = abz * acx - abx * acz
+        val nz = abx * acy - aby * acx
+        val nn = nx * nx + ny * ny + nz * nz
+        if (nn < 1e-24f) return Float.MAX_VALUE
+        val pn = ax * nx + ay * ny + az * nz
+        return pn * pn / nn
     }
 
     /**

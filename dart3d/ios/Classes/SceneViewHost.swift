@@ -448,6 +448,37 @@ final class SceneViewHost: SCNView {
     private var componentJointIds: [UInt64: [Int: UInt32]] = [:]
     private var nextComponentJointHandle: UInt32 = 0x4000_0000
 
+    /// W23 `collide:false` bookkeeping (all under `jointLock`).
+    /// SceneKit exposes no per-pair collision switch, so exclusion
+    /// borrows category bits the wire can't reach: the decoder shifts
+    /// wire layers <<2 (bits 2–33 on the 64-bit Int), leaving bits
+    /// 40–63 for private per-body categories. A privatized body's
+    /// category is its dedicated bit; every body's masks are then
+    /// DERIVED, never patched — `rebuildPairMasksLocked` re-runs the
+    /// upstream `(a.layer & b.mask) && (b.layer & a.mask)` rule per
+    /// body against the wire truth (`jointWireMasks`), so a pair
+    /// exclusion is just clearing the partner's bit on both sides'
+    /// collision and contact-test masks — the Jolt `GroupFilterTable`
+    /// pair disable's twin, contact-event suppression included.
+    private struct JointPair: Hashable {
+        let lo: UInt64, hi: UInt64
+        init(_ a: UInt64, _ b: UInt64) {
+            lo = min(a, b); hi = max(a, b)
+        }
+        func contains(_ k: UInt64) -> Bool { k == lo || k == hi }
+        func other(_ k: UInt64) -> UInt64 { k == lo ? hi : lo }
+    }
+    /// Category bits reserved for pair exclusion — bits 40–63, above
+    /// the wire's <<2 layer space.
+    private static let jointPrivateBits = Int(0xFF_FFFF) << 40
+    /// Node key → its private category bit (implies a wire-masks save).
+    private var jointPrivBits: [UInt64: Int] = [:]
+    /// Privatized node key → (category, collision mask) as the wire
+    /// authored it — the truth masks re-derive from.
+    private var jointWireMasks: [UInt64: (cat: Int, mask: Int)] = [:]
+    /// Body pair → count of live joint records excluding it.
+    private var jointExcludedPairs: [JointPair: Int] = [:]
+
     /// The shared world anchor for joints declared without an
     /// `otherNode` — upstream attaches to a fixed body at the identity
     /// pose, so a single hidden static body at the origin serves every
@@ -1977,10 +2008,11 @@ final class SceneViewHost: SCNView {
     }
 
     /// `{"shape":{…},"from":[x,y,z],"to":[x,y,z]}` →
-    /// `convexSweepTest`. `SCNPhysicsContact` exposes no sweep
-    /// fraction — `d` is the distance from the cast origin to the
-    /// contact point (documented approximation); one hit per node,
-    /// nearest first.
+    /// `convexSweepTest`. `d` is the distance ALONG the cast at
+    /// contact — `SCNPhysicsContact.sweepTestFraction` × the segment
+    /// length, upstream's distance-along-cast semantic (a grazing hit
+    /// whose contact point sits off the ray line would over-report as
+    /// a point distance). One hit per node, nearest first.
     private func queryShapecast(_ q: Int, _ json: [String: Any]) {
         guard let shape = queryShape(json["shape"]),
               let f = vec(json["from"]), f.count == 3,
@@ -1995,6 +2027,8 @@ final class SceneViewHost: SCNView {
             to: SCNMatrix4MakeTranslation(tv.x, tv.y, tv.z),
             options: [.searchMode: SCNPhysicsWorld.TestSearchMode.all])
             ?? []
+        let sdx = tv.x - fv.x, sdy = tv.y - fv.y, sdz = tv.z - fv.z
+        let segLen = (sdx * sdx + sdy * sdy + sdz * sdz).squareRoot()
         var hits: [(d: Float, json: String)] = []
         var seen: Set<UInt64> = []
         for c in results {
@@ -2004,8 +2038,7 @@ final class SceneViewHost: SCNView {
                   let key = nodeToKey[ObjectIdentifier(node)],
                   seen.insert(key).inserted else { continue }
             let p = c.contactPoint, n = c.contactNormal
-            let dx = p.x - fv.x, dy = p.y - fv.y, dz = p.z - fv.z
-            let d = (dx * dx + dy * dy + dz * dz).squareRoot()
+            let d = Float(c.sweepTestFraction) * segLen
             hits.append((d, "{\"node\":\(refJSON(key)),"
                 + "\"collider\":\(colliderIndexByKey[key] ?? 0),"
                 + "\"p\":[\(p.x),\(p.y),\(-p.z)],"
@@ -2064,6 +2097,7 @@ final class SceneViewHost: SCNView {
         var basisA: SCNQuaternion?   // generic only, SceneKit space
         var basisB: SCNQuaternion?
         var axes = [JointAxis](repeating: JointAxis(), count: 6)
+        var excluded = false         // this record holds a pair count
     }
 
     /// One `generic` axis config (`axes` order: linearX…angularZ).
@@ -2166,6 +2200,13 @@ final class SceneViewHost: SCNView {
         if let v = vec(json["axisB"]), v.count == 3 {
             rec.axisB = axis(v)
         }
+        // Scalars pass through on iOS: the revolute axis above is
+        // decoded as a pseudovector (−S·a), so a wire rotation θ about
+        // the wire axis is a SceneKit rotation +θ about the stored
+        // axis and limits/motor keep their wire sign. Android takes
+        // the equivalent representation instead — a direction-mapped
+        // axis (S·a) with limits swapped ([−upper, −lower]) and motor
+        // negated — same physical constraint either way.
         rec.lower = (json["lower"] as? NSNumber)?.doubleValue
         rec.upper = (json["upper"] as? NSNumber)?.doubleValue
         rec.motorVelocity =
@@ -2205,6 +2246,13 @@ final class SceneViewHost: SCNView {
                 }
                 axes[i].motion = .free
             }
+            // Scalars pass through unmirrored: `genericAxis` bakes
+            // the z-mirror into each axis's DIRECTION (linear maps
+            // polar, angular axial), so the wire scalar keeps its
+            // sense about the produced SceneKit axis. Android's
+            // per-index negation (linearZ, angularX/Y) exists because
+            // Jolt measures the scalar inside the mirrored constraint
+            // frame — a different representation of the same physics.
             axes[i].lower = (m["lower"] as? NSNumber)?.doubleValue ?? 0
             axes[i].upper = (m["upper"] as? NSNumber)?.doubleValue ?? 0
             guard let motor = m["motor"] as? [String: Any] else { continue }
@@ -2285,14 +2333,21 @@ final class SceneViewHost: SCNView {
     /// `jointLock`.
     private func realizeJointLocked(_ id: UInt32) {
         guard var rec = joints[id], rec.behavior == nil else { return }
-        guard let bodyA = nodesById[rec.a]?.physicsBody else {
+        // `parent != nil` rejects stale registry entries: between a
+        // scene reset and install, `nodesById` still maps to detached
+        // nodes whose physicsBody objects are dead — binding one
+        // would strand the constraint (and its pair bookkeeping) on a
+        // body that never simulates again.
+        guard let nodeA = nodesById[rec.a], nodeA.parent != nil,
+              let bodyA = nodeA.physicsBody else {
             logOnce("joint.\(id).deferred",
                 "joint \(id): endpoint not a live body yet; deferred")
             return
         }
         let bodyB: SCNPhysicsBody
         if let b = rec.b {
-            guard let found = nodesById[b]?.physicsBody else {
+            guard let nodeB = nodesById[b], nodeB.parent != nil,
+                  let found = nodeB.physicsBody else {
                 logOnce("joint.\(id).deferred",
                     "joint \(id): endpoint not a live body yet; deferred")
                 return
@@ -2307,36 +2362,231 @@ final class SceneViewHost: SCNView {
             }
             bodyB = anchor
         }
-        // collide:false wants pairwise collision exclusion — SceneKit
-        // has none, and carving the pair out of the global category/
-        // mask space would break every other pair's rules. When the
-        // pair's own masks already prevent contact the flag is
-        // satisfied; otherwise document the approximation and leave
-        // collisions on.
-        if !rec.collide,
-           (bodyA.categoryBitMask & bodyB.collisionBitMask) != 0
-               || (bodyB.categoryBitMask & bodyA.collisionBitMask) != 0 {
-            logOnce("joint.\(id).collide",
-                "joint \(id): collide=false isn't expressible on "
-                + "SceneKit (no pairwise exclusion); pair still collides")
-        }
         guard let behavior = buildJoint(rec, bodyA, bodyB) else {
             joints.removeValue(forKey: id)
             return
         }
         scene?.physicsWorld.addBehavior(behavior)
         rec.behavior = behavior
+        // collide:false → pairwise exclusion (the world anchor is
+        // shapeless — nothing to exclude).
+        if !rec.collide, rec.b != nil, !rec.excluded {
+            recordPairLocked(&rec)
+        }
         joints[id] = rec
     }
 
     /// Removes joint `id`'s behavior and record. Caller holds
     /// `jointLock`.
     private func dropJointLocked(_ id: UInt32) {
-        if let b = joints[id]?.behavior {
-            scene?.physicsWorld.removeBehavior(b)
-            retire(b)
+        if let rec = joints[id] {
+            if rec.excluded { releasePairLocked(rec) }
+            if let b = rec.behavior {
+                scene?.physicsWorld.removeBehavior(b)
+                retire(b)
+            }
         }
         joints.removeValue(forKey: id)
+    }
+
+    /// `collide:false` — counts the pair and attempts the carve. A
+    /// pair that can't collide at the wire level stays recorded only;
+    /// `applyJointPairMasks` retries the carve on every body rebuild.
+    /// Caller holds `jointLock`.
+    private func recordPairLocked(_ rec: inout JointRecord) {
+        guard let bKey = rec.b else { return }
+        rec.excluded = true
+        let pair = JointPair(rec.a, bKey)
+        jointExcludedPairs[pair] = (jointExcludedPairs[pair] ?? 0) + 1
+        carvePairLocked(pair)
+    }
+
+    /// Reverses one record's [recordPairLocked]: the last record off
+    /// a pair frees the endpoints' private bits (each only when no
+    /// other pair still excludes it), then all masks re-derive.
+    /// Caller holds `jointLock`.
+    private func releasePairLocked(_ rec: JointRecord) {
+        guard let bKey = rec.b else { return }
+        let pair = JointPair(rec.a, bKey)
+        guard let n = jointExcludedPairs[pair] else { return }
+        if n > 1 {
+            jointExcludedPairs[pair] = n - 1
+            return
+        }
+        jointExcludedPairs.removeValue(forKey: pair)
+        for key in [pair.lo, pair.hi]
+        where !jointExcludedPairs.keys.contains(where: {
+            $0.contains(key)
+        }) {
+            unprivatizeLocked(key)
+        }
+        rebuildPairMasksLocked()
+    }
+
+    /// Privatizes both endpoints and re-derives the mask space when
+    /// the pair can collide at the wire level — idempotent, so a
+    /// recorded pair retries here on every rebuild it touches. An
+    /// already-excluded pair no-ops at the wire-collide check (the
+    /// wire truth doesn't move under carving). Both private bits are
+    /// reserved before either installs: privatizing `lo` and then
+    /// hitting the 24-bit cap on `hi` would orphan `lo`'s private
+    /// category — no mask references it — leaving it colliding with
+    /// nothing until a rebuild heals it, instead of the pair
+    /// documentedly keeping colliding. Caller holds `jointLock`.
+    private func carvePairLocked(_ pair: JointPair) {
+        guard let wA = wireMasksLocked(pair.lo),
+              let wB = wireMasksLocked(pair.hi),
+              (wA.cat & wB.mask) != 0,
+              (wB.cat & wA.mask) != 0 else { return }
+        var reserved: [UInt64: Int] = [:]
+        for key in [pair.lo, pair.hi] where jointPrivBits[key] == nil {
+            guard nodesById[key]?.parent != nil,
+                  nodesById[key]?.physicsBody != nil,
+                  let bit = freePrivateBitLocked(
+                      excluding: Set(reserved.values))
+            else { return }
+            reserved[key] = bit
+        }
+        for (key, bit) in reserved { privatizeLocked(key, bit: bit) }
+        rebuildPairMasksLocked()
+    }
+
+    /// A node's wire-truth (category, collision mask): privatized
+    /// nodes read their save; live bodies read their realizer values
+    /// minus the private range. Nil for a node without a LIVE body —
+    /// `parent != nil` keeps detached pre-install registry entries
+    /// (dead nodes that still hold a physicsBody) from answering.
+    /// Caller holds `jointLock`.
+    private func wireMasksLocked(_ key: UInt64)
+        -> (cat: Int, mask: Int)?
+    {
+        if let w = jointWireMasks[key] { return w }
+        guard let node = nodesById[key], node.parent != nil,
+              let b = node.physicsBody else { return nil }
+        return (b.categoryBitMask,
+                b.collisionBitMask & ~Self.jointPrivateBits)
+    }
+
+    /// The first free private category bit (top-down from bit 63,
+    /// inside `jointPrivateBits`), skipping bits a carve has reserved
+    /// but not yet installed. Nil past 24 privatized bodies — the
+    /// pair then keeps colliding, and the recorded pair's carve
+    /// retries on every rebuild so a bit freed later still completes
+    /// it. Caller holds `jointLock`.
+    private func freePrivateBitLocked(excluding reserved: Set<Int>)
+        -> Int?
+    {
+        for i in 0..<24 {
+            let cand = 1 << (63 - i)
+            if !jointPrivBits.values.contains(cand),
+               !reserved.contains(cand) { return cand }
+        }
+        logOnce("joint.collide.bits",
+            "collide=false joints exhausted the private category "
+            + "bits; the pair keeps colliding")
+        return nil
+    }
+
+    /// Installs the node's reserved private category bit and saves
+    /// its wire masks. Caller holds `jointLock`.
+    private func privatizeLocked(_ key: UInt64, bit: Int) {
+        guard let body = nodesById[key]?.physicsBody else { return }
+        jointPrivBits[key] = bit
+        jointWireMasks[key] = (body.categoryBitMask,
+            body.collisionBitMask & ~Self.jointPrivateBits)
+        body.categoryBitMask = bit
+    }
+
+    /// Frees the node's private bit and restores its saved wire
+    /// category/mask (skipped cleanly when the body is already gone).
+    /// Caller holds `jointLock`.
+    private func unprivatizeLocked(_ key: UInt64) {
+        guard jointPrivBits.removeValue(forKey: key) != nil
+        else { return }
+        if let (cat, mask) = jointWireMasks.removeValue(forKey: key),
+           let body = nodesById[key]?.physicsBody {
+            body.categoryBitMask = cat
+            body.collisionBitMask = mask
+            body.contactTestBitMask = ~0
+        }
+    }
+
+    /// One body's derived (category, collision mask, contact mask)
+    /// under the live exclusion state — pure: wire truth in, masks
+    /// out. Caller holds `jointLock`.
+    private func pairMasks(_ key: UInt64, _ body: SCNPhysicsBody)
+        -> (cat: Int, mask: Int, contact: Int)
+    {
+        let wire = wireMasksLocked(key)
+            ?? (body.categoryBitMask,
+                body.collisionBitMask & ~Self.jointPrivateBits)
+        var mask = wire.mask
+        var contact: Int = ~0
+        // See a privatized body exactly when the wire mask saw its
+        // wire category; excluded partners lose their bit outright.
+        for (k, bit) in jointPrivBits where k != key {
+            guard let (wCat, _) = jointWireMasks[k],
+                  (wCat & wire.mask) != 0 else { continue }
+            mask |= bit
+        }
+        for pair in jointExcludedPairs.keys where pair.contains(key) {
+            if let bit = jointPrivBits[pair.other(key)] {
+                mask &= ~bit
+                contact &= ~bit
+            }
+        }
+        return (jointPrivBits[key] ?? wire.cat, mask, contact)
+    }
+
+    /// Re-derives every registered body's masks via [pairMasks] —
+    /// the ONE place the pair scheme writes them, so rebuilds can
+    /// never leak a freed or stale private bit. Caller holds
+    /// `jointLock`.
+    private func rebuildPairMasksLocked() {
+        for (key, node) in nodesById where node.parent != nil {
+            guard let body = node.physicsBody else { continue }
+            let (cat, mask, contact) = pairMasks(key, body)
+            body.categoryBitMask = cat
+            body.collisionBitMask = mask
+            body.contactTestBitMask = contact
+        }
+    }
+
+    /// Re-attempts every recorded pair's carve, then re-derives —
+    /// `install` calls this once `nodesById` holds the new scene, so
+    /// pairs that recorded against the outgoing registry (or couldn't
+    /// collide then) converge instead of waiting on a body rebuild.
+    private func settleJointPairMasks() {
+        jointLock.lock()
+        defer { jointLock.unlock() }
+        for pair in jointExcludedPairs.keys { carvePairLocked(pair) }
+        rebuildPairMasksLocked()
+    }
+
+    /// Re-derives a freshly (re)built body's pair masks: refreshes a
+    /// privatized node's wire save, retries the carve on every
+    /// recorded pair it touches (a pair that couldn't collide at
+    /// joint time may collide on the new masks), and re-derives. The
+    /// body gets its own pass too — during an initial decode it isn't
+    /// in `nodesById` yet. FsceneRealizer calls this right after
+    /// `node.physicsBody =`.
+    func applyJointPairMasks(_ key: UInt64, _ body: SCNPhysicsBody) {
+        jointLock.lock()
+        defer { jointLock.unlock() }
+        guard !jointExcludedPairs.isEmpty || !jointPrivBits.isEmpty
+        else { return }
+        if jointPrivBits[key] != nil {
+            jointWireMasks[key] = (body.categoryBitMask,
+                body.collisionBitMask & ~Self.jointPrivateBits)
+        }
+        for pair in jointExcludedPairs.keys where pair.contains(key) {
+            carvePairLocked(pair)
+        }
+        rebuildPairMasksLocked()
+        let (cat, mask, contact) = pairMasks(key, body)
+        body.categoryBitMask = cat
+        body.collisionBitMask = mask
+        body.contactTestBitMask = contact
     }
 
     /// Maps a record to its SceneKit behavior. iOS has no
@@ -3010,6 +3260,12 @@ final class SceneViewHost: SCNView {
             retire(rec.behavior!)
             joints[id]?.behavior = nil
         }
+        // Exclusion state dies with the scene's bodies — records
+        // re-exclude as they re-realize on the new scene's bodies.
+        for id in joints.keys { joints[id]?.excluded = false }
+        jointPrivBits.removeAll()
+        jointWireMasks.removeAll()
+        jointExcludedPairs.removeAll()
         jointLock.unlock()
         for child in scene.rootNode.childNodes {
             child.removeFromParentNode()
@@ -3150,8 +3406,11 @@ final class SceneViewHost: SCNView {
         }
         // Joint behaviors were detached from the replaced world at the
         // top of install — every record re-realizes against the new
-        // bodies; endpoints still missing re-defer.
+        // bodies; endpoints still missing re-defer. The pair-mask
+        // settle then converges whatever the pre-install registry
+        // couldn't see.
         retryPendingJoints()
+        settleJointPairMasks()
         if let camera {
             pointOfView = camera
             fallbackCameraNode = nil
