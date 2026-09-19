@@ -468,21 +468,21 @@ Each live lane drives the real surfaces. Android lanes use the phone A142 (`adb 
 
 **Files.**
 
-- [ ] Edit both realizers for `trail` and `lod` components.
-- [ ] Create the Android ribbon mesh path.
+- [x] Edit both realizers for `trail` and `lod` components.
+- [x] Create the Android ribbon mesh path.
 
 **Build.**
 
-- [ ] `trail` as a camera-facing ribbon with `width`, `lifetime`, `minVertexDistance`, `maxPoints`, and `widthOverTrail` on both platforms.
-- [ ] `lod` via `SCNGeometry.levelsOfDetail` on iOS and a per-frame camera test on Android. `hysteresis` and `blendRange` documented as no-ops.
+- [x] `trail` as a camera-facing ribbon with `width`, `lifetime`, `minVertexDistance`, `maxPoints`, and `widthOverTrail` on both platforms.
+- [x] `lod` via `SCNGeometry.levelsOfDetail` on iOS and a per-frame camera test on Android. `hysteresis` and `blendRange` documented as no-ops.
 
 **You see.**
 
-- [ ] A moving node leaves a fading ribbon and geometry visibly swaps with distance on both platforms.
+- [ ] A moving node leaves a fading ribbon and geometry visibly swaps with distance on both platforms. (Wired via the `w16` harness lane; live run still owed.)
 
 **Verify, unit.** Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked.
 
-- [ ] Trail point-buffer and LOD-threshold cases in `dart3d/example/test/`. Run `dn test`.
+- [x] Trail point-buffer and LOD-threshold cases in `dart3d/example/test/`. Run `dn test`.
 
 **Verify, live.** Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked. Ten lanes on `swe-2-max` at the PR head, per the boot recipe.
 

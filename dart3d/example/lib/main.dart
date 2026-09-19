@@ -150,6 +150,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
   void Function()? _wLoosePhase;
   void Function()? _w15Phase;
   void Function(({double w, double h}) Function() targetPx)? _w24Phase;
+  void Function()? _w16Phase;
   Timer? _w11Timer;
   Timer? _w12Timer;
   Timer? _w13Timer;
@@ -157,6 +158,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
   Timer? _wLooseTimer;
   Timer? _w15Timer;
   Timer? _w24Timer;
+  Timer? _w16Timer;
   int _animsPlaying = 0;
   LocalId? _die;
   LocalId? _ball;
@@ -216,6 +218,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     _wLoosePhase = scene.wLoosePhase;
     _w15Phase = scene.w15Phase;
     _w24Phase = scene.w24Phase;
+    _w16Phase = scene.w16Phase;
     _animsPlaying = 0;
     // The W11 lane lands at +14 s — after the joint rig — so its
     // skinned flag and morph blob don't contend with the +8 s diff
@@ -250,6 +253,11 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     // clear of the streaming cycles.
     _w24Timer?.cancel();
     _w24Timer = Timer(const Duration(seconds: 126), _runW24);
+    // The W16 trails/LOD lane lands at +112 s — after wLoose's +30 s
+    // settle-metric window, so the mover's transform stream can't
+    // contend with the roll→rest timing.
+    _w16Timer?.cancel();
+    _w16Timer = Timer(const Duration(seconds: 112), _runW16);
     _jointsBroke = 0;
     _controller.loadDocument(scene.document);
     // W8: the query battery fires at +10 s — after the +8 s diff — and
@@ -382,6 +390,16 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
       final dpr = mq.devicePixelRatio;
       return (w: size.width * dpr, h: size.height * dpr);
     });
+  }
+
+  /// The W16 trails/LOD phase at +112 s — after wLoose's cleanup
+  /// window. The phase drives `w16Mover` ~29.5 m out and back through
+  /// its three `lod` thresholds and the cull floor while the node's
+  /// `trail` draws the camera-facing ribbon; it logs its own
+  /// completion.
+  void _runW16() {
+    dnLog('dart3d: w16 phase — trail ribbon + screen-size lod drive');
+    _w16Phase?.call();
   }
 
   void _onJointEvent(SceneJointBroke event) {
@@ -617,6 +635,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     _wLooseTimer?.cancel();
     _w15Timer?.cancel();
     _w24Timer?.cancel();
+    _w16Timer?.cancel();
     _queryBattery?.cancel();
     _jointTimer?.cancel();
     _reroll?.cancel();
@@ -637,6 +656,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     _wLoosePhase = null;
     _w15Phase = null;
     _w24Phase = null;
+    _w16Phase = null;
     _animsPlaying = 0;
     _jointCount = 0;
     _jointsBroke = 0;
@@ -675,6 +695,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     _wLooseTimer?.cancel();
     _w15Timer?.cancel();
     _w24Timer?.cancel();
+    _w16Timer?.cancel();
     super.dispose();
   }
 
