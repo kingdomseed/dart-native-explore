@@ -52,9 +52,12 @@ class StageLut private constructor(
     companion object {
         /**
          * Parses `.cube` text into a table. Throws [ParseException]
-         * on the same conditions upstream does; non-table lines that
-         * carry fewer than three tokens are skipped, matching the
-         * upstream tolerance.
+         * on the same structural conditions upstream does;
+         * non-table lines that carry fewer than three tokens are
+         * skipped, matching the upstream tolerance. A malformed
+         * numeric token in a data row becomes `0` (`?: 0f`) where
+         * upstream's `double.parse` throws — a deliberate
+         * robustness choice, not strict parity.
          */
         @Throws(ParseException::class)
         fun parse(content: String): StageLut {

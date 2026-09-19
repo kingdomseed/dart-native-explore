@@ -4035,8 +4035,11 @@ final class FeatureScene {
           'LUT asset path (assets/luts/cool.cube)',
         );
       });
-      // +6 s: film grain + auto exposure — Filament dithering plus
-      // the readPixels adaptation on Android; logged limits on iOS.
+      // +6 s: film grain + auto exposure — grain lands as Filament
+      // dithering on Android / grainIntensity on iOS; Android
+      // metering is a documented limit so only `compensation`
+      // applies (a static EV offset), iOS logs strength and
+      // compensation.
       Timer(const Duration(seconds: 6), () {
         setEffects(
           EnvironmentEffectsSpec(
@@ -4050,8 +4053,8 @@ final class FeatureScene {
         );
       });
       // +8 s: SSR + lens flare — real passes on Android; iOS
-      // approximates the flare with a sprite overlay and logs the SSR
-      // platform limit.
+      // approximates the flare as widened bloom + a color fringe
+      // and logs the SSR platform limit.
       Timer(const Duration(seconds: 8), () {
         setEffects(
           EnvironmentEffectsSpec(

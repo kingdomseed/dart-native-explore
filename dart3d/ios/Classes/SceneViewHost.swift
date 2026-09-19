@@ -873,6 +873,20 @@ final class SceneViewHost: SCNView {
         payloadStore[id] = bytes
         // W25: a rewritten LUT chunk invalidates its cached strips.
         invalidateLuts(backedBy: id)
+        // W7/W25: an env equirect or LUT chunk re-runs `decodeStage`
+        // on the live scene — the same early-out `upsertPayload`
+        // takes, and the only path that doesn't depend on other
+        // resources still being pending. No early return: a chunk the
+        // stage shares with another claimant must still reach the
+        // checks below.
+        if environmentPayloadKeys.values.contains(id)
+            || lutPayloadKeys.values.contains(id) {
+            let ctx = surgicalContext()
+            ctx.decodeStage(ctx.stageJSON)
+            publish(ctx)
+            applyStageExposure(ctx.stageExposure)
+            applyStageEffects()
+        }
         // W11 claims run surgically first — a skin's IBM chunk or an
         // animation's timeline/keyframes chunk re-decodes just its
         // owner, like the `upsertPayload` path (and keeps live clips

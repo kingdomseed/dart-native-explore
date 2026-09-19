@@ -36,9 +36,11 @@ struct StageLut {
     }
 
     /// Parses `.cube` text into a table. Throws `ParseError` on the
-    /// same conditions upstream does; non-table lines that carry
-    /// fewer than three tokens are skipped, matching the upstream
-    /// tolerance.
+    /// same structural conditions upstream does; non-table lines
+    /// that carry fewer than three tokens are skipped, matching the
+    /// upstream tolerance. A malformed numeric token in a data row
+    /// becomes `0` (`?? 0`) where upstream's `double.parse` throws —
+    /// a deliberate robustness choice, not strict parity.
     static func parse(_ content: String) throws -> StageLut {
         var size = 0
         var values: [Float] = []
