@@ -345,14 +345,43 @@ Map<String, Object?> encodeAnimationSpec(
   };
 }
 
+/// A [RenderViewSpec] plus the dart3d `viewport` extension (W24).
+///
+/// Upstream's spec is final-shaped — it has no field for the
+/// `"viewport":[l,b,w,h]` member dart3d adds to the manifest `views`
+/// entry (a split-screen rect in target-pixel units, bottom-left
+/// origin — absent means the full target). The extension rides a
+/// subclass so it flows through `doc.views`, [diffCommands],
+/// `SceneController.updateViews`, and `D3Protocol.loadSceneBytes`
+/// with no API change — every one of those re-encodes through
+/// [encodeViewSpec], which emits the member for this type only.
+final class Dart3dRenderViewSpec extends RenderViewSpec {
+  /// Creates a view spec carrying the upstream fields plus [viewport].
+  Dart3dRenderViewSpec({
+    required super.cameraNode,
+    super.target,
+    super.layerMask = 0xFFFFFFFF,
+    super.order = 0,
+    super.antiAliasingMode,
+    super.renderScale,
+    super.filterQuality,
+    this.viewport,
+  });
+
+  /// `[left, bottom, width, height]` in target-pixel units — a
+  /// split-screen rect inside the view's target (screen or render
+  /// texture); null draws the full target.
+  final List<double>? viewport;
+}
+
 /// A [RenderViewSpec] encoded as the manifest `views` entry — the
 /// entry shape `updateViews` carries (upstream's `_encodeView` is
 /// private; this emits the identical fields): `camera` always, plus
 /// `target`/`layerMask`/`order`/`antiAliasing`/`renderScale`/
 /// `filterQuality` only when non-default. [idKey] supplies the
-/// manifest id-key prefixes for the `n:`/`rt:` tokens. A dart3d
-/// extension layer may add `"viewport":[l,b,w,h]` (target-pixel
-/// units) to the returned map — absent means the full target.
+/// manifest id-key prefixes for the `n:`/`rt:` tokens. A
+/// [Dart3dRenderViewSpec] adds `"viewport":[l,b,w,h]` (target-pixel
+/// units) — absent means the full target.
 Map<String, Object?> encodeViewSpec(
   RenderViewSpec view,
   String Function(LocalId) idKey,
@@ -364,7 +393,62 @@ Map<String, Object?> encodeViewSpec(
   if (view.antiAliasingMode != null) 'antiAliasing': view.antiAliasingMode,
   if (view.renderScale != null) 'renderScale': view.renderScale,
   if (view.filterQuality != null) 'filterQuality': view.filterQuality,
+  if (view is Dart3dRenderViewSpec && view.viewport != null)
+    'viewport': view.viewport,
 };
+
+/// The manifest `views` entry decoded back to a spec — the inverse of
+/// [encodeViewSpec], producing a [Dart3dRenderViewSpec] so the
+/// `viewport` extension survives a manifest round-trip (upstream's
+/// `_decodeView` drops it). Malformed/absent members take the spec
+/// defaults; `camera` is required and [LocalId.parse] throws on a
+/// missing token, same as upstream.
+RenderViewSpec decodeViewSpec(Map<String, Object?> json) =>
+    Dart3dRenderViewSpec(
+      cameraNode: LocalId.parse(json['camera'] as String),
+      target: json['target'] != null
+          ? LocalId.parse(json['target'] as String)
+          : null,
+      layerMask: (json['layerMask'] as num?)?.toInt() ?? 0xFFFFFFFF,
+      order: (json['order'] as num?)?.toInt() ?? 0,
+      antiAliasingMode: json['antiAliasing'] as String?,
+      renderScale: (json['renderScale'] as num?)?.toDouble(),
+      filterQuality: json['filterQuality'] as String?,
+      viewport: (json['viewport'] as List?)
+          ?.map((v) => (v as num).toDouble())
+          .toList(),
+    );
+
+/// Re-decodes [doc]'s view list from the raw `.fscene` manifest
+/// object so the dart3d view extensions survive — upstream's
+/// `_decodeView` emits one spec per manifest entry, unskipped and in
+/// order, so the lists pair by index. Entries that aren't JSON
+/// objects keep upstream's spec.
+void applyViewExtensions(SceneDocument doc, Map<String, Object?> manifest) {
+  final viewsJson = manifest['views'];
+  if (viewsJson is! List) return;
+  for (var i = 0; i < doc.views.length && i < viewsJson.length; i++) {
+    final entry = viewsJson[i];
+    if (entry is Map) {
+      doc.views[i] = decodeViewSpec(Map<String, Object?>.from(entry));
+    }
+  }
+}
+
+/// The `.fscene` text decode dart3d callers use — upstream
+/// [readFscene] plus [applyViewExtensions], so a `viewport` on a
+/// manifest `views` entry reaches `doc.views` instead of being
+/// dropped by upstream's `_decodeView` (W24).
+SceneDocument readFsceneWithExtensions(String manifest) {
+  final doc = readFscene(manifest);
+  // `stripJsonc` matches upstream's own reader tolerance — the logged
+  // path (W29's `readFsceneLogged`) decodes through here too.
+  applyViewExtensions(
+    doc,
+    jsonDecode(stripJsonc(manifest)) as Map<String, Object?>,
+  );
+  return doc;
+}
 
 /// [doc]'s view list as canonical JSON, encoded with the document's
 /// own manifest id keys — the compare form the `updateViews` emit

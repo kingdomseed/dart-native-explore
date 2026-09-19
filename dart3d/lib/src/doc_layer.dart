@@ -17,6 +17,7 @@ import 'dart:typed_data';
 
 import 'package:vector_math/vector_math.dart';
 
+import 'diff_apply.dart';
 import 'scene_model.dart';
 
 /// The `command` ops that carry document state — the set
@@ -51,8 +52,19 @@ const _documentOps = {
 /// space: serializing, then realizing with `SceneController.loadDocument`
 /// reproduces the scene — including payload chunks, whose bytes ride the
 /// binary channel and so cannot appear in the JSON tree.
+///
+/// `encodeDocument` drops the dart3d `viewport` view extension
+/// (upstream `_encodeView`), so the snapshot's view list is re-decoded
+/// through the dart3d codec pair the same way the wire manifest is —
+/// `loadSceneBytes`'s encode half feeding `decodeViewSpec` (W24).
 SceneDocument serializeScene(SceneDocument live) {
   final snapshot = decodeDocument(encodeDocument(live));
+  if (live.views.isNotEmpty) {
+    final idKey = manifestIdKey(live);
+    for (var i = 0; i < live.views.length; i++) {
+      snapshot.views[i] = decodeViewSpec(encodeViewSpec(live.views[i], idKey));
+    }
+  }
   for (final entry in live.payloads.entries) {
     final bytes = entry.value.bytes;
     snapshot.payloads[entry.key]?.bytes = bytes == null
@@ -70,6 +82,11 @@ SceneDocument serializeScene(SceneDocument live) {
 /// A same-version source logs nothing; a source the peek can't parse
 /// leaves [log] uncalled and lets `readFscene` throw the real error.
 ///
+/// The decode runs through `readFsceneWithExtensions`, not bare
+/// `readFscene`, so the dart3d `viewport` view member survives on
+/// every logged path — showcase assets, prefab grafts, and
+/// `SceneController.loadFscene` alike (W24 merge).
+///
 /// The sink is injected because `dnLog` isn't reachable everywhere the
 /// decode is — the showcase loader stays `dart test`-compatible and
 /// passes its own `log` parameter through.
@@ -85,7 +102,7 @@ SceneDocument readFsceneLogged(
   } catch (_) {
     // `readFscene` reports the parse failure.
   }
-  final doc = readFscene(source);
+  final doc = readFsceneWithExtensions(source);
   final from = encodedVersion;
   if (from != null && from != doc.formatVersion) {
     log?.call('dart3d: migrated fscene v$from → v${doc.formatVersion}');
@@ -170,9 +187,19 @@ void foldCommandIntoDocument(SceneDocument doc, Map<String, Object?> op) {
     case 'removeAnimation':
       doc.animations.remove(_opId(op, 'id'));
     case 'updateViews':
+      // `decodeViewSpec`, not the fragment decode — the op's entries
+      // are the manifest view shape and may carry the dart3d
+      // `viewport` member upstream's `_decodeView` would drop (W24).
+      // A missing/malformed `views` member no-ops — both natives warn
+      // `updateViews.malformed` and return without touching the list.
+      final list = op['views'];
+      if (list is! List) return;
       doc.views
         ..clear()
-        ..addAll(_decodeFragment(doc, {'views': op['views']}).views);
+        ..addAll([
+          for (final entry in list)
+            if (entry is Map) decodeViewSpec(Map<String, Object?>.from(entry)),
+        ]);
   }
 }
 
