@@ -184,6 +184,37 @@ void main() {
       }
     });
 
+    test('volume props without transmission classify as the inert drop', () {
+      // extFlagsFor warn-onces "volume props without transmission are
+      // inert — dropped" — a documented drop, i.e. `approx` under the
+      // matrix's definition, not the clean pass Android reported
+      // before the classification modeled it.
+      final report = runConformance(loadCatalog());
+      // IORTestGrid's T0 materials carry transmission:0 + thickness +
+      // attenuationColor — ten inert-warn materials.
+      final grid = report.rows.singleWhere((r) => r.name == 'IORTestGrid');
+      expect(grid.status['android'], RowStatus.approx);
+      expect(
+        grid.approximated['android'],
+        containsAll(<String>['thickness', 'attenuationColor']),
+      );
+      // ScatteringSkull declares no transmission at all — every
+      // volume prop is inert on Android.
+      final skull = report.rows.singleWhere((r) => r.name == 'ScatteringSkull');
+      expect(
+        skull.approximated['android'],
+        containsAll(<String>[
+          'thickness',
+          'thicknessTexture',
+          'attenuationColor',
+          'attenuationDistance',
+        ]),
+      );
+      // Control: a transmissive volume still realizes the props.
+      final att = report.rows.singleWhere((r) => r.name == 'AttenuationTest');
+      expect(att.status['android'], RowStatus.pass);
+    });
+
     test('the support table covers every catalog property name', () {
       // Guards the table against typos — a claimed-realized name that
       // no asset uses and no wire name matches would hide a gap.
@@ -207,7 +238,7 @@ void main() {
     test('classifies the upstream smoke scenes and generates fixtures', () {
       expect(goldenScenes, hasLength(37));
       final applicable = goldenScenes.where((s) => s.applies).length;
-      expect(applicable, 19);
+      expect(applicable, 20);
       // Every generated fixture encodes a valid manifest with a
       // material, a mesh node, and a camera.
       for (final s in goldenScenes.where((s) => s.fixture != null)) {
