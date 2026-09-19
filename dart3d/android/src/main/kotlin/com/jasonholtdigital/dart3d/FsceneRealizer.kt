@@ -101,6 +101,52 @@ class GpuMesh(
 }
 
 /**
+ * W26: a node whose vertex buffer re-expands toward the live camera
+ * each frame — `d3:procMesh` camera-facing shapes (`polyline`,
+ * `lineSegments`, `billboard`) plus the instanced-quad form
+ * (`billboardInstances`). `points` holds native-space xyz triples
+ * (line points or per-instance centers); the remaining fields mirror
+ * the component params so `MeshFactory` can rebuild the record.
+ */
+class FacingSpec(
+    val shape: String,
+    val points: List<MeshFactory.V3>,
+    val colors: List<FloatArray>?,
+    val widths: List<Float>?,
+    val width: Float,
+    val dashes: DoubleArray?,
+    val closed: Boolean,
+    val sizeX: Float, val sizeY: Float,
+    val rotation: Float,
+    val tint: FloatArray,
+    val vertexBuffer: VertexBuffer,
+    val entity: Int,
+    /** Billboard facing mode — `spherical`/`axisY` aim at the
+     *  node-local camera position; `screen` keeps the camera plane.
+     *  Lines ignore it (they always aim at the camera). */
+    val facing: String = "spherical",
+) {
+    companion object {
+        /** The instanced-billboard registration — centers are the
+         *  instance transforms' translations in node space. */
+        fun billboards(
+            centers: FloatArray, sizeX: Float, sizeY: Float,
+            rotation: Float, colors: List<FloatArray>?,
+            vertexBuffer: VertexBuffer, entity: Int,
+            facing: String = "spherical",
+        ) = FacingSpec(
+            "billboardInstances",
+            (0 until centers.size / 3).map {
+                MeshFactory.V3(centers[it * 3], centers[it * 3 + 1],
+                    centers[it * 3 + 2])
+            },
+            colors, null, 1f, null, false,
+            sizeX, sizeY, rotation,
+            floatArrayOf(1f, 1f, 1f, 1f), vertexBuffer, entity, facing)
+    }
+}
+
+/**
  * Realizes a `.fscene` manifest (canonical JSON) into Filament entities
  * and Jolt bodies. Mirrors FsceneRealizer.swift: same component
  * vocabulary, same deferred physics pass, same tagged-value decoding.
@@ -596,6 +642,19 @@ object FsceneRealizer {
         // the same object the host does (no extra registry).
         var trail: TrailState? = null,
         var lod: LodState? = null,
+        // W26: a `d3:procMesh`/`d3:instances` node's private GpuMesh —
+        // unlike the shared gpuMeshes map (keyed by geometry
+        // resource), component-owned buffers die with the component.
+        var procGpuMesh: GpuMesh? = null,
+        // Retained `d3:instances` props — a geometry-ref consumer
+        // re-bakes when the resource upserts (meshPrimGeoKeys' mesh
+        // path can't reproduce transformed copies).
+        var instancesProps: JSONObject? = null,
+        // W26: a `doubleSided` instances node binds a duplicated
+        // MaterialInstance (the shared instance can't carry a
+        // per-component flag); component-owned, destroyed with the
+        // renderable.
+        var procMaterialInstance: MaterialInstance? = null,
     )
 
     /**
@@ -949,7 +1008,7 @@ object FsceneRealizer {
             val proc = r.optJSONObject("procedural")
             if (proc != null) {
                 val shape = proc.optString("shape")
-                val md = procedural(shape, proc)
+                val md = procedural(key, shape, proc)
                 if (md != null) geometries[key] = md
                 geometryPayloadIds.remove(key)
                 return
@@ -1151,27 +1210,543 @@ object FsceneRealizer {
             )
         }
 
-        private fun procedural(shape: String, p: JSONObject): MeshFactory.MeshData? {
+        /** Segment-count params clamp to ≥1 — a zero/negative on the
+         *  wire would NaN the generators' `s / segments` divisions
+         *  (FsceneRealizer.swift's `seg` does the same). */
+        private fun seg(p: JSONObject, name: String, def: Int): Int =
+            maxOf(1, p.tag(name).d3Int() ?: def)
+
+        private fun procedural(
+            key: Long, shape: String, p: JSONObject,
+        ): MeshFactory.MeshData? {
             when (shape) {
                 "cuboid" -> {
                     val e = p.tag("extents").d3Vec3() ?: doubleArrayOf(1.0, 1.0, 1.0)
                     return MeshFactory.cuboid(
-                        e[0].toFloat(), e[1].toFloat(), e[2].toFloat())
+                        e[0].toFloat(), e[1].toFloat(), e[2].toFloat(),
+                        p.tag("debugColors").d3Bool() == true)
                 }
                 "sphere" -> return MeshFactory.sphere(
-                    (p.tag("radius").d3Double() ?: 0.5).toFloat())
+                    (p.tag("radius").d3Double() ?: 0.5).toFloat(),
+                    seg(p, "segments", 32), seg(p, "rings", 16))
                 "icosphere" -> {
-                    Log.i(TAG, "icosphere approximated with UV sphere")
-                    return MeshFactory.sphere(
-                        (p.tag("radius").d3Double() ?: 0.5).toFloat())
+                    // W26: a real subdivided icosahedron replaces the
+                    // UV-sphere stand-in (same algorithm proc.dart +
+                    // GeometryFactory.swift generate).
+                    return MeshFactory.icosphere(
+                        (p.tag("radius").d3Double() ?: 0.5).toFloat(),
+                        maxOf(0, p.tag("subdivisions").d3Int() ?: 2))
                 }
                 "plane" -> return MeshFactory.plane(
                     (p.tag("width").d3Double() ?: 1.0).toFloat(),
-                    (p.tag("depth").d3Double() ?: 1.0).toFloat())
+                    (p.tag("depth").d3Double() ?: 1.0).toFloat(),
+                    seg(p, "segmentsX", 1), seg(p, "segmentsZ", 1))
                 "torus" -> return MeshFactory.torus(
                     (p.tag("radius").d3Double() ?: 0.5).toFloat(),
-                    (p.tag("tubeRadius").d3Double() ?: 0.125).toFloat())
+                    (p.tag("tubeRadius").d3Double() ?: 0.15).toFloat(),
+                    seg(p, "radialSegments", 32),
+                    seg(p, "tubularSegments", 16))
+                // W26 vocabulary — `d3:procMesh` components and
+                // upstream-style `procedural` geometry resources share
+                // the same shape/param names.
+                "cylinder" -> return MeshFactory.cylinder(
+                    (p.tag("bottomRadius").d3Double() ?: 0.5).toFloat(),
+                    (p.tag("topRadius").d3Double() ?: 0.5).toFloat(),
+                    (p.tag("height").d3Double() ?: 1.0).toFloat(),
+                    seg(p, "radialSegments", 32),
+                    seg(p, "heightSegments", 1),
+                    p.tag("bottomCap").d3Bool() != false,
+                    p.tag("topCap").d3Bool() != false)
+                "cone" -> return MeshFactory.cylinder(
+                    (p.tag("radius").d3Double() ?: 0.5).toFloat(), 0f,
+                    (p.tag("height").d3Double() ?: 1.0).toFloat(),
+                    seg(p, "radialSegments", 32),
+                    seg(p, "heightSegments", 1),
+                    p.tag("bottomCap").d3Bool() != false, false)
+                "capsule" -> return MeshFactory.capsule(
+                    (p.tag("radius").d3Double() ?: 0.5).toFloat(),
+                    (p.tag("height").d3Double() ?: 1.0).toFloat(),
+                    seg(p, "radialSegments", 32),
+                    seg(p, "capRings", 8))
+                "disc" -> return MeshFactory.disc(
+                    (p.tag("radius").d3Double() ?: 0.5).toFloat(),
+                    seg(p, "segments", 32))
+                "tube" -> {
+                    val pts = d3PointList(p, "points")
+                    if (pts == null || pts.size < 2) {
+                        Log.w(TAG, "tube: needs at least two points")
+                        return null
+                    }
+                    return MeshFactory.tube(pts,
+                        (p.tag("radius").d3Double() ?: 0.5).toFloat(),
+                        seg(p, "radialSegments", 12),
+                        maxOf(2, p.tag("stations").d3Int() ?: 64),
+                        p.tag("caps").d3Bool() != false,
+                        p.tag("closed").d3Bool() == true)
+                }
+                "ribbon" -> {
+                    val pts = d3PointList(p, "points")
+                    if (pts == null || pts.size < 2) {
+                        Log.w(TAG, "ribbon: needs at least two points")
+                        return null
+                    }
+                    val u = p.tag("up").d3Vec3()
+                        ?: doubleArrayOf(0.0, 1.0, 0.0)
+                    return MeshFactory.ribbon(pts,
+                        (p.tag("width").d3Double() ?: 1.0).toFloat(),
+                        maxOf(2, p.tag("stations").d3Int() ?: 64),
+                        MeshFactory.V3(
+                            u[0].toFloat(), u[1].toFloat(), -u[2].toFloat()),
+                        p.tag("closed").d3Bool() == true)
+                }
+                in FACING_SHAPES -> {
+                    // A camera-facing shape as a static geometry
+                    // resource can't reface per frame — bake once
+                    // toward +Z, the same fallback the instances
+                    // path uses.
+                    logOnce("geometry.facing.$shape",
+                        "geometry $key: camera-facing shape '$shape'" +
+                            " bakes once toward +Z")
+                    return facingMesh(shape, parseFacing(key, p),
+                        MeshFactory.V3(0f, 0f, 1f),
+                        MeshFactory.V3(1f, 0f, 0f),
+                        MeshFactory.V3(0f, 1f, 0f))
+                }
                 else -> { Log.w(TAG, "unknown procedural shape '$shape'"); return null }
+            }
+        }
+
+        // MARK: W26 `d3:procMesh` / `d3:instances`
+
+        /** `d3:procMesh` shapes that re-expand toward the live camera
+         *  each frame — the rest build once like the upstream
+         *  procedural resources above. */
+        private val FACING_SHAPES = setOf(
+            "polyline", "lineSegments", "billboard")
+
+        /** A `{'v3':[…]}` list → native-space points (z-mirrored at
+         *  the wire boundary, like every vertex source). */
+        private fun d3PointList(
+            p: JSONObject, key: String,
+        ): List<MeshFactory.V3>? {
+            val list = p.tag(key).d3List() ?: return null
+            val out = ArrayList<MeshFactory.V3>(list.length())
+            for (i in 0 until list.length()) {
+                val v = list.optJSONObject(i)?.d3Vec3() ?: return null
+                if (v.size < 3) return null
+                out.add(MeshFactory.V3(
+                    v[0].toFloat(), v[1].toFloat(), -v[2].toFloat()))
+            }
+            return out
+        }
+
+        /** A `{'c':[rgba]}` list → per-point colors. */
+        private fun d3ColorList(p: JSONObject, key: String): List<FloatArray>? {
+            val list = p.tag(key).d3List() ?: return null
+            val out = ArrayList<FloatArray>(list.length())
+            for (i in 0 until list.length()) {
+                out.add(list.optJSONObject(i)?.d3Color() ?: return null)
+            }
+            return out
+        }
+
+        /** A `{'d':x}` list → per-point widths. */
+        private fun d3FloatList(p: JSONObject, key: String): List<Float>? {
+            val list = p.tag(key).d3List() ?: return null
+            val out = ArrayList<Float>(list.length())
+            for (i in 0 until list.length()) {
+                out.add((list.optJSONObject(i)?.d3Double() ?: return null)
+                    .toFloat())
+            }
+            return out
+        }
+
+        /** The parsed parameters of a camera-facing shape — retained
+         *  so stepFrame can re-expand the vertex buffer toward the
+         *  live camera basis each frame. `facing` is the billboard
+         *  mode (`spherical`/`axisY`/`screen`). */
+        private class FacingParams(
+            val points: List<MeshFactory.V3>,
+            val colors: List<FloatArray>?,
+            val widths: List<Float>?,
+            val width: Float,
+            val dashes: DoubleArray?,
+            val closed: Boolean,
+            val sizeX: Float, val sizeY: Float,
+            val rotation: Float,
+            val tint: FloatArray,
+            val facing: String,
+        )
+
+        /** The billboard facing modes the wire recognizes — anything
+         *  else warns once and falls back to `spherical`, the
+         *  Dart-side default (mirrors FsceneRealizer.facingMode). */
+        private fun facingMode(key: Long, raw: String?): String = when (raw) {
+            null, "spherical" -> "spherical"
+            "axisY", "screen" -> raw
+            else -> {
+                warnOnce("facing.$key.$raw",
+                    "node $key: unknown billboard facing '$raw'" +
+                        " — using spherical")
+                "spherical"
+            }
+        }
+
+        private fun parseFacing(key: Long, p: JSONObject): FacingParams {
+            val s = p.tag("size").d3Vec2() ?: doubleArrayOf(1.0, 1.0)
+            return FacingParams(
+                points = d3PointList(p, "points") ?: emptyList(),
+                colors = d3ColorList(p, "colors"),
+                widths = d3FloatList(p, "widths"),
+                width = (p.tag("width").d3Double() ?: 1.0).toFloat(),
+                dashes = p.tag("dashes").d3Vec2(),
+                closed = p.tag("closed").d3Bool() == true,
+                sizeX = s[0].toFloat(), sizeY = s[1].toFloat(),
+                rotation = (p.tag("rotation").d3Double() ?: 0.0).toFloat(),
+                tint = p.tag("color").d3Color()
+                    ?: floatArrayOf(1f, 1f, 1f, 1f),
+                facing = facingMode(key, p.tag("facing").d3String()))
+        }
+
+        /** Builds a facing mesh for [shape] from [fp] expanded along
+         *  the supplied basis — the decode-time call uses a neutral
+         *  viewDir; stepFrame's re-expansion passes the live camera
+         *  basis + node-local camera position in. */
+        private fun facingMesh(
+            shape: String, fp: FacingParams,
+            viewDir: MeshFactory.V3,
+            right: MeshFactory.V3, up: MeshFactory.V3,
+            camPos: MeshFactory.V3 = MeshFactory.V3(0f, 0f, 1f),
+        ): MeshFactory.MeshData? = when (shape) {
+            "polyline" ->
+                if (fp.dashes != null) MeshFactory.dashedPolyline(
+                    fp.points, fp.width, viewDir,
+                    fp.dashes[0].toFloat(), fp.dashes[1].toFloat(),
+                    fp.colors, fp.widths, fp.closed)
+                else MeshFactory.polyline(
+                    fp.points, fp.width, viewDir,
+                    fp.colors, fp.widths, fp.closed)
+            "lineSegments" -> MeshFactory.lineSegments(
+                fp.points, fp.width, viewDir, fp.colors)
+            "billboard" -> MeshFactory.billboardQuad(
+                fp.sizeX, fp.sizeY, fp.rotation, fp.tint, right, up,
+                facing = fp.facing, camPos = camPos)
+            else -> null
+        }
+
+        /** Component-owned renderable/buffer teardown for the W26
+         *  decoders — unlike mesh nodes (shared gpuMeshes rebound in
+         *  place), a proc/instances re-decode replaces its private
+         *  buffers wholesale. */
+        private fun destroyProcRenderable(rec: NodeRec) {
+            val rm = host.engine.renderableManager
+            if (rm.hasComponent(rec.entity)) rm.destroy(rec.entity)
+            rec.procGpuMesh?.let {
+                it.destroy(host.engine)
+                rec.procGpuMesh = null
+            }
+            rec.procMaterialInstance?.let {
+                host.engine.destroyMaterialInstance(it)
+                rec.procMaterialInstance = null
+            }
+        }
+
+        /**
+         * `d3:procMesh` — one node, one procedural mesh built from the
+         * component's `shape` + params. Camera-facing shapes register
+         * a FacingSpec so stepFrame re-expands their vertex buffer
+         * toward the live camera (Filament line primitives are thin;
+         * thick lines ride ribbon quads).
+         */
+        private fun decodeProcMesh(key: Long, rec: NodeRec, p: JSONObject) {
+            val shape = p.tag("shape").d3String() ?: run {
+                Log.w(TAG, "d3:procMesh node $key: missing shape"); return
+            }
+            destroyProcRenderable(rec)
+            val facing = shape in FACING_SHAPES
+            val fp = if (facing) parseFacing(key, p) else null
+            if (fp != null) {
+                // Unsupported-on-native params warn once per node —
+                // the wire contract records these as carried but
+                // unrealized.
+                if (p.tag("widthInPixels").d3Bool() == true) {
+                    warnOnce("procMesh.$key.widthInPixels",
+                        "d3:procMesh node $key: widthInPixels is" +
+                            " unsupported — `width` reads as world" +
+                            " units")
+                }
+                if (shape == "polyline" &&
+                    p.tag("caps").d3String() != null) {
+                    warnOnce("procMesh.$key.caps",
+                        "d3:procMesh node $key: 'caps' is unsupported" +
+                            " — line ends are butt")
+                }
+                if (shape == "lineSegments" &&
+                    fp.points.size % 2 != 0) {
+                    warnOnce("procMesh.$key.oddLineTail",
+                        "d3:procMesh node $key: lineSegments got an" +
+                            " odd point count — trailing point" +
+                            " dropped")
+                }
+            }
+            val md = when {
+                fp != null -> facingMesh(shape, fp,
+                    MeshFactory.V3(0f, 0f, 1f),
+                    MeshFactory.V3(1f, 0f, 0f), MeshFactory.V3(0f, 1f, 0f))
+                else -> procedural(key, shape, p)
+            }
+            if (md == null) {
+                Log.w(TAG, "d3:procMesh node $key: shape '$shape' failed")
+                return
+            }
+            val gm = buildGpuMesh(md)
+            rec.procGpuMesh = gm
+            rec.lastGeoPositions = gm.positions
+            rec.lastGeoIndices = gm.indices
+            rec.lastGeoBounds = gm.bounds
+            val matKey = p.tag("material").d3Ref()
+            val inst = matKey?.let { materials[it] }
+                ?: host.litMaterial.defaultInstance
+            matKey?.let {
+                materialConsumers.getOrPut(it) { ArrayList() }
+                    .add(Pair(rec.entity, 0))
+            }
+            RenderableManager.Builder(1)
+                .boundingBox(Box(gm.bounds[0], gm.bounds[1], gm.bounds[2],
+                    gm.bounds[3], gm.bounds[4], gm.bounds[5]))
+                .layerMask(0xFF, rec.layers and 0xFF)
+                .castShadows(true)
+                .receiveShadows(true)
+                .geometry(0, gm.primitiveType, gm.vertexBuffer,
+                    gm.indexBuffer)
+                .material(0, inst)
+                .build(host.engine, rec.entity)
+            if (fp != null) {
+                host.cameraFacing[key] = FacingSpec(
+                    shape, fp.points, fp.colors, fp.widths, fp.width,
+                    fp.dashes, fp.closed, fp.sizeX, fp.sizeY,
+                    fp.rotation, fp.tint, gm.vertexBuffer, rec.entity,
+                    fp.facing)
+            }
+        }
+
+        /** Instance transforms: an inline `{'m4':[16]}` list or a
+         *  `matrices` payload ref — each S·M·S mirrored into native
+         *  space like every other transform crossing the wire. */
+        private fun d3InstanceTransforms(
+            key: Long, p: JSONObject,
+        ): List<FloatArray>? {
+            val t = p.tag("transforms") ?: return null
+            t.d3List()?.let { list ->
+                val out = ArrayList<FloatArray>(list.length())
+                for (i in 0 until list.length()) {
+                    val m = list.optJSONObject(i)?.d3Mat4() ?: return null
+                    out.add(D3Wire.matrix(m))
+                }
+                return out
+            }
+            val ref = t.d3Ref() ?: return null
+            val bytes = host.payloadStore[ref]
+            if (bytes == null || bytes.size % 64 != 0) {
+                pendingPayloadRefs.add(key)
+                return null
+            }
+            val n = bytes.size / 64
+            return (0 until n).map { i ->
+                D3Wire.matrix(DoubleArray(16) { k ->
+                    D3Wire.f32LE(bytes, i * 64 + k * 4).toDouble()
+                })
+            }
+        }
+
+        /** The `color` per-instance attribute — inline `{'v4':[…]}`
+         *  list, a `floats` payload (4×f32 per instance), or a `bytes`
+         *  payload (4×u8 normalized). */
+        private fun d3InstanceColors(
+            key: Long, p: JSONObject,
+        ): List<FloatArray>? {
+            val attrs = p.tag("attributes").d3Map() ?: return null
+            val color = attrs["color"] ?: return null
+            color.d3List()?.let { list ->
+                val out = ArrayList<FloatArray>(list.length())
+                for (i in 0 until list.length()) {
+                    val v = list.optJSONObject(i)?.d3Vec4() ?: return null
+                    out.add(FloatArray(4) { v.getOrElse(it) { 0.0 }.toFloat() })
+                }
+                return out
+            }
+            val ref = color.d3Ref() ?: return null
+            val bytes = host.payloadStore[ref]
+            if (bytes == null) {
+                pendingPayloadRefs.add(key)
+                return null
+            }
+            return when (payloadSpecs[ref]?.encoding) {
+                "bytes" -> (0 until bytes.size / 4).map { i ->
+                    FloatArray(4) {
+                        (bytes[i * 4 + it].toInt() and 0xFF) / 255f
+                    }
+                }
+                else -> (0 until bytes.size / 16).map { i ->
+                    FloatArray(4) {
+                        D3Wire.f32LE(bytes, i * 16 + it * 4)
+                    }
+                }
+            }
+        }
+
+        /**
+         * `d3:instances` — one node, one draw, N copies of a mesh.
+         * Filament 1.71.6's Java binding exposes only
+         * `RenderableManager.Builder.instances(int)` — the native
+         * `InstanceBuffer` overload that carries per-instance
+         * transforms isn't reachable from Java, so the instance data
+         * is baked into a single vertex buffer instead: same one-node/
+         * one-draw contract, per-instance colors stamped into the
+         * COLOR stream. `billboard: true` swaps the mesh for
+         * camera-facing quads re-faced per frame (FacingSpec).
+         */
+        private fun decodeInstances(key: Long, rec: NodeRec, p: JSONObject) {
+            val transforms = d3InstanceTransforms(key, p)
+            if (transforms == null) {
+                Log.i(TAG, "d3:instances node $key: transforms unresolved")
+                return
+            }
+            rec.instancesProps = p
+            destroyProcRenderable(rec)
+            val colors = d3InstanceColors(key, p)
+            val billboard = p.tag("billboard").d3Bool() == true
+            // Wire precedence (mirrors FsceneRealizer.swift):
+            // `billboard` overrides the mesh fields; `shape` wins
+            // over `geometry` when both are present.
+            if (billboard &&
+                (p.tag("shape").d3String() != null ||
+                    p.tag("geometry").d3Ref() != null)) {
+                logOnce("instances.$key.billboardPrecedence",
+                    "d3:instances node $key: 'billboard' overrides" +
+                        " shape/geometry")
+            }
+            if (!billboard && p.tag("shape").d3String() != null &&
+                p.tag("geometry").d3Ref() != null) {
+                logOnce("instances.$key.shapePrecedence",
+                    "d3:instances node $key: 'shape' wins over" +
+                        " 'geometry'")
+            }
+            // attr1–attr3 are wire-carried but unread today — `color`
+            // is the only attribute with a renderer contract.
+            p.tag("attributes").d3Map()?.let { attrs ->
+                for (name in attrs.keys()) {
+                    if (name != "color") {
+                        logOnce("instances.$key.attr.$name",
+                            "d3:instances node $key: attribute" +
+                                " '$name' is carried but not" +
+                                " rendered (only 'color' is)")
+                    }
+                }
+            }
+            val facing = facingMode(key, p.tag("facing").d3String())
+            val doubleSided = p.tag("doubleSided").d3Bool() == true
+            val s = p.tag("size").d3Vec2() ?: doubleArrayOf(1.0, 1.0)
+            val rotation = (p.tag("rotation").d3Double() ?: 0.0).toFloat()
+
+            val md: MeshFactory.MeshData
+            if (billboard) {
+                val centers = transforms.map {
+                    MeshFactory.V3(it[12], it[13], it[14])
+                }
+                md = MeshFactory.bakeBillboardInstances(centers,
+                    s[0].toFloat(), s[1].toFloat(), rotation, colors,
+                    MeshFactory.V3(1f, 0f, 0f), MeshFactory.V3(0f, 1f, 0f),
+                    facing = facing)
+            } else {
+                // The repeated mesh — a geometry resource ref or an
+                // inline `shape` + params (same names as d3:procMesh).
+                val shape = p.tag("shape").d3String()
+                var base: MeshFactory.MeshData? = null
+                var geoKey: Long? = null
+                if (shape != null && shape in FACING_SHAPES) {
+                    // Facing geometry inside a non-billboard instances
+                    // bake doesn't make sense — expand once flat.
+                    logOnce("instances.$key.facingShape",
+                        "d3:instances node $key: facing shape '$shape'" +
+                            " bakes once toward +Z")
+                    base = facingMesh(shape, parseFacing(key, p),
+                        MeshFactory.V3(0f, 0f, 1f),
+                        MeshFactory.V3(1f, 0f, 0f), MeshFactory.V3(0f, 1f, 0f))
+                } else if (shape != null) {
+                    base = procedural(key, shape, p)
+                } else {
+                    geoKey = p.tag("geometry").d3Ref()
+                    if (geoKey == null) {
+                        Log.w(TAG, "d3:instances node $key: needs" +
+                            " geometry or shape")
+                        return
+                    }
+                    geometryConsumers.getOrPut(geoKey) { LinkedHashSet() }
+                        .add(key)
+                    base = geometries[geoKey]
+                }
+                if (base == null) {
+                    Log.i(TAG, "d3:instances node $key: geometry" +
+                        " unresolved")
+                    return
+                }
+                if (base.hasSkinning) {
+                    warnOnce("instances.$key.skinning",
+                        "d3:instances node $key: skinned geometry" +
+                            " bakes unskinned — joint/weight streams" +
+                            " are dropped")
+                }
+                md = MeshFactory.bakeInstances(base, transforms, colors)
+            }
+            if (md.vertexCount == 0) {
+                Log.w(TAG, "d3:instances node $key: empty bake")
+                return
+            }
+            val gm = buildGpuMesh(md)
+            rec.procGpuMesh = gm
+            rec.lastGeoPositions = gm.positions
+            rec.lastGeoIndices = gm.indices
+            rec.lastGeoBounds = gm.bounds
+            val matKey = p.tag("material").d3Ref()
+            val shared = matKey?.let { materials[it] }
+                ?: host.litMaterial.defaultInstance
+            // A component `doubleSided` can't ride the shared
+            // instance (every consumer would turn two-sided), so the
+            // node binds a duplicate — a snapshot: surgical updates
+            // to the source material after this bind don't propagate
+            // (the payload-geometry contract doc records the
+            // limitation). Mirrors the iOS material clone.
+            val inst = if (doubleSided) {
+                MaterialInstance.duplicate(shared, "d3ds_$key").also {
+                    it.setDoubleSided(true)
+                    rec.procMaterialInstance = it
+                }
+            } else shared
+            matKey?.let {
+                materialConsumers.getOrPut(it) { ArrayList() }
+                    .add(Pair(rec.entity, 0))
+            }
+            RenderableManager.Builder(1)
+                .boundingBox(Box(gm.bounds[0], gm.bounds[1], gm.bounds[2],
+                    gm.bounds[3], gm.bounds[4], gm.bounds[5]))
+                .layerMask(0xFF, rec.layers and 0xFF)
+                .castShadows(true)
+                .receiveShadows(true)
+                .geometry(0, gm.primitiveType, gm.vertexBuffer,
+                    gm.indexBuffer)
+                .material(0, inst)
+                .build(host.engine, rec.entity)
+            if (billboard) {
+                val centers = FloatArray(transforms.size * 3)
+                for ((i, m) in transforms.withIndex()) {
+                    centers[i * 3] = m[12]
+                    centers[i * 3 + 1] = m[13]
+                    centers[i * 3 + 2] = m[14]
+                }
+                host.cameraFacing[key] = FacingSpec.billboards(
+                    centers, s[0].toFloat(), s[1].toFloat(), rotation,
+                    colors, gm.vertexBuffer, rec.entity, facing)
             }
         }
 
@@ -1651,6 +2226,9 @@ object FsceneRealizer {
                     decodeMaterialsVariants(key, index, props)
                 "trail" -> decodeTrail(key, rec, props)
                 "lod" -> decodeLod(key, rec, props)
+                // W26: the dart3d geometry/instancing vocabulary.
+                "d3:procMesh" -> decodeProcMesh(key, rec, props)
+                "d3:instances" -> decodeInstances(key, rec, props)
                 else -> Log.i(TAG, "unhandled component type '$type'")
             }
         }
@@ -3856,7 +4434,14 @@ object FsceneRealizer {
             var rebound = 0
             for (nodeKey in geometryConsumers[key]?.toList().orEmpty()) {
                 val rec = nodes[nodeKey] ?: continue
-                if (rebuild) {
+                val instProps = rec.instancesProps
+                if (instProps != null) {
+                    // W26: an instances consumer re-bakes — a
+                    // setGeometryAt swap can't reproduce transformed
+                    // copies.
+                    decodeInstances(nodeKey, rec, instProps)
+                    applyVisibility(nodeKey)
+                } else if (rebuild) {
                     rebuildRenderable(nodeKey)
                 } else if (rm.hasComponent(rec.entity)) {
                     // Instance handles aren't entities — resolve per
@@ -4007,6 +4592,19 @@ object FsceneRealizer {
             rec.lastGeoBounds = null
             rec.meshProps = null
             rec.meshPrimGeoKeys = null
+            // W26: the camera-facing re-expansion registration and the
+            // component-owned mesh buffers die with the component
+            // list.
+            host.cameraFacing.remove(key)
+            rec.procGpuMesh?.let {
+                it.destroy(host.engine)
+                rec.procGpuMesh = null
+            }
+            rec.procMaterialInstance?.let {
+                host.engine.destroyMaterialInstance(it)
+                rec.procMaterialInstance = null
+            }
+            rec.instancesProps = null
             if (rec.isCamera) {
                 rec.isCamera = false
                 nodeCameraProps.remove(key)
