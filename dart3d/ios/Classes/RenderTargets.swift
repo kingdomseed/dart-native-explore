@@ -162,7 +162,7 @@ extension FsceneRealizer.Context {
     /// each rt record happens at `installViews`.
     func decodeViews(_ any: Any?) {
         views = []
-        for entry in any as? [Any] ?? [] {
+        for (index, entry) in (any as? [Any] ?? []).enumerated() {
             guard let e = entry as? [String: Any] else { continue }
             // Contract tokens are plain strings; the tagged rref/nref
             // form is accepted for robustness.
@@ -192,6 +192,21 @@ extension FsceneRealizer.Context {
                 host.logOnce("w14.view.targetToken",
                     "view 'target' is malformed; treating as screen")
             }
+            // dart3d extension — [l,b,w,h] target px. Malformed rects
+            // warn and drop (→ full target), the same shape Android's
+            // `views.$index.viewport` warning takes.
+            let rawVp = (e["viewport"] as? [NSNumber])
+                .map { $0.map { $0.doubleValue } }
+            var viewport: [Double]?
+            if let vp = rawVp {
+                if vp.count == 4 {
+                    viewport = vp
+                } else {
+                    host.logOnce("w24.viewport.\(index)",
+                        "view \(index): viewport needs [l,b,w,h]; "
+                        + "ignored")
+                }
+            }
             views.append(ViewRec(
                 cameraKey: camKey,
                 targetKey: targetKey,
@@ -205,8 +220,7 @@ extension FsceneRealizer.Context {
                     ?? d3Double(e["renderScale"]),
                 filterQuality: e["filterQuality"] as? String
                     ?? d3String(e["filterQuality"]),
-                viewport: (e["viewport"] as? [NSNumber])
-                    .map { $0.map { $0.doubleValue } }))
+                viewport: viewport))
         }
         // Feature-present warnings — decode time is when "requested"
         // is known.
@@ -214,6 +228,12 @@ extension FsceneRealizer.Context {
             $0.targetKey != nil && $0.renderScale != nil }) {
             host.logOnce("w14.renderScale.rt",
                 "renderScale on a texture-target view is ignored on iOS")
+        }
+        if views.contains(where: {
+            $0.targetKey != nil && $0.viewport != nil }) {
+            host.logOnce("w24.viewport.rt",
+                "viewport on a texture-target view is ignored on iOS — "
+                + "the pass fills the rt (Android honors the rect)")
         }
         if views.contains(where: { $0.filterQuality != nil }) {
             host.logOnce("w14.filterQuality.view",
@@ -423,6 +443,7 @@ extension SceneViewHost {
         teardownScreenSubviews()
         multiScreenMode = false
         blankPov = nil
+        docPov = nil
         rendersContinuously = false
     }
 

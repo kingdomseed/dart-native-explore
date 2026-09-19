@@ -3341,8 +3341,15 @@ enum FsceneRealizer {
 
         /// W24: the upstream directional-light shadow vocabulary
         /// (flutter_scene `DirectionalLightCodec`, defaults noted per
-        /// field). SceneKit renders ONE shadow map per directional —
-        /// the cascade/contact/fade/ambient fields have no native
+        /// field) plus three dart3d wire extensions upstream keeps on
+        /// `stage.skyEnvironment.sunLight` (`SunLightSpec`):
+        /// `contactShadows`, `contactShadowDistance`, `angularRadius`
+        /// — the sun block stays deferred on both platforms, so the
+        /// fields ride the light component here. `priority` and
+        /// `localDirection` are upstream codec members dart3d doesn't
+        /// map — they warn below like the other unmapped fields.
+        /// SceneKit renders ONE shadow map per directional — the
+        /// cascade/contact/fade/ambient fields have no native
         /// counterpart and log once instead of pretending parity;
         /// what maps, maps absolutely (re-decode under diff updates
         /// writes the same state).
@@ -3357,7 +3364,10 @@ enum FsceneRealizer {
                 // World-space penumbra radius → SceneKit's blur
                 // factor (texel-space-ish): direct assignment is the
                 // closest analog, same convention 'shadowRadius'
-                // already uses.
+                // already uses. Precedence: `shadowRadius` (W6) and
+                // `shadowSoftness` (W24) write the same knob — this
+                // decode runs second, so softness wins when a
+                // document authors both.
                 light.shadowRadius = CGFloat(v)
             }
             if let v = d3Double(p["shadowMaxDistance"]) {
@@ -3388,7 +3398,8 @@ enum FsceneRealizer {
                     + "unknown; kept 'front'")
             }
             // Present-but-unsupported members — one warning per field
-            // per scene, not per light.
+            // per scene, not per light. The last three are the dart3d
+            // wire extensions (upstream home: `sunLight`, deferred).
             for field in ["shadowCascadeCount",
                           "shadowCascadeSplitLambda",
                           "shadowFadeRange",
@@ -3402,6 +3413,15 @@ enum FsceneRealizer {
                 host.logOnce("w24.directional.\(field)",
                     "directionalLight '\(field)' has no SceneKit "
                     + "equivalent; ignored")
+            }
+            // Unmapped upstream `DirectionalLightCodec` members —
+            // `priority` (feature priority) and `localDirection`
+            // (travel dir; dart3d aims lights by node transform).
+            for field in ["priority", "localDirection"]
+            where p[field] != nil {
+                host.logOnce("w24.directional.\(field)",
+                    "directionalLight '\(field)' is an upstream field "
+                    + "with no dart3d mapping; ignored")
             }
             if let f = p["shadowFilter"] as? String,
                f != "rotatedPoisson" {
