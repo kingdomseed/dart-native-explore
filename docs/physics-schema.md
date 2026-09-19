@@ -122,3 +122,100 @@ change. `kind: 'static'` becomes `type: 'fixed'`;
 halfExtents: v * 0.5}`. The Dart emitter API keeps its ergonomic shape
 (`colliderComponent(shape:'box', extents:v)`) — it translates to the
 upstream map on write, so callers do not build tagged unions by hand.
+
+## Joint semantics (W23)
+
+`addJoint`/`updateJoint` wire fields carry upstream semantics verbatim —
+signed `lower`/`upper`/`motorVelocity` are never mirrored on the wire.
+Each native maps handedness inside its own constraint space, so
+Dart-side code must not "fix" the signs:
+
+- **iOS (SceneKit).** A revolute axis decodes as a pseudovector
+  (`(−x,−y,+z)`, the map angular velocity already takes), and generic
+  angular axes likewise; the wire scalar then keeps its sense about
+  the produced SceneKit axis and limits/motor pass through unchanged.
+- **Android (Jolt).** The axis takes the plain direction map
+  (`(x,y,−z)`) and the scalars mirror inside Jolt's constraint space:
+  revolute `lower`/`upper` arrive swapped (`[−upper, −lower]`,
+  clamped to Jolt's `[−π,0]`/`[0,π]` brackets around the zero angle)
+  and `motorVelocity` negates; generic axes negate per index —
+  linearZ (axis 2) and angularX/Y (axes 3–4), the same axial-vector
+  rule. Same physical constraint, two representations.
+
+### SceneKit primitive coverage
+
+SceneKit has no `SCNPhysicsFixedJoint` (macOS-only) and
+`SCNPhysicsHingeJoint` exposes neither limits nor a motor, so
+`SCNPhysicsSliderJoint` stands in: linear range pinned at zero gives
+the limited/motorized revolute; angular range pinned gives prismatic;
+both pinned gives the `fixed` weld. An unconstrained revolute still
+uses `SCNPhysicsHingeJoint`. `generic` decomposes: all-locked → weld,
+one free angular axis → the revolute path, one free linear axis →
+the prismatic path; a wider free set warns once
+(`joint.generic.fallback`) and uses the nearest covering primitive
+(ball socket frees all rotation; a slider frees its axis plus
+rotation about it). Generic-axis motors keep only
+`targetVelocity`/`maxForce` — stiffness, damping, targetPosition and
+the model field have no SceneKit home (`joint.generic.motor`).
+
+### `collide:false` — pairwise exclusion
+
+Upstream's joint `collide` flag asks for one body pair to stop
+colliding. Neither engine exposes a per-pair switch on the joint
+itself, so both borrow the collision-filter machinery:
+
+- **Android** gives every body its own sub-group in the shared
+  `GroupFilterTable` (the same table layer/mask uses) and calls
+  `disableCollision(sgA, sgB)` — an exact pair disable, reference-
+  counted so several joints can share a pair and teardown never
+  re-enables a pair the wire masks already exclude.
+- **iOS** has no pair table; exclusion borrows category bits the wire
+  can't reach. The decoder shifts wire layers `<<2` (bits 2–33 of
+  the 64-bit mask), leaving bits 40–63 for private per-body
+  categories. Excluding a pair privatizes both endpoints: the body
+  takes its dedicated bit as `categoryBitMask`, and every body's
+  collision/contact masks are then *derived* — never patched — from
+  the wire truth, so a pair exclusion is just clearing the partner's
+  bit on both sides (contact events between the two suppress too,
+  matching Jolt). The cap is 24 privatized bodies; past it the pair
+  keeps colliding with a `joint.collide.bits` warn-once. Derived
+  masks rebuild on every body (re)creation and on install, so a
+  rebuilt body re-takes its exclusion without leaking freed bits.
+
+Pairs the upstream `(a.layer & b.mask) && (b.layer & a.mask)` rule
+already excludes need no carve on either platform — the exclusion
+record is kept so the joint's semantics still read correctly if the
+collider masks later change.
+
+## Query semantics (W23)
+
+- **shapecast `d`** is the distance ALONG the cast segment to first
+  contact — iOS reports `SCNPhysicsContact.sweepTestFraction ×
+  segmentLength`, matching Android's `fraction × |to−from|` and
+  upstream's distance-along-cast semantic. The earlier
+  origin→contact-point Euclidean distance over-reported grazing hits
+  whose contact point sits off the ray line.
+- **raycast `n`** on Android is the true surface normal: the hit
+  shape's triangles stream in a small box around the hit point and
+  the closest triangle's normal answers. Jolt tessellates its smooth
+  primitives too, but a tessellation facet is not the surface normal —
+  leaf subtypes `Sphere`, `Capsule`, `TaperedCapsule`, and `Cylinder`
+  (resolved through compounds/decorators via `getLeafShape` on the
+  hit's `subShapeId2`) skip the stream and keep the analytic sphere
+  probe, which reports the exact smooth normal. iOS's
+  `SCNPhysicsContact.contactNormal` already carries the true normal.
+- **contact manifold**: upstream `points[]` carries one entry per
+  manifold point. jolt-jni 6.0.0's `ContactManifold` exposes a base
+  offset, penetration depth, sub-shape IDs, and the world-space
+  normal — but no per-point list — so Android `began` frames carry at
+  most one point. This is a platform/API limitation, not a dropped
+  feature; iOS reports the full manifold.
+
+## `clearForces` (W23)
+
+iOS maps the op to `SCNPhysicsBody.clearAllForces()` — SceneKit keeps
+a persistent force accumulator, so the semantic is expressible.
+**Jolt has no persistent-force accumulator** (impulses only), so the
+op is a documented permanent no-op on Android: it logs and returns
+rather than clearing velocity, which would fight `setVelocity` sends
+and overshoot the upstream semantic.
