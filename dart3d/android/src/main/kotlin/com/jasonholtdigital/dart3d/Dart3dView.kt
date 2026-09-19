@@ -306,6 +306,16 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         private set
     private var lastManifest: ByteArray? = null
 
+    // MARK: - W26 camera-facing geometry
+
+    /**
+     * Nodes whose vertex buffers re-expand toward the live camera each
+     * frame — `d3:procMesh` polylines/line-segments/billboards and
+     * `d3:instances` billboard quads. Filament's line primitives are
+     * thin; thick lines ride camera-facing ribbon quads instead.
+     */
+    internal val cameraFacing = HashMap<Long, FacingSpec>()
+
     // MARK: - W14 render targets + views
 
     /**
@@ -765,6 +775,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // either channel per texture.
         b.require(MaterialBuilder.VertexAttribute.UV0)
             .require(MaterialBuilder.VertexAttribute.UV1)
+            // W26: COLOR rides every wire vertex record (white when
+            // absent upstream); instances bake per-instance colors
+            // into it. Meshes lacking the attribute read Filament's
+            // vec4(1) default, so baseColor stays unchanged there.
+            .require(MaterialBuilder.VertexAttribute.COLOR)
             .uniformParameter(MaterialBuilder.UniformType.FLOAT4, "baseColor")
             .uniformParameter(MaterialBuilder.UniformType.FLOAT4,
                 "baseColorUVTransform")
@@ -888,10 +903,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         if (slotBound(0)) {
             body.append(uvBlock("baseColor"))
                 .append("    material.baseColor = materialParams.baseColor" +
-                    " * texture(materialParams_baseColorMap, baseColorUv);\n")
+                    " * texture(materialParams_baseColorMap, baseColorUv)" +
+                    " * getColor();\n")
         } else {
             body.append("    material.baseColor = materialParams" +
-                ".baseColor;\n")
+                ".baseColor * getColor();\n")
         }
         if (!unlit) {
             if (slotBound(2)) {
@@ -3838,7 +3854,13 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             scene.removeEntity(rec.entity)
             engine.destroyEntity(rec.entity)
             EntityManager.get().destroy(rec.entity)
+            // W26: component-owned proc/instances buffers aren't in
+            // the shared gpuMeshes map — they die with their node.
+            rec.procGpuMesh?.destroy(engine)
         }
+        // W26: facing-spec VertexBuffers belonged to the old scene's
+        // component-owned meshes — the fresh decode re-registers.
+        cameraFacing.clear()
         for ((_, b) in this.bodies) world.removeBody(b)
         // W11: skinning buffers are host-owned GPU objects — the
         // entity teardown doesn't destroy them. The NEW scene's
@@ -4455,6 +4477,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // camera — the same pre-render slot iOS's renderer delegate
         // uses (node poses and camera are final here).
         updateTrailsLods(dt)
+        // W26: camera-facing lines/billboards re-expand against this
+        // frame's camera pose — after every camera write, before draw.
+        updateCameraFacing()
         render(tNanos)
         // W15: this frame is the first a just-applied subtree is
         // visible in — stamp it for the latency lane (the Dart side
@@ -4624,6 +4649,76 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         tcm.getWorldTransform(tcm.getInstance(rec.entity), wm)
         camera.setModelMatrix(wm)
     }
+
+    /**
+     * W26: re-expands each registered camera-facing vertex buffer
+     * against the live camera basis. The camera's world right/up/
+     * forward are pulled into each node's local space by the inverse
+     * world transform (a direction transform — translation dropped),
+     * so node rotation/scale composes correctly and the emitted quads
+     * face the camera after the node matrix applies.
+     */
+    private fun updateCameraFacing() {
+        if (cameraFacing.isEmpty()) return
+        val camWorld = camera.getModelMatrix(FloatArray(16))
+        // Filament looks down −Z in camera space: forward = −col2.
+        val fWorld = floatArrayOf(-camWorld[8], -camWorld[9], -camWorld[10])
+        val rWorld = floatArrayOf(camWorld[0], camWorld[1], camWorld[2])
+        val uWorld = floatArrayOf(camWorld[4], camWorld[5], camWorld[6])
+        val pWorld = floatArrayOf(camWorld[12], camWorld[13], camWorld[14])
+        val tm = engine.transformManager
+        val wm = FloatArray(16)
+        val inv = FloatArray(16)
+        for ((_, spec) in cameraFacing) {
+            val inst = tm.getInstance(spec.entity)
+            if (inst == 0) continue
+            tm.getWorldTransform(inst, wm)
+            if (!Matrix.invertM(inv, 0, wm, 0)) {
+                Matrix.setIdentityM(inv, 0)
+            }
+            val f = transformDir(inv, fWorld)
+            val r = transformDir(inv, rWorld)
+            val u = transformDir(inv, uWorld)
+            // Node-local camera position — `spherical`/`axisY`
+            // billboards aim at it; `screen` ignores it.
+            val camPos = MeshFactory.V3(
+                inv[0] * pWorld[0] + inv[4] * pWorld[1] +
+                    inv[8] * pWorld[2] + inv[12],
+                inv[1] * pWorld[0] + inv[5] * pWorld[1] +
+                    inv[9] * pWorld[2] + inv[13],
+                inv[2] * pWorld[0] + inv[6] * pWorld[1] +
+                    inv[10] * pWorld[2] + inv[14])
+            val md = when (spec.shape) {
+                "polyline" ->
+                    if (spec.dashes != null) MeshFactory.dashedPolyline(
+                        spec.points, spec.width, f,
+                        spec.dashes[0].toFloat(), spec.dashes[1].toFloat(),
+                        spec.colors, spec.widths, spec.closed)
+                    else MeshFactory.polyline(
+                        spec.points, spec.width, f,
+                        spec.colors, spec.widths, spec.closed)
+                "lineSegments" -> MeshFactory.lineSegments(
+                    spec.points, spec.width, f, spec.colors)
+                "billboard" -> MeshFactory.billboardQuad(
+                    spec.sizeX, spec.sizeY, spec.rotation, spec.tint,
+                    r, u, facing = spec.facing, camPos = camPos)
+                "billboardInstances" -> MeshFactory.bakeBillboardInstances(
+                    spec.points, spec.sizeX, spec.sizeY, spec.rotation,
+                    spec.colors, r, u, facing = spec.facing,
+                    camPos = camPos)
+                else -> continue
+            }
+            md.vertices.rewind()
+            spec.vertexBuffer.setBufferAt(engine, 0, md.vertices)
+        }
+    }
+
+    /** world direction → node-local direction (column-major inv, w=0). */
+    private fun transformDir(inv: FloatArray, d: FloatArray): MeshFactory.V3 =
+        MeshFactory.V3(
+            inv[0] * d[0] + inv[4] * d[1] + inv[8] * d[2],
+            inv[1] * d[0] + inv[5] * d[1] + inv[9] * d[2],
+            inv[2] * d[0] + inv[6] * d[1] + inv[10] * d[2])
 
     private fun render(tNanos: Long) {
         val sc = swapChain ?: return
