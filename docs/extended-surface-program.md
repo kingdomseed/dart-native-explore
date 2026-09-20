@@ -392,7 +392,7 @@ verification is compile-level only (no live device run yet).**
   out and back through all three thresholds and the cull floor
   with an x sway bending the ribbon.
 
-**Verification.** `dn analyze` + `dn test` green (23 trail/lod
+**Verification.** `dn analyze` + `dn test` green (26 trail/lod
 tests); Android `assembleRelease` builds the Kotlin path; the iOS
 sources pass a syntax/typecheck pass. A trail following a moving
 node and the distance-based geometry swap exercise on both
