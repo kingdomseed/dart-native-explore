@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:ffi';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:dart3d/dart3d.dart';
@@ -13,7 +15,27 @@ import 'showcase_scene.dart';
 
 void main() {
   DartNativePluginRegistrant.registerAll();
+  _applyBackendDefine();
   runApp(const Dart3dExampleApp());
+}
+
+/// `--dart-define=DART3D_BACKEND=auto|opengl|vulkan` picks the Filament
+/// backend on Android. `opengl` (or `gl`) forces the GL fallback,
+/// `vulkan` forces Vulkan, anything else leaves the library's auto
+/// default. Forwarded to the JNI shim before any SceneView exists; the
+/// engine reads it once at construction, so a live run ignores a later
+/// flip.
+void _applyBackendDefine() {
+  if (!Platform.isAndroid) return;
+  final pref = switch (const String.fromEnvironment('DART3D_BACKEND')) {
+    'opengl' || 'gl' => 1,
+    'vulkan' => 2,
+    _ => 0,
+  };
+  DynamicLibrary.open('libdart3d_jni.so')
+      .lookupFunction<Void Function(Int32), void Function(int)>(
+        'Dart3dSetBackend',
+      )(pref);
 }
 
 /// The example app's shell — three screens switched by a segmented
@@ -31,6 +53,9 @@ void main() {
 /// picks the screen; `--dart-define=DART3D_MODEL=<label>` boots the
 /// showcase with that item selected (the old single-model lane);
 /// `--dart-define=DART3D_QUALITY=low|medium|high` pins the view tier.
+/// `--dart-define=DART3D_BACKEND=auto|opengl|vulkan` picks the Filament
+/// backend (Android only); `--dart-define=DART3D_STATS=1` turns the
+/// showcase view's stats HUD on (and its ~4 Hz `stats:` logcat line).
 class Dart3dExampleApp extends StatefulWidget {
   const Dart3dExampleApp({super.key});
 
