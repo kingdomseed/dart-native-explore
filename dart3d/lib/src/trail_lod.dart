@@ -112,9 +112,14 @@ class LodLevel {
 /// camera disables the metric — the natives draw the highest-detail
 /// level (upstream's orthographic rule).
 ///
-/// [hysteresis] and [blendRange] decode for wire parity but are
-/// documented no-ops: dart3d hard-switches levels (the upstream
-/// dead-band and cross-fade are future work).
+/// [hysteresis] is upstream's fractional dead-band around each
+/// threshold (an absent key decodes to upstream's `0.1` default on
+/// the natives) — an adjacent-level crossing holds until the size
+/// clears the boundary by the margin, so a hovering size doesn't
+/// flip-flop. [blendRange] decodes for wire parity but is a
+/// documented no-op: upstream's cross-fade needs the per-material
+/// dither slot (`Material.lodFade`) the natives don't carry, so
+/// dart3d hard-switches levels.
 ComponentSpec lodComponent({
   required List<LodLevel> levels,
   double lodBias = 1.0,
@@ -362,17 +367,57 @@ double lodScreenSize({
 /// [thresholds] — the first level whose threshold the size meets, or
 /// `-1` to cull below the smallest threshold (a last threshold of `0`
 /// never culls). [lodBias] multiplies the size first, matching
-/// upstream's `LodSelection.resolve`; upstream's `hysteresis`
-/// dead-band and `blendRange` cross-fade are documented no-ops in
-/// dart3d (hard switch).
+/// upstream's `LodSelection.resolve`.
+///
+/// [hysteresis] is upstream's fractional dead-band and [currentLevel]
+/// its memory (the level selected last frame, or `-1` if culled):
+/// an adjacent-level crossing holds until the biased size clears the
+/// boundary by the margin — finer only once `size` reaches
+/// `thresholds[currentLevel - 1]·(1 + hysteresis)`, coarser only below
+/// `thresholds[currentLevel]·(1 - hysteresis)`, and the cull floor is
+/// the boundary below the last level in both directions. A multi-level
+/// jump switches immediately. Upstream's `blendRange` cross-fade is a
+/// documented no-op in dart3d (hard switch) — the natives have no
+/// per-material dither slot to fade through.
 int selectLodLevel(
   double screenSize,
   List<double> thresholds, {
   double lodBias = 1.0,
+  double hysteresis = 0.0,
+  int currentLevel = -1,
 }) {
   final size = screenSize * lodBias;
+  var naive = -1;
   for (var i = 0; i < thresholds.length; i++) {
-    if (size >= thresholds[i]) return i;
+    if (size >= thresholds[i]) {
+      naive = i;
+      break;
+    }
   }
-  return -1;
+  if (naive == currentLevel || hysteresis <= 0) return naive;
+
+  final last = thresholds.length - 1;
+  // Switch to finer detail only once clearly past the upper boundary.
+  if (currentLevel >= 1 && naive == currentLevel - 1) {
+    return size >= thresholds[currentLevel - 1] * (1 + hysteresis)
+        ? naive
+        : currentLevel;
+  }
+  // Switch to coarser detail only once clearly below the lower
+  // boundary.
+  if (currentLevel >= 0 && naive == currentLevel + 1) {
+    return size < thresholds[currentLevel] * (1 - hysteresis)
+        ? naive
+        : currentLevel;
+  }
+  // The cull floor is just the boundary below the last level.
+  if (currentLevel == last && naive == -1) {
+    return size < thresholds[last] * (1 - hysteresis) ? -1 : currentLevel;
+  }
+  if (currentLevel == -1 && naive == last) {
+    return size >= thresholds[last] * (1 + hysteresis) ? naive : -1;
+  }
+  // A multi-level jump (or any non-adjacent change) switches
+  // immediately.
+  return naive;
 }

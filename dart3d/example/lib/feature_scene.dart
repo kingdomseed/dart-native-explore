@@ -3862,16 +3862,18 @@ final class FeatureScene {
 
     /// W16 lane — fires at +140 s (after W15's +112 s streaming
     /// lane closes its +12 s cycle). Drives `w16Mover` away and back through its
-    /// three `lod` thresholds and the cull floor — ~29.5 m out over
+    /// three `lod` thresholds and the cull floor — ~49.5 m out over
     /// 12 s, then home — with an x sway that bends the `trail`
     /// ribbon so the camera-facing expansion reads in a still
     /// frame. No new wire ops: `setNodeTransforms` per 100 ms tick
-    /// for 24 s, then the timer cancels.
+    /// for 24 s, then the timer cancels. farZ 47 reaches ~54 m
+    /// Euclidean from the camera — comfortably past the upstream
+    /// cull floor (~32 m) on both platforms.
     void addW16Phase() {
       final c = controller;
       if (c == null) return;
       const startZ = -2.5;
-      const farZ = 27.0;
+      const farZ = 47.0;
       const total = 240; // 24 s at one 100 ms tick
       var t = 0;
       Timer.periodic(const Duration(milliseconds: 100), (timer) {

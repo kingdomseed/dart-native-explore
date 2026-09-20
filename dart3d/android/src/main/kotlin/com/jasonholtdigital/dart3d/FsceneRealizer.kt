@@ -630,9 +630,12 @@ object FsceneRealizer {
      * renderable from a foreign one (a `mesh` decoded earlier) so a
      * takeover rebuilds instead of slot-swapping; `suspended` marks
      * a later `mesh` decode taking the slot back (last-write-wins —
-     * iOS's `node.geometry` overwrite order). `hysteresis`/
-     * `blendRange` decode for wire parity but are documented
-     * no-ops — dart3d hard-switches.
+     * iOS's `node.geometry` overwrite order). `hysteresis` is
+     * upstream's dead-band fraction (wire default 0.1) — applied by
+     * [selectLodLevel] with `bound` as its memory. `blendRange`
+     * decodes for wire parity but is a documented no-op — upstream's
+     * cross-fade needs a per-material dither slot Filament doesn't
+     * carry here, so dart3d hard-switches.
      */
     class LodState(
         val levels: List<LodLevelSpec>,
@@ -1892,8 +1895,10 @@ object FsceneRealizer {
             rec.lod = LodState(
                 levels = levels,
                 lodBias = p.tag("lodBias").d3Double() ?: 1.0,
-                // Decoded for wire parity — documented no-ops.
-                hysteresis = p.tag("hysteresis").d3Double() ?: 0.0,
+                // Upstream's dead-band (LodCodec/LodComponent default
+                // 0.1) — live now that selection is ours.
+                hysteresis = p.tag("hysteresis").d3Double() ?: 0.1,
+                // Wire parity only — a documented no-op (hard switch).
                 blendRange = p.tag("blendRange").d3Double() ?: 0.0,
             )
             bindLodLevel(key, rec, 0)
@@ -2282,8 +2287,9 @@ object FsceneRealizer {
          * upstream `_resolveLod`: the circumscribed sphere of the
          * level-0 (highest-detail) world AABB projected through
          * `lodScreenSize`, biased by `lodBias`, then the first
-         * threshold the size still meets; below the smallest is
-         * the cull floor (a last threshold of `0` always meets →
+         * threshold the size still meets under the `hysteresis`
+         * dead-band (upstream `selectLodLevel`); below the smallest
+         * is the cull floor (a last threshold of `0` always meets →
          * never culls). A non-perspective camera — or an
          * unresolved level-0 geometry — falls back to highest
          * detail.
@@ -2347,14 +2353,58 @@ object FsceneRealizer {
                 else radius /
                     (dist * kotlin.math.tan(fovRadY * 0.5))
             val scaled = size * lod.lodBias
-            var sel = -1
-            for (i in lod.levels.indices) {
-                if (scaled >= lod.levels[i].screenSize) {
-                    sel = i
+            // Upstream `LodSelection.resolve`'s hard-switch arm —
+            // the hysteresis dead-band reads the bound level as its
+            // `_currentLevel` memory.
+            val sel = selectLodLevel(
+                scaled, lod.levels, lod.hysteresis, lod.bound)
+            bindLodLevel(key, rec, sel)
+        }
+
+        /**
+         * Upstream `selectLodLevel` — the first level whose
+         * descending `screenSize` threshold the (already biased)
+         * [size] meets, then the [hysteresis] dead-band around
+         * [currentLevel]'s boundaries: an adjacent crossing holds
+         * until the size clears the boundary by the fractional
+         * margin (finer at `t·(1+h)`, coarser at `t·(1−h)`; the cull
+         * floor is the boundary below the last level both ways); a
+         * non-adjacent jump switches immediately. `-1` culls below
+         * the smallest threshold (a last threshold of `0` never
+         * culls).
+         */
+        private fun selectLodLevel(
+            size: Double, levels: List<LodLevelSpec>,
+            hysteresis: Double, currentLevel: Int,
+        ): Int {
+            var naive = -1
+            for (i in levels.indices) {
+                if (size >= levels[i].screenSize) {
+                    naive = i
                     break
                 }
             }
-            bindLodLevel(key, rec, sel)
+            if (naive == currentLevel || hysteresis <= 0.0) {
+                return naive
+            }
+            val last = levels.size - 1
+            if (currentLevel >= 1 && naive == currentLevel - 1) {
+                return if (size >= levels[currentLevel - 1].screenSize *
+                    (1 + hysteresis)) naive else currentLevel
+            }
+            if (currentLevel >= 0 && naive == currentLevel + 1) {
+                return if (size < levels[currentLevel].screenSize *
+                    (1 - hysteresis)) naive else currentLevel
+            }
+            if (currentLevel == last && naive == -1) {
+                return if (size < levels[last].screenSize *
+                    (1 - hysteresis)) -1 else currentLevel
+            }
+            if (currentLevel == -1 && naive == last) {
+                return if (size >= levels[last].screenSize *
+                    (1 + hysteresis)) naive else -1
+            }
+            return naive
         }
 
         /**
