@@ -160,10 +160,10 @@ void main() {
 
     test('the approximation set matches the per-platform contract', () {
       final report = runConformance(loadCatalog());
-      // iOS approximates every extension except the texture transform
-      // and the base vocabulary — any asset touching an extension
-      // approximates. Android realizes all but iridescence and
-      // diffuse transmission.
+      // iOS realizes clearcoat (the native `clearCoat` inputs) and
+      // approximates the rest of the extension family — any asset
+      // touching one approximates. Android realizes all but
+      // iridescence and diffuse transmission.
       final iosApprox = report.rows
           .where((r) => r.status['ios'] == RowStatus.approx)
           .length;
@@ -395,13 +395,9 @@ void main() {
       // Every generated fixture encodes a valid manifest with a
       // material, a mesh node, and a camera.
       for (final s in goldenScenes.where((s) => s.fixture != null)) {
-        final manifest =
-            jsonDecode(
-                  utf8.decode(
-                    D3Protocol.loadSceneBytes(goldenFixture(s.fixture!)),
-                  ),
-                )
-                as Map<String, dynamic>;
+        final manifest = jsonDecode(
+          utf8.decode(D3Protocol.loadSceneBytes(goldenFixture(s.fixture!))),
+        ) as Map<String, dynamic>;
         final resources = manifest['resources'] as Map<String, dynamic>;
         expect(
           resources.values.any((r) => (r as Map)['kind'] == 'material'),

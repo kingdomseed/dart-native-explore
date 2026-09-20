@@ -208,16 +208,16 @@ approximation or drop, logged once — the material still renders.
 
 | Wire property | iOS (SceneKit) | Android (Filament 1.71.6) |
 |---|---|---|
-| `clearcoat` | approx — environment-reflection intensity on `reflective` | realized — `material.clearCoat` (+`clearCoatIorChange`) |
-| `clearcoatTexture` | approx — R×factor baked into `reflective` intensity map | realized — `clearCoat × map.r` |
-| `clearcoatRoughness` | approx — dropped | realized — `material.clearCoatRoughness` |
-| `clearcoatRoughnessTexture` | approx — dropped | realized — `× map.g` |
-| `clearcoatNormalTexture` | approx — dropped | realized — `material.clearCoatNormal` |
-| `clearcoatNormalScale` | approx — dropped | realized — scales coat-normal xy |
-| `sheenColor` | approx — `reflective` tint + material `fresnelExponent` (yields to clearcoat) | realized — `material.sheenColor` |
-| `sheenRoughness` | approx — folded into `fresnelExponent` | realized — `material.sheenRoughness` |
-| `sheenColorTexture` | approx — dropped | realized — `× map.rgb` |
-| `sheenRoughnessTexture` | approx — dropped | realized — `× map.a` |
+| `clearcoat` | realized — `material.clearCoat` (PBR coat lobe, iOS 13+) | realized — `material.clearCoat` (+`clearCoatIorChange`) |
+| `clearcoatTexture` | realized — R×factor baked into `clearCoat` intensity map | realized — `clearCoat × map.r` |
+| `clearcoatRoughness` | realized — `material.clearCoatRoughness` | realized — `material.clearCoatRoughness` |
+| `clearcoatRoughnessTexture` | realized — G×factor baked into `clearCoatRoughness` map | realized — `× map.g` |
+| `clearcoatNormalTexture` | realized — `material.clearCoatNormal` | realized — `material.clearCoatNormal` |
+| `clearcoatNormalScale` | realized — `clearCoatNormal.intensity` (v2's x) | realized — scales coat-normal xy |
+| `sheenColor` | approx — fresnel rim in a `.fragment` shader modifier | realized — `material.sheenColor` |
+| `sheenRoughness` | approx — folds into the rim exponent (smoother → tighter) | realized — `material.sheenRoughness` |
+| `sheenColorTexture` | approx — `texture2d` modifier arg × factor (diffuse uv; slot transform drops) | realized — `× map.rgb` |
+| `sheenRoughnessTexture` | approx — `texture2d` modifier arg, `.a` × factor (same uv limit) | realized — `× map.a` |
 | `specular` | approx — no dielectric-F0 lever under `.physicallyBased` | realized — `material.specularFactor` |
 | `specularColor` | approx — dropped | realized — `material.specularColorFactor` |
 | `specularTexture` | approx — dropped | realized — `× map.a` |
@@ -270,21 +270,43 @@ before the round-3 fix.
 
 ### iOS approximation notes
 
-SceneKit's `.physicallyBased` exposes one specular lobe and no
-refraction/sheen/anisotropy/iridescence inputs, so the iOS column is
-mostly approximation: clearcoat rides `reflective` (environment
-intensity, factor-gray or baked map), sheen reuses the same slot with
-a fresnel exponent when clearcoat didn't claim it, and transmission
-becomes straight alpha blend through `transparent` (per-texel alpha
-bake, `.aOne`, depth reads on / writes off — the `blend` alphaMode
-rules). Every drop is named in its once-per-material log.
+SceneKit's `.physicallyBased` ships a real clearcoat family —
+`clearCoat`, `clearCoatRoughness`, `clearCoatNormal` (iOS 13+; the
+round-3 `reflective`/`fresnelExponent` writes it replaced are on
+Apple's documented PBR ignore list and produced no pixels). Clearcoat
+is realized end-to-end: factor, the R/G channel-split ×factor
+intensity maps (same bake rule as `metallicRoughnessTexture`), the
+coat normal map (`intensity` ← the duplicated-v2 scale's x), and
+slot transforms via `contentsTransform`.
+
+Sheen has no lobe, so it approximates as a view-dependent fresnel rim
+added post-lighting in a `.fragment` shader modifier:
+`pow(1 − saturate(N·V), e) · tint` where `e = 1 + (1−roughness)·3`
+(smoother sheen → tighter rim). Its textures bind into the modifier
+as `texture2d` arguments — `setValue(_:forKey:)` with an
+SCNMaterialProperty — and multiply the factor literals the modifier
+baked; they sample `_surface.diffuseTexcoord` (a uniform-bound
+texture can't carry a contentsTransform, so `sheen*TextureTransform`
+drops, logged once). An unresolved texture binds a neutral 1×1 until
+the upsert rebind. Divergence from glTF sheen: the rim ignores
+lights and adds energy rather than shading the lobe beneath — a
+plausible fabric edge, not a retro-reflective lobe.
+
+Transmission becomes straight alpha blend through `transparent`
+(per-texel alpha bake, `.aOne`, depth reads on / writes off — the
+`blend` alphaMode rules). Every drop is named in its
+once-per-material log.
 
 ### `KHR_texture_transform` on extension slots
 
 Every extension texture slot decodes `<slot>Transform`: Android gets
 per-slot `UVTransform`/`UVRotation`/`UVSet` uniforms (uv0/uv1 select,
 same as the base slots); iOS gets `contentsTransform` +
-`mappingChannel` on the bound property. Transforms on dropped
+`mappingChannel` on the bound property — the clearcoat slots take it
+like the base slots. The exception is sheen: its textures bind as
+`texture2d` shader-modifier arguments, which carry no texcoord
+transform, so `sheen*TextureTransform` drops (log-once) and the
+modifier samples the diffuse uv channel. Transforms on dropped
 textures drop with them.
 
 ### Conformance harness
