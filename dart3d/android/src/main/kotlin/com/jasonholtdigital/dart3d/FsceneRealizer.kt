@@ -1596,6 +1596,24 @@ object FsceneRealizer {
                     " bulbRadius=${so.shadowBulbRadius}")
             }
             if (type == LightManager.Type.DIRECTIONAL) {
+                // dart3d wire extension — upstream carries it on
+                // `sunLight`, deferred here. Light-level, not a
+                // shadow option, so it applies whether or not the
+                // light casts (matches iOS's decode placement).
+                p.tag("angularRadius").d3Double()?.let {
+                    builder.sunAngularRadius(it.toFloat())
+                }
+                // The contact-shadow extensions still need a casting
+                // light — warn rather than drop silently.
+                if (p.tag("castsShadow").d3Bool() != true &&
+                    (p.tag("contactShadows") != null ||
+                        p.tag("contactShadowDistance") != null)
+                ) {
+                    warnOnce("w24.directional.contactShadow.noCast",
+                        "contactShadows/contactShadowDistance require " +
+                            "castsShadow — ignored on a non-casting " +
+                            "directional light")
+                }
                 // Unmapped upstream `DirectionalLightCodec` members —
                 // warned here, outside the castsShadow gate, since
                 // they aren't shadow fields: `priority` (feature
@@ -1674,13 +1692,6 @@ object FsceneRealizer {
                 // (W24) write the same knob — this decode runs second,
                 // so softness wins when a document authors both.
                 so.shadowBulbRadius = it.toFloat()
-            }
-            p.tag("angularRadius").d3Double()?.let {
-                // dart3d wire extension — upstream carries it on
-                // `sunLight`, deferred here. Exact — the sun's angular
-                // radius (radians) Filament uses for the sun disk and
-                // PCSS penumbra scale.
-                builder.sunAngularRadius(it.toFloat())
             }
             p.tag("shadowCascadeSplitLambda").d3Double()?.let { lambda ->
                 if (so.shadowCascades > 1) {

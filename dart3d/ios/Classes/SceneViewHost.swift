@@ -1506,7 +1506,13 @@ final class SceneViewHost: SCNView {
     /// camera-less pick gets the same default the camera-drop path
     /// installs.
     private func restoreDocumentPov() {
-        if let pov = docPov, pov.camera != nil, pov.parent != nil {
+        // `removeSubtree` only detaches the root — interior nodes keep
+        // `parent` set, so scene membership needs the full climb.
+        var top = docPov
+        while let parent = top?.parent { top = parent }
+        if let scene, let pov = docPov, pov.camera != nil,
+            top === scene.rootNode
+        {
             pointOfView = pov
             applyStageExposure(stageExposure)
             applyStageEffects()
