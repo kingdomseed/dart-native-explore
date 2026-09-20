@@ -444,6 +444,7 @@ object FsceneRealizer {
             animDefs = res.animDefs,
             nodeSkinKeys = res.nodeSkinKeys,
             nodeSkinning = host.nodeSkinning,
+            particleRuntimes = host.particleRuntimes,
             variantComponents = res.variantComponents,
             disabledComponents = res.disabledComponents,
             renderTargets = host.renderTargets,
@@ -557,6 +558,10 @@ object FsceneRealizer {
         // light entities — destroyed with the node (teardownComponents
         // / node removal).
         var lightEntities: MutableList<Int> = mutableListOf(),
+        // W18: live particle emitters on this node (sprite and/or
+        // mesh) — destroyed with the node's component state.
+        val particleRuntimes: MutableList<ParticleRuntime> =
+            mutableListOf(),
         // W11: the node's live morph weights — non-null only while a
         // renderable with a MorphTargetBuffer is attached. Written by
         // the `setMorphWeights` op and the animation sampler's
@@ -727,6 +732,11 @@ object FsceneRealizer {
         // install teardown from destroying buffers decoded in the
         // same pass.
         val nodeSkinning: MutableMap<Long, Dart3dView.NodeSkin> = HashMap(),
+        // W18: nodeKey → live particle runtimes. Same ownership as
+        // nodeSkinning — a manifest Context's fresh map swaps onto the
+        // host at install; a surgical Context aliases the live one.
+        val particleRuntimes: MutableMap<Long,
+            MutableList<ParticleRuntime>> = HashMap(),
         // W14: `rt:` key → live RenderTarget rec (built eagerly in
         // decodeResources pass 1 so materials bind the color texture);
         // every camera node's decoded props (per-view projections);
@@ -1515,6 +1525,10 @@ object FsceneRealizer {
             if (rm.hasComponent(rec.entity) || lm.hasComponent(rec.entity)) {
                 host.scene.addEntity(rec.entity)
             }
+            // W18: particle entities are runtime-owned (a sprite's
+            // dedicated batch entity; a mesh pool's children) — the
+            // node entity's component test doesn't cover them.
+            for (rt in rec.particleRuntimes) rt.setSceneVisible(true)
         }
 
         /** True when the node or any ancestor carries `visible:false`. */
@@ -1557,10 +1571,21 @@ object FsceneRealizer {
             val props = spec.optJSONObject("properties") ?: JSONObject()
             // Universal `enabled` (W12) — upstream's component wrapper
             // applies it around update/fixedUpdate callbacks only; it
-            // does not remove realized state. dart3d components have
-            // no tick surface, so the flag is recorded, not applied.
+            // does not remove realized state. W18 particle emitters
+            // are the first components with a tick surface, so for
+            // them `enabled:false` IS applied — no runtime is created
+            // (upstream's gate is a no-op update + no repack, which is
+            // identical). All other types keep the recorded-only
+            // behavior.
             if (props.tag("enabled").d3Bool() == false) {
                 disabledComponents.getOrPut(key) { HashSet() }.add(index)
+                if (type == "particleEmitter" ||
+                    type == "meshParticleEmitter") {
+                    logOnce("enabled:$key:$index",
+                        "component '$type' on node $key: enabled:false " +
+                            "— particle runtime not created")
+                    return
+                }
                 logOnce("enabled:$key:$index",
                     "component '$type' on node $key: enabled:false " +
                         "gates upstream component ticks only; dart3d " +
@@ -1573,6 +1598,8 @@ object FsceneRealizer {
                 "pointLight" -> decodeLight(rec, props, LightManager.Type.POINT)
                 "spotLight" -> decodeLight(rec, props, LightManager.Type.FOCUSED_SPOT)
                 "rectAreaLight" -> decodeRectAreaLight(key, rec, props)
+                "particleEmitter", "meshParticleEmitter" ->
+                    decodeParticleEmitter(key, rec, type, props)
                 "rigidBody", "collider", "physicsWorld" ->
                     physicsDeferred.add(PhysicsItem(key, rec, type, props))
                 "fixedJoint", "sphericalJoint", "revoluteJoint",
@@ -1584,6 +1611,67 @@ object FsceneRealizer {
                 "trail" -> decodeTrail(key, rec, props)
                 "lod" -> decodeLod(key, rec, props)
                 else -> Log.i(TAG, "unhandled component type '$type'")
+            }
+        }
+
+        /**
+         * W18: `particleEmitter` / `meshParticleEmitter` — builds the
+         * CPU particle system from the same tagged property map the
+         * Dart reference sim and the iOS SCNParticleSystem mapping
+         * decode, then the render-side runtime (a billboard batch for
+         * sprites; a baked per-particle pool for meshes — Filament's
+         * Java binding has no InstanceBuffer).
+         *
+         * Scene membership rides the node's visibility through
+         * attachIfRenderable/applyVisibility — a hidden node's runtime
+         * entities stay out of the scene.
+         */
+        private fun decodeParticleEmitter(
+            key: Long, rec: NodeRec, type: String, props: JSONObject,
+        ) {
+            val system = ParticleSpec.system(props)
+            when (type) {
+                "particleEmitter" -> {
+                    val spec = SpriteEmitterSpec(props)
+                    val rt = host.createSpriteParticle(
+                        system, spec, rec.layers)
+                    // Texture binding: the resolved texture or the
+                    // neutral white fallback; a registered consumer
+                    // pair picks up an upsert rebind automatically
+                    // (same (instance, param) contract as materials).
+                    val texKey = spec.texture
+                    val tex = texKey?.let { textures[it] }
+                        ?: host.fallbackWhite
+                    val sampler = texKey?.let { textureSamplers[it] }
+                        ?: host.textureSampler
+                    rt.materialInstance.setParameter(
+                        "particleMap", tex, sampler)
+                    if (texKey != null) {
+                        textureConsumers.getOrPut(texKey) { ArrayList() }
+                            .add(Pair(rt.materialInstance, "particleMap"))
+                    }
+                    rec.particleRuntimes.add(rt)
+                    particleRuntimes.getOrPut(key) { ArrayList() }.add(rt)
+                }
+                else -> {
+                    val spec = MeshEmitterSpec(props)
+                    val buckets = spec.geometries.map { geoKey ->
+                        val gm = gpuMesh(geoKey)
+                        if (gm == null) {
+                            // A pending payload resolves through
+                            // redecodeGeometry → onGeometryRebound.
+                            logOnce("meshParticle.geo.$geoKey",
+                                "meshParticleEmitter on node $key: " +
+                                    "geometry $geoKey unresolved")
+                        }
+                        gm
+                    }.toMutableList()
+                    val rt = host.createMeshParticle(
+                        system, spec, spec.geometries, buckets,
+                        spec.material, rec.entity, rec.layers)
+                    rec.particleRuntimes.add(rt)
+                    particleRuntimes.getOrPut(key) { ArrayList() }.add(rt)
+                }
             }
         }
 
@@ -3646,6 +3734,8 @@ object FsceneRealizer {
                     rm.setLayerMask(rm.getInstance(rec.entity),
                         0xFF, rec.layers and 0xFF)
                 }
+                // W18: runtime-owned entities track the node's layers.
+                for (rt in rec.particleRuntimes) rt.applyLayers(rec.layers)
             }
             // `skin` is a node member, not a component — update the
             // binding BEFORE a components re-decode so decodeMesh's
@@ -3762,6 +3852,16 @@ object FsceneRealizer {
             // the old buffers die — the bound renderable's
             // VertexBuffer is the one being swapped out.
             refreshLodConsumers(key)
+            // W18: mesh-particle buckets aren't renderable consumers —
+            // the runtime holds geoKey → bucket and re-points its pool
+            // slots at the fresh buffers (also the late-arrival path
+            // for a geometry that decoded pending at component decode).
+            for ((_, list) in particleRuntimes) {
+                for (rt in list) {
+                    (rt as? MeshParticleRuntime)
+                        ?.onGeometryRebound(key, gm)
+                }
+            }
             // Safe only after every consumer swapped — the old buffers
             // were still bound until now.
             old?.destroy(host.engine)
@@ -3817,8 +3917,14 @@ object FsceneRealizer {
         private fun applyVisibility(key: Long) {
             for ((k, rec) in nodes) {
                 if (k != key && !isDescendantOf(k, key)) continue
-                if (isHidden(k)) host.scene.removeEntity(rec.entity)
-                else attachIfRenderable(rec)
+                if (isHidden(k)) {
+                    host.scene.removeEntity(rec.entity)
+                    for (rt in rec.particleRuntimes) {
+                        rt.setSceneVisible(false)
+                    }
+                } else {
+                    attachIfRenderable(rec)
+                }
             }
         }
 
@@ -3876,6 +3982,11 @@ object FsceneRealizer {
             host.dropComponentJointsForNode(key)
             variantComponents.remove(key)
             disabledComponents.remove(key)
+            // W18: particle runtimes own entities + GPU buffers the
+            // entity teardown doesn't cover — destroy them and prune
+            // the registry (the re-decode rebuilds fresh).
+            particleRuntimes.remove(key)?.forEach { it.destroy() }
+            rec.particleRuntimes.clear()
             for (child in rec.lightEntities) {
                 host.scene.removeEntity(child)
                 host.engine.destroyEntity(child)
@@ -4316,6 +4427,7 @@ object FsceneRealizer {
                     disabledComponents = disabledComponents,
                 ),
                 nodeSkins = nodeSkinning,
+                particles = particleRuntimes,
                 pending = pendingPayloadRefs,
                 cameraKey = firstCameraKey,
                 cameraProps = cameraProps,
