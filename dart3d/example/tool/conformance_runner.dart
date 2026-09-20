@@ -81,58 +81,50 @@ const Map<String, PropRow> kMaterialPropertySupport = {
   'alphaMode': PropRow(Support.realized, Support.realized, ''),
   'alphaCutoff': PropRow(Support.realized, Support.realized, ''),
 
-  // KHR_materials_clearcoat.
-  'clearcoat': PropRow(
-    Support.approximated,
-    Support.realized,
-    'iOS: environment-reflection intensity on `reflective`',
-  ),
-  'clearcoatRoughness': PropRow(
-    Support.approximated,
-    Support.realized,
-    'iOS: dropped — no coat roughness lever',
-  ),
+  // KHR_materials_clearcoat — realized on both: iOS 13+ exposes the
+  // PBR coat inputs (`clearCoat`/`clearCoatRoughness`/`clearCoatNormal`)
+  // the round-3 `reflective` writes only pretended to reach.
+  'clearcoat': PropRow(Support.realized, Support.realized, ''),
+  'clearcoatRoughness': PropRow(Support.realized, Support.realized, ''),
   'clearcoatTexture': PropRow(
-    Support.approximated,
     Support.realized,
-    'iOS: R×factor baked into `reflective` intensity map',
+    Support.realized,
+    'iOS: R×factor baked into the `clearCoat` intensity map',
   ),
   'clearcoatRoughnessTexture': PropRow(
-    Support.approximated,
     Support.realized,
-    'iOS: dropped',
-  ),
-  'clearcoatNormalTexture': PropRow(
-    Support.approximated,
     Support.realized,
-    'iOS: dropped',
+    'iOS: G×factor baked into the `clearCoatRoughness` map',
   ),
+  'clearcoatNormalTexture': PropRow(Support.realized, Support.realized, ''),
   'clearcoatNormalScale': PropRow(
-    Support.approximated,
     Support.realized,
-    'iOS: dropped',
+    Support.realized,
+    'iOS: `clearCoatNormal.intensity` ← the duplicated v2\'s x',
   ),
 
-  // KHR_materials_sheen.
+  // KHR_materials_sheen — no SceneKit lobe; iOS approximates as a
+  // fresnel rim in a `.fragment` shader modifier (textures bind into
+  // it as `texture2d` args; slot transforms can't reach them).
   'sheenColor': PropRow(
     Support.approximated,
     Support.realized,
-    'iOS: tinted `reflective` rim via fresnelExponent',
+    'iOS: fresnel rim via `.fragment` shader modifier',
   ),
   'sheenRoughness': PropRow(
     Support.approximated,
     Support.realized,
-    'iOS: folded into fresnelExponent',
+    'iOS: folds into the rim exponent (smoother → tighter)',
   ),
   'sheenColorTexture': PropRow(
     Support.approximated,
     Support.realized,
-    'iOS: dropped — sheen rides the reflective approximation',
+    'iOS: `texture2d` modifier arg (diffuse uv; transform drops)',
   ),
   'sheenRoughnessTexture': PropRow(
     Support.approximated,
     Support.realized,
-    'iOS: dropped',
+    'iOS: `texture2d` modifier arg, `.a` (same uv limit)',
   ),
 
   // KHR_materials_specular.
@@ -1319,13 +1311,10 @@ Directory exampleRoot() {
   return Directory.current;
 }
 
-Map<String, dynamic> loadCatalog() =>
-    jsonDecode(
-          File(
-            '${exampleRoot().path}/assets/conformance/catalog.json',
-          ).readAsStringSync(),
-        )
-        as Map<String, dynamic>;
+Map<String, dynamic> loadCatalog() => jsonDecode(
+  File('${exampleRoot().path}/assets/conformance/catalog.json')
+      .readAsStringSync(),
+) as Map<String, dynamic>;
 
 /// Emits the conformance matrix + golden manifest artifacts under
 /// `build/conformance/`. Returns the output directory.
@@ -1333,9 +1322,8 @@ Directory writeArtifacts(ConformanceReport report) {
   final out = Directory('${exampleRoot().path}/build/conformance')
     ..createSync(recursive: true);
   const encoder = JsonEncoder.withIndent('  ');
-  File(
-    '${out.path}/conformance-matrix.json',
-  ).writeAsStringSync(encoder.convert(report.toJson()));
+  File('${out.path}/conformance-matrix.json')
+      .writeAsStringSync(encoder.convert(report.toJson()));
 
   final golden = [
     for (final s in goldenScenes)
@@ -1361,9 +1349,8 @@ Directory writeArtifacts(ConformanceReport report) {
     final manifest = jsonDecode(
       utf8.decode(D3Protocol.loadSceneBytes(goldenFixture(s.fixture!))),
     );
-    File(
-      '${fixtures.path}/${s.fixture}.fscene.json',
-    ).writeAsStringSync(encoder.convert(manifest));
+    File('${fixtures.path}/${s.fixture}.fscene.json')
+        .writeAsStringSync(encoder.convert(manifest));
   }
   return out;
 }

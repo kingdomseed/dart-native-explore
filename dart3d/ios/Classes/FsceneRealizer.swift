@@ -1271,14 +1271,21 @@ enum FsceneRealizer {
             where props[slot] != nil {
                 applyTextureSlot(m, materialKey: key, slot: slot)
             }
-            // W22: KHR_materials_* — SceneKit has no second specular
-            // lobe, no sheen/anisotropy/iridescence, and no refraction
-            // input, so each extension lands on its nearest
-            // documented approximation (each logs once). `unlit`
-            // skips extensions the way the importer drops them.
+            // W22: KHR_materials_* — clearcoat maps onto SceneKit's
+            // real coat inputs (`clearCoat`/`clearCoatRoughness`/
+            // `clearCoatNormal` — PBR properties since iOS 13); sheen
+            // gets a `.fragment` shader-modifier fresnel rim; the rest
+            // lands on its nearest documented approximation (each logs
+            // once). `unlit` skips extensions the way the importer
+            // drops them.
             if type != "unlit" {
                 decodeMaterialExtensions(m, key, props)
-                for slot in ["clearcoatTexture", "transmissionTexture"]
+                for slot in ["clearcoatTexture",
+                             "clearcoatRoughnessTexture",
+                             "clearcoatNormalTexture",
+                             "sheenColorTexture",
+                             "sheenRoughnessTexture",
+                             "transmissionTexture"]
                 where props[slot] != nil {
                     applyTextureSlot(m, materialKey: key, slot: slot)
                 }
@@ -1287,61 +1294,109 @@ enum FsceneRealizer {
             materials[key] = m
         }
 
-        /// W22 KHR_materials_* realization under SceneKit's fixed
-        /// lobes. What maps lands on `reflective`/`transparent`; what
-        /// can't gets one per-material log naming the drop — the
-        /// conformance matrix's `approx` rows are these messages.
+        /// W22 KHR_materials_* realization under SceneKit's PBR model.
+        /// Clearcoat is REALIZED — `clearCoat`/`clearCoatRoughness`/
+        /// `clearCoatNormal` are real `.physicallyBased` inputs (SCN-
+        /// Material properties since iOS 13, in Apple's PBR set — NOT
+        /// on its `reflective`/`specular`/`ambient`/`shininess`/
+        /// `fresnelExponent` ignore list). Sheen is approximated
+        /// post-lighting in a `.fragment` shader modifier — a fresnel
+        /// rim — with its textures bound into the modifier as
+        /// `texture2d` arguments (SCNShadable binds `texture2d` args
+        /// from SCNMaterialProperty values set via KVC). Transmission
+        /// keeps the thin-blend `transparent` approximation. What
+        /// still can't map gets one per-material log naming the drop —
+        /// the conformance matrix's `approx` rows are these messages.
+        ///
+        /// W22-r4: the round-3 `reflective`/`fresnelExponent` writes
+        /// were inert — `.physicallyBased` ignores both (documented),
+        /// so the approximations logged honestly but produced no
+        /// pixels. The `reflectiveClaimed` slot arbitration is gone:
+        /// coat and sheen live on separate mechanisms now and combine
+        /// freely on one material.
         func decodeMaterialExtensions(_ m: SCNMaterial, _ key: UInt64,
                                       _ props: [String: Any]) {
-            // `reflective.contents` is non-nil out of the box (a
-            // black hdrm(1) color), so a contents nil-check can never
-            // see whether an approximation already claimed the slot —
-            // this flag tracks the claim explicitly. clearcoat claims
-            // first; sheen applies its rim only while unclaimed.
-            var reflectiveClaimed = false
-            // clearcoat → the coat's constant dielectric reflection
-            // approximates as `reflective` environment intensity —
-            // SceneKit has no coat lobe, so its roughness and normal
-            // map drop. `reflective` hosts one contents, so sheen
-            // (below) yields when the coat claimed it.
+            // KHR_materials_clearcoat → the real coat lobe. Factor
+            // contents here are the texture-absent values; the texture
+            // slots bind in applyTextureSlot (R×factor → clearCoat,
+            // G×factor → clearCoatRoughness, rgb → clearCoatNormal).
             let coat = d3Double(props["clearcoat"]) ?? 0
             let hasTransmission = (d3Double(props["transmission"]) ?? 0)
                 > 0 || d3Ref(props["transmissionTexture"]) != nil
             if coat > 0 || d3Ref(props["clearcoatTexture"]) != nil {
-                host.logOnce("material.\(key).clearcoat",
-                    "material \(key): clearcoat → `reflective` "
-                    + "environment intensity (no coat lobe); "
-                    + "clearcoatRoughness and the coat normal map "
-                    + "drop")
-                m.reflective.contents = UIColor(white: coat, alpha: 1)
-                reflectiveClaimed = true
+                m.clearCoat.contents = UIColor(white: coat, alpha: 1)
             }
-            // sheen → tinted rim via `reflective` + fresnelExponent
-            // (roughness → exponent: rougher sheen, tighter rim).
-            // Sheen textures drop — the approximation is a constant
-            // tint.
+            if let cr = d3Double(props["clearcoatRoughness"]) {
+                m.clearCoatRoughness.contents = NSNumber(value: cr)
+            }
+            // sheen → post-lighting fresnel rim via a `.fragment`
+            // shader modifier — `.physicallyBased` has no sheen lobe.
+            // rim = pow(1 − saturate(N·V), e) · tint, added after
+            // lighting; sheenRoughness maps to e — smoother sheen →
+            // tighter rim (e up), rougher → broader (the r3 comment
+            // had the direction backwards). Bound sheen textures
+            // become texture2d arguments sampled at the diffuse uv —
+            // a uniform-bound texture can't carry a contentsTransform,
+            // so `<slot>Transform` on sheen drops (applyTextureSlot
+            // logs). Divergence from a true sheen lobe, documented:
+            // the rim is view-dependent only — no light response, and
+            // it adds energy rather than shading what's underneath.
             let sheen = d3ColorComponents(props["sheenColor"])
+            let sheenColorTex = d3Ref(props["sheenColorTexture"]) != nil
+            let sheenRoughTex =
+                d3Ref(props["sheenRoughnessTexture"]) != nil
             let sheenOn =
                 (sheen.map { $0[0] + $0[1] + $0[2] > 0 } ?? false)
-                || d3Ref(props["sheenColorTexture"]) != nil
-                || d3Ref(props["sheenRoughnessTexture"]) != nil
+                || sheenColorTex || sheenRoughTex
             if sheenOn {
-                if !reflectiveClaimed {
-                    let c = sheen ?? [1, 1, 1, 1]
-                    let rough = d3Double(props["sheenRoughness"]) ?? 0
-                    m.reflective.contents = UIColor(
-                        red: c[0], green: c[1], blue: c[2], alpha: 1)
-                    m.fresnelExponent = CGFloat(1 + (1 - rough) * 3)
-                    reflectiveClaimed = true
-                    host.logOnce("material.\(key).sheen",
-                        "material \(key): sheen → tinted `reflective` "
-                        + "rim (fresnelExponent from sheenRoughness); "
-                        + "sheen textures drop")
-                } else {
-                    host.logOnce("material.\(key).sheen.coat",
-                        "material \(key): sheen drops — `reflective` "
-                        + "already carries the clearcoat approximation")
+                let c = sheen ?? [1, 1, 1, 1]
+                let rough = d3Double(props["sheenRoughness"]) ?? 0
+                var decl = ""
+                var texBody = ""
+                if sheenColorTex {
+                    decl += "texture2d<float> d3SheenColorTex;\n"
+                    texBody += "tint *= d3SheenColorTex.sample("
+                        + "d3SheenS, _surface.diffuseTexcoord).rgb;\n"
                 }
+                if sheenRoughTex {
+                    decl += "texture2d<float> d3SheenRoughTex;\n"
+                    texBody += "rough *= d3SheenRoughTex.sample("
+                        + "d3SheenS, _surface.diffuseTexcoord).a;\n"
+                }
+                var body = String(format:
+                    "float3 tint = float3(%.6f, %.6f, %.6f);\n"
+                    + "float rough = %.6f;\n", c[0], c[1], c[2], rough)
+                    + texBody
+                    + "float rim = pow(1.0 - saturate(dot("
+                    + "normalize(_surface.normal),"
+                    + " normalize(_surface.view))),"
+                    + " 1.0 + (1.0 - saturate(rough)) * 3.0);\n"
+                    + "_output.color.rgb += tint * rim;"
+                if !decl.isEmpty {
+                    body = "constexpr sampler d3SheenS(filter::linear,"
+                        + " mip_filter::linear, address::repeat);\n"
+                        + body
+                }
+                // Merge with the mask-alpha modifier when both apply —
+                // `#pragma arguments`/`#pragma body` lead the combined
+                // source; the mask snippet carries no pragmas.
+                let prior = m.shaderModifiers?[.fragment] ?? ""
+                var mods = m.shaderModifiers ?? [:]
+                mods[.fragment] = decl.isEmpty
+                    ? prior + "\n" + body
+                    : "#pragma arguments\n" + decl + "#pragma body\n"
+                        + prior + "\n" + body
+                m.shaderModifiers = mods
+                host.logOnce("material.\(key).sheen",
+                    "material \(key): sheen → fresnel rim in a "
+                    + ".fragment shader modifier (no sheen lobe — "
+                    + "view-dependent rim, not a light-responding "
+                    + "lobe)"
+                    + (sheenColorTex || sheenRoughTex
+                        ? "; sheen textures bind as modifier args "
+                          + "sampling the diffuse uv (slot transforms "
+                          + "drop)"
+                        : ""))
             }
             // specular → no dielectric-F0 lever under .physicallyBased.
             let spec = d3Double(props["specular"]) ?? 1
@@ -1586,24 +1641,81 @@ enum FsceneRealizer {
                 if let v = d3Double(props["emissiveStrength"]) {
                     m.emission.intensity = CGFloat(v)
                 }
-            // W22 extension slots (KHR_materials_clearcoat /
-            // _transmission): SceneKit has no coat or refraction
-            // input, so the textures bake into the approximation the
-            // factors already wrote — reflective intensity = R×factor;
-            // transparent alpha = 1 − R×factor under .aOne. A missing
-            // bake keeps the factor-only contents (the channel-split
-            // rule).
+            // W22-r4 extension slots. clearcoat is REAL — the textures
+            // bind SceneKit's `clearCoat` inputs with the same
+            // channel-split/factor-bake rules as the base slots
+            // (glTF: coat intensity in R, coat roughness in G).
+            // Sheen textures bind into the `.fragment` rim modifier as
+            // `texture2d` arguments via `setValue(_:forKey:)` — the
+            // modifier multiplies them by the factor literals it
+            // baked at decode, so an unresolved texture binds a
+            // neutral 1×1 (factor-only) until the upsert rebind.
+            // transmission keeps the thin-blend `transparent` bake.
             case "clearcoatTexture":
                 let f = d3Double(props["clearcoat"]) ?? 0
                 if let tex {
-                    m.reflective.contents =
+                    m.clearCoat.contents =
                         channelGray(tex, channel: 0, factor: f)
                         ?? UIColor(white: f, alpha: 1)
                     applyContentsTransform(
-                        m.reflective, transform,
+                        m.clearCoat, transform,
                         materialKey: materialKey, slot: slot)
                 } else {
-                    m.reflective.contents = UIColor(white: f, alpha: 1)
+                    m.clearCoat.contents = UIColor(white: f, alpha: 1)
+                }
+            case "clearcoatRoughnessTexture":
+                let f = d3Double(props["clearcoatRoughness"]) ?? 0
+                if let tex {
+                    m.clearCoatRoughness.contents =
+                        channelGray(tex, channel: 1, factor: f)
+                        ?? NSNumber(value: f)
+                    applyContentsTransform(
+                        m.clearCoatRoughness, transform,
+                        materialKey: materialKey, slot: slot)
+                } else {
+                    m.clearCoatRoughness.contents = NSNumber(value: f)
+                }
+            case "clearcoatNormalTexture":
+                // The coat normal binds like `occlusionTexture` — raw
+                // contents, no renormalized-mip pass (the base
+                // normal's chain builder is normal-specific; SceneKit
+                // generates this slot's own chain).
+                m.clearCoatNormal.contents = tex?.contents
+                if let tex {
+                    if tex.mtlTexture != nil {
+                        m.clearCoatNormal.mipFilter = .linear
+                    }
+                    applyContentsTransform(
+                        m.clearCoatNormal, transform,
+                        materialKey: materialKey, slot: slot)
+                }
+                // The wire sends the scale as a duplicated v2
+                // (xy-pair convention); the property's scalar
+                // `intensity` takes .x. A scale without the map is
+                // inert — glTF agrees.
+                if let s = d3Vec2(props["clearcoatNormalScale"])?.first
+                        ?? d3Double(props["clearcoatNormalScale"]) {
+                    m.clearCoatNormal.intensity = CGFloat(s)
+                }
+            case "sheenColorTexture", "sheenRoughnessTexture":
+                // Bound into the rim modifier as a texture2d argument
+                // (declared there iff this slot was referenced, so the
+                // key always has a declared arg). A transform on a
+                // uniform-bound texture can't reach a texcoord — the
+                // modifier samples the diffuse uv; log the drop.
+                let arg = slot == "sheenColorTexture"
+                    ? "d3SheenColorTex" : "d3SheenRoughTex"
+                if props["\(slot)Transform"] != nil {
+                    host.logOnce("material.\(materialKey).\(slot).xform",
+                        "material \(materialKey): \(slot)Transform "
+                        + "drops — modifier-bound textures sample the "
+                        + "diffuse uv channel")
+                }
+                if let contents = tex?.contents {
+                    m.setValue(SCNMaterialProperty(contents: contents),
+                               forKey: arg)
+                } else {
+                    m.setValue(neutralTexProperty(), forKey: arg)
                 }
             case "transmissionTexture":
                 let f = d3Double(props["transmission"]) ?? 0
@@ -1657,6 +1769,17 @@ enum FsceneRealizer {
         /// color texture — a live texture has no CPU channel split.
         func applyRenderTextureSlot(_ m: SCNMaterial,
                                     rt: RenderTargetRec, slot: String) {
+            // Sheen textures live in the rim modifier's texture2d
+            // args, not material slots — bind the live color texture
+            // through KVC. The modifier's constexpr sampler is fixed
+            // (linear/repeat), so the rt's filter/wrap can't apply.
+            if slot == "sheenColorTexture" || slot == "sheenRoughnessTexture" {
+                m.setValue(
+                    SCNMaterialProperty(contents: rt.colorTex),
+                    forKey: slot == "sheenColorTexture"
+                        ? "d3SheenColorTex" : "d3SheenRoughTex")
+                return
+            }
             let props: [SCNMaterialProperty]
             switch slot {
             case "baseColorTexture":         props = [m.diffuse]
@@ -1665,6 +1788,12 @@ enum FsceneRealizer {
             case "normalTexture":            props = [m.normal]
             case "occlusionTexture":         props = [m.ambientOcclusion]
             case "emissiveTexture":          props = [m.emission]
+            // W22-r4: clearcoat slots are real properties — the rt
+            // path can bind them like the base slots.
+            case "clearcoatTexture":         props = [m.clearCoat]
+            case "clearcoatRoughnessTexture":
+                props = [m.clearCoatRoughness]
+            case "clearcoatNormalTexture":   props = [m.clearCoatNormal]
             default:                         props = []
             }
             let f: SCNFilterMode =
@@ -2270,8 +2399,20 @@ enum FsceneRealizer {
             UInt8(clamping: Int((Double(b) * f).rounded()))
         }
 
+        /// Neutral 1×1 white bound to a shader-modifier `texture2d`
+        /// argument whose texture hasn't decoded yet — the modifier
+        /// samples it as ×1 (factor-only) until the deferred texture
+        /// lands and `applyTextureSlot` rebinds the real contents.
+        func neutralTexProperty() -> SCNMaterialProperty {
+            let img = rgbaCGImage(Data([255, 255, 255, 255]),
+                                  width: 1, height: 1, content: "data")
+                .map { UIImage(cgImage: $0) }
+            return SCNMaterialProperty(contents: img ?? UIColor.white)
+        }
+
         /// W22: single channel × factor → gray image for a scalar
-        /// slot's intensity map (clearcoat → `reflective`). GPU-only
+        /// slot's intensity map (clearcoat → `clearCoat`,
+        /// clearcoatRoughness → `clearCoatRoughness`). GPU-only
         /// textures (KTX2) have no CPU pixels — nil + warn-once, the
         /// same rule splitMetallicRoughness follows.
         func channelGray(_ tex: DecodedTexture, channel: Int,
