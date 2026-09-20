@@ -546,7 +546,10 @@ final class SceneViewHost: SCNView {
         [UInt64: FsceneRealizer.TrailState] = [:]
     /// W16: node key → decoded `lod` spec; `lodResourceConsumers`
     /// routes resource landings to `rebindLod`, `pendingLodNodes`
-    /// holds the unresolved ones (`pendingSkinNodes` pattern).
+    /// holds the unresolved ones (`pendingSkinNodes` pattern). The
+    /// per-frame pass in `updateLods` selects + binds the level —
+    /// SceneKit's `levelsOfDetail` is not used (its screen-space
+    /// metric can't reproduce upstream's `lodScreenSize`).
     private(set) var lodSpecs:
         [UInt64: FsceneRealizer.LodSpec] = [:]
     private(set) var lodResourceConsumers:
@@ -1412,8 +1415,8 @@ final class SceneViewHost: SCNView {
         }
         // W16: the lod spec and its pending mark drop; the level
         // geometry copies' material-consumer entries purge below
-        // (they ride `old`'s sweep only for level 0 — the
-        // SCNLevelOfDetail copies are not node.geometry).
+        // (the bound copy rides `old`'s sweep — it IS node.geometry;
+        // the unbound ones are not).
         if let spec = ctx.lods.removeValue(forKey: key) {
             for copy in spec.geoCopies where copy !== old {
                 for mk in ctx.materialConsumers.keys {
@@ -1835,9 +1838,10 @@ final class SceneViewHost: SCNView {
     /// that referenced it; a geometry rebuilds and swaps onto every
     /// consuming node, carrying its per-node materials over.
     /// W16: resource `key` just (re)decoded — re-resolve every `lod`
-    /// spec that consumes it. `rebindLod` is a full rebuild, so a
-    /// geometry or material landing on ANY level rewrites the node's
-    /// level set; publishing happens in the caller's own write-back.
+    /// spec that consumes it. `rebindLod` rebuilds the whole level
+    /// copy set, so a geometry or material landing on ANY level
+    /// rewrites it and re-applies the bound level onto the fresh
+    /// copies; publishing happens in the caller's own write-back.
     private func rebindLodConsumers(
         _ key: UInt64, _ ctx: FsceneRealizer.Context
     ) {
@@ -1931,6 +1935,16 @@ final class SceneViewHost: SCNView {
             resourceDefs = ctx.resourceDefs
             morphTargetsById = ctx.morphTargets
             for node in geometryConsumers[key] ?? [] {
+                // W16: an `lod` owning the node's draw slot isn't a
+                // mesh-geometry rebind target — the level copies
+                // refresh through `rebindLodConsumers` below
+                // (Android's rebuildRenderable skips an lod-owned
+                // renderable).
+                if let nk = nodeToKey[ObjectIdentifier(node)],
+                   let spec = ctx.lods[nk],
+                   spec.ownsRenderable, !spec.suspended {
+                    continue
+                }
                 let old = node.geometry
                 let rebound = ctx.geometries[key]
                     .flatMap { ($0.copy() as? SCNGeometry) ?? $0 }
@@ -3849,10 +3863,11 @@ extension SceneViewHost: SCNSceneRendererDelegate {
         drainPendingWork()
         sampleAnimations(at: time)
         // W16: trails record after the sampler — the head follows
-        // this frame's sampled pose; LOD thresholds refresh against
-        // the live viewport pixel height.
+        // this frame's sampled pose; lods then re-select and rebind
+        // against this frame's camera (Android's `updateTrailsLods`
+        // slot — post-camera, pre-render).
         updateTrails(at: time)
-        refreshLodScreenRadii()
+        updateLods()
     }
 
     /// W16 per-frame trail pass — `TrailComponent.update` ported:
@@ -3983,42 +3998,161 @@ extension SceneViewHost: SCNSceneRendererDelegate {
         st.child.geometry = geo
     }
 
-    /// W16: rebuilds each `lod`'s `SCNLevelOfDetail` array when the
-    /// derived pixel radii change — `screenSpaceRadius` is
-    /// construction-only, and the wire threshold is a fraction of
-    /// viewport height while SceneKit wants pixels:
-    /// `radius = fraction · viewportPxHeight / 2` (the fraction
-    /// covers the diameter), scaled by `1/lodBias` (a bigger size is
-    /// the same as a smaller threshold). An orthographic
-    /// point-of-view disables the metric like upstream — every
-    /// radius writes 0, so the base (highest detail) always draws.
-    /// Radii only move on a viewport resize, an ortho toggle, or a
-    /// rebind, so the array rebuild is rare.
-    private func refreshLodScreenRadii() {
-        guard !lodSpecs.isEmpty else { return }
-        let scale = Double(window?.screen.scale ?? 1.0)
-        let hPx = Double(bounds.height) * max(scale, 1.0)
-        let ortho =
-            pointOfView?.camera?.usesOrthographicProjection ?? false
-        for (_, spec) in lodSpecs where spec.resolved {
-            let bias = max(spec.lodBias, 1e-6)
-            let radii = spec.ssrFractions.map {
-                ortho ? 0.0 : $0 * hPx / (2 * bias)
-            }
-            guard radii != spec.appliedRadii,
-                  let base = spec.geoCopies.first else { continue }
-            spec.appliedRadii = radii
-            var lods: [SCNLevelOfDetail] = []
-            for (i, r) in radii.enumerated() {
-                // Entries map onto levels 1…n-1; the cull entry (i
-                // past the last copy) carries nil geometry.
-                lods.append(SCNLevelOfDetail(
-                    geometry: i + 1 < spec.geoCopies.count
-                        ? spec.geoCopies[i + 1] : nil,
-                    screenSpaceRadius: r))
-            }
-            base.levelsOfDetail = lods
+    /// W16 per-frame LOD pass — Android's `updateLod`
+    /// (FsceneRealizer.kt) ported field-for-field: upstream
+    /// `_resolveLod`. This replaces the earlier `SCNLevelOfDetail`
+    /// delegation, which probe-verified can't reproduce the upstream
+    /// metric (its `screenSpaceRadius` is a max-projection-axis,
+    /// half-viewport-diagonal measure on view depth, and the tight
+    /// level-0 bounding sphere isn't overridable).
+    private func updateLods() {
+        guard !lodSpecs.isEmpty,
+              let pov = pointOfView, let cam = pov.camera
+        else { return }
+        let perspective = !cam.usesOrthographicProjection
+        // `fovRadiansY` decodes onto a `.vertical` fieldOfView
+        // (degrees); a horizontal-declared fov converts through the
+        // viewport aspect.
+        var fovRadY = Double(cam.fieldOfView) * .pi / 180
+        if cam.projectionDirection == .horizontal {
+            let aspect =
+                Double(bounds.width) / Double(max(bounds.height, 1))
+            fovRadY = 2 * atan(tan(fovRadY / 2) / max(aspect, 1e-9))
         }
+        // Both positions live in the same LH→RH-mirrored space — a
+        // mirror is an isometry, so the Euclidean distances the
+        // metric wants match the authored ones.
+        let camPos = simd_float3(
+            Float(pov.simdWorldPosition.x),
+            Float(pov.simdWorldPosition.y),
+            Float(pov.simdWorldPosition.z))
+        for (key, spec) in lodSpecs where !spec.suspended {
+            guard let node = nodesById[key] else { continue }
+            updateLod(spec, node: node, camPos: camPos,
+                      fovRadY: fovRadY, perspective: perspective)
+        }
+    }
+
+    /// One node's selection for this frame: the level-0 local AABB's
+    /// 8 corners through the node's world transform give the world
+    /// AABB (rotation and non-uniform scale both land); its
+    /// circumscribed sphere — center plus half-diagonal radius —
+    /// projects through upstream `lodScreenSize`: `∞` when the
+    /// camera is inside, else `radius / (dist·tan(fovY/2))` at the
+    /// Euclidean distance. `lodBias` scales the size, then the
+    /// `hysteresis` dead-band picks against the descending
+    /// thresholds with `spec.bound` as memory; `-1` culls. A
+    /// non-perspective camera or an unresolved level set binds
+    /// level 0 — upstream's orthographic/unresolved rules.
+    private func updateLod(_ spec: FsceneRealizer.LodSpec,
+                           node: SCNNode, camPos: simd_float3,
+                           fovRadY: Double, perspective: Bool) {
+        if !perspective || !spec.resolved {
+            bindLodLevel(spec, node, 0)
+            return
+        }
+        let m = node.simdWorldTransform
+        var lo = simd_float3(repeating: Float.greatestFiniteMagnitude)
+        var hi = simd_float3(repeating: -Float.greatestFiniteMagnitude)
+        for xs in [spec.boundMin.x, spec.boundMax.x] {
+            for ys in [spec.boundMin.y, spec.boundMax.y] {
+                for zs in [spec.boundMin.z, spec.boundMax.z] {
+                    let w = m * simd_float4(xs, ys, zs, 1)
+                    lo = simd_min(lo, simd_float3(w.x, w.y, w.z))
+                    hi = simd_max(hi, simd_float3(w.x, w.y, w.z))
+                }
+            }
+        }
+        // The circumscribed sphere — upstream's conservative choice
+        // (detail kept slightly longer than a tight sphere would).
+        let center = (lo + hi) * 0.5
+        let radius = Double(simd_length(hi - lo) * 0.5)
+        let dist = Double(simd_length(center - camPos))
+        let size = dist <= radius
+            ? Double.infinity
+            : radius / (dist * tan(fovRadY * 0.5))
+        let sel = SceneViewHost.selectLodLevel(
+            size * spec.lodBias,
+            thresholds: spec.levels.map { $0.screenSize },
+            hysteresis: spec.hysteresis,
+            currentLevel: spec.bound)
+        bindLodLevel(spec, node, sel)
+    }
+
+    /// Upstream `selectLodLevel` — the first level whose descending
+    /// threshold the (already biased) `size` meets, then the
+    /// `hysteresis` dead-band around `currentLevel`'s boundaries: an
+    /// adjacent crossing holds until the size clears the boundary by
+    /// the fractional margin — finer at `t·(1+h)`, coarser at
+    /// `t·(1−h)`; the cull floor is the boundary below the last
+    /// level in both directions. A non-adjacent jump switches
+    /// immediately. `-1` culls below the smallest threshold (a last
+    /// threshold of `0` never culls).
+    private static func selectLodLevel(
+        _ size: Double, thresholds: [Double],
+        hysteresis: Double, currentLevel: Int
+    ) -> Int {
+        var naive = -1
+        for (i, t) in thresholds.enumerated() {
+            if size >= t {
+                naive = i
+                break
+            }
+        }
+        if naive == currentLevel || hysteresis <= 0 { return naive }
+        let last = thresholds.count - 1
+        if currentLevel >= 1 && naive == currentLevel - 1 {
+            return size >= thresholds[currentLevel - 1] * (1 + hysteresis)
+                ? naive : currentLevel
+        }
+        if currentLevel >= 0 && naive == currentLevel + 1 {
+            return size < thresholds[currentLevel] * (1 - hysteresis)
+                ? naive : currentLevel
+        }
+        if currentLevel == last && naive == -1 {
+            return size < thresholds[last] * (1 - hysteresis)
+                ? -1 : currentLevel
+        }
+        if currentLevel == -1 && naive == last {
+            return size >= thresholds[last] * (1 + hysteresis)
+                ? naive : -1
+        }
+        return naive
+    }
+
+    /// Binds level `idx` of `spec` to `node.geometry` — the swap the
+    /// frame pass drives, dirty-checked so an unchanged level doesn't
+    /// rewrite the slot. `idx` -1 is the cull floor: the node's own
+    /// geometry drops to nil while children keep drawing — the
+    /// closest match to Android's `scene.removeEntity(entity)` unbind
+    /// (which detaches the renderable without touching the subtree).
+    /// `force` rebinds the same index: the resource-landing rebind's
+    /// fresh copies must replace the bound ones.
+    func bindLodLevel(_ spec: FsceneRealizer.LodSpec, _ node: SCNNode,
+                      _ idx: Int, force: Bool = false) {
+        if spec.suspended { return }
+        if idx < 0 {
+            // Culled — only a bound level drops its geometry; `bound`
+            // -1 also marks a never-bound spec, whose slot belongs to
+            // whatever wrote it (a pending mesh's geometry).
+            if spec.bound >= 0 {
+                node.geometry = nil
+                spec.bound = -1
+            }
+            return
+        }
+        if !force && spec.bound == idx { return }
+        guard idx < spec.geoCopies.count else { return }
+        let g = spec.geoCopies[idx]
+        if let old = node.geometry, old !== g,
+           !spec.geoCopies.contains(where: { $0 === old }) {
+            // A foreign geometry (a `mesh`'s) retires here; the
+            // spec's own level copies stay alive on the spec.
+            retire(old)
+        }
+        node.geometry = g
+        spec.bound = idx
+        spec.ownsRenderable = true
     }
 
     /// W14: post-physics, pre-drawable — the offscreen passes draw the

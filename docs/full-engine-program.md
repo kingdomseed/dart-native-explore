@@ -474,7 +474,7 @@ Each live lane drives the real surfaces. Android lanes use the phone A142 (`adb 
 **Build.**
 
 - [x] `trail` as a camera-facing ribbon with `width`, `lifetime`, `minVertexDistance`, `maxPoints`, and `widthOverTrail` on both platforms.
-- [x] `lod` via `SCNGeometry.levelsOfDetail` on iOS and a per-frame camera test on Android. `hysteresis` and `blendRange` documented as no-ops.
+- [x] `lod` via the shared explicit per-frame selection on both platforms — upstream `lodScreenSize` over the level-0 world-AABB circumscribed sphere, `lodBias`, descending thresholds, `-1` cull (iOS ports Android's `updateLod`; SceneKit's `levelsOfDetail` can't reproduce the metric — probe-verified — and its bound isn't overridable). `hysteresis` is live (upstream's dead-band; wire default 0.1); `blendRange` stays a documented no-op (upstream's cross-fade needs a per-material dither slot neither native carries).
 
 **You see.**
 

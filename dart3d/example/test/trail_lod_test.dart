@@ -74,7 +74,8 @@ void main() {
       expect((l0['material'] as ResourceRefValue).id, matId);
       expect((l0['screenSize'] as DoubleValue).value, 0.3);
       expect((c.properties['lodBias'] as DoubleValue).value, 2.0);
-      // Decoded for parity; documented no-ops on the natives.
+      // hysteresis is upstream's dead-band (the natives apply it);
+      // blendRange stays a documented no-op — decoded for parity.
       expect((c.properties['hysteresis'] as DoubleValue).value, 0.1);
       expect((c.properties['blendRange'] as DoubleValue).value, 0.2);
     });
@@ -332,6 +333,53 @@ void main() {
     test('lodBias scales the size before selection', () {
       expect(selectLodLevel(0.05, const [0.3, 0.1], lodBias: 3), 1);
       expect(selectLodLevel(0.6, thresholds, lodBias: 0.1), 2);
+    });
+
+    test('hysteresis holds an adjacent crossing inside the dead-band', () {
+      // thresholds [0.3, 0.1, 0.0], hysteresis 0.1: the coarser arm
+      // watches the CURRENT level's lower boundary — level 1 holds
+      // until size < 0.1·(1−0.1) = 0.09.
+      expect(
+        selectLodLevel(0.095, thresholds, hysteresis: 0.1, currentLevel: 1),
+        1,
+      );
+      expect(
+        selectLodLevel(0.089, thresholds, hysteresis: 0.1, currentLevel: 1),
+        2,
+      );
+      // The finer arm watches the upper boundary: level 1 holds until
+      // size ≥ 0.3·(1+0.1) = 0.33.
+      expect(
+        selectLodLevel(0.31, thresholds, hysteresis: 0.1, currentLevel: 1),
+        1,
+      );
+      expect(
+        selectLodLevel(0.33, thresholds, hysteresis: 0.1, currentLevel: 1),
+        0,
+      );
+    });
+
+    test('hysteresis gates the cull floor both ways', () {
+      const t = [0.3, 0.1];
+      // Level 1 (the last) holds until size < 0.1·(1−h) = 0.09.
+      expect(selectLodLevel(0.095, t, hysteresis: 0.1, currentLevel: 1), 1);
+      expect(selectLodLevel(0.08, t, hysteresis: 0.1, currentLevel: 1), -1);
+      // Culled: the last level re-binds only past 0.1·(1+h) = 0.11
+      // (the float product lands a hair above the literal — use a
+      // clearly-crossing size).
+      expect(selectLodLevel(0.105, t, hysteresis: 0.1, currentLevel: -1), -1);
+      expect(selectLodLevel(0.115, t, hysteresis: 0.1, currentLevel: -1), 1);
+    });
+
+    test('a multi-level jump switches immediately through the band', () {
+      expect(
+        selectLodLevel(0.5, thresholds, hysteresis: 0.1, currentLevel: 2),
+        0,
+      );
+      expect(
+        selectLodLevel(0.001, thresholds, hysteresis: 0.1, currentLevel: 0),
+        2,
+      );
     });
   });
 }

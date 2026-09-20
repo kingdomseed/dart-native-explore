@@ -356,11 +356,14 @@ enum FsceneRealizer {
 
     /// W16: a decoded `lod` component — upstream `LodComponent`. The
     /// level list is highest detail first with descending
-    /// `screenSize` thresholds (fraction of viewport height); the
-    /// realized mapping is SceneKit's `levelsOfDetail`: level 0 is the
-    /// node's geometry, each later level rides an `SCNLevelOfDetail`
-    /// keyed by the PREVIOUS level's threshold, and a nil-geometry
-    /// entry at the smallest threshold culls below the floor.
+    /// `screenSize` thresholds (fraction of viewport height). Selection
+    /// is dart3d's own per-frame pass (the Android `updateLod` port in
+    /// `SceneViewHost.updateLods`): SceneKit's `levelsOfDetail` is NOT
+    /// used — probe-verified, its `screenSpaceRadius` is a
+    /// max-projection-axis, half-viewport-diagonal metric measured on
+    /// view depth, which can't reproduce upstream's height-fraction
+    /// Euclidean selection, and its level-0 tight bounding sphere
+    /// isn't overridable.
     final class LodSpec {
         struct Level {
             let geoKey: UInt64
@@ -369,24 +372,41 @@ enum FsceneRealizer {
         }
         var levels: [Level] = []
         var lodBias = 1.0
-        /// Decoded for wire parity — documented no-ops (hard switch).
-        var hysteresis = 0.0
+        /// Upstream's dead-band fraction — the wire default is 0.1
+        /// (LodCodec/LodComponent); the frame pass's `selectLodLevel`
+        /// applies it with `bound` as the memory.
+        var hysteresis = 0.1
+        /// Decoded for wire parity — a documented no-op: upstream's
+        /// cross-fade needs a per-material dither slot
+        /// (`Material.lodFade`) the natives don't carry, so dart3d
+        /// hard-switches (Android matches).
         var blendRange = 0.0
         /// False while a level's geometry/material hasn't landed —
         /// `lodResourceConsumers` routes its arrival to `rebindLod`.
         var resolved = false
-        /// The entry thresholds in `SCNLevelOfDetail` order —
-        /// [t_0 … t_{n-2}] for levels 1…n-1 plus the optional cull
-        /// floor t_{n-1}. The host's per-frame refresh derives pixel
-        /// radii from these (`screenSpaceRadius` is construction-
-        /// only, so a viewport/bias change rebuilds the entry array).
-        var ssrFractions: [Double] = []
-        /// The pixel radii currently attached — change detection for
-        /// the refresh's entry rebuild.
-        var appliedRadii: [Double] = []
-        /// The level geometry copies in force — kept so a teardown or
-        /// rebind can purge them from `materialConsumers`.
+        /// The level geometry copies in force — the frame pass binds
+        /// by swapping `node.geometry` among them; kept so a teardown
+        /// or rebind can purge them from `materialConsumers`.
         var geoCopies: [SCNGeometry] = []
+        /// Level-0's local-space AABB — cached at rebind so the frame
+        /// pass transforms its 8 corners per frame instead of
+        /// re-reading `SCNGeometry.boundingBox`.
+        var boundMin = simd_float3()
+        var boundMax = simd_float3()
+        /// The level currently bound to `node.geometry` — -1 while
+        /// culled or never bound. Doubles as the hysteresis
+        /// dead-band's memory (upstream `_currentLevel`).
+        var bound = -1
+        /// The node's draw slot is lod-owned once a level has bound —
+        /// a culled node STILL owns the slot (bound -1 only parks its
+        /// geometry). The mesh geometry-consumer rebind lane skips
+        /// lod-owned nodes (Android's `ownsRenderable`).
+        var ownsRenderable = false
+        /// A `mesh` decoded after this `lod` took the slot back —
+        /// last-write-wins (Android's `suspended`); the frame pass
+        /// and resource-landing rebinds skip it until a fresh `lod`
+        /// decodes.
+        var suspended = false
     }
 
     // MARK: - Context
@@ -3912,6 +3932,17 @@ enum FsceneRealizer {
             // pass's frozen storage can still reference it.
             if let old = node.geometry, old !== geo { host.retire(old) }
             node.geometry = geo
+            // W16: the mesh took the draw slot — a decoded `lod`
+            // suspends (last-write-wins, Android's `suspended`); a
+            // pending mesh leaves the lod's binding live (the early
+            // returns above never reach this write), and a later `lod`
+            // re-decode restores itself through a fresh spec.
+            if let spec = lods[key] {
+                spec.suspended = true
+                spec.ownsRenderable = false
+                spec.bound = -1
+                pendingLodNodes.remove(key)
+            }
             // A collider decoded a nil shape while this geometry was
             // payload-deferred, so the body attached shapeless. Refit
             // the recorded derivation now that the geometry exists.
@@ -3988,9 +4019,11 @@ enum FsceneRealizer {
         /// descending); entries missing either ref are skipped like
         /// upstream's codec, while an absent/malformed `screenSize`
         /// decodes as `0.0` — upstream's fallback, the never-cull
-        /// threshold (NOT a dropped level). `hysteresis`/`blendRange`
-        /// decode for wire parity but are documented no-ops — dart3d
-        /// hard-switches.
+        /// threshold (NOT a dropped level). `hysteresis` is
+        /// upstream's dead-band (wire default 0.1); `blendRange`
+        /// decodes for wire parity but is a documented no-op —
+        /// dart3d hard-switches (upstream's cross-fade needs the
+        /// per-material dither slot the natives don't carry).
         func decodeLod(_ key: UInt64, _ node: SCNNode,
                        _ p: [String: Any]) {
             let spec = LodSpec()
@@ -4004,27 +4037,46 @@ enum FsceneRealizer {
                     screenSize: d3Double(m["screenSize"]) ?? 0.0))
             }
             spec.lodBias = d3Double(p["lodBias"]) ?? 1.0
-            spec.hysteresis = d3Double(p["hysteresis"]) ?? 0.0
+            spec.hysteresis = d3Double(p["hysteresis"]) ?? 0.1
             spec.blendRange = d3Double(p["blendRange"]) ?? 0.0
             guard !spec.levels.isEmpty else { return }
+            // A re-decode replaces the spec wholesale — purge the
+            // outgoing level copies' material-consumer entries (they
+            // die with the spec).
+            if let old = lods[key] {
+                for copy in old.geoCopies {
+                    for mk in materialConsumers.keys {
+                        materialConsumers[mk]?.removeAll { $0 === copy }
+                    }
+                }
+            }
             lods[key] = spec
             for l in spec.levels {
                 lodResourceConsumers[l.geoKey, default: []].insert(key)
                 lodResourceConsumers[l.matKey, default: []].insert(key)
             }
             rebindLod(key, node)
+            // The initial draw is level 0 — upstream's base
+            // MeshComponent mesh — until the frame pass selects
+            // (Android's `decodeLod` binds 0 the same way). A pending
+            // spec leaves the slot alone: the pass re-evaluates once
+            // the resources land.
+            host.bindLodLevel(spec, node, 0)
         }
 
         /// (Re)resolves a node's `lod` levels against the resource
-        /// maps and rewrites `node.geometry` — level 0 becomes the
-        /// base, later levels ride `SCNLevelOfDetail`s keyed by the
-        /// previous threshold, and a nil-geometry entry at the
-        /// smallest threshold reproduces upstream's cull floor.
-        /// Called at decode and on every geometry/material landing
-        /// that the spec consumes; a partial resolve leaves the
-        /// node untouched and parks the key in `pendingLodNodes`.
+        /// maps — every level's geometry copies and binds its
+        /// material, and level 0's local AABB caches onto the spec
+        /// for the frame pass. Called at decode and on every
+        /// geometry/material landing that the spec consumes; a
+        /// partial resolve leaves the node untouched and parks the
+        /// key in `pendingLodNodes`. A resolved spec re-applies its
+        /// bound level onto the fresh copies (Android's
+        /// `refreshLodConsumers` force-rebind); a culled or
+        /// never-bound spec leaves `node.geometry` alone — the frame
+        /// pass re-evaluates it.
         func rebindLod(_ key: UInt64, _ node: SCNNode) {
-            guard let spec = lods[key] else { return }
+            guard let spec = lods[key], !spec.suspended else { return }
             var geos: [SCNGeometry] = []
             geos.reserveCapacity(spec.levels.count)
             for l in spec.levels {
@@ -4037,6 +4089,9 @@ enum FsceneRealizer {
                 }
                 let g = (base.copy() as? SCNGeometry) ?? base
                 g.materials = [mat]
+                // Selection is dart3d's own — a SceneKit LOD set
+                // copied off a base geometry must never drive.
+                g.levelsOfDetail = nil
                 geos.append(g)
             }
             // Fully resolved — swap the realized state wholesale: the
@@ -4059,33 +4114,18 @@ enum FsceneRealizer {
             spec.geoCopies = geos
             spec.resolved = true
             pendingLodNodes.remove(key)
-            // SceneKit's contract: entries are ordered by DESCENDING
-            // screen-space radius and the smallest qualifying radius
-            // wins (the base draws when none qualify). Upstream draws
-            // level i while size ≥ t_i, so the SceneKit entry for
-            // level i ≥ 1 keys off the PREVIOUS threshold t_{i-1} —
-            // below it the next level's entry wins — and a nil
-            // geometry at t_{n-1} culls below the floor (a last
-            // threshold of 0 never culls → no entry). The host's
-            // per-frame refresh builds the entry array itself —
-            // `screenSpaceRadius` is construction-only, and the pixel
-            // conversion needs the live viewport height — so decode
-            // records only the fractions and forces the first build.
-            var fracs: [Double] = []
-            for i in 1..<geos.count {
-                fracs.append(spec.levels[i - 1].screenSize)
+            // Cache level 0's local AABB — upstream's selection sphere
+            // is the circumscribed sphere of the level-0 world AABB,
+            // which the frame pass derives by transforming these 8
+            // corners rather than re-reading `boundingBox`.
+            let bb = geos[0].boundingBox
+            spec.boundMin = simd_float3(
+                Float(bb.min.x), Float(bb.min.y), Float(bb.min.z))
+            spec.boundMax = simd_float3(
+                Float(bb.max.x), Float(bb.max.y), Float(bb.max.z))
+            if spec.bound >= 0 {
+                host.bindLodLevel(spec, node, spec.bound, force: true)
             }
-            if spec.levels[spec.levels.count - 1].screenSize > 0 {
-                fracs.append(
-                    spec.levels[spec.levels.count - 1].screenSize)
-            }
-            spec.ssrFractions = fracs
-            spec.appliedRadii = []
-            if let old = node.geometry, old !== geos[0] {
-                host.retire(old)
-            }
-            node.geometry = geos[0]
-            node.geometry?.levelsOfDetail = []
         }
 
         func decodeCamera(_ node: SCNNode, _ p: [String: Any]) {
