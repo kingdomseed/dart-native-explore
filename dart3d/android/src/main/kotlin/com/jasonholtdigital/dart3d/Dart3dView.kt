@@ -126,8 +126,27 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     val unlitMaterial: Material
     val unlitMaskedMaterial: Material
     val unlitBlendMaterial: Material
-    /** W24 `shadowCatcher` — the Filament unlit+shadowMultiplier path. */
-    val catcherMaterial: Material
+    /**
+     * W24 `shadowCatcher` — the Filament unlit+shadowMultiplier path.
+     * Built lazily on first use: a compile failure degrades catcher
+     * surfaces to transparent instead of aborting SceneView init.
+     */
+    private var catcherMaterialBacking: Material? = null
+    private var catcherMaterialFailed = false
+    val catcherMaterial: Material?
+        get() {
+            if (catcherMaterialBacking == null && !catcherMaterialFailed) {
+                catcherMaterialBacking = try {
+                    buildShadowCatcherMaterial()
+                } catch (t: Throwable) {
+                    catcherMaterialFailed = true
+                    Log.w(TAG, "d3.shadowCatcher: material build failed; " +
+                        "catcher surfaces degrade to transparent", t)
+                    null
+                }
+            }
+            return catcherMaterialBacking
+        }
 
     // MARK: - Jolt world
 
@@ -422,7 +441,6 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             MaterialBuilder.BlendingMode.MASKED)
         unlitBlendMaterial = buildMaterial(unlit = true,
             MaterialBuilder.BlendingMode.TRANSPARENT)
-        catcherMaterial = buildShadowCatcherMaterial()
         // The materials are compiled double-sided-capable; keep the
         // default single-sided unless a resource's doubleSided says so.
         for (m in arrayOf(litMaterial, litMaskedMaterial, litBlendMaterial,
@@ -660,12 +678,17 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 "shadowColor")
             .uniformParameter(MaterialBuilder.UniformType.FLOAT,
                 "shadowIntensity")
+        // `shadowMultiplier` makes the engine multiply the FINAL
+        // color — alpha included — by the shadow factor downstream;
+        // no MaterialInputs field exposes it to read (1.71.6 emits
+        // `shadowStrength`, a writable attenuation output). The
+        // material only declares the catcher's max tint/opacity.
         val body = "void material(inout MaterialInputs material) {\n" +
-            "    float a = materialParams.shadowIntensity" +
-            " * (1.0 - material.shadowMultiplier);\n" +
-            "    material.baseColor = vec4(" +
-            "materialParams.shadowColor.rgb * a, a);\n" +
             "    prepareMaterial(material);\n" +
+            "    material.baseColor = vec4(" +
+            "materialParams.shadowColor.rgb," +
+            " materialParams.shadowColor.a * " +
+            "materialParams.shadowIntensity);\n" +
             "}\n"
         val pkg = b.material(body).build()
         check(pkg.isValid) { "d3 shadow catcher failed to compile" }
@@ -1102,7 +1125,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             engine.destroyMaterial(unlitMaterial)
             engine.destroyMaterial(unlitMaskedMaterial)
             engine.destroyMaterial(unlitBlendMaterial)
-            engine.destroyMaterial(catcherMaterial)
+            catcherMaterialBacking?.let { engine.destroyMaterial(it) }
             engine.destroyRenderer(renderer)
             engine.destroyView(view)
             engine.destroyScene(scene)

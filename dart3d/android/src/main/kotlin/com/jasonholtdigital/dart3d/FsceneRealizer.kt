@@ -3306,7 +3306,16 @@ object FsceneRealizer {
             // Filament's unlit+shadowMultiplier material carries the
             // visibility; aoStrength/softness/fade*/mode have no
             // per-material analog here and warn once.
-            val mi = host.catcherMaterial.createInstance()
+            val base = host.catcherMaterial
+            if (base == null) {
+                warnOnce("w24.catcher.unavailable",
+                    "shadowCatcher material unavailable; " +
+                        "surface degrades to transparent")
+                val mi = host.unlitBlendMaterial.createInstance()
+                mi.setParameter("baseColor", 0f, 0f, 0f, 0f)
+                return mi
+            }
+            val mi = base.createInstance()
             val c = props.tag("shadowColor").d3Color()
                 ?: floatArrayOf(0f, 0f, 0f, 1f)
             mi.setParameter("shadowColor", c[0], c[1], c[2], c[3])
