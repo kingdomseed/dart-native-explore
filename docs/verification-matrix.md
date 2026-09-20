@@ -461,6 +461,35 @@ zero `modified within a rendering callback` warnings; Android A142 —
 dash→fcar→logo→dice switches instant (`realize:` logs 3–333ms each),
 dice 7 settled total 42. `dn test` 150/150.
 
+## W18 — particles (harness landed; device verification pending)
+
+`docs/particles-spec.md`. `w18Phase` fires at +170 s — after W15's
+lane closes and the auto-reroll is parked — and adds four emitters
+live: `w18.fountain` (spherical flipbook sprites on a generated 2×2
+atlas, size/color-over-life, turbulence, `randomFlipX`),
+`w18.streaks` (additive `velocityStretched` bursts, untextured
+flat-color path), `w18.mesh` (two-bucket `meshParticleEmitter`,
+tumbling shard/pebble renderables), `w18.gated` (`enabled:false`
+`axisLocked` emitter). Follow-on timers flip the gated emitter's
+`enabled` through a `components` updateNode (+6 s), hide/restore the
+streaks node through `visible` updates (+9 s/+11 s), and `removeNode`
+the gated node (+14 s).
+
+| Lane | iOS sim — expected | iOS sim — observed | Android A142 — expected | Android A142 — observed |
+|---|---|---|---|---|
+| Sprite emitters (fountain + streaks) | SCNParticleSystems on both nodes — textured flipbook fountain; additive streak bursts | pending — no device access this workstream | Two billboard entities, world-space CPU-expanded quads; fountain textured+blended flipbook, streaks additive stretched | pending — same |
+| Mesh emitter | Degrades to an untextured sprite pass tinted by the material baseColor (SCNParticleSystem is sprite-only — documented delta) | pending | Baked per-particle renderable pool — Filament's Java binding has no `InstanceBuffer` (documented deviation) | pending |
+| `enabled:false` gate | No `SCNParticleSystem` attached at decode; `enabled` flip at +6 s attaches it mid-scene | pending | No runtime at decode; the +6 s `components` re-decode creates it | pending |
+| `visible` toggles | Node membership carries the system | pending | `setSceneVisible` moves the runtime-owned entities | pending |
+| `removeNode` teardown | System retired with the node | pending | Runtime destroys entities/buffers/material instance | pending |
+| iOS decode-and-warn deltas | `fixedStep`/`maxFrameTime`/`seed`/`maxParticles`/`bursts`/`turbulence`/`randomFlipX`/`aspectRatio` log once each | pending | n/a — all honored | n/a |
+
+Static receipts this workstream: `dn test` 221/221 (24 particle-sim
+tests incl. determinism, gate, and noise-curl lanes), `dn analyze`
+13 infos/warnings (all pre-existing `example/tool/` lanes),
+`swiftc -typecheck` clean on the iPhoneSimulator 27.0 SDK,
+`dn build apk --release` clean (117 MB).
+
 ## Notes
 
 - **Runtime-minted payloads need their spec on the op** — the W11
@@ -663,6 +692,16 @@ dice 7 settled total 42. `dn test` 150/150.
   `rectAreaLight` gets an emissive-quad + point-cluster approximation
   on Android; iOS `.area` is real but its `width`/`height`/
   `areaExtents` decode was never wired — both fixed in W12.
+- **Filament's Java binding has no `InstanceBuffer`** (1.71.6): the
+  AAR exposes `RenderableManager.Builder.instances` but nothing to
+  feed it — true instanced mesh particles are unreachable from Java.
+  `meshParticleEmitter` bakes a lazily-grown pool of per-particle
+  child entities instead (upstream's own `_hiddenTransform` slot
+  pattern); sprites sidestep it entirely — the billboards are
+  CPU-expanded into a world-space `VertexBuffer`, which is also what
+  lets `getCustom0()` carry the flipbook blend factor the upstream
+  shader took from an instance attribute. See
+  `docs/particles-spec.md`.
 - **All scene/physics mutation must run inside the render loop** —
   Dart deliveries used to apply straight onto SceneKit/Jolt state from
   the plugin delivery thread. iOS crashed twice from it: first in

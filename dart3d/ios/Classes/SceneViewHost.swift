@@ -1377,6 +1377,14 @@ final class SceneViewHost: SCNView {
         node.light = nil
         node.camera = nil
         node.physicsBody = nil
+        // W18: particle systems ride on the node — retire each before
+        // detaching so an in-flight pass still holding one renders
+        // safely, then drop the whole set (a components re-decode
+        // re-adds whatever the new spec carries).
+        for ps in node.particleSystems ?? [] {
+            retire(ps)
+        }
+        node.removeAllParticleSystems()
         // W11: the skinner/morpher ride on the geometry — drop them
         // with it; `decodeMesh` re-attaches on the rebuild.
         node.skinner = nil

@@ -94,6 +94,19 @@ import 'package:vector_math/vector_math.dart';
 /// closure — fired at +140 s — which drives `w16Mover` away and
 /// back through its `lod` thresholds (three screen-size levels plus
 /// the cull floor) while its `trail` draws the camera-facing ribbon.
+/// W18 lands the
+/// particle lane through the returned `w18Phase` closure — fired at
+/// +170 s — which adds four emitters live: a spherical flipbook
+/// fountain on a generated 2×2 atlas (size/color-over-life,
+/// turbulence, `randomFlipX`), an additive `velocityStretched`
+/// burst emitter on the untextured flat-color path, a two-bucket
+/// `meshParticleEmitter` tumbling shard/pebble renderables, and an
+/// `enabled:false` gated emitter that must not tick. The lane then
+/// flips the gated emitter's `enabled` through a `components`
+/// `updateNode` (+6 s — the runtime materializes mid-scene), hides
+/// and restores the streak emitter through `visible` updates (+9 s /
+/// +11 s — the scene-membership path), and removes the gated node
+/// (+14 s — the runtime teardown path).
 ///
 /// [ortho] flips the camera's `projection` manifest field; the toggle
 /// is a document reload, the only camera write the protocol carries
@@ -124,6 +137,7 @@ final class FeatureScene {
     void Function() w15Phase,
     void Function(({double w, double h}) Function() targetPx) w24Phase,
     void Function() w16Phase,
+    void Function() w18Phase,
   })
   build({bool ortho = false, int env = 1, SceneController? controller}) {
     final doc = SceneDocument();
@@ -3897,6 +3911,293 @@ final class FeatureScene {
       });
     }
 
+    // W18 phase (+170 s): the particle lane. One batch lands three
+    // live emitters plus a gated one, then timers exercise the
+    // dynamic surface — a `components` updateNode flipping the gated
+    // emitter's `enabled` (the runtime is created by the re-decode),
+    // `visible` toggles on the streak emitter (scene membership of
+    // the runtime-owned entities), and a `removeNode` (runtime
+    // teardown). Everything rides addNode/updateNode/removeNode —
+    // no bespoke particle op exists.
+    void addW18Phase() {
+      final c = controller;
+      if (c == null) return;
+      final live = phaseTwoDoc ?? doc;
+      final ops = <Map<String, Object?>>[];
+
+      void addNodeOp(NodeSpec node, LocalId? parent) {
+        ops.add({
+          'op': 'addNode',
+          'node': node.id.toToken(),
+          'parent': parent?.toToken(),
+          'spec': encodeNodeCommandSpec(node, live),
+        });
+      }
+
+      // ── Resources ─────────────────────────────────────────────
+      // A generated 2×2 flipbook atlas — four visually distinct cells
+      // (disc, ring, diamond, spark) so frame cycling reads in a
+      // still capture. rgba8 rides the same payload path as W4.
+      final atlasPixels = _sparkAtlas(128, 2);
+      final atlasPayload = live.addPayload(
+        PayloadSpec(
+          live.newId(),
+          encoding: PayloadEncoding.image,
+          format: 'rgba8',
+          width: 128,
+          height: 128,
+          length: atlasPixels.lengthInBytes,
+          bytes: atlasPixels,
+        ),
+      );
+      final atlasTex = live.addResource(
+        TextureResource(live.newId(), payload: atlasPayload.id),
+      );
+      final shardGeo = live.addResource(
+        GeometryResource(
+          live.newId(),
+          procedural: CuboidGeometrySpec(extents: Vector3.all(0.14)),
+        ),
+      );
+      final pebbleGeo = live.addResource(
+        GeometryResource(
+          live.newId(),
+          procedural: SphereGeometrySpec(radius: 0.09),
+        ),
+      );
+      final emberMat = live.addResource(
+        MaterialResource(
+          live.newId(),
+          type: 'physicallyBased',
+          properties: {
+            'baseColor': ColorValue(0.95, 0.45, 0.15, 1.0),
+            'emissive': ColorValue(0.6, 0.2, 0.05, 1.0),
+            'roughness': DoubleValue(0.6),
+          },
+        ),
+      );
+      for (final res in [atlasTex, shardGeo, pebbleGeo, emberMat]) {
+        ops.add({
+          'op': 'upsertResource',
+          'id': 'res:${res.id.toToken()}',
+          'resource': encodeResource(res, (id) => 'chunk:${id.toToken()}'),
+        });
+      }
+      // The payload chunk ships with the batch — the texture binds at
+      // decode rather than through the deferred-arrival rebind.
+      ops.add({
+        'op': 'upsertPayload',
+        'id': 'chunk:${atlasPayload.id.toToken()}',
+        'bytes': base64Encode(atlasPixels),
+        'encoding': PayloadEncoding.image.name,
+        'format': 'rgba8',
+        'length': atlasPixels.lengthInBytes,
+        'width': 128,
+        'height': 128,
+      });
+
+      // ── Emitters ──────────────────────────────────────────────
+      // Spherical flipbook fountain — the textured lane: size and
+      // color over life, curl turbulence, a blended 2×2 flipbook,
+      // randomFlipX variety.
+      final fountain = live.createNode(
+        name: 'w18.fountain',
+        transform: TrsTransform(translation: Vector3(-1.7, 0.7, 1.4)),
+        components: [
+          particleEmitterComponent(
+            texture: atlasTex.id,
+            facing: 'spherical',
+            blendMode: 'alpha',
+            shape: coneEmitterShape(radius: 0.15, angle: 0.35),
+            modules: ListValue([
+              sizeOverLifeModule(
+                curveFloat(
+                  particleCurve(const [(0.0, 0.4), (0.25, 1.0), (1.0, 0.5)]),
+                ),
+              ),
+              colorOverLifeModule(
+                gradientColor(
+                  colorGradient([
+                    (0.0, Vector4(1.0, 0.9, 0.6, 0.0)),
+                    (0.15, Vector4(1.0, 0.85, 0.55, 1.0)),
+                    (1.0, Vector4(0.9, 0.3, 0.4, 0.0)),
+                  ]),
+                ),
+              ),
+              flipbookModule(frameCount: 4, randomStartFrame: true),
+              turbulenceModule(strength: 0.6, frequency: 1.4, seed: 7),
+              rotationModule(),
+            ]),
+            emitRate: 26,
+            lifetime: uniformFloat(1.4, 2.0),
+            startSpeed: uniformFloat(1.6, 2.4),
+            startSize: uniformFloat(0.16, 0.3),
+            startAngularVelocity: uniformFloat(-2.0, 2.0),
+            gravity: Vector3(0, -0.6, 0),
+            flipbookColumns: 2,
+            flipbookRows: 2,
+            flipbookBlend: true,
+            randomFlipX: true,
+            duration: 6,
+            seed: 7,
+          ),
+        ],
+        root: true,
+      );
+      addNodeOp(fountain, null);
+
+      // Velocity-stretched additive bursts — the untextured lane
+      // (no `texture` → the flat-color path) and the burst schedule.
+      final streaks = live.createNode(
+        name: 'w18.streaks',
+        transform: TrsTransform(translation: Vector3(1.7, 1.0, 1.4)),
+        components: [
+          particleEmitterComponent(
+            facing: 'velocityStretched',
+            blendMode: 'additive',
+            velocityStretch: 0.10,
+            shape: sphereEmitterShape(radius: 0.1, surfaceOnly: true),
+            bursts: [particleBurst(time: 0, count: 20, interval: 1.4)],
+            modules: ListValue([
+              colorOverLifeModule(
+                gradientColor(
+                  colorGradient([
+                    (0.0, Vector4(1.0, 0.8, 0.4, 1.0)),
+                    (1.0, Vector4(0.8, 0.1, 0.05, 0.0)),
+                  ]),
+                ),
+              ),
+              rotationModule(),
+            ]),
+            emitRate: 0,
+            lifetime: constantFloat(0.9),
+            startSpeed: uniformFloat(2.6, 3.6),
+            startSize: constantFloat(0.10),
+            gravity: Vector3(0, -5.5, 0),
+            duration: 8,
+            seed: 11,
+          ),
+        ],
+        root: true,
+      );
+      addNodeOp(streaks, null);
+
+      // Two-bucket mesh emitter — baked per-particle renderables on
+      // Filament (no InstanceBuffer in the Java binding), tumbling
+      // around each particle's random axis.
+      final mesh = live.createNode(
+        name: 'w18.mesh',
+        transform: TrsTransform(translation: Vector3(0, 0.9, 2.7)),
+        components: [
+          meshParticleEmitterComponent(
+            geometries: [shardGeo.id, pebbleGeo.id],
+            material: emberMat.id,
+            facing: 'tumble',
+            shape: coneEmitterShape(radius: 0.2, angle: 0.5),
+            modules: ListValue([rotationModule()]),
+            emitRate: 10,
+            lifetime: constantFloat(1.8),
+            startSpeed: uniformFloat(2.0, 3.0),
+            startSize: constantFloat(1.0),
+            startAngularVelocity: uniformFloat(-7.0, 7.0),
+            gravity: Vector3(0, -4.5, 0),
+            duration: 6,
+            seed: 5,
+          ),
+        ],
+        root: true,
+      );
+      addNodeOp(mesh, null);
+
+      // The gated emitter — `enabled:false` skips runtime creation at
+      // decode (the first real `enabled` consumer), so nothing spawns
+      // until the +6 s components flip creates it. axisLocked facing
+      // covers the third sprite mode once it comes up.
+      final gated = live.createNode(
+        name: 'w18.gated',
+        transform: TrsTransform(translation: Vector3(0.0, 1.1, 0.2)),
+        components: [
+          particleEmitterComponent(
+            facing: 'axisLocked',
+            blendMode: 'additive',
+            shape: boxEmitterShape(halfExtents: Vector3(0.5, 0.05, 0.2)),
+            emitRate: 40,
+            lifetime: constantFloat(2.0),
+            startSpeed: constantFloat(0.8),
+            startSize: uniformFloat(0.12, 0.22),
+            startColor: constantColor(Vector4(0.4, 0.8, 1.0, 0.9)),
+            duration: 6,
+            seed: 3,
+            enabled: false,
+          ),
+        ],
+        root: true,
+      );
+      addNodeOp(gated, null);
+
+      c.applyCommands(ops);
+      dnLog(
+        'dart3d: w18 phase — flipbook fountain, additive streaks, '
+        'mesh tumble pool, enabled:false gate',
+      );
+
+      // +6 s: flip the gated emitter on through a `components`
+      // updateNode — the surgical re-decode creates the runtime that
+      // `enabled:false` skipped.
+      Timer(const Duration(seconds: 6), () {
+        gated.components[0].properties['enabled'] = BoolValue(true);
+        c.applyCommands([
+          {
+            'op': 'updateNode',
+            'node': gated.id.toToken(),
+            'flags': ['components'],
+            'spec': encodeNodeCommandSpec(gated, live),
+          },
+        ]);
+        dnLog('dart3d: w18 gated emitter enabled (components update)');
+      });
+      // +9 s / +11 s: hide then restore the streaks node — particle
+      // entities ride the node's scene membership.
+      Timer(const Duration(seconds: 9), () {
+        streaks.visible = false;
+        c.applyCommands([
+          {
+            'op': 'updateNode',
+            'node': streaks.id.toToken(),
+            'flags': ['visible'],
+            'spec': encodeNodeCommandSpec(streaks, live),
+          },
+        ]);
+        dnLog('dart3d: w18 streaks hidden');
+      });
+      Timer(const Duration(seconds: 11), () {
+        streaks.visible = true;
+        c.applyCommands([
+          {
+            'op': 'updateNode',
+            'node': streaks.id.toToken(),
+            'flags': ['visible'],
+            'spec': encodeNodeCommandSpec(streaks, live),
+          },
+        ]);
+        dnLog('dart3d: w18 streaks restored');
+      });
+      // +14 s: teardown — the gated node's runtime and its buffers
+      // leave with the node.
+      Timer(const Duration(seconds: 14), () {
+        c.applyCommands([
+          {'op': 'removeNode', 'node': gated.id.toToken()},
+        ]);
+        dnLog('dart3d: w18 gated node removed');
+      });
+      Timer(const Duration(seconds: 16), () {
+        dnLog(
+          'dart3d: w18 lane complete — expected: fountain + streaks + '
+          'mesh pool live, gated ran +6 s…+14 s then removed',
+        );
+      });
+    }
+
     return (
       document: doc,
       die: die.id,
@@ -3911,6 +4212,7 @@ final class FeatureScene {
       w15Phase: addW15Phase,
       w24Phase: addW24Phase,
       w16Phase: addW16Phase,
+      w18Phase: addW18Phase,
     );
   }
 
@@ -4714,6 +5016,45 @@ final class FeatureScene {
       out[i] = 255 - out[i];
       out[i + 1] = 255 - out[i + 1];
       out[i + 2] = 255 - out[i + 2];
+    }
+    return out;
+  }
+
+  /// W18 flipbook atlas — `cells`×`cells` square cells in an `n`×`n`
+  /// rgba8 image, row-major (cell (0,0) top-left — the flipbook's
+  /// frame 0). The four cells of a 2×2 atlas are a filled disc, a
+  /// ring, a diamond, and a tight spark — distinct silhouettes so
+  /// frame cycling is legible in a still capture. Alpha carries the
+  /// shape; RGB stays white so the per-particle color modulates it.
+  static Uint8List _sparkAtlas(int n, int cells) {
+    final out = Uint8List(n * n * 4);
+    final cell = n ~/ cells;
+    var o = 0;
+    for (var y = 0; y < n; y++) {
+      for (var x = 0; x < n; x++) {
+        final cx = x ~/ cell;
+        final cy = y ~/ cell;
+        final cellIndex = cy * cells + cx;
+        // Pixel position inside its cell, centered: u,v ∈ [-1,1].
+        final u = ((x % cell) + 0.5) / cell * 2 - 1;
+        final v = ((y % cell) + 0.5) / cell * 2 - 1;
+        final r = sqrt(u * u + v * v);
+        final a = switch (cellIndex % 4) {
+          // Filled disc with a soft edge.
+          0 => (1.0 - r / 0.85).clamp(0.0, 1.0),
+          // Ring.
+          1 => (1.0 - (r - 0.55).abs() / 0.18).clamp(0.0, 1.0),
+          // Diamond (manhattan falloff).
+          2 => (1.0 - (u.abs() + v.abs()) / 0.9).clamp(0.0, 1.0),
+          // Tight spark.
+          _ => (1.0 - r / 0.4).clamp(0.0, 1.0),
+        };
+        out[o] = 255;
+        out[o + 1] = 255;
+        out[o + 2] = 255;
+        out[o + 3] = (a * 255).round();
+        o += 4;
+      }
     }
     return out;
   }
