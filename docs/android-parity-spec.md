@@ -265,3 +265,44 @@ can never express upstream's "drop accumulated forces" — it logs and
 returns. Clearing velocity would be the closest analogue but fights
 `setVelocity` sends and overshoots the semantic. iOS maps to
 `SCNPhysicsBody.clearAllForces()` — expressible there.
+
+## Filament backend (W30)
+
+`Dart3dView` builds the engine with `Engine.Builder().backend(...)`.
+The backend resolves once per engine, at view construction:
+
+1. An explicit pref wins. The app's Dart side calls
+   `Dart3dSetBackend(pref)` on `libdart3d_jni.so` during boot
+   (`1` = force OpenGL, `2` = force Vulkan). The example exposes it as
+   `--dart-define=DART3D_BACKEND=auto|opengl|vulkan`; the call lands
+   before any `SceneView` exists, so the flag is boot-time, not
+   per-view and not flippable on a live engine.
+2. Otherwise `auto` picks `DEFAULT_BACKEND` when the device declares
+   `PackageManager.FEATURE_VULKAN_HARDWARE_VERSION` and OpenGL when it
+   does not. Vulkan-incapable devices degrade without the flag.
+3. A backend that throws at `Engine.Builder.build()` retries on
+   OpenGL once before the failure surfaces — Vulkan can be declared
+   and still fail driver init.
+4. `DEFAULT_BACKEND` is set from the A142 GL-vs-Vulkan A/B recorded on
+   the W30 PR. Vulkan if frame time is equal or faster; if slower, the
+   PR lands behind `DART3D_BACKEND=vulkan` with GL still the default.
+
+`Engine.create()` was the pre-W30 call. `Backend.DEFAULT` resolves to
+OpenGL on Android, so Vulkan has to be asked for. The Vulkan driver
+ships inside the pinned `filament-android` 1.71.6 AAR (confirmed in
+`libfilament-jni.so` symbols), so no new dependency.
+
+Every `d3_*` material comes out of `MaterialBuilder` in
+`buildMaterial`, which now sets `targetApi` from `engine.backend` —
+SPIR-V under Vulkan, GLSL under OpenGL. The default OpenGL-only
+package aborts `Material.Builder.build()` under Vulkan with a
+`PostconditionPanic` ("not built for any of the Vulkan backend's
+supported shader languages"). `TargetApi.ALL` is not the answer in
+1.71.6: its mask (0x15) does not include Vulkan's bit, verified by the
+same panic on device.
+
+Verification surfaces: `Dart3dView` logs `Filament engine backend:` at
+init (tag `dart3d`), and `tickStats` mirrors the stats HUD into logcat
+(`stats <fps> <ms/frame> …`) so lanes read frame times without watching
+the screen. The HUD itself is opt-in per view (`showsStatistics`; the
+example showcase takes `--dart-define=DART3D_STATS=1`).
