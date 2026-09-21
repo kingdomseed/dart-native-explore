@@ -12,6 +12,8 @@ import 'dart:typed_data';
 
 import 'package:dart3d/src/doc_layer.dart';
 import 'package:dart3d/src/fsceneb_reader.dart';
+import 'package:dart3d/src/geometry/instances.dart';
+import 'package:dart3d/src/geometry/proc.dart';
 import 'package:dart3d/src/glb_import.dart';
 import 'package:dart3d/src/scene_model.dart';
 import 'package:dart3d/src/vertex_pack.dart';
@@ -77,6 +79,11 @@ const showcaseItems = [
     kBuiltinDocRoundtripKey,
     'W29: build → .fscene → re-realize',
   ),
+  ShowcaseItem(
+    'w26',
+    kBuiltinGeometryKey,
+    'W26: 13 shapes · paths/lines · 1000 instances one draw',
+  ),
 ];
 
 /// The synthetic asset key for the W21 materials conformance scene —
@@ -91,6 +98,11 @@ const String kBuiltinMaterialsKey = 'builtin:materials';
 /// byte-carrying chunks the JSON leg cannot carry — and the
 /// re-realized document must render identically.
 const String kBuiltinDocRoundtripKey = 'builtin:docroundtrip';
+
+/// The synthetic asset key for the W26 geometry showcase — no bundled
+/// file; [loadShowcaseScene] builds the document procedurally (see
+/// [buildGeometryDocument]).
+const String kBuiltinGeometryKey = 'builtin:geometry';
 
 /// Dice stay in the gallery too — the [DART3D_MODEL] verification lane
 /// and anyone wanting a single die on the physics slab.
@@ -137,6 +149,8 @@ ShowcaseScene? loadShowcaseScene(
       // leg itself (loadShowcaseScene stays controller-free so the
       // path is reachable under `dart test`).
       doc = buildMaterialsDocument(bytesOf: bytesOf);
+    } else if (item.assetKey == kBuiltinGeometryKey) {
+      doc = buildGeometryDocument();
     } else {
       final bytes = bytesOf(item.assetKey);
       if (bytes == null) {
@@ -710,4 +724,241 @@ Uint8List _latticePixels(int w, int h) {
     }
   }
   return out;
+}
+
+/// The W26 geometry showcase — a procedural document exercising the
+/// `d3:procMesh`/`d3:instances` vocabulary: the five new primitives
+/// plus the real icosphere in the front row, the path-driven shapes
+/// (tube, ribbon, dashed polyline, line segments) and a billboard in
+/// the second, and a 1000-instance icosphere field — one node, one
+/// draw — plus a camera-facing billboard-instance cloud behind them.
+SceneDocument buildGeometryDocument() {
+  final doc = SceneDocument();
+
+  MaterialResource mat(double r, double g, double b, {double rough = 0.55}) =>
+      doc.addResource(
+        MaterialResource(
+          doc.newId(),
+          type: 'physicallyBased',
+          properties: {
+            'baseColor': ColorValue(r, g, b, 1.0),
+            'roughness': DoubleValue(rough),
+            'metallic': DoubleValue(0.0),
+          },
+        ),
+      );
+
+  void procNode(String name, Vector3 at, D3Proc proc, MaterialResource m) {
+    doc.createNode(
+      name: name,
+      transform: TrsTransform(translation: at),
+      components: [d3ProcMeshComponent(proc, material: m.id)],
+      root: true,
+    );
+  }
+
+  // ── Front row: the solid primitives ─────────────────────────────
+  procNode(
+    'w26.cylinder',
+    Vector3(-6.0, 0.8, 0),
+    D3CylinderProc(bottomRadius: 0.45, topRadius: 0.3, height: 1.2),
+    mat(0.9, 0.55, 0.2),
+  );
+  procNode(
+    'w26.cone',
+    Vector3(-4.0, 0.8, 0),
+    D3ConeProc(radius: 0.5, height: 1.4),
+    mat(0.85, 0.3, 0.3),
+  );
+  procNode(
+    'w26.capsule',
+    Vector3(-2.0, 1.0, 0),
+    D3CapsuleProc(radius: 0.4, height: 0.9),
+    mat(0.4, 0.75, 0.45),
+  );
+  procNode(
+    'w26.disc',
+    Vector3(0.0, 0.8, 0),
+    D3DiscProc(radius: 0.65, segments: 40),
+    mat(0.3, 0.6, 0.95),
+  );
+  procNode(
+    'w26.icosphere',
+    Vector3(2.0, 0.8, 0),
+    D3IcosphereProc(radius: 0.6, subdivisions: 3),
+    mat(0.75, 0.55, 0.95, rough: 0.35),
+  );
+  procNode(
+    'w26.torus',
+    Vector3(4.0, 0.8, 0),
+    D3TorusProc(radius: 0.55, tubeRadius: 0.18),
+    mat(0.95, 0.8, 0.3),
+  );
+  procNode(
+    'w26.cuboid',
+    Vector3(6.0, 0.6, 0),
+    D3CuboidProc(extents: Vector3(1.0, 1.0, 1.0), debugColors: true),
+    mat(0.6, 0.6, 0.65),
+  );
+
+  // The ground lane — the XZ/+Y plane contract under the front row
+  // (the pre-fix SCNPlane/XY port drew this edge-on).
+  procNode(
+    'w26.plane',
+    Vector3(0.0, -0.02, 0),
+    D3PlaneProc(width: 14.0, depth: 2.4, segmentsX: 4, segmentsZ: 1),
+    mat(0.28, 0.30, 0.34, rough: 0.9),
+  );
+
+  // ── Second row: path-driven and camera-facing shapes ────────────
+  // One shared S-curve carries the tube and the ribbon beside it.
+  final sCurve = [
+    Vector3(-5.5, 0.4, -2.5),
+    Vector3(-4.2, 1.2, -3.2),
+    Vector3(-2.8, 0.4, -2.5),
+    Vector3(-1.4, 1.2, -3.2),
+    Vector3(0.0, 0.4, -2.5),
+  ];
+  procNode(
+    'w26.tube',
+    Vector3.zero(),
+    D3TubeProc(points: sCurve, radius: 0.14, radialSegments: 10),
+    mat(0.9, 0.4, 0.65),
+  );
+  procNode(
+    'w26.ribbon',
+    Vector3(0, -0.15, -0.9),
+    D3RibbonProc(points: sCurve, width: 0.3),
+    mat(0.25, 0.75, 0.8),
+  );
+  procNode(
+    'w26.polyline',
+    Vector3(1.6, 0.0, -2.5),
+    D3PolylineProc(
+      points: [
+        Vector3(0, 0.4, 0),
+        Vector3(0.8, 1.2, 0.4),
+        Vector3(1.6, 0.4, 0),
+        Vector3(2.4, 1.2, 0.4),
+        Vector3(3.2, 0.4, 0),
+      ],
+      width: 0.09,
+      dashPattern: (0.35, 0.2),
+    ),
+    mat(1.0, 0.85, 0.25),
+  );
+  procNode(
+    'w26.segments',
+    Vector3(5.4, 0.0, -2.5),
+    D3LineSegmentsProc(
+      points: [
+        Vector3(0, 0.3, 0),
+        Vector3(0.7, 1.1, 0),
+        Vector3(0.7, 0.3, 0.3),
+        Vector3(1.4, 1.1, -0.3),
+        Vector3(1.4, 0.3, 0),
+        Vector3(2.1, 1.1, 0),
+      ],
+      width: 0.07,
+    ),
+    mat(0.55, 0.9, 0.35),
+  );
+  procNode(
+    'w26.billboard',
+    Vector3(7.4, 0.9, -2.5),
+    D3BillboardProc(size: Vector2(0.9, 0.9), color: const [1, 0.5, 0.9, 1]),
+    mat(1.0, 1.0, 1.0),
+  );
+
+  // ── The 1000-instance field — one node, one draw ────────────────
+  // 40×25 icospheres on a tilted grid; transforms and per-instance
+  // colors ride payload chunks (the deferred-path the natives claim
+  // against `upsertPayload`).
+  const cols = 40, rows = 25;
+  final matrices = <Matrix4>[];
+  final colors = <Vector4>[];
+  final rng = _Rng(26);
+  for (var r = 0; r < rows; r++) {
+    for (var c = 0; c < cols; c++) {
+      final x = (c - cols / 2) * 0.9;
+      final z = 4.0 + r * 0.85;
+      final y = 0.35 + 0.5 * sin(c * 0.55 + r * 0.7);
+      final s = 0.8 + rng.next() * 0.5;
+      matrices.add(
+        Matrix4.identity()
+          ..setTranslationRaw(x, y, z)
+          ..rotateY(rng.next() * pi)
+          ..scaleByDouble(s, s, s, 1.0),
+      );
+      colors.add(
+        Vector4(
+          0.25 + 0.7 * (c / cols),
+          0.25 + 0.7 * (r / rows),
+          0.9 - 0.5 * (c / cols),
+          1.0,
+        ),
+      );
+    }
+  }
+  final matricesPayload = doc.addPayload(
+    d3MatricesPayload(doc.newId(), matrices),
+  );
+  final colorsPayload = doc.addPayload(d3FloatsPayload(doc.newId(), colors));
+  final instanceMat = mat(1.0, 1.0, 1.0, rough: 0.4);
+  doc.createNode(
+    name: 'w26.instances.field',
+    components: [
+      D3InstancesSpec(
+        proc: D3IcosphereProc(radius: 0.16, subdivisions: 1),
+        material: instanceMat.id,
+        transforms: D3InstanceTransforms.payload(matricesPayload.id),
+        attributes: {'color': D3InstanceAttribute.payload(colorsPayload.id)},
+      ).toComponent(),
+    ],
+    root: true,
+  );
+
+  // ── Billboard-instance cloud — camera-facing quads, re-faced ────
+  final bbMatrices = <Matrix4>[
+    for (var i = 0; i < 64; i++)
+      Matrix4.identity()
+        ..setTranslationRaw(((i % 8) - 3.5) * 0.8, 2.2 + (i ~/ 8) * 0.55, 4.0),
+  ];
+  final bbColors = <Vector4>[
+    for (var i = 0; i < 64; i++)
+      Vector4(0.3 + 0.7 * ((i % 8) / 7), 0.9, 0.4 + 0.5 * ((i ~/ 8) / 7), 0.85),
+  ];
+  doc.createNode(
+    name: 'w26.instances.billboards',
+    components: [
+      D3InstancesSpec(
+        proc: D3BillboardProc(size: Vector2(0.42, 0.42)),
+        material: instanceMat.id,
+        transforms: D3InstanceTransforms.inline(bbMatrices),
+        attributes: {'color': D3InstanceAttribute.inline(bbColors)},
+        billboard: true,
+        size: Vector2(0.42, 0.42),
+      ).toComponent(),
+    ],
+    root: true,
+  );
+
+  return doc;
+}
+
+/// Deterministic tiny PRNG for the instance field — no `dart:math`
+/// Random so the scene is identical run to run (xorshift32).
+final class _Rng {
+  _Rng(this._s);
+
+  int _s;
+
+  double next() {
+    var x = _s;
+    x ^= x << 13;
+    x ^= x >> 17;
+    x ^= x << 5;
+    _s = x & 0x7FFFFFFF;
+    return _s / 0x7FFFFFFF;
+  }
 }

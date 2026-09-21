@@ -657,68 +657,68 @@ object MeshFactory {
         return q
     }
 
-    fun cuboid(ex: Float, ey: Float, ez: Float): MeshData {
+    /** A box — 24 vertices (four per face so normals stay
+     *  axis-aligned), proc.dart's buildCuboid corner order and UVs.
+     *  [debugColors] keys each vertex color to its corner sign bits
+     *  (the d3 debug mode — a centered box gets the eight corners
+     *  black/red/green/yellow/blue/magenta/cyan/white). */
+    fun cuboid(
+        ex: Float, ey: Float, ez: Float, debugColors: Boolean = false,
+    ): MeshData {
         val hx = ex / 2; val hy = ey / 2; val hz = ez / 2
-        val verts = ArrayList<Float>()
-        val idx = ArrayList<Int>()
-        // Each face: normal n, tangent t, bitangent b, 4 corners.
-        // Winding is counter-clockwise looking at the face from outside.
-        data class F(
-            val n: FloatArray, val t: FloatArray, val b: FloatArray,
-            val c: FloatArray,
-        )
-        val faces = listOf(
-            F(floatArrayOf(0f, 0f, 1f), floatArrayOf(1f, 0f, 0f), floatArrayOf(0f, 1f, 0f), floatArrayOf(0f, 0f, hz)),
-            F(floatArrayOf(0f, 0f, -1f), floatArrayOf(-1f, 0f, 0f), floatArrayOf(0f, 1f, 0f), floatArrayOf(0f, 0f, -hz)),
-            F(floatArrayOf(1f, 0f, 0f), floatArrayOf(0f, 0f, -1f), floatArrayOf(0f, 1f, 0f), floatArrayOf(hx, 0f, 0f)),
-            F(floatArrayOf(-1f, 0f, 0f), floatArrayOf(0f, 0f, 1f), floatArrayOf(0f, 1f, 0f), floatArrayOf(-hx, 0f, 0f)),
-            F(floatArrayOf(0f, 1f, 0f), floatArrayOf(1f, 0f, 0f), floatArrayOf(0f, 0f, -1f), floatArrayOf(0f, hy, 0f)),
-            F(floatArrayOf(0f, -1f, 0f), floatArrayOf(1f, 0f, 0f), floatArrayOf(0f, 0f, 1f), floatArrayOf(0f, -hy, 0f)),
-        )
-        val extents = floatArrayOf(hx, hy, hz)
-        for ((fi, f) in faces.withIndex()) {
-            val q = packTangentFrame(
-                f.t[0], f.t[1], f.t[2],
-                f.b[0], f.b[1], f.b[2],
-                f.n[0], f.n[1], f.n[2],
-            )
-            val base = fi * 4
-            for (ci in 0..3) {
-                val su = if (ci == 1 || ci == 2) 1f else -1f
-                val sv = if (ci >= 2) 1f else -1f
-                val eu = extents[0] * abs(f.t[0]) +
-                    extents[1] * abs(f.t[1]) + extents[2] * abs(f.t[2])
-                val ev = extents[0] * abs(f.b[0]) +
-                    extents[1] * abs(f.b[1]) + extents[2] * abs(f.b[2])
-                verts.add(f.c[0] + f.t[0] * su * eu + f.b[0] * sv * ev)
-                verts.add(f.c[1] + f.t[1] * su * eu + f.b[1] * sv * ev)
-                verts.add(f.c[2] + f.t[2] * su * eu + f.b[2] * sv * ev)
-                verts.addAll(q.toList())
-                // Per-face [0,1]² UVs — SCNBox maps each face the
-                // same way; white vertex color = neutral; no uv1.
-                verts.add((su + 1f) / 2f); verts.add((sv + 1f) / 2f)
-                for (k in 0 until 4) verts.add(1f)
-                verts.add(0f); verts.add(0f)
-            }
-            idx.addAll(listOf(base, base + 1, base + 2, base, base + 2, base + 3))
+        val b = ProcBuilder()
+        fun color(v: V3): FloatArray = if (debugColors) floatArrayOf(
+            if (v.x >= 0f) 1f else 0f,
+            if (v.y >= 0f) 1f else 0f,
+            if (v.z >= 0f) 1f else 0f, 1f)
+        else WHITE4
+        fun face(n: V3, v0: V3, v1: V3, v2: V3, v3: V3) {
+            val base = b.vertexCount
+            var c = color(v0)
+            b.emit(v0, n, 0f, 1f, c[0], c[1], c[2], c[3])
+            c = color(v1)
+            b.emit(v1, n, 1f, 1f, c[0], c[1], c[2], c[3])
+            c = color(v2)
+            b.emit(v2, n, 0f, 0f, c[0], c[1], c[2], c[3])
+            c = color(v3)
+            b.emit(v3, n, 1f, 0f, c[0], c[1], c[2], c[3])
+            b.quad(base, base + 1, base + 2, base + 3)
         }
-        return MeshData(
-            bufferOf(verts), indexBufferOf(idx),
-            verts.size / FLOATS_PER_VERTEX, idx.size,
-            floatArrayOf(0f, 0f, 0f, hx, hy, hz),
-            hasUvColor = true,
-        )
+        face(V3(0f, 0f, 1f),
+            V3(-hx, -hy, hz), V3(hx, -hy, hz),
+            V3(-hx, hy, hz), V3(hx, hy, hz))
+        face(V3(0f, 0f, -1f),
+            V3(hx, -hy, -hz), V3(-hx, -hy, -hz),
+            V3(hx, hy, -hz), V3(-hx, hy, -hz))
+        face(V3(1f, 0f, 0f),
+            V3(hx, -hy, hz), V3(hx, -hy, -hz),
+            V3(hx, hy, hz), V3(hx, hy, -hz))
+        face(V3(-1f, 0f, 0f),
+            V3(-hx, -hy, -hz), V3(-hx, -hy, hz),
+            V3(-hx, hy, -hz), V3(-hx, hy, hz))
+        face(V3(0f, 1f, 0f),
+            V3(-hx, hy, hz), V3(hx, hy, hz),
+            V3(-hx, hy, -hz), V3(hx, hy, -hz))
+        face(V3(0f, -1f, 0f),
+            V3(hx, -hy, -hz), V3(-hx, -hy, -hz),
+            V3(-hx, -hy, hz), V3(hx, -hy, hz))
+        return b.build(floatArrayOf(0f, 0f, 0f, hx, hy, hz))
     }
 
-    fun sphere(radius: Float, rings: Int = 16, sectors: Int = 24): MeshData {
+    /** A UV sphere — proc.dart's buildSphere: `segments` around the
+     *  equator, `rings` pole to pole, outward winding (the previous
+     *  transposed index order faced inward). The tangent is the
+     *  analytic ∂pos/∂u — UV-aligned like GeometryFactory.swift's. */
+    fun sphere(radius: Float, segments: Int = 32, rings: Int = 16): MeshData {
+        val seg = maxOf(1, segments); val rgs = maxOf(1, rings)
         val verts = ArrayList<Float>()
         val idx = ArrayList<Int>()
-        for (r in 0..rings) {
-            val v = r.toFloat() / rings
+        for (r in 0..rgs) {
+            val v = r.toFloat() / rgs
             val phi = v * PI.toFloat()
             val sp = sin(phi); val cp = cos(phi)
-            for (s in 0..sectors) {
-                val u = s.toFloat() / sectors
+            for (s in 0..seg) {
+                val u = s.toFloat() / seg
                 val theta = u * 2f * PI.toFloat()
                 val st = sin(theta); val ct = cos(theta)
                 val nx = sp * ct; val ny = cp; val nz = sp * st
@@ -730,18 +730,19 @@ object MeshFactory {
                 verts.addAll(
                     packTangentFrame(tx, ty, tz, bx, by, bz, nx, ny, nz).toList()
                 )
-                // Spherical UVs — u along the sector, v down the ring
-                // (SCNSphere convention); white vertex color; no uv1.
+                // Spherical UVs — u along the segment, v down the
+                // ring; white vertex color; no uv1.
                 verts.add(u); verts.add(v)
                 for (k in 0 until 4) verts.add(1f)
                 verts.add(0f); verts.add(0f)
             }
         }
-        for (r in 0 until rings) {
-            for (s in 0 until sectors) {
-                val a = r * (sectors + 1) + s
-                val b = a + sectors + 1
-                idx.addAll(listOf(a, b, a + 1, b, b + 1, a + 1))
+        for (r in 0 until rgs) {
+            for (s in 0 until seg) {
+                val a = r * (seg + 1) + s
+                val b = a + seg + 1
+                // quad(a, a+1, a+cols, a+cols+1) — outward.
+                idx.addAll(listOf(a, a + 1, b, a + 1, b + 1, b))
             }
         }
         return MeshData(
@@ -752,66 +753,79 @@ object MeshFactory {
         )
     }
 
-    /** XY plane facing +Z (parity with `SCNPlane`). */
-    fun plane(width: Float, height: Float): MeshData {
-        val hx = width / 2; val hy = height / 2
-        val q = packTangentFrame(1f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 1f)
-        val verts = ArrayList<Float>()
-        val corners = listOf(
-            floatArrayOf(-hx, -hy, 0f), floatArrayOf(hx, -hy, 0f),
-            floatArrayOf(hx, hy, 0f), floatArrayOf(-hx, hy, 0f),
-        )
-        val uvs = listOf(
-            floatArrayOf(0f, 0f), floatArrayOf(1f, 0f),
-            floatArrayOf(1f, 1f), floatArrayOf(0f, 1f),
-        )
-        for (i in corners.indices) {
-            verts.addAll(corners[i].toList()); verts.addAll(q.toList())
-            verts.addAll(uvs[i].toList())
-            for (k in 0 until 4) verts.add(1f)
-            verts.add(0f); verts.add(0f)
+    /** An XZ grid plane facing +Y — the wire contract (proc.dart's
+     *  buildPlane): `width` spans X, `depth` spans Z, `segmentsX` ×
+     *  `segmentsZ` cells, winding wound so the geometric normal
+     *  agrees with the +Y attribute normal. The tangent frame is the
+     *  UV-aligned (+X, +Z) pair — the reflected-frame w<0 encoding. */
+    fun plane(
+        width: Float, depth: Float,
+        segmentsX: Int = 1, segmentsZ: Int = 1,
+    ): MeshData {
+        val sx = maxOf(1, segmentsX); val sz = maxOf(1, segmentsZ)
+        val b = ProcBuilder()
+        val n = V3(0f, 1f, 0f)
+        for (z in 0..sz) {
+            for (x in 0..sx) {
+                b.emit(
+                    V3((x.toFloat() / sx - 0.5f) * width, 0f,
+                        (z.toFloat() / sz - 0.5f) * depth),
+                    n, x.toFloat() / sx, z.toFloat() / sz,
+                    t = V3(1f, 0f, 0f), w = -1f)
+            }
         }
-        val idx = listOf(0, 1, 2, 0, 2, 3)
-        return MeshData(
-            bufferOf(verts), indexBufferOf(idx), 4, idx.size,
-            floatArrayOf(0f, 0f, 0f, hx, hy, 0f),
-            hasUvColor = true,
-        )
+        val cols = sx + 1
+        for (z in 0 until sz) {
+            for (x in 0 until sx) {
+                val a = z * cols + x
+                // quad(a, a+cols, a+1, a+cols+1) — the +Y order.
+                b.quad(a, a + cols, a + 1, a + cols + 1)
+            }
+        }
+        return b.build(floatArrayOf(0f, 0f, 0f, width / 2, 0f, depth / 2))
     }
 
+    /** A torus around Y — proc.dart's buildTorus: `rings` (the wire's
+     *  `radialSegments`) around the main ring, `sectors`
+     *  (`tubularSegments`) around the tube; uv = (v-tube, u-ring)
+     *  matching the Dart emit order, outward winding, and the
+     *  UV-aligned ∂pos/∂v tangent. */
     fun torus(ringR: Float, tubeR: Float, rings: Int = 32, sectors: Int = 16): MeshData {
+        val rg = maxOf(1, rings); val sc = maxOf(1, sectors)
         val verts = ArrayList<Float>()
         val idx = ArrayList<Int>()
-        for (r in 0..rings) {
-            val u = r.toFloat() / rings * 2f * PI.toFloat()
+        for (r in 0..rg) {
+            val u = r.toFloat() / rg * 2f * PI.toFloat()
             val cu = cos(u); val su = sin(u)
-            for (s in 0..sectors) {
-                val v = s.toFloat() / sectors * 2f * PI.toFloat()
+            for (s in 0..sc) {
+                val v = s.toFloat() / sc * 2f * PI.toFloat()
                 val cv = cos(v); val sv = sin(v)
                 val nx = cu * cv; val ny = sv; val nz = su * cv
                 verts.add((ringR + tubeR * cv) * cu)
                 verts.add(tubeR * sv)
                 verts.add((ringR + tubeR * cv) * su)
-                val tx = -su; val ty = 0f; val tz = cu
+                // The uv.x gradient runs around the tube — the
+                // tangent is ∂pos/∂v; n×t lands on the ring direction.
+                val tx = -sv * cu; val ty = cv; val tz = -sv * su
                 val bx = ny * tz - nz * ty
                 val by = nz * tx - nx * tz
                 val bz = nx * ty - ny * tx
                 verts.addAll(
                     packTangentFrame(tx, ty, tz, bx, by, bz, nx, ny, nz).toList()
                 )
-                // u around the ring, v along the tube; white color;
-                // no uv1.
-                verts.add(u / (2f * PI.toFloat()))
+                // uv = (v-frac, u-frac) — Dart emits
+                // (j/tubularSegments, i/radialSegments).
                 verts.add(v / (2f * PI.toFloat()))
+                verts.add(u / (2f * PI.toFloat()))
                 for (k in 0 until 4) verts.add(1f)
                 verts.add(0f); verts.add(0f)
             }
         }
-        for (r in 0 until rings) {
-            for (s in 0 until sectors) {
-                val a = r * (sectors + 1) + s
-                val b = a + sectors + 1
-                idx.addAll(listOf(a, b, a + 1, b, b + 1, a + 1))
+        for (r in 0 until rg) {
+            for (s in 0 until sc) {
+                val a = r * (sc + 1) + s
+                val b = a + sc + 1
+                idx.addAll(listOf(a, a + 1, b, a + 1, b + 1, b))
             }
         }
         return MeshData(
@@ -820,5 +834,933 @@ object MeshFactory {
             floatArrayOf(0f, 0f, 0f, ringR + tubeR, tubeR, ringR + tubeR),
             hasUvColor = true,
         )
+    }
+
+    // ------------------------------------------------------------------
+    // W26: expanded procedural vocabulary — the `d3:procMesh` /
+    // `d3:instances` shapes. Generators mirror proc.dart's build*
+    // functions and emit the same 15-float record the payload path
+    // decodes, so textured/vertex-color materials bind identically.
+    // Point-driven shapes take native-space (z-mirrored) points —
+    // the decoders convert at the wire boundary like every other
+    // vertex source.
+    // ------------------------------------------------------------------
+
+    /** Minimal float3 for the W26 generators — the decoders build
+     *  point lists in native space. */
+    data class V3(var x: Float, var y: Float, var z: Float) {
+        operator fun plus(o: V3) = V3(x + o.x, y + o.y, z + o.z)
+        operator fun minus(o: V3) = V3(x - o.x, y - o.y, z - o.z)
+        operator fun times(s: Float) = V3(x * s, y * s, z * s)
+        fun dot(o: V3) = x * o.x + y * o.y + z * o.z
+        fun cross(o: V3) = V3(
+            y * o.z - z * o.y, z * o.x - x * o.z, x * o.y - y * o.x)
+        val length2 get() = x * x + y * y + z * z
+        val length get() = sqrt(length2)
+        fun normalized(fallback: V3 = V3(0f, 0f, 1f)): V3 {
+            val l = length
+            return if (l.isFinite() && l > 1e-8f) V3(x / l, y / l, z / l)
+            else fallback
+        }
+    }
+
+    /** Accumulates 15-float records + triangles into a [MeshData]. */
+    private class ProcBuilder {
+        val verts = ArrayList<Float>()
+        val idx = ArrayList<Int>()
+        val vertexCount get() = verts.size / FLOATS_PER_VERTEX
+
+        /** Emits a vertex; the tangent frame is synthesized from the
+         *  normal when [t] is null (perpendicular pick). [w] is the
+         *  bitangent handedness — a −1 flips the derived bitangent so
+         *  UV-aligned frames can mark the reflected case. */
+        fun emit(
+            p: V3, n: V3, u: Float, v: Float,
+            r: Float = 1f, g: Float = 1f, b: Float = 1f, a: Float = 1f,
+            t: V3? = null, w: Float = 1f,
+        ): Int {
+            val i = vertexCount
+            var tan = t
+            if (tan == null || tan.length2 < 1e-12f) {
+                val axis = if (abs(n.x) < 0.9f) V3(1f, 0f, 0f)
+                    else V3(0f, 1f, 0f)
+                tan = n.cross(axis).normalized(V3(1f, 0f, 0f))
+            }
+            val bit = (n.cross(tan) * w).normalized()
+            val q = packTangentFrame(
+                tan.x, tan.y, tan.z, bit.x, bit.y, bit.z, n.x, n.y, n.z)
+            verts.add(p.x); verts.add(p.y); verts.add(p.z)
+            verts.addAll(q.toList())
+            verts.add(u); verts.add(v)
+            verts.add(r); verts.add(g); verts.add(b); verts.add(a)
+            verts.add(0f); verts.add(0f)
+            return i
+        }
+
+        fun tri(a: Int, b: Int, c: Int) { idx.add(a); idx.add(b); idx.add(c) }
+        fun quad(a: Int, b: Int, c: Int, d: Int) {
+            tri(a, b, c); tri(b, d, c)
+        }
+
+        fun build(
+            bounds: FloatArray? = null,
+            topology: Topology = Topology.TRIANGLES,
+        ): MeshData {
+            val vc = vertexCount
+            val width = if (vc <= 0x10000) IndexWidth.UINT16 else IndexWidth.UINT32
+            val vb = bufferOf(verts)
+            val b = bounds ?: scanBounds(vb, vc, PROCEDURAL_VERTEX_STRIDE_BYTES)
+            vb.rewind()
+            return MeshData(
+                vb, indexBufferOf(idx.toIntArray(), width),
+                vc, idx.size, b,
+                hasUvColor = true, indexWidth = width, topology = topology)
+        }
+    }
+
+    /** A cylinder/cone along Y with optional end caps — mirrors
+     *  proc.dart's buildCylinder (sloped side normals, apex-fan
+     *  handling, flip-wound bottom cap). */
+    fun cylinder(
+        bottomRadius: Float, topRadius: Float, height: Float,
+        radialSegments: Int, heightSegments: Int,
+        bottomCap: Boolean, topCap: Boolean,
+    ): MeshData {
+        val b = ProcBuilder()
+        val slopeY = bottomRadius - topRadius
+        val columns = radialSegments + 1
+        for (r in 0..heightSegments) {
+            val t = r.toFloat() / heightSegments
+            val y = height / 2 - height * t
+            val radius = topRadius + (bottomRadius - topRadius) * t
+            for (s in 0..radialSegments) {
+                val theta = (2 * PI * s / radialSegments).toFloat()
+                val cos = cos(theta); val sin = sin(theta)
+                val n = V3(height * cos, slopeY, height * sin).normalized()
+                b.emit(
+                    V3(radius * cos, y, radius * sin), n,
+                    s.toFloat() / radialSegments, t)
+            }
+        }
+        for (r in 0 until heightSegments) {
+            val topApex = r == 0 && topRadius == 0f
+            val bottomApex = r + 1 == heightSegments && bottomRadius == 0f
+            for (s in 0 until radialSegments) {
+                val a = r * columns + s
+                val bv = a + 1
+                val c = a + columns
+                val d = c + 1
+                if (!topApex) b.tri(a, bv, c)
+                if (!bottomApex) b.tri(bv, d, c)
+            }
+        }
+
+        fun addCap(y: Float, radius: Float, ny: Float, flip: Boolean) {
+            if (radius <= 0f) return
+            val n = V3(0f, ny, 0f)
+            val center = b.emit(V3(0f, y, 0f), n, 0.5f, 0.5f)
+            val rimBase = b.vertexCount
+            for (s in 0..radialSegments) {
+                val theta = (2 * PI * s / radialSegments).toFloat()
+                val cos = cos(theta); val sin = sin(theta)
+                b.emit(V3(radius * cos, y, radius * sin), n,
+                    0.5f + 0.5f * cos, 0.5f + 0.5f * sin)
+            }
+            for (s in 0 until radialSegments) {
+                val r0 = rimBase + s
+                val r1 = rimBase + s + 1
+                if (flip) b.tri(center, r0, r1) else b.tri(center, r1, r0)
+            }
+        }
+
+        if (bottomCap) addCap(-height / 2, bottomRadius, -1f, flip = true)
+        if (topCap) addCap(height / 2, topRadius, 1f, flip = false)
+        return b.build()
+    }
+
+    /** A capsule along Y — mirrors proc.dart's buildCapsule:
+     *  hemisphere rings sharing the mid-section equators. */
+    fun capsule(
+        radius: Float, height: Float,
+        radialSegments: Int, capRings: Int,
+    ): MeshData {
+        val halfH = height / 2
+        data class Ring(val posY: Float, val posR: Float,
+                        val normY: Float, val normR: Float)
+        val rings = ArrayList<Ring>()
+        for (r in 0..capRings) {
+            val phi = (PI / 2) * (r.toDouble() / capRings)
+            rings.add(Ring(
+                halfH + radius * cos(phi).toFloat(),
+                radius * sin(phi).toFloat(),
+                cos(phi).toFloat(), sin(phi).toFloat()))
+        }
+        for (r in 0..capRings) {
+            val phi = (PI / 2) + (PI / 2) * (r.toDouble() / capRings)
+            rings.add(Ring(
+                -halfH + radius * cos(phi).toFloat(),
+                radius * sin(phi).toFloat(),
+                cos(phi).toFloat(), sin(phi).toFloat()))
+        }
+        val b = ProcBuilder()
+        val columns = radialSegments + 1
+        for ((ri, ring) in rings.withIndex()) {
+            for (s in 0..radialSegments) {
+                val theta = (2 * PI * s / radialSegments).toFloat()
+                val cos = cos(theta); val sin = sin(theta)
+                b.emit(
+                    V3(ring.posR * cos, ring.posY, ring.posR * sin),
+                    V3(ring.normR * cos, ring.normY, ring.normR * sin),
+                    s.toFloat() / radialSegments,
+                    ri.toFloat() / (rings.size - 1))
+            }
+        }
+        for (r in 0 until rings.size - 1) {
+            for (s in 0 until radialSegments) {
+                val a = r * columns + s
+                b.quad(a, a + 1, a + columns, a + columns + 1)
+            }
+        }
+        return b.build()
+    }
+
+    /** A filled disc in the XZ plane facing +Y — proc.dart buildDisc. */
+    fun disc(radius: Float, segments: Int): MeshData {
+        val b = ProcBuilder()
+        val n = V3(0f, 1f, 0f)
+        val center = b.emit(V3(0f, 0f, 0f), n, 0.5f, 0.5f)
+        val rimBase = b.vertexCount
+        for (s in 0..segments) {
+            val theta = (2 * PI * s / segments).toFloat()
+            val cos = cos(theta); val sin = sin(theta)
+            b.emit(V3(radius * cos, 0f, radius * sin), n,
+                0.5f + 0.5f * cos, 0.5f + 0.5f * sin)
+        }
+        for (s in 0 until segments) {
+            b.tri(center, rimBase + s + 1, rimBase + s)
+        }
+        return b.build()
+    }
+
+    /** A real subdivided icosahedron projected to [radius] — replaces
+     *  the UV-sphere stand-in for `icosphere` (midpoint edge cache,
+     *  spherical UVs, outward winding; proc.dart buildIcosphere). */
+    fun icosphere(radius: Float, subdivisions: Int): MeshData {
+        val t = ((1 + sqrt(5.0)) / 2).toFloat()
+        val verts = mutableListOf(
+            V3(-1f, t, 0f), V3(1f, t, 0f), V3(-1f, -t, 0f), V3(1f, -t, 0f),
+            V3(0f, -1f, t), V3(0f, 1f, t), V3(0f, -1f, -t), V3(0f, 1f, -t),
+            V3(t, 0f, -1f), V3(t, 0f, 1f), V3(-t, 0f, -1f), V3(-t, 0f, 1f),
+        )
+        var faces = mutableListOf(
+            intArrayOf(0, 11, 5), intArrayOf(0, 5, 1), intArrayOf(0, 1, 7),
+            intArrayOf(0, 7, 10), intArrayOf(0, 10, 11), intArrayOf(1, 5, 9),
+            intArrayOf(5, 11, 4), intArrayOf(11, 10, 2), intArrayOf(10, 7, 6),
+            intArrayOf(7, 1, 8), intArrayOf(3, 9, 4), intArrayOf(3, 4, 2),
+            intArrayOf(3, 2, 6), intArrayOf(3, 6, 8), intArrayOf(3, 8, 9),
+            intArrayOf(4, 9, 5), intArrayOf(2, 4, 11), intArrayOf(6, 2, 10),
+            intArrayOf(8, 6, 7), intArrayOf(9, 8, 1),
+        )
+        val midpointCache = HashMap<Int, Int>()
+        fun midpoint(a: Int, bv: Int): Int {
+            val key = if (a < bv) (a shl 16) or bv else (bv shl 16) or a
+            midpointCache[key]?.let { return it }
+            val index = verts.size
+            verts.add((verts[a] + verts[bv]) * 0.5f)
+            midpointCache[key] = index
+            return index
+        }
+        repeat(maxOf(subdivisions, 0)) {
+            val next = ArrayList<IntArray>(faces.size * 4)
+            for (f in faces) {
+                val ab = midpoint(f[0], f[1])
+                val bc = midpoint(f[1], f[2])
+                val ca = midpoint(f[2], f[0])
+                next.add(intArrayOf(f[0], ab, ca))
+                next.add(intArrayOf(f[1], bc, ab))
+                next.add(intArrayOf(f[2], ca, bc))
+                next.add(intArrayOf(ab, bc, ca))
+            }
+            faces = next
+        }
+        val b = ProcBuilder()
+        for (v in verts) {
+            val n = v.normalized()
+            b.emit(n * radius, n,
+                (0.5 + kotlin.math.atan2(n.z, n.x) / (2 * PI)).toFloat(),
+                (0.5 - kotlin.math.asin(
+                    n.y.coerceIn(-1f, 1f).toDouble()) / PI).toFloat())
+        }
+        for (f in faces) b.tri(f[0], f[1], f[2])
+        return b.build()
+    }
+
+    // MARK: - Path evaluation (W26 tube/ribbon — paths.dart port)
+
+    private data class PathFrame(
+        val position: V3, val tangent: V3,
+        val normal: V3, val binormal: V3)
+
+    /** Arc-length-parameterized curve eval — a compact port of
+     *  paths.dart's ScenePath bake: sampled positions/tangents, the
+     *  cumulative-length table, and rotation-minimizing normals. */
+    private class PathEval(
+        private val positionAt: (Float) -> V3,
+        private val tangentAt: (Float) -> V3,
+        sampleParams: List<Float>,
+    ) {
+        private val params = sampleParams
+        private val tangents: List<V3>
+        private val normals: List<V3>
+        private val cumulative: FloatArray
+        val length: Float
+
+        init {
+            val positions = params.map { positionAt(it) }
+            tangents = params.map { tangentAt(it) }
+            cumulative = FloatArray(params.size)
+            for (i in 1 until params.size) {
+                cumulative[i] = cumulative[i - 1] +
+                    (positions[i] - positions[i - 1]).length
+            }
+            length = cumulative.last()
+            normals = rotationMinimizingNormals(positions, tangents)
+        }
+
+        fun parameterAtDistance(d: Float): Float {
+            val total = length
+            if (total <= 0f) return 0f
+            val target = d.coerceIn(0f, total)
+            var lo = 0
+            var hi = cumulative.size - 1
+            while (lo + 1 < hi) {
+                val mid = (lo + hi) ushr 1
+                if (cumulative[mid] <= target) lo = mid else hi = mid
+            }
+            val segment = cumulative[hi] - cumulative[lo]
+            val local = if (segment > 1e-12f)
+                (target - cumulative[lo]) / segment else 0f
+            return params[lo] + (params[hi] - params[lo]) * local
+        }
+
+        fun frameAtDistance(d: Float): PathFrame {
+            val t = parameterAtDistance(d)
+            var hi = 1
+            while (hi < params.size - 1 && params[hi] < t) hi++
+            val lo = hi - 1
+            val span = params[hi] - params[lo]
+            val local = if (span > 1e-12f) (t - params[lo]) / span else 0f
+            val position = positionAt(t)
+            var tangent = tangentAt(t)
+            if (tangent.length2 < 1e-12f) tangent = tangents[hi]
+            tangent = tangent.normalized()
+            var normal = normals[lo] * (1f - local) + normals[hi] * local
+            normal -= tangent * normal.dot(tangent)
+            normal = if (normal.length2 < 1e-12f) perpendicularTo(tangent)
+                else normal.normalized()
+            return PathFrame(position, tangent, normal,
+                tangent.cross(normal).normalized())
+        }
+
+        fun evenlySpacedFrames(stations: Int): List<PathFrame> {
+            val total = length
+            return List(stations) { i ->
+                frameAtDistance(
+                    if (stations == 1) 0f else total * i / (stations - 1))
+            }
+        }
+    }
+
+    private fun perpendicularTo(direction: V3): V3 {
+        val ax = abs(direction.x); val ay = abs(direction.y)
+        val az = abs(direction.z)
+        val axis = if (ax <= ay && ax <= az) V3(1f, 0f, 0f)
+            else if (ay <= az) V3(0f, 1f, 0f)
+            else V3(0f, 0f, 1f)
+        val result = axis.cross(direction)
+        return if (result.length2 < 1e-12f) V3(0f, 1f, 0f)
+            else result.normalized()
+    }
+
+    private fun rotationMinimizingNormals(
+        positions: List<V3>, tangents: List<V3>,
+    ): List<V3> {
+        val count = positions.size
+        val normals = MutableList(count) { V3(0f, 0f, 0f) }
+        normals[0] = perpendicularTo(tangents[0])
+        for (i in 0 until count - 1) {
+            var reference = normals[i]
+            val v1 = positions[i + 1] - positions[i]
+            val c1 = v1.dot(v1)
+            if (c1 > 1e-12f) {
+                val reflectedRef = reference - v1 * (2f / c1 * v1.dot(reference))
+                val reflectedTan = tangents[i] - v1 * (2f / c1 * v1.dot(tangents[i]))
+                val v2 = tangents[i + 1] - reflectedTan
+                val c2 = v2.dot(v2)
+                reference = if (c2 > 1e-12f)
+                    reflectedRef - v2 * (2f / c2 * v2.dot(reflectedRef))
+                    else reflectedRef
+            }
+            reference -= tangents[i + 1] * reference.dot(tangents[i + 1])
+            normals[i + 1] = if (reference.length2 < 1e-12f)
+                perpendicularTo(tangents[i + 1]) else reference.normalized()
+        }
+        return normals
+    }
+
+    private const val SMOOTH_SAMPLES_PER_SEGMENT = 24
+
+    private fun subdividedParams(segments: Int): List<Float> {
+        val params = ArrayList<Float>()
+        for (s in 0 until segments) {
+            for (k in 0 until SMOOTH_SAMPLES_PER_SEGMENT) {
+                params.add((s + k.toFloat() / SMOOTH_SAMPLES_PER_SEGMENT) / segments)
+            }
+        }
+        params.add(1f)
+        return params
+    }
+
+    /** Uniform Catmull-Rom through [points] — paths.dart port; the
+     *  endpoints repeat so end segments interpolate cleanly. */
+    private fun catmullRomPath(points: List<V3>, closed: Boolean): PathEval {
+        val pts = if (closed) points + points.first() else points
+        fun cp(i: Int) = pts[i.coerceIn(0, pts.size - 1)]
+        fun segmentOf(t: Float): Pair<Int, Float> {
+            val segs = pts.size - 1
+            val scaled = t.coerceIn(0f, 1f) * segs
+            var seg = scaled.toInt()
+            if (seg >= segs) seg = segs - 1
+            return seg to scaled - seg
+        }
+        return PathEval(
+            positionAt = { t ->
+                val (seg, s) = segmentOf(t)
+                val p0 = cp(seg - 1); val p1 = cp(seg)
+                val p2 = cp(seg + 1); val p3 = cp(seg + 2)
+                val s2 = s * s; val s3 = s2 * s
+                (p1 * 2f + (p2 - p0) * s +
+                    (p0 * 2f - p1 * 5f + p2 * 4f - p3) * s2 +
+                    (p1 * 3f - p0 - p2 * 3f + p3) * s3) * 0.5f
+            },
+            tangentAt = { t ->
+                val (seg, s) = segmentOf(t)
+                val p0 = cp(seg - 1); val p1 = cp(seg)
+                val p2 = cp(seg + 1); val p3 = cp(seg + 2)
+                val d = ((p2 - p0) +
+                    (p0 * 2f - p1 * 5f + p2 * 4f - p3) * (2f * s) +
+                    (p1 * 3f - p0 - p2 * 3f + p3) * (3f * s * s)) * 0.5f
+                d.normalized(V3(1f, 0f, 0f))
+            },
+            sampleParams = subdividedParams(pts.size - 1))
+    }
+
+    private fun stitchRings(b: ProcBuilder, ringBases: List<Int>, ringSize: Int) {
+        for (s in 0 until ringBases.size - 1) {
+            val base = ringBases[s]
+            val nextBase = ringBases[s + 1]
+            for (j in 0 until ringSize - 1) {
+                b.quad(base + j, base + j + 1, nextBase + j, nextBase + j + 1)
+            }
+        }
+    }
+
+    /** A round cross-section swept along a Catmull-Rom path — mirrors
+     *  proc.dart's buildTube (rotation-minimizing frames, ring
+     *  stitching, fan caps). [points] are native-space. */
+    fun tube(
+        points: List<V3>, radius: Float, radialSegments: Int,
+        stations: Int, caps: Boolean, closed: Boolean,
+    ): MeshData {
+        if (points.size < 2) return ProcBuilder().build()
+        val path = catmullRomPath(points, closed)
+        val frames = path.evenlySpacedFrames(stations)
+        val length = path.length
+        val b = ProcBuilder()
+        val ringBases = ArrayList<Int>(stations)
+        for (i in 0 until stations) {
+            val frame = frames[i]
+            val v = length * i / (stations - 1)
+            ringBases.add(b.vertexCount)
+            for (k in 0..radialSegments) {
+                val theta = (2 * PI * k / radialSegments).toFloat()
+                val radial = frame.normal * cos(theta) +
+                    frame.binormal * sin(theta)
+                b.emit(frame.position + radial * radius, radial,
+                    k.toFloat() / radialSegments, v)
+            }
+        }
+        stitchRings(b, ringBases, radialSegments + 1)
+        if (caps) {
+            tubeCap(b, frames.first(), radius, radialSegments, atEnd = false)
+            tubeCap(b, frames.last(), radius, radialSegments, atEnd = true)
+        }
+        return b.build()
+    }
+
+    private fun tubeCap(
+        b: ProcBuilder, frame: PathFrame,
+        radius: Float, radialSegments: Int, atEnd: Boolean,
+    ) {
+        val normal = if (atEnd) frame.tangent else frame.tangent * -1f
+        val center = b.emit(frame.position, normal, 0.5f, 0.5f)
+        val ringIndices = IntArray(radialSegments) { k ->
+            val theta = (2 * PI * k / radialSegments).toFloat()
+            val radial = frame.normal * cos(theta) +
+                frame.binormal * sin(theta)
+            b.emit(frame.position + radial * radius, normal,
+                0.5f + 0.5f * cos(theta), 0.5f + 0.5f * sin(theta))
+        }
+        for (k in 0 until radialSegments) {
+            val next = (k + 1) % radialSegments
+            if (atEnd) b.tri(center, ringIndices[k], ringIndices[next])
+            else b.tri(center, ringIndices[next], ringIndices[k])
+        }
+    }
+
+    /** A flat strip swept along a Catmull-Rom path — proc.dart's
+     *  buildRibbon ground alignment (width perpendicular to the path
+     *  as seen from [up]). [points] are native-space. */
+    fun ribbon(
+        points: List<V3>, width: Float, stations: Int,
+        up: V3, closed: Boolean,
+    ): MeshData {
+        if (points.size < 2) return ProcBuilder().build()
+        val path = catmullRomPath(points, closed)
+        val frames = path.evenlySpacedFrames(stations)
+        val length = path.length
+        val half = width / 2f
+        val b = ProcBuilder()
+        val ringBases = ArrayList<Int>(stations)
+        for (i in 0 until stations) {
+            val frame = frames[i]
+            var sideways = frame.tangent.cross(up)
+            if (sideways.length2 < 1e-12f) sideways = frame.binormal
+            val across = sideways.normalized()
+            val normal = up.normalized()
+            val v = if (stations == 1) 0f else length * i / (stations - 1)
+            ringBases.add(b.vertexCount)
+            b.emit(frame.position - across * half, normal, 0f, v)
+            b.emit(frame.position + across * half, normal, 1f, v)
+        }
+        stitchRings(b, ringBases, 2)
+        return b.build()
+    }
+
+    // MARK: - Camera-facing expansion (W26 lines / billboards)
+
+    /**
+     * Emits one quad for the span [a]→[c] into [b]. The quad expands
+     * perpendicular to the segment direction and [viewDir] (the
+     * camera-forward hint — Dart's `right`/`sideHint` parameter); at
+     * frame time the host re-expands toward the live camera.
+     * [wa]/[wb] are half-width multipliers at each end.
+     */
+    private fun emitLineQuad(
+        b: ProcBuilder, a: V3, c: V3,
+        wa: Float, wb: Float, viewDir: V3,
+        ca: FloatArray?, cb: FloatArray?,
+    ) {
+        var d = c - a
+        if (d.length2 < 1e-20f) return
+        d = d.normalized()
+        var side = d.cross(viewDir)
+        if (side.length2 < 1e-12f) side = d.cross(V3(0f, 1f, 0f))
+        if (side.length2 < 1e-12f) side = V3(1f, 0f, 0f)
+        side = side.normalized()
+        val sa = side * (wa / 2)
+        val sb = side * (wb / 2)
+        // Face normal toward the camera — cross(d, side) approximates
+        // the view direction for a perpendicular expansion.
+        val n = d.cross(side).normalized()
+        val ra = ca ?: WHITE4
+        val rb = cb ?: WHITE4
+        val v0 = b.emit(a - sa, n, 0f, 0f,
+            ra[0], ra[1], ra[2], ra[3], t = d)
+        b.emit(c - sb, n, 1f, 0f, rb[0], rb[1], rb[2], rb[3], t = d)
+        b.emit(a + sa, n, 0f, 1f, ra[0], ra[1], ra[2], ra[3], t = d)
+        b.emit(c + sb, n, 1f, 1f, rb[0], rb[1], rb[2], rb[3], t = d)
+        b.quad(v0, v0 + 1, v0 + 2, v0 + 3)
+    }
+
+    private val WHITE4 = floatArrayOf(1f, 1f, 1f, 1f)
+
+    /** Solid camera-facing polyline — one quad per segment pair.
+     *  [points] native-space, [viewDir] the expansion hint. */
+    fun polyline(
+        points: List<V3>, width: Float, viewDir: V3,
+        colors: List<FloatArray>? = null, widths: List<Float>? = null,
+        closed: Boolean = false,
+    ): MeshData {
+        if (points.size < 2) return ProcBuilder().build()
+        val pts = if (closed) points + points.first() else points
+        val b = ProcBuilder()
+        for (i in 0 until pts.size - 1) {
+            emitLineQuad(b, pts[i], pts[i + 1],
+                widths?.getOrNull(i) ?: width,
+                widths?.getOrNull(i + 1) ?: width,
+                viewDir, colors?.getOrNull(i), colors?.getOrNull(i + 1))
+        }
+        return b.build()
+    }
+
+    /** Dashed polyline — walks each segment's arc length with a
+     *  global `(on, off)` cursor, emitting one quad per kept span
+     *  (proc.dart's _expandDashed). */
+    fun dashedPolyline(
+        points: List<V3>, width: Float, viewDir: V3,
+        onLen: Float, offLen: Float,
+        colors: List<FloatArray>? = null, widths: List<Float>? = null,
+        closed: Boolean = false,
+    ): MeshData {
+        if (points.size < 2) return ProcBuilder().build()
+        val pts = if (closed) points + points.first() else points
+        val b = ProcBuilder()
+        var distance = 0f
+        var on = true
+        var nextBoundary = onLen
+        fun lerpColor(ia: Int, ib: Int, t: Float): FloatArray? {
+            val ca = colors?.getOrNull(ia) ?: return colors?.getOrNull(ib)
+            val cb = colors.getOrNull(ib) ?: return ca
+            return FloatArray(4) { ca[it] + (cb[it] - ca[it]) * t }
+        }
+        for (i in 0 until pts.size - 1) {
+            val a = pts[i]
+            val c = pts[i + 1]
+            val dir = c - a
+            val segLen = dir.length
+            if (segLen < 1e-12f) continue
+            var t0 = 0f
+            while (t0 < 1f - 1e-9f) {
+                val remain = distance + segLen - nextBoundary
+                val t1 = if (remain > 0f)
+                    (nextBoundary - distance) / segLen else 1f
+                if (on) {
+                    val wa = (widths?.getOrNull(i) ?: width) +
+                        ((widths?.getOrNull(i + 1) ?: width) -
+                            (widths?.getOrNull(i) ?: width)) * t0
+                    val wb = (widths?.getOrNull(i) ?: width) +
+                        ((widths?.getOrNull(i + 1) ?: width) -
+                            (widths?.getOrNull(i) ?: width)) * t1
+                    emitLineQuad(b, a + dir * t0, a + dir * t1,
+                        wa, wb, viewDir, lerpColor(i, i + 1, t0),
+                        lerpColor(i, i + 1, t1))
+                }
+                t0 = t1
+                if (distance + t0 * segLen >= nextBoundary - 1e-9f) {
+                    on = !on
+                    nextBoundary += if (on) onLen else offLen
+                }
+            }
+            distance += segLen
+        }
+        return b.build()
+    }
+
+    /** Independent camera-facing quads, one per point pair —
+     *  thick line segments without join stitching. */
+    fun lineSegments(
+        points: List<V3>, width: Float, viewDir: V3,
+        colors: List<FloatArray>? = null,
+    ): MeshData {
+        val b = ProcBuilder()
+        var i = 0
+        while (i + 1 < points.size) {
+            emitLineQuad(b, points[i], points[i + 1], width, width,
+                viewDir, colors?.getOrNull(i), colors?.getOrNull(i + 1))
+            i += 2
+        }
+        return b.build()
+    }
+
+    /** The billboard facing basis for [facing] — `spherical` aims the
+     *  quad's normal at the node-local camera position [camPos] and
+     *  keeps the camera's up vector; `axisY` rotates about
+     *  node-local +Y only (cylindrical); `screen` (and any degenerate
+     *  aim) keeps the camera-plane basis [camRight]/[camUp]. Mirrors
+     *  GeometryFactory.facingBasis. */
+    fun facingBasis(
+        facing: String, center: V3, camPos: V3,
+        camRight: V3, camUp: V3,
+    ): Pair<V3, V3> = when (facing) {
+        "axisY" -> {
+            val nx = camPos.x - center.x
+            val nz = camPos.z - center.z
+            val l2 = nx * nx + nz * nz
+            if (l2 > 1e-12f) {
+                val l = sqrt(l2)
+                val nxn = nx / l; val nzn = nz / l
+                // right = (0,1,0) × n — the yaw-only basis.
+                Pair(V3(nzn, 0f, -nxn).normalized(), V3(0f, 1f, 0f))
+            } else Pair(camRight, camUp)
+        }
+        "spherical" -> {
+            val toCam = camPos - center
+            if (toCam.length2 > 1e-12f) {
+                val n = toCam.normalized()
+                val r = camUp.cross(n)
+                if (r.length2 > 1e-12f) {
+                    val rn = r.normalized()
+                    Pair(rn, n.cross(rn))
+                } else Pair(camRight, camUp)
+            } else Pair(camRight, camUp)
+        }
+        else -> Pair(camRight, camUp)
+    }
+
+    /** A camera-facing quad at the origin — [right]/[up] supply the
+     *  facing basis (node-local at decode, camera-derived at frame
+     *  reface). [facing] + [camPos] (node-local camera position)
+     *  realize the `spherical`/`axisY` modes; `screen` keeps the
+     *  passed basis. */
+    fun billboardQuad(
+        sizeX: Float, sizeY: Float, rotation: Float,
+        color: FloatArray, right: V3, up: V3,
+        facing: String = "screen", camPos: V3 = V3(0f, 0f, 0f),
+    ): MeshData {
+        var r = right; var u = up
+        if (facing != "screen") {
+            val fb = facingBasis(facing, V3(0f, 0f, 0f), camPos, right, up)
+            r = fb.first; u = fb.second
+        }
+        val cosR = cos(rotation); val sinR = sin(rotation)
+        val n = r.cross(u).normalized()
+        val b = ProcBuilder()
+        val corners = listOf(-0.5f to -0.5f, 0.5f to -0.5f,
+            -0.5f to 0.5f, 0.5f to 0.5f)
+        for ((dx, dy) in corners) {
+            val rx = dx * cosR - dy * sinR
+            val ry = dx * sinR + dy * cosR
+            b.emit(r * (rx * sizeX) + u * (ry * sizeY), n,
+                dx + 0.5f, dy + 0.5f, color[0], color[1], color[2], color[3])
+        }
+        b.quad(0, 1, 2, 3)
+        return b.build()
+    }
+
+    // MARK: - Instance baking (W26 `d3:instances`)
+
+    /**
+     * Bakes `matrices.size` transformed copies of [base] into one
+     * vertex buffer — the Android `d3:instances` realization.
+     * Filament 1.71.6's Java binding exposes
+     * `RenderableManager.Builder.instances(int)` but not the native
+     * `InstanceBuffer` overload, so per-instance transforms/
+     * attributes can't reach the GPU through the bound API; a single
+     * baked renderable keeps the one-node/one-draw contract with
+     * per-instance colors stamped into the COLOR stream.
+     * [matrices] are native-space column-major 16-float arrays;
+     * [colors] (nullable) is one rgba quad per instance.
+     *
+     * Normals transform by the exact inverse-transpose of the upper
+     * 3×3 (the cofactor identity — exact under non-uniform scale,
+     * mirror, and shear, where the old normalize-columns/quaternion
+     * path drifted); the tangent column transforms by the matrix
+     * itself, re-orthogonalized against the new normal, and the
+     * frame's bitangent handedness flips with the determinant's
+     * sign. A non-invertible/non-finite transform carries the source
+     * frame through unchanged.
+     */
+    fun bakeInstances(
+        base: MeshData, matrices: List<FloatArray>,
+        colors: List<FloatArray>? = null,
+    ): MeshData {
+        val b = ProcBuilder()
+        val src = base.vertices
+        val stride = base.vertexStrideBytes
+        val frame = FloatArray(9)   // unpacked (t, b, n) columns
+        for ((i, m) in matrices.withIndex()) {
+            val c0x = m[0]; val c0y = m[1]; val c0z = m[2]
+            val c1x = m[4]; val c1y = m[5]; val c1z = m[6]
+            val c2x = m[8]; val c2y = m[9]; val c2z = m[10]
+            // For column-basis (c0, c1, c2), M^-1's ROWS are the
+            // cofactor triples r0 = c1×c2, r1 = c2×c0, r2 = c0×c1
+            // scaled by 1/det — so M^-T·n = (n.x·r0 + n.y·r1 +
+            // n.z·r2)/det. Normalizing folds the |det| scale away;
+            // only its sign survives.
+            val r0x = c1y * c2z - c1z * c2y
+            val r0y = c1z * c2x - c1x * c2z
+            val r0z = c1x * c2y - c1y * c2x
+            val r1x = c2y * c0z - c2z * c0y
+            val r1y = c2z * c0x - c2x * c0z
+            val r1z = c2x * c0y - c2y * c0x
+            val r2x = c0y * c1z - c0z * c1y
+            val r2y = c0z * c1x - c0x * c1z
+            val r2z = c0x * c1y - c0y * c1x
+            val det = c0x * r0x + c0y * r0y + c0z * r0z
+            val invertible = det.isFinite() && abs(det) > 1e-20f &&
+                c0x.isFinite() && c0y.isFinite() && c0z.isFinite() &&
+                c1x.isFinite() && c1y.isFinite() && c1z.isFinite() &&
+                c2x.isFinite() && c2y.isFinite() && c2z.isFinite() &&
+                m[12].isFinite() && m[13].isFinite() && m[14].isFinite()
+            // A reflection flips the frame's handedness — the
+            // bitangent sign channel follows the determinant.
+            val flip = if (det < 0f) -1f else 1f
+            val ic = colors?.getOrNull(i)
+            val base0 = b.vertexCount
+            src.rewind()
+            for (vi in 0 until base.vertexCount) {
+                val off = vi * stride
+                val px = src.getFloat(off)
+                val py = src.getFloat(off + 4)
+                val pz = src.getFloat(off + 8)
+                // Position: M * (p, 1), column-major.
+                val wx = m[0] * px + m[4] * py + m[8] * pz + m[12]
+                val wy = m[1] * px + m[5] * py + m[9] * pz + m[13]
+                val wz = m[2] * px + m[6] * py + m[10] * pz + m[14]
+                b.verts.add(wx); b.verts.add(wy); b.verts.add(wz)
+                val qx = src.getFloat(off + 12)
+                val qy = src.getFloat(off + 16)
+                val qz = src.getFloat(off + 20)
+                val qw = src.getFloat(off + 24)
+                if (invertible) {
+                    // Unpack (t, b, n) + the encoded handedness,
+                    // transform, repack.
+                    val handed = unpackTangentFrame(
+                        qx, qy, qz, qw, frame)
+                    var nx = r0x * frame[6] + r1x * frame[7] +
+                        r2x * frame[8]
+                    var ny = r0y * frame[6] + r1y * frame[7] +
+                        r2y * frame[8]
+                    var nz = r0z * frame[6] + r1z * frame[7] +
+                        r2z * frame[8]
+                    nx *= flip; ny *= flip; nz *= flip
+                    val nl = sqrt(nx * nx + ny * ny + nz * nz)
+                    if (nl.isFinite() && nl > 1e-12f) {
+                        nx /= nl; ny /= nl; nz /= nl
+                    } else {
+                        nx = frame[6]; ny = frame[7]; nz = frame[8]
+                    }
+                    var tx = c0x * frame[0] + c1x * frame[1] +
+                        c2x * frame[2]
+                    var ty = c0y * frame[0] + c1y * frame[1] +
+                        c2y * frame[2]
+                    var tz = c0z * frame[0] + c1z * frame[1] +
+                        c2z * frame[2]
+                    // Re-orthogonalize against the transformed
+                    // normal — a shearing/nonuniform matrix tilts t
+                    // off the surface otherwise.
+                    val d = nx * tx + ny * ty + nz * tz
+                    tx -= nx * d; ty -= ny * d; tz -= nz * d
+                    val tl = sqrt(tx * tx + ty * ty + tz * tz)
+                    if (tl.isFinite() && tl > 1e-12f) {
+                        tx /= tl; ty /= tl; tz /= tl
+                    } else {
+                        val axis = if (abs(nx) < 0.9f) V3(1f, 0f, 0f)
+                            else V3(0f, 1f, 0f)
+                        val t3 = V3(nx, ny, nz).cross(axis)
+                            .normalized(V3(1f, 0f, 0f))
+                        tx = t3.x; ty = t3.y; tz = t3.z
+                    }
+                    val hs = handed * flip
+                    val bx = (ny * tz - nz * ty) * hs
+                    val by = (nz * tx - nx * tz) * hs
+                    val bz = (nx * ty - ny * tx) * hs
+                    val q = packTangentFrame(
+                        tx, ty, tz, bx, by, bz, nx, ny, nz)
+                    for (k in 0 until 4) b.verts.add(q[k])
+                } else {
+                    // Degenerate transform — the source frame rides
+                    // through unchanged.
+                    b.verts.add(qx); b.verts.add(qy)
+                    b.verts.add(qz); b.verts.add(qw)
+                }
+                // uv0, color (instance color × vertex color), uv1.
+                b.verts.add(src.getFloat(off + 28))
+                b.verts.add(src.getFloat(off + 32))
+                for (k in 0 until 4) {
+                    b.verts.add(
+                        (ic?.get(k) ?: 1f) * src.getFloat(off + 36 + k * 4))
+                }
+                b.verts.add(src.getFloat(off + 52))
+                b.verts.add(src.getFloat(off + 56))
+            }
+            src.rewind()
+            val ints = base.indices
+            when (base.indexWidth) {
+                IndexWidth.UINT16 -> {
+                    val shorts = ints.asShortBuffer()
+                    for (k in 0 until base.indexCount) {
+                        b.idx.add((shorts.get(k).toInt() and 0xFFFF) + base0)
+                    }
+                }
+                IndexWidth.UINT32 -> {
+                    val ib = ints.asIntBuffer()
+                    for (k in 0 until base.indexCount) {
+                        b.idx.add(ib.get(k) + base0)
+                    }
+                }
+            }
+        }
+        return b.build()
+    }
+
+    /** Decodes a packed tangent-frame quaternion into [out] as the
+     *  (t, b, n) columns; returns the frame's handedness (−1 when the
+     *  packed w<0 sign channel marks a reflected basis — see
+     *  packTangentFrame). A degenerate quat yields the identity
+     *  frame. */
+    private fun unpackTangentFrame(
+        qx: Float, qy: Float, qz: Float, qw: Float, out: FloatArray,
+    ): Float {
+        var x = qx; var y = qy; var z = qz; var w = qw
+        val l = sqrt(x * x + y * y + z * z + w * w)
+        if (!l.isFinite() || l < 1e-12f) {
+            out[0] = 1f; out[1] = 0f; out[2] = 0f
+            out[3] = 0f; out[4] = 1f; out[5] = 0f
+            out[6] = 0f; out[7] = 0f; out[8] = 1f
+            return 1f
+        }
+        x /= l; y /= l; z /= l; w /= l
+        val reflected = w < 0f
+        if (reflected) { x = -x; y = -y; z = -z; w = -w }
+        val xx = x * x; val yy = y * y; val zz = z * z
+        val xy = x * y; val xz = x * z; val yz = y * z
+        val wx = w * x; val wy = w * y; val wz = w * z
+        out[0] = 1f - 2f * (yy + zz); out[1] = 2f * (xy + wz)
+        out[2] = 2f * (xz - wy)
+        out[3] = 2f * (xy - wz); out[4] = 1f - 2f * (xx + zz)
+        out[5] = 2f * (yz + wx)
+        out[6] = 2f * (xz + wy); out[7] = 2f * (yz - wx)
+        out[8] = 1f - 2f * (xx + yy)
+        // The packed basis stores −b when the source frame was
+        // reflected; restore the true bitangent.
+        if (reflected) { out[3] = -out[3]; out[4] = -out[4]; out[5] = -out[5] }
+        return if (reflected) -1f else 1f
+    }
+
+    /** Bakes one camera-facing quad per instance center — billboard
+     *  mode of `d3:instances`. [centers] are the instance transforms'
+     *  translations in node space; [right]/[up] supply the facing
+     *  basis the host refreshes per frame. A non-`screen` [facing]
+     *  computes the basis per center from the node-local camera
+     *  position [camPos] (spherical quads aim individually). */
+    fun bakeBillboardInstances(
+        centers: List<V3>, sizeX: Float, sizeY: Float, rotation: Float,
+        colors: List<FloatArray>?, right: V3, up: V3,
+        facing: String = "screen", camPos: V3 = V3(0f, 0f, 0f),
+    ): MeshData {
+        val cosR = cos(rotation); val sinR = sin(rotation)
+        val b = ProcBuilder()
+        val corners = listOf(-0.5f to -0.5f, 0.5f to -0.5f,
+            -0.5f to 0.5f, 0.5f to 0.5f)
+        for ((i, c) in centers.withIndex()) {
+            var r = right; var u = up
+            if (facing != "screen") {
+                val fb = facingBasis(facing, c, camPos, right, up)
+                r = fb.first; u = fb.second
+            }
+            val n = r.cross(u).normalized()
+            val col = colors?.getOrNull(i) ?: WHITE4
+            val v0 = b.vertexCount
+            for ((dx, dy) in corners) {
+                val rx = dx * cosR - dy * sinR
+                val ry = dx * sinR + dy * cosR
+                b.emit(c + r * (rx * sizeX) + u * (ry * sizeY), n,
+                    dx + 0.5f, dy + 0.5f, col[0], col[1], col[2], col[3])
+            }
+            b.quad(v0, v0 + 1, v0 + 2, v0 + 3)
+        }
+        return b.build()
     }
 }
