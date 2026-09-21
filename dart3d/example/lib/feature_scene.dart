@@ -94,6 +94,16 @@ import 'package:vector_math/vector_math.dart';
 /// closure — fired at +140 s — which drives `w16Mover` away and
 /// back through its `lod` thresholds (three screen-size levels plus
 /// the cull floor) while its `trail` draws the camera-facing ribbon.
+/// W25 lands the
+/// stage-effects matrix lanes through the returned `w25Phase`
+/// closure — fired at +166 s — which runs the `colorGradingLut`
+/// asset path both ways (a `chunk:` ref whose `.cube` bytes land
+/// ~800 ms late for the deferred-claim lane, then the registered
+/// `assets/luts/cool.cube` bundle path), a partial `lutBlend`, the
+/// film-grain/auto-exposure, SSR+lens-flare, and god-rays+standalone
+/// chromatic-aberration blocks on a two-second cadence, and an
+/// all-defaults reset whose close-out log names the die's token for
+/// the dice regression.
 /// W18 lands the
 /// particle lane through the returned `w18Phase` closure — fired at
 /// +170 s — which adds four emitters live: a spherical flipbook
@@ -137,6 +147,7 @@ final class FeatureScene {
     void Function() w15Phase,
     void Function(({double w, double h}) Function() targetPx) w24Phase,
     void Function() w16Phase,
+    void Function() w25Phase,
     void Function() w18Phase,
   })
   build({bool ortho = false, int env = 1, SceneController? controller}) {
@@ -3911,6 +3922,181 @@ final class FeatureScene {
       });
     }
 
+    // W25 phase (+166 s): the stage-effects matrix lanes. The
+    // `colorGradingLut` path runs both ways — a `chunk:` ref whose
+    // `.cube` bytes land ~800 ms after the env upsert (the
+    // deferred-claim lane: natives register the env's LUT claim, hold
+    // the grade, and re-run the stage decode when `upsertPayload`
+    // arrives), then the registered `assets/luts/cool.cube` bundle
+    // path — followed by a partial `lutBlend` and the remaining W25
+    // realizations/limits on a two-second cadence, ending on an
+    // all-defaults reset. Lanes (brief numbering): 1 is the W13
+    // regression (the +34 s w13Phase itself); 2–3 the LUT
+    // payload/asset lanes both platforms share; 4–5 film grain +
+    // auto-exposure; 6 SSR; 7 lens flare; 8 god rays; 9 standalone
+    // chromatic aberration; 10 the dice regression — the reset leaves
+    // the table live and the close-out log names the die's token.
+    void addW25Phase() {
+      final c = controller;
+      if (c == null) return;
+      final live = phaseTwoDoc ?? doc;
+      final ref = live.stage.environmentRef;
+      final existing = ref == null ? null : live.resources[ref];
+      final envRes = existing is EnvironmentResource
+          ? existing
+          : live.addResource(
+              EnvironmentResource(
+                live.newId(),
+                environment: const StudioEnvironment(),
+                effects: EnvironmentEffectsSpec(),
+              ),
+            );
+      live.stage.environmentRef = envRes.id;
+
+      String idKey(LocalId id) =>
+          '${live.resources[id] is EnvironmentResource ? 'env' : 'chunk'}'
+          ':${id.toToken()}';
+
+      void push() {
+        c.applyCommands([
+          {
+            'op': 'upsertResource',
+            'id': 'env:${envRes.id.toToken()}',
+            'resource': encodeResource(envRes, idKey),
+          },
+          {'op': 'updateStage', 'stage': encodeStage(live.stage, idKey)},
+        ]);
+      }
+
+      void setEffects(EnvironmentEffectsSpec effects, String tag) {
+        envRes.effects = effects;
+        envRes.overridesEffects = true;
+        push();
+        dnLog('dart3d: w25 $tag');
+      }
+
+      // t+0: the deferred-chunk LUT lane — the env block names a
+      // `chunk:` token whose `.cube` bytes haven't landed; the native
+      // claim holds the grade until the payload op arrives ~800 ms
+      // out. A warm grade (reds up, blues down) contrasts the asset
+      // lane's cool table.
+      final warmLut = _w25CubeBytes(
+        (r, g, b) => (
+          (r * 1.08 + 0.04).clamp(0.0, 1.0).toDouble(),
+          (g * 0.98 + 0.01).clamp(0.0, 1.0).toDouble(),
+          (b * 0.90).clamp(0.0, 1.0).toDouble(),
+        ),
+      );
+      final lutChunk = live.addPayload(
+        PayloadSpec(
+          live.newId(),
+          encoding: PayloadEncoding.bytes,
+          length: warmLut.lengthInBytes,
+          bytes: warmLut,
+        ),
+      );
+      envRes.effects = EnvironmentEffectsSpec(
+        colorGradingLut: AssetRef('chunk:${lutChunk.id.toToken()}'),
+      );
+      envRes.overridesEffects = true;
+      push();
+      dnLog('dart3d: w25 LUT chunk ref staged — payload deferred');
+      Timer(const Duration(milliseconds: 800), () {
+        c.applyCommands([
+          {
+            'op': 'upsertPayload',
+            'id': 'chunk:${lutChunk.id.toToken()}',
+            'bytes': base64Encode(warmLut),
+            'encoding': PayloadEncoding.bytes.name,
+            'length': warmLut.lengthInBytes,
+          },
+        ]);
+        dnLog('dart3d: w25 LUT payload landed — deferred grade applies');
+      });
+      // +2 s: `lutBlend` bakes a partial grade over the same chunk —
+      // the cache key changes, so natives re-pack at 0.35 strength.
+      Timer(const Duration(seconds: 2), () {
+        setEffects(
+          EnvironmentEffectsSpec(
+            colorGradingLut: AssetRef('chunk:${lutChunk.id.toToken()}'),
+            colorGradingLutBlend: 0.35,
+          ),
+          'LUT blend 0.35',
+        );
+      });
+      // +4 s: the asset-path lane — the registered bundle file the
+      // native asset fallback resolves at apply time (a cool grade,
+      // the visible opposite of the warm chunk).
+      Timer(const Duration(seconds: 4), () {
+        setEffects(
+          EnvironmentEffectsSpec(
+            colorGradingLut: const AssetRef('assets/luts/cool.cube'),
+          ),
+          'LUT asset path (assets/luts/cool.cube)',
+        );
+      });
+      // +6 s: film grain + auto exposure — grain lands as Filament
+      // dithering on Android / grainIntensity on iOS; Android
+      // metering is a documented limit so only `compensation`
+      // applies (a static EV offset), iOS logs strength and
+      // compensation.
+      Timer(const Duration(seconds: 6), () {
+        setEffects(
+          EnvironmentEffectsSpec(
+            filmGrainEnabled: true,
+            filmGrainIntensity: 0.5,
+            autoExposureEnabled: true,
+            autoExposureCompensation: -0.5,
+            autoExposureSpeedUp: 2.0,
+          ),
+          'filmGrain+autoExposure on',
+        );
+      });
+      // +8 s: SSR + lens flare — real passes on Android; iOS
+      // approximates the flare as widened bloom + a color fringe
+      // and logs the SSR platform limit.
+      Timer(const Duration(seconds: 8), () {
+        setEffects(
+          EnvironmentEffectsSpec(
+            screenSpaceReflectionsEnabled: true,
+            screenSpaceReflectionsIntensity: 0.7,
+            lensFlareEnabled: true,
+            lensFlareIntensity: 0.8,
+            lensFlareGhostCount: 3,
+            lensFlareChromaticAberration: 0.01,
+          ),
+          'ssr+lensFlare on',
+        );
+      });
+      // +10 s: god rays + standalone chromatic aberration — each
+      // platform applies or logs the limit per its support matrix.
+      Timer(const Duration(seconds: 10), () {
+        setEffects(
+          EnvironmentEffectsSpec(
+            godRaysEnabled: true,
+            godRaysIntensity: 0.6,
+            chromaticAberrationEnabled: true,
+            chromaticAberrationIntensity: 0.35,
+          ),
+          'godRays+standalone CA on',
+        );
+      });
+      // +12 s: an all-defaults spec — every family off, the LUT claim
+      // cleared with the fresh effects block.
+      Timer(const Duration(seconds: 12), () {
+        setEffects(EnvironmentEffectsSpec(), 'effects reset');
+      });
+      // +14 s: the dice-regression close-out — the table must still
+      // be live after the matrix sweep.
+      Timer(const Duration(seconds: 14), () {
+        dnLog(
+          'dart3d: w25 lane complete — dice table live '
+          '(die ${die.id.toToken()}); expected final state: '
+          'all effects off',
+        );
+      });
+    }
+
     // W18 phase (+170 s): the particle lane. One batch lands three
     // live emitters plus a gated one, then timers exercise the
     // dynamic surface — a `components` updateNode flipping the gated
@@ -4212,6 +4398,7 @@ final class FeatureScene {
       w15Phase: addW15Phase,
       w24Phase: addW24Phase,
       w16Phase: addW16Phase,
+      w25Phase: addW25Phase,
       w18Phase: addW18Phase,
     );
   }
@@ -4470,6 +4657,35 @@ final class FeatureScene {
       throw FsceneFormatException('w15: unknown prefab "${ref.key}"');
     }
     return prefab;
+  }
+
+  /// Builds a `size`³ `.cube` table with [grade] applied to each
+  /// cell's normalized RGB — the W25 phase's warm-look LUT chunk.
+  /// The text form is what both native parsers consume (red-fastest
+  /// rows, `LUT_3D_SIZE` header).
+  static Uint8List _w25CubeBytes(
+    (double, double, double) Function(double r, double g, double b) grade, {
+    int size = 16,
+  }) {
+    final text = StringBuffer()
+      ..writeln('TITLE "dart3d w25"')
+      ..writeln('LUT_3D_SIZE $size');
+    for (var b = 0; b < size; b++) {
+      for (var g = 0; g < size; g++) {
+        for (var r = 0; r < size; r++) {
+          final (ro, go, bo) = grade(
+            r / (size - 1),
+            g / (size - 1),
+            b / (size - 1),
+          );
+          text.writeln(
+            '${ro.toStringAsFixed(6)} ${go.toStringAsFixed(6)} '
+            '${bo.toStringAsFixed(6)}',
+          );
+        }
+      }
+    }
+    return Uint8List.fromList(utf8.encode(text.toString()));
   }
 
   /// A face-up quad of edge `2 * half` packed into the upstream

@@ -26,7 +26,14 @@ enum FsceneRealizer {
     /// Replaces `host`'s scene with the realized manifest. Payload-backed
     /// resources whose bytes have not arrived stay deferred and are
     /// re-realized when a payload lands (`SceneViewHost.applyPayload`).
-    static func realize(manifest: Data, into host: SceneViewHost) {
+    /// - Parameter preserveStage: W25 fix-2 — set only by the
+    ///   payload-arrival re-realize. That pass is a deferred-resource
+    ///   retry, not a stage re-apply: the live stage (updateStage
+    ///   mutations, op-added env resources, LUT/effects state) carries
+    ///   forward instead of the manifest's stale stage being
+    ///   re-decoded on top of it.
+    static func realize(manifest: Data, into host: SceneViewHost,
+                        preserveStage: Bool = false) {
         guard let json = try? JSONSerialization.jsonObject(with: manifest)
                 as? [String: Any] else {
             d3Log("loadScene: manifest is not a JSON object"); return
@@ -48,6 +55,17 @@ enum FsceneRealizer {
         host.beginComponentJointRegistration()
         ctx.decodePayloadSpecs(json["payloads"] as? [String: Any] ?? [:])
         ctx.decodeResources(json["resources"] as? [String: Any] ?? [:])
+        if preserveStage {
+            // Op-added env resources aren't in the manifest —
+            // overlay the live defs so the preserved stage's
+            // environmentRef still resolves (and the defs stay
+            // installed for later surgical stage decodes).
+            for (k, r) in host.resourceDefs
+            where (r["kind"] as? String) == "environment" {
+                ctx.resourceDefs[k] = r
+                ctx.environments[k] = r
+            }
+        }
         ctx.decodeNodes(json["nodes"] as? [String: Any] ?? [:])
         ctx.decodeSkins(json["skins"] as? [String: Any] ?? [:])
         ctx.decodeAnimations(json["animations"] as? [String: Any] ?? [:])
@@ -55,7 +73,8 @@ enum FsceneRealizer {
         ctx.resolveSkinAttachments()
         ctx.decodePhysicsDeferred()
         ctx.applyVariantComponents()
-        ctx.decodeStage(json["stage"] as? [String: Any])
+        ctx.decodeStage(preserveStage ? host.lastStage
+                        : json["stage"] as? [String: Any])
         // W14: view decode runs after stage (it needs nothing from it,
         // but the rt records and node registry must already exist).
         ctx.decodeViews(json["views"])
@@ -477,6 +496,13 @@ enum FsceneRealizer {
         /// env it unblocks (W7).
         var environmentPayloadKeys: [UInt64: UInt64] = [:]
 
+        /// W25: environment id → payload id backing its
+        /// `effects.colorGrading.lut` `.cube` table, so the chunk's
+        /// arrival re-runs `decodeStage` (and the host re-applies the
+        /// effects stack). Asset-path LUT refs don't claim — they
+        /// resolve through the host's bundle lookup.
+        var lutPayloadKeys: [UInt64: UInt64] = [:]
+
         /// Decoded `skins` entries (W11) — joint keys, IBMs, optional
         /// skeleton. Populated by `decodeSkins` after the node pass.
         var skins: [UInt64: DecodedSkin] = [:]
@@ -643,6 +669,7 @@ enum FsceneRealizer {
                                      geometryPayloadKeys: geometryPayloadKeys,
                                      environmentPayloadKeys:
                                         environmentPayloadKeys,
+                                     lutPayloadKeys: lutPayloadKeys,
                                      skins: skins,
                                      animations: animations,
                                      morphTargets: morphTargets,
@@ -2193,8 +2220,7 @@ enum FsceneRealizer {
             if let asset = r["ref"] as? String {
                 var image = UIImage(named: asset)
                 if image == nil,
-                   let url = Bundle.main.url(forResource: asset,
-                                             withExtension: nil) {
+                   let url = FlutterAssets.url(forResource: asset) {
                     image = UIImage(contentsOfFile: url.path)
                 }
                 guard let image, let cg = image.cgImage else {
@@ -5117,6 +5143,7 @@ enum FsceneRealizer {
                (stage?["environmentRef"] as? String) != oldToken {
                 deferredResourceIds.remove(oldKey)
                 environmentPayloadKeys.removeValue(forKey: oldKey)
+                lutPayloadKeys.removeValue(forKey: oldKey)
             }
             stageJSON = stage
             stageEnvDeferred = false
@@ -5233,6 +5260,29 @@ enum FsceneRealizer {
                         + "unknown; background cleared")
                 }
                 scene.background.contents = nil
+            }
+
+            // W25: the colorGrading LUT rides the env's payload-claim
+            // path — a `chunk:`/id-token ref whose bytes haven't
+            // landed defers this env id so the chunk's arrival
+            // re-runs the stage decode (and the host's
+            // `applyStageEffects` picks the table up). Asset-path
+            // refs aren't claims; the host resolves them from the
+            // main bundle at apply time. An absent `effects` key
+            // keeps the prior claim (the decoded stack is retained).
+            if let envKey, let fx = stageEffects {
+                if let ref = fx.colorGrading.lut, !ref.isEmpty,
+                   let lutPid = D3Wire.localIdKey(ref) {
+                    lutPayloadKeys[envKey] = lutPid
+                    if host.payloadStore[lutPid] == nil {
+                        deferredResourceIds.insert(envKey)
+                        host.logOnce("env.\(envKey).lut.awaiting",
+                            "environment \(envKey): awaiting LUT "
+                            + "payload")
+                    }
+                } else {
+                    lutPayloadKeys.removeValue(forKey: envKey)
+                }
             }
         }
 
@@ -5463,8 +5513,7 @@ enum FsceneRealizer {
         func envPixels(fromAsset ref: String, tag: String)
             -> EnvPixels?
         {
-            if let url = Bundle.main.url(forResource: ref,
-                                         withExtension: nil),
+            if let url = FlutterAssets.url(forResource: ref),
                let data = try? Data(contentsOf: url) {
                 return envPixels(fromBytes: data, tag: tag)
             }

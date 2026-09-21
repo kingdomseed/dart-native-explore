@@ -381,6 +381,13 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      * not re-run ~10ms of GPU work each time. */
     internal var lastEnvFingerprint: Int? = null
 
+    /** W25: decoded `.cube` tables → the direct `customLut` buffers,
+     * keyed by `ref + sep + blend` (the blend bakes into the texels).
+     * Entries drop when a `payload`/`upsertPayload` chunk rewrites the
+     * ref's bytes. */
+    private val lutBuffers =
+        HashMap<String, Pair<java.nio.ByteBuffer, Int>>()
+
     /** Filament objects owned by the applied stage env — swapped and
      * destroyed by [applyEnvironment]/[applySkybox] on every
      * non-deferred `decodeStage`. `envIblTextures` holds the equirect +
@@ -783,6 +790,14 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         }
         if (!unlit) {
             b.require(MaterialBuilder.VertexAttribute.TANGENTS)
+                // W25 fix-2: SSR needs materials compiled with
+                // reflectionMode SCREEN_SPACE — without it the shader
+                // never samples the SSR buffer (MATERIAL_HAS_REFLECTIONS
+                // stays off) and the view option alone is a no-op.
+                // Harmless when SSR is disabled: the bound buffer's
+                // zero coverage falls back to IBL specular.
+                .reflectionMode(MaterialBuilder.ReflectionMode
+                    .SCREEN_SPACE)
                 .uniformParameter(MaterialBuilder.UniformType.FLOAT, "metallic")
                 .uniformParameter(MaterialBuilder.UniformType.FLOAT, "roughness")
                 .uniformParameter(MaterialBuilder.UniformType.FLOAT4,
@@ -1482,13 +1497,22 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         agxWhite: Double, agxContrast: Double,
         fx: StageEffects? = null,
     ) {
-        camera.setExposure(16.0f, 1.0f / 125.0f, 100.0f * exposure)
+        // W25: autoExposure's static term — upstream adds
+        // `compensation` (EV) to the metered target; metering itself
+        // is a documented platform limit (see applyStageEffects), so
+        // the compensation folds into the base exposure as a ×2^c
+        // multiplier.
+        val aeComp = fx?.autoExposure
+            ?.takeIf { it.enabled }?.compensation ?: 0.0
+        val effExposure = (exposure *
+            Math.pow(2.0, aeComp)).toFloat()
+        camera.setExposure(16.0f, 1.0f / 125.0f, 100.0f * effExposure)
         // W14: exposure is a Camera property — every screen-bound view
         // camera takes it (offscreen views keep Filament's default,
         // the same policy as the per-View post stack).
         for (rec in screenViews) {
             rec.camera?.setExposure(16.0f, 1.0f / 125.0f,
-                100.0f * exposure)
+                100.0f * effExposure)
         }
         val mapper: ToneMapper = when (toneMapping) {
             "pbrNeutral" -> ToneMapper.PBRNeutralToneMapper()
@@ -1527,12 +1551,16 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     fxCg.tint.toFloat())
                 // ASC CDL: wire gain→slope, lift→offset, gamma→power.
                 .slopeOffsetPower(fxCg.gain, fxCg.lift, fxCg.gamma)
-            if (fxCg.lut.isNotEmpty()) {
-                logCommandOnce("fx.colorGrading.lut",
-                    "colorGrading LUT assets aren't resolved by dart3d" +
-                        " yet; ignored")
-            }
         }
+        // W25: the LUT grades independently of `enabled` (upstream's
+        // rule). A `chunk:`/id-token ref resolves through the payload
+        // store — its decode-time claim re-runs the stage when the
+        // bytes land; an asset path resolves from the app assets.
+        // `lutBlend` bakes into the uploaded texels (lerp toward the
+        // identity cell) since `customLut` has no mix knob.
+        fx?.colorGrading?.lut?.takeIf { it.isNotEmpty() }
+            ?.let { ref -> resolveLutBuffer(ref, fx.colorGrading.lutBlend) }
+            ?.let { (buf, size) -> cgBuilder.customLut(buf, size) }
         val cg = cgBuilder.build(engine)
         view.colorGrading = cg
         envColorGrading?.let {
@@ -1553,10 +1581,17 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     internal fun applyStageEffects() {
         val fx = lastEffects ?: return
 
-        // Bloom + lens flare — Filament folds flare into BloomOptions.
+        // Bloom + lens flare — Filament folds flare into BloomOptions:
+        // the bloom pass must be enabled for ghosts/halo to render, and
+        // its `strength` doubles as the flare composite weight. A
+        // flare-only stage therefore enables the pass at
+        // lensFlare.intensity — real ghosts/halo/CA render, at the cost
+        // of a mild bloom halo the same gain (not separable; iOS widens
+        // SceneKit bloomIntensity the same way). Never silent.
         view.bloomOptions = View.BloomOptions().apply {
-            enabled = fx.bloom.enabled
-            strength = fx.bloom.intensity.toFloat()
+            enabled = fx.bloom.enabled || fx.lensFlare.enabled
+            strength = if (fx.bloom.enabled) fx.bloom.intensity.toFloat()
+                else fx.lensFlare.intensity.toFloat().coerceIn(0f, 1f)
             // Filament's `threshold` is a bool knee toggle; upstream's
             // 0..1 luminance cutoff lands on `highlight` instead.
             threshold = true
@@ -1573,10 +1608,15 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             // thickness (Filament's default haloThickness is 0.1).
             haloThickness = fx.lensFlare.haloIntensity.toFloat() * 0.1f
         }
-        if (fx.chromaticAberration.enabled && !fx.lensFlare.enabled) {
-            logCommandOnce("fx.ca",
-                "chromaticAberration is bloom/lens-flare-scoped on" +
-                    " Filament; enable lensFlare to see it")
+        // W25: standalone chromaticAberration (enabled without
+        // lensFlare) has no Filament surface — the platform-limit
+        // note logs at the bottom of this function.
+        if (fx.lensFlare.enabled && !fx.bloom.enabled) {
+            logCommandOnce("fx.lensFlare.standalone",
+                "lensFlare without bloom: Filament's flare rides the" +
+                    " bloom pass — enabled at lensFlare.intensity" +
+                    " strength, so a mild bloom halo comes with the" +
+                    " ghosts (flare gain is not separable)")
         }
 
         view.vignetteOptions = View.VignetteOptions().apply {
@@ -1696,6 +1736,18 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 bias = 0.01f
             }
         val ssr = fx.screenSpaceReflections
+        if (ssr.enabled) {
+            // Coverage note (W25 fix-2): SSR shades only lit materials
+            // — compiled with reflectionMode SCREEN_SPACE — whose
+            // reflection rays land on on-screen content; misses fall
+            // back to IBL specular, rough surfaces show little, and
+            // frame N needs N-1's color+depth history (the first
+            // SSR-enabled frame seeds it). Unlit materials never
+            // reflect.
+            logCommandOnce("fx.ssr.conditions",
+                "screenSpaceReflections: applies to lit materials;" +
+                    " off-screen/rough surfaces keep IBL specular")
+        }
         if (ssr.enabled && (ssr.intensity != 1.0 || ssr.maxSteps != 90 ||
                 ssr.blur != 0.3 || ssr.distanceFadeStart != 0.0 ||
                 ssr.resolutionScale != 1.0)) {
@@ -1704,16 +1756,94 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     " (thickness/maxDistance/stride only)")
         }
 
-        // No Java-binding surface — decoded for parity, logged once.
-        if (fx.autoExposure.enabled) logCommandOnce("fx.autoExposure",
-            "autoExposure unsupported on Filament (no Java-binding" +
-                " auto-exposure)")
-        if (fx.filmGrain.enabled) logCommandOnce("fx.filmGrain",
-            "filmGrain unsupported on Filament")
-        if (fx.globalIllumination.enabled) logCommandOnce("fx.gi",
-            "globalIllumination volumes unsupported on Filament")
-        if (fx.godRays.enabled) logCommandOnce("fx.godRays",
-            "godRays unsupported on Filament")
+        // W25 film grain — Filament has no grain pass; approximated
+        // by temporal dithering (the post pipeline's animated noise,
+        // intensity unmapped).
+        view.dithering = if (fx.filmGrain.enabled)
+            View.Dithering.TEMPORAL else View.Dithering.NONE
+        if (fx.filmGrain.enabled) {
+            logCommandOnce("fx.filmGrain.approx",
+                "filmGrain approximated on Filament as temporal" +
+                    " dithering; grain intensity unmapped")
+        }
+
+        // W25 documented platform limits — no Java-binding surface
+        // exists for these blocks; each logs once and the decoded
+        // value still participates in blending/parity.
+        if (fx.chromaticAberration.enabled && !fx.lensFlare.enabled) {
+            logCommandOnce("fx.ca.limit",
+                "chromaticAberration standalone: platform limit —" +
+                    " Filament's CA only shades the lens-flare" +
+                    " ghosts/halo (flare.mat); no post-material" +
+                    " binding exists; ignored")
+        }
+        if (fx.autoExposure.enabled) {
+            logCommandOnce("fx.autoExposure.limit",
+                "autoExposure metering: platform limit — Filament's" +
+                    " readPixels is debug/testing-grade (in-frame," +
+                    " perf-heavy); `compensation` is applied as a" +
+                    " static EV offset in applyStageLook," +
+                    " strength/speeds/EV range unmapped")
+        }
+        if (fx.globalIllumination.enabled) logCommandOnce("fx.gi.limit",
+            "globalIllumination: platform limit — no dynamic" +
+                " GI/probe-volume API in the Java bindings; the IBL" +
+                " environment stands; ignored")
+        if (fx.godRays.enabled) logCommandOnce("fx.godRays.limit",
+            "godRays: platform limit — no light-shaft/volumetric" +
+                " post pass in the Java bindings; ignored")
+    }
+
+    /**
+     * W25: resolves a `colorGrading.lut` ref to the direct
+     * `float3`-cube buffer `ColorGrading.Builder.customLut` consumes.
+     * `chunk:`/id-token refs read the payload store (null while
+     * deferred — the realizer's claim re-runs the stage on arrival);
+     * other strings are app-asset paths (same lookup the `asset` env
+     * type uses). Results cache by ref+blend; a `payload`/
+     * `upsertPayload` landing on the ref's id drops stale entries.
+     */
+    private fun resolveLutBuffer(
+        ref: String, blend: Double,
+    ): Pair<java.nio.ByteBuffer, Int>? {
+        val cacheKey = "$ref\u001F$blend"
+        lutBuffers[cacheKey]?.let { return it }
+        // A token ref reads the payload store only — a miss is the
+        // deferred-claim state, not an asset lookup (the claim
+        // re-runs the stage when the chunk lands; iOS parity — no
+        // bundle attempt and no 'not found' log for chunk ids).
+        val pid = D3Wire.localIdKey(ref)
+        val bytes: ByteArray? = if (pid != null) {
+            payloadStore[pid]
+        } else {
+            FlutterAssets.readBytes(context, ref).also {
+                if (it == null) {
+                    logCommandOnce("fx.lut.asset.$ref",
+                        "colorGrading LUT asset '$ref' not found")
+                }
+            }
+        }
+        bytes ?: return null
+        val table = try {
+            StageLut.parse(bytes)
+        } catch (e: StageLut.ParseException) {
+            logCommandOnce("fx.lut.parse.$ref",
+                "colorGrading LUT '$ref': ${e.message}")
+            return null
+        }
+        val pair = table.directBuffer(blend) to table.size
+        lutBuffers[cacheKey] = pair
+        return pair
+    }
+
+    /** Drops cached LUT buffers whose ref names payload id [key] —
+     * called when a `payload`/`upsertPayload` chunk rewrites those
+     * bytes, so the next apply rebuilds from the new table. */
+    private fun invalidateLuts(backedBy: Long) {
+        lutBuffers.entries.removeIf { entry ->
+            val ref = entry.key.substringBefore('\u001F')
+            D3Wire.localIdKey(ref) == backedBy
+        }
     }
 
     // MARK: - Lifecycle
@@ -1982,12 +2112,17 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         if (data.size <= 8) return
         val id = D3Wire.readLocalId(data, 0)
         payloadStore[id] = data.copyOfRange(8, data.size)
+        // W25: a rewritten LUT chunk invalidates its cached tables.
+        invalidateLuts(backedBy = id)
         // W7: an environment equirect chunk re-runs decodeStage on the
         // live scene — the same early-out `upsertPayload` takes, and
         // the only path that doesn't depend on other resources still
         // being pending. No early return: a chunk the env shares with
         // another claimant must still reach the checks below.
-        if (resources.environmentPayloadIds.values.contains(id)) {
+        if (resources.environmentPayloadIds.values.contains(id) ||
+            resources.lutPayloadIds.values.contains(id)) {
+            // W7/W25: an env equirect or LUT chunk — decodeStage
+            // re-runs and the stage's deferred claim unblocks.
             FsceneRealizer.surgicalContext(this).decodeStage(lastStage)
         }
         // W11 claims run surgically first — a skin's IBM chunk or an
@@ -2002,11 +2137,17 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             if (id !in pids) continue
             resources.animDefs[animKey]?.let { redecodeAnimation(animKey, it) }
         }
-        if (pendingPayloadRefs.isNotEmpty() && lastManifest != null) {
-            // The deferred set holds resource ids, not payload ids —
-            // one re-realize at the end of the drain retries them all;
-            // a decoder whose payload is still missing re-marks itself
-            // pending.
+        // W25 fix-2: only a chunk a still-deferred texture or geometry
+        // awaits earns the manifest re-realize — the deferred set holds
+        // resource ids, so map through the claim tables. Never-landing
+        // sibling refs (or an env/LUT/skin/anim claim served above)
+        // must not re-arm it: a stray re-realize re-decodes the
+        // manifest's stale stage and reverts the live stage's
+        // LUT/effects state — the silent W25 regression. One armed
+        // drain retries every pending ref at once; a decoder whose
+        // payload is still missing re-marks itself pending.
+        if (lastManifest != null &&
+            resources.pendingClaims(id, pendingPayloadRefs)) {
             realizePending = true
         }
     }
@@ -2353,44 +2494,33 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      * keys invalidate the old batches. */
     private val streamedSubtreeOps = LinkedHashMap<Long, JSONArray>()
 
-    /** Guards the deferred-resource re-realize during a subtree
-     * replay: a replayed `upsertPayload` that leaves unrelated
-     * pending refs must not re-arm `realizePending` — that would
-     * rebuild the scene once per frame. */
-    private var subtreeReplayActive = false
-
     /** Replays each live subtree's recorded load batch through the
      * ordinary op dispatch — called right after a payload-arrival
      * re-realize has rebuilt the manifest scene. */
     private fun replayStreamedSubtrees() {
         if (streamedSubtreeOps.isEmpty()) return
-        subtreeReplayActive = true
-        try {
-            // A replayed batch can doom a later record's placeholder
-            // (a priorRoots removeNode taking a placeholder grafted
-            // into the doomed subtree): removeNode prunes the map
-            // inline, so iterate a snapshot — and skip records whose
-            // placeholder is already dead, since their addNodes would
-            // resolve a dead parent and root the resurrected members
-            // at scene root.
-            val dead = HashSet<Long>()
-            for ((key, ops) in streamedSubtreeOps.toList()) {
-                if (nodesById[key] == null) {
-                    dead += key
-                    continue
-                }
-                for (i in 0 until ops.length()) {
-                    ops.optJSONObject(i)?.let { applyCommandJson(it) }
-                }
-                if (nodesById[key] == null) {
-                    Log.w(TAG, "subtree replay: placeholder $key" +
-                        " missing after re-realize")
-                }
+        // A replayed batch can doom a later record's placeholder
+        // (a priorRoots removeNode taking a placeholder grafted
+        // into the doomed subtree): removeNode prunes the map
+        // inline, so iterate a snapshot — and skip records whose
+        // placeholder is already dead, since their addNodes would
+        // resolve a dead parent and root the resurrected members
+        // at scene root.
+        val dead = HashSet<Long>()
+        for ((key, ops) in streamedSubtreeOps.toList()) {
+            if (nodesById[key] == null) {
+                dead += key
+                continue
             }
-            streamedSubtreeOps.keys.removeAll(dead)
-        } finally {
-            subtreeReplayActive = false
+            for (i in 0 until ops.length()) {
+                ops.optJSONObject(i)?.let { applyCommandJson(it) }
+            }
+            if (nodesById[key] == null) {
+                Log.w(TAG, "subtree replay: placeholder $key" +
+                    " missing after re-realize")
+            }
         }
+        streamedSubtreeOps.keys.removeAll(dead)
     }
 
     /**
@@ -3052,10 +3182,14 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             opPayloadSpecs[key] = meta
         }
         payloadStore[key] = bytes
-        // W7: an environment equirect chunk re-runs decodeStage on the
-        // live scene (its payload deferral unblocks here). Checked
-        // first — env payloads also carry encoding:'image'.
-        if (resources.environmentPayloadIds.values.contains(key)) {
+        // W25: a rewritten LUT chunk invalidates its cached tables.
+        invalidateLuts(backedBy = key)
+        // W7/W25: an environment equirect or LUT chunk re-runs
+        // decodeStage on the live scene (its payload deferral unblocks
+        // here). Checked first — env payloads also carry
+        // encoding:'image'.
+        if (resources.environmentPayloadIds.values.contains(key) ||
+            resources.lutPayloadIds.values.contains(key)) {
             FsceneRealizer.surgicalContext(this).decodeStage(lastStage)
             return
         }
@@ -3121,15 +3255,12 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             }
             return
         }
-        if (pendingPayloadRefs.isNotEmpty()) {
-            // W15: a chunk replayed after a subtree-restoring
-            // re-realize must not re-arm the next one — the pending
-            // set can outlive the replay when other refs still wait.
-            if (lastManifest != null && !subtreeReplayActive) {
-                realizePending = true
-            }
-            return
-        }
+        // W25 fix-2: every claim map was checked surgically above —
+        // reaching here means no installed or deferred resource awaits
+        // this chunk, so a manifest re-realize would gain nothing (and
+        // a stray one reverts the live stage; see applyPayload's
+        // pending-claim gate). Log the unclaimed landing instead of
+        // arming.
         val enc = resources.payloadSpecs[key]?.encoding ?: "unknown"
         logCommandOnce("upsertPayload.$key.unclaimed",
             "upsertPayload $key (encoding '$enc'): stored; no consumers")
@@ -4269,12 +4400,15 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         }
         // Payload chunks in this drain may have unblocked deferred
         // resources — a single re-realize resolves every landed claim
-        // at once (previously one full decode ran per chunk).
+        // at once (previously one full decode ran per chunk). The
+        // retry is not a stage re-apply: preserveStage re-decodes the
+        // LIVE stage so updateStage/LUT/effects state survives.
         if (realizePending) {
             realizePending = false
             val manifest = lastManifest
             if (manifest != null && pendingPayloadRefs.isNotEmpty()) {
-                FsceneRealizer.realize(manifest, this)
+                FsceneRealizer.realize(manifest, this,
+                    preserveStage = true)
                 // W15: the re-realize discarded the surgically
                 // streamed subtrees with the rest of the scene —
                 // rebuild each from its recorded load batch.

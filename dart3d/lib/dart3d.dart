@@ -25,6 +25,7 @@ export 'src/diff_apply.dart';
 export 'src/doc_layer.dart';
 export 'src/fsceneb_reader.dart';
 export 'src/glb_import.dart';
+export 'src/lut_assets.dart';
 export 'src/particle_sim.dart';
 export 'src/particles.dart';
 export 'src/scene_model.dart';

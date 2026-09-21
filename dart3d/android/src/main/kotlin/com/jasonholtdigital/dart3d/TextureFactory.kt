@@ -105,9 +105,8 @@ object TextureFactory {
         }
         val ref = spec.optString("ref")
         if (ref.isNotEmpty()) {
-            val bytes = try {
-                host.context.assets.open(ref).use { it.readBytes() }
-            } catch (e: Exception) {
+            val bytes = FlutterAssets.readBytes(host.context, ref)
+            if (bytes == null) {
                 logOnce("texture:$key:ref:$ref",
                     "texture $key: asset '$ref' not found")
                 return Result.Failed
