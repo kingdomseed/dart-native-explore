@@ -4569,14 +4569,15 @@ enum FsceneRealizer {
             sys.isLocal = true  // upstream simulates in node space
             sys.birthRate =
                 CGFloat(d3Double(props["emitRate"]) ?? 32)
-            // looping → emit forever. emissionDuration 0 +
-            // loops:false emits NOTHING on iOS 27 (device-proven),
-            // so looping maps to an infinite emission window; a
-            // finite run emits for `duration` then stops.
+            // looping → emit forever. SceneKit needs a FINITE
+            // positive emissionDuration on iOS 26.5 — 0 and
+            // .infinity both emit NOTHING (device-proven) — so
+            // looping maps to a ~11.6-day window with loops as a
+            // restart hedge; a finite run emits for `duration`.
             let looping = d3Bool(props["looping"]) ?? true
             sys.loops = looping
             sys.emissionDuration = looping
-                ? .infinity : CGFloat(d3Double(props["duration"]) ?? 5)
+                ? 1e6 : CGFloat(d3Double(props["duration"]) ?? 5)
             sys.warmupDuration =
                 CGFloat(d3Double(props["prewarm"]) ?? 0)
 
