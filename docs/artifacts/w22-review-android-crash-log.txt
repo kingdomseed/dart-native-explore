@@ -1,0 +1,66 @@
+W22 Android verification — crash log excerpts (Nothing A142, API 36, release build ddc4f6c)
+
+=== Fatal 1: 20:13:11 PID 25557 — golden fixture physical_layered ===
+22443:09-19 20:13:11.424  1587  1587 I adbd    : adbd service requested 'shell,v2,raw:echo physical_layered > /sdcard/Android/data/com.jasonholtdigital.dart3d_example/files/w22/control.txt'
+22459:09-19 20:13:11.567 25557 25557 I dartnative: w22: loading "physical_layered"
+22462:09-19 20:13:11.587 25557 25557 I dartnative: w22: loaded "physical_layered" — 8 nodes · 3 geo · 3 mat
+22463:09-19 20:13:11.605 25557 25557 E Filament: Error: material "d3_lit_e3" has feature level 1 and is using more than 9 samplers.
+22464:09-19 20:13:11.605 25557 25557 E Filament: "baseColorMap" sampler2d { vertex | fragment | COMPUTE }
+22465:09-19 20:13:11.605 25557 25557 E Filament: 
+22466:09-19 20:13:11.605 25557 25557 E Filament: "normalMap" sampler2d { vertex | fragment | COMPUTE }
+22467:09-19 20:13:11.605 25557 25557 E Filament: 
+09-19 20:13:11.608 25557 25557 D AndroidRuntime: Shutting down VM
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: FATAL EXCEPTION: main
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: Process: com.jasonholtdigital.dart3d_example, PID: 25557
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: java.lang.IllegalStateException: d3 material failed to compile
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: 	at n1.q.u(SourceFile:685)
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: 	at n1.K.c(SourceFile:754)
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: 	at n1.K.g(SourceFile:792)
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: 	at n1.q.a(SourceFile:1270)
+
+=== Fatal 2: 20:54:18 PID 26973 — xt_cb_cs (clearcoat+specular) ===
+09-19 20:54:18.593  1587  1587 I adbd    : adbd service requested 'shell,v2,raw:echo xt_cb_cs > /sdcard/Android/data/com.jasonholtdigital.dart3d_example/files/w22/control.txt'
+09-19 20:54:18.698 26973 26973 I dartnative: w22: loading "xt_cb_cs"
+09-19 20:54:18.699 26973 26973 I dartnative: w22: scratch doc "xt_cb_cs" — 5 nodes · 2 geo · 2 mat · 2 tex
+09-19 20:54:18.702 26973 26973 I dartnative: w22: loaded "xt_cb_cs" — 5 nodes · 2 geo · 2 mat · 2 tex
+09-19 20:54:18.719 26973 26973 E Filament: Error: material "d3_lit_e5" has feature level 1 and is using more than 9 samplers.
+09-19 20:54:18.719 26973 26973 E Filament: "baseColorMap" sampler2d { vertex | fragment | COMPUTE }
+
+=== Fatal 3: 20:55:12 PID 27574 — stale control re-crash xt_cb_cs ===
+09-19 20:55:12.768 27574 27574 I dartnative: w22: loading "xt_cb_cs"
+09-19 20:55:12.768 27574 27574 I dartnative: w22: scratch doc "xt_cb_cs" — 5 nodes · 2 geo · 2 mat · 2 tex
+09-19 20:55:12.769 27574 27574 I dartnative: w22: loaded "xt_cb_cs" — 5 nodes · 2 geo · 2 mat · 2 tex
+09-19 20:55:12.775 27574 27574 E Filament: Error: material "d3_lit_e5" has feature level 1 and is using more than 9 samplers.
+09-19 20:55:12.775 27574 27574 E Filament: "baseColorMap" sampler2d { vertex | fragment | COMPUTE }
+09-19 20:55:12.775 27574 27574 E Filament: 
+
+=== Fatal 4: 20:57:24 PID 27860 — xt_cb_ct (clearcoat+transmission) ===
+09-19 20:57:24.504 27860 27860 I dartnative: w22: loading "xt_cb_ct"
+09-19 20:57:24.504 27860 27860 I dartnative: w22: scratch doc "xt_cb_ct" — 5 nodes · 2 geo · 2 mat · 2 tex
+09-19 20:57:24.505 27860 27860 I dartnative: w22: loaded "xt_cb_ct" — 5 nodes · 2 geo · 2 mat · 2 tex
+09-19 20:57:24.511 27860 27860 E Filament: Error: material "d3_lit_e33" has feature level 1 and is using more than 8 samplers.
+09-19 20:57:24.511 27860 27860 E Filament: "baseColorMap" sampler2d { vertex | fragment | COMPUTE }
+09-19 20:57:24.511 27860 27860 E Filament: 
+
+=== Stack (representative, PID 25557) ===
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: FATAL EXCEPTION: main
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: Process: com.jasonholtdigital.dart3d_example, PID: 25557
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: java.lang.IllegalStateException: d3 material failed to compile
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: 	at n1.q.u(SourceFile:685)
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: 	at n1.K.c(SourceFile:754)
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: 	at n1.K.g(SourceFile:792)
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: 	at n1.q.a(SourceFile:1270)
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: 	at n1.g.invoke(SourceFile:8)
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: 	at n1.o.doFrame(SourceFile:3522)
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: 	at android.view.Choreographer$CallbackRecord.run(Choreographer.java:1870)
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: 	at android.view.Choreographer$CallbackRecord.run(Choreographer.java:1881)
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: 	at android.view.Choreographer.doCallbacks(Choreographer.java:1427)
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: 	at android.view.Choreographer.doFrame(Choreographer.java:1305)
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: 	at android.view.Choreographer$FrameDisplayEventReceiver.run(Choreographer.java:1848)
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:995)
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:103)
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: 	at android.os.Looper.loopOnce(Looper.java:283)
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:392)
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: 	at android.app.ActivityThread.main(ActivityThread.java:9231)
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+09-19 20:13:11.613 25557 25557 E AndroidRuntime: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:633)

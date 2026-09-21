@@ -180,6 +180,45 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             return catcherMaterialBacking
         }
 
+    /**
+     * W22: KHR_materials_* feature variants, built lazily — a material
+     * resource's extension set picks its compiled variant. The six
+     * prebuilts cover extFlags==0; anything beyond compiles on first
+     * use inside the render callback (same lane as every decode), so
+     * views that never see an extension material pay nothing.
+     *
+     * W22-r3: [VariantKey.boundSlots] is the bound-texture mask
+     * (FsceneRealizer.boundTextureMask) — the variant declares
+     * samplers only for those slots, because Filament's FL1 cap
+     * counts *declared* samplers, not bound textures.
+     */
+    internal data class VariantKey(
+        val unlit: Boolean,
+        val alphaMode: String,
+        val extFlags: Int,
+        val boundSlots: Int,
+    )
+    internal val materialVariants = HashMap<VariantKey, Material>()
+
+    /**
+     * What a `materialForVariant` request resolved to. A request that
+     * can't compile — over the sampler cap or a filamat/build failure
+     * — degrades to the matching base prebuilt: [material] is that
+     * prebuilt and [extFlags]/[boundSlots] collapse to the base
+     * contract, so the instance decode never writes or binds a
+     * parameter the shader lacks.
+     */
+    data class VariantPick(
+        val material: Material,
+        val extFlags: Int,
+        val boundSlots: Int,
+    )
+
+    /** Variant keys whose compile already failed — logged once via
+     * warnOnce and degraded; kept out of [materialVariants] so the
+     * destroy pass never double-frees a shared base prebuilt. */
+    private val failedVariants = HashSet<VariantKey>()
+
     // MARK: - Jolt world
 
     val world = JoltWorld()
@@ -360,6 +399,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     // One-shot log dedup for command ops (spec: unknown upsert kinds
     // and unclaimed payloads log once, not per send).
     private val commandLoggedOnce = HashSet<String>()
+    // Same convention for view-level warnings — W22-r3 variant
+    // degrades warn once per bad variant, never per material.
+    private val warnedOnce = HashSet<String>()
     private var simTick = 0
     private var sawHello = false
     private var warnedNoHello = false
@@ -461,18 +503,34 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         surfaceView.setOnTouchListener { _, event ->
             gestureDetector?.let { it.onTouchEvent(event); true } ?: false
         }
-        litMaterial = buildMaterial(unlit = false,
-            MaterialBuilder.BlendingMode.OPAQUE)
-        litMaskedMaterial = buildMaterial(unlit = false,
-            MaterialBuilder.BlendingMode.MASKED)
-        litBlendMaterial = buildMaterial(unlit = false,
-            MaterialBuilder.BlendingMode.TRANSPARENT)
-        unlitMaterial = buildMaterial(unlit = true,
-            MaterialBuilder.BlendingMode.OPAQUE)
-        unlitMaskedMaterial = buildMaterial(unlit = true,
-            MaterialBuilder.BlendingMode.MASKED)
-        unlitBlendMaterial = buildMaterial(unlit = true,
-            MaterialBuilder.BlendingMode.TRANSPARENT)
+        // The six prebuilts declare every base slot (instances bind
+        // 1×1 fallbacks, so all five stay sampled) — boundSlots is
+        // the full base mask. A prebuilt that can't compile leaves
+        // nothing to fall back to; the check stays fatal there.
+        litMaterial = checkNotNull(buildMaterial(unlit = false,
+            MaterialBuilder.BlendingMode.OPAQUE, 0,
+            FsceneRealizer.ALL_BASE_SLOTS))
+            { "d3 material failed to compile" }
+        litMaskedMaterial = checkNotNull(buildMaterial(unlit = false,
+            MaterialBuilder.BlendingMode.MASKED, 0,
+            FsceneRealizer.ALL_BASE_SLOTS))
+            { "d3 material failed to compile" }
+        litBlendMaterial = checkNotNull(buildMaterial(unlit = false,
+            MaterialBuilder.BlendingMode.TRANSPARENT, 0,
+            FsceneRealizer.ALL_BASE_SLOTS))
+            { "d3 material failed to compile" }
+        unlitMaterial = checkNotNull(buildMaterial(unlit = true,
+            MaterialBuilder.BlendingMode.OPAQUE, 0,
+            FsceneRealizer.ALL_BASE_SLOTS))
+            { "d3 material failed to compile" }
+        unlitMaskedMaterial = checkNotNull(buildMaterial(unlit = true,
+            MaterialBuilder.BlendingMode.MASKED, 0,
+            FsceneRealizer.ALL_BASE_SLOTS))
+            { "d3 material failed to compile" }
+        unlitBlendMaterial = checkNotNull(buildMaterial(unlit = true,
+            MaterialBuilder.BlendingMode.TRANSPARENT, 0,
+            FsceneRealizer.ALL_BASE_SLOTS))
+            { "d3 material failed to compile" }
         // The materials are compiled double-sided-capable; keep the
         // default single-sided unless a resource's doubleSided says so.
         for (m in arrayOf(litMaterial, litMaskedMaterial, litBlendMaterial,
@@ -497,6 +555,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // PCF) keeps a soft edge at fixed-kernel cost — PCSS's blocker
         // search runs ~300ms/frame on Mali at these world scales.
         view.setShadowType(View.ShadowType.DPCF)
+        // W22: KHR_materials_transmission variants render through
+        // screen-space refraction — without the flag Filament skips
+        // the refraction pass even for refraction-enabled materials.
+        view.setScreenSpaceRefractionEnabled(true)
         applyClearColor()
 
         uiHelper.renderCallback = object : UiHelper.RendererCallback {
@@ -542,10 +604,96 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             else -> if (unlit) unlitMaterial else litMaterial
         }
 
+    private fun blendingForMode(alphaMode: String) =
+        when (alphaMode.lowercase()) {
+            "mask" -> MaterialBuilder.BlendingMode.MASKED
+            "blend" -> MaterialBuilder.BlendingMode.TRANSPARENT
+            else -> MaterialBuilder.BlendingMode.OPAQUE
+        }
+
+    /**
+     * Filament feature level 1 sampler cap — *declared* samplers in
+     * the compiled material. Screen-space refraction reserves one,
+     * so a transmission-armed variant caps at 8.
+     */
+    private fun samplerCapFor(extFlags: Int) =
+        if (extFlags and FsceneRealizer.EXT_TRANSMISSION != 0) 8 else 9
+
+    /**
+     * Picks (or lazily compiles) the variant carrying [extFlags]'s
+     * KHR_materials_* features, declaring samplers only for the
+     * [boundSlots] texture set. Unlit materials ignore extensions on
+     * the wire, so flags only apply to lit variants; flag-less
+     * requests short-circuit onto the six prebuilts. Compilation
+     * happens on first use inside the render callback — the same lane
+     * every other decode runs on.
+     *
+     * A request that can't produce a compilable variant — a bound
+     * set over the FL1 sampler cap, or a filamat/engine failure —
+     * warns once and degrades to the matching base prebuilt: the
+     * scene renders the base PBR material instead of fataling.
+     */
+    fun materialForVariant(
+        unlit: Boolean,
+        alphaMode: String,
+        extFlags: Int,
+        boundSlots: Int,
+    ): VariantPick {
+        val flags = if (unlit) 0 else extFlags
+        fun base() = VariantPick(
+            materialForAlphaMode(unlit, alphaMode), 0,
+            if (unlit) 1 else FsceneRealizer.ALL_BASE_SLOTS)
+        if (flags == 0) return base()
+        val mode = alphaMode.lowercase()
+        val key = VariantKey(unlit, mode, flags, boundSlots)
+        materialVariants[key]?.let {
+            return VariantPick(it, flags, boundSlots)
+        }
+        // Over-cap bound sets compile nothing — degrade before
+        // filamat sees a package it must reject.
+        if (boundSlots.countOneBits() > samplerCapFor(flags)) {
+            warnOnce("variant.e$flags.s$boundSlots.cap",
+                "material variant d3_lit_e$flags/$mode binds " +
+                    "${boundSlots.countOneBits()} texture slots —" +
+                    " over the FL1 sampler cap of" +
+                    " ${samplerCapFor(flags)}; degrading to base" +
+                    " d3_lit (extension lobes dropped)")
+            return base()
+        }
+        if (key in failedVariants) return base()
+        val built = try {
+            buildMaterial(unlit, blendingForMode(mode), flags,
+                boundSlots)
+        } catch (e: Exception) {
+            null
+        }
+        if (built == null) {
+            failedVariants.add(key)
+            warnOnce("variant.e$flags.s$boundSlots.compile",
+                "material variant d3_lit_e$flags/$mode failed to" +
+                    " compile — degrading to base d3_lit" +
+                    " (extension lobes dropped)")
+            return base()
+        }
+        materialVariants[key] = built
+        return VariantPick(built, flags, boundSlots)
+    }
+
+    private fun warnOnce(tag: String, msg: String) {
+        if (warnedOnce.add(tag)) Log.w(TAG, msg)
+    }
+
+    /**
+     * Compiles one material package. Returns null when filamat or the
+     * engine rejects it — the caller degrades (variants) or fatals
+     * (the six prebuilts, which have no fallback).
+     */
     private fun buildMaterial(
         unlit: Boolean,
         blending: MaterialBuilder.BlendingMode,
-    ): Material {
+        extFlags: Int = 0,
+        boundSlots: Int = 0,
+    ): Material? {
         // MaterialBuilder.init() is a one-time static init of the
         // filamat backend — the builder itself is a fresh instance.
         if (!filamatReady) {
@@ -557,6 +705,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             MaterialBuilder.BlendingMode.MASKED -> "_mask"
             else -> "_blend"
         }
+        val extSuffix = if (extFlags != 0) "_e$extFlags" else ""
         val b = MaterialBuilder()
             .platform(MaterialBuilder.Platform.MOBILE)
             // W30: SPIR-V under Vulkan, GLSL under OpenGL — matched to
@@ -565,7 +714,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             .targetApi(if (engine.backend == Engine.Backend.VULKAN)
                 MaterialBuilder.TargetApi.VULKAN
                 else MaterialBuilder.TargetApi.OPENGL)
-            .name((if (unlit) "d3_unlit" else "d3_lit") + blendSuffix)
+            .name((if (unlit) "d3_unlit" else "d3_lit") + blendSuffix +
+                extSuffix)
             .shading(if (unlit) MaterialBuilder.Shading.UNLIT
                 else MaterialBuilder.Shading.LIT)
             // Baked capability so MaterialInstance.setDoubleSided works —
@@ -573,10 +723,28 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             // resource opts in (glTF/SceneKit default).
             .doubleSided(true)
             .blending(blending)
-            // W21: every mesh record carries uv1 (zero-filled when the
-            // wire layout lacks it), so the slot's `texCoord` can pick
-            // either channel per texture.
-            .require(MaterialBuilder.VertexAttribute.UV0)
+        if (extFlags and FsceneRealizer.EXT_TRANSMISSION != 0) {
+            // KHR_materials_transmission → screen-space refraction;
+            // KHR_materials_volume (thickness>0) upgrades the variant
+            // to SOLID so `material.thickness`/`dispersion` are legal
+            // — THIN reads the same thickness uniform as
+            // `microThickness`.
+            b.refractionMode(MaterialBuilder.RefractionMode.SCREEN_SPACE)
+                .refractionType(
+                    if (extFlags and FsceneRealizer.EXT_VOLUME_SOLID != 0)
+                        MaterialBuilder.RefractionType.SOLID
+                    else MaterialBuilder.RefractionType.THIN)
+        }
+        if (extFlags and FsceneRealizer.EXT_CLEARCOAT != 0) {
+            // glTF's fixed-IOR (1.5) coat attenuates the lobes beneath
+            // it — Filament models exactly that attenuation under
+            // clearCoatIorChange.
+            b.clearCoatIorChange(true)
+        }
+        // W21: every mesh record carries uv1 (zero-filled when the
+        // wire layout lacks it), so the slot's `texCoord` can pick
+        // either channel per texture.
+        b.require(MaterialBuilder.VertexAttribute.UV0)
             .require(MaterialBuilder.VertexAttribute.UV1)
             .uniformParameter(MaterialBuilder.UniformType.FLOAT4, "baseColor")
             .uniformParameter(MaterialBuilder.UniformType.FLOAT4,
@@ -585,9 +753,22 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 "baseColorUVRotation")
             .uniformParameter(MaterialBuilder.UniformType.FLOAT,
                 "baseColorUVSet")
-            .samplerParameter(MaterialBuilder.SamplerType.SAMPLER_2D,
+        // W22-r3: one declared sampler per *bound* texture slot —
+        // Filament's FL1 cap counts declarations, so an extension
+        // flag must not cost the slots the material leaves unbound.
+        // The body below emits the matching factor-only term for
+        // unbound slots. Prebuilts pass ALL_BASE_SLOTS: their
+        // instances bind 1×1 fallbacks everywhere, keeping every
+        // declared sampler sampled.
+        val baseSlotCount =
+            if (unlit) 1 else FsceneRealizer.BASE_TEXTURE_SLOTS.size
+        for (i in 0 until baseSlotCount) {
+            if (boundSlots and (1 shl i) == 0) continue
+            b.samplerParameter(MaterialBuilder.SamplerType.SAMPLER_2D,
                 MaterialBuilder.SamplerFormat.FLOAT,
-                MaterialBuilder.ParameterPrecision.DEFAULT, "baseColorMap")
+                MaterialBuilder.ParameterPrecision.DEFAULT,
+                FsceneRealizer.BASE_TEXTURE_SLOTS[i].param)
+        }
         if (!unlit) {
             b.require(MaterialBuilder.VertexAttribute.TANGENTS)
                 .uniformParameter(MaterialBuilder.UniformType.FLOAT, "metallic")
@@ -624,19 +805,45 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     "emissiveUVRotation")
                 .uniformParameter(MaterialBuilder.UniformType.FLOAT,
                     "emissiveUVSet")
-                .samplerParameter(MaterialBuilder.SamplerType.SAMPLER_2D,
-                    MaterialBuilder.SamplerFormat.FLOAT,
-                    MaterialBuilder.ParameterPrecision.DEFAULT, "normalMap")
-                .samplerParameter(MaterialBuilder.SamplerType.SAMPLER_2D,
-                    MaterialBuilder.SamplerFormat.FLOAT,
-                    MaterialBuilder.ParameterPrecision.DEFAULT,
-                    "metallicRoughnessMap")
-                .samplerParameter(MaterialBuilder.SamplerType.SAMPLER_2D,
-                    MaterialBuilder.SamplerFormat.FLOAT,
-                    MaterialBuilder.ParameterPrecision.DEFAULT, "occlusionMap")
-                .samplerParameter(MaterialBuilder.SamplerType.SAMPLER_2D,
-                    MaterialBuilder.SamplerFormat.FLOAT,
-                    MaterialBuilder.ParameterPrecision.DEFAULT, "emissiveMap")
+            // W22: extension slots/factors come from the same registry
+            // buildMaterialInstance walks — the builder declares what
+            // the decode writes, so the shader vocabulary can't drift.
+            // UV uniforms stay flag-gated (uniforms don't hit the
+            // sampler cap); samplers are bound-only.
+            for ((i, slot) in FsceneRealizer.EXT_TEXTURE_SLOTS.withIndex()) {
+                if (extFlags and slot.flag == 0) continue
+                b.uniformParameter(MaterialBuilder.UniformType.FLOAT4,
+                    "${slot.prefix}UVTransform")
+                    .uniformParameter(MaterialBuilder.UniformType.FLOAT,
+                        "${slot.prefix}UVRotation")
+                    .uniformParameter(MaterialBuilder.UniformType.FLOAT,
+                        "${slot.prefix}UVSet")
+                if (boundSlots and FsceneRealizer.extSlotBit(i) != 0) {
+                    b.samplerParameter(
+                        MaterialBuilder.SamplerType.SAMPLER_2D,
+                        MaterialBuilder.SamplerFormat.FLOAT,
+                        MaterialBuilder.ParameterPrecision.DEFAULT,
+                        "${slot.prefix}Map")
+                }
+            }
+            for (f in FsceneRealizer.EXT_FACTORS) {
+                if (extFlags and f.mask == 0) continue
+                b.uniformParameter(
+                    if (f.isColor) MaterialBuilder.UniformType.FLOAT4
+                    else MaterialBuilder.UniformType.FLOAT, f.uniform)
+            }
+            if (extFlags and FsceneRealizer.EXT_TRANSMISSION != 0) {
+                b.uniformParameter(MaterialBuilder.UniformType.FLOAT3,
+                    "absorption")
+            }
+            if (extFlags and FsceneRealizer.EXT_ANISOTROPY != 0) {
+                // 1 when an anisotropyTexture drives the direction —
+                // the flat-normal fallback decodes to direction (0,0),
+                // which normalize() would turn into NaN, so the shader
+                // mixes the tangent-space +X default in instead.
+                b.uniformParameter(MaterialBuilder.UniformType.FLOAT,
+                    "anisotropyUseMap")
+            }
         }
         // Per-slot UV transform (KHR_texture_transform):
         //   uv' = offset + R(rotation)·(scale ⊙ uv)
@@ -644,44 +851,245 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // column-major args so (c,s,-s,c) is the standard CCW rotation.
         // Wire UVs are V=0-top (glTF/SceneKit) and uploads land top-row-
         // first at texel v=0, so no flipUV — see the report.
+        fun slotBound(i: Int) = boundSlots and (1 shl i) != 0
+        fun extBound(i: Int) =
+            boundSlots and FsceneRealizer.extSlotBit(i) != 0
         val body = StringBuilder()
             .append("void material(inout MaterialInputs material) {\n")
             .append("    vec2 uv0 = getUV0();\n")
             .append("    vec2 uv1 = getUV1();\n")
-            .append(uvBlock("baseColor"))
-            .append("    material.baseColor = materialParams.baseColor" +
-                " * texture(materialParams_baseColorMap, baseColorUv);\n")
+        if (slotBound(0)) {
+            body.append(uvBlock("baseColor"))
+                .append("    material.baseColor = materialParams.baseColor" +
+                    " * texture(materialParams_baseColorMap, baseColorUv);\n")
+        } else {
+            body.append("    material.baseColor = materialParams" +
+                ".baseColor;\n")
+        }
         if (!unlit) {
-            body.append(uvBlock("mr"))
-                .append("    vec4 mrTex = texture(" +
-                    "materialParams_metallicRoughnessMap, mrUv);\n")
-                .append("    material.metallic = mrTex.b" +
-                    " * materialParams.metallic;\n")
-                .append("    material.roughness = mrTex.g" +
-                    " * materialParams.roughness;\n")
-                .append(uvBlock("occlusion"))
-                .append("    material.ambientOcclusion = mix(1.0," +
-                    " texture(materialParams_occlusionMap, occlusionUv).r," +
-                    " materialParams.occlusionStrength);\n")
-                .append(uvBlock("normal"))
-                .append("    vec3 nTex = texture(materialParams_normalMap," +
-                    " normalUv).xyz * 2.0 - 1.0;\n")
-                .append("    material.normal = normalize(vec3(" +
-                    "nTex.xy * materialParams.normalScale, nTex.z));\n")
-                .append(uvBlock("emissive"))
-                .append("    material.emissive = vec4(" +
-                    "materialParams.emissiveColor.rgb *" +
-                    " texture(materialParams_emissiveMap, emissiveUv).rgb *" +
-                    " materialParams.emissiveStrength, 0.0);\n")
+            if (slotBound(2)) {
+                body.append(uvBlock("mr"))
+                    .append("    vec4 mrTex = texture(" +
+                        "materialParams_metallicRoughnessMap, mrUv);\n")
+                    .append("    material.metallic = mrTex.b" +
+                        " * materialParams.metallic;\n")
+                    .append("    material.roughness = mrTex.g" +
+                        " * materialParams.roughness;\n")
+            } else {
+                body.append("    material.metallic = materialParams" +
+                    ".metallic;\n")
+                    .append("    material.roughness = materialParams" +
+                        ".roughness;\n")
+            }
+            if (slotBound(3)) {
+                body.append(uvBlock("occlusion"))
+                    .append("    material.ambientOcclusion = mix(1.0," +
+                        " texture(materialParams_occlusionMap," +
+                        " occlusionUv).r," +
+                        " materialParams.occlusionStrength);\n")
+            } else {
+                body.append("    material.ambientOcclusion = 1.0;\n")
+            }
+            if (slotBound(1)) {
+                body.append(uvBlock("normal"))
+                    .append("    vec3 nTex = texture(" +
+                        "materialParams_normalMap, normalUv).xyz" +
+                        " * 2.0 - 1.0;\n")
+                    .append("    material.normal = normalize(vec3(" +
+                        "nTex.xy * materialParams.normalScale, nTex.z));\n")
+            } else {
+                body.append("    material.normal =" +
+                    " vec3(0.0, 0.0, 1.0);\n")
+            }
+            if (slotBound(4)) {
+                body.append(uvBlock("emissive"))
+                    .append("    material.emissive = vec4(" +
+                        "materialParams.emissiveColor.rgb *" +
+                        " texture(materialParams_emissiveMap," +
+                        " emissiveUv).rgb *" +
+                        " materialParams.emissiveStrength, 0.0);\n")
+            } else {
+                // fallbackEmissive is black — a texture-less emissive
+                // reads as off (pre-r3 semantics, preserved).
+                body.append("    material.emissive = vec4(0.0);\n")
+            }
+            // W22: extension lobes — one block per feature flag, each
+            // factor×texture matching the glTF channel spec. The
+            // slot-prefixed uvBlocks carry KHR_texture_transform per
+            // extension texture.
+            if (extFlags and FsceneRealizer.EXT_CLEARCOAT != 0) {
+                if (extBound(0)) {
+                    body.append(uvBlock("clearCoat"))
+                        .append("    material.clearCoat = materialParams" +
+                            ".clearCoat * texture(materialParams" +
+                            "_clearCoatMap, clearCoatUv).r;\n")
+                } else {
+                    body.append("    material.clearCoat = materialParams" +
+                        ".clearCoat;\n")
+                }
+                if (extBound(1)) {
+                    body.append(uvBlock("clearCoatRoughness"))
+                        .append("    material.clearCoatRoughness =" +
+                            " materialParams.clearCoatRoughness *" +
+                            " texture(materialParams" +
+                            "_clearCoatRoughnessMap," +
+                            " clearCoatRoughnessUv).g;\n")
+                } else {
+                    body.append("    material.clearCoatRoughness =" +
+                        " materialParams.clearCoatRoughness;\n")
+                }
+                if (extBound(2)) {
+                    body.append(uvBlock("clearCoatNormal"))
+                        .append("    vec3 ccN = texture(materialParams" +
+                            "_clearCoatNormalMap, clearCoatNormalUv).xyz" +
+                            " * 2.0 - 1.0;\n")
+                        .append("    material.clearCoatNormal = normalize(" +
+                            "vec3(ccN.xy * materialParams" +
+                            ".clearCoatNormalScale, ccN.z));\n")
+                } else {
+                    body.append("    material.clearCoatNormal =" +
+                        " vec3(0.0, 0.0, 1.0);\n")
+                }
+            }
+            if (extFlags and FsceneRealizer.EXT_SHEEN != 0) {
+                if (extBound(3)) {
+                    body.append(uvBlock("sheenColor"))
+                        .append("    material.sheenColor = materialParams" +
+                            ".sheenColor.rgb * texture(materialParams" +
+                            "_sheenColorMap, sheenColorUv).rgb;\n")
+                } else {
+                    body.append("    material.sheenColor = materialParams" +
+                        ".sheenColor.rgb;\n")
+                }
+                if (extBound(4)) {
+                    body.append(uvBlock("sheenRoughness"))
+                        .append("    material.sheenRoughness =" +
+                            " materialParams.sheenRoughness * texture(" +
+                            "materialParams_sheenRoughnessMap," +
+                            " sheenRoughnessUv).a;\n")
+                } else {
+                    body.append("    material.sheenRoughness =" +
+                        " materialParams.sheenRoughness;\n")
+                }
+            }
+            if (extFlags and FsceneRealizer.EXT_SPECULAR != 0) {
+                if (extBound(5)) {
+                    body.append(uvBlock("specular"))
+                        .append("    material.specularFactor =" +
+                            " materialParams.specularFactor * texture(" +
+                            "materialParams_specularMap, specularUv).a;\n")
+                } else {
+                    body.append("    material.specularFactor =" +
+                        " materialParams.specularFactor;\n")
+                }
+                if (extBound(6)) {
+                    body.append(uvBlock("specularColor"))
+                        .append("    material.specularColorFactor =" +
+                            " materialParams.specularColorFactor.rgb *" +
+                            " texture(materialParams_specularColorMap," +
+                            " specularColorUv).rgb;\n")
+                } else {
+                    body.append("    material.specularColorFactor =" +
+                        " materialParams.specularColorFactor.rgb;\n")
+                }
+            }
+            if (extFlags and FsceneRealizer.EXT_ANISOTROPY != 0) {
+                // glTF packs the tangent-space direction in rg
+                // ([0,1]→[-1,1]) and the strength in b; the factor's
+                // rotation applies on top in the same space.
+                body.append("    float aCos = cos(materialParams" +
+                    ".anisotropyRotation);\n")
+                    .append("    float aSin = sin(materialParams" +
+                        ".anisotropyRotation);\n")
+                if (extBound(7)) {
+                    body.append(uvBlock("anisotropy"))
+                        .append("    vec4 aTex = texture(materialParams" +
+                            "_anisotropyMap, anisotropyUv);\n")
+                        .append("    vec2 aBase = mix(vec2(1.0, 0.0)," +
+                            " aTex.rg * 2.0 - 1.0, materialParams" +
+                            ".anisotropyUseMap);\n")
+                        .append("    vec2 aDir = mat2(aCos, aSin," +
+                            " -aSin, aCos) * aBase;\n")
+                        .append("    material.anisotropy =" +
+                            " materialParams.anisotropy * aTex.b;\n")
+                } else {
+                    body.append("    vec2 aDir = mat2(aCos, aSin," +
+                        " -aSin, aCos) * vec2(1.0, 0.0);\n")
+                        .append("    material.anisotropy =" +
+                            " materialParams.anisotropy;\n")
+                }
+                body.append("    material.anisotropyDirection = vec3(" +
+                    "aDir, 0.0);\n")
+            }
+            if (extFlags and FsceneRealizer.EXT_TRANSMISSION != 0) {
+                if (extBound(8)) {
+                    body.append(uvBlock("transmission"))
+                        .append("    material.transmission =" +
+                            " materialParams.transmission * texture(" +
+                            "materialParams_transmissionMap," +
+                            " transmissionUv).r;\n")
+                } else {
+                    body.append("    material.transmission =" +
+                        " materialParams.transmission;\n")
+                }
+                body.append("    material.ior = materialParams.ior;\n")
+                    .append("    material.absorption = materialParams" +
+                        ".absorption;\n")
+                if (extFlags and FsceneRealizer.EXT_VOLUME_SOLID != 0) {
+                    if (extBound(9)) {
+                        body.append(uvBlock("thickness"))
+                            .append("    material.thickness =" +
+                                " materialParams.thickness * texture(" +
+                                "materialParams_thicknessMap," +
+                                " thicknessUv).g;\n")
+                    } else {
+                        body.append("    material.thickness =" +
+                            " materialParams.thickness;\n")
+                    }
+                    if (extFlags and FsceneRealizer.EXT_DISPERSION != 0) {
+                        body.append("    material.dispersion =" +
+                            " materialParams.dispersion;\n")
+                    }
+                } else {
+                    // THIN has no `thickness` field — the same uniform
+                    // feeds microThickness (Filament ignores
+                    // thickness/dispersion on thin volumes).
+                    if (extBound(9)) {
+                        body.append(uvBlock("thickness"))
+                            .append("    material.microThickness =" +
+                                " materialParams.thickness * texture(" +
+                                "materialParams_thicknessMap," +
+                                " thicknessUv).g;\n")
+                    } else {
+                        body.append("    material.microThickness =" +
+                            " materialParams.thickness;\n")
+                    }
+                }
+            } else if (extFlags and FsceneRealizer.EXT_IOR != 0) {
+                // KHR_materials_ior without transmission still applies
+                // — Filament accepts `ior` as an alternative to
+                // reflectance on lit materials.
+                body.append("    material.ior = materialParams.ior;\n")
+            }
         }
         // prepareMaterial must run AFTER material.normal is set — it
         // snapshots shading_normal through the tangent frame at call time.
         body.append("    prepareMaterial(material);\n}\n")
-        val pkg = b.material(body.toString()).build()
-        check(pkg.isValid) { "d3 material failed to compile" }
-        return Material.Builder()
-            .payload(pkg.buffer, pkg.buffer.remaining())
-            .build(engine)
+        // W22-r3: no check→fatal — a rejected package returns null
+        // and the caller degrades to a base prebuilt (warn-once).
+        val pkg = try {
+            b.material(body.toString()).build()
+        } catch (e: Exception) {
+            null
+        }
+        if (pkg == null || !pkg.isValid) return null
+        return try {
+            Material.Builder()
+                .payload(pkg.buffer, pkg.buffer.remaining())
+                .build(engine)
+        } catch (e: Exception) {
+            null
+        }
     }
 
     /**
@@ -1164,6 +1572,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             engine.destroyMaterial(unlitMaskedMaterial)
             engine.destroyMaterial(unlitBlendMaterial)
             catcherMaterialBacking?.let { engine.destroyMaterial(it) }
+            for ((_, m) in materialVariants) engine.destroyMaterial(m)
+            materialVariants.clear()
             engine.destroyRenderer(renderer)
             engine.destroyView(view)
             engine.destroyScene(scene)
