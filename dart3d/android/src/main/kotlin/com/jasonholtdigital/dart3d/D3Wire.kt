@@ -159,19 +159,30 @@ object D3Wire {
 
 fun JSONObject.tag(key: String): Any? = opt(key)
 
+// All d3* readers accept the bare (untagged) JSON upstream's
+// `_encodeProcedural` emits — raw bools/numbers/strings, `[[x,y,z],…]`
+// lists, plain maps — alongside our tagged {'d':…}-style envelopes.
+// Tagged wins when both parse.
+
 fun Any?.d3Bool(): Boolean? =
-    (this as? JSONObject)?.optBoolean("b")
+    (this as? JSONObject)?.optBoolean("b") ?: (this as? Boolean)
 
 fun Any?.d3Double(): Double? {
-    val o = this as? JSONObject ?: return null
-    val raw = if (o.has("d")) o.opt("d") else o.opt("i") ?: return null
-    return (raw as? Number)?.toDouble()
+    val o = this as? JSONObject
+    if (o != null) {
+        val raw = if (o.has("d")) o.opt("d") else o.opt("i")
+        (raw as? Number)?.let { return it.toDouble() }
+    }
+    return (this as? Number)?.toDouble()
 }
 
 fun Any?.d3Int(): Int? {
-    val o = this as? JSONObject ?: return null
-    val raw = if (o.has("i")) o.opt("i") else o.opt("d") ?: return null
-    return (raw as? Number)?.toInt()
+    val o = this as? JSONObject
+    if (o != null) {
+        val raw = if (o.has("i")) o.opt("i") else o.opt("d")
+        (raw as? Number)?.let { return it.toInt() }
+    }
+    return (this as? Number)?.toInt()
 }
 
 // Procedural spec fields (e.g. cuboid `extents`) serialize as bare
@@ -191,10 +202,12 @@ fun Any?.d3Vec4(): DoubleArray? =
 
 fun Any?.d3String(): String? =
     (this as? JSONObject)?.optString("s")?.takeIf { it.isNotEmpty() }
+        ?: (this as? String)
 
 fun Any?.d3Color(): FloatArray? {
-    val a = (this as? JSONObject)?.optJSONArray("c") ?: return null
-    if (a.length() != 4) return null
+    val a = (this as? JSONObject)?.optJSONArray("c")
+        ?: (this as? JSONArray)
+    if (a == null || a.length() != 4) return null
     return FloatArray(4) { a.optDouble(it).toFloat() }
 }
 
@@ -206,11 +219,24 @@ fun Any?.d3Ref(): Long? {
 }
 
 fun Any?.d3List(): JSONArray? =
-    (this as? JSONObject)?.optJSONArray("list")
+    (this as? JSONObject)?.optJSONArray("list") ?: (this as? JSONArray)
 
-/** MapValue — `{'map': {key: taggedValue, ...}}`. */
-fun Any?.d3Map(): JSONObject? =
-    (this as? JSONObject)?.optJSONObject("map")
+/** Single-key tag envelopes — a bare map holding only e.g.
+ *  {"d": 5} is a scalar envelope, not a map. */
+private val envelopeKeys = setOf(
+    "b", "d", "i", "v2", "v3", "v4", "q", "c", "s", "m4",
+    "list", "map", "rref", "nref",
+)
+
+/** MapValue — `{'map': {key: taggedValue, ...}}`, or a bare
+ *  (untagged) JSON object as upstream's _encodeProcedural emits. */
+fun Any?.d3Map(): JSONObject? {
+    val o = this as? JSONObject ?: return null
+    o.optJSONObject("map")?.let { return it }
+    if (o.length() == 1 && envelopeKeys.contains(o.keys().next()))
+        return null
+    return o
+}
 
 /**
  * Ordered (geometryKey, materialKey) pairs of a `mesh` component's

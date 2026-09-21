@@ -28,9 +28,14 @@ enum GeometryFactory {
 
     // MARK: - SCNGeometry assembly
 
+    /// [stride] must be the ELEMENT stride of the source buffer —
+    /// `[SIMD3<Float>]` is 16 B (padded), not 12. Passing the packed
+    /// `components*4` reads a padding lane + shifted components for
+    /// every vertex past index 0.
     private static func floatSource(_ values: UnsafeRawBufferPointer,
                                     _ semantic: SCNGeometrySource.Semantic,
-                                    _ count: Int, _ components: Int)
+                                    _ count: Int, _ components: Int,
+                                    stride: Int? = nil)
         -> SCNGeometrySource
     {
         SCNGeometrySource(
@@ -41,7 +46,7 @@ enum GeometryFactory {
             componentsPerVector: components,
             bytesPerComponent: MemoryLayout<Float>.size,
             dataOffset: 0,
-            dataStride: components * MemoryLayout<Float>.size)
+            dataStride: stride ?? components * MemoryLayout<Float>.size)
     }
 
     /// Builds an `SCNGeometry` from [parts] — vertex/normal/texcoord/
@@ -49,17 +54,20 @@ enum GeometryFactory {
     /// sources the payload decoder emits, so materials bind
     /// identically on procedural and payload meshes.
     static func makeGeometry(_ parts: MeshParts) -> SCNGeometry {
+        guard parts.vertexCount > 0 else { return SCNGeometry() }
         var sources = [SCNGeometrySource]()
         parts.positions.withUnsafeBufferPointer {
             sources.append(floatSource(
                 UnsafeRawBufferPointer($0), .vertex,
-                parts.vertexCount, 3))
+                parts.vertexCount, 3,
+                stride: MemoryLayout<SIMD3<Float>>.stride))
         }
         if parts.normals.count == parts.vertexCount {
             parts.normals.withUnsafeBufferPointer {
                 sources.append(floatSource(
                     UnsafeRawBufferPointer($0), .normal,
-                    parts.vertexCount, 3))
+                    parts.vertexCount, 3,
+                    stride: MemoryLayout<SIMD3<Float>>.stride))
             }
         }
         if parts.uvs.count == parts.vertexCount {
@@ -774,6 +782,7 @@ enum GeometryFactory {
         _ points: [SIMD3<Float>], radius: Float, radialSegments: Int,
         stations: Int, caps: Bool, closed: Bool
     ) -> MeshParts {
+        guard points.count >= 2 else { return MeshParts() }
         let path = catmullRomPath(points, closed: closed)
         let frames = path.evenlySpacedFrames(stations)
         let length = path.length
@@ -828,6 +837,7 @@ enum GeometryFactory {
         _ points: [SIMD3<Float>], width: Float, stations: Int,
         up: SIMD3<Float>, closed: Bool
     ) -> MeshParts {
+        guard points.count >= 2 else { return MeshParts() }
         let path = catmullRomPath(points, closed: closed)
         let frames = path.evenlySpacedFrames(stations)
         let length = path.length
@@ -890,6 +900,7 @@ enum GeometryFactory {
         _ points: [SIMD3<Float>], width: Float, viewDir: SIMD3<Float>,
         colors: [SIMD4<Float>]?, widths: [Float]?, closed: Bool
     ) -> MeshParts {
+        guard points.count >= 2 else { return MeshParts() }
         let pts = closed ? points + [points[0]] : points
         var b = ProcBuilder()
         for i in 0..<pts.count - 1 {
@@ -911,6 +922,7 @@ enum GeometryFactory {
         onLen: Float, offLen: Float,
         colors: [SIMD4<Float>]?, widths: [Float]?, closed: Bool
     ) -> MeshParts {
+        guard points.count >= 2 else { return MeshParts() }
         let pts = closed ? points + [points[0]] : points
         var b = ProcBuilder()
         var distance = Float(0)

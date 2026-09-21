@@ -1272,6 +1272,7 @@ object MeshFactory {
         points: List<V3>, radius: Float, radialSegments: Int,
         stations: Int, caps: Boolean, closed: Boolean,
     ): MeshData {
+        if (points.size < 2) return ProcBuilder().build()
         val path = catmullRomPath(points, closed)
         val frames = path.evenlySpacedFrames(stations)
         val length = path.length
@@ -1324,6 +1325,7 @@ object MeshFactory {
         points: List<V3>, width: Float, stations: Int,
         up: V3, closed: Boolean,
     ): MeshData {
+        if (points.size < 2) return ProcBuilder().build()
         val path = catmullRomPath(points, closed)
         val frames = path.evenlySpacedFrames(stations)
         val length = path.length
@@ -1390,6 +1392,7 @@ object MeshFactory {
         colors: List<FloatArray>? = null, widths: List<Float>? = null,
         closed: Boolean = false,
     ): MeshData {
+        if (points.size < 2) return ProcBuilder().build()
         val pts = if (closed) points + points.first() else points
         val b = ProcBuilder()
         for (i in 0 until pts.size - 1) {
@@ -1410,6 +1413,7 @@ object MeshFactory {
         colors: List<FloatArray>? = null, widths: List<Float>? = null,
         closed: Boolean = false,
     ): MeshData {
+        if (points.size < 2) return ProcBuilder().build()
         val pts = if (closed) points + points.first() else points
         val b = ProcBuilder()
         var distance = 0f
