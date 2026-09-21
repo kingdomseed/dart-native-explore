@@ -1123,6 +1123,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         }
         val b = MaterialBuilder()
             .platform(MaterialBuilder.Platform.MOBILE)
+            .targetApi(if (engine.backend == Engine.Backend.VULKAN)
+                MaterialBuilder.TargetApi.VULKAN
+                else MaterialBuilder.TargetApi.OPENGL)
             .name("d3_shadow_catcher")
             .shading(MaterialBuilder.Shading.UNLIT)
             .doubleSided(true)
@@ -1170,6 +1173,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         }
         val b = MaterialBuilder()
             .platform(MaterialBuilder.Platform.MOBILE)
+            .targetApi(if (engine.backend == Engine.Backend.VULKAN)
+                MaterialBuilder.TargetApi.VULKAN
+                else MaterialBuilder.TargetApi.OPENGL)
             .name("d3_trail")
             .shading(MaterialBuilder.Shading.UNLIT)
             .doubleSided(true)
