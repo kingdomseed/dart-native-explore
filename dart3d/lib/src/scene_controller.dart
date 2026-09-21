@@ -13,6 +13,7 @@ import 'diff_apply.dart';
 import 'dispatch.dart';
 import 'doc_layer.dart' as doc_layer;
 import 'glb_import.dart';
+import 'lut_assets.dart';
 import 'physics.dart';
 import 'protocol.dart';
 import 'scene_view.dart';
@@ -106,13 +107,30 @@ final class SceneController {
   /// refused with [FsceneUnsupportedFeatureException] — upstream's
   /// required-means-refuse rule applied to the engine's realized set
   /// (W29). The default is warn-only (W12).
-  void loadDocument(SceneDocument doc, {bool strictFeatures = false}) {
+  ///
+  /// [resolveLuts] maps each environment resource's
+  /// `effects.colorGradingLut` asset-path key to its `.cube` bytes
+  /// before the manifest encodes (W25 — see
+  /// [resolveLutAssets]/`lut_assets.dart`): resolved refs land as
+  /// `bytes` payload chunks in the send below and rewrite to `chunk:`
+  /// tokens, so the natives pick the table up through the ordinary
+  /// payload path with a deferred claim. Resolver misses leave the
+  /// path string for the native bundle-asset fallback. Callers whose
+  /// loader is async (e.g. `rootBundle`) run
+  /// `await resolveLutAssetsAsync(doc, resolve: …)` first and omit
+  /// this.
+  void loadDocument(
+    SceneDocument doc, {
+    bool strictFeatures = false,
+    LutResolver? resolveLuts,
+  }) {
     if (strictFeatures) {
       final missing = missingRequiredFeatures(doc);
       if (missing.isNotEmpty) {
         throw FsceneUnsupportedFeatureException(missing.first);
       }
     }
+    if (resolveLuts != null) resolveLutAssets(doc, resolve: resolveLuts);
     _document = doc;
     _streamed.clear();
     _warnUnrealizedFeatures(doc);
@@ -136,8 +154,12 @@ final class SceneController {
   Future<void> loadDocumentComposed(
     SceneDocument doc, {
     required AsyncPrefabLoader loadPrefab,
+    LutResolver? resolveLuts,
   }) async {
-    loadDocument(await composeSceneAsync(doc, load: loadPrefab));
+    loadDocument(
+      await composeSceneAsync(doc, load: loadPrefab),
+      resolveLuts: resolveLuts,
+    );
   }
 
   /// Parses a `.fscene` JSON/JSONC [source] and loads it — upstream's
@@ -249,7 +271,17 @@ final class SceneController {
   /// docs/structural-commands-spec.md and
   /// docs/animation-skins-morphs-spec.md). [newDoc] becomes the
   /// tracked [document], so chain the next diff against it.
-  List<Map<String, Object?>> applyDiff(SceneDiff diff, SceneDocument newDoc) {
+  ///
+  /// [resolveLuts] resolves [newDoc]'s LUT asset refs before the ops
+  /// encode — the same hook [loadDocument] offers; a newly-resolved
+  /// `chunk:` payload then rides the batch's `upsertPayload` ops
+  /// ahead of the env resource upsert naming it.
+  List<Map<String, Object?>> applyDiff(
+    SceneDiff diff,
+    SceneDocument newDoc, {
+    LutResolver? resolveLuts,
+  }) {
+    if (resolveLuts != null) resolveLutAssets(newDoc, resolve: resolveLuts);
     final ops = diffCommands(diff, _document, newDoc);
     // A streamed instance that is itself removed drops its stream
     // record — the removeNode took the whole subtree with it.

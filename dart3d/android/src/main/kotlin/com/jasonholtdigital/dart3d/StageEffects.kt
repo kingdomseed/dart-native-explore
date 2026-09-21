@@ -459,8 +459,242 @@ data class StageEffects(
                     AutoExposure.decode(obj.optJSONObject("autoExposure")),
             )
         }
+
+        // ---- W20 groundwork: per-volume blending ----
+
+        /**
+         * One resolved environment contribution to blend over the
+         * base — upstream `EnvironmentContribution`
+         * (`environment_volume.dart`). [weight] is the effective
+         * 0..1 strength (volume coverage × master weight, already
+         * folded by the caller); [priority] orders the fold so a
+         * higher-priority volume applies later (on top).
+         */
+        data class Contribution(
+            val effects: StageEffects,
+            val weight: Double,
+            val priority: Double,
+        )
+
+        /**
+         * Upstream `blendEnvironmentContributions`: drops weight-0
+         * contributions, sorts ascending by priority, folds [lerp]
+         * left over [base] so the strongest, highest-priority look
+         * lands last.
+         */
+        fun blendContributions(
+            base: StageEffects,
+            contributions: List<Contribution>,
+        ): StageEffects {
+            var result = base
+            contributions
+                .filter { it.weight > 0 }
+                .sortedBy { it.priority }
+                .forEach { c ->
+                    result =
+                        lerp(result, c.effects, c.weight.coerceIn(0.0, 1.0))
+                }
+            return result
+        }
+
+        /**
+         * Upstream `EnvironmentSettings.lerp`: every numeric leaf
+         * interpolates `a + (b - a) * t`; discrete fields — `enabled`
+         * flags, mode/quality strings, sample/step counts, LUT
+         * identity, the GI resolution/extents — switch to [b] once
+         * `t >= 0.5`. `copy` on [d]'s block carries the discrete pick
+         * while named args overwrite the continuous leaves.
+         */
+        fun lerp(a: StageEffects, b: StageEffects, t: Double): StageEffects {
+            val d = if (t >= 0.5) b else a
+            return StageEffects(
+                colorGrading = d.colorGrading.copy(
+                    brightness = lerpD(a.colorGrading.brightness, b.colorGrading.brightness, t),
+                    contrast = lerpD(a.colorGrading.contrast, b.colorGrading.contrast, t),
+                    saturation = lerpD(a.colorGrading.saturation, b.colorGrading.saturation, t),
+                    temperature = lerpD(a.colorGrading.temperature, b.colorGrading.temperature, t),
+                    tint = lerpD(a.colorGrading.tint, b.colorGrading.tint, t),
+                    lift = lerp3(a.colorGrading.lift, b.colorGrading.lift, t),
+                    gamma = lerp3(a.colorGrading.gamma, b.colorGrading.gamma, t),
+                    gain = lerp3(a.colorGrading.gain, b.colorGrading.gain, t),
+                    lutBlend = lerpD(a.colorGrading.lutBlend, b.colorGrading.lutBlend, t),
+                ),
+                bloom = d.bloom.copy(
+                    threshold = lerpD(a.bloom.threshold, b.bloom.threshold, t),
+                    intensity = lerpD(a.bloom.intensity, b.bloom.intensity, t),
+                    scatter = lerpD(a.bloom.scatter, b.bloom.scatter, t),
+                ),
+                lensFlare = d.lensFlare.copy(
+                    intensity = lerpD(a.lensFlare.intensity, b.lensFlare.intensity, t),
+                    ghostSpacing = lerpD(a.lensFlare.ghostSpacing, b.lensFlare.ghostSpacing, t),
+                    haloRadius = lerpD(a.lensFlare.haloRadius, b.lensFlare.haloRadius, t),
+                    haloIntensity = lerpD(a.lensFlare.haloIntensity, b.lensFlare.haloIntensity, t),
+                    chromaticAberration = lerpD(
+                        a.lensFlare.chromaticAberration,
+                        b.lensFlare.chromaticAberration, t),
+                ),
+                vignette = d.vignette.copy(
+                    intensity = lerpD(a.vignette.intensity, b.vignette.intensity, t),
+                    radius = lerpD(a.vignette.radius, b.vignette.radius, t),
+                    smoothness = lerpD(a.vignette.smoothness, b.vignette.smoothness, t),
+                ),
+                chromaticAberration = d.chromaticAberration.copy(
+                    intensity = lerpD(
+                        a.chromaticAberration.intensity,
+                        b.chromaticAberration.intensity, t),
+                ),
+                filmGrain = d.filmGrain.copy(
+                    intensity = lerpD(a.filmGrain.intensity, b.filmGrain.intensity, t),
+                ),
+                ambientOcclusion = d.ambientOcclusion.copy(
+                    radius = lerpD(a.ambientOcclusion.radius, b.ambientOcclusion.radius, t),
+                    intensity = lerpD(a.ambientOcclusion.intensity, b.ambientOcclusion.intensity, t),
+                    bias = lerpD(a.ambientOcclusion.bias, b.ambientOcclusion.bias, t),
+                    power = lerpD(a.ambientOcclusion.power, b.ambientOcclusion.power, t),
+                    detail = lerpD(a.ambientOcclusion.detail, b.ambientOcclusion.detail, t),
+                    horizonAngle = lerpD(
+                        a.ambientOcclusion.horizonAngle,
+                        b.ambientOcclusion.horizonAngle, t),
+                    directLightAffect = lerpD(
+                        a.ambientOcclusion.directLightAffect,
+                        b.ambientOcclusion.directLightAffect, t),
+                    multiBounce = lerpD(
+                        a.ambientOcclusion.multiBounce,
+                        b.ambientOcclusion.multiBounce, t),
+                    thickness = lerpD(
+                        a.ambientOcclusion.thickness,
+                        b.ambientOcclusion.thickness, t),
+                    thicknessHeuristic = lerpD(
+                        a.ambientOcclusion.thicknessHeuristic,
+                        b.ambientOcclusion.thicknessHeuristic, t),
+                    indirectLight = lerpD(
+                        a.ambientOcclusion.indirectLight,
+                        b.ambientOcclusion.indirectLight, t),
+                ),
+                screenSpaceReflections = d.screenSpaceReflections.copy(
+                    intensity = lerpD(
+                        a.screenSpaceReflections.intensity,
+                        b.screenSpaceReflections.intensity, t),
+                    maxDistance = lerpD(
+                        a.screenSpaceReflections.maxDistance,
+                        b.screenSpaceReflections.maxDistance, t),
+                    thickness = lerpD(
+                        a.screenSpaceReflections.thickness,
+                        b.screenSpaceReflections.thickness, t),
+                    stride = lerpD(
+                        a.screenSpaceReflections.stride,
+                        b.screenSpaceReflections.stride, t),
+                    blur = lerpD(
+                        a.screenSpaceReflections.blur,
+                        b.screenSpaceReflections.blur, t),
+                    distanceFadeStart = lerpD(
+                        a.screenSpaceReflections.distanceFadeStart,
+                        b.screenSpaceReflections.distanceFadeStart, t),
+                    resolutionScale = lerpD(
+                        a.screenSpaceReflections.resolutionScale,
+                        b.screenSpaceReflections.resolutionScale, t),
+                ),
+                globalIllumination = d.globalIllumination.copy(
+                    intensity = lerpD(
+                        a.globalIllumination.intensity,
+                        b.globalIllumination.intensity, t),
+                    visibility = lerpD(
+                        a.globalIllumination.visibility,
+                        b.globalIllumination.visibility, t),
+                ),
+                temporalAntiAliasing = d.temporalAntiAliasing.copy(
+                    minimumCurrentWeight = lerpD(
+                        a.temporalAntiAliasing.minimumCurrentWeight,
+                        b.temporalAntiAliasing.minimumCurrentWeight, t),
+                    varianceGamma = lerpD(
+                        a.temporalAntiAliasing.varianceGamma,
+                        b.temporalAntiAliasing.varianceGamma, t),
+                    sharpness = lerpD(
+                        a.temporalAntiAliasing.sharpness,
+                        b.temporalAntiAliasing.sharpness, t),
+                    jitterScale = lerpD(
+                        a.temporalAntiAliasing.jitterScale,
+                        b.temporalAntiAliasing.jitterScale, t),
+                ),
+                fog = d.fog.copy(
+                    color = lerp3(a.fog.color, b.fog.color, t),
+                    skyColorInfluence = lerpD(
+                        a.fog.skyColorInfluence, b.fog.skyColorInfluence, t),
+                    density = lerpD(a.fog.density, b.fog.density, t),
+                    start = lerpD(a.fog.start, b.fog.start, t),
+                    end = lerpD(a.fog.end, b.fog.end, t),
+                    maxOpacity = lerpD(a.fog.maxOpacity, b.fog.maxOpacity, t),
+                    cutoffDistance = lerpD(
+                        a.fog.cutoffDistance, b.fog.cutoffDistance, t),
+                    height = lerpD(a.fog.height, b.fog.height, t),
+                    heightFalloff = lerpD(
+                        a.fog.heightFalloff, b.fog.heightFalloff, t),
+                    sunInScatter = lerpD(
+                        a.fog.sunInScatter, b.fog.sunInScatter, t),
+                    sunInScatterExponent = lerpD(
+                        a.fog.sunInScatterExponent,
+                        b.fog.sunInScatterExponent, t),
+                ),
+                godRays = d.godRays.copy(
+                    intensity = lerpD(a.godRays.intensity, b.godRays.intensity, t),
+                    density = lerpD(a.godRays.density, b.godRays.density, t),
+                    anisotropy = lerpD(a.godRays.anisotropy, b.godRays.anisotropy, t),
+                    maxDistance = lerpD(
+                        a.godRays.maxDistance, b.godRays.maxDistance, t),
+                    jitter = lerpD(a.godRays.jitter, b.godRays.jitter, t),
+                    color = lerp3(a.godRays.color, b.godRays.color, t),
+                ),
+                depthOfField = d.depthOfField.copy(
+                    focusDistance = lerpD(
+                        a.depthOfField.focusDistance,
+                        b.depthOfField.focusDistance, t),
+                    fStop = lerpD(a.depthOfField.fStop, b.depthOfField.fStop, t),
+                    focalLength = lerpD(
+                        a.depthOfField.focalLength,
+                        b.depthOfField.focalLength, t),
+                    sensorHeight = lerpD(
+                        a.depthOfField.sensorHeight,
+                        b.depthOfField.sensorHeight, t),
+                    blurScale = lerpD(
+                        a.depthOfField.blurScale, b.depthOfField.blurScale, t),
+                    maxForegroundBlur = lerpD(
+                        a.depthOfField.maxForegroundBlur,
+                        b.depthOfField.maxForegroundBlur, t),
+                    maxBackgroundBlur = lerpD(
+                        a.depthOfField.maxBackgroundBlur,
+                        b.depthOfField.maxBackgroundBlur, t),
+                    bladeRotation = lerpD(
+                        a.depthOfField.bladeRotation,
+                        b.depthOfField.bladeRotation, t),
+                    bladeCurvature = lerpD(
+                        a.depthOfField.bladeCurvature,
+                        b.depthOfField.bladeCurvature, t),
+                ),
+                autoExposure = d.autoExposure.copy(
+                    strength = lerpD(
+                        a.autoExposure.strength, b.autoExposure.strength, t),
+                    compensation = lerpD(
+                        a.autoExposure.compensation,
+                        b.autoExposure.compensation, t),
+                    minEv = lerpD(a.autoExposure.minEv, b.autoExposure.minEv, t),
+                    maxEv = lerpD(a.autoExposure.maxEv, b.autoExposure.maxEv, t),
+                    speedUp = lerpD(
+                        a.autoExposure.speedUp, b.autoExposure.speedUp, t),
+                    speedDown = lerpD(
+                        a.autoExposure.speedDown, b.autoExposure.speedDown, t),
+                ),
+            )
+        }
     }
 }
+
+private fun lerpD(a: Double, b: Double, t: Double) = a + (b - a) * t
+
+private fun lerp3(a: FloatArray, b: FloatArray, t: Double) = floatArrayOf(
+    (a[0] + (b[0] - a[0]) * t).toFloat(),
+    (a[1] + (b[1] - a[1]) * t).toFloat(),
+    (a[2] + (b[2] - a[2]) * t).toFloat(),
+)
 
 /** vec3 leaf — absent or shorter than 3 falls back to the supplied
  * default (upstream's `_effectVec` rule). */

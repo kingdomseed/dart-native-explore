@@ -256,7 +256,7 @@ packages:
     source: hosted
     version: "2.2.1"
   scene:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: scene
       sha256: f14dd23ea3858041b644ec4824eca5cae817b42aca03c5ed2efcf1afa003d554
