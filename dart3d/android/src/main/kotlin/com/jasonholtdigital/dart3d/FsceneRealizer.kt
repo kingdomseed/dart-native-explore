@@ -363,7 +363,15 @@ object FsceneRealizer {
         return f
     }
 
-    fun realize(manifest: ByteArray, host: Dart3dView) {
+    /**
+     * @param preserveStage W25 fix-2 — set only by the payload-arrival
+     * re-realize. That pass is a deferred-resource retry, not a stage
+     * re-apply: the live stage (updateStage mutations, op-added env
+     * resources, LUT/effects state) carries forward instead of the
+     * manifest's stale stage being re-decoded on top of it.
+     */
+    fun realize(manifest: ByteArray, host: Dart3dView,
+                preserveStage: Boolean = false) {
         val realizeStart = System.nanoTime()
         val json = try {
             JSONObject(String(manifest, Charsets.UTF_8))
@@ -373,6 +381,12 @@ object FsceneRealizer {
         val ctx = Context(host, json.optInt("fscene", 5))
         ctx.decodePayloads(json.optJSONObject("payloads"))
         ctx.decodeResources(json.optJSONObject("resources"))
+        if (preserveStage) {
+            // Op-added env resources aren't in the manifest — overlay
+            // the live defs so the preserved stage's environmentRef
+            // still resolves.
+            ctx.environments.putAll(host.resources.environments)
+        }
         // W11 before the node pass — decodeMesh attaches skinning at
         // renderable-build time, so the decoded skin records must
         // exist first (iOS attaches late via resolveSkinAttachments;
@@ -388,7 +402,8 @@ object FsceneRealizer {
         ctx.attachToScene()
         ctx.decodePhysicsDeferred()
         ctx.applyVariantComponents()
-        ctx.decodeStage(json.optJSONObject("stage"))
+        ctx.decodeStage(if (preserveStage) host.lastStage
+            else json.optJSONObject("stage"))
         // W14: after decodeStage so the stage-level quality defaults
         // are in place when views resolve theirs; rt refs resolve
         // because decodeResources already built them.
@@ -802,7 +817,25 @@ object FsceneRealizer {
                 HashMap(),
             val disabledComponents:
                 MutableMap<Long, MutableSet<Int>> = HashMap(),
-        )
+        ) {
+            /**
+             * W25 fix-2: true when chunk [id] is awaited by a ref still
+             * in [pending] — texture (`tex → payload`) or geometry
+             * (`geo → payload-set`) claims are the only pending kinds
+             * `applyPayload` has no surgical handler for. Env equirect,
+             * LUT, skin, and animation claims are consumed surgically
+             * before this check runs, so they never gate the manifest
+             * re-realize — and a pending ref whose chunk never lands
+             * must not keep re-arming it (the re-realize re-decodes the
+             * manifest's stale stage and reverts the live stage's
+             * LUT/effects mutations).
+             */
+            fun pendingClaims(id: Long, pending: Set<Long>): Boolean =
+                pending.any {
+                    texturePayloadIds[it] == id ||
+                        geometryPayloadIds[it]?.contains(id) == true
+                }
+        }
 
         var firstCameraKey: Long? = null
         var cameraProps: JSONObject? = null
@@ -4379,10 +4412,8 @@ object FsceneRealizer {
                             "$tag: asset environment lacks 'ref'")
                         null
                     } else {
-                        val bytes = try {
-                            host.context.assets.open(ref)
-                                .use { it.readBytes() }
-                        } catch (e: Exception) { null }
+                        val bytes =
+                            FlutterAssets.readBytes(host.context, ref)
                         if (bytes == null) {
                             logOnce("env.asset.$ref",
                                 "$tag: asset '$ref' not found")

@@ -459,8 +459,7 @@ final class SceneViewHost: SCNView {
         let data: Data?
         if let pid = D3Wire.localIdKey(ref) {
             data = payloadStore[pid]
-        } else if let url = Bundle.main.url(forResource: ref,
-                                            withExtension: nil) {
+        } else if let url = FlutterAssets.url(forResource: ref) {
             data = try? Data(contentsOf: url)
             if data == nil {
                 logOnce("fx.lut.asset.\(ref)",
@@ -787,9 +786,12 @@ final class SceneViewHost: SCNView {
             realizePending = false
             if !deferredResourceIds.isEmpty, let manifest = lastManifest {
                 // The shadow registry repopulates with this pass's
-                // light objects.
+                // light objects. The retry is not a stage re-apply:
+                // preserveStage re-decodes the LIVE stage so
+                // updateStage/LUT/effects state survives.
                 shadowAuthored.removeAll()
-                FsceneRealizer.realize(manifest: manifest, into: self)
+                FsceneRealizer.realize(manifest: manifest, into: self,
+                                       preserveStage: true)
                 // W15: the re-realize discarded the surgically
                 // streamed subtrees with the rest of the scene —
                 // rebuild each from its recorded load batch.
@@ -901,11 +903,29 @@ final class SceneViewHost: SCNView {
                 redecodeAnimation(animKey, def)
             }
         }
-        if !deferredResourceIds.isEmpty, lastManifest != nil {
-            // Any deferred resource may now resolve — one re-realize
-            // at the end of the drain retries them all; ones still
-            // missing a payload re-defer.
+        // W25 fix-2: only a chunk a still-deferred texture or
+        // geometry awaits earns the manifest re-realize — the
+        // deferred set holds resource ids, so map through the claim
+        // tables. Never-landing sibling refs (or an env/LUT/skin/anim
+        // claim served above) must not re-arm it: a stray re-realize
+        // re-decodes the manifest's stale stage and reverts the live
+        // stage's LUT/effects state — the silent W25 regression. One
+        // armed drain retries every pending ref at once; a decoder
+        // still missing its payload re-defers.
+        if lastManifest != nil, deferredRefClaims(id) {
             realizePending = true
+        }
+    }
+
+    /// W25 fix-2: true when [id] is a chunk some still-deferred
+    /// texture or geometry awaits — the only pending kinds this path
+    /// has no surgical handler for. Env/LUT/skin/anim claims are
+    /// consumed above before the check runs, so they never gate the
+    /// manifest re-realize.
+    private func deferredRefClaims(_ id: UInt64) -> Bool {
+        deferredResourceIds.contains {
+            texturePayloadKeys[$0] == id
+                || (geometryPayloadKeys[$0]?.contains(id) ?? false)
         }
     }
 
@@ -1142,19 +1162,11 @@ final class SceneViewHost: SCNView {
     /// document's session keys invalidate the old batches.
     private var streamedSubtreeOps: [(key: UInt64, ops: [Any])] = []
 
-    /// Guards the deferred-resource re-realize during a subtree
-    /// replay: a replayed `upsertPayload` that leaves unrelated
-    /// pending refs must not re-arm `realizePending` — that would
-    /// rebuild the scene once per frame.
-    private var subtreeReplayActive = false
-
     /// Replays each live subtree's recorded load batch through the
     /// ordinary op dispatch — called right after a payload-arrival
     /// re-realize has rebuilt the manifest scene.
     private func replayStreamedSubtrees() {
         if streamedSubtreeOps.isEmpty { return }
-        subtreeReplayActive = true
-        defer { subtreeReplayActive = false }
         var dead: Set<UInt64> = []
         for (key, ops) in streamedSubtreeOps {
             // A replayed batch can doom a later record's placeholder
@@ -1862,16 +1874,12 @@ final class SceneViewHost: SCNView {
                     redecodeAnimation(animKey, def)
                 }
             }
-        } else if !deferredResourceIds.isEmpty, lastManifest != nil,
-                  !subtreeReplayActive {
-            // A non-image payload chunk that unblocks deferred
-            // resources — same deferred re-realize as a `payload`
-            // mutation. W15: a chunk replayed after a
-            // subtree-restoring re-realize must not re-arm the next
-            // one — the pending set can outlive the replay when
-            // other refs still wait.
-            realizePending = true
         } else {
+            // W25 fix-2: every claim map was checked surgically above
+            // — reaching here means no installed or deferred resource
+            // awaits this chunk, so a manifest re-realize would gain
+            // nothing (and a stray one reverts the live stage; see
+            // applyPayload's deferred-claim gate).
             logOnce("upsertPayload.\(key)",
                 "upsertPayload \(key): encoding "
                 + "'\(payloadSpecs[key]?.encoding ?? "?")' backs no "
