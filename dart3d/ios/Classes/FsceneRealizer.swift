@@ -1354,12 +1354,12 @@ enum FsceneRealizer {
                 var decl = ""
                 var texBody = ""
                 if sheenColorTex {
-                    decl += "texture2d<float> d3SheenColorTex;\n"
+                    decl += "texture2d d3SheenColorTex;\n"
                     texBody += "tint *= d3SheenColorTex.sample("
                         + "d3SheenS, _surface.diffuseTexcoord).rgb;\n"
                 }
                 if sheenRoughTex {
-                    decl += "texture2d<float> d3SheenRoughTex;\n"
+                    decl += "texture2d d3SheenRoughTex;\n"
                     texBody += "rough *= d3SheenRoughTex.sample("
                         + "d3SheenS, _surface.diffuseTexcoord).a;\n"
                 }
@@ -2656,20 +2656,29 @@ enum FsceneRealizer {
         }
 
         /// One-channel gray image for the metallic/roughness split —
-        /// scalar data, so linear gray (no sRGB decode).
+        /// scalar data, so linear gray (no sRGB decode). Emitted as
+        /// RGBA8 (gray replicated, opaque alpha): SceneKit maps an
+        /// 8bpp gray CGImage to R8Unorm_sRGB, which Metal validation
+        /// rejects in renderResourceForImage (W22 lane-4 SIGABRT).
         func grayCGImage(_ data: Data, width w: Int, height h: Int)
             -> CGImage?
         {
-            guard let provider = CGDataProvider(data: data as CFData),
-                  let space = CGColorSpace(name: CGColorSpace.linearGray)
-            else { return nil }
-            return CGImage(width: w, height: h,
-                           bitsPerComponent: 8, bitsPerPixel: 8,
-                           bytesPerRow: w, space: space,
-                           bitmapInfo: CGBitmapInfo(
-                               rawValue: CGImageAlphaInfo.none.rawValue),
-                           provider: provider, decode: nil,
-                           shouldInterpolate: true, intent: .defaultIntent)
+            var rgba = Data(count: w * h * 4)
+            data.withUnsafeBytes { sp in
+                guard let s = sp.baseAddress?
+                    .assumingMemoryBound(to: UInt8.self) else { return }
+                rgba.withUnsafeMutableBytes { dp in
+                    let d = dp.baseAddress!
+                        .assumingMemoryBound(to: UInt8.self)
+                    for i in 0..<w * h {
+                        let v = s[i]
+                        d[i * 4] = v; d[i * 4 + 1] = v
+                        d[i * 4 + 2] = v; d[i * 4 + 3] = 255
+                    }
+                }
+            }
+            return rgbaCGImage(rgba, width: w, height: h,
+                               content: "data")
         }
 
         // MARK: Nodes
