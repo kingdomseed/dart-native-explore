@@ -68,6 +68,11 @@ private const val TAG = "dart3d"
 private const val DIRECTIONAL_LUX_PER_UNIT = 10.0
 private const val ENVIRONMENT_LUX_PER_UNIT = 30_000.0
 private const val FOUR_PI_STERADIANS = 4.0 * kotlin.math.PI
+// d3:instances bakes N copies into one vertex buffer on CPU — an
+// unbounded count is a memory/peak-frame hazard, so over the cap the
+// tail is truncated with a warn-once (upstream's GPU instancing has
+// no equivalent limit; documented in payload-geometry-spec).
+private const val MAX_BAKED_INSTANCES = 16384
 
 /** Wire `alphaMode` vocabulary (lowercase in the spec). */
 private val ALPHA_MODES = setOf("opaque", "mask", "blend")
@@ -1607,10 +1612,17 @@ object FsceneRealizer {
          * camera-facing quads re-faced per frame (FacingSpec).
          */
         private fun decodeInstances(key: Long, rec: NodeRec, p: JSONObject) {
-            val transforms = d3InstanceTransforms(key, p)
+            var transforms = d3InstanceTransforms(key, p)
             if (transforms == null) {
                 Log.i(TAG, "d3:instances node $key: transforms unresolved")
                 return
+            }
+            if (transforms.size > MAX_BAKED_INSTANCES) {
+                warnOnce("instances.$key.countCap",
+                    "d3:instances node $key: ${transforms.size} instances" +
+                        " exceeds the baked-instance cap" +
+                        " $MAX_BAKED_INSTANCES — truncated")
+                transforms = transforms.take(MAX_BAKED_INSTANCES)
             }
             rec.instancesProps = p
             destroyProcRenderable(rec)
@@ -1695,6 +1707,12 @@ object FsceneRealizer {
                     warnOnce("instances.$key.skinning",
                         "d3:instances node $key: skinned geometry" +
                             " bakes unskinned — joint/weight streams" +
+                            " are dropped")
+                }
+                if (base.morph != null) {
+                    warnOnce("instances.$key.morph",
+                        "d3:instances node $key: morphed geometry" +
+                            " bakes unmorphed — morph targets" +
                             " are dropped")
                 }
                 md = MeshFactory.bakeInstances(base, transforms, colors)

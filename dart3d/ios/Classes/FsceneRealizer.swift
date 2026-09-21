@@ -1554,6 +1554,11 @@ enum FsceneRealizer {
         /// `d3:procMesh` shapes that re-expand toward the live camera
         /// each frame — the rest build once like the upstream
         /// procedural resources above.
+        /// d3:instances bakes N copies into one vertex buffer on CPU —
+        /// over the cap the tail is truncated with a log-once
+        /// (mirrors Android's MAX_BAKED_INSTANCES; documented in
+        /// payload-geometry-spec).
+        private static let maxBakedInstances = 16384
         private static let facingShapes: Set<String> = [
             "polyline", "lineSegments", "billboard",
         ]
@@ -1851,9 +1856,16 @@ enum FsceneRealizer {
          */
         func decodeInstances(key: UInt64, node: SCNNode,
                              _ p: [String: Any]) {
-            guard let transforms = d3InstanceTransforms(key, p) else {
+            guard var transforms = d3InstanceTransforms(key, p) else {
                 d3Log("d3:instances node \(key): transforms unresolved")
                 return
+            }
+            if transforms.count > Self.maxBakedInstances {
+                host.logOnce("instances.\(key).countCap",
+                    "d3:instances node \(key): \(transforms.count)"
+                        + " instances exceeds the baked-instance cap"
+                        + " \(Self.maxBakedInstances) — truncated")
+                transforms = Array(transforms.prefix(Self.maxBakedInstances))
             }
             instancesProps[key] = p
             let colors = d3InstanceColors(key, p)
@@ -1916,6 +1928,23 @@ enum FsceneRealizer {
                         geometryConsumers[gk] = list
                     }
                     if let geo = geometries[gk] {
+                        // `extractParts` drops skinning/morph streams —
+                        // warn before they're silently lost (Android
+                        // parity: instances.<key>.skinning/.morph).
+                        if !geo.sources(for: .boneIndices).isEmpty ||
+                           !geo.sources(for: .boneWeights).isEmpty {
+                            host.logOnce("instances.\(key).skinning",
+                                "d3:instances node \(key): skinned"
+                                    + " geometry bakes unskinned —"
+                                    + " joint/weight streams are"
+                                    + " dropped")
+                        }
+                        if morphTargets[gk] != nil {
+                            host.logOnce("instances.\(key).morph",
+                                "d3:instances node \(key): morphed"
+                                    + " geometry bakes unmorphed —"
+                                    + " morph targets are dropped")
+                        }
                         base = GeometryFactory.extractParts(geo)
                     }
                 } else {

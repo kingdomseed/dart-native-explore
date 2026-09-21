@@ -251,7 +251,10 @@ Precedence is explicit, each case logging once per node:
 mesh fields are present `shape` wins. `attr1`–`attr3` log once as
 carried-but-unread (`color` is the only realized attribute). A skinned
 base geometry bakes unskinned — the joint/weight streams drop with a
-warn-once.
+warn-once on both platforms; a morphed base likewise bakes unmorphed
+with a warn-once. Baked instance counts cap at 16384 — over it, the
+tail truncates with a warn-once (upstream's GPU instancing has no
+equivalent limit).
 
 `billboard: true` instances re-expand per frame toward the camera
 (transform translation = quad center, `size` = extent, `facing` =
