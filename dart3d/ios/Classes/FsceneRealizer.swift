@@ -26,7 +26,14 @@ enum FsceneRealizer {
     /// Replaces `host`'s scene with the realized manifest. Payload-backed
     /// resources whose bytes have not arrived stay deferred and are
     /// re-realized when a payload lands (`SceneViewHost.applyPayload`).
-    static func realize(manifest: Data, into host: SceneViewHost) {
+    /// - Parameter preserveStage: W25 fix-2 — set only by the
+    ///   payload-arrival re-realize. That pass is a deferred-resource
+    ///   retry, not a stage re-apply: the live stage (updateStage
+    ///   mutations, op-added env resources, LUT/effects state) carries
+    ///   forward instead of the manifest's stale stage being
+    ///   re-decoded on top of it.
+    static func realize(manifest: Data, into host: SceneViewHost,
+                        preserveStage: Bool = false) {
         guard let json = try? JSONSerialization.jsonObject(with: manifest)
                 as? [String: Any] else {
             d3Log("loadScene: manifest is not a JSON object"); return
@@ -48,6 +55,17 @@ enum FsceneRealizer {
         host.beginComponentJointRegistration()
         ctx.decodePayloadSpecs(json["payloads"] as? [String: Any] ?? [:])
         ctx.decodeResources(json["resources"] as? [String: Any] ?? [:])
+        if preserveStage {
+            // Op-added env resources aren't in the manifest —
+            // overlay the live defs so the preserved stage's
+            // environmentRef still resolves (and the defs stay
+            // installed for later surgical stage decodes).
+            for (k, r) in host.resourceDefs
+            where (r["kind"] as? String) == "environment" {
+                ctx.resourceDefs[k] = r
+                ctx.environments[k] = r
+            }
+        }
         ctx.decodeNodes(json["nodes"] as? [String: Any] ?? [:])
         ctx.decodeSkins(json["skins"] as? [String: Any] ?? [:])
         ctx.decodeAnimations(json["animations"] as? [String: Any] ?? [:])
@@ -55,7 +73,8 @@ enum FsceneRealizer {
         ctx.resolveSkinAttachments()
         ctx.decodePhysicsDeferred()
         ctx.applyVariantComponents()
-        ctx.decodeStage(json["stage"] as? [String: Any])
+        ctx.decodeStage(preserveStage ? host.lastStage
+                        : json["stage"] as? [String: Any])
         // W14: view decode runs after stage (it needs nothing from it,
         // but the rt records and node registry must already exist).
         ctx.decodeViews(json["views"])
@@ -2201,8 +2220,7 @@ enum FsceneRealizer {
             if let asset = r["ref"] as? String {
                 var image = UIImage(named: asset)
                 if image == nil,
-                   let url = Bundle.main.url(forResource: asset,
-                                             withExtension: nil) {
+                   let url = FlutterAssets.url(forResource: asset) {
                     image = UIImage(contentsOfFile: url.path)
                 }
                 guard let image, let cg = image.cgImage else {
@@ -5495,8 +5513,7 @@ enum FsceneRealizer {
         func envPixels(fromAsset ref: String, tag: String)
             -> EnvPixels?
         {
-            if let url = Bundle.main.url(forResource: ref,
-                                         withExtension: nil),
+            if let url = FlutterAssets.url(forResource: ref),
                let data = try? Data(contentsOf: url) {
                 return envPixels(fromBytes: data, tag: tag)
             }
