@@ -1332,15 +1332,16 @@ object FsceneRealizer {
         private val FACING_SHAPES = setOf(
             "polyline", "lineSegments", "billboard")
 
-        /** A `{'v3':[…]}` list → native-space points (z-mirrored at
-         *  the wire boundary, like every vertex source). */
+        /** A `{'v3':[…]}` (or bare `[x,y,z]`) list → native-space
+         *  points (z-mirrored at the wire boundary, like every vertex
+         *  source). */
         private fun d3PointList(
             p: JSONObject, key: String,
         ): List<MeshFactory.V3>? {
             val list = p.tag(key).d3List() ?: return null
             val out = ArrayList<MeshFactory.V3>(list.length())
             for (i in 0 until list.length()) {
-                val v = list.optJSONObject(i)?.d3Vec3() ?: return null
+                val v = list.opt(i).d3Vec3() ?: return null
                 if (v.size < 3) return null
                 out.add(MeshFactory.V3(
                     v[0].toFloat(), v[1].toFloat(), -v[2].toFloat()))
@@ -1348,22 +1349,24 @@ object FsceneRealizer {
             return out
         }
 
-        /** A `{'c':[rgba]}` list → per-point colors. */
+        /** A `{'c':[rgba]}` (or bare `[r,g,b,a]`) list →
+         *  per-point colors. */
         private fun d3ColorList(p: JSONObject, key: String): List<FloatArray>? {
             val list = p.tag(key).d3List() ?: return null
             val out = ArrayList<FloatArray>(list.length())
             for (i in 0 until list.length()) {
-                out.add(list.optJSONObject(i)?.d3Color() ?: return null)
+                out.add(list.opt(i).d3Color() ?: return null)
             }
             return out
         }
 
-        /** A `{'d':x}` list → per-point widths. */
+        /** A `{'d':x}` (or bare number) list → per-point
+         *  widths. */
         private fun d3FloatList(p: JSONObject, key: String): List<Float>? {
             val list = p.tag(key).d3List() ?: return null
             val out = ArrayList<Float>(list.length())
             for (i in 0 until list.length()) {
-                out.add((list.optJSONObject(i)?.d3Double() ?: return null)
+                out.add((list.opt(i).d3Double() ?: return null)
                     .toFloat())
             }
             return out
@@ -1512,8 +1515,9 @@ object FsceneRealizer {
                     MeshFactory.V3(1f, 0f, 0f), MeshFactory.V3(0f, 1f, 0f))
                 else -> procedural(key, shape, p)
             }
-            if (md == null) {
-                Log.w(TAG, "d3:procMesh node $key: shape '$shape' failed")
+            if (md == null || md.vertexCount == 0) {
+                Log.w(TAG, "d3:procMesh node $key: shape '$shape'"
+                    + " produced no geometry")
                 return
             }
             val gm = buildGpuMesh(md)
@@ -1557,7 +1561,7 @@ object FsceneRealizer {
             t.d3List()?.let { list ->
                 val out = ArrayList<FloatArray>(list.length())
                 for (i in 0 until list.length()) {
-                    val m = list.optJSONObject(i)?.d3Mat4() ?: return null
+                    val m = list.opt(i).d3Mat4() ?: return null
                     out.add(D3Wire.matrix(m))
                 }
                 return out
@@ -1587,7 +1591,7 @@ object FsceneRealizer {
             color.d3List()?.let { list ->
                 val out = ArrayList<FloatArray>(list.length())
                 for (i in 0 until list.length()) {
-                    val v = list.optJSONObject(i)?.d3Vec4() ?: return null
+                    val v = list.opt(i).d3Vec4() ?: return null
                     out.add(FloatArray(4) { v.getOrElse(it) { 0.0 }.toFloat() })
                 }
                 return out
@@ -2476,6 +2480,11 @@ object FsceneRealizer {
         private fun gpuMesh(key: Long): GpuMesh? {
             gpuMeshes[key]?.let { return it }
             val md = geometries[key] ?: return null
+            if (md.vertexCount == 0) {
+                warnOnce("gpuMesh.$key.empty",
+                    "geometry $key: empty mesh — nothing realized")
+                return null
+            }
             return buildGpuMesh(md).also { gpuMeshes[key] = it }
         }
 
@@ -4453,6 +4462,12 @@ object FsceneRealizer {
             // A pending or failed decode leaves the map untouched —
             // consumers keep their old buffers until new data lands.
             if (md == null || md === before) return
+            if (md.vertexCount == 0) {
+                warnOnce("redecode.$key.empty",
+                    "geometry $key: re-decode produced an empty mesh" +
+                        " — keeping the previous buffers")
+                return
+            }
             pendingPayloadRefs.remove(key)
             val old = gpuMeshes[key]
             val gm = buildGpuMesh(md)

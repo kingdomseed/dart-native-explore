@@ -265,9 +265,12 @@ fun meshPrimitiveKeys(p: JSONObject):
     return geoKeys to matKeys
 }
 
-/** Matrix4Value — `{'m4': [16]}` column-major (vector_math storage). */
+/** Matrix4Value — `{'m4': [16]}` column-major (vector_math
+ *  storage), or a bare `[16]` array as upstream's procedural
+ *  encoder emits. */
 fun Any?.d3Mat4(): DoubleArray? =
     (this as? JSONObject)?.optJSONArray("m4")?.toDoubleArray()
+        ?: (this as? JSONArray)?.toDoubleArray()?.takeIf { it.size == 16 }
 
 fun JSONArray.toDoubleArray(): DoubleArray =
     DoubleArray(length()) { optDouble(it) }
