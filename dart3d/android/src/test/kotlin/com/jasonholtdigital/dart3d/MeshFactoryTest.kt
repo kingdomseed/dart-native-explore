@@ -35,14 +35,146 @@ class MeshFactoryTest {
             MeshFactory.cuboid(2f, 4f, 6f), 24, 36,
             floatArrayOf(0f, 0f, 0f, 1f, 2f, 3f))
         assertProceduralMesh(
-            MeshFactory.sphere(1.5f), 17 * 25, 16 * 24 * 6,
+            MeshFactory.sphere(1.5f), 17 * 33, 16 * 32 * 6,
             floatArrayOf(0f, 0f, 0f, 1.5f, 1.5f, 1.5f))
+        // The wire plane spans XZ — depth is the Z half-extent, not Y.
         assertProceduralMesh(
             MeshFactory.plane(2f, 3f), 4, 6,
-            floatArrayOf(0f, 0f, 0f, 1f, 1.5f, 0f))
+            floatArrayOf(0f, 0f, 0f, 1f, 0f, 1.5f))
         assertProceduralMesh(
             MeshFactory.torus(1f, 0.25f), 33 * 17, 32 * 16 * 6,
             floatArrayOf(0f, 0f, 0f, 1.25f, 0.25f, 1.25f))
+    }
+
+    @Test
+    fun `plane lies in XZ and winds facing +Y`() {
+        val mesh = MeshFactory.plane(2f, 2f)
+        assertEquals(4, mesh.vertexCount)
+        // Every vertex sits at y == 0 with a +Y attribute normal.
+        for (v in 0 until mesh.vertexCount) {
+            val r = record(mesh, v)
+            assertEquals(0f, r[1], 0f)
+            assertEquals(1f, normalOf(r)[1], EPS)
+        }
+        // quad(a, a+cols, a+1, a+cols+1): tri (0, 2, 1) spans
+        // (−x,−z) → (−x,+z) → (+x,−z); e1×e2 points +Y.
+        val a = vert(mesh, indexAt(mesh, 0))
+        val b = vert(mesh, indexAt(mesh, 1))
+        val c = vert(mesh, indexAt(mesh, 2))
+        val nx = (b[1] - a[1]) * (c[2] - a[2]) -
+            (b[2] - a[2]) * (c[1] - a[1])
+        val ny = (b[2] - a[2]) * (c[0] - a[0]) -
+            (b[0] - a[0]) * (c[2] - a[2])
+        val nz = (b[0] - a[0]) * (c[1] - a[1]) -
+            (b[1] - a[1]) * (c[0] - a[0])
+        assertEquals(0f, nx, EPS)
+        assertTrue("plane must wind facing +Y", ny > 0f)
+        assertEquals(0f, nz, EPS)
+        // Segmented grids keep the same contract per cell.
+        val grid = MeshFactory.plane(2f, 2f, segmentsX = 3, segmentsZ = 2)
+        assertEquals(12, grid.vertexCount)
+        assertEquals(36, grid.indexCount)
+        for (v in 0 until grid.vertexCount) {
+            assertEquals(0f, record(grid, v)[1], 0f)
+        }
+    }
+
+    @Test
+    fun `sphere and torus wind outward`() {
+        for (mesh in listOf(
+            MeshFactory.sphere(1f, segments = 8, rings = 4),
+            MeshFactory.torus(1f, 0.25f, rings = 8, sectors = 4))) {
+            for (t in 0 until mesh.indexCount / 3) {
+                val a = vert(mesh, indexAt(mesh, t * 3))
+                val b = vert(mesh, indexAt(mesh, t * 3 + 1))
+                val c = vert(mesh, indexAt(mesh, t * 3 + 2))
+                val e1x = b[0] - a[0]; val e1y = b[1] - a[1]
+                val e1z = b[2] - a[2]
+                val e2x = c[0] - a[0]; val e2y = c[1] - a[1]
+                val e2z = c[2] - a[2]
+                val nx = e1y * e2z - e1z * e2y
+                val ny = e1z * e2x - e1x * e2z
+                val nz = e1x * e2y - e1y * e2x
+                if (nx * nx + ny * ny + nz * nz < 1e-10f) continue
+                // The attribute normal is the normal column of each
+                // vertex's packed tangent frame — the geometric normal
+                // must agree (outward) on every non-degenerate tri.
+                var anx = 0f; var any = 0f; var anz = 0f
+                for (k in 0 until 3) {
+                    val n = normalOf(record(mesh, indexAt(mesh, t * 3 + k)))
+                    anx += n[0]; any += n[1]; anz += n[2]
+                }
+                assertTrue(
+                    "triangle $t winds inward",
+                    nx * anx + ny * any + nz * anz > 0f)
+            }
+        }
+    }
+
+    @Test
+    fun `cuboid debugColors keys vertex color to corner sign bits`() {
+        val mesh = MeshFactory.cuboid(2f, 2f, 2f, debugColors = true)
+        assertEquals(24, mesh.vertexCount)
+        for (v in 0 until mesh.vertexCount) {
+            val r = record(mesh, v)
+            assertEquals(if (r[0] >= 0f) 1f else 0f, r[9], 0f)
+            assertEquals(if (r[1] >= 0f) 1f else 0f, r[10], 0f)
+            assertEquals(if (r[2] >= 0f) 1f else 0f, r[11], 0f)
+            assertEquals(1f, r[12], 0f)
+        }
+    }
+
+    @Test
+    fun `bakeInstances transforms normals by the exact inverse-transpose`() {
+        // +Y normals everywhere.
+        val base = MeshFactory.plane(2f, 2f)
+        // Shear y' = y + x (column-major: M[1,0] lives at index 1 —
+        // x'=x+y would leave the +Y normal invariant). M^-T·(0,1,0)
+        // = (−1,1,0)/√2 — the old normalize-the-columns approximation
+        // could not produce this.
+        val shear = floatArrayOf(
+            1f, 1f, 0f, 0f,
+            0f, 1f, 0f, 0f,
+            0f, 0f, 1f, 0f,
+            0f, 0f, 0f, 1f)
+        val baked = MeshFactory.bakeInstances(base, listOf(shear))
+        for (v in 0 until baked.vertexCount) {
+            val n = normalOf(record(baked, v))
+            assertEquals(-0.7071f, n[0], 1e-3f)
+            assertEquals(0.7071f, n[1], 1e-3f)
+            assertEquals(0f, n[2], 1e-3f)
+        }
+        // A mirror keeps the +Y normal (M^-T·n is unchanged) but the
+        // determinant's sign flips the frame's handedness — the
+        // packed quat's w<0 channel marks it. The plane's own frame
+        // is the w<0 reflected basis, so identity keeps w<0 and the
+        // mirror flips it positive.
+        val identity = FloatArray(16) { if (it % 5 == 0) 1f else 0f }
+        val identBaked = MeshFactory.bakeInstances(base, listOf(identity))
+        val mirror = floatArrayOf(
+            -1f, 0f, 0f, 0f,
+            0f, 1f, 0f, 0f,
+            0f, 0f, 1f, 0f,
+            0f, 0f, 0f, 1f)
+        val mirrored = MeshFactory.bakeInstances(base, listOf(mirror))
+        for (v in 0 until mirrored.vertexCount) {
+            val ri = record(identBaked, v)
+            val rm = record(mirrored, v)
+            assertTrue("identity bake keeps the source frame", ri[6] < 0f)
+            assertTrue("mirror must flip the frame's handedness",
+                rm[6] > 0f)
+            assertEquals(1f, normalOf(rm)[1], 1e-4f)
+        }
+        // A non-invertible transform carries the source frame through.
+        val flat = floatArrayOf(
+            0f, 0f, 0f, 0f,
+            0f, 1f, 0f, 0f,
+            0f, 0f, 1f, 0f,
+            0f, 0f, 0f, 1f)
+        val flatBaked = MeshFactory.bakeInstances(base, listOf(flat))
+        for (v in 0 until flatBaked.vertexCount) {
+            assertEquals(1f, normalOf(record(flatBaked, v))[1], 1e-4f)
+        }
     }
 
     @Test
@@ -313,6 +445,25 @@ class MeshFactoryTest {
         return FloatArray(MeshFactory.FLOATS_PER_VERTEX) {
             mesh.vertices.getFloat(base + it * 4)
         }
+    }
+
+    // Vertex `v`'s position triple.
+    private fun vert(mesh: MeshFactory.MeshData, v: Int): FloatArray {
+        val base = v * mesh.vertexStrideBytes
+        return floatArrayOf(mesh.vertices.getFloat(base),
+            mesh.vertices.getFloat(base + 4),
+            mesh.vertices.getFloat(base + 8))
+    }
+
+    // The normal column of a record's packed tangent-frame quat —
+    // the w<0 handedness channel doesn't change the rotation matrix.
+    private fun normalOf(r: FloatArray): FloatArray {
+        var x = r[3]; var y = r[4]; var z = r[5]; var w = r[6]
+        if (w < 0f) { x = -x; y = -y; z = -z; w = -w }
+        return floatArrayOf(
+            2f * (x * z + w * y),
+            2f * (y * z - w * x),
+            1f - 2f * (x * x + y * y))
     }
 
     private fun indexAt(mesh: MeshFactory.MeshData, i: Int): Int =

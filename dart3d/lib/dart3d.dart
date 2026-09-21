@@ -14,16 +14,14 @@
 library;
 
 export 'src/animation.dart';
-export 'src/components.dart'
-    show
-        encodeRenderCommand,
-        encodeSelectVariantCommand,
-        kRealizedFeatures,
-        missingRequiredFeatures,
-        unrealizedFeatureWarnings;
+export 'src/components.dart';
 export 'src/diff_apply.dart';
 export 'src/doc_layer.dart';
 export 'src/fsceneb_reader.dart';
+export 'src/geometry/instances.dart';
+export 'src/geometry/mesh_data.dart';
+export 'src/geometry/paths.dart';
+export 'src/geometry/proc.dart';
 export 'src/glb_import.dart';
 export 'src/lut_assets.dart';
 export 'src/particle_sim.dart';

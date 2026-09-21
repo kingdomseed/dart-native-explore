@@ -14,6 +14,7 @@ import 'dart:math';
 
 import 'package:vector_math/vector_math.dart';
 
+import 'geometry/proc.dart';
 import 'scene_model.dart';
 
 /// The union of every mesh component's geometry bounds in world space,
@@ -51,13 +52,22 @@ Map<LocalId, (Vector3 min, Vector3 max)> meshNodeWorldBounds(
     if (w == null) continue;
     Vector3? nmin, nmax;
     for (final comp in node.components) {
-      if (comp.type != 'mesh') continue;
-      for (final geoId in _meshGeometryIds(comp)) {
-        final resource = doc.resources[geoId];
-        if (resource is! GeometryResource) continue;
-        // Authored bounds win; procedural primitives derive theirs
-        // from the spec — `.fscene` JSON rarely declares `bounds`.
-        final b = resource.bounds ?? _proceduralBounds(resource.procedural);
+      final bounds = switch (comp.type) {
+        'mesh' => [
+          for (final geoId in _meshGeometryIds(comp))
+            if (doc.resources[geoId] is GeometryResource)
+              (doc.resources[geoId]! as GeometryResource).bounds ??
+                  _proceduralBounds(
+                    (doc.resources[geoId]! as GeometryResource).procedural,
+                  ),
+        ],
+        // W26: dart3d extension components — the inline shape spec and
+        // the instance-transform union both read off the property bag.
+        kD3ProcMeshType => [d3ProcComponentBounds(comp)],
+        kD3InstancesType => [_d3InstancesBounds(comp, doc)],
+        _ => const <BoundsSpec?>[],
+      };
+      for (final b in bounds) {
         if (b == null) continue;
         nmin ??= Vector3.all(double.infinity);
         nmax ??= Vector3.all(-double.infinity);
@@ -107,8 +117,7 @@ Map<LocalId, (Vector3 min, Vector3 max)> meshNodeWorldBounds(
   final bmax = Vector3.all(-double.infinity);
   for (final bounds in perNode.values) {
     final size = bounds.$2 - bounds.$1;
-    if (isFlat(size) &&
-        max(size.x, size.z) > maxNonFlatSpan * 2.5) {
+    if (isFlat(size) && max(size.x, size.z) > maxNonFlatSpan * 2.5) {
       continue; // a floor slab — it draws, but doesn't frame
     }
     Vector3.min(bmin, bounds.$1, bmin);
@@ -153,19 +162,19 @@ Map<LocalId, Matrix4> _worldTransforms(SceneDocument doc) {
 BoundsSpec? _proceduralBounds(ProceduralGeometry? spec) {
   return switch (spec) {
     CuboidGeometrySpec(:final extents) => BoundsSpec(
-        min: -extents / 2,
-        max: extents / 2,
-      ),
+      min: -extents / 2,
+      max: extents / 2,
+    ),
     PlaneGeometrySpec(:final width, :final depth) => BoundsSpec(
-        min: Vector3(-width / 2, 0, -depth / 2),
-        max: Vector3(width / 2, 0, depth / 2),
-      ),
+      min: Vector3(-width / 2, 0, -depth / 2),
+      max: Vector3(width / 2, 0, depth / 2),
+    ),
     SphereGeometrySpec(:final radius) => _cubeBounds(radius),
     IcosphereGeometrySpec(:final radius) => _cubeBounds(radius),
     TorusGeometrySpec(:final radius, :final tubeRadius) => BoundsSpec(
-        min: Vector3(-(radius + tubeRadius), -tubeRadius, -(radius + tubeRadius)),
-        max: Vector3(radius + tubeRadius, tubeRadius, radius + tubeRadius),
-      ),
+      min: Vector3(-(radius + tubeRadius), -tubeRadius, -(radius + tubeRadius)),
+      max: Vector3(radius + tubeRadius, tubeRadius, radius + tubeRadius),
+    ),
     _ => null,
   };
 }
@@ -185,4 +194,61 @@ Iterable<LocalId> _meshGeometryIds(ComponentSpec comp) sync* {
     final ref = entry.values['geometry'];
     if (ref is ResourceRefValue) yield ref.id;
   }
+}
+
+/// Bounds for a `d3:instances` component: the instanced geometry's
+/// bounds (a `geometry` resource ref — payload bounds or procedural —
+/// or an inline `shape` + params) unioned over every inline `m4`
+/// transform, plus the billboard pad. Payload-carried transforms
+/// aren't readable here, so those components contribute only the
+/// untransformed geometry bounds.
+BoundsSpec? _d3InstancesBounds(ComponentSpec comp, SceneDocument doc) {
+  final props = comp.properties;
+  BoundsSpec? local;
+  final shape = props['shape'];
+  if (shape is StringValue) {
+    local = d3ProcShapeBounds(shape.value, props);
+  } else {
+    final ref = props['geometry'];
+    if (ref is ResourceRefValue && doc.resources[ref.id] is GeometryResource) {
+      final resource = doc.resources[ref.id]! as GeometryResource;
+      local = resource.bounds ?? _proceduralBounds(resource.procedural);
+    }
+  }
+  final transforms = props['transforms'];
+  final mats = transforms is ListValue
+      ? [
+          for (final v in transforms.values)
+            if (v is Matrix4Value) v.value,
+        ]
+      : const <Matrix4>[];
+  if (mats.isEmpty) return local;
+  var pad = 0.0;
+  if (props['billboard'] is BoolValue) {
+    final size = props['size'];
+    pad = size is Vec2Value ? max(size.value.x, size.value.y) : 1.0;
+  }
+  final bmin = Vector3.all(double.infinity);
+  final bmax = Vector3.all(-double.infinity);
+  final corner = Vector3.zero();
+  for (final m in mats) {
+    if (local != null) {
+      for (var i = 0; i < 8; i++) {
+        corner.setValues(
+          i & 1 == 0 ? local.min.x : local.max.x,
+          i & 2 == 0 ? local.min.y : local.max.y,
+          i & 4 == 0 ? local.min.z : local.max.z,
+        );
+        m.transform3(corner);
+        Vector3.min(bmin, corner, bmin);
+        Vector3.max(bmax, corner, bmax);
+      }
+    }
+    if (pad > 0) {
+      final c = m.getTranslation();
+      Vector3.min(bmin, c - Vector3.all(pad), bmin);
+      Vector3.max(bmax, c + Vector3.all(pad), bmax);
+    }
+  }
+  return bmin.x.isFinite ? BoundsSpec(min: bmin, max: bmax) : local;
 }

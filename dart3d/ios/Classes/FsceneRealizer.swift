@@ -639,6 +639,11 @@ enum FsceneRealizer {
         /// `redecodeResource`/payload arrivals, the
         /// `pendingSkinNodes` pattern.
         var pendingLodNodes: Set<UInt64> = []
+        /// W26: node key → raw `d3:instances` properties — recorded
+        /// at decode so a geometry `upsertResource`/`upsertPayload`
+        /// arriving after the component can re-bake the instance
+        /// mesh instead of rebinding the raw geometry onto the node.
+        var instancesProps: [UInt64: [String: Any]] = [:]
 
         /// `scene` is the host's bound scene for every caller — the
         /// manifest path decodes into it in place (a second SCNScene
@@ -688,6 +693,7 @@ enum FsceneRealizer {
                                      lodResourceConsumers:
                                         lodResourceConsumers,
                                      pendingLodNodes: pendingLodNodes,
+                                     instancesProps: instancesProps,
                                      renderTargets: renderTargets),
                          deferred: deferredResourceIds,
                          camera: firstCameraNode,
@@ -817,7 +823,7 @@ enum FsceneRealizer {
         func decodeGeometry(_ key: UInt64, _ r: [String: Any]) {
             if let proc = r["procedural"] as? [String: Any],
                let shape = proc["shape"] as? String {
-                geometries[key] = procedural(shape, proc)
+                geometries[key] = procedural(key, shape, proc)
                 return
             }
             guard let token = r["vertices"] as? String,
@@ -1412,29 +1418,609 @@ enum FsceneRealizer {
                 targetCount: targetCount)
         }
 
-        func procedural(_ shape: String, _ p: [String: Any]) -> SCNGeometry? {
+        /// Segment-count params clamp to ≥1 — a zero/negative on the
+        /// wire would NaN the generators' `s / segments` divisions
+        /// (the Dart-side contract floors at 1 too).
+        private func seg(_ p: [String: Any], _ name: String,
+                         _ def: Int) -> Int {
+            max(1, d3Int(p[name]) ?? def)
+        }
+
+        func procedural(_ key: UInt64, _ shape: String,
+                        _ p: [String: Any]) -> SCNGeometry? {
             switch shape {
             case "cuboid":
                 let e = d3Vec3(p["extents"]) ?? [1, 1, 1]
-                return SCNBox(width: CGFloat(e[0]), height: CGFloat(e[1]),
-                              length: CGFloat(e[2]), chamferRadius: 0)
+                // `debugColors` is a d3 extension — corner-keyed vertex
+                // colors; SCNBox can't carry a color stream so both
+                // paths use the CPU port (same verts as Android).
+                return GeometryFactory.makeGeometry(
+                    GeometryFactory.cuboid(
+                        extents: SIMD3(Float(e[0]), Float(e[1]),
+                                       Float(e[2])),
+                        debugColors: d3Bool(p["debugColors"]) == true))
             case "sphere":
-                return SCNSphere(radius: CGFloat(d3Double(p["radius"]) ?? 0.5))
+                return GeometryFactory.makeGeometry(
+                    GeometryFactory.sphere(
+                        radius: Float(d3Double(p["radius"]) ?? 0.5),
+                        segments: seg(p, "segments", 32),
+                        rings: seg(p, "rings", 16)))
             case "icosphere":
-                // SceneKit has no geodesic primitive; a high-segment UV
-                // sphere is the closest native analog.
-                let s = SCNSphere(radius: CGFloat(d3Double(p["radius"]) ?? 0.5))
-                s.segmentCount = 48
-                d3Log("icosphere approximated with UV sphere")
-                return s
+                // W26: a real subdivided icosahedron replaces the
+                // high-segment UV-sphere stand-in (same algorithm
+                // proc.dart + MeshFactory.kt generate).
+                return GeometryFactory.makeGeometry(
+                    GeometryFactory.icosphere(
+                        radius: Float(d3Double(p["radius"]) ?? 0.5),
+                        subdivisions: max(0, d3Int(p["subdivisions"]) ?? 2)))
             case "plane":
-                return SCNPlane(width: CGFloat(d3Double(p["width"]) ?? 1),
-                                height: CGFloat(d3Double(p["depth"]) ?? 1))
+                // XZ +Y — the wire contract; SCNPlane's XY/+Z never
+                // matched it.
+                return GeometryFactory.makeGeometry(
+                    GeometryFactory.plane(
+                        width: Float(d3Double(p["width"]) ?? 1),
+                        depth: Float(d3Double(p["depth"]) ?? 1),
+                        segmentsX: seg(p, "segmentsX", 1),
+                        segmentsZ: seg(p, "segmentsZ", 1)))
             case "torus":
-                return SCNTorus(ringRadius: CGFloat(d3Double(p["radius"]) ?? 0.5),
-                                pipeRadius: CGFloat(d3Double(p["tubeRadius"]) ?? 0.125))
+                return GeometryFactory.makeGeometry(
+                    GeometryFactory.torus(
+                        radius: Float(d3Double(p["radius"]) ?? 0.5),
+                        tubeRadius: Float(d3Double(p["tubeRadius"]) ?? 0.15),
+                        radialSegments: seg(p, "radialSegments", 32),
+                        tubularSegments: seg(p, "tubularSegments", 16)))
+            // W26 vocabulary — `d3:procMesh` components and
+            // upstream-style `procedural` geometry resources share
+            // the same shape/param names.
+            case "cylinder":
+                return GeometryFactory.makeGeometry(
+                    GeometryFactory.cylinder(
+                        bottomRadius: Float(d3Double(p["bottomRadius"]) ?? 0.5),
+                        topRadius: Float(d3Double(p["topRadius"]) ?? 0.5),
+                        height: Float(d3Double(p["height"]) ?? 1),
+                        radialSegments: seg(p, "radialSegments", 32),
+                        heightSegments: seg(p, "heightSegments", 1),
+                        bottomCap: d3Bool(p["bottomCap"]) != false,
+                        topCap: d3Bool(p["topCap"]) != false))
+            case "cone":
+                return GeometryFactory.makeGeometry(
+                    GeometryFactory.cylinder(
+                        bottomRadius: Float(d3Double(p["radius"]) ?? 0.5),
+                        topRadius: 0,
+                        height: Float(d3Double(p["height"]) ?? 1),
+                        radialSegments: seg(p, "radialSegments", 32),
+                        heightSegments: seg(p, "heightSegments", 1),
+                        bottomCap: d3Bool(p["bottomCap"]) != false,
+                        topCap: false))
+            case "capsule":
+                return GeometryFactory.makeGeometry(
+                    GeometryFactory.capsule(
+                        radius: Float(d3Double(p["radius"]) ?? 0.5),
+                        height: Float(d3Double(p["height"]) ?? 1),
+                        radialSegments: seg(p, "radialSegments", 32),
+                        capRings: seg(p, "capRings", 8)))
+            case "disc":
+                return GeometryFactory.makeGeometry(
+                    GeometryFactory.disc(
+                        radius: Float(d3Double(p["radius"]) ?? 0.5),
+                        segments: seg(p, "segments", 32)))
+            case "tube":
+                guard let pts = d3PointList(p["points"]), pts.count >= 2
+                else {
+                    d3Log("tube: needs at least two points")
+                    return nil
+                }
+                return GeometryFactory.makeGeometry(
+                    GeometryFactory.tube(pts,
+                        radius: Float(d3Double(p["radius"]) ?? 0.5),
+                        radialSegments: seg(p, "radialSegments", 12),
+                        stations: max(2, d3Int(p["stations"]) ?? 64),
+                        caps: d3Bool(p["caps"]) != false,
+                        closed: d3Bool(p["closed"]) == true))
+            case "ribbon":
+                guard let pts = d3PointList(p["points"]), pts.count >= 2
+                else {
+                    d3Log("ribbon: needs at least two points")
+                    return nil
+                }
+                let u = d3Vec3(p["up"]) ?? [0, 1, 0]
+                return GeometryFactory.makeGeometry(
+                    GeometryFactory.ribbon(pts,
+                        width: Float(d3Double(p["width"]) ?? 1),
+                        stations: max(2, d3Int(p["stations"]) ?? 64),
+                        up: SIMD3(Float(u[0]), Float(u[1]), Float(-u[2])),
+                        closed: d3Bool(p["closed"]) == true))
+            case let s where FsceneRealizer.Context.facingShapes
+                .contains(s):
+                // A camera-facing shape as a static geometry
+                // resource can't reface per frame — bake once toward
+                // +Z, the same fallback the instances path uses.
+                host.logOnce("geometry.facing.\(s)",
+                    "geometry \(key): camera-facing shape '\(s)'"
+                        + " bakes once toward +Z")
+                var fp = parseFacing(p)
+                warnFacingDrops(site: "geometry", noun: "geometry",
+                                key: key, shape: s, p, fp)
+                fp.facing = facingMode(key, fp.facing)
+                return facingMesh(s, fp,
+                    viewDir: SIMD3(0, 0, 1),
+                    right: SIMD3(1, 0, 0), up: SIMD3(0, 1, 0))
+                    .map(GeometryFactory.makeGeometry)
             default:
                 d3Log("unknown procedural shape '\(shape)'"); return nil
+            }
+        }
+
+        // MARK: W26 `d3:procMesh` / `d3:instances`
+
+        /// `d3:procMesh` shapes that re-expand toward the live camera
+        /// each frame — the rest build once like the upstream
+        /// procedural resources above.
+        /// d3:instances bakes N copies into one vertex buffer on CPU —
+        /// over the cap the tail is truncated with a log-once
+        /// (mirrors Android's MAX_BAKED_INSTANCES; documented in
+        /// payload-geometry-spec).
+        private static let maxBakedInstances = 16384
+        private static let facingShapes: Set<String> = [
+            "polyline", "lineSegments", "billboard",
+        ]
+
+        /// A `{'v3':[…]}` list → native-space points (z-mirrored at
+        /// the wire boundary, like every vertex source).
+        func d3PointList(_ v: Any?) -> [SIMD3<Float>]? {
+            guard let list = d3List(v) else { return nil }
+            var out: [SIMD3<Float>] = []
+            out.reserveCapacity(list.count)
+            for e in list {
+                guard let p = d3Vec3(e), p.count >= 3 else { return nil }
+                out.append(SIMD3(Float(p[0]), Float(p[1]), Float(-p[2])))
+            }
+            return out
+        }
+
+        /// A `{'c':[rgba]}` list → per-point colors.
+        func d3ColorList(_ v: Any?) -> [SIMD4<Float>]? {
+            guard let list = d3List(v) else { return nil }
+            var out: [SIMD4<Float>] = []
+            out.reserveCapacity(list.count)
+            for e in list {
+                guard let c = d3ColorComponents(e) else { return nil }
+                out.append(SIMD4(Float(c[0]), Float(c[1]),
+                                 Float(c[2]), Float(c[3])))
+            }
+            return out
+        }
+
+        /// A `{'d':x}` list → per-point widths.
+        func d3FloatList(_ v: Any?) -> [Float]? {
+            guard let list = d3List(v) else { return nil }
+            var out: [Float] = []
+            out.reserveCapacity(list.count)
+            for e in list {
+                guard let d = d3Double(e) else { return nil }
+                out.append(Float(d))
+            }
+            return out
+        }
+
+        /// The parsed parameters of a camera-facing shape — retained
+        /// so the per-frame pass can re-expand the vertex data toward
+        /// the live camera basis. `facing` is the billboard mode
+        /// (`spherical`/`axisY`/`screen`); validated at the call site.
+        struct FacingParams {
+            var points: [SIMD3<Float>] = []
+            var colors: [SIMD4<Float>]?
+            var widths: [Float]?
+            var width: Float = 1
+            var dashes: (Float, Float)?
+            var closed = false
+            var sizeX: Float = 1, sizeY: Float = 1
+            var rotation: Float = 0
+            var tint = SIMD4<Float>(1, 1, 1, 1)
+            var facing = "spherical"
+        }
+
+        /// The billboard facing modes the wire recognizes — anything
+        /// else warns once and reads as the `spherical` default.
+        private static let facingModes: Set<String> = [
+            "spherical", "axisY", "screen",
+        ]
+
+        /// Validates a wire `facing` value — unknown strings warn once
+        /// and resolve to `spherical` (the D3BillboardProc default).
+        func facingMode(_ key: UInt64, _ raw: String?) -> String {
+            guard let raw else { return "spherical" }
+            if Context.facingModes.contains(raw) { return raw }
+            host.logOnce("facing.\(key).\(raw)",
+                "d3 node \(key): unknown billboard facing '\(raw)'"
+                    + " — using 'spherical'")
+            return "spherical"
+        }
+
+        func parseFacing(_ p: [String: Any]) -> FacingParams {
+            var fp = FacingParams()
+            fp.points = d3PointList(p["points"]) ?? []
+            fp.colors = d3ColorList(p["colors"])
+            fp.widths = d3FloatList(p["widths"])
+            fp.width = Float(d3Double(p["width"]) ?? 1)
+            if let d = d3Vec2(p["dashes"]), d.count >= 2 {
+                fp.dashes = (Float(d[0]), Float(d[1]))
+            }
+            fp.closed = d3Bool(p["closed"]) == true
+            let s = d3Vec2(p["size"]) ?? [1, 1]
+            fp.sizeX = Float(s[0]); fp.sizeY = Float(s[1])
+            fp.rotation = Float(d3Double(p["rotation"]) ?? 0)
+            if let c = d3ColorComponents(p["color"]) {
+                fp.tint = SIMD4(Float(c[0]), Float(c[1]),
+                                Float(c[2]), Float(c[3]))
+            }
+            fp.facing = d3String(p["facing"]) ?? "spherical"
+            return fp
+        }
+
+        /// Builds a facing mesh for [shape] from [fp] expanded along
+        /// the supplied basis — the decode-time call uses a neutral
+        /// viewDir; the per-frame pass passes the live camera basis
+        /// and node-local camera position.
+        func facingMesh(
+            _ shape: String, _ fp: FacingParams,
+            viewDir: SIMD3<Float>,
+            right: SIMD3<Float>, up: SIMD3<Float>,
+            camPos: SIMD3<Float> = .zero
+        ) -> GeometryFactory.MeshParts? {
+            switch shape {
+            case "polyline":
+                if let (onLen, offLen) = fp.dashes {
+                    return GeometryFactory.dashedPolyline(
+                        fp.points, width: fp.width, viewDir: viewDir,
+                        onLen: onLen, offLen: offLen,
+                        colors: fp.colors, widths: fp.widths,
+                        closed: fp.closed)
+                }
+                return GeometryFactory.polyline(
+                    fp.points, width: fp.width, viewDir: viewDir,
+                    colors: fp.colors, widths: fp.widths,
+                    closed: fp.closed)
+            case "lineSegments":
+                return GeometryFactory.lineSegments(
+                    fp.points, width: fp.width, viewDir: viewDir,
+                    colors: fp.colors)
+            case "billboard":
+                return GeometryFactory.billboardQuad(
+                    sizeX: fp.sizeX, sizeY: fp.sizeY,
+                    rotation: fp.rotation, color: fp.tint,
+                    right: right, up: up,
+                    facing: fp.facing, camPos: camPos)
+            default:
+                return nil
+            }
+        }
+
+        /// Wire fields the facing-shape expanders can't honor —
+        /// logged once per node on EVERY path that parses a facing
+        /// shape (procMesh component, procedural resource bake,
+        /// d3:instances shape), not just the component.
+        func warnFacingDrops(site: String, noun: String, key: UInt64,
+                             shape: String, _ p: [String: Any],
+                             _ fp: FacingParams) {
+            if d3Bool(p["widthInPixels"]) == true {
+                host.logOnce("\(site).\(key).widthInPixels",
+                    "\(noun) \(key): widthInPixels is"
+                        + " unsupported — `width` is world units")
+            }
+            if shape == "polyline", d3String(p["caps"]) != nil {
+                host.logOnce("\(site).\(key).caps",
+                    "\(noun) \(key): 'caps' is unsupported"
+                        + " — line ends are butt")
+            }
+            if shape == "lineSegments", fp.points.count % 2 != 0 {
+                host.logOnce("\(site).\(key).oddLineTail",
+                    "\(noun) \(key): lineSegments got an"
+                        + " odd point count — trailing point"
+                        + " dropped")
+            }
+        }
+
+        /**
+         * `d3:procMesh` — one node, one procedural mesh built from the
+         * component's `shape` + params. Camera-facing shapes register
+         * a `FacingSpec` so the willRenderScene pass re-expands their
+         * vertex data toward the live camera (SceneKit lines are
+         * thin; thick lines ride ribbon quads).
+         */
+        func decodeProcMesh(key: UInt64, node: SCNNode,
+                            _ p: [String: Any]) {
+            guard let shape = d3String(p["shape"]) else {
+                d3Log("d3:procMesh node \(key): missing shape")
+                return
+            }
+            let facing = FsceneRealizer.Context.facingShapes.contains(shape)
+            var fp = facing ? parseFacing(p) : nil
+            if fp != nil {
+                warnFacingDrops(site: "procMesh", noun: "d3:procMesh node",
+                                key: key, shape: shape, p, fp!)
+                fp!.facing = facingMode(key, fp!.facing)
+            }
+            let geometry: SCNGeometry?
+            if let fpu = fp {
+                geometry = facingMesh(shape, fpu,
+                    viewDir: SIMD3(0, 0, 1),
+                    right: SIMD3(1, 0, 0), up: SIMD3(0, 1, 0))
+                    .map(GeometryFactory.makeGeometry)
+            } else {
+                geometry = procedural(key, shape, p)
+            }
+            guard let geometry else {
+                d3Log("d3:procMesh node \(key): shape '\(shape)' failed")
+                return
+            }
+            if let ref = d3Ref(p["material"]), let m = materials[ref] {
+                geometry.materials = [m]
+                let existing = materialConsumers[ref] ?? []
+                if !existing.contains(where: { $0 === geometry }) {
+                    materialConsumers[ref] = existing + [geometry]
+                }
+            }
+            if let old = node.geometry, old !== geometry {
+                host.retire(old)
+            }
+            node.geometry = geometry
+            if let t = host.pendingColliderShapes.removeValue(forKey: key) {
+                if let body = node.physicsBody, body.physicsShape == nil {
+                    body.physicsShape = derivedShape(node, t, "deferred")
+                }
+            }
+            if let fp {
+                host.cameraFacing[key] = SceneViewHost.FacingSpec(
+                    shape: shape, node: node,
+                    points: fp.points, colors: fp.colors,
+                    widths: fp.widths, width: fp.width,
+                    dashes: fp.dashes, closed: fp.closed,
+                    sizeX: fp.sizeX, sizeY: fp.sizeY,
+                    rotation: fp.rotation, tint: fp.tint,
+                    facing: fp.facing)
+            }
+        }
+
+        /// Instance transforms: an inline `{'m4':[16]}` list or a
+        /// `matrices` payload ref — each S·M·S mirrored into native
+        /// space like every other transform crossing the wire.
+        func d3InstanceTransforms(_ key: UInt64, _ p: [String: Any])
+            -> [simd_float4x4]?
+        {
+            guard let t = p["transforms"] else { return nil }
+            if let list = d3List(t) {
+                var out: [simd_float4x4] = []
+                out.reserveCapacity(list.count)
+                for e in list {
+                    guard let m = d3Mat4(e) else { return nil }
+                    out.append(simd_float4x4(m))
+                }
+                return out
+            }
+            guard let ref = d3Ref(t) else { return nil }
+            guard let bytes = host.payloadStore[ref], bytes.count % 64 == 0
+            else {
+                deferredResourceIds.insert(key)
+                return nil
+            }
+            let n = bytes.count / 64
+            return (0..<n).map { i in
+                var m = [Double](repeating: 0, count: 16)
+                for k in 0..<16 {
+                    m[k] = Double(D3Wire.f32LE(
+                        bytes, bytes.startIndex + i * 64 + k * 4))
+                }
+                return simd_float4x4(D3Wire.matrix(m))
+            }
+        }
+
+        /// The `color` per-instance attribute — inline `{'v4':[…]}`
+        /// list, a `floats` payload (4×f32 per instance), or a `bytes`
+        /// payload (4×u8 normalized).
+        func d3InstanceColors(_ key: UInt64, _ p: [String: Any])
+            -> [SIMD4<Float>]?
+        {
+            guard let attrs = d3Map(p["attributes"]),
+                  let color = attrs["color"] else { return nil }
+            if let list = d3List(color) {
+                var out: [SIMD4<Float>] = []
+                for e in list {
+                    guard let v = d3Vec4(e), v.count >= 4 else { return nil }
+                    out.append(SIMD4(Float(v[0]), Float(v[1]),
+                                     Float(v[2]), Float(v[3])))
+                }
+                return out
+            }
+            guard let ref = d3Ref(color),
+                  let bytes = host.payloadStore[ref]
+            else {
+                if d3Ref(color) != nil { deferredResourceIds.insert(key) }
+                return nil
+            }
+            if payloadSpecs[ref]?.encoding == "bytes" {
+                return (0..<bytes.count / 4).map { i in
+                    SIMD4(Float(bytes[bytes.startIndex + i * 4]) / 255,
+                          Float(bytes[bytes.startIndex + i * 4 + 1]) / 255,
+                          Float(bytes[bytes.startIndex + i * 4 + 2]) / 255,
+                          Float(bytes[bytes.startIndex + i * 4 + 3]) / 255)
+                }
+            }
+            return (0..<bytes.count / 16).map { i in
+                SIMD4(
+                    D3Wire.f32LE(bytes, bytes.startIndex + i * 16),
+                    D3Wire.f32LE(bytes, bytes.startIndex + i * 16 + 4),
+                    D3Wire.f32LE(bytes, bytes.startIndex + i * 16 + 8),
+                    D3Wire.f32LE(bytes, bytes.startIndex + i * 16 + 12))
+            }
+        }
+
+        /**
+         * `d3:instances` — one node, one draw, N copies of a mesh.
+         * SceneKit has no per-instance draw call on `SCNGeometry`, so
+         * the instance data bakes into a single geometry: transforms
+         * applied to the CPU vertex copies, per-instance `color`
+         * stamped into the color stream (the W26 contract — same one
+         * node/draw path as Android's baked renderable).
+         * `billboard: true` swaps the mesh for camera-facing quads
+         * re-faced per frame (FacingSpec).
+         */
+        func decodeInstances(key: UInt64, node: SCNNode,
+                             _ p: [String: Any]) {
+            guard var transforms = d3InstanceTransforms(key, p) else {
+                d3Log("d3:instances node \(key): transforms unresolved")
+                return
+            }
+            if transforms.count > Self.maxBakedInstances {
+                host.logOnce("instances.\(key).countCap",
+                    "d3:instances node \(key): \(transforms.count)"
+                        + " instances exceeds the baked-instance cap"
+                        + " \(Self.maxBakedInstances) — truncated")
+                transforms = Array(transforms.prefix(Self.maxBakedInstances))
+            }
+            instancesProps[key] = p
+            let colors = d3InstanceColors(key, p)
+            let billboard = d3Bool(p["billboard"]) == true
+            let s = d3Vec2(p["size"]) ?? [1, 1]
+            let rotation = Float(d3Double(p["rotation"]) ?? 0)
+            let facing = facingMode(key, d3String(p["facing"]))
+            let doubleSided = d3Bool(p["doubleSided"]) == true
+            // Precedence + wire-carried-but-unread fields — warned
+            // once per node so the drops aren't silent.
+            if billboard, p["shape"] != nil || p["geometry"] != nil {
+                host.logOnce("instances.\(key).billboardPrecedence",
+                    "d3:instances node \(key): 'billboard' overrides"
+                        + " shape/geometry")
+            }
+            if !billboard, d3String(p["shape"]) != nil,
+               p["geometry"] != nil {
+                host.logOnce("instances.\(key).shapePrecedence",
+                    "d3:instances node \(key): 'shape' and 'geometry'"
+                        + " both present — 'shape' wins")
+            }
+            if let attrs = d3Map(p["attributes"]),
+               attrs.keys.contains(where: { $0 != "color" }) {
+                host.logOnce("instances.\(key).attrs",
+                    "d3:instances node \(key): attr1–attr3 are carried"
+                        + " on the wire but not rendered")
+            }
+
+            let parts: GeometryFactory.MeshParts?
+            if billboard {
+                let centers = transforms.map {
+                    SIMD3<Float>($0.columns.3.x,
+                                 $0.columns.3.y, $0.columns.3.z)
+                }
+                parts = GeometryFactory.bakeBillboardInstances(
+                    centers, sizeX: Float(s[0]), sizeY: Float(s[1]),
+                    rotation: rotation, colors: colors,
+                    right: SIMD3(1, 0, 0), up: SIMD3(0, 1, 0),
+                    facing: facing)
+            } else {
+                let shape = d3String(p["shape"])
+                var base: GeometryFactory.MeshParts?
+                if let shape, FsceneRealizer.Context.facingShapes.contains(shape) {
+                    host.logOnce("instances.\(key).facingShape",
+                        "d3:instances node \(key): facing shape '\(shape)'"
+                            + " bakes once toward +Z")
+                    var fp = parseFacing(p)
+                    warnFacingDrops(site: "instances",
+                                    noun: "d3:instances node",
+                                    key: key, shape: shape, p, fp)
+                    fp.facing = facing
+                    base = facingMesh(shape, fp,
+                        viewDir: SIMD3(0, 0, 1),
+                        right: SIMD3(1, 0, 0), up: SIMD3(0, 1, 0))
+                } else if let shape {
+                    if let geo = procedural(key, shape, p) {
+                        base = GeometryFactory.extractParts(geo)
+                    }
+                } else if let gk = d3Ref(p["geometry"]) {
+                    var list = geometryConsumers[gk] ?? []
+                    if !list.contains(where: { $0 === node }) {
+                        list.append(node)
+                        geometryConsumers[gk] = list
+                    }
+                    if let geo = geometries[gk] {
+                        // `extractParts` drops skinning/morph streams —
+                        // warn before they're silently lost (Android
+                        // parity: instances.<key>.skinning/.morph).
+                        if !geo.sources(for: .boneIndices).isEmpty ||
+                           !geo.sources(for: .boneWeights).isEmpty {
+                            host.logOnce("instances.\(key).skinning",
+                                "d3:instances node \(key): skinned"
+                                    + " geometry bakes unskinned —"
+                                    + " joint/weight streams are"
+                                    + " dropped")
+                        }
+                        if morphTargets[gk] != nil {
+                            host.logOnce("instances.\(key).morph",
+                                "d3:instances node \(key): morphed"
+                                    + " geometry bakes unmorphed —"
+                                    + " morph targets are dropped")
+                        }
+                        base = GeometryFactory.extractParts(geo)
+                    }
+                } else {
+                    d3Log("d3:instances node \(key): needs geometry or shape")
+                    return
+                }
+                guard let base else {
+                    d3Log("d3:instances node \(key): geometry unresolved")
+                    return
+                }
+                parts = GeometryFactory.bakeInstances(
+                    base, transforms, colors: colors)
+            }
+            guard let parts, !parts.indices.isEmpty else {
+                d3Log("d3:instances node \(key): empty bake")
+                return
+            }
+            let geometry = GeometryFactory.makeGeometry(parts)
+            if let ref = d3Ref(p["material"]), let m = materials[ref] {
+                // A component `doubleSided` can't ride the shared
+                // material (every consumer would turn two-sided), so
+                // the node binds a clone — a snapshot: surgical
+                // updates to the source material after this bind
+                // don't propagate (the payload-geometry contract doc
+                // records the limitation).
+                let bound: SCNMaterial
+                if doubleSided && !m.isDoubleSided,
+                   let clone = m.copy() as? SCNMaterial {
+                    clone.isDoubleSided = true
+                    bound = clone
+                } else {
+                    bound = m
+                }
+                geometry.materials = [bound]
+                let existing = materialConsumers[ref] ?? []
+                if !existing.contains(where: { $0 === geometry }) {
+                    materialConsumers[ref] = existing + [geometry]
+                }
+            } else if doubleSided {
+                // No material ref — the default material is shared, so
+                // a fresh double-sided material stands in for it.
+                let dm = SCNMaterial()
+                dm.isDoubleSided = true
+                geometry.materials = [dm]
+            }
+            if let old = node.geometry, old !== geometry {
+                host.retire(old)
+            }
+            node.geometry = geometry
+            if billboard {
+                host.cameraFacing[key] = SceneViewHost.FacingSpec(
+                    shape: "billboardInstances", node: node,
+                    points: transforms.map {
+                        SIMD3<Float>($0.columns.3.x,
+                                     $0.columns.3.y, $0.columns.3.z)
+                    },
+                    colors: colors, widths: nil, width: 1,
+                    dashes: nil, closed: false,
+                    sizeX: Float(s[0]), sizeY: Float(s[1]),
+                    rotation: rotation,
+                    tint: SIMD4<Float>(1, 1, 1, 1),
+                    facing: facing)
             }
         }
 
@@ -3086,6 +3672,12 @@ enum FsceneRealizer {
                 decodeMaterialsVariants(key: key, index: index, props: props)
             case "trail":           decodeTrail(key, node, props)
             case "lod":             decodeLod(key, node, props)
+            // W26: generic `ComponentSpec` extension components —
+            // properties arrive through the standard tagged codec.
+            case "d3:procMesh":
+                decodeProcMesh(key: key, node: node, props)
+            case "d3:instances":
+                decodeInstances(key: key, node: node, props)
             default:
                 d3Log("unhandled component type '\(type)'")
             }
@@ -6172,14 +6764,19 @@ enum FsceneRealizer {
 
         // MARK: Tagged property values
 
+        /// All d3* readers accept the bare (untagged) JSON upstream's
+        /// `_encodeProcedural` emits — raw bools/numbers/strings,
+        /// `[[x,y,z],…]` lists, plain maps — alongside our tagged
+        /// `{'b':…}`-style envelopes. Tagged wins when both parse.
         func d3Bool(_ v: Any?) -> Bool? {
-            (v as? [String: Any])?["b"] as? Bool
+            (v as? [String: Any])?["b"] as? Bool ?? (v as? Bool)
         }
 
         func d3Double(_ v: Any?) -> Double? {
             ((v as? [String: Any])?["d"] ?? (v as? [String: Any])?["i"]) as? Double
                 ?? (((v as? [String: Any])?["d"] ?? (v as? [String: Any])?["i"]) as? Int)
                     .map(Double.init)
+                ?? (v as? Double) ?? (v as? Int).map(Double.init)
         }
 
         /// `{'v3': [x,y,z]}` — bare `[x,y,z]` fallback: procedural spec
@@ -6208,14 +6805,15 @@ enum FsceneRealizer {
         }
 
         func d3String(_ v: Any?) -> String? {
-            (v as? [String: Any])?["s"] as? String
+            (v as? [String: Any])?["s"] as? String ?? (v as? String)
         }
 
         func d3Int(_ v: Any?) -> Int? {
             let raw = (v as? [String: Any])?["i"]
                 ?? (v as? [String: Any])?["d"]
             if let i = raw as? Int { return i }
-            return (raw as? Double).map(Int.init)
+            if let d = raw as? Double { return Int(d) }
+            return (v as? Int) ?? (v as? Double).map(Int.init)
         }
 
         /// `{'v2': [x,y]}` — with a bare `[x,y]` fallback so a raw
@@ -6230,8 +6828,9 @@ enum FsceneRealizer {
         /// Raw [r,g,b,a] for a `{'c': …}` color — the bake path needs
         /// the components, not a UIColor.
         func d3ColorComponents(_ v: Any?) -> [Double]? {
-            guard let c = (v as? [String: Any])?["c"] as? [Double],
-                  c.count == 4 else { return nil }
+            if let c = (v as? [String: Any])?["c"] as? [Double],
+               c.count == 4 { return c }
+            guard let c = v as? [Double], c.count == 4 else { return nil }
             return c
         }
 
@@ -6248,17 +6847,29 @@ enum FsceneRealizer {
         }
 
         func d3List(_ v: Any?) -> [Any]? {
-            (v as? [String: Any])?["list"] as? [Any]
+            (v as? [String: Any])?["list"] as? [Any] ?? (v as? [Any])
         }
 
+        /// Single-key tag envelopes — a bare map that happens to hold
+        /// only e.g. {"d": 5} is a scalar envelope, not a map.
+        private static let envelopeKeys: Set<String> = [
+            "b", "d", "i", "v2", "v3", "v4", "q", "c", "s", "m4",
+            "list", "map", "rref", "nref",
+        ]
+
         func d3Map(_ v: Any?) -> [String: Any]? {
-            (v as? [String: Any])?["map"] as? [String: Any]
+            guard let d = v as? [String: Any] else { return nil }
+            if let m = d["map"] as? [String: Any] { return m }
+            if d.count == 1, let k = d.keys.first,
+               Context.envelopeKeys.contains(k) { return nil }
+            return d
         }
 
         /// Column-major 16-element `Matrix4` storage, converted LH→RH.
         func d3Mat4(_ v: Any?) -> SCNMatrix4? {
-            guard let m = (v as? [String: Any])?["m4"] as? [Double],
-                  m.count == 16 else { return nil }
+            let m = (v as? [String: Any])?["m4"] as? [Double]
+                ?? v as? [Double]
+            guard let m, m.count == 16 else { return nil }
             return D3Wire.matrix(m)
         }
     }

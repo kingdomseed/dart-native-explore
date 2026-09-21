@@ -127,6 +127,39 @@ final class SceneViewHost: SCNView {
     private(set) var skinDefs: [UInt64: [String: Any]] = [:]
     private(set) var animDefs: [UInt64: [String: Any]] = [:]
 
+    /// W26: node key → a camera-facing mesh spec (polyline, line
+    /// segments, billboard, billboard instances). SceneKit's native
+    /// line element is thin, so these ride expanded quad strips that
+    /// the `renderer(_:updateAtTime:)` pass re-expands toward the
+    /// live camera basis each frame. Weak node ref — node teardown
+    /// drops the entry.
+    struct FacingSpec {
+        var shape: String
+        weak var node: SCNNode?
+        var points: [SIMD3<Float>]
+        var colors: [SIMD4<Float>]?
+        var widths: [Float]?
+        var width: Float
+        var dashes: (Float, Float)?
+        var closed: Bool
+        var sizeX: Float
+        var sizeY: Float
+        var rotation: Float
+        var tint: SIMD4<Float>
+        /// Billboard facing mode — `spherical` aims each quad at the
+        /// node-local camera position, `axisY` rotates about the
+        /// node's local +Y only, `screen` keeps the camera-plane
+        /// basis. Validated at decode; absent reads as `spherical`.
+        var facing: String = "spherical"
+    }
+    var cameraFacing: [UInt64: FacingSpec] = [:]
+
+    /// W26: node key → the raw `d3:instances` properties — retained
+    /// so a deferred geometry/payload arrival can re-bake the
+    /// instance mesh (the geometry-consumer swap path would put the
+    /// raw geometry on the node instead).
+    private(set) var instancesProps: [UInt64: [String: Any]] = [:]
+
     /// The last `stage` JSON applied — the manifest's on install, then
     /// `updateStage` ops. A payload-arrival stage re-decode replays it.
     private(set) var lastStage: [String: Any]?
@@ -1247,6 +1280,10 @@ final class SceneViewHost: SCNView {
                 if let g = tr.child.geometry { retire(g) }
             }
             pendingLodNodes.remove(k)
+            // W26: the facing spec and instances props die with the
+            // node — a recycled id re-registers on re-decode.
+            cameraFacing.removeValue(forKey: k)
+            instancesProps.removeValue(forKey: k)
         }
         for (lk, spec) in lodSpecs where doomed.contains(lk) {
             for copy in spec.geoCopies {
@@ -1549,6 +1586,11 @@ final class SceneViewHost: SCNView {
         for rk in ctx.lodResourceConsumers.keys {
             ctx.lodResourceConsumers[rk]?.remove(key)
         }
+        // W26: the camera-facing spec and instances props are per-
+        // component state — the re-decode re-registers the ones the
+        // diff still declares.
+        cameraFacing.removeValue(forKey: key)
+        ctx.instancesProps.removeValue(forKey: key)
         if let old {
             for mk in ctx.materialConsumers.keys {
                 ctx.materialConsumers[mk]?.removeAll { $0 === old }
@@ -1651,6 +1693,7 @@ final class SceneViewHost: SCNView {
         lodSpecs = ctx.lods
         lodResourceConsumers = ctx.lodResourceConsumers
         pendingLodNodes = ctx.pendingLodNodes
+        instancesProps = ctx.instancesProps
     }
 
     /// A node op that decoded a camera takes the point of view only
@@ -1941,6 +1984,9 @@ final class SceneViewHost: SCNView {
         ctx.lods = lodSpecs
         ctx.lodResourceConsumers = lodResourceConsumers
         ctx.pendingLodNodes = pendingLodNodes
+        // W26: instances re-bake on a deferred geometry/payload
+        // landing needs the declaring component's props.
+        ctx.instancesProps = instancesProps
         // W14 stores — an rt upsert mutates `renderTargets`, an
         // `updateViews` op wholesale-replaces `views`; the quality
         // fields ride along so publish's write-back is a no-op for
@@ -2069,6 +2115,15 @@ final class SceneViewHost: SCNView {
                    spec.ownsRenderable, !spec.suspended {
                     continue
                 }
+                // W26: an `d3:instances` node's baked mesh consumed
+                // the geometry — re-bake against the fresh decode;
+                // assigning the raw resource would replace the
+                // instance field with one copy.
+                if let nk = nodeToKey[ObjectIdentifier(node)],
+                   let props = ctx.instancesProps[nk] {
+                    ctx.decodeInstances(key: nk, node: node, props)
+                    continue
+                }
                 let old = node.geometry
                 let rebound = ctx.geometries[key]
                     .flatMap { ($0.copy() as? SCNGeometry) ?? $0 }
@@ -2099,6 +2154,8 @@ final class SceneViewHost: SCNView {
             }
             materialConsumers = ctx.materialConsumers
             pendingSkinNodes = ctx.pendingSkinNodes
+            instancesProps = ctx.instancesProps
+            deferredResourceIds = ctx.deferredResourceIds
             // A geometry that just landed (or a rebound copy) re-runs
             // pending variant bindings against the fresh instance.
             ctx.applyVariantComponents()
@@ -3842,6 +3899,7 @@ final class SceneViewHost: SCNView {
                     lods: [UInt64: FsceneRealizer.LodSpec],
                     lodResourceConsumers: [UInt64: Set<UInt64>],
                     pendingLodNodes: Set<UInt64>,
+                    instancesProps: [UInt64: [String: Any]],
                     renderTargets: [UInt64: RenderTargetRec]),
         deferred: Set<UInt64>,
         camera: SCNNode?,
@@ -3913,6 +3971,7 @@ final class SceneViewHost: SCNView {
         lodResourceConsumers = resources.lodResourceConsumers
         pendingLodNodes = resources.pendingLodNodes
         lastTrailTime = nil
+        instancesProps = resources.instancesProps
         animLock.lock()
         animClips.removeAll()
         animTargets.removeAll()
@@ -4285,12 +4344,109 @@ extension SceneViewHost: SCNSceneRendererDelegate {
     /// same pose the screen frame is about to. Only fires for the
     /// SCNView; the per-view SCNRenderers have no delegate set. W24:
     /// sibling proxies sync in the same hook so their poke-drawn
-    /// frames share this pose.
+    /// frames share this pose. W26 also re-expands camera-facing
+    /// meshes here — the last hook before draw sees the final camera
+    /// pose.
     func renderer(_ renderer: SCNSceneRenderer,
                   willRenderScene scene: SCNScene,
                   atTime time: TimeInterval) {
+        updateCameraFacing()
         renderDueTargets(at: time)
         syncScreenSubviews()
+    }
+
+    /// W26: rebuilds each `cameraFacing` entry's geometry expanded
+    /// toward the live camera — SceneKit's native line primitive is
+    /// thin, so thick polylines/segments and billboards ride quad
+    /// strips baked per frame. The viewDir/right/up basis is brought
+    /// into each node's local space through the inverse of its world
+    /// transform, so facing survives a rotated/scaled parent.
+    private func updateCameraFacing() {
+        guard !cameraFacing.isEmpty,
+              let pov = pointOfView else { return }
+        let world = pov.presentation.worldTransform
+        // SceneKit cameras look down -Z; the basis columns of the
+        // world transform are the camera's right/up/forward axes.
+        let fWorld = SIMD3<Float>(-world.m31, -world.m32, -world.m33)
+        let rWorld = SIMD3<Float>(world.m11, world.m12, world.m13)
+        let uWorld = SIMD3<Float>(world.m21, world.m22, world.m23)
+        let camWorld = SIMD3<Float>(world.m41, world.m42, world.m43)
+        for (key, spec) in cameraFacing {
+            guard let node = spec.node else {
+                cameraFacing.removeValue(forKey: key)
+                continue
+            }
+            let inv = SCNMatrix4Invert(node.worldTransform)
+            func localDir(_ d: SIMD3<Float>) -> SIMD3<Float> {
+                SIMD3<Float>(
+                    inv.m11 * d.x + inv.m21 * d.y + inv.m31 * d.z,
+                    inv.m12 * d.x + inv.m22 * d.y + inv.m32 * d.z,
+                    inv.m13 * d.x + inv.m23 * d.y + inv.m33 * d.z)
+            }
+            let viewDir = simd_normalize(localDir(fWorld))
+            let right = simd_normalize(localDir(rWorld))
+            let up = simd_normalize(localDir(uWorld))
+            // Node-local camera position — `spherical`/`axisY` billboards
+            // aim at it; `screen` ignores it (camera-plane basis only).
+            let camPos = SIMD3<Float>(
+                inv.m11 * camWorld.x + inv.m21 * camWorld.y
+                    + inv.m31 * camWorld.z + inv.m41,
+                inv.m12 * camWorld.x + inv.m22 * camWorld.y
+                    + inv.m32 * camWorld.z + inv.m42,
+                inv.m13 * camWorld.x + inv.m23 * camWorld.y
+                    + inv.m33 * camWorld.z + inv.m43)
+            let parts: GeometryFactory.MeshParts?
+            switch spec.shape {
+            case "polyline":
+                if let (onLen, offLen) = spec.dashes {
+                    parts = GeometryFactory.dashedPolyline(
+                        spec.points, width: spec.width,
+                        viewDir: viewDir, onLen: onLen, offLen: offLen,
+                        colors: spec.colors, widths: spec.widths,
+                        closed: spec.closed)
+                } else {
+                    parts = GeometryFactory.polyline(
+                        spec.points, width: spec.width,
+                        viewDir: viewDir,
+                        colors: spec.colors, widths: spec.widths,
+                        closed: spec.closed)
+                }
+            case "lineSegments":
+                parts = GeometryFactory.lineSegments(
+                    spec.points, width: spec.width,
+                    viewDir: viewDir, colors: spec.colors)
+            case "billboard":
+                parts = GeometryFactory.billboardQuad(
+                    sizeX: spec.sizeX, sizeY: spec.sizeY,
+                    rotation: spec.rotation, color: spec.tint,
+                    right: right, up: up,
+                    facing: spec.facing, camPos: camPos)
+            case "billboardInstances":
+                parts = GeometryFactory.bakeBillboardInstances(
+                    spec.points, sizeX: spec.sizeX, sizeY: spec.sizeY,
+                    rotation: spec.rotation, colors: spec.colors,
+                    right: right, up: up,
+                    facing: spec.facing, camPos: camPos)
+            default:
+                parts = nil
+            }
+            guard let parts, !parts.indices.isEmpty else { continue }
+            let geo = GeometryFactory.makeGeometry(parts)
+            // The rebuilt mesh keeps the previous materials — they
+            // were bound per-node at decode (material→geometry
+            // consumer lists repoint below so a material upsert
+            // still finds it).
+            let old = node.geometry
+            geo.materials = old?.materials ?? []
+            if let old {
+                for mk in materialConsumers.keys {
+                    materialConsumers[mk] = materialConsumers[mk]?
+                        .compactMap { $0 === old ? geo : $0 } ?? []
+                }
+                retire(old)
+            }
+            node.geometry = geo
+        }
     }
 
     /// W15: the frame carrying a just-applied subtree is the first

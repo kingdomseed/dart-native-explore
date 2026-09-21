@@ -25,12 +25,17 @@ Map<String, Object?> encodeRenderCommand(LocalId target) => {
 /// Feature names the dart3d natives realize today (kept in sync with
 /// the native decode surfaces — `skinning` landed in W11,
 /// `materialsVariants` in W12, `renderTextures` in W14, `particles`
-/// in W18).
+/// in W18, the W26 geometry/instancing surface below).
 const kRealizedFeatures = {
   'skinning',
   'materialsVariants',
   'renderTextures',
   'particles',
+  // W26 — the `d3:procMesh` shape vocabulary and `d3:instances`
+  // component.
+  'd3ProcGeometry',
+  'd3Instances',
+  'd3Billboards',
 };
 
 /// Feature names with a named follow-on workstream — the warning names
