@@ -318,18 +318,85 @@ apply→first-visible-frame stamps for the manifest-to-visible metric.
 
 ## W16 — Trails and LOD
 
-**Scope.**
+**Depends on:** none. **DONE — implemented both platforms; native
+verification is compile-level only (no live device run yet).**
 
-- `trail`: custom camera-facing ribbon both platforms — persistent
-  `MTLBuffer`+`SCNGeometry` (iOS), dynamic `VertexBuffer`+
-  `IndexBuffer`+custom material (Android); world-anchored points,
-  `width`/`lifetime`/`minVertexDistance`/`maxPoints`/`widthOverTrail`.
-- `lod`: iOS `SCNGeometry.levelsOfDetail` (screenSize→px conversion,
-  documented approx); Android per-frame camera test + geometry swap.
-  `hysteresis`/`blendRange` documented as no-ops both platforms.
+**Implemented.**
 
-**Verification.** A trail following a moving node; LOD visibly
-switching geometry with camera distance on both.
+- `trail` component (upstream `TrailComponent` wire shape):
+  `width`/`lifetime`/`minVertexDistance`/`maxPoints`/`emitting` plus
+  the `widthOverTrail` curve (`{keys:[{t,v}]}`) and `colorOverTrail`
+  gradient (`{stops:[{t,color}]}`) — upstream serializes no trail
+  material; both natives draw a shared translucent vertex-color
+  unlit double-sided default.
+- iOS: a `d3trail:` child node carries a dynamic `SCNGeometry`
+  ribbon — points record in world space, rebase to the child's
+  local space through the inverse owner transform, and expand
+  camera-facing per frame in `SceneViewHost`'s renderer callback
+  (before render, same slot as skinning). Fewer than two live
+  points hides the ribbon.
+- Android: the trail is an unparented entity with a dynamic
+  `VertexBuffer`/`IndexBuffer` (2 verts per anchor, POSITION+COLOR)
+  filled world-space per frame — the verts ARE world space, so no
+  rebase is needed; `stepFrame` ticks it after the camera update.
+  The renderable builds `.culling(false)` — no static AABB can
+  describe a per-frame ribbon, and a zero box at the unparented
+  entity's identity transform would frustum-cull every off-axis
+  trail.
+- `lod` component (upstream `LodComponent` — which extends
+  MeshComponent, so the lod owns the node's draw slot): ordered
+  `levels` each carrying `geometry`+`material` refs and a
+  descending `screenSize` threshold; `lodBias` scales the
+  projected size. Level decode matches upstream `_levelEntries`:
+  an entry drops only on a missing/mistyped geometry or material
+  ref, while an absent/malformed `screenSize` decodes as `0.0` —
+  the never-cull threshold. `hysteresis` is live — upstream's
+  dead-band on both natives (wire default 0.1). `blendRange`
+  decodes for wire parity — a documented no-op (upstream's
+  cross-fade needs a per-material dither slot neither native
+  carries; hard switch).
+- iOS: the same explicit per-frame selection Android runs —
+  level-0's local AABB (cached at rebind) transforms its 8
+  corners through the node world transform into the world AABB,
+  whose circumscribed sphere projects through upstream
+  `lodScreenSize` (Euclidean camera distance, viewport-height
+  fraction); `lodBias` scales, the `hysteresis` dead-band picks
+  with the bound level as memory, `-1` culls. The bound level
+  rides `node.geometry` swaps among per-level copies
+  (dirty-checked; cull writes nil — children keep drawing,
+  matching Android's entity unbind). SceneKit's `levelsOfDetail`
+  is NOT used: probe-verified, its `screenSpaceRadius` is a
+  max-projection-axis, half-viewport-diagonal metric on view
+  depth (~1.5× the upstream crossing distance), and the tight
+  level-0 bound isn't overridable. Level resources re-resolve
+  through `lodResourceConsumers`/`pendingLodNodes` on landings.
+- Android: the lod owns the node's renderable slot — per-frame
+  `lodScreenSize` over the level-0 world-AABB circumscribed sphere
+  selects the level (with the hysteresis dead-band), then
+  `setGeometryAt`/`setMaterialInstanceAt` swap it (a foreign
+  renderable is rebuilt single-primitive on takeover; a culled
+  node leaves the scene until a later selection re-binds).
+  mesh+lod on one node is last-write-wins, mirroring iOS's
+  `node.geometry` overwrite order. Non-perspective cameras draw
+  level 0, matching upstream.
+- Shared Dart reference math in `dart3d/lib/src/trail_lod.dart`:
+  `TrailPointBuffer` (upstream's update policy), the
+  `expandTrailRibbon` port, `lodScreenSize`, `selectLodLevel`
+  (now including upstream's hysteresis dead-band), and
+  `decodeLodLevels` (upstream's `_levelEntries` fallback rule) —
+  the natives port these verbatim; 26 pure-Dart tests cover the
+  point buffer, ramps, expansion, selection thresholds, the
+  dead-band arms, and the screenSize fallback.
+- Harness: `w16Mover` carries `lod`+`trail`; the `w16Phase` lane
+  (+140 s — staggered past W15's +112 s slot) drives it ~49.5 m
+  out and back through all three thresholds and the cull floor
+  with an x sway bending the ribbon.
+
+**Verification.** `dn analyze` + `dn test` green (26 trail/lod
+tests); Android `assembleRelease` builds the Kotlin path; the iOS
+sources pass a syntax/typecheck pass. A trail following a moving
+node and the distance-based geometry swap exercise on both
+platforms via the `w16` harness lane — live device run still owed.
 
 ## W17 — skyEnvironment and physical sky
 

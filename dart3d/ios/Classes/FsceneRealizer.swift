@@ -192,6 +192,223 @@ enum FsceneRealizer {
         var endTime: Double
     }
 
+    /// W16: one live `trail` component — the decoded spec plus the
+    /// recorded world-space path (head-first) and the `d3trail:`
+    /// child node whose ribbon geometry the host rebuilds each frame.
+    /// The update policy ports upstream `TrailComponent.update`: the
+    /// head follows the node continuously, a new anchor drops once the
+    /// node travels `minVertexDistance`, and the tail expires by age
+    /// (`lifetime`) and capacity (`maxPoints`).
+    final class TrailState {
+        var width = 0.25
+        var lifetime = 0.6
+        var minVertexDistance = 0.05
+        let maxPoints: Int
+        /// While false no new points record; the path ages out.
+        var emitting = true
+        /// `widthOverTrail` decoded — (t, v) pairs sorted by t;
+        /// nil → upstream's `1 − t` taper.
+        var widthKeys: [(t: Double, v: Double)]?
+        /// `colorOverTrail` decoded — (t, r, g, b, a) sorted by t;
+        /// nil → upstream's white fading `1 − t` in alpha.
+        var colorStops:
+            [(t: Double, r: Double, g: Double, b: Double, a: Double)]?
+        /// Head-first world positions — `points[0]` follows the node.
+        var points: [simd_float3] = []
+        /// Parallel birth clock of `points` (accumulated seconds).
+        var born: [Double] = []
+        var time = 0.0
+        /// The `d3trail:` child — its geometry renders under the
+        /// node's transform while the verts rebase to node-local
+        /// each frame (upstream's world-anchored rebase).
+        let child: SCNNode
+        /// Static strip topology — 2 verts per anchor, upstream's
+        /// `_stripIndices` winding.
+        let indexElement: SCNGeometryElement
+        /// Static +Z normals, one per strip vertex (upstream
+        /// `_initialNormals`) — the constant-lit material doesn't
+        /// read them but SceneKit wants the semantic present.
+        let normalSource: SCNGeometrySource
+        /// The shared translucent unlit material — upstream's
+        /// `_TrailDefaultMaterial`: vertex color (incl. alpha)
+        /// drives base color, double-sided because a camera-facing
+        /// strip's winding flips where the path doubles back.
+        static let material: SCNMaterial = {
+            let m = SCNMaterial()
+            m.lightingModel = .constant
+            m.diffuse.contents = UIColor.white
+            m.isDoubleSided = true
+            m.transparencyMode = .default
+            return m
+        }()
+
+        init(maxPoints: Int) {
+            self.maxPoints = maxPoints
+            child = SCNNode()
+            // `d3prim:`-style prefix — clearComponentState/removal
+            // purge by name, and the child never enters nodesById.
+            child.name = "d3trail:"
+            child.castsShadow = false
+            var indices: [UInt16] = []
+            indices.reserveCapacity((maxPoints - 1) * 6)
+            for i in 0..<maxPoints - 1 {
+                let a = UInt16(i * 2)
+                indices.append(contentsOf:
+                    [a, a + 1, a + 2, a + 1, a + 3, a + 2])
+            }
+            indexElement = SCNGeometryElement(
+                data: indices.withUnsafeBytes { Data($0) },
+                primitiveType: .triangles,
+                primitiveCount: (maxPoints - 1) * 2,
+                bytesPerIndex: MemoryLayout<UInt16>.size)
+            var normals = [Float](repeating: 0, count: maxPoints * 6)
+            for i in 0..<maxPoints * 2 { normals[i * 3 + 2] = 1 }
+            normalSource = SCNGeometrySource(
+                data: normals.withUnsafeBytes { Data($0) },
+                semantic: .normal,
+                vectorCount: maxPoints * 2,
+                usesFloatComponents: true,
+                componentsPerVector: 3,
+                bytesPerComponent: 4,
+                dataOffset: 0,
+                dataStride: 12)
+        }
+
+        /// Forgets the recorded path — the ribbon disappears.
+        func clear() {
+            points.removeAll()
+            born.removeAll()
+        }
+
+        /// Records `world` at `time + dt` — upstream's update ported.
+        func record(dt: Double, world: simd_float3) {
+            time += dt
+            if emitting {
+                if points.isEmpty {
+                    points.insert(world, at: 0)
+                    born.insert(time, at: 0)
+                } else {
+                    points[0] = world
+                    born[0] = time
+                    let anchored = points.count > 1
+                        ? points[1] : points[0]
+                    if points.count == 1 ||
+                        simd_distance(anchored, world) >=
+                            Float(minVertexDistance) {
+                        points.insert(world, at: 0)
+                        born.insert(time, at: 0)
+                    }
+                }
+            }
+            while points.count > maxPoints ||
+                (born.last.map { time - $0 > lifetime } ?? false) {
+                points.removeLast()
+                born.removeLast()
+                if points.isEmpty { break }
+            }
+        }
+
+        /// `widthOverTrail` at the head-to-tail fraction — piecewise-
+        /// linear, clamped to the ends; `1 − t` when no curve shipped.
+        func widthAt(_ t: Double) -> Double {
+            guard let keys = widthKeys, !keys.isEmpty else {
+                return 1.0 - t
+            }
+            if t <= keys[0].t { return keys[0].v }
+            if t >= keys[keys.count - 1].t {
+                return keys[keys.count - 1].v
+            }
+            for i in 1..<keys.count where t <= keys[i].t {
+                let f = (t - keys[i - 1].t) / (keys[i].t - keys[i - 1].t)
+                return keys[i - 1].v + (keys[i].v - keys[i - 1].v) * f
+            }
+            return keys[keys.count - 1].v
+        }
+
+        /// `colorOverTrail` at the head-to-tail fraction — piecewise-
+        /// linear rgba; the absent gradient is white fading `1 − t`.
+        func colorAt(_ t: Double) -> simd_float4 {
+            guard let stops = colorStops, !stops.isEmpty else {
+                return simd_float4(1, 1, 1, Float(1.0 - t))
+            }
+            if t <= stops[0].t {
+                return simd_float4(Float(stops[0].r), Float(stops[0].g),
+                                   Float(stops[0].b), Float(stops[0].a))
+            }
+            let last = stops[stops.count - 1]
+            if t >= last.t {
+                return simd_float4(Float(last.r), Float(last.g),
+                                   Float(last.b), Float(last.a))
+            }
+            for i in 1..<stops.count where t <= stops[i].t {
+                let a = stops[i - 1], b = stops[i]
+                let f = Float((t - a.t) / (b.t - a.t))
+                return simd_float4(
+                    Float(a.r) + Float(b.r - a.r) * f,
+                    Float(a.g) + Float(b.g - a.g) * f,
+                    Float(a.b) + Float(b.b - a.b) * f,
+                    Float(a.a) + Float(b.a - a.a) * f)
+            }
+            return simd_float4(Float(last.r), Float(last.g),
+                               Float(last.b), Float(last.a))
+        }
+    }
+
+    /// W16: a decoded `lod` component — upstream `LodComponent`. The
+    /// level list is highest detail first with descending
+    /// `screenSize` thresholds (fraction of viewport height). Selection
+    /// is dart3d's own per-frame pass (the Android `updateLod` port in
+    /// `SceneViewHost.updateLods`): SceneKit's `levelsOfDetail` is NOT
+    /// used — probe-verified, its `screenSpaceRadius` is a
+    /// max-projection-axis, half-viewport-diagonal metric measured on
+    /// view depth, which can't reproduce upstream's height-fraction
+    /// Euclidean selection, and its level-0 tight bounding sphere
+    /// isn't overridable.
+    final class LodSpec {
+        struct Level {
+            let geoKey: UInt64
+            let matKey: UInt64
+            let screenSize: Double
+        }
+        var levels: [Level] = []
+        var lodBias = 1.0
+        /// Upstream's dead-band fraction — the wire default is 0.1
+        /// (LodCodec/LodComponent); the frame pass's `selectLodLevel`
+        /// applies it with `bound` as the memory.
+        var hysteresis = 0.1
+        /// Decoded for wire parity — a documented no-op: upstream's
+        /// cross-fade needs a per-material dither slot
+        /// (`Material.lodFade`) the natives don't carry, so dart3d
+        /// hard-switches (Android matches).
+        var blendRange = 0.0
+        /// False while a level's geometry/material hasn't landed —
+        /// `lodResourceConsumers` routes its arrival to `rebindLod`.
+        var resolved = false
+        /// The level geometry copies in force — the frame pass binds
+        /// by swapping `node.geometry` among them; kept so a teardown
+        /// or rebind can purge them from `materialConsumers`.
+        var geoCopies: [SCNGeometry] = []
+        /// Level-0's local-space AABB — cached at rebind so the frame
+        /// pass transforms its 8 corners per frame instead of
+        /// re-reading `SCNGeometry.boundingBox`.
+        var boundMin = simd_float3()
+        var boundMax = simd_float3()
+        /// The level currently bound to `node.geometry` — -1 while
+        /// culled or never bound. Doubles as the hysteresis
+        /// dead-band's memory (upstream `_currentLevel`).
+        var bound = -1
+        /// The node's draw slot is lod-owned once a level has bound —
+        /// a culled node STILL owns the slot (bound -1 only parks its
+        /// geometry). The mesh geometry-consumer rebind lane skips
+        /// lod-owned nodes (Android's `ownsRenderable`).
+        var ownsRenderable = false
+        /// A `mesh` decoded after this `lod` took the slot back —
+        /// last-write-wins (Android's `suspended`); the frame pass
+        /// and resource-landing rebinds skip it until a fresh `lod`
+        /// decodes.
+        var suspended = false
+    }
+
     // MARK: - Context
 
     final class Context {
@@ -374,6 +591,29 @@ enum FsceneRealizer {
         /// claim).
         var variantComponents: [UInt64: VariantComponentSpec] = [:]
 
+        /// W16: node key → its live `trail` component state (decoded
+        /// spec + recorded path + the `d3trail:` child). The host's
+        /// per-frame pass records the world position and rebuilds the
+        /// ribbon geometry.
+        var trails: [UInt64: TrailState] = [:]
+
+        /// W16: node key → its decoded `lod` component. Level
+        /// resources resolve through `rebindLod` — unresolved specs
+        /// sit in `pendingLodNodes` and retry on resource landings.
+        var lods: [UInt64: LodSpec] = [:]
+
+        /// Resource id (geometry OR material) → node keys whose `lod`
+        /// references it — the consumer-map lane for surgical
+        /// rebinds, parallel to `geometryConsumers`/`materialConsumers`
+        /// (an LOD level can't ride those: a landing re-resolves the
+        /// whole level list, not a single slot).
+        var lodResourceConsumers: [UInt64: Set<UInt64>] = [:]
+
+        /// LOD nodes waiting on a level resource — retried by
+        /// `redecodeResource`/payload arrivals, the
+        /// `pendingSkinNodes` pattern.
+        var pendingLodNodes: Set<UInt64> = []
+
         /// `scene` is the host's bound scene for every caller — the
         /// manifest path decodes into it in place (a second SCNScene
         /// built inside the render callback trips SceneKit's
@@ -416,6 +656,11 @@ enum FsceneRealizer {
                                         variantComponents,
                                      disabledComponents:
                                         disabledComponents,
+                                     trails: trails,
+                                     lods: lods,
+                                     lodResourceConsumers:
+                                        lodResourceConsumers,
+                                     pendingLodNodes: pendingLodNodes,
                                      renderTargets: renderTargets),
                          deferred: deferredResourceIds,
                          camera: firstCameraNode,
@@ -2800,6 +3045,8 @@ enum FsceneRealizer {
                 jointComponentsDeferred.append((key, index, type, props))
             case "materialsVariants":
                 decodeMaterialsVariants(key: key, index: index, props: props)
+            case "trail":           decodeTrail(key, node, props)
+            case "lod":             decodeLod(key, node, props)
             default:
                 d3Log("unhandled component type '\(type)'")
             }
@@ -3685,6 +3932,17 @@ enum FsceneRealizer {
             // pass's frozen storage can still reference it.
             if let old = node.geometry, old !== geo { host.retire(old) }
             node.geometry = geo
+            // W16: the mesh took the draw slot — a decoded `lod`
+            // suspends (last-write-wins, Android's `suspended`); a
+            // pending mesh leaves the lod's binding live (the early
+            // returns above never reach this write), and a later `lod`
+            // re-decode restores itself through a fresh spec.
+            if let spec = lods[key] {
+                spec.suspended = true
+                spec.ownsRenderable = false
+                spec.bound = -1
+                pendingLodNodes.remove(key)
+            }
             // A collider decoded a nil shape while this geometry was
             // payload-deferred, so the body attached shapeless. Refit
             // the recorded derivation now that the geometry exists.
@@ -3705,6 +3963,169 @@ enum FsceneRealizer {
                 node.morpher = nil
             }
             attachSkin(key, node)
+        }
+
+        // MARK: Trails and LOD (W16)
+
+        /// Decodes a `trail` component (upstream `TrailComponent`):
+        /// spec fields into a `TrailState` and a `d3trail:` child to
+        /// carry the ribbon. The path is runtime state — upstream's
+        /// codec persists none of it, so a re-decode starts empty.
+        /// Upstream does not serialize a trail material; the natives
+        /// draw the translucent vertex-color unlit default.
+        func decodeTrail(_ key: UInt64, _ node: SCNNode,
+                         _ p: [String: Any]) {
+            let st = TrailState(
+                maxPoints: max(2, d3Int(p["maxPoints"]) ?? 48))
+            st.width = d3Double(p["width"]) ?? 0.25
+            st.lifetime = d3Double(p["lifetime"]) ?? 0.6
+            st.minVertexDistance =
+                d3Double(p["minVertexDistance"]) ?? 0.05
+            st.emitting = d3Bool(p["emitting"]) ?? true
+            // Upstream curve shape: `{keys: [{t, v}, …]}`.
+            if let curve = d3Map(p["widthOverTrail"]),
+               let keys = d3List(curve["keys"]) {
+                var parsed: [(t: Double, v: Double)] = []
+                for e in keys {
+                    guard let m = d3Map(e),
+                          let t = d3Double(m["t"]),
+                          let v = d3Double(m["v"]) else { continue }
+                    parsed.append((t, v))
+                }
+                st.widthKeys = parsed.isEmpty ? nil : parsed
+            }
+            // Upstream gradient shape: `{stops: [{t, color}, …]}`.
+            if let grad = d3Map(p["colorOverTrail"]),
+               let stops = d3List(grad["stops"]) {
+                var parsed:
+                    [(t: Double, r: Double, g: Double,
+                      b: Double, a: Double)] = []
+                for e in stops {
+                    guard let m = d3Map(e),
+                          let t = d3Double(m["t"]),
+                          let c = d3ColorComponents(m["color"])
+                    else { continue }
+                    parsed.append((t, c[0], c[1], c[2], c[3]))
+                }
+                st.colorStops = parsed.isEmpty ? nil : parsed
+            }
+            node.addChildNode(st.child)
+            trails[key] = st
+        }
+
+        /// Decodes an `lod` component (upstream `LodComponent`):
+        /// `levels` entries carry geometry+material refs and a
+        /// `screenSize` threshold (fraction of viewport height,
+        /// descending); entries missing either ref are skipped like
+        /// upstream's codec, while an absent/malformed `screenSize`
+        /// decodes as `0.0` — upstream's fallback, the never-cull
+        /// threshold (NOT a dropped level). `hysteresis` is
+        /// upstream's dead-band (wire default 0.1); `blendRange`
+        /// decodes for wire parity but is a documented no-op —
+        /// dart3d hard-switches (upstream's cross-fade needs the
+        /// per-material dither slot the natives don't carry).
+        func decodeLod(_ key: UInt64, _ node: SCNNode,
+                       _ p: [String: Any]) {
+            let spec = LodSpec()
+            for e in d3List(p["levels"]) ?? [] {
+                guard let m = d3Map(e),
+                      let g = d3Ref(m["geometry"]),
+                      let mat = d3Ref(m["material"])
+                else { continue }
+                spec.levels.append(.init(
+                    geoKey: g, matKey: mat,
+                    screenSize: d3Double(m["screenSize"]) ?? 0.0))
+            }
+            spec.lodBias = d3Double(p["lodBias"]) ?? 1.0
+            spec.hysteresis = d3Double(p["hysteresis"]) ?? 0.1
+            spec.blendRange = d3Double(p["blendRange"]) ?? 0.0
+            guard !spec.levels.isEmpty else { return }
+            // A re-decode replaces the spec wholesale — purge the
+            // outgoing level copies' material-consumer entries (they
+            // die with the spec).
+            if let old = lods[key] {
+                for copy in old.geoCopies {
+                    for mk in materialConsumers.keys {
+                        materialConsumers[mk]?.removeAll { $0 === copy }
+                    }
+                }
+            }
+            lods[key] = spec
+            for l in spec.levels {
+                lodResourceConsumers[l.geoKey, default: []].insert(key)
+                lodResourceConsumers[l.matKey, default: []].insert(key)
+            }
+            rebindLod(key, node)
+            // The initial draw is level 0 — upstream's base
+            // MeshComponent mesh — until the frame pass selects
+            // (Android's `decodeLod` binds 0 the same way). A pending
+            // spec leaves the slot alone: the pass re-evaluates once
+            // the resources land.
+            host.bindLodLevel(spec, node, 0)
+        }
+
+        /// (Re)resolves a node's `lod` levels against the resource
+        /// maps — every level's geometry copies and binds its
+        /// material, and level 0's local AABB caches onto the spec
+        /// for the frame pass. Called at decode and on every
+        /// geometry/material landing that the spec consumes; a
+        /// partial resolve leaves the node untouched and parks the
+        /// key in `pendingLodNodes`. A resolved spec re-applies its
+        /// bound level onto the fresh copies (Android's
+        /// `refreshLodConsumers` force-rebind); a culled or
+        /// never-bound spec leaves `node.geometry` alone — the frame
+        /// pass re-evaluates it.
+        func rebindLod(_ key: UInt64, _ node: SCNNode) {
+            guard let spec = lods[key], !spec.suspended else { return }
+            var geos: [SCNGeometry] = []
+            geos.reserveCapacity(spec.levels.count)
+            for l in spec.levels {
+                guard let base = geometries[l.geoKey],
+                      let mat = materials[l.matKey]
+                else {
+                    spec.resolved = false
+                    pendingLodNodes.insert(key)
+                    return
+                }
+                let g = (base.copy() as? SCNGeometry) ?? base
+                g.materials = [mat]
+                // Selection is dart3d's own — a SceneKit LOD set
+                // copied off a base geometry must never drive.
+                g.levelsOfDetail = nil
+                geos.append(g)
+            }
+            // Fully resolved — swap the realized state wholesale: the
+            // outgoing level copies purge their material-consumer
+            // entries, the new copies register theirs.
+            for old in spec.geoCopies {
+                for mk in materialConsumers.keys {
+                    materialConsumers[mk]?.removeAll { $0 === old }
+                }
+            }
+            for (i, g) in geos.enumerated() {
+                let mk = spec.levels[i].matKey
+                if !(materialConsumers[mk] ?? []).contains(where: {
+                    $0 === g
+                }) {
+                    materialConsumers[mk] =
+                        (materialConsumers[mk] ?? []) + [g]
+                }
+            }
+            spec.geoCopies = geos
+            spec.resolved = true
+            pendingLodNodes.remove(key)
+            // Cache level 0's local AABB — upstream's selection sphere
+            // is the circumscribed sphere of the level-0 world AABB,
+            // which the frame pass derives by transforming these 8
+            // corners rather than re-reading `boundingBox`.
+            let bb = geos[0].boundingBox
+            spec.boundMin = simd_float3(
+                Float(bb.min.x), Float(bb.min.y), Float(bb.min.z))
+            spec.boundMax = simd_float3(
+                Float(bb.max.x), Float(bb.max.y), Float(bb.max.z))
+            if spec.bound >= 0 {
+                host.bindLodLevel(spec, node, spec.bound, force: true)
+            }
         }
 
         func decodeCamera(_ node: SCNNode, _ p: [String: Any]) {
