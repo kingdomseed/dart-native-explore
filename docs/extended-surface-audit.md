@@ -84,7 +84,7 @@ Resource kinds (`specs.dart:278` `ResourceSpec` hierarchy):
 |---|---|
 | `GeometryResource` | realized — procedural (cuboid/plane/sphere/torus/icosphere) + payload vertices/indices; morph-delta payloads ship but morph decode is an audit row |
 | `TextureResource` | realized (payload + asset paths) |
-| `MaterialResource` | realized (PBR + unlit, emissive/doubleSided W6) |
+| `MaterialResource` | realized (PBR + unlit, emissive/doubleSided W6); W24 adds the `shadowCatcher` type — iOS `.shadowOnly` lighting model, Android unlit + `shadowMultiplier` filamat — both with logged per-field deltas |
 | `EnvironmentResource` | realized (W7) minus two deferred members — `effects` and `skyEnvironment`, both audit rows |
 | `RenderTextureResource` | **not realized** — audit row |
 
@@ -95,7 +95,7 @@ Document-level blocks:
 | `nodes` (transform/components/children/layers/visible) | realized + structural ops (W5) |
 | `payloads` | realized (W3) + `upsertPayload` (W5) |
 | `stage` (`environmentRef`, AA, camera) | realized (W1/W6/W7); `renderScale`/`filterQuality` audit row |
-| `views` (`RenderViewSpec` list) | **manifest carries it; neither realizer decodes it** — audit row |
+| `views` (`RenderViewSpec` list) | realized — rt-targeted entries W14; screen entries W24 (iOS sibling `SCNView` split, Android per-view `Viewport` passes). dart3d `viewport:[l,b,w,h]` extension rides a `Dart3dRenderViewSpec` subclass end-to-end |
 | `skins` (`SkinSpec`) | manifest carries it; not decoded — audit row |
 | `animations` (`AnimationSpec`) | manifest carries it; not decoded — audit row |
 | prefab `instance` field (`PrefabInstanceSpec`) | not emitted by dart3d's diff (document model has no compose) — audit row |
@@ -132,7 +132,7 @@ rendering/simulation subsystem.
 | Rect area light | `builtin_codecs.dart:1628-1697` | component; iOS decodes, Android logs | `.area` set today but `width`/`height`/`areaExtents` never applied — ~4 lines to finish | `LightManager.Type` 1.71.6 has no rectangle — emissive-quad + point cluster approximation | **partial** — iOS small, Android medium |
 | Material variants | `builtin_codecs.dart:1350-1537` (`variants`, `selected`, `bindings`) | component; unhandled | `geometry.materials[i]` swap per binding | `RenderableManager.setMaterialInstanceAt` | **supported** — small-medium; `select` rides `updateNode` or a new op |
 | Render textures | `specs.dart:498-531` `RenderTextureResource` (`width`/`height`/`updatePolicy`/`filter`/`wrap`) | resource spec carries; decode logs unimplemented | `SCNRenderer` offscreen → `MTLTexture` → `SCNMaterialProperty.contents`; scheduler per updatePolicy | `RenderTarget` + `View.setRenderTarget` + sample `Texture`; same scheduler | **supported** — medium both; manual policy needs a trigger op |
-| Views (multi-view) | `specs.dart:1531-1570` `RenderViewSpec`; `scene_document.dart:79` | manifest `views` block carried, undecoded | one `SCNView`; extra views = `SCNRenderer` passes to textures only — split-screen needs compositing | `View` per entry — `setViewport`/`setRenderTarget`/`setVisibleLayers`/`setBlendMode`/`setDynamicResolutionOptions` | **partial** — iOS large, Android medium |
+| Views (multi-view) | `specs.dart:1531-1570` `RenderViewSpec`; `scene_document.dart:79` | **realized W14+W24** — rt entries W14; screen entries land W24 | sibling `SCNView`s layered over the host (blank-camera host pass in split mode), `viewport` rects converted bottom-left→UIKit top-left, paused + poked from the host's render delegate | screen entries share `view` — per-pass camera/`Viewport`/layerMask/quality; `viewport` native (Filament is bottom-left too) | **landed** — sibling-vs-composited split is the documented platform delta; `layerMask` truncates to 8 bits on Filament |
 
 ### Environment and post-processing
 
@@ -323,3 +323,84 @@ workstream settled; platform-row edits belong to the integrator.
   payload (`alphaCutoff 0.5`), and a two-UV-set quad pair differing only
   in `baseColorTextureTransform.texCoord`. No KTX2 sample asset exists —
   that lane stays a manifest-level gap pending a bundled `.ktx2`.
+
+## W24 landed — views breadth and shadow breadth
+
+Where the views/shadow workstream settled. Verification: `dn test`
+(207 pass incl. 10 new `views_viewport_test.dart` cases), `dn analyze`
+(13 pre-existing `example/tool` findings only), iOS
+`swiftc -typecheck -target arm64-apple-ios16.0-simulator` clean,
+Android `:dart3d:compileReleaseKotlin` green. No device run — the
+harness phase is the driveable lane.
+
+- **`viewport` wire extension** — upstream `RenderViewSpec` is
+  final-shaped with no rect field; `Dart3dRenderViewSpec`
+  (`diff_apply.dart:358`) subclasses it and adds
+  `viewport:[left,bottom,width,height]` in target-pixel units,
+  bottom-left origin. `encodeViewSpec`/`decodeViewSpec` preserve the
+  upstream field set; `readFsceneWithExtensions` +
+  `applyViewExtensions` re-decode `doc.views` so `.fscene`,
+  `.fsceneb`, showcase, and `loadSceneBytes` all keep the member, and
+  `updateViews` re-encodes it.
+- **iOS split-screen** — ≥2 screen views, or any screen view with a
+  `viewport`, swaps the host into a blank-camera pass (category mask 0)
+  and layers one sibling `SCNView` per entry in `order`. Siblings share
+  the scene, stay `isPlaying = false`, get their cameras synchronized
+  in `willRenderScene`, and are poked (`setNeedsDisplay`) in
+  `didRenderScene`. A single full-frame screen view keeps the original
+  host `SCNView` path. The lowest-order view drives the real camera
+  node; later views get detached proxy cameras.
+- **Android screen views** — each screen entry is a pass on the shared
+  Filament `View`: camera, `Viewport` (Filament's origin is
+  bottom-left, same as the wire), `setVisibleLayers`, AA, and
+  renderScale pushed per render, in `order`. Composited-pass
+  equivalent of iOS's siblings.
+- **Android `layerMask` is 8-bit** — the wire mask is 32-bit; Filament
+  `setVisibleLayers`/`layerMask` take uint8. Both the view entries and
+  node `layers` truncate `and 0xFF` at build and `warnOnce` when high
+  bits are set (`RenderTargets.kt:274-281`,
+  `FsceneRealizer.kt:1110-1117`). Layer bit ≥8 is iOS-visible only.
+- **Directional shadow vocabulary** — the harness re-decodes `key`
+  with the upstream `DirectionalLightCodec` field set plus three
+  dart3d wire extensions upstream keeps on
+  `stage.skyEnvironment.sunLight` (`SunLightSpec`:
+  `contactShadows`/`contactShadowDistance`/`angularRadius`). The sun
+  block stays deferred on both platforms (the `skyEnvironment`
+  relighting row above), so dart3d accepts the fields on the light
+  component instead — decode sites mark them extensions. Upstream's
+  `priority`/`localDirection` members stay unmapped and warn once on
+  receipt both platforms. iOS maps `shadowMapResolution`→
+  `shadowMapSize`, `shadowSoftness`→`shadowRadius`,
+  `shadowMaxDistance`→`orthographicScale` (auto-fit off),
+  `shadowCasterFaces 'back'`→`forcesBackFaceCasters`; cascades, split
+  lambda, fade range, ambient strength, normal bias, cacheStatic,
+  the three sun extensions, and non-rotatedPoisson filters `logOnce`
+  per field — SceneKit renders one shadow map per directional
+  (`FsceneRealizer.swift:3342-3433`). Android maps
+  `shadowCascadeCount`/`shadowCascadeSplitLambda` (computed split
+  positions), `shadowMaxDistance`, `shadowNormalBias`,
+  `contactShadows`→`screenSpaceContactShadows`, `shadowSoftness`→
+  `shadowBulbRadius` (DPCF approximation), `angularRadius`→
+  `sunAngularRadius`; fade/ambient/caster-faces/cacheStatic/
+  `contactShadowDistance`/`shadowFilter` warn once
+  (`FsceneRealizer.kt:1618-1708`).
+- **`shadowRadius` vs `shadowSoftness` precedence** — both write the
+  same native knob (`light.shadowRadius` iOS, `shadowBulbRadius`
+  Android). The W24 field decodes second in `decodeDirectionalShadow`
+  and wins when a document authors both; the `key` re-decode
+  exercises it on purpose (3.0 then 0.08).
+- **`shadowCatcher` material** — dart3d extension `type` on
+  `MaterialResource`, upstream `ShadowCatcherMaterial`'s live mode:
+  the surface draws only its received shadow. iOS realizes
+  `SCNLightingModel.shadowOnly` (the light's `shadowColor` drives the
+  catch — material-level `shadowColor`/`shadowIntensity`/`aoStrength`/
+  `softness`/`fade*`/`mode` log once). Android compiles an unlit
+  `shadowMultiplier` filamat at runtime — fragment emits
+  `(shadowColor·a, a)`, `a = intensity·(1−visibility)` — with the same
+  unsupported-field warnings (`Dart3dView.kt:643-675`,
+  `FsceneRealizer.kt:3260-3285`).
+- **Harness** — `w24Phase` fires at +126 s: arms the shadow vocabulary
+  on `key`, drops a catcher plane and a layer-bit-8 marker, then walks
+  `updateViews` through a two-view split, a single inset-rect view,
+  and a high-bit layerMask pair before restoring the pre-phase list
+  for the dice-regression tail.

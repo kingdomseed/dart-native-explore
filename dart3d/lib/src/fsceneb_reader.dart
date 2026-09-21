@@ -25,6 +25,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'diff_apply.dart';
 import 'scene_model.dart';
 
 /// The newest `.fsceneb` container version this reader accepts.
@@ -132,6 +133,10 @@ SceneDocument readFsceneb(Uint8List bytes) {
     throw const FscenebFormatException('Container has no JSON manifest chunk');
   }
   final document = readFscene(manifest);
+  // W24: upstream's `_decodeView` drops the dart3d `viewport`
+  // extension — re-decode the manifest's raw `views` entries through
+  // dart3d's codec so it survives the round-trip.
+  applyViewExtensions(document, jsonDecode(manifest) as Map<String, Object?>);
   blobs.forEach((id, payload) {
     document.payload(id)?.bytes = payload;
   });

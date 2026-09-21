@@ -158,6 +158,27 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     val unlitMaterial: Material
     val unlitMaskedMaterial: Material
     val unlitBlendMaterial: Material
+    /**
+     * W24 `shadowCatcher` — the Filament unlit+shadowMultiplier path.
+     * Built lazily on first use: a compile failure degrades catcher
+     * surfaces to transparent instead of aborting SceneView init.
+     */
+    private var catcherMaterialBacking: Material? = null
+    private var catcherMaterialFailed = false
+    val catcherMaterial: Material?
+        get() {
+            if (catcherMaterialBacking == null && !catcherMaterialFailed) {
+                catcherMaterialBacking = try {
+                    buildShadowCatcherMaterial()
+                } catch (t: Throwable) {
+                    catcherMaterialFailed = true
+                    Log.w(TAG, "d3.shadowCatcher: material build failed; " +
+                        "catcher surfaces degrade to transparent", t)
+                    null
+                }
+            }
+            return catcherMaterialBacking
+        }
 
     // MARK: - Jolt world
 
@@ -664,6 +685,57 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     }
 
     /**
+     * W24 `shadowCatcher` — upstream ShadowCatcherMaterial's live
+     * mode: the surface draws only the shadow it receives. Filament's
+     * recipe is UNLIT + `shadowMultiplier`, which carries the
+     * aggregated shadow visibility (1 = lit) into the fragment — the
+     * output is upstream's `(shadowColor * alpha, alpha)` where
+     * `alpha = shadowIntensity * (1 - visibility)`; TRANSPARENT
+     * blending is premultiplied, so the rgb premultiply is literal.
+     * `aoStrength`/`softness`/`fadeStart`/`fadeEnd`/`mode` have no
+     * per-material analog on this path — the realizer warns once per
+     * authored key.
+     */
+    private fun buildShadowCatcherMaterial(): Material {
+        if (!filamatReady) {
+            MaterialBuilder.init()
+            filamatReady = true
+        }
+        val b = MaterialBuilder()
+            .platform(MaterialBuilder.Platform.MOBILE)
+            .name("d3_shadow_catcher")
+            .shading(MaterialBuilder.Shading.UNLIT)
+            .doubleSided(true)
+            .blending(MaterialBuilder.BlendingMode.TRANSPARENT)
+            // The catcher is still a real surface — it joins the
+            // depth prepass like upstream's catcher does, so contact
+            // shadows and occlusion read its depth.
+            .depthWrite(true)
+            .shadowMultiplier(true)
+            .uniformParameter(MaterialBuilder.UniformType.FLOAT4,
+                "shadowColor")
+            .uniformParameter(MaterialBuilder.UniformType.FLOAT,
+                "shadowIntensity")
+        // `shadowMultiplier` makes the engine multiply the FINAL
+        // color — alpha included — by the shadow factor downstream;
+        // no MaterialInputs field exposes it to read (1.71.6 emits
+        // `shadowStrength`, a writable attenuation output). The
+        // material only declares the catcher's max tint/opacity.
+        val body = "void material(inout MaterialInputs material) {\n" +
+            "    prepareMaterial(material);\n" +
+            "    material.baseColor = vec4(" +
+            "materialParams.shadowColor.rgb," +
+            " materialParams.shadowColor.a * " +
+            "materialParams.shadowIntensity);\n" +
+            "}\n"
+        val pkg = b.material(body).build()
+        check(pkg.isValid) { "d3 shadow catcher failed to compile" }
+        return Material.Builder()
+            .payload(pkg.buffer, pkg.buffer.remaining())
+            .build(engine)
+    }
+
+    /**
      * Emits `vec2 <slot>Uv = offset + R(rot)·(scale ⊙ uvSet)` where the
      * `<slot>UVSet` uniform selects getUV0()/getUV1() — the wire's
      * `texCoord` channel index (0 → uv0, ≥1 → uv1).
@@ -1091,6 +1163,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             engine.destroyMaterial(unlitMaterial)
             engine.destroyMaterial(unlitMaskedMaterial)
             engine.destroyMaterial(unlitBlendMaterial)
+            catcherMaterialBacking?.let { engine.destroyMaterial(it) }
             engine.destroyRenderer(renderer)
             engine.destroyView(view)
             engine.destroyScene(scene)

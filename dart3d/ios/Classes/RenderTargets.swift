@@ -2,17 +2,30 @@ import Foundation
 import Metal
 import SceneKit
 
-/// W14: render textures and views.
+/// W14: render textures and views. W24 adds iOS split-screen.
 ///
 /// A `kind:'renderTexture'` resource realizes to an `MTLTexture` pair
 /// the offscreen passes draw into; a material slot referencing it binds
 /// the color texture live (FsceneRealizer `applyTextureSlot`). The
 /// top-level `views` array declares per-camera draws — `target` absent
-/// means the screen (iOS has no split-screen: lowest `order` wins
-/// `pointOfView`), `target:'rt:<tok>'` draws into that rt via an
+/// means the screen, `target:'rt:<tok>'` draws into that rt via an
 /// `SCNRenderer` sharing the SAME scene object, scheduled from
 /// `renderer(_:willRenderScene:atTime:)` so the pass sees the same
 /// post-physics pose as the screen frame.
+///
+/// Screen views (W24): a single target-absent view with no `viewport`
+/// keeps the W14 path — its camera takes the host `SCNView`'s
+/// `pointOfView`. Two or more screen views, or any `viewport` rect,
+/// switch to split mode: the host's point of view becomes a blank
+/// camera (mask 0 — its pass contributes clear/background only) and
+/// every screen view owns a sibling `SCNView` laid out over the host
+/// at its rect (`[l,b,w,h]` target pixels, bottom-left origin; absent
+/// rect = full bounds), added in `order` so later views draw on top.
+/// A sibling is `isPlaying:false` + `rendersContinuously:false` — it
+/// shares the scene object but advances no scene time of its own (no
+/// second physics step); the host's delegate syncs each sibling's
+/// point of view in `willRenderScene` and pokes `setNeedsDisplay` in
+/// `didRenderScene`, so sibling draws follow the host's frame.
 ///
 /// Update policies: `everyFrame` draws every vsync, `interval` draws
 /// when `intervalMilliseconds` have elapsed since the last pass,
@@ -31,12 +44,26 @@ struct ViewRec {
     var aaMode: String?            // 'none'|'msaa'|'fxaa'|'auto'
     var renderScale: Double?
     var filterQuality: String?
-    var viewport: [Double]?        // dart3d additive ext — iOS ignores it
+    var viewport: [Double]?        // dart3d ext — [l,b,w,h] target px, W24 screen views
     // Texture-target runtime — never populated on screen views.
     var renderer: SCNRenderer?
     var msaaColorTex: MTLTexture?
     var msaaDepthTex: MTLTexture?
     var msaaSamples = 1
+}
+
+/// W24 split-screen — the render-queue half of one screen view's
+/// sibling `SCNView`: the rec snapshot it syncs from and the sibling's
+/// point-of-view. `pov` is the real camera node for the lowest-order
+/// view when resolvable (`drivesRealNode` — `allowsCameraControl` and
+/// authored motion keep the single-view semantics) or a detached
+/// proxy node whose transform+camera are copied in each frame. The
+/// sibling `UIView` objects live in `mainScreenSubviews` (main
+/// thread); the two lists pair by index.
+struct ScreenSubview {
+    var rec: ViewRec
+    var pov: SCNNode
+    var drivesRealNode: Bool
 }
 
 /// A `kind:'renderTexture'` resource record: the spec fields, the
@@ -135,7 +162,7 @@ extension FsceneRealizer.Context {
     /// each rt record happens at `installViews`.
     func decodeViews(_ any: Any?) {
         views = []
-        for entry in any as? [Any] ?? [] {
+        for (index, entry) in (any as? [Any] ?? []).enumerated() {
             guard let e = entry as? [String: Any] else { continue }
             // Contract tokens are plain strings; the tagged rref/nref
             // form is accepted for robustness.
@@ -165,6 +192,21 @@ extension FsceneRealizer.Context {
                 host.logOnce("w14.view.targetToken",
                     "view 'target' is malformed; treating as screen")
             }
+            // dart3d extension — [l,b,w,h] target px. Malformed rects
+            // warn and drop (→ full target), the same shape Android's
+            // `views.$index.viewport` warning takes.
+            let rawVp = (e["viewport"] as? [NSNumber])
+                .map { $0.map { $0.doubleValue } }
+            var viewport: [Double]?
+            if let vp = rawVp {
+                if vp.count == 4 {
+                    viewport = vp
+                } else {
+                    host.logOnce("w24.viewport.\(index)",
+                        "view \(index): viewport needs [l,b,w,h]; "
+                        + "ignored")
+                }
+            }
             views.append(ViewRec(
                 cameraKey: camKey,
                 targetKey: targetKey,
@@ -178,20 +220,20 @@ extension FsceneRealizer.Context {
                     ?? d3Double(e["renderScale"]),
                 filterQuality: e["filterQuality"] as? String
                     ?? d3String(e["filterQuality"]),
-                viewport: (e["viewport"] as? [NSNumber])
-                    .map { $0.map { $0.doubleValue } }))
+                viewport: viewport))
         }
         // Feature-present warnings — decode time is when "requested"
         // is known.
-        if views.contains(where: { $0.viewport != nil }) {
-            host.logOnce("w14.viewport",
-                "view 'viewport' is ignored on iOS — split-screen is "
-                + "offscreen-only on this platform")
-        }
         if views.contains(where: {
             $0.targetKey != nil && $0.renderScale != nil }) {
             host.logOnce("w14.renderScale.rt",
                 "renderScale on a texture-target view is ignored on iOS")
+        }
+        if views.contains(where: {
+            $0.targetKey != nil && $0.viewport != nil }) {
+            host.logOnce("w24.viewport.rt",
+                "viewport on a texture-target view is ignored on iOS — "
+                + "the pass fills the rt (Android honors the rect)")
         }
         if views.contains(where: { $0.filterQuality != nil }) {
             host.logOnce("w14.filterQuality.view",
@@ -386,7 +428,9 @@ extension SceneViewHost {
 
     /// Destroys every rt's textures and per-view renderers through the
     /// graveyard — called from `install` (the renderers hold the
-    /// replaced scene) and `willMove(toWindow:)` detach.
+    /// replaced scene) and `willMove(toWindow:)` detach. The W24
+    /// sibling views die with them (their `SCNView`s hold the replaced
+    /// scene object too).
     func teardownRenderTargets() {
         for rec in renderTargets.values {
             retire(rec.colorTex)
@@ -396,6 +440,180 @@ extension SceneViewHost {
         renderTargets = [:]
         views = []
         screenViews = []
+        teardownScreenSubviews()
+        multiScreenMode = false
+        blankPov = nil
+        docPov = nil
         rendersContinuously = false
+    }
+
+    // MARK: - W24 split-screen siblings
+
+    /// Whether the current screen-view set needs sibling mode: more
+    /// than one screen view, or any view carrying a `viewport` rect.
+    private var wantsScreenSubviews: Bool {
+        screenViews.count > 1
+            || screenViews.contains { $0.viewport != nil }
+    }
+
+    /// Rebuilds the split-screen state after `screenViews` changes —
+    /// called from `installViews` (render queue). The sibling `SCNView`
+    /// objects are UIKit: their build and teardown hop to the main
+    /// thread, generation-gated so a superseded build can't install.
+    /// The render-queue `screenSubviews` list (rec + proxy) is written
+    /// here so per-frame sync never touches UIKit state.
+    func updateScreenSubviews() {
+        screenSubviewBuild += 1
+        let gen = screenSubviewBuild
+        multiScreenMode = wantsScreenSubviews
+        screenSubviews = []
+        teardownScreenSubviews()
+        guard multiScreenMode else { return }
+        let recs = screenViews
+        // Index 0's point-of-view is the real camera node when
+        // resolvable — the lowest-order view keeps the single-view
+        // semantics (allowsCameraControl mutates the real node,
+        // authored motion reads it directly). Later views draw
+        // through detached proxies synced per frame.
+        screenSubviews = recs.enumerated().map { i, rec in
+            let real = i == 0 ? nodesById[rec.cameraKey] : nil
+            return ScreenSubview(
+                rec: rec, pov: real ?? SCNNode(), drivesRealNode: real != nil)
+        }
+        let povs = screenSubviews.map { $0.pov }
+        let snapScene = scene
+        let snapControl = allowsCameraControl
+        let snapAA = antialiasingMode
+        let snapScale = contentScaleFactor
+        let snapBg = backgroundColor
+        DispatchQueue.main.async { [weak self] in
+            guard let self,
+                  self.screenSubviewBuild == gen,
+                  self.multiScreenMode else { return }
+            for (i, rec) in recs.enumerated() {
+                let sub = SCNView(frame: self.screenSubviewFrame(rec.viewport))
+                sub.scene = snapScene
+                // Paused + on-demand: the sibling shares the scene but
+                // owns no clock — no second update/sim step. The host
+                // pokes setNeedsDisplay once per host frame.
+                sub.isPlaying = false
+                sub.rendersContinuously = false
+                sub.autoenablesDefaultLighting = false
+                sub.isUserInteractionEnabled = i == 0
+                sub.allowsCameraControl = i == 0 && snapControl
+                sub.backgroundColor = snapBg
+                sub.antialiasingMode = snapAA
+                sub.contentScaleFactor = snapScale
+                sub.pointOfView = povs[i]
+                self.addSubview(sub)
+                self.mainScreenSubviews.append((view: sub, rec: rec))
+            }
+            self.applyScreenSubviewQuality()
+        }
+    }
+
+    /// Tears down the sibling views — render-queue side drops its
+    /// list now; the UIView removal hops to main (the sibling may be
+    /// mid-draw there; removeFromSuperview sequences on main).
+    func teardownScreenSubviews() {
+        screenSubviews = []
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            for s in self.mainScreenSubviews {
+                s.view.removeFromSuperview()
+            }
+            self.mainScreenSubviews = []
+        }
+    }
+
+    /// Per-frame sibling point-of-view sync — runs in
+    /// `willRenderScene` (post-physics, same hook the offscreen
+    /// scheduler uses) so a sibling's next draw sees the pose this
+    /// frame's screen pass is about to. The proxy gets a COPY of the
+    /// node's camera each frame: the copy carries the view's own
+    /// `layerMask` (the wire mask is per-view; the SCNCamera mask is
+    /// per-object) plus whatever exposure/effects the stage last
+    /// wrote. Index 0's pov is the real node — the mask write lands
+    /// there instead (the same write `applyScreenViewCamera` does).
+    /// A camera that stops resolving keeps its sibling's last pose.
+    func syncScreenSubviews() {
+        for s in screenSubviews {
+            guard let camNode = nodesById[s.rec.cameraKey],
+                  let cam = camNode.camera else { continue }
+            let mask = s.rec.layerMask == UInt32.max
+                ? Int(bitPattern: UInt.max) : Int(s.rec.layerMask)
+            if s.drivesRealNode {
+                cam.categoryBitMask = mask
+                continue
+            }
+            s.pov.transform = camNode.presentation.worldTransform
+            if let copy = cam.copy() as? SCNCamera {
+                copy.categoryBitMask = mask
+                s.pov.camera = copy
+            }
+        }
+    }
+
+    /// Pokes every sibling for a redraw — called from
+    /// `didRenderScene`. The list lives on main; the hop is once per
+    /// host frame and the draws land on the next display commit.
+    func pokeScreenSubviews() {
+        guard multiScreenMode else { return }
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            for s in self.mainScreenSubviews {
+                s.view.setNeedsDisplay()
+            }
+        }
+    }
+
+    /// Re-lays the sibling frames after a bounds change — called from
+    /// `layoutSubviews` (main thread) and at build time.
+    func layoutScreenSubviews() {
+        for s in mainScreenSubviews {
+            s.view.frame = screenSubviewFrame(s.rec.viewport)
+        }
+    }
+
+    /// `[l,b,w,h]` target-pixel rect → a UIKit points frame. The wire
+    /// origin is bottom-left (Filament's convention — the dart3d
+    /// contract mirrors it); UIKit's is top-left, so y flips against
+    /// the target height. Target pixels = the host drawable:
+    /// bounds × contentScaleFactor (renderScale rides it, so a scaled
+    /// pass keeps the rect proportional). Absent/malformed → bounds.
+    private func screenSubviewFrame(_ vp: [Double]?) -> CGRect {
+        guard let vp, vp.count == 4 else { return bounds }
+        let s = contentScaleFactor > 0 ? contentScaleFactor : 1.0
+        let targetH = bounds.height * s
+        return CGRect(
+            x: vp[0] / s,
+            y: (targetH - vp[1] - vp[3]) / s,
+            width: vp[2] / s,
+            height: vp[3] / s)
+    }
+
+    /// Per-sibling quality resolve — view `antiAliasing` (non-'auto')
+    /// > stage (non-'auto') > the sibling's init mode (the host's at
+    /// build); `renderScale` (view > stage) multiplies the screen
+    /// scale into `contentScaleFactor`, the same approximate path
+    /// `applyStageQuality` uses. Runs on main — called from
+    /// `applyStageQuality` and at build.
+    func applyScreenSubviewQuality() {
+        for s in mainScreenSubviews {
+            let req = s.rec.aaMode.flatMap { $0 == "auto" ? nil : $0 }
+                ?? (stageAntiAliasing != "auto" ? stageAntiAliasing : nil)
+            switch req {
+            case "none": s.view.antialiasingMode = .none
+            case "msaa": s.view.antialiasingMode = .multisampling4X
+            case nil: break
+            default:
+                logOnce("w24.aa.screen.\(req!)",
+                    "antiAliasing '\(req!)' unsupported on SceneKit "
+                    + "screen views; using the view's mode")
+            }
+            s.view.contentScaleFactor =
+                (s.rec.renderScale ?? stageRenderScale)
+                    * (window?.screen.scale ?? UIScreen.main.scale)
+        }
     }
 }

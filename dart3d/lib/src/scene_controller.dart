@@ -614,9 +614,10 @@ final class SceneController {
   /// `updateViews` op (W14). Entries encode in the manifest `_encodeView`
   /// shape with the tracked [document]'s id keys (`n:`/`rt:`/…
   /// prefixes); before any document loads, bare id tokens go out —
-  /// the native decoders strip prefixes either way. To ship the dart3d
-  /// `viewport` extension or reference ids outside the document, send
-  /// pre-encoded entries through [applyCommands] directly.
+  /// the native decoders strip prefixes either way. A
+  /// [Dart3dRenderViewSpec] carries the `viewport` extension straight
+  /// through; anything more exotic (ids outside the document) can
+  /// still send pre-encoded entries through [applyCommands] directly.
   void updateViews(List<RenderViewSpec> views) {
     final doc = _document;
     applyCommands([

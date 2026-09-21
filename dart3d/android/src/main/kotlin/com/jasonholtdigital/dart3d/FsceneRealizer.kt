@@ -1107,6 +1107,14 @@ object FsceneRealizer {
             )
             rec.name = spec.optString("name").takeIf { it.isNotEmpty() }
             rec.layers = spec.optInt("layers", 1)
+            if (rec.layers and 0xFFFFFF00.toInt() != 0) {
+                // W24 audit: Filament's layer system is natively
+                // 8-bit (uint8 masks on layerMask/setVisibleLayers) —
+                // the upstream 32-bit mask truncates, not widens.
+                warnOnce("w24.nodeLayers.$key",
+                    "node $key layers ${rec.layers}: Filament layer " +
+                        "masks are 8-bit; high bits ignored")
+            }
             if (spec.has("visible") && !spec.getBoolean("visible")) {
                 rec.hidden = true
             }
@@ -1576,12 +1584,162 @@ object FsceneRealizer {
                     // approximation, not equality.
                     so.shadowBulbRadius = it.toFloat()
                 }
+                if (type == LightManager.Type.DIRECTIONAL) {
+                    decodeDirectionalShadow(host, builder, so, p)
+                }
                 builder.shadowOptions(so)
                 Log.i(TAG, "shadow options: mapSize=${so.mapSize}" +
+                    " cascades=${so.shadowCascades}" +
+                    " maxDist=${so.maxShadowDistance}" +
+                    " contact=${so.screenSpaceContactShadows}" +
                     " bias=${so.constantBias} normalBias=${so.normalBias}" +
                     " bulbRadius=${so.shadowBulbRadius}")
             }
+            if (type == LightManager.Type.DIRECTIONAL) {
+                // dart3d wire extension — upstream carries it on
+                // `sunLight`, deferred here. Light-level, not a
+                // shadow option, so it applies whether or not the
+                // light casts (matches iOS's decode placement).
+                p.tag("angularRadius").d3Double()?.let {
+                    builder.sunAngularRadius(it.toFloat())
+                }
+                // The contact-shadow extensions still need a casting
+                // light — warn rather than drop silently.
+                if (p.tag("castsShadow").d3Bool() != true &&
+                    (p.tag("contactShadows") != null ||
+                        p.tag("contactShadowDistance") != null)
+                ) {
+                    warnOnce("w24.directional.contactShadow.noCast",
+                        "contactShadows/contactShadowDistance require " +
+                            "castsShadow — ignored on a non-casting " +
+                            "directional light")
+                }
+                // Unmapped upstream `DirectionalLightCodec` members —
+                // warned here, outside the castsShadow gate, since
+                // they aren't shadow fields: `priority` (feature
+                // priority) and `localDirection` (travel dir; dart3d
+                // aims lights by node transform).
+                for (field in listOf("priority", "localDirection")) {
+                    if (p.tag(field) != null) {
+                        warnOnce("w24.directional.$field",
+                            "directionalLight '$field' is an " +
+                                "upstream field with no dart3d " +
+                                "mapping; ignored")
+                    }
+                }
+            }
             builder.build(host.engine, rec.entity)
+        }
+
+        /**
+         * W24: the upstream directional-light shadow vocabulary
+         * (flutter_scene `DirectionalLightCodec`) plus three dart3d
+         * wire extensions upstream keeps on
+         * `stage.skyEnvironment.sunLight` (`SunLightSpec`):
+         * `contactShadows`, `contactShadowDistance`, `angularRadius`
+         * — the sun block stays deferred on both platforms, so the
+         * fields ride the light component here. `priority` and
+         * `localDirection` are upstream codec members dart3d doesn't
+         * map — they warn below like the other unmapped fields.
+         * Filament maps the breadth onto `ShadowOptions` + the sun
+         * knobs; fields with no Filament counterpart warn once
+         * instead of pretending parity. Runs inside the `castsShadow`
+         * guard — the options are only meaningful on a casting light.
+         */
+        private fun decodeDirectionalShadow(
+            host: Dart3dView,
+            builder: LightManager.Builder,
+            so: LightManager.ShadowOptions,
+            p: JSONObject,
+        ) {
+            p.tag("shadowMapResolution").d3Double()?.let {
+                so.mapSize = it.toInt().coerceIn(64, 4096)
+            }
+            p.tag("shadowCascadeCount").d3Double()?.let {
+                so.shadowCascades = it.toInt().coerceIn(1, 4)
+            }
+            p.tag("shadowMaxDistance").d3Double()?.let {
+                so.maxShadowDistance = it.toFloat()
+            }
+            p.tag("shadowNormalBias").d3Double()?.let {
+                // Exact — overrides the shadowDepthBias 2:1 split's
+                // normal half when both are authored.
+                so.normalBias = it.toFloat()
+            }
+            p.tag("contactShadows").d3Bool()?.let {
+                // dart3d wire extension — upstream carries it on
+                // `sunLight`, deferred here. Exact — Filament's
+                // screen-space contact-shadow chain.
+                // `contactShadowDistance` has no distance knob (the
+                // march's reach is fixed by the light), so an
+                // authored value only rides the approximation note.
+                so.screenSpaceContactShadows = it
+            }
+            if (p.tag("contactShadowDistance").d3Double() != null) {
+                // dart3d wire extension — upstream carries it on
+                // `sunLight`, deferred here.
+                warnOnce("w24.contactShadowDistance",
+                    "contactShadowDistance has no Filament equivalent " +
+                        "— screen-space contact shadows march a fixed " +
+                        "reach; ignored")
+            }
+            p.tag("shadowSoftness").d3Double()?.let {
+                // World-space penumbra → the bulb radius PCSS-style
+                // filters scale by; DPCF (the view's shadow type)
+                // doesn't consume it — softening stays an
+                // approximation until a soft shadow type is chosen.
+                // Precedence: `shadowRadius` (W6) and `shadowSoftness`
+                // (W24) write the same knob — this decode runs second,
+                // so softness wins when a document authors both.
+                so.shadowBulbRadius = it.toFloat()
+            }
+            p.tag("shadowCascadeSplitLambda").d3Double()?.let { lambda ->
+                if (so.shadowCascades > 1) {
+                    so.cascadeSplitPositions = cascadeSplits(
+                        lambda.toFloat(), so.shadowCascades)
+                }
+            }
+            for (field in listOf("shadowFadeRange",
+                                 "shadowAmbientStrength",
+                                 "shadowCasterFaces",
+                                 "cacheStaticShadows")) {
+                if (p.tag(field) != null) {
+                    warnOnce("w24.directional.$field",
+                        "directionalLight '$field' has no Filament " +
+                            "equivalent; ignored")
+                }
+            }
+            p.tag("shadowFilter").d3String()?.let { f ->
+                if (f != "rotatedPoisson") {
+                    warnOnce("w24.shadowFilter.$f",
+                        "shadowFilter '$f' is per-view on Filament " +
+                            "(the view runs DPCF); ignored")
+                }
+            }
+        }
+
+        /**
+         * The practical (log/linear blend) cascade split scheme —
+         * `split_i = λ·n·(f/n)^(i/N) + (1−λ)·(n + (f−n)·i/N)` for
+         * i = 1..N−1, normalized to (0,1) fractions of the shadow
+         * range Filament expects. `n` is nominal — the view camera's
+         * near isn't known at light decode; 0.1 m is the authored
+         * scenes' band.
+         */
+        private fun cascadeSplits(
+            lambda: Float, cascades: Int,
+        ): FloatArray {
+            val n = 0.1f
+            val f = 1.0f // normalized — splits are fractions of maxShadowDistance
+            val out = FloatArray(3) { 1.0f }
+            for (i in 1 until cascades.coerceAtMost(4)) {
+                val t = i.toFloat() / cascades
+                val log = n * Math.pow((f / n).toDouble(),
+                    t.toDouble()).toFloat()
+                val uni = n + (f - n) * t
+                out[i - 1] = lambda * log + (1 - lambda) * uni
+            }
+            return out
         }
 
         /**
@@ -3140,8 +3298,43 @@ object FsceneRealizer {
         consumers: MutableMap<Long, MutableList<Pair<MaterialInstance, String>>>?,
     ): MaterialInstance {
         val type = r.optString("type").ifEmpty { "physicallyBased" }
-        val unlit = type == "unlit"
         val props = r.optJSONObject("properties") ?: JSONObject()
+        if (type == "shadowCatcher") {
+            // W24 dart3d extension — upstream's live-mode
+            // ShadowCatcherMaterial: draws only the received shadow,
+            // `(shadowColor·a, a)` with a = intensity·(1−visibility).
+            // Filament's unlit+shadowMultiplier material carries the
+            // visibility; aoStrength/softness/fade*/mode have no
+            // per-material analog here and warn once.
+            val base = host.catcherMaterial
+            if (base == null) {
+                warnOnce("w24.catcher.unavailable",
+                    "shadowCatcher material unavailable; " +
+                        "surface degrades to transparent")
+                val mi = host.unlitBlendMaterial.createInstance()
+                mi.setParameter("baseColor", 0f, 0f, 0f, 0f)
+                return mi
+            }
+            val mi = base.createInstance()
+            val c = props.tag("shadowColor").d3Color()
+                ?: floatArrayOf(0f, 0f, 0f, 1f)
+            mi.setParameter("shadowColor", c[0], c[1], c[2], c[3])
+            mi.setParameter("shadowIntensity",
+                (props.tag("shadowIntensity").d3Double()
+                    ?: 0.8).toFloat())
+            mi.setDoubleSided(
+                props.tag("doubleSided").d3Bool() ?: false)
+            for (field in listOf("aoStrength", "softness",
+                                 "fadeStart", "fadeEnd", "mode")) {
+                if (props.tag(field) != null) {
+                    warnOnce("w24.catcher.$field",
+                        "shadowCatcher '$field' unsupported on " +
+                            "Filament's shadowMultiplier path; ignored")
+                }
+            }
+            return mi
+        }
+        val unlit = type == "unlit"
         // W21 alphaMode: Filament bakes the blending mode into the
         // compiled Material, so the wire string picks the host's
         // variant; `mask` adds the per-instance discard threshold.
