@@ -1312,7 +1312,10 @@ object FsceneRealizer {
                     logOnce("geometry.facing.$shape",
                         "geometry $key: camera-facing shape '$shape'" +
                             " bakes once toward +Z")
-                    return facingMesh(shape, parseFacing(key, p),
+                    val fp = parseFacing(key, p)
+                    warnFacingDrops("geometry", "geometry",
+                        key, shape, p, fp)
+                    return facingMesh(shape, fp,
                         MeshFactory.V3(0f, 0f, 1f),
                         MeshFactory.V3(1f, 0f, 0f),
                         MeshFactory.V3(0f, 1f, 0f))
@@ -1457,6 +1460,35 @@ object FsceneRealizer {
         }
 
         /**
+         * Wire fields the facing-shape expanders can't honor —
+         * warned once per node on EVERY path that parses a facing
+         * shape (procMesh component, procedural resource bake,
+         * d3:instances shape), not just the component.
+         */
+        private fun warnFacingDrops(site: String, noun: String,
+                                    key: Long, shape: String,
+                                    p: JSONObject, fp: FacingParams) {
+            if (p.tag("widthInPixels").d3Bool() == true) {
+                warnOnce("$site.$key.widthInPixels",
+                    "$noun $key: widthInPixels is" +
+                        " unsupported — `width` reads as world" +
+                        " units")
+            }
+            if (shape == "polyline" &&
+                p.tag("caps").d3String() != null) {
+                warnOnce("$site.$key.caps",
+                    "$noun $key: 'caps' is unsupported" +
+                        " — line ends are butt")
+            }
+            if (shape == "lineSegments" && fp.points.size % 2 != 0) {
+                warnOnce("$site.$key.oddLineTail",
+                    "$noun $key: lineSegments got an" +
+                        " odd point count — trailing point" +
+                        " dropped")
+            }
+        }
+
+        /**
          * `d3:procMesh` — one node, one procedural mesh built from the
          * component's `shape` + params. Camera-facing shapes register
          * a FacingSpec so stepFrame re-expands their vertex buffer
@@ -1471,28 +1503,8 @@ object FsceneRealizer {
             val facing = shape in FACING_SHAPES
             val fp = if (facing) parseFacing(key, p) else null
             if (fp != null) {
-                // Unsupported-on-native params warn once per node —
-                // the wire contract records these as carried but
-                // unrealized.
-                if (p.tag("widthInPixels").d3Bool() == true) {
-                    warnOnce("procMesh.$key.widthInPixels",
-                        "d3:procMesh node $key: widthInPixels is" +
-                            " unsupported — `width` reads as world" +
-                            " units")
-                }
-                if (shape == "polyline" &&
-                    p.tag("caps").d3String() != null) {
-                    warnOnce("procMesh.$key.caps",
-                        "d3:procMesh node $key: 'caps' is unsupported" +
-                            " — line ends are butt")
-                }
-                if (shape == "lineSegments" &&
-                    fp.points.size % 2 != 0) {
-                    warnOnce("procMesh.$key.oddLineTail",
-                        "d3:procMesh node $key: lineSegments got an" +
-                            " odd point count — trailing point" +
-                            " dropped")
-                }
+                warnFacingDrops("procMesh", "d3:procMesh node",
+                    key, shape, p, fp)
             }
             val md = when {
                 fp != null -> facingMesh(shape, fp,
@@ -1682,7 +1694,10 @@ object FsceneRealizer {
                     logOnce("instances.$key.facingShape",
                         "d3:instances node $key: facing shape '$shape'" +
                             " bakes once toward +Z")
-                    base = facingMesh(shape, parseFacing(key, p),
+                    val fp = parseFacing(key, p)
+                    warnFacingDrops("instances", "d3:instances node",
+                        key, shape, p, fp)
+                    base = facingMesh(shape, fp,
                         MeshFactory.V3(0f, 0f, 1f),
                         MeshFactory.V3(1f, 0f, 0f), MeshFactory.V3(0f, 1f, 0f))
                 } else if (shape != null) {
