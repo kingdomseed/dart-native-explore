@@ -6867,8 +6867,9 @@ enum FsceneRealizer {
 
         /// Column-major 16-element `Matrix4` storage, converted LH→RH.
         func d3Mat4(_ v: Any?) -> SCNMatrix4? {
-            guard let m = (v as? [String: Any])?["m4"] as? [Double],
-                  m.count == 16 else { return nil }
+            let m = (v as? [String: Any])?["m4"] as? [Double]
+                ?? v as? [Double]
+            guard let m, m.count == 16 else { return nil }
             return D3Wire.matrix(m)
         }
     }
