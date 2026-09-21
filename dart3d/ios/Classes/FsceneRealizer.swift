@@ -6764,14 +6764,19 @@ enum FsceneRealizer {
 
         // MARK: Tagged property values
 
+        /// All d3* readers accept the bare (untagged) JSON upstream's
+        /// `_encodeProcedural` emits — raw bools/numbers/strings,
+        /// `[[x,y,z],…]` lists, plain maps — alongside our tagged
+        /// `{'b':…}`-style envelopes. Tagged wins when both parse.
         func d3Bool(_ v: Any?) -> Bool? {
-            (v as? [String: Any])?["b"] as? Bool
+            (v as? [String: Any])?["b"] as? Bool ?? (v as? Bool)
         }
 
         func d3Double(_ v: Any?) -> Double? {
             ((v as? [String: Any])?["d"] ?? (v as? [String: Any])?["i"]) as? Double
                 ?? (((v as? [String: Any])?["d"] ?? (v as? [String: Any])?["i"]) as? Int)
                     .map(Double.init)
+                ?? (v as? Double) ?? (v as? Int).map(Double.init)
         }
 
         /// `{'v3': [x,y,z]}` — bare `[x,y,z]` fallback: procedural spec
@@ -6800,14 +6805,15 @@ enum FsceneRealizer {
         }
 
         func d3String(_ v: Any?) -> String? {
-            (v as? [String: Any])?["s"] as? String
+            (v as? [String: Any])?["s"] as? String ?? (v as? String)
         }
 
         func d3Int(_ v: Any?) -> Int? {
             let raw = (v as? [String: Any])?["i"]
                 ?? (v as? [String: Any])?["d"]
             if let i = raw as? Int { return i }
-            return (raw as? Double).map(Int.init)
+            if let d = raw as? Double { return Int(d) }
+            return (v as? Int) ?? (v as? Double).map(Int.init)
         }
 
         /// `{'v2': [x,y]}` — with a bare `[x,y]` fallback so a raw
@@ -6822,8 +6828,9 @@ enum FsceneRealizer {
         /// Raw [r,g,b,a] for a `{'c': …}` color — the bake path needs
         /// the components, not a UIColor.
         func d3ColorComponents(_ v: Any?) -> [Double]? {
-            guard let c = (v as? [String: Any])?["c"] as? [Double],
-                  c.count == 4 else { return nil }
+            if let c = (v as? [String: Any])?["c"] as? [Double],
+               c.count == 4 { return c }
+            guard let c = v as? [Double], c.count == 4 else { return nil }
             return c
         }
 
@@ -6840,11 +6847,22 @@ enum FsceneRealizer {
         }
 
         func d3List(_ v: Any?) -> [Any]? {
-            (v as? [String: Any])?["list"] as? [Any]
+            (v as? [String: Any])?["list"] as? [Any] ?? (v as? [Any])
         }
 
+        /// Single-key tag envelopes — a bare map that happens to hold
+        /// only e.g. {"d": 5} is a scalar envelope, not a map.
+        private static let envelopeKeys: Set<String> = [
+            "b", "d", "i", "v2", "v3", "v4", "q", "c", "s", "m4",
+            "list", "map", "rref", "nref",
+        ]
+
         func d3Map(_ v: Any?) -> [String: Any]? {
-            (v as? [String: Any])?["map"] as? [String: Any]
+            guard let d = v as? [String: Any] else { return nil }
+            if let m = d["map"] as? [String: Any] { return m }
+            if d.count == 1, let k = d.keys.first,
+               Context.envelopeKeys.contains(k) { return nil }
+            return d
         }
 
         /// Column-major 16-element `Matrix4` storage, converted LH→RH.
