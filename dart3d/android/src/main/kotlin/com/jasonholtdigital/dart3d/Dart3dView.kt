@@ -1232,11 +1232,13 @@ class Dart3dView(context: Context) : FrameLayout(context) {
 
     /**
      * The billboard material — vertices arrive already expanded into
-     * WORLD space (vertexDomain passes mesh_position through), so the
-     * renderable transform is a no-op. UV0/UV1 carry the two flipbook
-     * cells; CUSTOM0 is the blend factor, forwarded through a custom
-     * interpolant. `flipUV(false)` keeps v=0 = the uploaded image's
-     * top row (upstream's quad UVs are authored v-top).
+     * world space and the sprite entity's transform is identity, so
+     * OBJECT domain passes them through unchanged. (WORLD domain is
+     * tempting here but misplaces geometry on this backend — see the
+     * W18 report.) UV0/UV1 carry the two flipbook cells; CUSTOM0 is
+     * the blend factor, forwarded through a custom interpolant.
+     * `flipUV(false)` keeps v=0 = the uploaded image's top row
+     * (upstream's quad UVs are authored v-top).
      */
     private fun buildParticleMaterial(additive: Boolean): Material {
         if (!filamatReady) {
@@ -1265,7 +1267,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 else MaterialBuilder.TargetApi.OPENGL)
             .name(if (additive) "d3_particle_add" else "d3_particle_alpha")
             .shading(MaterialBuilder.Shading.UNLIT)
-            .vertexDomain(MaterialBuilder.VertexDomain.WORLD)
+            .vertexDomain(MaterialBuilder.VertexDomain.OBJECT)
             .doubleSided(true)
             .culling(MaterialBuilder.CullingMode.NONE)
             .blending(if (additive) MaterialBuilder.BlendingMode.ADD
@@ -1307,6 +1309,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         val ib = SpriteParticleRuntime.buildIndexBuffer(engine, cap)
         val entity = EntityManager.get().create()
         val mi = particleMaterial(spec.blendMode).createInstance()
+        // Identity transform — every other renderable in this layer
+        // owns a TransformManager component; vertex data is already
+        // world-space so identity preserves positions.
+        engine.transformManager.setTransform(
+            engine.transformManager.create(entity), IDENTITY16)
         RenderableManager.Builder(1)
             .geometry(0, RenderableManager.PrimitiveType.TRIANGLES,
                 vb, ib, 0, 0)
