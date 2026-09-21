@@ -569,6 +569,83 @@ object FsceneRealizer {
         // unloadSubtree's restore re-tags it; the Dart layer composes
         // the subtree and streams it as ordinary ops.
         var instanceSpec: JSONObject? = null,
+        // W16: the node's `trail` / `lod` runtime state — created at
+        // decode, destroyed in teardownComponents/node removal/the
+        // install sweep. Riding the rec means surgical contexts see
+        // the same object the host does (no extra registry).
+        var trail: TrailState? = null,
+        var lod: LodState? = null,
+    )
+
+    /**
+     * W16: one live `trail` component — the decoded spec plus the
+     * recorded path and the ribbon renderable's engine objects. The
+     * entity is UNPARENTED with identity transform: the path is
+     * recorded in world space and the verts write world-space
+     * directly, so the ribbon hangs where the node has been
+     * (upstream's world-anchored semantics without a per-frame
+     * rebase).
+     */
+    class TrailState(
+        val entity: Int,
+        val vertexBuffer: VertexBuffer,
+        val indexBuffer: IndexBuffer,
+        val maxPoints: Int,
+        var width: Float,
+        var lifetime: Float,
+        var minVertexDistance: Float,
+        var emitting: Boolean,
+        /** `widthOverTrail` (t,v) pairs sorted by t; null → 1−t. */
+        val widthKeys: FloatArray?,
+        /** `colorOverTrail` (t,r,g,b,a) tuples sorted by t; null →
+         *  upstream's white alpha-fade. */
+        val colorStops: FloatArray?,
+        /** Head-first world positions, capacity maxPoints (xyz
+         *  stride). `count` entries are live. */
+        val points: FloatArray,
+        /** Parallel birth clock of [points] (accumulated seconds). */
+        val born: DoubleArray,
+        /** Staging buffer the per-frame pass refills — 2 verts per
+         *  anchor × (pos f3 + color f4) × 4B = 28B/vert. */
+        val staging: java.nio.ByteBuffer,
+        var count: Int = 0,
+        var time: Double = 0.0,
+        var inScene: Boolean = false,
+    )
+
+    /** W16: one level of a decoded `lod` spec. */
+    class LodLevelSpec(
+        val geoKey: Long,
+        val matKey: Long,
+        val screenSize: Double,
+    )
+
+    /**
+     * W16: a decoded `lod` component — upstream `LodComponent` (which
+     * EXTENDS MeshComponent upstream: the lod owns the node's draw
+     * slot, so the realized renderable swaps geometry+material per
+     * selection rather than spawning level children). `bound` is the
+     * level currently bound to the node's renderable — -1 while
+     * culled or unbuilt; `ownsRenderable` distinguishes the lod's
+     * renderable from a foreign one (a `mesh` decoded earlier) so a
+     * takeover rebuilds instead of slot-swapping; `suspended` marks
+     * a later `mesh` decode taking the slot back (last-write-wins —
+     * iOS's `node.geometry` overwrite order). `hysteresis` is
+     * upstream's dead-band fraction (wire default 0.1) — applied by
+     * [selectLodLevel] with `bound` as its memory. `blendRange`
+     * decodes for wire parity but is a documented no-op — upstream's
+     * cross-fade needs a per-material dither slot Filament doesn't
+     * carry here, so dart3d hard-switches.
+     */
+    class LodState(
+        val levels: List<LodLevelSpec>,
+        var lodBias: Double,
+        var hysteresis: Double,
+        var blendRange: Double,
+        var bound: Int = -1,
+        var boundMatKey: Long? = null,
+        var ownsRenderable: Boolean = false,
+        var suspended: Boolean = false,
     )
 
     /**
@@ -1278,6 +1355,12 @@ object FsceneRealizer {
          */
         fun rebuildRenderable(nodeKey: Long) {
             val rec = nodes[nodeKey] ?: return
+            // W16: an lod-owned renderable isn't a mesh rebuild
+            // target — the frame pass owns the slot (a suspended
+            // lod's mesh owns it and rebuilds normally).
+            rec.lod?.let {
+                if (it.ownsRenderable && !it.suspended) return
+            }
             val rm = host.engine.renderableManager
             if (rm.hasComponent(rec.entity)) rm.destroy(rec.entity)
             host.scene.removeEntity(rec.entity)
@@ -1419,6 +1502,14 @@ object FsceneRealizer {
         /** The visibility-aware scene add — [attachToScene]'s per-node
          * body, reused by the W5 node ops. */
         private fun attachIfRenderable(rec: NodeRec) {
+            // W16: an lod-culled node keeps its renderable out of the
+            // scene until the frame pass rebinds a level — a
+            // visibility re-eval must not re-attach it.
+            rec.lod?.let {
+                if (!it.suspended && it.ownsRenderable && it.bound < 0) {
+                    return
+                }
+            }
             val rm = host.engine.renderableManager
             val lm = host.engine.lightManager
             if (rm.hasComponent(rec.entity) || lm.hasComponent(rec.entity)) {
@@ -1490,12 +1581,40 @@ object FsceneRealizer {
                         JointItem(key, index, type, props))
                 "materialsVariants" ->
                     decodeMaterialsVariants(key, index, props)
+                "trail" -> decodeTrail(key, rec, props)
+                "lod" -> decodeLod(key, rec, props)
                 else -> Log.i(TAG, "unhandled component type '$type'")
             }
         }
 
         private fun decodeMesh(key: Long, rec: NodeRec, p: JSONObject) {
             rec.meshProps = p
+            // W16: an `lod` decoded earlier in the same component
+            // list owns the renderable slot until now — last-write-
+            // wins, mirroring iOS's `node.geometry` overwrite order.
+            // Its (entity,0) material-consumer entry dies with the
+            // foreign renderable so a level-material upsert can't
+            // stomp the mesh's slot.
+            run {
+                val rm = host.engine.renderableManager
+                if (rm.hasComponent(rec.entity)) {
+                    rm.destroy(rec.entity)
+                    for ((_, list) in materialConsumers) {
+                        list.removeAll { it.first == rec.entity }
+                    }
+                    // The lod's slot bookkeeping dies with its
+                    // renderable — but it isn't suspended until the
+                    // mesh actually builds, so a pending mesh
+                    // geometry leaves the lod drawing (iOS's
+                    // node.geometry stays the last successful write
+                    // too).
+                    rec.lod?.let {
+                        it.ownsRenderable = false
+                        it.bound = -1
+                        it.boundMatKey = null
+                    }
+                }
+            }
             // Ordered (geometry, material) pairs across the mesh's
             // primitives — see meshPrimitiveKeys for the upstream
             // tagged-map entry shape.
@@ -1586,6 +1705,15 @@ object FsceneRealizer {
             }
             mesh.morphTargetBuffer?.let { builder.morphing(it) }
             builder.build(host.engine, rec.entity)
+            // The mesh took the slot — suspend a decoded `lod` (the
+            // per-frame pass skips it; a components re-decode
+            // restores whichever order the wire sends).
+            rec.lod?.let {
+                it.suspended = true
+                it.ownsRenderable = false
+                it.bound = -1
+                it.boundMatKey = null
+            }
             if (skinBuf != null && skinKey != null) {
                 nodeSkinning[key] = Dart3dView.NodeSkin(
                     skinKey, skinBuf, boneCount)
@@ -1609,6 +1737,674 @@ object FsceneRealizer {
             gpuMeshes[key]?.let { return it }
             val md = geometries[key] ?: return null
             return buildGpuMesh(md).also { gpuMeshes[key] = it }
+        }
+
+        // MARK: Trails and LOD (W16)
+
+        /**
+         * Decodes a `trail` component (upstream `TrailComponent`):
+         * the spec fields into a `TrailState` plus a fixed-topology
+         * ribbon — 2 verts per anchor, upstream's strip winding,
+         * POSITION+COLOR streams the per-frame pass refills. The
+         * entity rides no parent (identity transform — the verts
+         * ARE world space). Upstream serializes no trail material;
+         * the shared vertex-color unlit blend instance binds here.
+         * The path itself is runtime state — a re-decode starts
+         * empty like upstream's codec.
+         */
+        private fun decodeTrail(key: Long, rec: NodeRec, p: JSONObject) {
+            val maxPoints = maxOf(2,
+                p.tag("maxPoints").d3Int() ?: 48)
+            val entity = em.create()
+            val vb = VertexBuffer.Builder()
+                .vertexCount(maxPoints * 2)
+                .bufferCount(1)
+                .attribute(VertexBuffer.VertexAttribute.POSITION, 0,
+                    VertexBuffer.AttributeType.FLOAT3, 0, 28)
+                .attribute(VertexBuffer.VertexAttribute.COLOR, 0,
+                    VertexBuffer.AttributeType.FLOAT4, 12, 28)
+                .build(host.engine)
+            // Zeroed until the first frame records a path — dead
+            // verts collapse to zero width/alpha like upstream's
+            // `_TrailGeometry.setTrail`.
+            val staging = java.nio.ByteBuffer.allocateDirect(
+                maxPoints * 2 * 28)
+                .order(java.nio.ByteOrder.nativeOrder())
+            vb.setBufferAt(host.engine, 0, staging)
+            val indices = ShortArray((maxPoints - 1) * 6)
+            for (i in 0 until maxPoints - 1) {
+                val a = (i * 2).toShort()
+                val o = i * 6
+                indices[o] = a; indices[o + 1] = (a + 1).toShort()
+                indices[o + 2] = (a + 2).toShort()
+                indices[o + 3] = (a + 1).toShort()
+                indices[o + 4] = (a + 3).toShort()
+                indices[o + 5] = (a + 2).toShort()
+            }
+            val ib = IndexBuffer.Builder()
+                .indexCount(indices.size)
+                .bufferType(IndexBuffer.Builder.IndexType.USHORT)
+                .build(host.engine)
+            ib.setBuffer(host.engine,
+                java.nio.ByteBuffer.allocateDirect(indices.size * 2)
+                    .order(java.nio.ByteOrder.nativeOrder())
+                    .also { b -> b.asShortBuffer().put(indices) }
+                    .also { it.rewind() })
+            RenderableManager.Builder(1)
+                // The verts are dynamic world-space data — no static
+                // AABB describes them (a zero box at the unparented
+                // entity's identity transform is a point at the world
+                // origin, which would frustum-cull every off-axis
+                // trail). Filament only exempts an empty AABB when
+                // culling is off AND the renderable is neither a
+                // shadow caster nor receiver — all three flags are
+                // required or build() throws.
+                .culling(false)
+                .layerMask(0xFF, rec.layers and 0xFF)
+                .castShadows(false)
+                .receiveShadows(false)
+                .geometry(0, RenderableManager.PrimitiveType.TRIANGLES,
+                    vb, ib)
+                .material(0, host.trailMaterial.defaultInstance)
+                .build(host.engine, entity)
+            // Identity world transform — the entity is unparented.
+            val ident = FloatArray(16)
+            Matrix.setIdentityM(ident, 0)
+            tcm.setTransform(tcm.create(entity), ident)
+            // Upstream curve `{keys:[{t,v}]}`, gradient
+            // `{stops:[{t,color}]}` — decoded to flat (t,v) /
+            // (t,r,g,b,a) tuples.
+            fun taggedPairs(list: JSONArray?): List<FloatArray> {
+                if (list == null) return emptyList()
+                val out = ArrayList<FloatArray>(list.length())
+                for (i in 0 until list.length()) {
+                    val m = list.opt(i).d3Map() ?: continue
+                    val t = m.tag("t").d3Double() ?: continue
+                    val v = m.tag("v").d3Double() ?: continue
+                    out.add(floatArrayOf(t.toFloat(), v.toFloat()))
+                }
+                return out
+            }
+            val wk = taggedPairs(p.tag("widthOverTrail").d3Map()
+                ?.tag("keys").d3List())
+            val widthKeys = if (wk.isEmpty()) null
+                else FloatArray(wk.size * 2) { i -> wk[i / 2][i % 2] }
+            val stops = ArrayList<FloatArray>()
+            p.tag("colorOverTrail").d3Map()
+                ?.tag("stops").d3List()?.let { list ->
+                    for (i in 0 until list.length()) {
+                        val m = list.opt(i).d3Map() ?: continue
+                        val t = m.tag("t").d3Double() ?: continue
+                        val c = m.tag("color").d3Color() ?: continue
+                        stops.add(floatArrayOf(
+                            t.toFloat(), c[0], c[1], c[2], c[3]))
+                    }
+                }
+            val colorStops = if (stops.isEmpty()) null
+                else FloatArray(stops.size * 5) { i ->
+                    stops[i / 5][i % 5]
+                }
+            rec.trail = TrailState(
+                entity = entity,
+                vertexBuffer = vb,
+                indexBuffer = ib,
+                maxPoints = maxPoints,
+                width = (p.tag("width").d3Double() ?: 0.25).toFloat(),
+                lifetime =
+                    (p.tag("lifetime").d3Double() ?: 0.6).toFloat(),
+                minVertexDistance =
+                    (p.tag("minVertexDistance").d3Double() ?: 0.05)
+                        .toFloat(),
+                emitting = p.tag("emitting").d3Bool() ?: true,
+                widthKeys = widthKeys,
+                colorStops = colorStops,
+                points = FloatArray(maxPoints * 3),
+                born = DoubleArray(maxPoints),
+                staging = staging,
+            )
+        }
+
+        /**
+         * Decodes an `lod` component (upstream `LodComponent`): each
+         * `levels` entry carries geometry+material refs plus a
+         * `screenSize` threshold (fraction of viewport height,
+         * descending); entries missing either ref are skipped like
+         * upstream's codec. The lod owns the node's renderable slot —
+         * a `mesh` decoded earlier in the same component list yields
+         * here (iOS's `node.geometry` overwrite order), a later one
+         * suspends the pass. Level resources resolve per bind; a
+         * landing re-runs [refreshLodConsumers].
+         */
+        private fun decodeLod(key: Long, rec: NodeRec, p: JSONObject) {
+            val levels = ArrayList<LodLevelSpec>()
+            val list = p.tag("levels").d3List()
+            if (list != null) {
+                for (i in 0 until list.length()) {
+                    val m = list.opt(i).d3Map() ?: continue
+                    val g = m.tag("geometry").d3Ref() ?: continue
+                    val mat = m.tag("material").d3Ref() ?: continue
+                    // Upstream's _levelEntries drops a level only for
+                    // a missing/mistyped geometry or material ref; an
+                    // absent/malformed screenSize decodes as 0.0 —
+                    // the never-cull threshold, NOT a dropped level.
+                    val s = m.tag("screenSize").d3Double() ?: 0.0
+                    levels.add(LodLevelSpec(g, mat, s))
+                }
+            }
+            if (levels.isEmpty()) return
+            rec.lod = LodState(
+                levels = levels,
+                lodBias = p.tag("lodBias").d3Double() ?: 1.0,
+                // Upstream's dead-band (LodCodec/LodComponent default
+                // 0.1) — live now that selection is ours.
+                hysteresis = p.tag("hysteresis").d3Double() ?: 0.1,
+                // Wire parity only — a documented no-op (hard switch).
+                blendRange = p.tag("blendRange").d3Double() ?: 0.0,
+            )
+            bindLodLevel(key, rec, 0)
+        }
+
+        /**
+         * Binds level [idx] of the node's `lod` to its renderable
+         * slot — the geometry+material swap the per-frame selection
+         * pass drives. A foreign renderable (a `mesh` decoded
+         * earlier, or none) is destroyed and rebuilt single-
+         * primitive; one the lod already owns takes the cheap
+         * setGeometryAt/setMaterialInstanceAt path. An unresolved
+         * level leaves the current binding — a resource landing
+         * retries via [refreshLodConsumers], and the frame pass
+         * re-evaluates every step regardless. `idx` -1 is the cull
+         * floor: the entity leaves the scene until a later
+         * selection re-binds. [force] rebinds the current level —
+         * the geometry-upsert path, whose new buffers must replace
+         * the bound (about-to-be-destroyed) ones.
+         */
+        private fun bindLodLevel(key: Long, rec: NodeRec, idx: Int,
+                                 force: Boolean = false) {
+            val lod = rec.lod ?: return
+            if (lod.suspended) return
+            if (idx < 0) {
+                if (lod.bound >= 0) {
+                    host.scene.removeEntity(rec.entity)
+                    lod.boundMatKey?.let { mk ->
+                        materialConsumers[mk]?.removeAll {
+                            it.first == rec.entity
+                        }
+                    }
+                    lod.bound = -1
+                    lod.boundMatKey = null
+                }
+                return
+            }
+            if (!force && lod.bound == idx) return
+            val level = lod.levels[idx]
+            val gm = gpuMesh(level.geoKey) ?: return
+            val mi = materials[level.matKey] ?: return
+            val rm = host.engine.renderableManager
+            // Take a foreign renderable over wholesale — the lod
+            // renders exactly one level, so a mesh's multi-primitive
+            // slots can't ride setGeometryAt.
+            if (!lod.ownsRenderable && rm.hasComponent(rec.entity)) {
+                rm.destroy(rec.entity)
+                for ((_, list) in materialConsumers) {
+                    list.removeAll { it.first == rec.entity }
+                }
+                for ((_, set) in geometryConsumers) set.remove(key)
+            }
+            val b = gm.bounds
+            if (!rm.hasComponent(rec.entity)) {
+                RenderableManager.Builder(1)
+                    .boundingBox(Box(b[0], b[1], b[2],
+                        b[3], b[4], b[5]))
+                    .layerMask(0xFF, rec.layers and 0xFF)
+                    .castShadows(true)
+                    .receiveShadows(true)
+                    .geometry(0, gm.primitiveType, gm.vertexBuffer,
+                        gm.indexBuffer)
+                    .material(0, mi)
+                    .build(host.engine, rec.entity)
+            } else {
+                val ri = rm.getInstance(rec.entity)
+                rm.setGeometryAt(ri, 0, gm.primitiveType,
+                    gm.vertexBuffer, gm.indexBuffer)
+                rm.setMaterialInstanceAt(ri, 0, mi)
+                rm.setAxisAlignedBoundingBox(ri,
+                    Box(b[0], b[1], b[2], b[3], b[4], b[5]))
+            }
+            // The (entity,0) consumer entry belongs to the bound
+            // level's material — one live entry at a time so a
+            // material upsert writes the live level's slot.
+            lod.boundMatKey?.let { mk ->
+                materialConsumers[mk]?.removeAll {
+                    it.first == rec.entity
+                }
+            }
+            materialConsumers.getOrPut(level.matKey) { ArrayList() }
+                .add(Pair(rec.entity, 0))
+            lod.bound = idx
+            lod.boundMatKey = level.matKey
+            lod.ownsRenderable = true
+            if (!isHidden(key)) attachIfRenderable(rec)
+        }
+
+        /**
+         * Rebinds the live level of every `lod` spec consuming the
+         * just-landed resource `key` — a geometry upsert swaps the
+         * GpuMesh buffers under the bound renderable (stale buffers
+         * are destroyed by the upsert), a material landing re-
+         * resolves the instance. Unbound/culled specs need nothing:
+         * the frame pass re-resolves per bind.
+         */
+        fun refreshLodConsumers(resKey: Long) {
+            for ((key, rec) in nodes) {
+                val lod = rec.lod ?: continue
+                if (lod.suspended || lod.bound < 0) continue
+                val l = lod.levels[lod.bound]
+                if (l.geoKey == resKey || l.matKey == resKey) {
+                    bindLodLevel(key, rec, lod.bound, force = true)
+                }
+            }
+        }
+
+        /**
+         * Destroys a node's trail/lod runtime state — shared by
+         * `teardownComponents`, node removal, and the install sweep.
+         * The trail's unparented entity and dynamic buffers die
+         * here; the lod's renderable/entity belong to the node and
+         * die with it — only its consumer entry drops.
+         */
+        fun destroyTrailLod(rec: NodeRec) {
+            val rm = host.engine.renderableManager
+            rec.trail?.let { tr ->
+                host.scene.removeEntity(tr.entity)
+                if (rm.hasComponent(tr.entity)) rm.destroy(tr.entity)
+                host.engine.destroyEntity(tr.entity)
+                em.destroy(tr.entity)
+                host.engine.destroyVertexBuffer(tr.vertexBuffer)
+                host.engine.destroyIndexBuffer(tr.indexBuffer)
+            }
+            rec.trail = null
+            rec.lod?.let { lod ->
+                lod.boundMatKey?.let { mk ->
+                    materialConsumers[mk]?.removeAll {
+                        it.first == rec.entity
+                    }
+                }
+            }
+            rec.lod = null
+        }
+
+        // MARK: Trails and LOD frame pass (W16)
+
+        /** Per-vertex color scratch for [tickTrail]'s refill — the
+         *  pass runs on the frame thread only. */
+        private val colorScratch = FloatArray(4)
+
+        /**
+         * Samples the flat `widthOverTrail` (t,v) pairs at the
+         * head-to-tail fraction [t] — piecewise-linear, clamped to
+         * the ends; the absent-ramp fallback is upstream's `1 − t`
+         * taper. Port of `sampleTrailStops`.
+         */
+        private fun sampleTrailKeys(keys: FloatArray?, t: Float): Float {
+            if (keys == null || keys.isEmpty()) return 1f - t
+            val n = keys.size / 2
+            if (t <= keys[0]) return keys[1]
+            if (t >= keys[(n - 1) * 2]) return keys[(n - 1) * 2 + 1]
+            for (i in 1 until n) {
+                val bt = keys[i * 2]
+                if (t <= bt) {
+                    val at = keys[(i - 1) * 2]
+                    val av = keys[(i - 1) * 2 + 1]
+                    val bv = keys[i * 2 + 1]
+                    return av + (bv - av) * (t - at) / (bt - at)
+                }
+            }
+            return keys[(n - 1) * 2 + 1]
+        }
+
+        /**
+         * Samples the flat `colorOverTrail` (t,r,g,b,a) tuples at
+         * [t] into [out] — piecewise-linear rgba, clamped; the
+         * absent-gradient fallback is upstream's white fading
+         * alpha `1 − t`. Port of `sampleTrailColorStops`.
+         */
+        private fun sampleTrailColor(stops: FloatArray?, t: Float,
+                                     out: FloatArray) {
+            if (stops == null || stops.isEmpty()) {
+                out[0] = 1f; out[1] = 1f; out[2] = 1f
+                out[3] = 1f - t
+                return
+            }
+            val n = stops.size / 5
+            fun cp(i: Int) {
+                out[0] = stops[i * 5 + 1]
+                out[1] = stops[i * 5 + 2]
+                out[2] = stops[i * 5 + 3]
+                out[3] = stops[i * 5 + 4]
+            }
+            if (t <= stops[0]) { cp(0); return }
+            if (t >= stops[(n - 1) * 5]) { cp(n - 1); return }
+            for (i in 1 until n) {
+                val bt = stops[i * 5]
+                if (t <= bt) {
+                    val at = stops[(i - 1) * 5]
+                    val f = (t - at) / (bt - at)
+                    for (c in 0..3) {
+                        val a = stops[(i - 1) * 5 + 1 + c]
+                        val bv = stops[i * 5 + 1 + c]
+                        out[c] = a + (bv - a) * f
+                    }
+                    return
+                }
+            }
+            cp(n - 1)
+        }
+
+        /**
+         * The per-frame trail/lod pass — the host's `stepFrame`
+         * calls it after the camera updates, before render (the
+         * same slot iOS's renderer delegate uses). Trails record
+         * head-first world points, expire by age/capacity, and
+         * refill the camera-facing ribbon; lods project the
+         * level-0 bounding sphere and rebind (or cull) the node.
+         */
+        fun updateTrailsLods(dt: Float, camPos: FloatArray,
+                             fovRadY: Double, perspective: Boolean) {
+            for ((key, rec) in nodes) {
+                rec.trail?.let { tickTrail(key, rec, it, dt, camPos) }
+                val lod = rec.lod
+                if (lod != null && !lod.suspended) {
+                    updateLod(key, rec, lod, camPos, fovRadY,
+                        perspective)
+                }
+            }
+        }
+
+        /**
+         * Advances one trail: the head follows the node's world
+         * position, a new anchor drops after `minVertexDistance`,
+         * the tail expires by `lifetime`/`maxPoints` (upstream's
+         * `TrailComponent.update` policy — `emitting` false pauses
+         * recording while the path still ages out). Then the
+         * ribbon refills: two verts per anchor offset `±width·side`
+         * where `side = normalize(tangent × toCamera)` — world
+         * space, the entity is unparented. Under two live points
+         * (or a hidden chain) the entity leaves the scene.
+         */
+        private fun tickTrail(key: Long, rec: NodeRec,
+                              tr: TrailState, dt: Float,
+                              camPos: FloatArray) {
+            tr.time += dt
+            val m = FloatArray(16)
+            tcm.getWorldTransform(tcm.getInstance(rec.entity), m)
+            val hx = m[12]; val hy = m[13]; val hz = m[14]
+            if (tr.emitting) {
+                if (tr.count == 0) {
+                    tr.points[0] = hx
+                    tr.points[1] = hy
+                    tr.points[2] = hz
+                    tr.born[0] = tr.time
+                    tr.count = 1
+                } else {
+                    // The head follows continuously; a new anchor
+                    // drops once the node has moved far enough
+                    // from the previous one.
+                    tr.points[0] = hx
+                    tr.points[1] = hy
+                    tr.points[2] = hz
+                    tr.born[0] = tr.time
+                    val a = if (tr.count > 1) 3 else 0
+                    val dx = tr.points[a] - hx
+                    val dy = tr.points[a + 1] - hy
+                    val dz = tr.points[a + 2] - hz
+                    val d2 = dx * dx + dy * dy + dz * dz
+                    if (tr.count == 1 ||
+                        d2 >= tr.minVertexDistance *
+                            tr.minVertexDistance) {
+                        // Insert at the head — the tail slot drops
+                        // when the buffer is full (upstream's
+                        // insert-then-trim, same result).
+                        val n = minOf(tr.count + 1, tr.maxPoints)
+                        for (i in n - 1 downTo 1) {
+                            tr.points[i * 3] = tr.points[(i - 1) * 3]
+                            tr.points[i * 3 + 1] =
+                                tr.points[(i - 1) * 3 + 1]
+                            tr.points[i * 3 + 2] =
+                                tr.points[(i - 1) * 3 + 2]
+                            tr.born[i] = tr.born[i - 1]
+                        }
+                        tr.points[0] = hx
+                        tr.points[1] = hy
+                        tr.points[2] = hz
+                        tr.born[0] = tr.time
+                        tr.count = n
+                    }
+                }
+            }
+            while (tr.count > 0 &&
+                tr.time - tr.born[tr.count - 1] > tr.lifetime) {
+                tr.count--
+            }
+            // Refill the ribbon — port of expandTrailRibbon: two
+            // verts per anchor, `side = normalize(tangent ×
+            // toCamera)`, degenerate tangents reuse the last good
+            // side, a camera on the point falls back to any
+            // perpendicular.
+            val buf = tr.staging
+            buf.clear()
+            val live = tr.count >= 2
+            var sx = 1f; var sy = 0f; var sz = 0f
+            if (live) {
+                for (i in 0 until tr.count) {
+                    val px = tr.points[i * 3]
+                    val py = tr.points[i * 3 + 1]
+                    val pz = tr.points[i * 3 + 2]
+                    val prev = if (i == 0) 0 else i - 1
+                    val next = if (i == tr.count - 1)
+                        tr.count - 1 else i + 1
+                    var tx = tr.points[prev * 3] -
+                        tr.points[next * 3]
+                    var ty = tr.points[prev * 3 + 1] -
+                        tr.points[next * 3 + 1]
+                    var tz = tr.points[prev * 3 + 2] -
+                        tr.points[next * 3 + 2]
+                    var tl2 = tx * tx + ty * ty + tz * tz
+                    if (tl2 < 1e-12f && tr.count > 1) {
+                        val j = if (i == 0) 0 else i - 1
+                        val k = if (i == 0) 1 else i
+                        tx = tr.points[j * 3] - tr.points[k * 3]
+                        ty = tr.points[j * 3 + 1] -
+                            tr.points[k * 3 + 1]
+                        tz = tr.points[j * 3 + 2] -
+                            tr.points[k * 3 + 2]
+                        tl2 = tx * tx + ty * ty + tz * tz
+                    }
+                    if (tl2 >= 1e-12f) {
+                        val vx = camPos[0] - px
+                        val vy = camPos[1] - py
+                        val vz = camPos[2] - pz
+                        var cx = ty * vz - tz * vy
+                        var cy = tz * vx - tx * vz
+                        var cz = tx * vy - ty * vx
+                        var cl2 = cx * cx + cy * cy + cz * cz
+                        if (cl2 < 1e-12f) {
+                            // Camera on the tangent — any
+                            // perpendicular (tangent × up, then
+                            // tangent × X).
+                            cx = tz; cy = 0f; cz = -tx
+                            cl2 = cx * cx + cz * cz
+                            if (cl2 < 1e-12f) {
+                                cx = 0f; cy = tz; cz = -ty
+                                cl2 = cy * cy + cz * cz
+                            }
+                        }
+                        if (cl2 >= 1e-12f) {
+                            val inv = (1.0 / kotlin.math.sqrt(
+                                cl2.toDouble())).toFloat()
+                            sx = cx * inv; sy = cy * inv; sz = cz * inv
+                        }
+                    }
+                    val t = if (tr.count > 1)
+                        i.toFloat() / (tr.count - 1) else 0f
+                    val w = tr.width *
+                        sampleTrailKeys(tr.widthKeys, t)
+                    val half = w * 0.5f
+                    sampleTrailColor(tr.colorStops, t, colorScratch)
+                    buf.putFloat(px + sx * half)
+                    buf.putFloat(py + sy * half)
+                    buf.putFloat(pz + sz * half)
+                    buf.putFloat(colorScratch[0])
+                    buf.putFloat(colorScratch[1])
+                    buf.putFloat(colorScratch[2])
+                    buf.putFloat(colorScratch[3])
+                    buf.putFloat(px - sx * half)
+                    buf.putFloat(py - sy * half)
+                    buf.putFloat(pz - sz * half)
+                    buf.putFloat(colorScratch[0])
+                    buf.putFloat(colorScratch[1])
+                    buf.putFloat(colorScratch[2])
+                    buf.putFloat(colorScratch[3])
+                }
+            }
+            // Dead verts collapse to zero width/alpha (upstream's
+            // `_TrailGeometry.setTrail` zero-fill).
+            while (buf.position() < buf.capacity()) buf.putFloat(0f)
+            buf.rewind()
+            tr.vertexBuffer.setBufferAt(host.engine, 0, buf)
+            val want = live && !isHidden(key)
+            if (want && !tr.inScene) {
+                host.scene.addEntity(tr.entity)
+                tr.inScene = true
+            } else if (!want && tr.inScene) {
+                host.scene.removeEntity(tr.entity)
+                tr.inScene = false
+            }
+        }
+
+        /**
+         * Resolves the node's `lod` selection for this frame —
+         * upstream `_resolveLod`: the circumscribed sphere of the
+         * level-0 (highest-detail) world AABB projected through
+         * `lodScreenSize`, biased by `lodBias`, then the first
+         * threshold the size still meets under the `hysteresis`
+         * dead-band (upstream `selectLodLevel`); below the smallest
+         * is the cull floor (a last threshold of `0` always meets →
+         * never culls). A non-perspective camera — or an
+         * unresolved level-0 geometry — falls back to highest
+         * detail.
+         */
+        private fun updateLod(key: Long, rec: NodeRec,
+                              lod: LodState, camPos: FloatArray,
+                              fovRadY: Double, perspective: Boolean) {
+            if (!perspective) {
+                bindLodLevel(key, rec, 0)
+                return
+            }
+            val gm = gpuMesh(lod.levels[0].geoKey)
+            if (gm == null) {
+                bindLodLevel(key, rec, 0)
+                return
+            }
+            // World AABB of the level-0 bounds — transform the 8
+            // corners (rotation and non-uniform scale both land).
+            val m = FloatArray(16)
+            tcm.getWorldTransform(tcm.getInstance(rec.entity), m)
+            val b = gm.bounds
+            var lx = Float.MAX_VALUE
+            var ly = Float.MAX_VALUE
+            var lz = Float.MAX_VALUE
+            var hx = -Float.MAX_VALUE
+            var hy = -Float.MAX_VALUE
+            var hz = -Float.MAX_VALUE
+            for (cxs in intArrayOf(-1, 1)) {
+                for (cys in intArrayOf(-1, 1)) {
+                    for (czs in intArrayOf(-1, 1)) {
+                        val x = b[0] + b[3] * cxs
+                        val y = b[1] + b[4] * cys
+                        val z = b[2] + b[5] * czs
+                        val wx = m[0] * x + m[4] * y + m[8] * z + m[12]
+                        val wy = m[1] * x + m[5] * y + m[9] * z + m[13]
+                        val wz = m[2] * x + m[6] * y + m[10] * z + m[14]
+                        lx = minOf(lx, wx); hx = maxOf(hx, wx)
+                        ly = minOf(ly, wy); hy = maxOf(hy, wy)
+                        lz = minOf(lz, wz); hz = maxOf(hz, wz)
+                    }
+                }
+            }
+            val ccx = (lx + hx) * 0.5f
+            val ccy = (ly + hy) * 0.5f
+            val ccz = (lz + hz) * 0.5f
+            // The circumscribed sphere — upstream's conservative
+            // choice (detail kept slightly longer than a tight
+            // sphere would).
+            val rdx = hx - lx; val rdy = hy - ly; val rdz = hz - lz
+            val radius = kotlin.math.sqrt(
+                (rdx * rdx + rdy * rdy + rdz * rdz).toDouble()) * 0.5
+            val ddx = ccx - camPos[0]
+            val ddy = ccy - camPos[1]
+            val ddz = ccz - camPos[2]
+            val dist = kotlin.math.sqrt(
+                (ddx * ddx + ddy * ddy + ddz * ddz).toDouble())
+            // lodScreenSize: inside the sphere → infinite (highest
+            // detail); else the sphere's angular share of the
+            // viewport height.
+            val size = if (dist <= radius) Double.MAX_VALUE
+                else radius /
+                    (dist * kotlin.math.tan(fovRadY * 0.5))
+            val scaled = size * lod.lodBias
+            // Upstream `LodSelection.resolve`'s hard-switch arm —
+            // the hysteresis dead-band reads the bound level as its
+            // `_currentLevel` memory.
+            val sel = selectLodLevel(
+                scaled, lod.levels, lod.hysteresis, lod.bound)
+            bindLodLevel(key, rec, sel)
+        }
+
+        /**
+         * Upstream `selectLodLevel` — the first level whose
+         * descending `screenSize` threshold the (already biased)
+         * [size] meets, then the [hysteresis] dead-band around
+         * [currentLevel]'s boundaries: an adjacent crossing holds
+         * until the size clears the boundary by the fractional
+         * margin (finer at `t·(1+h)`, coarser at `t·(1−h)`; the cull
+         * floor is the boundary below the last level both ways); a
+         * non-adjacent jump switches immediately. `-1` culls below
+         * the smallest threshold (a last threshold of `0` never
+         * culls).
+         */
+        private fun selectLodLevel(
+            size: Double, levels: List<LodLevelSpec>,
+            hysteresis: Double, currentLevel: Int,
+        ): Int {
+            var naive = -1
+            for (i in levels.indices) {
+                if (size >= levels[i].screenSize) {
+                    naive = i
+                    break
+                }
+            }
+            if (naive == currentLevel || hysteresis <= 0.0) {
+                return naive
+            }
+            val last = levels.size - 1
+            if (currentLevel >= 1 && naive == currentLevel - 1) {
+                return if (size >= levels[currentLevel - 1].screenSize *
+                    (1 + hysteresis)) naive else currentLevel
+            }
+            if (currentLevel >= 0 && naive == currentLevel + 1) {
+                return if (size < levels[currentLevel].screenSize *
+                    (1 - hysteresis)) naive else currentLevel
+            }
+            if (currentLevel == last && naive == -1) {
+                return if (size < levels[last].screenSize *
+                    (1 - hysteresis)) -1 else currentLevel
+            }
+            if (currentLevel == -1 && naive == last) {
+                return if (size >= levels[last].screenSize *
+                    (1 + hysteresis)) naive else -1
+            }
+            return naive
         }
 
         /**
@@ -2962,6 +3758,10 @@ object FsceneRealizer {
                 }
                 rebound++
             }
+            // W16: lod levels consuming this geometry rebind BEFORE
+            // the old buffers die — the bound renderable's
+            // VertexBuffer is the one being swapped out.
+            refreshLodConsumers(key)
             // Safe only after every consumer swapped — the old buffers
             // were still bound until now.
             old?.destroy(host.engine)
@@ -3082,6 +3882,10 @@ object FsceneRealizer {
                 em.destroy(child)
             }
             rec.lightEntities.clear()
+            // W16: trail/lod runtime state dies with the component
+            // list — the re-decode rebuilds both (the trail's path
+            // is runtime state that never persists, upstream's rule).
+            destroyTrailLod(rec)
         }
 
         /**

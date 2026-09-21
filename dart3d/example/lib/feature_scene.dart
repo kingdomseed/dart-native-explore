@@ -90,6 +90,10 @@ import 'package:vector_math/vector_math.dart';
 /// a high-bit `layerMask` pair, and the pre-phase restore. The
 /// closure takes a `targetPx` probe — viewports are authored in
 /// target pixels, which only the widget tree knows (size × dpr).
+/// W16 lands the trails/LOD lane through the returned `w16Phase`
+/// closure — fired at +140 s — which drives `w16Mover` away and
+/// back through its `lod` thresholds (three screen-size levels plus
+/// the cull floor) while its `trail` draws the camera-facing ribbon.
 ///
 /// [ortho] flips the camera's `projection` manifest field; the toggle
 /// is a document reload, the only camera write the protocol carries
@@ -119,6 +123,7 @@ final class FeatureScene {
     void Function() wLoosePhase,
     void Function() w15Phase,
     void Function(({double w, double h}) Function() targetPx) w24Phase,
+    void Function() w16Phase,
   })
   build({bool ortho = false, int env = 1, SceneController? controller}) {
     final doc = SceneDocument();
@@ -471,6 +476,36 @@ final class FeatureScene {
     final quadMatDeferred = doc.addResource(probeMat(0.3, 0.4, 0.95));
     final boundsMat = doc.addResource(probeMat(0.55, 0.95, 0.35));
     final gridMat = doc.addResource(probeMat(0.5, 0.55, 0.7));
+
+    // ── W16 trails + LOD probe ────────────────────────────────────
+    // One mover carries both new components: the `lod` owns its draw
+    // slot (three levels on descending screen-size thresholds, the
+    // last a cull floor at ~32 m under the camera's fovY=1.0), the
+    // `trail` draws the camera-facing ribbon behind it. The
+    // `w16Phase` closure below drives it away and back through the
+    // threshold crossings — the geometry swaps and the cull are the
+    // lane's evidence.
+    final lodHiGeo = doc.addResource(
+      GeometryResource(
+        doc.newId(),
+        procedural: SphereGeometrySpec(radius: 0.5),
+      ),
+    );
+    final lodMidGeo = doc.addResource(
+      GeometryResource(
+        doc.newId(),
+        procedural: CuboidGeometrySpec(extents: Vector3.all(0.9)),
+      ),
+    );
+    final lodLoGeo = doc.addResource(
+      GeometryResource(
+        doc.newId(),
+        procedural: TorusGeometrySpec(radius: 0.5, tubeRadius: 0.1),
+      ),
+    );
+    final lodHiMat = doc.addResource(probeMat(0.2, 0.9, 0.5));
+    final lodMidMat = doc.addResource(probeMat(0.95, 0.6, 0.15));
+    final lodLoMat = doc.addResource(probeMat(0.85, 0.25, 0.7));
 
     // ── W4 texture-slot probes ──────────────────────────────────────
     // Generated rgba8 images ride the same payload stream as the
@@ -918,6 +953,46 @@ final class FeatureScene {
           linearDamping: 0.05,
           angularDamping: 0.05,
           ccdEnabled: true,
+        ),
+      ],
+      root: true,
+    );
+
+    // W16 probe — the `lod` component IS the mesh slot upstream (no
+    // `mesh` alongside it); `trail` hangs a camera-facing ribbon on
+    // the same node. Starts near the camera at level 0.
+    final w16Mover = doc.createNode(
+      name: 'w16Mover',
+      transform: TrsTransform(translation: Vector3(-3.2, 1.1, -2.5)),
+      components: [
+        lodComponent(
+          levels: [
+            LodLevel(
+              geometry: lodHiGeo.id,
+              material: lodHiMat.id,
+              screenSize: 0.15,
+            ),
+            LodLevel(
+              geometry: lodMidGeo.id,
+              material: lodMidMat.id,
+              screenSize: 0.08,
+            ),
+            LodLevel(
+              geometry: lodLoGeo.id,
+              material: lodLoMat.id,
+              screenSize: 0.05,
+            ),
+          ],
+        ),
+        trailComponent(
+          width: 0.22,
+          lifetime: 2.5,
+          minVertexDistance: 0.08,
+          maxPoints: 96,
+          colorOverTrail: [
+            TrailColorStop(0, ColorValue(0.2, 0.9, 1.0, 0.9)),
+            TrailColorStop(1, ColorValue(0.9, 0.2, 0.8, 0.0)),
+          ],
         ),
       ],
       root: true,
@@ -3785,6 +3860,43 @@ final class FeatureScene {
       });
     }
 
+    /// W16 lane — fires at +140 s (after W15's +112 s streaming
+    /// lane closes its +12 s cycle). Drives `w16Mover` away and back through its
+    /// three `lod` thresholds and the cull floor — ~49.5 m out over
+    /// 12 s, then home — with an x sway that bends the `trail`
+    /// ribbon so the camera-facing expansion reads in a still
+    /// frame. No new wire ops: `setNodeTransforms` per 100 ms tick
+    /// for 24 s, then the timer cancels. farZ 47 reaches ~54 m
+    /// Euclidean from the camera — comfortably past the upstream
+    /// cull floor (~32 m) on both platforms.
+    void addW16Phase() {
+      final c = controller;
+      if (c == null) return;
+      const startZ = -2.5;
+      const farZ = 47.0;
+      const total = 240; // 24 s at one 100 ms tick
+      var t = 0;
+      Timer.periodic(const Duration(milliseconds: 100), (timer) {
+        t++;
+        final phase = t / total;
+        final out = phase < 0.5 ? phase * 2 : (1 - phase) * 2;
+        c.setNodeTransforms([
+          NodeTransform(
+            w16Mover.id,
+            translation: Vector3(
+              -3.2 + 1.6 * sin(out * pi * 2),
+              1.1,
+              startZ + (farZ - startZ) * out,
+            ),
+          ),
+        ]);
+        if (t >= total) {
+          timer.cancel();
+          dnLog('dart3d: w16 mover home — lod/trail lane done');
+        }
+      });
+    }
+
     return (
       document: doc,
       die: die.id,
@@ -3798,6 +3910,7 @@ final class FeatureScene {
       wLoosePhase: addWLoosePhase,
       w15Phase: addW15Phase,
       w24Phase: addW24Phase,
+      w16Phase: addW16Phase,
     );
   }
 
