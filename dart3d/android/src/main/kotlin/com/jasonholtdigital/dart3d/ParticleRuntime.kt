@@ -1300,8 +1300,11 @@ class SpriteParticleRuntime(
         // the z-mirror convention leaves it unchanged.
         val wux = 0f; val wuy = 1f; val wuz = 0f
 
-        var right = FloatArray(3)
-        var up = FloatArray(3)
+        // Scratch basis vectors reused across particles — the repack
+        // runs per emitter per frame, so per-particle allocation here
+        // is GC churn at 1000+ particles.
+        val right = FloatArray(3)
+        val up = FloatArray(3)
 
         for (i in 0 until count) {
             val size = s.size[i]
@@ -1344,8 +1347,8 @@ class SpriteParticleRuntime(
                         nodeWorld[10] * lvz
                     val speed = sqrt(wvx * wvx + wvy * wvy + wvz * wvz)
                     if (speed > 1e-5f) {
-                        up = floatArrayOf(wvx / speed, wvy / speed,
-                            wvz / speed)
+                        up[0] = wvx / speed; up[1] = wvy / speed
+                        up[2] = wvz / speed
                         var rx = up[1] * tez - up[2] * tey
                         var ry = up[2] * tex - up[0] * tez
                         var rz = up[0] * tey - up[1] * tex
@@ -1361,7 +1364,7 @@ class SpriteParticleRuntime(
                             if (fl > 1e-5f) { fx /= fl; fy /= fl; fz /= fl }
                             rx = fx; ry = fy; rz = fz
                         }
-                        right = floatArrayOf(rx, ry, rz)
+                        right[0] = rx; right[1] = ry; right[2] = rz
                         stretchLen = speed * spec.velocityStretch.toFloat()
                     } else {
                         val fwdX = tex; val fwdY = tey; val fwdZ = tez
@@ -1371,15 +1374,14 @@ class SpriteParticleRuntime(
                         var rz = wux * fwdY - wuy * fwdX
                         val rl = sqrt(rx * rx + ry * ry + rz * rz)
                         if (rl > 1e-5f) { rx /= rl; ry /= rl; rz /= rl }
-                        right = floatArrayOf(rx, ry, rz)
-                        up = floatArrayOf(
-                            fwdY * rz - fwdZ * ry,
-                            fwdZ * rx - fwdX * rz,
-                            fwdX * ry - fwdY * rx)
+                        right[0] = rx; right[1] = ry; right[2] = rz
+                        up[0] = fwdY * rz - fwdZ * ry
+                        up[1] = fwdZ * rx - fwdX * rz
+                        up[2] = fwdX * ry - fwdY * rx
                     }
                 }
                 "axisLocked" -> {
-                    up = floatArrayOf(wux, wuy, wuz)  // already unit
+                    up[0] = wux; up[1] = wuy; up[2] = wuz  // already unit
                     var rx = up[1] * tez - up[2] * tey
                     var ry = up[2] * tex - up[0] * tez
                     var rz = up[0] * tey - up[1] * tex
@@ -1389,7 +1391,7 @@ class SpriteParticleRuntime(
                     } else {
                         rx = 1f; ry = 0f; rz = 0f
                     }
-                    right = floatArrayOf(rx, ry, rz)
+                    right[0] = rx; right[1] = ry; right[2] = rz
                 }
                 else -> {
                     // spherical — per-particle camera-position facing.
@@ -1399,11 +1401,10 @@ class SpriteParticleRuntime(
                     var rz = wux * fwdY - wuy * fwdX
                     val rl = sqrt(rx * rx + ry * ry + rz * rz)
                     if (rl > 1e-5f) { rx /= rl; ry /= rl; rz /= rl }
-                    right = floatArrayOf(rx, ry, rz)
-                    up = floatArrayOf(
-                        fwdY * rz - fwdZ * ry,
-                        fwdZ * rx - fwdX * rz,
-                        fwdX * ry - fwdY * rx)
+                    right[0] = rx; right[1] = ry; right[2] = rz
+                    up[0] = fwdY * rz - fwdZ * ry
+                    up[1] = fwdZ * rx - fwdX * rz
+                    up[2] = fwdX * ry - fwdY * rx
                 }
             }
 
@@ -1453,7 +1454,10 @@ class SpriteParticleRuntime(
         // Upload only the live vertex prefix — the draw range below
         // never reads past it.
         if (count > 0) {
-            vertexBuffer.setBufferAt(engine, 0, cpuBuf, 0, count * 4)
+            // setBufferAt's last arg is BYTES — count*4 vertices at
+            // VERTEX_BYTES each, not a vertex count.
+            vertexBuffer.setBufferAt(engine, 0, cpuBuf, 0,
+                count * 4 * VERTEX_BYTES)
         }
 
         val ri = engine.renderableManager.getInstance(entity)
