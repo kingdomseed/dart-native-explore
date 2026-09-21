@@ -151,6 +151,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
   void Function()? _w15Phase;
   void Function(({double w, double h}) Function() targetPx)? _w24Phase;
   void Function()? _w16Phase;
+  void Function()? _w18Phase;
   Timer? _w11Timer;
   Timer? _w12Timer;
   Timer? _w13Timer;
@@ -159,6 +160,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
   Timer? _w15Timer;
   Timer? _w24Timer;
   Timer? _w16Timer;
+  Timer? _w18Timer;
   int _animsPlaying = 0;
   LocalId? _die;
   LocalId? _ball;
@@ -219,6 +221,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     _w15Phase = scene.w15Phase;
     _w24Phase = scene.w24Phase;
     _w16Phase = scene.w16Phase;
+    _w18Phase = scene.w18Phase;
     _animsPlaying = 0;
     // The W11 lane lands at +14 s — after the joint rig — so its
     // skinned flag and morph blob don't contend with the +8 s diff
@@ -259,6 +262,11 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     // load/unload cycles.
     _w16Timer?.cancel();
     _w16Timer = Timer(const Duration(seconds: 140), _runW16);
+    // W18's particle lane lands at +170 s — after W15's last inner
+    // timer (+112 s + 12 s close), so the emitters run on a quiet
+    // scene (the auto-reroll was already cancelled by wLoose).
+    _w18Timer?.cancel();
+    _w18Timer = Timer(const Duration(seconds: 170), _runW18);
     _jointsBroke = 0;
     _controller.loadDocument(scene.document);
     // W8: the query battery fires at +10 s — after the +8 s diff — and
@@ -401,6 +409,16 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
   void _runW16() {
     dnLog('dart3d: w16 phase — trail ribbon + screen-size lod drive');
     _w16Phase?.call();
+  }
+
+  /// The W18 particle phase at +170 s — three live emitters (a
+  /// spherical flipbook fountain, additive velocity-stretched
+  /// bursts, a two-bucket tumbling mesh pool) plus an `enabled:false`
+  /// gate the phase flips on, hides/restores the streaks node, and
+  /// removes the gated node. The phase logs each send.
+  void _runW18() {
+    dnLog('dart3d: w18 phase — particle emitters');
+    _w18Phase?.call();
   }
 
   void _onJointEvent(SceneJointBroke event) {
@@ -637,6 +655,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     _w15Timer?.cancel();
     _w24Timer?.cancel();
     _w16Timer?.cancel();
+    _w18Timer?.cancel();
     _queryBattery?.cancel();
     _jointTimer?.cancel();
     _reroll?.cancel();
@@ -658,6 +677,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     _w15Phase = null;
     _w24Phase = null;
     _w16Phase = null;
+    _w18Phase = null;
     _animsPlaying = 0;
     _jointCount = 0;
     _jointsBroke = 0;
@@ -697,6 +717,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     _w15Timer?.cancel();
     _w24Timer?.cancel();
     _w16Timer?.cancel();
+    _w18Timer?.cancel();
     super.dispose();
   }
 

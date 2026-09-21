@@ -16,6 +16,7 @@ import com.github.stephengold.joltjni.Body
 import com.github.stephengold.joltjni.Quat
 import com.github.stephengold.joltjni.RVec3
 import com.github.stephengold.joltjni.Vec3
+import com.google.android.filament.Box
 import com.google.android.filament.Camera
 import com.google.android.filament.ColorGrading
 import com.google.android.filament.Engine
@@ -24,6 +25,7 @@ import com.google.android.filament.IndirectLight
 import com.google.android.filament.Material
 import com.google.android.filament.MaterialInstance
 import com.google.android.filament.MorphTargetBuffer
+import com.google.android.filament.RenderableManager
 import com.google.android.filament.Renderer
 import com.google.android.filament.Scene
 import com.google.android.filament.SkinningBuffer
@@ -1121,6 +1123,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         }
         val b = MaterialBuilder()
             .platform(MaterialBuilder.Platform.MOBILE)
+            .targetApi(if (engine.backend == Engine.Backend.VULKAN)
+                MaterialBuilder.TargetApi.VULKAN
+                else MaterialBuilder.TargetApi.OPENGL)
             .name("d3_shadow_catcher")
             .shading(MaterialBuilder.Shading.UNLIT)
             .doubleSided(true)
@@ -1168,6 +1173,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         }
         val b = MaterialBuilder()
             .platform(MaterialBuilder.Platform.MOBILE)
+            .targetApi(if (engine.backend == Engine.Backend.VULKAN)
+                MaterialBuilder.TargetApi.VULKAN
+                else MaterialBuilder.TargetApi.OPENGL)
             .name("d3_trail")
             .shading(MaterialBuilder.Shading.UNLIT)
             .doubleSided(true)
@@ -1195,6 +1203,183 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         val s = "materialParams.${slot}UVSet"
         return "    vec2 ${slot}Uv = $t.xy + mat2(cos($r), sin($r)," +
             " -sin($r), cos($r)) * ($t.zw * ($s > 0.5 ? uv1 : uv0));\n"
+    }
+
+    // MARK: - W18 particles
+
+    /**
+     * nodeKey → that node's live particle runtimes. A manifest
+     * Context's fresh map swaps in at install (same ownership as
+     * nodeSkinning); a surgical Context aliases this map. The tick
+     * loop in stepFrame drives them.
+     */
+    internal var particleRuntimes:
+        MutableMap<Long, MutableList<ParticleRuntime>> = HashMap()
+        private set
+
+    /**
+     * Compiled sprite materials — one per wire `blendMode` since
+     * Filament bakes blending into the Material. Lazily built on
+     * first use so a scene without sprite emitters pays nothing.
+     */
+    private var particleAlphaMaterial: Material? = null
+    private var particleAdditiveMaterial: Material? = null
+
+    internal fun particleMaterial(blendMode: String): Material {
+        val additive = blendMode == "additive"
+        val existing = if (additive) particleAdditiveMaterial
+            else particleAlphaMaterial
+        if (existing != null) return existing
+        val m = buildParticleMaterial(additive)
+        if (additive) particleAdditiveMaterial = m
+        else particleAlphaMaterial = m
+        return m
+    }
+
+    /**
+     * The billboard material — vertices arrive already expanded into
+     * world space and the sprite entity's transform is identity, so
+     * OBJECT domain passes them through unchanged. (WORLD domain is
+     * tempting here but misplaces geometry on this backend — see the
+     * W18 report.) UV0/UV1 carry the two flipbook cells; CUSTOM0 is
+     * the blend factor, forwarded through a custom interpolant.
+     * `flipUV(false)` keeps v=0 = the uploaded image's top row
+     * (upstream's quad UVs are authored v-top).
+     */
+    private fun buildParticleMaterial(additive: Boolean): Material {
+        if (!filamatReady) {
+            MaterialBuilder.init()
+            filamatReady = true
+        }
+        val frag = StringBuilder()
+            .append("void material(inout MaterialInputs material) {\n")
+            .append("    vec4 tex = mix(texture(materialParams_particleMap," +
+                " getUV0()), texture(materialParams_particleMap," +
+                " getUV1()), variable_blendData.x);\n")
+            .append("    vec4 c = getColor() * tex;\n")
+        if (additive) {
+            // Filament ADD is ONE/ONE — premultiply so the particle
+            // alpha attenuates the contribution.
+            frag.append("    material.baseColor = vec4(c.rgb * c.a," +
+                " c.a);\n")
+        } else {
+            frag.append("    material.baseColor = c;\n")
+        }
+        frag.append("    prepareMaterial(material);\n}\n")
+        val b = MaterialBuilder()
+            .platform(MaterialBuilder.Platform.MOBILE)
+            .targetApi(if (engine.backend == Engine.Backend.VULKAN)
+                MaterialBuilder.TargetApi.VULKAN
+                else MaterialBuilder.TargetApi.OPENGL)
+            .name(if (additive) "d3_particle_add" else "d3_particle_alpha")
+            .shading(MaterialBuilder.Shading.UNLIT)
+            .vertexDomain(MaterialBuilder.VertexDomain.OBJECT)
+            .doubleSided(true)
+            .culling(MaterialBuilder.CullingMode.NONE)
+            .blending(if (additive) MaterialBuilder.BlendingMode.ADD
+                else MaterialBuilder.BlendingMode.TRANSPARENT)
+            .depthWrite(false)
+            .flipUV(false)
+            .require(MaterialBuilder.VertexAttribute.UV0)
+            .require(MaterialBuilder.VertexAttribute.UV1)
+            .require(MaterialBuilder.VertexAttribute.COLOR)
+            .require(MaterialBuilder.VertexAttribute.CUSTOM0)
+            .variable(MaterialBuilder.Variable.CUSTOM0, "blendData")
+            .samplerParameter(MaterialBuilder.SamplerType.SAMPLER_2D,
+                MaterialBuilder.SamplerFormat.FLOAT,
+                MaterialBuilder.ParameterPrecision.DEFAULT, "particleMap")
+            .materialVertex(
+                "void materialVertex(inout MaterialVertexInputs m) {\n" +
+                "    m.blendData = getCustom0();\n}\n")
+            .material(frag.toString())
+        val pkg = b.build()
+        check(pkg.isValid) { "d3 particle material failed to compile" }
+        return Material.Builder()
+            .payload(pkg.buffer, pkg.buffer.remaining())
+            .build(engine)
+    }
+
+    /**
+     * `particleEmitter` realization — one dedicated entity whose
+     * dynamic vertex buffer carries capacity×4 CPU-expanded world
+     * quads. A dedicated entity (not the node's) so a `mesh`
+     * component can co-exist on the same node.
+     */
+    internal fun createSpriteParticle(
+        system: ParticleSystem,
+        spec: SpriteEmitterSpec,
+        layers: Int,
+    ): SpriteParticleRuntime {
+        val cap = system.storage.capacity
+        val vb = SpriteParticleRuntime.buildVertexBuffer(engine, cap)
+        val ib = SpriteParticleRuntime.buildIndexBuffer(engine, cap)
+        val entity = EntityManager.get().create()
+        val mi = particleMaterial(spec.blendMode).createInstance()
+        // Identity transform — every other renderable in this layer
+        // owns a TransformManager component; vertex data is already
+        // world-space so identity preserves positions.
+        engine.transformManager.setTransform(
+            engine.transformManager.create(entity), IDENTITY16)
+        RenderableManager.Builder(1)
+            .geometry(0, RenderableManager.PrimitiveType.TRIANGLES,
+                vb, ib, 0, 0)
+            .material(0, mi)
+            // World-space verts roam the whole scene — the box is a
+            // formality (culling is off).
+            .boundingBox(Box(0f, 0f, 0f, 1e4f, 1e4f, 1e4f))
+            .layerMask(0xFF, layers and 0xFF)
+            .castShadows(false)
+            .receiveShadows(false)
+            .culling(false)
+            .build(engine, entity)
+        val rt = SpriteParticleRuntime(
+            this, system, spec, entity, vb, ib, mi, spec.texture)
+        rt.layers = layers
+        return rt
+    }
+
+    /**
+     * `meshParticleEmitter` realization — a lazily-grown pool of
+     * per-particle renderables (no InstanceBuffer in the Java
+     * binding). `buckets`/`geoKeys` are parallel lists; a null bucket
+     * waits on a pending geometry payload.
+     */
+    internal fun createMeshParticle(
+        system: ParticleSystem,
+        spec: MeshEmitterSpec,
+        geoKeys: List<Long>,
+        buckets: MutableList<GpuMesh?>,
+        materialKey: Long?,
+        parentEntity: Int,
+        layers: Int,
+    ): MeshParticleRuntime =
+        MeshParticleRuntime(
+            this, system, spec, geoKeys, buckets, materialKey,
+            parentEntity, layers)
+
+    /** Advances every live emitter then repacks — before render(),
+     * after the camera pose settles (billboards face it). */
+    private fun tickParticles(dt: Float) {
+        if (particleRuntimes.isEmpty()) return
+        val camPos = FloatArray(3)
+        camera.getPosition(camPos)
+        val tcm = engine.transformManager
+        val wm = FloatArray(16)
+        val it = particleRuntimes.entries.iterator()
+        while (it.hasNext()) {
+            val (key, list) = it.next()
+            val rec = nodesById[key]
+            if (rec == null) {
+                // Node died without a teardown pass — defensive prune.
+                it.remove()
+                for (rt in list) rt.destroy()
+                continue
+            }
+            val inst = tcm.getInstance(rec.entity)
+            if (inst == 0) continue
+            tcm.getWorldTransform(inst, wm)
+            for (rt in list) rt.tick(dt.toDouble(), camPos, wm)
+        }
     }
 
     private fun applyClearColor() {
@@ -1564,6 +1749,12 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             iblSpecular = null
             iblPrefilter = null
             world.close()
+            // W18: particle runtimes own entities + buffers — retire
+            // them before the node entity sweep.
+            for ((_, list) in particleRuntimes) {
+                for (rt in list) rt.destroy()
+            }
+            particleRuntimes.clear()
             val sweepCtx = FsceneRealizer.surgicalContext(this)
             for ((_, rec) in nodesById) {
                 // W16: trail entities/buffers and the lod consumer
@@ -1618,6 +1809,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             engine.destroyMaterial(unlitMaskedMaterial)
             engine.destroyMaterial(unlitBlendMaterial)
             catcherMaterialBacking?.let { engine.destroyMaterial(it) }
+            // W18: the lazily-built sprite materials.
+            particleAlphaMaterial?.let { engine.destroyMaterial(it) }
+            particleAdditiveMaterial?.let { engine.destroyMaterial(it) }
+            particleAlphaMaterial = null
+            particleAdditiveMaterial = null
             for ((_, m) in materialVariants) engine.destroyMaterial(m)
             materialVariants.clear()
             engine.destroyMaterial(trailMaterial)
@@ -1928,6 +2124,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 val rmCtx = FsceneRealizer.surgicalContext(this)
                 for (id in ids) {
                     val rec = nodesById.remove(id) ?: continue
+                    // W18: particle runtimes own entities/buffers —
+                    // destroy before the node entity (mesh slots are
+                    // its transform children).
+                    particleRuntimes.remove(id)
+                        ?.forEach { it.destroy() }
                     // W16: the trail's unparented entity + dynamic
                     // buffers and the lod consumer entry die with the
                     // node — neither rides rec.entity's teardown.
@@ -3474,6 +3675,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         materials: MutableMap<Long, MaterialInstance>,
         resources: FsceneRealizer.Context.InstalledResources,
         nodeSkins: MutableMap<Long, NodeSkin>,
+        particles: MutableMap<Long, MutableList<ParticleRuntime>>,
         pending: MutableSet<Long>,
         cameraKey: Long?,
         cameraProps: JSONObject?,
@@ -3490,6 +3692,12 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // body's addBody re-realizes it; LocalId session keys differ
         // across documents so a stale joint can't attach).
         world.retainJointsForNodes(nodes.keys)
+        // W18: particle runtimes own entities + buffers — retire them
+        // BEFORE the node sweep (mesh pool slots are transform
+        // children of node entities).
+        for ((_, list) in particleRuntimes) {
+            for (rt in list) rt.destroy()
+        }
         val sweepCtx = FsceneRealizer.surgicalContext(this)
         for ((_, rec) in nodesById) {
             // W16: trail entities/buffers + the lod consumer entry
@@ -3538,6 +3746,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         resources.payloadSpecs.putAll(opPayloadSpecs)
         nodesById = nodes
         nodeSkinning = nodeSkins
+        particleRuntimes = particles
         this.gpuMeshes = gpuMeshes
         materialInstances = materials
         this.resources = resources
@@ -4103,6 +4312,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // transform + retained projection — after the manipulator's
         // node write-back so a view camera sees this frame's pose.
         updateViewCameras()
+        // W18: particles step on the fixed-step accumulator inside
+        // each runtime, then repack render state — after the camera
+        // pose settles (billboards face it), before render. Upstream's
+        // update() slot.
+        tickParticles(dt)
         // W16: trails record/refill and lods rebind for this frame's
         // camera — the same pre-render slot iOS's renderer delegate
         // uses (node poses and camera are final here).
