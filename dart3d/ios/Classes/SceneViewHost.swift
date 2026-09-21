@@ -146,6 +146,28 @@ final class SceneViewHost: SCNView {
     var views: [ViewRec] = []
     var screenViews: [ViewRec] = []
 
+    /// W24 split-screen — render-queue state: one rec per screen view
+    /// while `multiScreenMode` is on (≥2 screen views or any
+    /// `viewport` rect). The sibling `SCNView` objects live in
+    /// `mainScreenSubviews` on the main thread; the lists pair by
+    /// index. `screenSubviewBuild` generation-gates the main-side
+    /// builds so a superseded one can't install.
+    var screenSubviews: [ScreenSubview] = []
+    var multiScreenMode = false
+    var screenSubviewBuild = 0
+
+    /// MAIN-THREAD state — the sibling `SCNView`s and their recs,
+    /// built and torn down inside main hops only (`layoutSubviews`
+    /// and the per-frame poke read it there). Stored on the host
+    /// rather than behind a lock: every access site is main-thread.
+    var mainScreenSubviews: [(view: SCNView, rec: ViewRec)] = []
+
+    /// The host's point-of-view in split mode — a detached node whose
+    /// camera sees nothing (mask 0), so the host pass contributes
+    /// clear/background only while every declared screen view owns a
+    /// sibling `SCNView`.
+    var blankPov: SCNNode?
+
     /// W14 stage quality — decoded off `stage` itself (not the env
     /// resource). `applyStageQuality` maps them onto the view;
     /// `resolvedViewAASamples` reads `stageAntiAliasing` for the
@@ -405,6 +427,15 @@ final class SceneViewHost: SCNView {
     /// decodes a camera promotes it over this placeholder.
     private var fallbackCameraNode: SCNNode?
 
+    /// The document pick — the doc camera, a diff-promoted camera,
+    /// or the install-time fallback — that owns `pointOfView` while
+    /// no screen view is declared. Written at the same sites the
+    /// fallback path picks `pointOfView` (install, `promoteCamera`,
+    /// `restoreFallbackCamera`), so an emptied `views` list can hand
+    /// the host's pass back to it (W24 fix-round). Non-private like
+    /// `blankPov` — `teardownRenderTargets` clears it cross-file.
+    var docPov: SCNNode?
+
     /// Warnings already emitted, keyed by caller-chosen tag, so
     /// payload-triggered re-realization can't repeat them.
     private var loggedOnce: Set<String> = []
@@ -590,6 +621,13 @@ final class SceneViewHost: SCNView {
         }
     }
 
+    /// W24: sibling frames track the host's bounds — each screen
+    /// view's `viewport` rect re-maps into the new target space.
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        layoutScreenSubviews()
+    }
+
     // MARK: - Mutation application (called from Dart3dPlugin.swift)
 
     /// Scene/physics mutations are only safe between SceneKit frames —
@@ -672,6 +710,12 @@ final class SceneViewHost: SCNView {
                 as? [String: Any] else { return }
         if let v = json["allowsCameraControl"] as? Bool {
             allowsCameraControl = v
+            // W24: in split mode the flag lives on sibling 0 (the
+            // lowest-order view, whose pov is the real camera node) —
+            // the host's own pov is the blank pass.
+            DispatchQueue.main.async { [weak self] in
+                self?.mainScreenSubviews.first?.view.allowsCameraControl = v
+            }
         }
         if let v = json["showsStatistics"] as? Bool {
             showsStatistics = v
@@ -1428,6 +1472,7 @@ final class SceneViewHost: SCNView {
         guard let cam = ctx.firstCameraNode, let fb = fallbackCameraNode
         else { return }
         pointOfView = cam
+        docPov = cam
         fb.removeFromParentNode()
         retire(fb)
         fallbackCameraNode = nil
@@ -1447,8 +1492,35 @@ final class SceneViewHost: SCNView {
         scene?.rootNode.addChildNode(cam)
         pointOfView = cam
         fallbackCameraNode = cam
+        docPov = cam
         applyStageExposure(stageExposure)
         applyStageEffects()
+    }
+
+    /// W24 fix-round: an emptied screen-view set hands the host's
+    /// pass back to the document pick — leaving `pointOfView` on
+    /// `blankPov` (category mask 0) or a retired view camera drew the
+    /// mask-0 clear pass every vsync. Reuses the fallback path's own
+    /// picks: `docPov` while it's still a live scene camera, else
+    /// `restoreFallbackCamera` installs the default — a removed or
+    /// camera-less pick gets the same default the camera-drop path
+    /// installs.
+    private func restoreDocumentPov() {
+        // `removeSubtree` only detaches the root — interior nodes keep
+        // `parent` set, so scene membership needs the full climb.
+        var top = docPov
+        while let parent = top?.parent { top = parent }
+        if let scene, let pov = docPov, pov.camera != nil,
+            top === scene.rootNode
+        {
+            pointOfView = pov
+            applyStageExposure(stageExposure)
+            applyStageEffects()
+            return
+        }
+        // The pick is gone or camera-less — the same default the
+        // camera-drop path installs (it applies the stage itself).
+        restoreFallbackCamera()
     }
 
     /// `{"op":"upsertResource","id":"<token>","resource":{…}}` — a
@@ -1866,7 +1938,15 @@ final class SceneViewHost: SCNView {
     /// `{"op":"updateViews","views":[<entries>]}` — wholesale replace
     /// of the view list: re-decode against the live registries, then
     /// re-distribute onto the rt records and re-pick the screen view.
+    /// An absent or non-array `views` member warns and no-ops — the
+    /// same `updateViews.malformed` shape Android logs (silently
+    /// clearing a live list on a decode hiccup hid real bugs).
     private func applyUpdateViews(_ json: [String: Any]) {
+        guard json["views"] is [Any] else {
+            logOnce("updateViews.malformed",
+                "updateViews: missing views array")
+            return
+        }
         let ctx = surgicalContext()
         ctx.decodeViews(json["views"])
         publish(ctx)
@@ -1902,11 +1982,10 @@ final class SceneViewHost: SCNView {
             renderTargets[key]?.views.sort { $0.order < $1.order }
         }
         screenViews.sort { $0.order < $1.order }
-        if screenViews.count > 1 {
-            logOnce("w14.screenViews",
-                "multiple screen-target views: iOS has no split-screen "
-                + "— lowest order wins pointOfView, extras ignored")
-        }
+        // W24: ≥2 screen views (or any viewport rect) switch the host
+        // into sibling mode — every screen view gets its own SCNView
+        // laid out over the host's clear pass.
+        updateScreenSubviews()
         updateContinuousRendering()
     }
 
@@ -1914,8 +1993,31 @@ final class SceneViewHost: SCNView {
     /// over the doc camera and the install-time fallback (which is
     /// removed like a promoted camera does). While `screenViews` is
     /// non-empty, `promoteCamera`/`restoreFallbackCamera` stand down.
+    /// W24: in split mode the host's point-of-view is the blank
+    /// camera instead — its pass contributes clear/background under
+    /// the sibling views, which carry every declared screen view.
+    /// An empty resolved set hands `pointOfView` back to the document
+    /// pick (`restoreDocumentPov`) — the split-mode blank pass must
+    /// not outlive the views that justified it.
     func applyScreenViewCamera() {
-        guard let v = screenViews.first else { return }
+        guard let v = screenViews.first else {
+            restoreDocumentPov()
+            return
+        }
+        if multiScreenMode {
+            // Split: the host's pass is clear/background under the
+            // siblings — the blank pov is set whether or not the
+            // lowest-order camera resolves (its sibling draws
+            // through a proxy until it does).
+            if blankPov == nil {
+                let node = SCNNode()
+                let blank = SCNCamera()
+                blank.categoryBitMask = 0
+                node.camera = blank
+                blankPov = node
+            }
+            pointOfView = blankPov
+        }
         guard let camNode = nodesById[v.cameraKey],
               let cam = camNode.camera else {
             logOnce("w14.screenCam.\(v.cameraKey)",
@@ -1930,7 +2032,9 @@ final class SceneViewHost: SCNView {
             retire(fb)
             fallbackCameraNode = nil
         }
-        pointOfView = camNode
+        if !multiScreenMode {
+            pointOfView = camNode
+        }
     }
 
     /// Applies the view-quality tier — runs whenever `viewConfig`
@@ -1987,15 +2091,24 @@ final class SceneViewHost: SCNView {
                 "filterQuality '\(stageFilterQuality)' unsupported on "
                 + "SceneKit; ignored")
         }
+        // W24: each sibling resolves its own view's AA/scale — the
+        // sibling list is main-thread state.
+        if multiScreenMode {
+            DispatchQueue.main.async { [weak self] in
+                self?.applyScreenSubviewQuality()
+            }
+        }
     }
 
     /// `rendersContinuously` stays on while any everyFrame/interval
     /// rt exists — a manual-only (or empty) registry lets the view
-    /// idle again.
+    /// idle again. W24: split mode keeps it on too — the host frame
+    /// is the siblings' poke source, so it must draw every vsync.
     func updateContinuousRendering() {
-        rendersContinuously = renderTargets.values.contains {
-            $0.update == "everyFrame" || $0.update == "interval"
-        }
+        rendersContinuously = multiScreenMode
+            || renderTargets.values.contains {
+                $0.update == "everyFrame" || $0.update == "interval"
+            }
     }
 
     /// Decodes a command's `bytes` field — JSON carries no raw bytes,
@@ -3599,6 +3712,7 @@ final class SceneViewHost: SCNView {
             pointOfView = cam
             fallbackCameraNode = cam
         }
+        docPov = pointOfView
         // W14: distribute the decoded views onto their rt records, let
         // a screen view's camera take the point of view (displacing
         // the doc/fallback pick), then apply stage quality before the
@@ -3631,11 +3745,14 @@ extension SceneViewHost: SCNSceneRendererDelegate {
 
     /// W14: post-physics, pre-drawable — the offscreen passes draw the
     /// same pose the screen frame is about to. Only fires for the
-    /// SCNView; the per-view SCNRenderers have no delegate set.
+    /// SCNView; the per-view SCNRenderers have no delegate set. W24:
+    /// sibling proxies sync in the same hook so their poke-drawn
+    /// frames share this pose.
     func renderer(_ renderer: SCNSceneRenderer,
                   willRenderScene scene: SCNScene,
                   atTime time: TimeInterval) {
         renderDueTargets(at: time)
+        syncScreenSubviews()
     }
 
     /// W15: the frame carrying a just-applied subtree is the first
@@ -3647,6 +3764,9 @@ extension SceneViewHost: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer,
                   didRenderScene scene: SCNScene,
                   atTime time: TimeInterval) {
+        // W24: the host's completed frame is the siblings' signal to
+        // draw — poke before the early-out below.
+        pokeScreenSubviews()
         guard let stamp = subtreeVisibleStamp else { return }
         subtreeVisibleStamp = nil
         let now = ProcessInfo.processInfo.systemUptime

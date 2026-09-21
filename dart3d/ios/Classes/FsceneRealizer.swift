@@ -1177,6 +1177,34 @@ enum FsceneRealizer {
         func decodeMaterial(_ key: UInt64, _ r: [String: Any]) {
             let m = SCNMaterial()
             let type = r["type"] as? String ?? "physicallyBased"
+            if type == "shadowCatcher" {
+                // W24 dart3d extension — upstream's
+                // ShadowCatcherMaterial 'live' mode: the surface
+                // draws only the shadow it receives (transparent
+                // where lit). SceneKit's .shadowOnly is the native
+                // equivalent; the caught shadow takes each light's
+                // shadowColor (per-light, default black at 50%) —
+                // the material-level shadowColor/shadowIntensity/
+                // aoStrength/softness/fade*/mode knobs have no
+                // per-material analog and log once. Depth writes
+                // stay on, matching upstream's depth-prepass join.
+                m.lightingModel = .shadowOnly
+                let props = r["properties"] as? [String: Any] ?? [:]
+                if d3Bool(props["doubleSided"]) == true {
+                    m.isDoubleSided = true
+                }
+                for field in ["shadowColor", "shadowIntensity",
+                              "aoStrength", "softness",
+                              "fadeStart", "fadeEnd", "mode"]
+                where props[field] != nil {
+                    host.logOnce("w24.catcher.\(field)",
+                        "shadowCatcher '\(field)' unsupported on "
+                        + "SceneKit's shadowOnly — the light's "
+                        + "shadowColor drives the catch")
+                }
+                materials[key] = m
+                return
+            }
             m.lightingModel = type == "unlit"
                 ? .constant : .physicallyBased
             let props = r["properties"] as? [String: Any] ?? [:]
@@ -3305,7 +3333,103 @@ enum FsceneRealizer {
                     light.shadowBias = CGFloat(v)
                 }
             }
+            if type == .directional {
+                decodeDirectionalShadow(light, p)
+            }
             node.light = light
+        }
+
+        /// W24: the upstream directional-light shadow vocabulary
+        /// (flutter_scene `DirectionalLightCodec`, defaults noted per
+        /// field) plus three dart3d wire extensions upstream keeps on
+        /// `stage.skyEnvironment.sunLight` (`SunLightSpec`):
+        /// `contactShadows`, `contactShadowDistance`, `angularRadius`
+        /// — the sun block stays deferred on both platforms, so the
+        /// fields ride the light component here. `priority` and
+        /// `localDirection` are upstream codec members dart3d doesn't
+        /// map — they warn below like the other unmapped fields.
+        /// SceneKit renders ONE shadow map per directional — the
+        /// cascade/contact/fade/ambient fields have no native
+        /// counterpart and log once instead of pretending parity;
+        /// what maps, maps absolutely (re-decode under diff updates
+        /// writes the same state).
+        func decodeDirectionalShadow(_ light: SCNLight,
+                                     _ p: [String: Any]) {
+            if let res = d3Double(p["shadowMapResolution"])
+                ?? (p["shadowMapResolution"] as? NSNumber)?.doubleValue {
+                let s = min(4096, max(64, res.rounded()))
+                light.shadowMapSize = CGSize(width: s, height: s)
+            }
+            if let v = d3Double(p["shadowSoftness"]) {
+                // World-space penumbra radius → SceneKit's blur
+                // factor (texel-space-ish): direct assignment is the
+                // closest analog, same convention 'shadowRadius'
+                // already uses. Precedence: `shadowRadius` (W6) and
+                // `shadowSoftness` (W24) write the same knob — this
+                // decode runs second, so softness wins when a
+                // document authors both.
+                light.shadowRadius = CGFloat(v)
+            }
+            if let v = d3Double(p["shadowMaxDistance"]) {
+                // Approximation: pin the ortho shadow projection at
+                // the authored coverage — SceneKit's auto-fit
+                // otherwise reframes the map every frame (the
+                // wire field is a view-camera distance; the ortho
+                // scale is the projection half-extent, so the map
+                // covers roughly ±v around the fitted center).
+                light.automaticallyAdjustsShadowProjection = false
+                light.orthographicScale = CGFloat(v)
+            }
+            switch p["shadowCasterFaces"] as? String ?? "front" {
+            case "back":
+                // Second-depth shadow mapping — SceneKit's one
+                // native analog of the wire enum.
+                light.forcesBackFaceCasters = true
+            case "both":
+                host.logOnce("w24.shadowCasterFaces.both",
+                    "shadowCasterFaces 'both' approximated as 'front' "
+                    + "on SceneKit")
+            case "front":
+                break
+            default:
+                host.logOnce(
+                    "w24.shadowCasterFaces.\(p["shadowCasterFaces"] ?? "?")",
+                    "shadowCasterFaces '\(p["shadowCasterFaces"] ?? "?")' "
+                    + "unknown; kept 'front'")
+            }
+            // Present-but-unsupported members — one warning per field
+            // per scene, not per light. The last three are the dart3d
+            // wire extensions (upstream home: `sunLight`, deferred).
+            for field in ["shadowCascadeCount",
+                          "shadowCascadeSplitLambda",
+                          "shadowFadeRange",
+                          "shadowAmbientStrength",
+                          "shadowNormalBias",
+                          "cacheStaticShadows",
+                          "contactShadows",
+                          "contactShadowDistance",
+                          "angularRadius"]
+            where p[field] != nil {
+                host.logOnce("w24.directional.\(field)",
+                    "directionalLight '\(field)' has no SceneKit "
+                    + "equivalent; ignored")
+            }
+            // Unmapped upstream `DirectionalLightCodec` members —
+            // `priority` (feature priority) and `localDirection`
+            // (travel dir; dart3d aims lights by node transform).
+            for field in ["priority", "localDirection"]
+            where p[field] != nil {
+                host.logOnce("w24.directional.\(field)",
+                    "directionalLight '\(field)' is an upstream field "
+                    + "with no dart3d mapping; ignored")
+            }
+            if let f = p["shadowFilter"] as? String,
+               f != "rotatedPoisson" {
+                host.logOnce("w24.directional.shadowFilter.\(f)",
+                    "shadowFilter '\(f)' unsupported on SceneKit — "
+                    + "its PCF kernel is fixed; shadowSoftness still "
+                    + "applies")
+            }
         }
 
         // MARK: Skins / morphs / animations (W11)

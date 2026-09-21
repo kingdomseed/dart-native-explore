@@ -190,7 +190,11 @@ live-verified both platforms.**
   `views`, so install-time alone can't express a list change).
 - Wire extension `"viewport":[l,b,w,h]` on view entries — additive,
   upstream readers ignore it; Android realises a real second viewport
-  (Filament viewport origin is bottom-left).
+  (Filament viewport origin is bottom-left); W24 iOS siblings lay out
+  by the same rect. Texture-target entries: Android honors the
+  rect; iOS ignores it and fills the rt (`w24.viewport.rt`
+  warn-once). A malformed ≠4-element rect warns and drops to full
+  target.
 - AA resolve chain: `view.antiAliasing` → `stage.antiAliasing` →
   widget `viewConfig.antialiasingMode` → platform default. `msaa`→4x,
   `fxaa`→FXAA, `auto`→inherit; `smaa`/`taa` warn-once and inherit

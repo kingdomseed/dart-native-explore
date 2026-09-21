@@ -148,7 +148,9 @@ ShowcaseScene? loadShowcaseScene(
           : item.assetKey.endsWith('.glb')
           ? importGlbToSceneDocument(bytes)
           // `readFsceneLogged` keeps the vN→vM migration lane log on
-          // the bundled-asset path (loadFscene never runs here).
+          // the bundled-asset path (loadFscene never runs here) — it
+          // decodes through the extensions-aware reader, so the dart3d
+          // `viewport` view member survives too (W24 merge).
           : readFsceneLogged(utf8.decode(bytes), log: log);
       // Prefab instances expand host-side — prefab_demo.fscene
       // references tree_prefab.fscene by bare filename.

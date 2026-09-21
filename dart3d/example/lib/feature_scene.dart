@@ -77,6 +77,19 @@ import 'package:vector_math/vector_math.dart';
 /// chunk, then drops and re-streams streamA three times for the
 /// no-stale-nodes lane. Send and native-visible timestamps log for
 /// the manifest-to-visible latency measurement.
+/// W24 lands the views-and-shadow-breadth lane through the returned
+/// `w24Phase` closure — fired at +126 s — which re-decodes `key` with
+/// the directional shadow vocabulary: the upstream
+/// `DirectionalLightCodec` fields (cascades, split lambda, max
+/// distance, biases, softness, caster faces) plus the three
+/// `sunLight` fields dart3d accepts on the light as wire extensions
+/// (contact shadows, distance, angular radius). It drops a
+/// `shadowCatcher` plane and a layer-bit-8 marker
+/// sphere into the arena, then walks the screen-view lanes through
+/// `updateViews`: a two-camera split, a single inset `viewport` rect,
+/// a high-bit `layerMask` pair, and the pre-phase restore. The
+/// closure takes a `targetPx` probe — viewports are authored in
+/// target pixels, which only the widget tree knows (size × dpr).
 ///
 /// [ortho] flips the camera's `projection` manifest field; the toggle
 /// is a document reload, the only camera write the protocol carries
@@ -105,6 +118,7 @@ final class FeatureScene {
     void Function() w14Phase,
     void Function() wLoosePhase,
     void Function() w15Phase,
+    void Function(({double w, double h}) Function() targetPx) w24Phase,
   })
   build({bool ortho = false, int env = 1, SceneController? controller}) {
     final doc = SceneDocument();
@@ -3499,6 +3513,278 @@ final class FeatureScene {
       });
     }
 
+    // W24 phase (+126 s): the views-and-shadow-breadth lane. One
+    // component re-decode arms the directional shadow vocabulary on
+    // `key` (upstream `DirectionalLightCodec` fields — cascades,
+    // split lambda, max distance, biases, softness, caster faces —
+    // plus the `sunLight` fields dart3d accepts as extensions:
+    // contact shadows, distance, angular radius. Each native maps
+    // what it supports and logs the rest), a `shadowCatcher`
+    // plane slides under the dice area, and a layer-bit-8 marker
+    // sphere lands for the 8-bit layerMask lane. Then the view list
+    // walks the screen-target lanes: a two-view split (each view its
+    // own camera + viewport rect — iOS siblings, Android viewports),
+    // a single inset-rect view, a high-bit layerMask pair, and back
+    // to the pre-phase list for the dice-regression tail. Every view
+    // is a [Dart3dRenderViewSpec] so `viewport` rides the wire.
+    void addW24Phase(({double w, double h}) Function() targetPx) {
+      final c = controller;
+      if (c == null) return;
+      final live = phaseTwoDoc ?? doc;
+
+      Map<String, Object?> addNodeOp(NodeSpec node) => {
+        'op': 'addNode',
+        'node': node.id.toToken(),
+        'parent': null,
+        'spec': encodeNodeCommandSpec(node, live),
+      };
+
+      void setViews(List<RenderViewSpec> views, String tag) {
+        live.views
+          ..clear()
+          ..addAll(views);
+        c.updateViews(views);
+        dnLog('dart3d: w24 $tag');
+      }
+
+      // The doc's camera and key light — built before the ids were
+      // captured, so find them by name.
+      final camNode = live.nodes.values.firstWhere((n) => n.name == 'camera');
+      final keyNode = live.nodes.values.firstWhere((n) => n.name == 'key');
+      // W14 leaves one texture-target view (rtCam → rt) — keep it
+      // live through the screen lanes and restore it at the end.
+      final prePhaseViews = List<RenderViewSpec>.of(live.views);
+
+      // ── t+0: shadow breadth + the catcher + the layer marker ──
+      // The `key` light re-decodes with the directionalLight shadow
+      // vocabulary — one `updateNode` components pass. SceneKit maps
+      // mapSize/softness/maxDistance (ortho projection)/back-face
+      // casters and logs the rest; Filament maps cascades/splits/
+      // maxDistance/contact/biases/angularRadius and logs the rest.
+      // `shadowRadius` (W6) and `shadowSoftness` (W24) drive the same
+      // native knob — both are authored here on purpose: softness
+      // decodes second and wins (0.08 beats 3.0), so the pass also
+      // exercises the documented precedence.
+      keyNode.components
+        ..clear()
+        ..add(
+          ComponentSpec(
+            'directionalLight',
+            properties: {
+              'color': ColorValue(1, 1, 1, 1),
+              'intensity': DoubleValue(1400),
+              'castsShadow': BoolValue(true),
+              // W6 fields — kept so the pass is a superset, not a swap.
+              'shadowRadius': DoubleValue(3.0),
+              'shadowDepthBias': DoubleValue(0.005),
+              // W24 vocabulary — upstream DirectionalLightCodec
+              // names first, the sunLight wire extensions last.
+              'shadowCascadeCount': IntValue(4),
+              'shadowCascadeSplitLambda': DoubleValue(0.7),
+              'shadowMaxDistance': DoubleValue(60),
+              'shadowMapResolution': IntValue(1024),
+              'shadowNormalBias': DoubleValue(0.02),
+              'shadowSoftness': DoubleValue(0.08),
+              'shadowFadeRange': DoubleValue(2.0),
+              'shadowAmbientStrength': DoubleValue(0.0),
+              'shadowFilter': StringValue('rotatedPoisson'),
+              'shadowCasterFaces': StringValue('front'),
+              'cacheStaticShadows': BoolValue(true),
+              // dart3d wire extensions — upstream carries these on
+              // `stage.skyEnvironment.sunLight` (deferred); dart3d
+              // accepts them on the light component.
+              'contactShadows': BoolValue(true),
+              'contactShadowDistance': DoubleValue(0.3),
+              'angularRadius': DoubleValue(0.005),
+            },
+          ),
+        );
+
+      // The shadow catcher: a 4×4 plane hovering just above the slab
+      // under the dice area — it draws only the shadow it receives.
+      final catcherGeo = live.addResource(
+        GeometryResource(
+          live.newId(),
+          procedural: PlaneGeometrySpec(width: 4, depth: 4),
+        ),
+      );
+      final catcherMat = live.addResource(
+        MaterialResource(
+          live.newId(),
+          type: 'shadowCatcher',
+          properties: {
+            'shadowColor': ColorValue(0, 0, 0, 1),
+            'shadowIntensity': DoubleValue(0.6),
+          },
+        ),
+      );
+      final catcher = live.createNode(
+        name: 'w24.catcher',
+        transform: TrsTransform(translation: Vector3(0, 0.02, 1.5)),
+        components: [
+          ComponentSpec(
+            'mesh',
+            properties: {
+              'geometry': ResourceRefValue(catcherGeo.id),
+              'material': ResourceRefValue(catcherMat.id),
+            },
+          ),
+        ],
+        root: true,
+      );
+
+      // The second screen view's camera — a front-left angle on the
+      // dice area, so the split shows two different poses.
+      final cam2 = live.createNode(
+        name: 'w24.cam2',
+        transform: TrsTransform(
+          translation: Vector3(-4.0, 2.4, -3.0),
+          rotation:
+              Quaternion.axisAngle(Vector3(0, 1, 0), -0.9) *
+              Quaternion.axisAngle(Vector3(1, 0, 0), 0.45),
+        ),
+        components: [
+          ComponentSpec(
+            'camera',
+            properties: {
+              'projection': StringValue('perspective'),
+              'fovRadiansY': DoubleValue(1.0),
+              'near': DoubleValue(0.05),
+              'far': DoubleValue(100),
+            },
+          ),
+        ],
+        root: true,
+      );
+
+      // A bright marker on layer bit 8 — the high-layerMask lane:
+      // iOS's category mask honors it; Filament's 8-bit layerMask
+      // truncates it (and warns).
+      final markerGeo = live.addResource(
+        GeometryResource(
+          live.newId(),
+          procedural: SphereGeometrySpec(radius: 0.3),
+        ),
+      );
+      final markerMat = live.addResource(
+        MaterialResource(
+          live.newId(),
+          type: 'unlit',
+          properties: {'baseColor': ColorValue(1.0, 0.0, 1.0, 1.0)},
+        ),
+      );
+      final marker = live.createNode(
+        name: 'w24.layerMarker',
+        transform: TrsTransform(translation: Vector3(1.6, 1.2, -0.5)),
+        components: [
+          ComponentSpec(
+            'mesh',
+            properties: {
+              'geometry': ResourceRefValue(markerGeo.id),
+              'material': ResourceRefValue(markerMat.id),
+            },
+          ),
+        ],
+        root: true,
+      )..layers = 0x100;
+
+      final idKey = manifestIdKey(live);
+      c.applyCommands([
+        {
+          'op': 'updateNode',
+          'node': keyNode.id.toToken(),
+          'flags': ['components'],
+          'spec': encodeNodeCommandSpec(keyNode, live),
+        },
+        {
+          'op': 'upsertResource',
+          'id': 'geo:${catcherGeo.id.toToken()}',
+          'resource': encodeResource(catcherGeo, idKey),
+        },
+        {
+          'op': 'upsertResource',
+          'id': 'mat:${catcherMat.id.toToken()}',
+          'resource': encodeResource(catcherMat, idKey),
+        },
+        {
+          'op': 'upsertResource',
+          'id': 'geo:${markerGeo.id.toToken()}',
+          'resource': encodeResource(markerGeo, idKey),
+        },
+        {
+          'op': 'upsertResource',
+          'id': 'mat:${markerMat.id.toToken()}',
+          'resource': encodeResource(markerMat, idKey),
+        },
+        addNodeOp(catcher),
+        addNodeOp(cam2),
+        addNodeOp(marker),
+      ]);
+      dnLog('dart3d: w24 shadow breadth + catcher + layer marker');
+
+      // +2 s: split-screen — the doc camera on the left half, cam2 on
+      // the right, both full-height. iOS realizes sibling SCNViews;
+      // Android assigns per-view viewports on the shared surface.
+      Timer(const Duration(seconds: 2), () {
+        final px = targetPx();
+        final hw = (px.w / 2).roundToDouble();
+        setViews([
+          ...prePhaseViews,
+          Dart3dRenderViewSpec(
+            cameraNode: camNode.id,
+            viewport: [0, 0, hw, px.h],
+          ),
+          Dart3dRenderViewSpec(
+            cameraNode: cam2.id,
+            order: 1,
+            viewport: [hw, 0, px.w - hw, px.h],
+          ),
+        ], 'split-screen views');
+      });
+
+      // +6 s: a single screen view inside a bottom-left inset rect —
+      // the lone-viewport lane (iOS splits on any rect, not just ≥2).
+      Timer(const Duration(seconds: 6), () {
+        final px = targetPx();
+        setViews([
+          ...prePhaseViews,
+          Dart3dRenderViewSpec(
+            cameraNode: camNode.id,
+            viewport: [px.w * 0.05, px.h * 0.05, px.w * 0.45, px.h * 0.45],
+          ),
+        ], 'viewport inset');
+      });
+
+      // +9 s: the layerMask lane — left view mask 0x101 (layers 0+8),
+      // right view mask 0x100 (layer 8 only). iOS shows the scene +
+      // marker left, marker-only right; Android truncates both to 8
+      // bits (layer 0 → marker absent; right mask 0 → empty).
+      Timer(const Duration(seconds: 9), () {
+        final px = targetPx();
+        final hw = (px.w / 2).roundToDouble();
+        setViews([
+          ...prePhaseViews,
+          Dart3dRenderViewSpec(
+            cameraNode: camNode.id,
+            layerMask: 0x101,
+            viewport: [0, 0, hw, px.h],
+          ),
+          Dart3dRenderViewSpec(
+            cameraNode: cam2.id,
+            order: 1,
+            layerMask: 0x100,
+            viewport: [hw, 0, px.w - hw, px.h],
+          ),
+        ], 'layerMask 8-bit lane');
+      });
+
+      // +12 s: restore the pre-phase list — the dice regression tail
+      // runs with the same views the earlier lanes left.
+      Timer(const Duration(seconds: 12), () {
+        setViews(prePhaseViews, 'views restored — lane complete');
+      });
+    }
+
     return (
       document: doc,
       die: die.id,
@@ -3511,6 +3797,7 @@ final class FeatureScene {
       w14Phase: addW14Phase,
       wLoosePhase: addWLoosePhase,
       w15Phase: addW15Phase,
+      w24Phase: addW24Phase,
     );
   }
 
