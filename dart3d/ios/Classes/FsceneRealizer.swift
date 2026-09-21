@@ -1539,6 +1539,8 @@ enum FsceneRealizer {
                     "geometry \(key): camera-facing shape '\(s)'"
                         + " bakes once toward +Z")
                 var fp = parseFacing(p)
+                warnFacingDrops(site: "geometry", noun: "geometry",
+                                key: key, shape: s, p, fp)
                 fp.facing = facingMode(key, fp.facing)
                 return facingMesh(s, fp,
                     viewDir: SIMD3(0, 0, 1),
@@ -1694,6 +1696,31 @@ enum FsceneRealizer {
             }
         }
 
+        /// Wire fields the facing-shape expanders can't honor —
+        /// logged once per node on EVERY path that parses a facing
+        /// shape (procMesh component, procedural resource bake,
+        /// d3:instances shape), not just the component.
+        func warnFacingDrops(site: String, noun: String, key: UInt64,
+                             shape: String, _ p: [String: Any],
+                             _ fp: FacingParams) {
+            if d3Bool(p["widthInPixels"]) == true {
+                host.logOnce("\(site).\(key).widthInPixels",
+                    "\(noun) \(key): widthInPixels is"
+                        + " unsupported — `width` is world units")
+            }
+            if shape == "polyline", d3String(p["caps"]) != nil {
+                host.logOnce("\(site).\(key).caps",
+                    "\(noun) \(key): 'caps' is unsupported"
+                        + " — line ends are butt")
+            }
+            if shape == "lineSegments", fp.points.count % 2 != 0 {
+                host.logOnce("\(site).\(key).oddLineTail",
+                    "\(noun) \(key): lineSegments got an"
+                        + " odd point count — trailing point"
+                        + " dropped")
+            }
+        }
+
         /**
          * `d3:procMesh` — one node, one procedural mesh built from the
          * component's `shape` + params. Camera-facing shapes register
@@ -1710,24 +1737,8 @@ enum FsceneRealizer {
             let facing = FsceneRealizer.Context.facingShapes.contains(shape)
             var fp = facing ? parseFacing(p) : nil
             if fp != nil {
-                // Wire fields the quad expanders can't honor — logged
-                // once per node so the drop isn't silent.
-                if d3Bool(p["widthInPixels"]) == true {
-                    host.logOnce("procMesh.\(key).widthInPixels",
-                        "d3:procMesh node \(key): widthInPixels is"
-                            + " unsupported — `width` is world units")
-                }
-                if shape == "polyline", d3String(p["caps"]) != nil {
-                    host.logOnce("procMesh.\(key).caps",
-                        "d3:procMesh node \(key): 'caps' is unsupported"
-                            + " — line ends are butt")
-                }
-                if shape == "lineSegments", fp!.points.count % 2 != 0 {
-                    host.logOnce("procMesh.\(key).oddLineTail",
-                        "d3:procMesh node \(key): lineSegments got an"
-                            + " odd point count — trailing point"
-                            + " dropped")
-                }
+                warnFacingDrops(site: "procMesh", noun: "d3:procMesh node",
+                                key: key, shape: shape, p, fp!)
                 fp!.facing = facingMode(key, fp!.facing)
             }
             let geometry: SCNGeometry?
@@ -1913,6 +1924,9 @@ enum FsceneRealizer {
                         "d3:instances node \(key): facing shape '\(shape)'"
                             + " bakes once toward +Z")
                     var fp = parseFacing(p)
+                    warnFacingDrops(site: "instances",
+                                    noun: "d3:instances node",
+                                    key: key, shape: shape, p, fp)
                     fp.facing = facing
                     base = facingMesh(shape, fp,
                         viewDir: SIMD3(0, 0, 1),
