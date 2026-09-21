@@ -410,7 +410,7 @@ approximation; sun direction can drive a directional light for
 **Verification.** Physical sky visible as background + IBL; sun disc
 position tracks `sunDirection` on both.
 
-## W18 — Particles
+## W18 — Particles — DONE (implemented; device verification pending)
 
 **Scope.**
 
@@ -423,6 +423,23 @@ position tracks `sunDirection` on both.
   renderables (cost documented).
 - `fixedStep`/`maxFrameTime` determinism knobs documented where
   unmappable.
+
+**As built.** `docs/particles-spec.md` carries the full contract.
+Dart: `lib/src/particles.dart` (spec builders) + `particle_sim.dart`
+(the reference CPU sim — the decode/behavior contract both natives
+mirror). iOS: the `SCNParticleSystem` mapping landed as scoped, incl.
+the sprite-only `meshParticleEmitter` degrade. Android: the CPU sim
+ports to Kotlin in `ParticleRuntime.kt`; sprites render through a
+CPU-expanded world-space `VertexBuffer` + in-app filamat material.
+Deviation from the plan: Filament's Java binding (1.71.6) exposes no
+`InstanceBuffer`, so mesh particles are a **baked per-particle
+renderable pool** rather than one instanced draw — upstream's
+`_hiddenTransform` slot pattern, documented in the spec. `enabled`
+became the first real component tick gate on both platforms (`false`
+skips creation entirely; upstream gates update+repack, which is the
+same observable state). The harness lane lives at +170 s
+(`w18Phase`): fountain + burst + mesh pool + the enabled gate, plus
+`visible` and `removeNode` lifecycle probes.
 
 **Verification.** A fountain + a one-shot burst live on both
 platforms; perf at 1000+ particles.

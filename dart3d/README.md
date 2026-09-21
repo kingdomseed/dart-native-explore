@@ -66,6 +66,13 @@ See `example/` for a live feature harness that exercises the surface.
   with `everyFrame`/`interval`/`manual` scheduling, the `render` and
   `updateViews` ops, per-view camera/layerMask/order/AA/renderScale,
   and material consumption via `{"rref":"rt:…"}`.
+- Particles: `particleEmitter` (billboard sprites — flipbook atlas,
+  alpha/additive, spherical/axisLocked/velocityStretched facing,
+  modules incl. curl turbulence, bursts, fixed-step sim) and
+  `meshParticleEmitter` (per-particle mesh pool). iOS maps onto
+  `SCNParticleSystem`; Android runs a Kotlin port of upstream's CPU
+  sim feeding a Filament vertex-expanded billboard batch — see
+  `../docs/particles-spec.md`.
 - Feature-capability warnings: `featuresRequired`/`featuresUsed`
   documents degrade with named-workstream warnings.
 
@@ -86,6 +93,13 @@ closest approximation and logs once:
 - Physics contact points/impulses are approximated on Android; joints
   map to the nearest native constraint per platform
   (`docs/joints-spec.md`).
+- Particles (`docs/particles-spec.md`): iOS runs SceneKit's own
+  render-clock sim, so `seed`/`fixedStep`/`maxFrameTime`/
+  `maxParticles`/`bursts`/`turbulence`/`randomFlipX`/`aspectRatio`
+  decode but warn once (no `SCNParticleSystem` counterpart); Android
+  honors them all. `meshParticleEmitter` degrades to a sprite pass on
+  iOS and renders as a baked per-particle renderable pool on Android
+  — the Filament Java binding has no `InstanceBuffer`.
 
 Full detail lives in `docs/verification-matrix.md` and the per-
 workstream specs under `docs/`.
@@ -125,9 +139,11 @@ wire never blocks them, and each can be pulled back into a workstream:
 3. **Widget slots** — upstream binds Flutter widgets to world-anchored
    quads; needs a DartNative host bridge before the engine half
    (texture-on-quad + input routing) matters.
-4. **Mesh particles on iOS** — `SCNParticleSystem` is sprite-only;
-   `meshParticleEmitter` has no native honor path. Sprite fallback is
-   the documented delta if particles ship.
+4. **Mesh particles on iOS** — landed as the documented delta:
+   `SCNParticleSystem` is sprite-only, so `meshParticleEmitter`
+   renders as an untextured sprite pass tinted by the material's
+   baseColor (W18). True mesh particles on iOS would need a custom
+   instanced-geometry path — still excluded.
 5. **`renderScale`/`filterQuality` fidelity** — partially folded into
    W14: both decode per stage and per view, Android applies
    `renderScale` via dynamic resolution and iOS approximates via
