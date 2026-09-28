@@ -62,6 +62,39 @@ final class PhaseTimers {
     return sub;
   }
 
+  /// The first event of [stream] matching [test] within [timeout], or
+  /// null on timeout. The listener is owned by this generation: it is
+  /// cancelled on a match, on timeout, and by [cancelAll] (the returned
+  /// future then never completes). Unlike `firstWhere(...).timeout(...)`,
+  /// whose inner subscription outlives the timeout, nothing is left
+  /// listening afterwards.
+  Future<T?> firstWithin<T>(
+    Stream<T> stream,
+    bool Function(T event) test,
+    Duration timeout,
+  ) {
+    final done = Completer<T?>();
+    if (_cancelled) return done.future;
+    late final StreamSubscription<T> sub;
+    late final Timer timer;
+    void finish(T? value) {
+      if (done.isCompleted) return;
+      timer.cancel();
+      _live.remove(timer);
+      sub.cancel();
+      _subs.remove(sub);
+      done.complete(value);
+    }
+
+    sub = own(
+      stream.listen((event) {
+        if (test(event)) finish(event);
+      }),
+    );
+    timer = after(timeout, () => finish(null));
+    return done.future;
+  }
+
   /// Cancels every live timer and owned subscription, and refuses new
   /// ones.
   void cancelAll() {
