@@ -479,8 +479,19 @@ extension SceneViewHost {
         // through detached proxies posed per frame.
         screenSubviews = recs.enumerated().map { i, rec in
             let real = i == 0 ? nodesById[rec.cameraKey] : nil
+            let pov = real ?? SCNNode()
+            if real == nil, let camNode = nodesById[rec.cameraKey],
+               let cam = camNode.camera?.copy() as? SCNCamera {
+                // Seed the proxy before any sibling sees it — a
+                // camera-less pointOfView draws nothing until the
+                // first pose poke lands.
+                cam.categoryBitMask = rec.layerMask == UInt32.max
+                    ? Int(bitPattern: UInt.max) : Int(rec.layerMask)
+                pov.camera = cam
+                pov.transform = camNode.presentation.worldTransform
+            }
             return ScreenSubview(
-                rec: rec, pov: real ?? SCNNode(), drivesRealNode: real != nil)
+                rec: rec, pov: pov, drivesRealNode: real != nil)
         }
         let povs = screenSubviews.map { $0.pov }
         let snapScene = scene
@@ -506,6 +517,7 @@ extension SceneViewHost {
                 self.mainScreenSubviews.append((view: sub, rec: rec))
             }
             self.mainScreenSubviewGen = gen
+            self.mainScreenSubviewPovs = povs
             self.applyScreenSubviewQuality(quality)
             self.applySiblingHostState()
         }
@@ -525,6 +537,7 @@ extension SceneViewHost {
                 s.view.removeFromSuperview()
             }
             self.mainScreenSubviews = []
+            self.mainScreenSubviewPovs = []
         }
     }
 
@@ -589,10 +602,8 @@ extension SceneViewHost {
                 SCNTransaction.begin()
                 SCNTransaction.disableActions = true
                 for (i, pose) in snap.poses
-                where i < self.mainScreenSubviews.count {
-                    guard let pov =
-                        self.mainScreenSubviews[i].view.pointOfView
-                    else { continue }
+                where i < self.mainScreenSubviewPovs.count {
+                    let pov = self.mainScreenSubviewPovs[i]
                     pov.transform = pose.0
                     pov.camera = pose.1
                 }
