@@ -414,7 +414,16 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      * Entries drop when a `payload`/`upsertPayload` chunk rewrites the
      * ref's bytes. */
     private val lutBuffers =
-        HashMap<String, Pair<java.nio.ByteBuffer, Int>>()
+        object : LinkedHashMap<String, Pair<java.nio.ByteBuffer, Int>>(
+            8, 0.75f, true) {
+            // A 64³ table is ~3 MiB and every distinct ref+blend is its
+            // own entry — an animated lutBlend or document churn grew
+            // this without bound. Keep the few most recently used.
+            override fun removeEldestEntry(
+                eldest: MutableMap.MutableEntry<String,
+                    Pair<java.nio.ByteBuffer, Int>>?,
+            ): Boolean = size > MAX_LUT_CACHE_ENTRIES
+        }
 
     /** Filament objects owned by the applied stage env — swapped and
      * destroyed by [applyEnvironment]/[applySkybox] on every
@@ -1065,6 +1074,24 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      * sensitivity floor of ISO 10 clamps the default exposure
      * (~1/38400) out of range.
      */
+    /** The last effective stage exposure (exposure × 2^AE comp). */
+    private var lastEffExposure = 1.0f
+
+    /**
+     * `f/16, 1/125 s, ISO 100·e` — but Filament clamps sensitivity to
+     * [10, 204800], so compensation below ≈ −3.3 EV (or above ≈ +11 EV)
+     * moves into the shutter time instead; EV100 is identical.
+     */
+    private fun setCameraExposure(cam: Camera, e: Float) {
+        val iso = 100.0f * e
+        when {
+            iso < 10f -> cam.setExposure(16.0f, (1.0f / 125.0f) * (iso / 10f), 10f)
+            iso > 204800f -> cam.setExposure(16.0f,
+                (1.0f / 125.0f) * (iso / 204800f), 204800f)
+            else -> cam.setExposure(16.0f, 1.0f / 125.0f, iso)
+        }
+    }
+
     internal fun applyStageLook(
         exposure: Float, toneMapping: String,
         agxWhite: Double, agxContrast: Double,
@@ -1079,13 +1106,14 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             ?.takeIf { it.enabled }?.compensation ?: 0.0
         val effExposure = (exposure *
             Math.pow(2.0, aeComp)).toFloat()
-        camera.setExposure(16.0f, 1.0f / 125.0f, 100.0f * effExposure)
+        lastEffExposure = effExposure
+        setCameraExposure(camera, effExposure)
         // W14: exposure is a Camera property — every screen-bound view
         // camera takes it (offscreen views keep Filament's default,
-        // the same policy as the per-View post stack).
+        // the same policy as the per-View post stack). applyViews
+        // re-applies [lastEffExposure] to cameras it creates later.
         for (rec in screenViews) {
-            rec.camera?.setExposure(16.0f, 1.0f / 125.0f,
-                100.0f * effExposure)
+            rec.camera?.let { setCameraExposure(it, effExposure) }
         }
         val mapper: ToneMapper = when (toneMapping) {
             "pbrNeutral" -> ToneMapper.PBRNeutralToneMapper()
@@ -1180,6 +1208,16 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             // haloIntensity has no Filament knob — approximated as
             // thickness (Filament's default haloThickness is 0.1).
             haloThickness = fx.lensFlare.haloIntensity.toFloat() * 0.1f
+        }
+        if (fx.lensFlare.enabled && fx.bloom.enabled &&
+            fx.lensFlare.intensity != fx.bloom.intensity) {
+            // One shared `strength` weights bloom AND the flare
+            // composite — the authored flare intensity can't apply
+            // separately while bloom is on. Say so (PR #8 review).
+            logCommandOnce("fx.lensFlare.intensityWithBloom",
+                "lensFlare.intensity is not separable from" +
+                    " bloom.intensity on Filament (one BloomOptions" +
+                    " strength); flare follows bloom.intensity")
         }
         // W25: standalone chromaticAberration (enabled without
         // lensFlare) has no Filament surface — the platform-limit
@@ -1332,8 +1370,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // W25 film grain — Filament has no grain pass; approximated
         // by temporal dithering (the post pipeline's animated noise,
         // intensity unmapped).
-        view.dithering = if (fx.filmGrain.enabled)
-            View.Dithering.TEMPORAL else View.Dithering.NONE
+        // Grain off must keep Filament's default TEMPORAL dithering —
+        // writing NONE stripped the normal anti-banding from every
+        // scene with an effects block.
+        view.dithering = View.Dithering.TEMPORAL
         if (fx.filmGrain.enabled) {
             logCommandOnce("fx.filmGrain.approx",
                 "filmGrain approximated on Filament as temporal" +
@@ -1737,6 +1777,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // the outgoing scene).
         streamedSubtreeOps.clear()
         surgicalJournal.clear()
+        // Payload-backed LUT refs are document-local ids.
+        lutBuffers.clear()
         subtreeVisibleStamp = null
         FsceneRealizer.realize(data, this)
     }
@@ -2384,6 +2426,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             val cam = engine.createCamera(camEntity)
             rec.cameraEntity = camEntity
             rec.camera = cam
+            // decodeStage may have run before these cameras existed
+            // (initial load / re-realize) — carry the stage exposure.
+            if (rec.targetKey == null) setCameraExposure(cam, lastEffExposure)
             val tk = rec.targetKey
             if (tk != null) {
                 val rtRec = renderTargets[tk]
@@ -4507,6 +4552,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         private const val PI_F = 3.1415927f
         // W30: Dart3dSetBackend wire values, shared with the Dart caller.
         private const val SLOW_FRAME_MS = 250L
+        private const val MAX_LUT_CACHE_ENTRIES = 4
         private const val BACKEND_OPENGL = 1
         private const val BACKEND_VULKAN = 2
         /** Auto-mode default, set from the W30 A142 A/B measurement. */
