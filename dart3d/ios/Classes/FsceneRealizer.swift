@@ -5238,7 +5238,12 @@ enum FsceneRealizer {
             let life = Double(lifeSpan)
             guard life > 0 else { return }
             let period = Double(count) / fps       // seconds per loop
-            let wraps = min(Int((life / period).rounded(.up)), 128)
+            // Clamp in Double first: a huge fps/lifetime makes the
+            // quotient exceed Int.max (or overflow to inf), and the
+            // Int conversion would trap before `min` could cap it.
+            let q = (life / period).rounded(.up)
+            guard !q.isNaN, q > 0 else { return }
+            let wraps = Int(min(q, 128))
             var times: [NSNumber] = []
             var values: [NSNumber] = []
             for w in 0..<max(wraps, 1) {
@@ -5610,6 +5615,7 @@ enum FsceneRealizer {
             node.addParticleSystem(sys)
             scheduleParticleBursts(sys, node: node, props: props,
                                    looping: looping, duration: duration,
+                                   prewarm: Double(sys.warmupDuration),
                                    index: index, logKey: logKey)
         }
 
@@ -5631,7 +5637,7 @@ enum FsceneRealizer {
         private func scheduleParticleBursts(
             _ base: SCNParticleSystem, node: SCNNode,
             props: [String: Any], looping: Bool, duration: Double,
-            index: Int, logKey: String
+            prewarm: Double, index: Int, logKey: String
         ) {
             guard let bursts = d3List(props["bursts"]),
                   !bursts.isEmpty else { return }
@@ -5666,11 +5672,22 @@ enum FsceneRealizer {
                     let cap = duration - time
                     stopAfter = min(stopAfter ?? cap, cap)
                 }
+                // Prewarm advances the reference's system clock through
+                // the spawner too, so bursts inside the warmup fire
+                // during it: live start = time − prewarm. A burst that
+                // started in the warmup attaches at once, warmed by
+                // the part of the warmup after its start (its
+                // particles have aged that long); its stop shifts by
+                // the same amount.
+                let delay = time - (prewarm.isFinite ? max(prewarm, 0) : 0)
+                let aged = max(-delay, 0)
+                sys.warmupDuration = CGFloat(aged)
                 var steps: [SCNAction] = []
-                if time > 0 { steps.append(.wait(duration: time)) }
+                if delay > 0 { steps.append(.wait(duration: delay)) }
                 steps.append(.run { n in n.addParticleSystem(sys) })
                 if let stop = stopAfter, interval > 0 {
-                    steps.append(.wait(duration: max(stop, 0)))
+                    // At least one frame so the warmup runs emitting.
+                    steps.append(.wait(duration: max(stop - aged, window)))
                     steps.append(.run { _ in sys.birthRate = 0 })
                 }
                 node.runAction(.sequence(steps),
