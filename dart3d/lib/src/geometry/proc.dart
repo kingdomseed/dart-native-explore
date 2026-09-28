@@ -17,8 +17,11 @@ import 'dart:typed_data';
 import 'package:vector_math/vector_math.dart';
 
 import '../scene_model.dart';
+import 'limits.dart';
 import 'mesh_data.dart';
 import 'paths.dart';
+
+export 'limits.dart';
 
 /// The `d3:procMesh` component type tag.
 const kD3ProcMeshType = 'd3:procMesh';
@@ -512,7 +515,8 @@ final class D3TubeProc extends D3Proc {
   /// Cross-sections sampled along the path.
   final int stations;
 
-  /// Whether the two ends close with discs.
+  /// Whether the two ends close with discs. Ignored when [closed] — a
+  /// loop has no ends, and caps at the seam would intersect the tube.
   final bool caps;
 
   /// Whether the path closes into a loop.
@@ -538,17 +542,7 @@ final class D3TubeProc extends D3Proc {
   };
 
   @override
-  BoundsSpec get bounds {
-    final b = computeD3Bounds(
-      Float32List.fromList([
-        for (final p in points) ...[p.x, p.y, p.z],
-      ]),
-    );
-    return BoundsSpec(
-      min: b.min - Vector3.all(radius),
-      max: b.max + Vector3.all(radius),
-    );
-  }
+  BoundsSpec get bounds => _padded(d3CatmullRomBounds(points, closed), radius);
 
   @override
   D3MeshData build() => buildTube(
@@ -556,7 +550,7 @@ final class D3TubeProc extends D3Proc {
     radius: radius,
     radialSegments: radialSegments,
     stations: stations,
-    caps: caps,
+    caps: caps && !closed,
   );
 }
 
@@ -609,18 +603,8 @@ final class D3RibbonProc extends D3Proc {
   };
 
   @override
-  BoundsSpec get bounds {
-    final b = computeD3Bounds(
-      Float32List.fromList([
-        for (final p in points) ...[p.x, p.y, p.z],
-      ]),
-    );
-    final half = width / 2;
-    return BoundsSpec(
-      min: b.min - Vector3.all(half),
-      max: b.max + Vector3.all(half),
-    );
-  }
+  BoundsSpec get bounds =>
+      _padded(d3CatmullRomBounds(points, closed), width / 2);
 
   @override
   D3MeshData build() => buildRibbon(
@@ -760,7 +744,8 @@ final class D3LineSegmentsProc extends D3Proc {
   /// Whether [width] is in screen pixels.
   final bool widthInPixels;
 
-  /// Optional per-segment rgba colors.
+  /// Optional per-segment rgba colors — one per point *pair*, applied
+  /// to both endpoints of that segment. rgb entries get alpha 1.
   final List<List<double>>? colors;
 
   @override
@@ -834,7 +819,10 @@ final class D3BillboardProc extends D3Proc {
 
   @override
   BoundsSpec get bounds {
-    final half = math.max(size.x, size.y) / 2;
+    // The quad faces the camera and spins by [rotation], so any corner
+    // can point along any axis: the half-diagonal is the conservative
+    // orientation-independent radius.
+    final half = d3BillboardRadius(size.x, size.y);
     return BoundsSpec(min: Vector3.all(-half), max: Vector3.all(half));
   }
 
@@ -881,6 +869,14 @@ BoundsSpec? d3ProcShapeBounds(String shape, Map<String, PropertyValue> props) {
     }
     return w;
   }
+
+  bool flag(String k) => switch (props[k]) {
+    BoolValue(:final value) => value,
+    _ => false,
+  };
+
+  BoundsSpec curveBounds(double pad) =>
+      _padded(d3CatmullRomBounds(points(), flag('closed')), pad);
 
   BoundsSpec pointBounds(double pad) {
     final pts = points();
@@ -933,15 +929,15 @@ BoundsSpec? d3ProcShapeBounds(String shape, Map<String, PropertyValue> props) {
       final r = d('radius', 0.5);
       return BoundsSpec(min: Vector3(-r, 0, -r), max: Vector3(r, 0, r));
     }(),
-    'tube' => pointBounds(d('radius', 0.5)),
-    'ribbon' => pointBounds(d('width', 1.0) / 2),
+    'tube' => curveBounds(d('radius', 0.5)),
+    'ribbon' => curveBounds(d('width', 1.0) / 2),
     'polyline' => pointBounds(width() / 2),
     'lineSegments' => pointBounds(d('width', 1.0) / 2),
     'billboard' => () {
       final size = props['size'];
       final half = size is Vec2Value
-          ? math.max(size.value.x, size.value.y) / 2
-          : 0.5;
+          ? d3BillboardRadius(size.value.x, size.value.y)
+          : d3BillboardRadius(1, 1);
       return BoundsSpec(min: Vector3.all(-half), max: Vector3.all(half));
     }(),
     _ => null,
@@ -950,6 +946,40 @@ BoundsSpec? d3ProcShapeBounds(String shape, Map<String, PropertyValue> props) {
 
 BoundsSpec _cubeBounds(double r) =>
     BoundsSpec(min: Vector3.all(-r), max: Vector3.all(r));
+
+BoundsSpec _padded(BoundsSpec b, double pad) =>
+    BoundsSpec(min: b.min - Vector3.all(pad), max: b.max + Vector3.all(pad));
+
+/// The conservative radius of a camera-facing `w × h` quad centered on
+/// its anchor: half its diagonal, which covers every facing and
+/// in-plane rotation.
+double d3BillboardRadius(double w, double h) => math.sqrt(w * w + h * h) / 2;
+
+/// A conservative AABB for the uniform Catmull-Rom curve through
+/// [points] (closed appends the first point, matching the sweep
+/// paths). Each segment `p1→p2` is exactly the cubic Bézier with
+/// controls `p1`, `p1 + (p2 − p0)/6`, `p2 − (p3 − p1)/6`, `p2`, which
+/// lies inside those controls' convex hull — so their box bounds the
+/// curve's overshoot (a control-point-only box does not: `0,1,1,0`
+/// peaks at 1.125). Endpoint controls repeat like `CatmullRomPath`.
+BoundsSpec d3CatmullRomBounds(List<Vector3> points, bool closed) {
+  final pts = closed && points.isNotEmpty
+      ? <Vector3>[...points, points.first]
+      : points;
+  if (pts.isEmpty) return BoundsSpec(min: Vector3.zero(), max: Vector3.zero());
+  final last = pts.length - 1;
+  Vector3 at(int i) => pts[i < 0 ? 0 : (i > last ? last : i)];
+  final hull = <double>[];
+  void add(Vector3 v) => hull.addAll([v.x, v.y, v.z]);
+  add(pts.first);
+  for (var s = 0; s < last; s++) {
+    final p0 = at(s - 1), p1 = at(s), p2 = at(s + 1), p3 = at(s + 2);
+    add(p1 + (p2 - p0) / 6.0);
+    add(p2 - (p3 - p1) / 6.0);
+    add(p2);
+  }
+  return computeD3Bounds(Float32List.fromList(hull));
+}
 
 // ---------------------------------------------------------------------------
 // Generators — CPU mirrors of the native decoders.
@@ -1031,6 +1061,10 @@ D3MeshData buildPlane({
   required int segmentsX,
   required int segmentsZ,
 }) {
+  // Clamped like the native `seg()` decode (min 1) plus the shared cap
+  // — zero used to divide by zero into NaN positions.
+  segmentsX = d3ClampSegments(segmentsX, 1);
+  segmentsZ = d3ClampSegments(segmentsZ, 1);
   final b = D3MeshBuilder();
   for (var z = 0; z <= segmentsZ; z++) {
     for (var x = 0; x <= segmentsX; x++) {
@@ -1061,6 +1095,8 @@ D3MeshData buildSphere({
   required int segments,
   required int rings,
 }) {
+  segments = d3ClampSegments(segments, 1);
+  rings = d3ClampSegments(rings, 1);
   final b = D3MeshBuilder();
   final cols = segments + 1;
   for (var r = 0; r <= rings; r++) {
@@ -1089,6 +1125,8 @@ D3MeshData buildTorus({
   required int radialSegments,
   required int tubularSegments,
 }) {
+  radialSegments = d3ClampSegments(radialSegments, 1);
+  tubularSegments = d3ClampSegments(tubularSegments, 1);
   final b = D3MeshBuilder();
   final cols = tubularSegments + 1;
   for (var i = 0; i <= radialSegments; i++) {
@@ -1142,6 +1180,8 @@ D3MeshData buildCylinder({
       'A cylinder needs a nonzero radius on at least one end',
     );
   }
+  radialSegments = d3ClampSegments(radialSegments, 3);
+  heightSegments = d3ClampSegments(heightSegments, 1);
 
   final b = D3MeshBuilder();
   final slopeY = bottomRadius - topRadius;
@@ -1226,6 +1266,8 @@ D3MeshData buildCapsule({
   if (radius <= 0) {
     throw ArgumentError('A capsule needs a positive radius');
   }
+  radialSegments = d3ClampSegments(radialSegments, 3);
+  capRings = d3ClampSegments(capRings, 1);
 
   final halfH = height / 2;
   final rings = <({double posY, double posR, double normY, double normR})>[];
@@ -1281,6 +1323,7 @@ D3MeshData buildDisc({required double radius, required int segments}) {
   if (radius <= 0) {
     throw ArgumentError('A disc needs a positive radius');
   }
+  segments = d3ClampSegments(segments, 3);
   final b = D3MeshBuilder();
   final center = b.emit(
     Vector3.zero(),
@@ -1307,6 +1350,12 @@ D3MeshData buildDisc({required double radius, required int segments}) {
 /// A real subdivided icosahedron projected to [radius] — the W26
 /// icosphere, ported from upstream `buildIcosphereArrays` (midpoint
 /// edge cache, spherical UVs, outward winding).
+///
+/// [subdivisions] above [kD3MaxIcosphereSubdivisions] clamp to it (the
+/// triangle count is `20·4ⁿ`). Triangles straddling the `atan2` seam
+/// get duplicated vertices with `u + 1` so the texture doesn't smear
+/// back across the whole atlas, and pole vertices (where longitude is
+/// undefined) are split per triangle at the neighbours' mean `u`.
 D3MeshData buildIcosphere({required double radius, required int subdivisions}) {
   if (subdivisions < 0) {
     throw ArgumentError('Icosphere subdivisions cannot be negative');
@@ -1314,6 +1363,7 @@ D3MeshData buildIcosphere({required double radius, required int subdivisions}) {
   if (radius <= 0) {
     throw ArgumentError('An icosphere needs a positive radius');
   }
+  subdivisions = d3ClampSubdivisions(subdivisions);
 
   final t = (1 + math.sqrt(5)) / 2;
   final verts = <Vector3>[
@@ -1353,9 +1403,11 @@ D3MeshData buildIcosphere({required double radius, required int subdivisions}) {
     [9, 8, 1],
   ];
 
+  // 32 bits per index: collision-free for any vertex count the
+  // subdivision cap allows (a 16-bit shift aliased past 65535).
   final midpointCache = <int, int>{};
   int midpoint(int a, int b) {
-    final key = a < b ? (a << 16) | b : (b << 16) | a;
+    final key = a < b ? (a << 32) | b : (b << 32) | a;
     final cached = midpointCache[key];
     if (cached != null) return cached;
     final index = verts.length;
@@ -1382,20 +1434,51 @@ D3MeshData buildIcosphere({required double radius, required int subdivisions}) {
     faces = next;
   }
 
+  final normals = [for (final v in verts) v.normalized()];
+  final us = [
+    for (final n in normals) 0.5 + math.atan2(n.z, n.x) / (2 * math.pi),
+  ];
+  final vs = [
+    for (final n in normals) 0.5 - math.asin(n.y.clamp(-1.0, 1.0)) / math.pi,
+  ];
+  bool isPole(int i) => normals[i].y.abs() > 1 - 1e-9;
+
   final b = D3MeshBuilder();
-  for (final v in verts) {
-    final n = v.normalized();
-    b.emit(
-      n * radius,
-      n: n,
-      uv: Vector2(
-        0.5 + math.atan2(n.z, n.x) / (2 * math.pi),
-        0.5 - math.asin(n.y.clamp(-1.0, 1.0)) / math.pi,
-      ),
-    );
+  final shared = <int, int>{}; // source vertex → builder index
+  final wrapped = <int, int>{}; // source vertex → its u+1 seam copy
+  int vertex(int i, double u, {bool wrap = false, bool fresh = false}) {
+    int make() =>
+        b.emit(normals[i] * radius, n: normals[i], uv: Vector2(u, vs[i]));
+    if (fresh) return make();
+    return (wrap ? wrapped : shared).putIfAbsent(i, make);
   }
+
   for (final f in faces) {
-    b.tri(f[0], f[1], f[2]);
+    final nonPole = [
+      for (final i in f)
+        if (!isPole(i)) us[i],
+    ];
+    final seam =
+        nonPole.isNotEmpty &&
+        nonPole.reduce(math.max) - nonPole.reduce(math.min) > 0.5;
+    double adjusted(int i) => seam && us[i] < 0.5 ? us[i] + 1.0 : us[i];
+    final poleU = nonPole.isEmpty
+        ? 0.5
+        : [
+                for (final i in f)
+                  if (!isPole(i)) adjusted(i),
+              ].reduce((a, c) => a + c) /
+              nonPole.length;
+    final out = [
+      for (final i in f)
+        if (isPole(i))
+          vertex(i, poleU, fresh: true)
+        else if (seam && us[i] < 0.5)
+          vertex(i, us[i] + 1.0, wrap: true)
+        else
+          vertex(i, us[i]),
+    ];
+    b.tri(out[0], out[1], out[2]);
   }
   return b.build();
 }
@@ -1420,6 +1503,8 @@ D3MeshData buildTube(
       'must be at least three',
     );
   }
+  stations = d3ClampSegments(stations, 2);
+  radialSegments = d3ClampSegments(radialSegments, 3);
   final frames = path.evenlySpacedFrames(stations);
   final length = path.length;
   final b = D3MeshBuilder();
@@ -1462,6 +1547,7 @@ D3MeshData buildRibbon(
   if (stations < 2) {
     throw ArgumentError.value(stations, 'stations', 'must be at least two');
   }
+  stations = d3ClampSegments(stations, 2);
   final frames = path.evenlySpacedFrames(stations);
   final length = path.length;
   final half = width / 2.0;
@@ -1473,7 +1559,13 @@ D3MeshData buildRibbon(
     var sideways = frame.tangent.cross(up);
     if (sideways.length2 < 1e-12) sideways = frame.binormal;
     final across = sideways.normalized();
-    final normal = up.normalized();
+    // The surface normal is perpendicular to both the path tangent and
+    // the strip's across axis — `up` with its tangent component
+    // projected out, not raw `up` (which tilts off the surface on any
+    // climbing segment).
+    var normal = across.cross(frame.tangent);
+    if (normal.length2 < 1e-12) normal = up.clone();
+    normal.normalize();
     final v = stations == 1 ? 0.0 : length * i / (stations - 1);
     ringBases.add(b.vertexCount);
     b.emit(frame.position - across * half, n: normal, uv: Vector2(0, v));
@@ -1533,7 +1625,14 @@ void _tubeCap(
 /// (natives re-expand toward the live camera each frame).
 ///
 /// [dashPattern] splits the polyline at `(on, off)` arc-length
-/// boundaries. Per-point [colors]/[widths] map to the matching point.
+/// boundaries. Per-point [colors]/[widths] map to the matching point;
+/// a closed loop's seam segment wraps back to point zero's attributes.
+/// Missing entries (a short list) fall back to [width]/white like the
+/// natives. rgb colors get alpha 1.
+///
+/// A dash pattern that cannot advance (`on <= 0`, a negative or
+/// non-finite length — see [d3DashPatternValid]) or that would emit
+/// more than [kD3MaxDashSpans] dashes renders solid.
 D3MeshData buildPolyline(
   List<Vector3> points, {
   required double width,
@@ -1544,19 +1643,33 @@ D3MeshData buildPolyline(
   Vector3? right,
 }) {
   final pts = closed ? <Vector3>[...points, points.first] : points;
+  final ptColors = colors == null
+      ? null
+      : [
+          for (var i = 0; i < pts.length; i++)
+            _rgba(_at(colors, closed ? i % points.length : i)),
+        ];
+  final ptWidths = widths == null
+      ? null
+      : [
+          for (var i = 0; i < pts.length; i++)
+            _at(widths, closed ? i % points.length : i) ?? width,
+        ];
   final segments = <(int, int)>[
     for (var i = 0; i < pts.length - 1; i++) (i, i + 1),
   ];
   final side = right ?? Vector3(0, 0, 1);
-  if (dashPattern != null) {
+  if (dashPattern != null &&
+      d3DashPatternValid(dashPattern.$1, dashPattern.$2) &&
+      _dashSpans(pts, dashPattern.$1, dashPattern.$2) <= kD3MaxDashSpans) {
     return _expandDashed(
       pts,
       segments,
       dashPattern.$1,
       dashPattern.$2,
       width: width,
-      colors: colors,
-      widths: widths,
+      colors: ptColors,
+      widths: ptWidths,
       sideHint: side,
     );
   }
@@ -1564,10 +1677,30 @@ D3MeshData buildPolyline(
     pts,
     segments,
     width: width,
-    colors: colors,
-    widths: widths,
+    colors: ptColors,
+    widths: ptWidths,
     sideHint: side,
   );
+}
+
+T? _at<T>(List<T> list, int i) => i < list.length ? list[i] : null;
+
+/// [c] as four components: rgb gets alpha 1, extras drop, null stays
+/// null (white downstream).
+List<double>? _rgba(List<double>? c) => switch (c) {
+  null => null,
+  [final r, final g, final b] => [r, g, b, 1.0],
+  [final r, final g, final b, final a, ...] => [r, g, b, a],
+  _ => null,
+};
+
+/// An upper bound on the dash spans `(on, off)` produces over [pts].
+double _dashSpans(List<Vector3> pts, double on, double off) {
+  var length = 0.0;
+  for (var i = 0; i + 1 < pts.length; i++) {
+    length += (pts[i + 1] - pts[i]).length;
+  }
+  return length / (on + off) + 1;
 }
 
 /// Independent camera-facing quads per point pair.
@@ -1578,11 +1711,17 @@ D3MeshData buildLineSegments(
   Vector3? right,
 }) {
   final side = right ?? Vector3(0, 0, 1);
+  // `colors` is one entry per segment (point pair): expand each onto
+  // both endpoints so a segment is flat-colored, never a gradient
+  // between neighbouring segments' colors.
+  final ptColors = colors == null
+      ? null
+      : [for (var i = 0; i < points.length; i++) _rgba(_at(colors, i ~/ 2))];
   return _expandSegments(
     points,
     [for (var i = 0; i + 1 < points.length; i += 2) (i, i + 1)],
     width: width,
-    colors: colors,
+    colors: ptColors,
     widths: null,
     sideHint: side,
   );
@@ -1604,10 +1743,14 @@ D3MeshData buildBillboard({
   final b = D3MeshBuilder();
   final n = r.cross(u).normalized();
   for (final (dx, dy) in [(-0.5, -0.5), (0.5, -0.5), (-0.5, 0.5), (0.5, 0.5)]) {
-    final rx = dx * cos - dy * sin;
-    final ry = dx * sin + dy * cos;
+    // Size first, then rotate: rotating the unit square and scaling
+    // afterwards shears a non-square quad instead of turning it.
+    final sx = dx * size.x;
+    final sy = dy * size.y;
+    final rx = sx * cos - sy * sin;
+    final ry = sx * sin + sy * cos;
     b.emit(
-      r * (rx * size.x) + u * (ry * size.y),
+      r * rx + u * ry,
       n: n,
       uv: Vector2(dx + 0.5, dy + 0.5),
       color: color,
@@ -1657,14 +1800,15 @@ void _emitQuad(
 /// Dashed-polyline expansion: walks each segment's arc length with a
 /// global `(on, off)` cursor, emitting one quad per kept span. Colors
 /// and widths interpolate across cut points via the segment's
-/// endpoints.
+/// endpoints. Callers validate the pattern first ([d3DashPatternValid]
+/// and the [kD3MaxDashSpans] budget) — `on == 0` would never advance.
 D3MeshData _expandDashed(
   List<Vector3> pts,
   List<(int, int)> segments,
   double onLen,
   double offLen, {
   required double width,
-  List<List<double>>? colors,
+  List<List<double>?>? colors,
   List<double>? widths,
   required Vector3 sideHint,
 }) {
@@ -1674,7 +1818,9 @@ D3MeshData _expandDashed(
   var on = true;
   var nextBoundary = onLen;
   List<double>? lerpColor(List<double>? ca, List<double>? cb, double t) {
-    if (ca == null || cb == null) return ca ?? cb;
+    if (ca == null && cb == null) return null;
+    ca ??= const [1.0, 1.0, 1.0, 1.0];
+    cb ??= const [1.0, 1.0, 1.0, 1.0];
     return [for (var i = 0; i < 4; i++) ca[i] + (cb[i] - ca[i]) * t];
   }
 
@@ -1692,12 +1838,10 @@ D3MeshData _expandDashed(
         final i0 = dense.length;
         dense.add(a + dir * t0);
         dense.add(a + dir * t1);
-        final wa =
-            (widths?[ia] ?? width) +
-            ((widths?[ib] ?? width) - (widths?[ia] ?? width)) * t0;
-        final wb =
-            (widths?[ia] ?? width) +
-            ((widths?[ib] ?? width) - (widths?[ia] ?? width)) * t1;
+        final w0 = widths?[ia] ?? width;
+        final w1 = widths?[ib] ?? width;
+        final wa = w0 + (w1 - w0) * t0;
+        final wb = w0 + (w1 - w0) * t1;
         _emitQuad(
           b,
           dense,
@@ -1727,7 +1871,7 @@ D3MeshData _expandSegments(
   List<Vector3> pts,
   List<(int, int)> segments, {
   required double width,
-  List<List<double>>? colors,
+  List<List<double>?>? colors,
   List<double>? widths,
   required Vector3 sideHint,
 }) {
