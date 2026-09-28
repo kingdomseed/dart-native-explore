@@ -72,6 +72,15 @@ Rules:
 | U2 geometry + shadows | Wedge/Ring/Extrude render with correct normals (lit from 2 angles); point + spot shadows visible on a receiver; catcher bake mode shows a baked patch |
 | U3 rendering extras | selection outline on a picked node; each iOS tone-mapper visibly distinct; sprite atlas frames advance |
 | U4 property resolver | a clip animating a material color and a light intensity plays on both platforms |
+| V0 re-pin | the published tags' `.fscene`/`.fsceneb` versions recorded; every 0.24 example `.fscene` loads in dart3d's Dart mirror with no unknown-component warnings except those assigned to V1–V6 |
+| V1 wire fields | a document using each new field (`shadowCastingMode` values, SMAA settings) round-trips through `serializeScene`; each `shadowCastingMode` value visibly differs on both platforms |
+| V2 ortho | an upstream 0.24 ortho-camera example matches upstream framing (screenshot overlay); splats sort correctly under ortho (after W31) |
+| V3 point shadows | a point light casts shadows onto a floor and a wall from an occluder on both platforms |
+| V4 decals | the upstream 0.24 decal example renders with correct projection and fade; a `d3:decal` document from E7 still loads (migrated or aliased) |
+| V5 `.fmat` | an additive-blended material, a depth-write-off material and an unlit engine-input material each render as in the upstream example; a malformed `.fmat` surfaces its diagnostics |
+| V6 runtime | 64 point lights render without per-light cost cliffs (frame time recorded); sun sweep with progressive prefilter holds frame budget; spatial audio pans with the camera; character yaw follows movement |
+| V7 breaking changes | a written map of each upstream breaking change to the dart3d behavior (changed / not applicable), with one test per changed behavior |
+| V8 conformance | every example in the published 0.24 corpus screenshotted on A142 (Vulkan) and iOS sim next to the upstream render, pass/fail per example in `verification-matrix.md` |
 
 ## Tracks and order
 
@@ -140,8 +149,12 @@ re-cut this list; items below are from the 2026-09-27 master preview.
       `.fscene` stays v5 or add the migration.
 - [ ] V1 Wire additions: `Node.shadowCastingMode`, SMAA fields, any new
       codecs; both natives + Dart mirror.
-- [ ] V2 Orthographic cameras (incl. splat sorting under ortho once W31
-      lands).
+- [ ] V2 Orthographic reconciliation: `projection:"orthographic"` already
+      realizes on both platforms (W6; `verification-matrix.md` rows 21,
+      133). Scope is only what 0.24 changes — any new ortho camera
+      fields/API in scene 0.4, the `Lighting` projection scale/offset
+      semantics (shared with V7), and splat sorting under ortho once W31
+      lands.
 - [ ] V3 Point-light shadows (extends U2's spot/point work).
 - [ ] V4 Decals against the published `DecalNode` contract — reconcile
       E7's `d3:decal` extension with upstream (migrate or alias).
