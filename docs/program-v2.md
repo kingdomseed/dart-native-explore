@@ -88,16 +88,27 @@ Rules:
 
 - [x] S0a Repo hygiene + CI (PR #12)
 - [ ] S0f Move `docs/artifacts/w30-review.mp4` (57 MB) and the root `DartNativeX-*.mp4` to GitHub release assets and link them; history rewrite to reclaim clone size is an operator decision (force-push)
-- [ ] S0b P1 fixes + review-thread triage — `stabilize/android`,
-      `stabilize/ios`, `stabilize/dart`; triage tables in `docs/triage/`
-- [ ] S0c **Verification backfill** at one head after S0b: T2 + the key
-      T3 lanes for W15, W16, W18, W22, W23, W24, W25, W26, W29 on both
-      platforms; update `verification-matrix.md`
+- [x] S0b P1 fixes + review-thread triage — PRs #14 (Dart), #15 (iOS),
+      #16 (Android); 7 Codex review rounds, every thread verified and
+      answered; triage tables in `docs/triage/`
+- [ ] S0c **Verification backfill** — *partial.* Done: combined T2 on the
+      merged heads (A142 Vulkan + GL, iOS sim — `docs/triage/integration.md`
+      §Final T2). Open: the key T3 lanes for W15, W16, W18, W22, W23, W24,
+      W25, W26, W29 on both platforms; iOS tab-switch/ROLL input; update
+      `verification-matrix.md`
 - [ ] S0d Doc truth pass: `extended-surface-audit.md`,
       `environment-ibl-spec.md`, `texture-material-spec.md`, README
       exclusions; mark `full-engine-program.md` superseded
-- [ ] S0e Android `disposeView` teardown (new DartNative hook) if not done
-      in S0b
+- [x] S0e Android `disposeView` teardown (in #16)
+- [ ] S0g Stabilization follow-ups (`docs/triage/integration.md`
+      §Follow-ups): **#18 Vulkan warm-relaunch crash (P1)**; dice readout
+      (inverse quaternion + mirrored face normals — root cause confirmed);
+      native light-unit unification (then delete the example's iOS 0.26
+      scale); iOS colour saturation vs Android; root-cause the Mali page
+      fault behind the catcher/particle prewarm and restore it; audit the
+      remaining Filament builder sites for the GC-reachability hazard;
+      W25 settle lane never passes after wLoose; body poses/velocities
+      across deferred re-realize (M)
 - [ ] S1 **Renderer spike** (≤ 3 days): Filament 1.77 on iOS Metal
       rendering the dice table + one showcase asset; measure binary size,
       frame time, integration cost. Output: go/no-go on D2.
