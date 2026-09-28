@@ -89,4 +89,17 @@ void main() {
     await pump(10);
     expect(timers.active, 0);
   });
+
+  test('auto-reroll gate: suspended lanes never re-arm; reload resumes', () {
+    final gate = AutoRerollGate();
+    expect(gate.rearmAfterSettle, isTrue);
+    gate.suspend(); // wLoose (+78 s)
+    // Every later settle — wLoose's own rolls, W25's one-shot roll —
+    // leaves the loop off.
+    for (var i = 0; i < 4; i++) {
+      expect(gate.rearmAfterSettle, isFalse);
+    }
+    gate.resume(); // _loadScene / _loadImported
+    expect(gate.rearmAfterSettle, isTrue);
+  });
 }
