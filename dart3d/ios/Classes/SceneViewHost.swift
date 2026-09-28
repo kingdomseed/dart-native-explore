@@ -205,6 +205,11 @@ final class SceneViewHost: SCNView {
     /// rather than behind a lock: every access site is main-thread.
     var mainScreenSubviews: [(view: SCNView, rec: ViewRec)] = []
 
+    /// MAIN-THREAD: the pov node each sibling was built with, by index
+    /// — the pose poke writes these directly (SCNView's `pointOfView`
+    /// getter is not a reliable handle on a detached proxy).
+    var mainScreenSubviewPovs: [SCNNode] = []
+
     /// MAIN-THREAD: the `screenSubviewBuild` generation the installed
     /// `mainScreenSubviews` belong to — a pose snapshot from another
     /// generation is dropped instead of posing the wrong sibling.
