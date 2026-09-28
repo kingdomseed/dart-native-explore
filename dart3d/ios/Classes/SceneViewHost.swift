@@ -1251,6 +1251,25 @@ final class SceneViewHost: SCNView {
         }
         if loading {
             if let i = existing {
+                // The record keeps its first-load `seq` (a subtree
+                // grafted under one of its members after that load must
+                // still replay after it — re-sequencing would replay the
+                // dependent against a missing placeholder and drop it).
+                // Instead, the re-load supersedes every journaled op on
+                // its members that arrived since the first load: live,
+                // the re-load already overwrote them, so replaying them
+                // after the (older-seq) batch would restore stale state.
+                let oldSeq = streamedSubtreeOps[i].seq
+                var members: Set<UInt64> = []
+                for case let o as [String: Any] in ops {
+                    if let t = o["node"] as? String,
+                       let k = D3Wire.localIdKey(t) {
+                        members.insert(k)
+                    }
+                }
+                nodeOpJournal.removeAll {
+                    $0.seq > oldSeq && members.contains($0.key)
+                }
                 streamedSubtreeOps[i].ops = ops
             } else {
                 opSeq += 1
