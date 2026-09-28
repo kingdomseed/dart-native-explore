@@ -210,13 +210,15 @@ final class SceneController {
   /// (W29). Everything sent since the last load is folded in:
   /// [applyCommands] structural ops, [setNodeTransforms] writes, and
   /// [sendPayload] deliveries, so a scene built or edited at runtime
-  /// serializes truthfully. Serialize the result with `writeFscene`;
-  /// reload it with [loadDocument] or [loadFscene].
+  /// serializes truthfully. Reload it with [loadDocument] or
+  /// [loadFscene].
   ///
   /// Returns null until the first document or structural op lands.
   /// Runtime state the format doesn't model — animation playheads,
   /// physics poses, joint constraints, morph weights — is not captured,
-  /// same as upstream.
+  /// same as upstream. Persist the result with
+  /// `writeFsceneWithExtensions` — plain upstream `writeFscene` drops
+  /// the dart3d view `viewport`s and W26 procedural-shape resources.
   SceneDocument? serializeScene() {
     final doc = _document;
     return doc == null ? null : doc_layer.serializeScene(doc);

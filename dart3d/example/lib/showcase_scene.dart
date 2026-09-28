@@ -135,7 +135,10 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
       dnLog('dart3d: showcase — roundtrip: serializeScene returned null');
       return;
     }
-    _controller.loadFscene(writeFscene(snapshot), strictFeatures: true);
+    _controller.loadFscene(
+      writeFsceneWithExtensions(snapshot),
+      strictFeatures: true,
+    );
     var resent = 0;
     for (final payload in snapshot.payloads.values) {
       if (payload.bytes == null) continue;

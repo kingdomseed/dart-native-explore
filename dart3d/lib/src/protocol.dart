@@ -297,20 +297,12 @@ abstract final class D3Protocol {
 
   /// Canonical `.fscene` JSON for [doc], utf8-encoded.
   ///
-  /// Upstream `writeFscene` drops the dart3d `viewport` extension —
-  /// its private `_encodeView` emits upstream fields only. When the
-  /// document declares views they are re-encoded here through
-  /// [encodeViewSpec] (identical upstream fields plus `viewport` on
-  /// [Dart3dRenderViewSpec]) so the extension survives onto the wire.
-  static Uint8List loadSceneBytes(SceneDocument doc) {
-    if (doc.views.isEmpty) {
-      return Uint8List.fromList(utf8.encode(writeFscene(doc)));
-    }
-    final manifest = jsonDecode(writeFscene(doc)) as Map<String, Object?>;
-    final idKey = manifestIdKey(doc);
-    manifest['views'] = [for (final v in doc.views) encodeViewSpec(v, idKey)];
-    return Uint8List.fromList(utf8.encode(canonicalJson(manifest)));
-  }
+  /// Upstream `writeFscene` drops the dart3d extensions — the view
+  /// `viewport` (its private `_encodeView` emits upstream fields only)
+  /// and W26 procedural-shape geometry resources — so the manifest
+  /// goes through [writeFsceneWithExtensions], which re-adds both.
+  static Uint8List loadSceneBytes(SceneDocument doc) =>
+      Uint8List.fromList(utf8.encode(writeFsceneWithExtensions(doc)));
 
   /// `[8B payloadId][raw bytes]` for one [PayloadSpec].
   static Uint8List payloadBytes(PayloadSpec payload) {
