@@ -38,6 +38,13 @@ named `mythic_scene` or anything infringing on `flutter_scene` naming.
   `--dart-define=DN_LICENSE_KEY=dnk_...`.
 - Lapsed subscription: shipped apps keep working; only new builds stop.
 
+## Program state
+
+- Active plan: `docs/program-v2.md` (tracks S/E/P/R, verification tiers
+  T1–T4, decisions D1–D8). Why it was reset: `docs/program-audit-2026-09-28.md`.
+- `docs/full-engine-program.md` is superseded; use it only for W17–W34 scope text.
+- Parity pin: flutter_scene 0.23.0 / scene 0.3.0 (bdero/flutter_scene `0dc6ee80`).
+
 ## Repo layout
 
 - `dartnative/` — clone of github.com/DartNative/dartnative (docs, playground,
