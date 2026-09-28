@@ -248,6 +248,29 @@ void main() {
     });
   });
 
+  group('4123065167 — authored cuboids are never mistaken for sentinels', () {
+    test('a (-1, -1, 0.5) cuboid survives composition untouched', () {
+      const prefabGeo = LocalId(6, 1);
+      const cuboidId = LocalId(1, 40);
+      final prefab = docWithExtension(prefabGeo, const LocalId(6, 2), 'tube');
+      final host = SceneDocument();
+      final odd = CuboidGeometrySpec(extents: Vector3(-1, -1, 0.5));
+      host.addResource(GeometryResource(cuboidId, procedural: odd));
+      host.createNode(root: true).instance = PrefabInstanceSpec(
+        source: AssetRef('prefabs/tube.fscene'),
+      );
+      final out = composeSceneWithExtensions(host, resolve: (_) => prefab);
+      final kept = out.resources[cuboidId];
+      expect(kept, isA<GeometryResource>());
+      expect(
+        ((kept! as GeometryResource).procedural! as CuboidGeometrySpec).extents,
+        Vector3(-1, -1, 0.5),
+      );
+      expect(d3ExtensionResources(out), isNot(contains(cuboidId)));
+      expect(d3ExtensionResources(out), hasLength(1));
+    });
+  });
+
   group('4122294480 — singular transforms keep usable normals', () {
     D3MeshData transformed(Matrix4 m, Vector3 n) {
       final b = D3MeshBuilder()

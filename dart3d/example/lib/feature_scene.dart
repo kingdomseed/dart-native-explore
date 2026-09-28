@@ -4112,28 +4112,27 @@ final class FeatureScene {
       // be live after the matrix sweep, so the die actually rolls and
       // the lane waits (10 s) for the settle event before it reports.
       timers.after(const Duration(seconds: 14), () {
-        final settled = c.physicsEvents
-            .firstWhere((e) => e is SceneSettledEvent)
-            .timeout(const Duration(seconds: 10));
-        rollDie();
-        settled.then(
-          (_) {
-            if (timers.isCancelled) return;
-            dnLog(
-              'dart3d: w25 lane complete — dice regression PASS: die '
-              '${die.id.toToken()} rolled and settled after the effects '
-              'sweep; expected final state: all effects off',
-            );
-          },
-          onError: (Object e) {
-            if (timers.isCancelled) return;
-            dnLog(
-              'dart3d: w25 lane complete — dice regression FAIL: die '
-              '${die.id.toToken()} rolled but no settle event within '
-              '10 s ($e)',
-            );
-          },
+        // An owned listener, not `firstWhere(...).timeout(...)`: the
+        // latter's inner subscription outlives both the timeout and
+        // the generation's cancelAll.
+        final settled = timers.firstWithin<ScenePhysicsEvent>(
+          c.physicsEvents,
+          (e) => e is SceneSettledEvent,
+          const Duration(seconds: 10),
         );
+        rollDie();
+        settled.then((event) {
+          if (timers.isCancelled) return;
+          dnLog(
+            event != null
+                ? 'dart3d: w25 lane complete — dice regression PASS: die '
+                      '${die.id.toToken()} rolled and settled after the '
+                      'effects sweep; expected final state: all effects off'
+                : 'dart3d: w25 lane complete — dice regression FAIL: die '
+                      '${die.id.toToken()} rolled but no settle event '
+                      'within 10 s',
+          );
+        });
       });
     }
 

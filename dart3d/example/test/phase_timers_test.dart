@@ -102,4 +102,61 @@ void main() {
     gate.resume(); // _loadScene / _loadImported
     expect(gate.rearmAfterSettle, isTrue);
   });
+
+  group('firstWithin (PR #14 4123065174)', () {
+    test('firstWhere+timeout leaks its listener (the reported bug)', () async {
+      final events = StreamController<int>.broadcast();
+      await events.stream
+          .firstWhere((e) => e == 1)
+          .timeout(const Duration(milliseconds: 5))
+          .then((_) {}, onError: (_) {});
+      expect(events.hasListener, isTrue);
+      await events.close();
+    });
+
+    test('timeout yields null and leaves nothing listening', () async {
+      final timers = PhaseTimers();
+      final events = StreamController<int>.broadcast();
+      final got = await timers.firstWithin(
+        events.stream,
+        (e) => e == 1,
+        const Duration(milliseconds: 5),
+      );
+      expect(got, isNull);
+      expect(events.hasListener, isFalse);
+      expect(timers.active, 0);
+      await events.close();
+    });
+
+    test('a match completes and cancels the listener', () async {
+      final timers = PhaseTimers();
+      final events = StreamController<int>.broadcast();
+      final f = timers.firstWithin(
+        events.stream,
+        (e) => e == 2,
+        const Duration(seconds: 5),
+      );
+      events
+        ..add(1)
+        ..add(2);
+      expect(await f, 2);
+      expect(events.hasListener, isFalse);
+      expect(timers.active, 0);
+      await events.close();
+    });
+
+    test('cancelAll drops the listener mid-wait', () async {
+      final timers = PhaseTimers();
+      final events = StreamController<int>.broadcast();
+      timers.firstWithin(
+        events.stream,
+        (e) => true,
+        const Duration(seconds: 5),
+      );
+      expect(events.hasListener, isTrue);
+      timers.cancelAll();
+      expect(events.hasListener, isFalse);
+      await events.close();
+    });
+  });
 }
