@@ -739,7 +739,7 @@ DiceTableScene? buildDiceTable({
         'directionalLight',
         properties: {
           'color': ColorValue(1.0, 0.93, 0.82, 1),
-          'intensity': DoubleValue(2400),
+          'intensity': DoubleValue(keyLightIntensity(2400)),
           'castsShadow': BoolValue(true),
           'shadowRadius': DoubleValue(2.5),
           'shadowDepthBias': DoubleValue(0.01),
