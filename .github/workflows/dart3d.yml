@@ -8,13 +8,9 @@ on:
 jobs:
   dart:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: dart3d/example
     steps:
       - uses: actions/checkout@v4
       - name: Install DartNative SDK
-        working-directory: .
         run: |
           curl -fsSL https://cdn.dartnative.com/install.sh | sh
           echo "$HOME/zero/bin" >> "$GITHUB_PATH"
@@ -31,6 +27,9 @@ jobs:
         working-directory: .
         run: dn upgrade
       - run: dn --version
-      - run: dn pub get
-      - run: dn analyze
-      - run: dn test
+      - name: Package — analyze and test
+        working-directory: dart3d
+        run: dn pub get && dn analyze && dn test
+      - name: Example — analyze and test
+        working-directory: dart3d/example
+        run: dn pub get && dn analyze && dn test

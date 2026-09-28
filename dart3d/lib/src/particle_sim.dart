@@ -534,6 +534,10 @@ abstract class ParticleModule {
   const ParticleModule();
   void spawn(ParticleStorage storage, int index) {}
   void update(ParticleStorage storage, double dt) {}
+
+  /// Clears any per-run state so a system [ParticleSystem.reset] replays
+  /// deterministically. Stateless modules keep the no-op default.
+  void reset() {}
 }
 
 class AccelerationModule extends ParticleModule {
@@ -651,6 +655,12 @@ class TurbulenceModule extends ParticleModule {
   final Vector3 scroll;
   final int seed;
   double _time = 0.0;
+
+  /// Rewinds the field clock — the curl field drifts with `_time`, so a
+  /// reset that kept it would replay against a shifted field.
+  @override
+  void reset() => _time = 0.0;
+
   @override
   void update(ParticleStorage s, double dt) {
     _time += dt;
@@ -1219,6 +1229,9 @@ class ParticleSystem {
     _random = math.Random(seed);
     _accumulator = 0.0;
     _systemTime = 0.0;
+    for (final module in modules) {
+      module.reset();
+    }
   }
 
   void _stepFixed(double dt) {

@@ -241,9 +241,9 @@ draw — fine at harness counts, not a 10k-particle path.
 | `meshParticleEmitter` | sprite-pass degrade — logged | ✓ baked renderable pool (no `InstanceBuffer`) |
 | per-particle color on meshes | n/a (degraded) | inert — upstream parity |
 
-## Harness — the W18 phase (+170 s)
+## Harness — the W18 phase (+192 s)
 
-`feature_scene.dart` `w18Phase` (fired from `main.dart` at +170 s —
+`feature_scene.dart` `w18Phase` (fired from `main.dart` at +192 s —
 after W15's +112 s lane closes and the auto-reroll is parked) adds:
 
 - `w18.fountain` — spherical flipbook sprite emitter on a generated

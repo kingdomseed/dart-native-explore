@@ -14,6 +14,7 @@ import 'dart:math';
 
 import 'package:vector_math/vector_math.dart';
 
+import 'geometry/instances.dart';
 import 'geometry/proc.dart';
 import 'scene_model.dart';
 
@@ -198,15 +199,23 @@ Iterable<LocalId> _meshGeometryIds(ComponentSpec comp) sync* {
 
 /// Bounds for a `d3:instances` component: the instanced geometry's
 /// bounds (a `geometry` resource ref — payload bounds or procedural —
-/// or an inline `shape` + params) unioned over every inline `m4`
-/// transform, plus the billboard pad. Payload-carried transforms
-/// aren't readable here, so those components contribute only the
-/// untransformed geometry bounds.
+/// or an inline `shape` + params) unioned over every instance
+/// transform — inline `m4` values, or the referenced `matrices`
+/// payload chunk's bytes when the document holds them — capped at the
+/// [kD3MaxBakedInstances] the natives draw. Billboard mode ignores the
+/// source geometry (the natives do) and pads each instance center by
+/// the quad's half-diagonal.
 BoundsSpec? _d3InstancesBounds(ComponentSpec comp, SceneDocument doc) {
   final props = comp.properties;
+  final billboard = switch (props['billboard']) {
+    BoolValue(:final value) => value,
+    _ => false,
+  };
   BoundsSpec? local;
   final shape = props['shape'];
-  if (shape is StringValue) {
+  if (billboard) {
+    // Natives swap the instanced mesh for camera-facing quads.
+  } else if (shape is StringValue) {
     local = d3ProcShapeBounds(shape.value, props);
   } else {
     final ref = props['geometry'];
@@ -216,17 +225,32 @@ BoundsSpec? _d3InstancesBounds(ComponentSpec comp, SceneDocument doc) {
     }
   }
   final transforms = props['transforms'];
-  final mats = transforms is ListValue
-      ? [
-          for (final v in transforms.values)
-            if (v is Matrix4Value) v.value,
-        ]
-      : const <Matrix4>[];
-  if (mats.isEmpty) return local;
+  var mats = switch (transforms) {
+    ListValue(:final values) => [
+      for (final v in values)
+        if (v is Matrix4Value) v.value,
+    ],
+    ResourceRefValue(:final id) => switch (doc.payloads[id]?.bytes) {
+      final bytes? => d3DecodeMatrices(bytes),
+      null => const <Matrix4>[],
+    },
+    _ => const <Matrix4>[],
+  };
+  if (mats.length > kD3MaxBakedInstances) {
+    mats = mats.sublist(0, kD3MaxBakedInstances);
+  }
   var pad = 0.0;
-  if (props['billboard'] is BoolValue) {
+  if (billboard) {
     final size = props['size'];
-    pad = size is Vec2Value ? max(size.value.x, size.value.y) : 1.0;
+    pad = size is Vec2Value
+        ? d3BillboardRadius(size.value.x, size.value.y)
+        : d3BillboardRadius(1, 1);
+  }
+  if (mats.isEmpty) {
+    return local ??
+        (pad > 0
+            ? BoundsSpec(min: Vector3.all(-pad), max: Vector3.all(pad))
+            : null);
   }
   final bmin = Vector3.all(double.infinity);
   final bmax = Vector3.all(-double.infinity);

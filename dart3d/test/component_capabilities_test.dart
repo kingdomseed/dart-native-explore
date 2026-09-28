@@ -10,6 +10,8 @@
 // assertions exercise.
 // ignore_for_file: implementation_imports
 
+import 'dart:typed_data';
+
 import 'package:dart3d/src/components.dart';
 import 'package:dart3d/src/scene_model.dart';
 import 'package:test/test.dart';
@@ -42,26 +44,42 @@ void main() {
       expect(unrealizedFeatureWarnings(doc), isEmpty);
     });
 
-    test('required features warn as degradation with the plan wave', () {
-      final doc = SceneDocument()..featuresRequired.add('streaming');
-      expect(unrealizedFeatureWarnings(doc), [
-        allOf(
-          contains("requires feature 'streaming'"),
-          contains('planned W15'),
-          contains('may be degraded'),
-        ),
-      ]);
+    test('W15 features are realized (no planned-W15 gate)', () {
+      final doc = SceneDocument()
+        ..featuresRequired.addAll({'prefabInstances', 'streaming'})
+        ..featuresUsed.addAll({'prefabInstances', 'streaming'});
+      expect(kPlannedFeatures, isEmpty);
+      expect(unrealizedFeatureWarnings(doc), isEmpty);
+      expect(missingRequiredFeatures(doc), isEmpty);
     });
 
-    test('used-only features warn as advisories', () {
-      final doc = SceneDocument()..featuresUsed.add('prefabInstances');
+    test('an uncomposed eager instance is a missing prefabInstances', () {
+      final doc = SceneDocument()..featuresRequired.add('prefabInstances');
+      final prefab = AssetRef('prefabs/tree.fscene');
+      doc.createNode().instance = PrefabInstanceSpec(source: prefab);
+      expect(missingRequiredFeatures(doc), {'prefabInstances'});
       expect(unrealizedFeatureWarnings(doc), [
-        allOf(
-          contains("uses feature 'prefabInstances'"),
-          contains('planned W15'),
-          isNot(contains('may be degraded')),
-        ),
+        allOf(contains('uncomposed eager'), contains('loadDocumentComposed')),
       ]);
+      // A lazy placeholder is the streaming contract — realized.
+      doc.nodes.values.single.instance = PrefabInstanceSpec(
+        source: prefab,
+        load: LoadPolicy.lazy,
+      );
+      expect(missingRequiredFeatures(doc), isEmpty);
+      expect(unrealizedFeatureWarnings(doc), isEmpty);
+    });
+
+    test('strict gate accepts a decoded prefab/streaming document', () {
+      final doc = readFscene("""
+        {
+          "fscene": 5,
+          "documentId": "${DocumentId(Uint8List(16)).toToken()}",
+          "stage": {},
+          "featuresRequired": ["prefabInstances", "streaming"]
+        }
+        """);
+      expect(missingRequiredFeatures(doc), isEmpty);
     });
 
     test('an unplanned feature warns without a wave name', () {
@@ -76,8 +94,8 @@ void main() {
 
     test('a feature in both sets warns once, as required', () {
       final doc = SceneDocument()
-        ..featuresRequired.add('prefabInstances')
-        ..featuresUsed.add('prefabInstances');
+        ..featuresRequired.add('gaussianSplats')
+        ..featuresUsed.add('gaussianSplats');
       expect(unrealizedFeatureWarnings(doc), hasLength(1));
     });
   });

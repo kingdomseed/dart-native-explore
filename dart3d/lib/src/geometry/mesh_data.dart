@@ -76,7 +76,9 @@ final class D3MeshBuilder {
   int get vertexCount => _positions.length ~/ 3;
 
   /// Appends a vertex. [uv] defaults to `(0, 0)`; a non-null [color]
-  /// fills the color stream (missing colors emit opaque white).
+  /// fills the color stream (missing colors emit opaque white). The
+  /// color is normalized to four components — rgb gets alpha 1, extra
+  /// entries drop — so the stream stays `vertexCount * 4` long.
   int emit(Vector3 p, {Vector3? n, Vector2? uv, List<double>? color}) {
     final index = vertexCount;
     _positions.addAll([p.x, p.y, p.z]);
@@ -89,7 +91,11 @@ final class D3MeshBuilder {
     _uvs.addAll([t.x, t.y]);
     if (color != null) {
       _hasColor = true;
-      _colors.addAll(color);
+      _colors
+        ..add(color.isNotEmpty ? color[0] : 1.0)
+        ..add(color.length > 1 ? color[1] : 1.0)
+        ..add(color.length > 2 ? color[2] : 1.0)
+        ..add(color.length > 3 ? color[3] : 1.0);
     } else {
       _colors.addAll(const [1.0, 1.0, 1.0, 1.0]);
     }
@@ -167,10 +173,30 @@ final class D3MeshBuilder {
     }
   }
 
-  /// Applies [m] to positions and its upper-3x3 to normals (rebuilt
-  /// orthonormal basis assumed — callers pass rigid or uniform
-  /// transforms).
+  /// Applies [m] to positions and its normal matrix — the inverse
+  /// transpose of the upper 3×3, never the translation — to normals,
+  /// so translated, rotated, and non-uniformly scaled meshes all keep
+  /// correct lighting. A reflecting [m] (negative determinant) also
+  /// reverses every triangle so the front faces stay outward-wound.
+  ///
+  /// The normal matrix is computed as the cofactor matrix (`det · M⁻ᵀ`,
+  /// sign-corrected), which stays defined when [m] is singular: a
+  /// flattening such as `diag(1, 1, 0)` keeps the collapsed axis as
+  /// the surviving surface normal. Where even that vanishes (a rank ≤ 1
+  /// collapse) the source normal is kept.
   void transform(Matrix4 m) {
+    final upper = m.getRotation();
+    final det = upper.determinant();
+    final c0 = upper.getColumn(0);
+    final c1 = upper.getColumn(1);
+    final c2 = upper.getColumn(2);
+    final normalMatrix = Matrix3.columns(
+      c1.cross(c2),
+      c2.cross(c0),
+      c0.cross(c1),
+    );
+    if (det < 0) normalMatrix.scale(-1.0);
+    final source = Vector3.zero();
     final v = Vector3.zero();
     final n = Vector3.zero();
     for (var i = 0; i < _positions.length; i += 3) {
@@ -180,23 +206,42 @@ final class D3MeshBuilder {
       _positions[i + 1] = v.y;
       _positions[i + 2] = v.z;
       n.setValues(_normals[i], _normals[i + 1], _normals[i + 2]);
-      m.transform3(n);
-      if (n.length2 > 1e-20) n.normalize();
+      source.setFrom(n);
+      normalMatrix.transform(n);
+      if (n.length2 > 1e-20 && n.x.isFinite && n.y.isFinite && n.z.isFinite) {
+        n.normalize();
+      } else {
+        n.setFrom(source);
+      }
       _normals[i] = n.x;
       _normals[i + 1] = n.y;
       _normals[i + 2] = n.z;
     }
+    if (det < 0) {
+      for (var t = 0; t + 2 < _indices.length; t += 3) {
+        final b = _indices[t + 1];
+        _indices[t + 1] = _indices[t + 2];
+        _indices[t + 2] = b;
+      }
+    }
   }
 
   /// Merges [other] (already translated into place by the caller) into
-  /// this builder.
+  /// this builder. An uncolored [other] backfills opaque white so the
+  /// color stream stays aligned with the vertices.
   void addMesh(D3MeshData other) {
     final base = vertexCount;
     _positions.addAll(other.positions);
     _normals.addAll(other.normals);
     _uvs.addAll(other.uvs);
-    _colors.addAll(other.colors);
-    _hasColor = _hasColor || other.colors.isNotEmpty;
+    if (other.colors.length == other.vertexCount * 4) {
+      _colors.addAll(other.colors);
+      _hasColor = _hasColor || other.colors.isNotEmpty;
+    } else {
+      for (var i = 0; i < other.vertexCount; i++) {
+        _colors.addAll(const [1.0, 1.0, 1.0, 1.0]);
+      }
+    }
     _indices.addAll(other.indices.map((i) => i + base));
   }
 

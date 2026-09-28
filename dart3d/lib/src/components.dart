@@ -22,14 +22,22 @@ Map<String, Object?> encodeRenderCommand(LocalId target) => {
   'target': 'rt:${target.toToken()}',
 };
 
-/// Feature names the dart3d natives realize today (kept in sync with
-/// the native decode surfaces — `skinning` landed in W11,
-/// `materialsVariants` in W12, `renderTextures` in W14, `particles`
-/// in W18, the W26 geometry/instancing surface below).
+/// Feature names dart3d realizes today (kept in sync with the native
+/// decode surfaces — `skinning` landed in W11, `materialsVariants` in
+/// W12, `renderTextures` in W14, `prefabInstances`/`streaming` in W15,
+/// `particles` in W18, the W26 geometry/instancing surface below).
+///
+/// `prefabInstances` is realized Dart-side: eager instances expand
+/// through `SceneController.loadDocumentComposed` (upstream
+/// `composeSceneAsync`) before the manifest goes out, and lazy ones
+/// stream through `loadSubtree`. The natives only ever see composed
+/// content or tagged placeholders — see [uncomposedEagerInstances].
 const kRealizedFeatures = {
   'skinning',
   'materialsVariants',
   'renderTextures',
+  'prefabInstances',
+  'streaming',
   'particles',
   // W26 — the `d3:procMesh` shape vocabulary and `d3:instances`
   // component.
@@ -40,15 +48,36 @@ const kRealizedFeatures = {
 
 /// Feature names with a named follow-on workstream — the warning names
 /// the plan so a degraded document says *where* the capability lands.
-const kPlannedFeatures = {'prefabInstances': 'W15', 'streaming': 'W15'};
+/// Empty today: W15 (`prefabInstances`/`streaming`) merged.
+const kPlannedFeatures = <String, String>{};
 
-/// The `featuresRequired` names dart3d natives do not realize — the set
-/// a strict loader refuses on. Upstream's decoder already rejects
-/// required features outside `supportedFeatures`; this is the
-/// engine-level half: features upstream's format supports but this
-/// engine has not implemented (W29).
-Set<String> missingRequiredFeatures(SceneDocument doc) =>
-    doc.featuresRequired.difference(kRealizedFeatures);
+/// The eager prefab-instance nodes in [doc] that have not been
+/// composed — nodes whose `instance` member is still present with a
+/// non-lazy load policy. The natives realize an `instance` node only
+/// as a contentless placeholder (the W15 lazy-stream contract), so an
+/// eager instance must be expanded Dart-side
+/// (`SceneController.loadDocumentComposed`) before it reaches them.
+List<LocalId> uncomposedEagerInstances(SceneDocument doc) => [
+  for (final node in doc.nodes.values)
+    if (node.instance case final inst? when inst.load != LoadPolicy.lazy)
+      node.id,
+];
+
+/// The `featuresRequired` names this engine would not realize for
+/// [doc] as-is — the set a strict loader refuses on. Upstream's
+/// decoder already rejects required features outside
+/// `supportedFeatures`; this is the engine-level half: features
+/// upstream's format supports but this engine has not implemented
+/// (W29), plus `prefabInstances` when [doc] still carries eager
+/// instances nobody composed ([uncomposedEagerInstances]).
+Set<String> missingRequiredFeatures(SceneDocument doc) {
+  final missing = doc.featuresRequired.difference(kRealizedFeatures);
+  if (doc.featuresRequired.contains('prefabInstances') &&
+      uncomposedEagerInstances(doc).isNotEmpty) {
+    missing.add('prefabInstances');
+  }
+  return missing;
+}
 
 /// The `featuresRequired`/`featuresUsed` capability pass (W12).
 ///
@@ -58,7 +87,10 @@ Set<String> missingRequiredFeatures(SceneDocument doc) =>
 /// still streams, the natives just skip the blocks. This pass returns
 /// one warning line per unrealized feature so the load path can make
 /// the gap loud. `featuresRequired` entries read as degradation
-/// warnings; `featuresUsed`-only entries are advisories.
+/// warnings; `featuresUsed`-only entries are advisories. Eager prefab
+/// instances that reach this pass uncomposed add one line naming the
+/// composing load path — they would otherwise realize as empty
+/// placeholders.
 List<String> unrealizedFeatureWarnings(SceneDocument doc) {
   final warnings = <String>[];
   final seen = <String>{};
@@ -83,6 +115,14 @@ List<String> unrealizedFeatureWarnings(SceneDocument doc) {
     warnings.add(
       "document uses feature '$feature' that dart3d natives "
       'do not realize yet${suffix(feature)}',
+    );
+  }
+  final eager = uncomposedEagerInstances(doc);
+  if (eager.isNotEmpty) {
+    warnings.add(
+      'document carries ${eager.length} uncomposed eager prefab '
+      'instance(s); they realize as empty placeholders — load through '
+      'loadDocumentComposed to expand them',
     );
   }
   return warnings;

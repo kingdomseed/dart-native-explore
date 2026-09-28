@@ -207,8 +207,7 @@ abstract class ScenePath {
             : reflectedRef;
       }
       // Re-orthonormalize against the next tangent.
-      reference =
-          reference - tangents[i + 1] * reference.dot(tangents[i + 1]);
+      reference = reference - tangents[i + 1] * reference.dot(tangents[i + 1]);
       if (reference.length2 < 1e-12) {
         reference = _perpendicularTo(tangents[i + 1]);
       }
@@ -274,8 +273,10 @@ class PolylinePath extends ScenePath {
 
   final List<Vector3> _points;
 
-  /// The control points (copied at construction).
-  List<Vector3> get points => List.unmodifiable(_points);
+  /// The control points — fresh copies, so mutating one can't desync
+  /// the cached arc-length/frame tables from the curve.
+  List<Vector3> get points =>
+      List.unmodifiable([for (final p in _points) p.clone()]);
 
   @override
   Vector3 positionAt(double t) {
@@ -330,8 +331,10 @@ class CatmullRomPath extends ScenePath {
 
   final List<Vector3> _points;
 
-  /// The control points (copied at construction).
-  List<Vector3> get points => List.unmodifiable(_points);
+  /// The control points — fresh copies, so mutating one can't desync
+  /// the cached arc-length/frame tables from the curve.
+  List<Vector3> get points =>
+      List.unmodifiable([for (final p in _points) p.clone()]);
 
   @override
   Vector3 positionAt(double t) {
@@ -360,8 +363,7 @@ class CatmullRomPath extends ScenePath {
   }
 
   @override
-  List<double> sampleParameters() =>
-      _subdividedParameters(_points.length - 1);
+  List<double> sampleParameters() => _subdividedParameters(_points.length - 1);
 
   // The four control points for [segment], with the endpoints repeated
   // so the first and last segments still interpolate cleanly.
