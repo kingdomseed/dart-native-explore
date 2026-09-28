@@ -601,6 +601,23 @@ data class StageEffects(
                     visibility = lerpD(
                         a.globalIllumination.visibility,
                         b.globalIllumination.visibility, t),
+                    // Every continuous leaf lerps — these jumped at
+                    // the t = 0.5 discrete pick before.
+                    hysteresis = lerpD(
+                        a.globalIllumination.hysteresis,
+                        b.globalIllumination.hysteresis, t),
+                    shadowBias = lerpD(
+                        a.globalIllumination.shadowBias,
+                        b.globalIllumination.shadowBias, t),
+                    visibilityBias = lerpD(
+                        a.globalIllumination.visibilityBias,
+                        b.globalIllumination.visibilityBias, t),
+                    fireflyClamp = lerpD(
+                        a.globalIllumination.fireflyClamp,
+                        b.globalIllumination.fireflyClamp, t),
+                    emissiveBoost = lerpD(
+                        a.globalIllumination.emissiveBoost,
+                        b.globalIllumination.emissiveBoost, t),
                 ),
                 temporalAntiAliasing = d.temporalAntiAliasing.copy(
                     minimumCurrentWeight = lerpD(
