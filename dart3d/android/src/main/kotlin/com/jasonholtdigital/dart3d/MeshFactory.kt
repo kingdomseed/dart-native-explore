@@ -36,6 +36,9 @@ object MeshFactory {
         PAYLOAD_VERTEX_STRIDE_BYTES + 24
 
     enum class IndexWidth { UINT16, UINT32 }
+
+    /** kD3MaxDashSpans (dart3d/lib/src/geometry/limits.dart). */
+    const val MAX_DASH_SPANS = 16384
     enum class Topology { TRIANGLES, TRIANGLE_STRIP, LINES, LINE_STRIP, POINTS }
 
     class PayloadDecodeException(message: String) : Exception(message)
@@ -1405,12 +1408,16 @@ object MeshFactory {
     ): MeshData {
         if (points.size < 2) return ProcBuilder().build()
         val pts = if (closed) points + points.first() else points
+        val n = points.size
         val b = ProcBuilder()
         for (i in 0 until pts.size - 1) {
+            // The closing segment's end attributes are point 0's —
+            // `i + 1 == n` wraps instead of reading past the list.
+            val j = (i + 1) % n
             emitLineQuad(b, pts[i], pts[i + 1],
                 widths?.getOrNull(i) ?: width,
-                widths?.getOrNull(i + 1) ?: width,
-                viewDir, colors?.getOrNull(i), colors?.getOrNull(i + 1))
+                widths?.getOrNull(j) ?: width,
+                viewDir, colors?.getOrNull(i), colors?.getOrNull(j))
         }
         return b.build()
     }
@@ -1425,8 +1432,17 @@ object MeshFactory {
         closed: Boolean = false,
     ): MeshData {
         if (points.size < 2) return ProcBuilder().build()
+        // d3DashPatternValid: `(0, x)` emitted nothing and `(0, 0)`
+        // never advanced the cursor (an infinite loop) — an invalid
+        // pattern renders solid, like the Dart reference.
+        if (!(onLen.isFinite() && offLen.isFinite() && onLen > 0f &&
+                offLen >= 0f)) {
+            return polyline(points, width, viewDir, colors, widths, closed)
+        }
         val pts = if (closed) points + points.first() else points
+        val n = points.size
         val b = ProcBuilder()
+        var spans = 0
         var distance = 0f
         var on = true
         var nextBoundary = onLen
@@ -1438,6 +1454,7 @@ object MeshFactory {
         for (i in 0 until pts.size - 1) {
             val a = pts[i]
             val c = pts[i + 1]
+            val j = (i + 1) % n
             val dir = c - a
             val segLen = dir.length
             if (segLen < 1e-12f) continue
@@ -1447,15 +1464,22 @@ object MeshFactory {
                 val t1 = if (remain > 0f)
                     (nextBoundary - distance) / segLen else 1f
                 if (on) {
+                    // kD3MaxDashSpans: a microscopic pattern against a
+                    // long line renders solid instead of millions of
+                    // quads.
+                    if (++spans > MAX_DASH_SPANS) {
+                        return polyline(points, width, viewDir, colors,
+                            widths, closed)
+                    }
                     val wa = (widths?.getOrNull(i) ?: width) +
-                        ((widths?.getOrNull(i + 1) ?: width) -
+                        ((widths?.getOrNull(j) ?: width) -
                             (widths?.getOrNull(i) ?: width)) * t0
                     val wb = (widths?.getOrNull(i) ?: width) +
-                        ((widths?.getOrNull(i + 1) ?: width) -
+                        ((widths?.getOrNull(j) ?: width) -
                             (widths?.getOrNull(i) ?: width)) * t1
                     emitLineQuad(b, a + dir * t0, a + dir * t1,
-                        wa, wb, viewDir, lerpColor(i, i + 1, t0),
-                        lerpColor(i, i + 1, t1))
+                        wa, wb, viewDir, lerpColor(i, j, t0),
+                        lerpColor(i, j, t1))
                 }
                 t0 = t1
                 if (distance + t0 * segLen >= nextBoundary - 1e-9f) {
@@ -1688,6 +1712,7 @@ object MeshFactory {
             }
             src.rewind()
             val ints = base.indices
+            val idxStart = b.idx.size
             when (base.indexWidth) {
                 IndexWidth.UINT16 -> {
                     val shorts = ints.asShortBuffer()
@@ -1700,6 +1725,18 @@ object MeshFactory {
                     for (k in 0 until base.indexCount) {
                         b.idx.add(ib.get(k) + base0)
                     }
+                }
+            }
+            // A reflecting transform (det < 0) reverses the triangles'
+            // screen orientation — rewind each so the mirrored copy's
+            // exterior isn't back-face culled (d3BakeInstances).
+            if (flip < 0f) {
+                var t = idxStart
+                while (t + 2 < b.idx.size) {
+                    val tmp = b.idx[t + 1]
+                    b.idx[t + 1] = b.idx[t + 2]
+                    b.idx[t + 2] = tmp
+                    t += 3
                 }
             }
         }
