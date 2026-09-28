@@ -154,12 +154,29 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      * `blend` (src-over transparency). `litMaterial`/`unlitMaterial`
      * stay the opaque defaults every existing reference expects.
      */
-    val litMaterial: Material
-    val litMaskedMaterial: Material
-    val litBlendMaterial: Material
-    val unlitMaterial: Material
-    val unlitMaskedMaterial: Material
-    val unlitBlendMaterial: Material
+    lateinit var litMaterial: Material
+        private set
+    lateinit var litMaskedMaterial: Material
+        private set
+    lateinit var litBlendMaterial: Material
+        private set
+    lateinit var unlitMaterial: Material
+        private set
+    lateinit var unlitMaskedMaterial: Material
+        private set
+    lateinit var unlitBlendMaterial: Material
+        private set
+
+    /**
+     * False until the base prebuilts + trail material are loaded. The
+     * packages compile on a background thread ([MaterialPackages]
+     * prewarm — ~4 s each for the lit set on the A142); construction
+     * and the frame loop never wait on filamat. Until ready, stepFrame
+     * leaves mutations queued (nothing can realize without materials)
+     * and polls the cache once per frame.
+     */
+    private var materialsReady = false
+    private var materialsFailed = false
     /**
      * W24 `shadowCatcher` — the Filament unlit+shadowMultiplier path.
      * Built lazily on first use: a compile failure degrades catcher
@@ -222,7 +239,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     private val failedVariants = HashSet<VariantKey>()
 
     /** W16: the `trail` ribbon material — vertex-color unlit + blend. */
-    val trailMaterial: Material
+    lateinit var trailMaterial: Material
+        private set
 
     // MARK: - Jolt world
 
@@ -538,43 +556,13 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // 1×1 fallbacks, so all five stay sampled) — boundSlots is
         // the full base mask. A prebuilt that can't compile leaves
         // nothing to fall back to; the check stays fatal there.
-        litMaterial = checkNotNull(buildMaterial(unlit = false,
-            MaterialBuilder.BlendingMode.OPAQUE, 0,
-            FsceneRealizer.ALL_BASE_SLOTS))
-            { "d3 material failed to compile" }
-        litMaskedMaterial = checkNotNull(buildMaterial(unlit = false,
-            MaterialBuilder.BlendingMode.MASKED, 0,
-            FsceneRealizer.ALL_BASE_SLOTS))
-            { "d3 material failed to compile" }
-        litBlendMaterial = checkNotNull(buildMaterial(unlit = false,
-            MaterialBuilder.BlendingMode.TRANSPARENT, 0,
-            FsceneRealizer.ALL_BASE_SLOTS))
-            { "d3 material failed to compile" }
-        unlitMaterial = checkNotNull(buildMaterial(unlit = true,
-            MaterialBuilder.BlendingMode.OPAQUE, 0,
-            FsceneRealizer.ALL_BASE_SLOTS))
-            { "d3 material failed to compile" }
-        unlitMaskedMaterial = checkNotNull(buildMaterial(unlit = true,
-            MaterialBuilder.BlendingMode.MASKED, 0,
-            FsceneRealizer.ALL_BASE_SLOTS))
-            { "d3 material failed to compile" }
-        unlitBlendMaterial = checkNotNull(buildMaterial(unlit = true,
-            MaterialBuilder.BlendingMode.TRANSPARENT, 0,
-            FsceneRealizer.ALL_BASE_SLOTS))
-            { "d3 material failed to compile" }
-        // The materials are compiled double-sided-capable; keep the
-        // default single-sided unless a resource's doubleSided says so.
-        for (m in arrayOf(litMaterial, litMaskedMaterial, litBlendMaterial,
-            unlitMaterial, unlitMaskedMaterial, unlitBlendMaterial)) {
-            m.defaultInstance.setDoubleSided(false)
-        }
-        // W16: the trail ribbon's own material — upstream's default is
-        // translucent unlit driven fully by vertex color (incl. alpha),
-        // drawn without culling (a camera-facing strip's winding flips
-        // where the path doubles back). One shared instance: the
-        // shader has no parameters, so every trail binds the same one.
-        trailMaterial = buildTrailMaterial()
-        trailMaterial.defaultInstance.setDoubleSided(true)
+        // Never compile on main here: DNPluginRegistry.createView runs
+        // on the UI thread, and a cold compile of the lit set parked it
+        // for ~12 s (the captured ANR). Load whatever the process cache
+        // already holds; otherwise make sure a background compile for
+        // this engine's API is running and let stepFrame finish init.
+        MaterialPackages.prewarm(MaterialPackages.apiFor(engine.backend))
+        materialsReady = tryLoadBaseMaterials()
 
         fallbackWhite = TextureFactory.solid(engine, 255, 255, 255, 255)
         fallbackNormal = TextureFactory.solid(engine, 128, 128, 255, 255)
@@ -743,6 +731,57 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     }
 
     /**
+     * Loads the six base prebuilts + the trail material from the
+     * process package cache. Returns false (loading nothing) while any
+     * package is still compiling; a package filamat rejected is fatal
+     * for this view and is reported loudly once.
+     */
+    private fun tryLoadBaseMaterials(): Boolean {
+        if (materialsReady) return true
+        if (materialsFailed) return false
+        val api = MaterialPackages.apiFor(engine.backend)
+        val modes = listOf(MaterialBuilder.BlendingMode.OPAQUE,
+            MaterialBuilder.BlendingMode.MASKED,
+            MaterialBuilder.BlendingMode.TRANSPARENT)
+        val keys = ArrayList<String>()
+        for (unlit in listOf(false, true)) {
+            for (mode in modes) {
+                keys += MaterialPackages.litKey(unlit, mode, 0,
+                    FsceneRealizer.ALL_BASE_SLOTS, api)
+            }
+        }
+        keys += MaterialPackages.trailKey(api)
+        val failed = keys.filter { MaterialPackages.hasFailed(it) }
+        if (failed.isNotEmpty()) {
+            materialsFailed = true
+            Log.e(TAG, "dart3d: base material compile FAILED ($failed) —" +
+                " this scene view cannot render")
+            return false
+        }
+        val bytes = keys.map { MaterialPackages.peek(it) ?: return false }
+        val loaded = bytes.map { MaterialPackages.load(engine, it) }
+        litMaterial = loaded[0]
+        litMaskedMaterial = loaded[1]
+        litBlendMaterial = loaded[2]
+        unlitMaterial = loaded[3]
+        unlitMaskedMaterial = loaded[4]
+        unlitBlendMaterial = loaded[5]
+        trailMaterial = loaded[6]
+        // The materials are compiled double-sided-capable; keep the
+        // default single-sided unless a resource's doubleSided says so.
+        for (m in loaded.subList(0, 6)) {
+            m.defaultInstance.setDoubleSided(false)
+        }
+        // W16: the trail ribbon's own material — upstream's default is
+        // translucent unlit driven fully by vertex color (incl. alpha),
+        // drawn without culling (a camera-facing strip's winding flips
+        // where the path doubles back). One shared instance: the
+        // shader has no parameters, so every trail binds the same one.
+        trailMaterial.defaultInstance.setDoubleSided(true)
+        return true
+    }
+
+    /**
      * W24 `shadowCatcher` — upstream ShadowCatcherMaterial's live
      * mode: the surface draws only the shadow it receives. Filament's
      * recipe is UNLIT + `shadowMultiplier`, which carries the
@@ -758,21 +797,6 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         val bytes = checkNotNull(MaterialPackages.catcherPackage(
             MaterialPackages.apiFor(engine.backend)))
             { "d3 shadow catcher failed to compile" }
-        return MaterialPackages.load(engine, bytes)
-    }
-
-    /**
-     * W16: the trail ribbon material — upstream's
-     * `_TrailDefaultMaterial` port: translucent unlit, base color
-     * driven fully by the vertex color (`getColor()` carries rgba,
-     * so the colorOverTrail alpha fades the tail), double-sided via
-     * the instance flag (a camera-facing strip's winding flips where
-     * the path doubles back).
-     */
-    private fun buildTrailMaterial(): Material {
-        val bytes = checkNotNull(MaterialPackages.trailPackage(
-            MaterialPackages.apiFor(engine.backend)))
-            { "d3 trail material failed to compile" }
         return MaterialPackages.load(engine, bytes)
     }
 
@@ -1487,12 +1511,15 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             engine.destroyTexture(fallbackWhite)
             engine.destroyTexture(fallbackNormal)
             engine.destroyTexture(fallbackEmissive)
-            engine.destroyMaterial(litMaterial)
-            engine.destroyMaterial(litMaskedMaterial)
-            engine.destroyMaterial(litBlendMaterial)
-            engine.destroyMaterial(unlitMaterial)
-            engine.destroyMaterial(unlitMaskedMaterial)
-            engine.destroyMaterial(unlitBlendMaterial)
+            if (materialsReady) {
+                engine.destroyMaterial(litMaterial)
+                engine.destroyMaterial(litMaskedMaterial)
+                engine.destroyMaterial(litBlendMaterial)
+                engine.destroyMaterial(unlitMaterial)
+                engine.destroyMaterial(unlitMaskedMaterial)
+                engine.destroyMaterial(unlitBlendMaterial)
+                engine.destroyMaterial(trailMaterial)
+            }
             catcherMaterialBacking?.let { engine.destroyMaterial(it) }
             // W18: the lazily-built sprite materials.
             particleAlphaMaterial?.let { engine.destroyMaterial(it) }
@@ -1501,7 +1528,6 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             particleAdditiveMaterial = null
             for ((_, m) in materialVariants) engine.destroyMaterial(m)
             materialVariants.clear()
-            engine.destroyMaterial(trailMaterial)
             engine.destroyRenderer(renderer)
             engine.destroyView(view)
             engine.destroyScene(scene)
@@ -4042,6 +4068,15 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         val dt = ((tNanos - lastFrameNanos).coerceIn(0L, 100_000_000L)) / 1e9f
         lastFrameNanos = tNanos
 
+        if (!materialsReady) {
+            materialsReady = tryLoadBaseMaterials()
+            if (!materialsReady) {
+                // Mutations stay queued (FIFO preserved) until the
+                // background compile lands; nothing to draw yet.
+                return
+            }
+            Log.i(TAG, "dart3d view $viewId: base materials ready")
+        }
         // Drain queued mutations before touching any scene/Jolt state —
         // the iOS twin drains at `updateAtTime`, the same pre-step slot.
         lastDrainCount = 0
