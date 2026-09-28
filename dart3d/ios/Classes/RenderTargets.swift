@@ -490,6 +490,14 @@ extension SceneViewHost {
                 pov.camera = cam
                 pov.transform = camNode.presentation.worldTransform
             }
+            if real == nil {
+                // The proxy lives IN the scene (a camera-only node
+                // draws nothing): SceneKit renders a pointOfView that
+                // isn't part of the rendered graph as an empty pass,
+                // which left every non-leading split view blank.
+                pov.name = "d3splitpov:\(i)"
+                scene?.rootNode.addChildNode(pov)
+            }
             return ScreenSubview(
                 rec: rec, pov: pov, drivesRealNode: real != nil)
         }
@@ -527,6 +535,12 @@ extension SceneViewHost {
     /// list now; the UIView removal hops to main (the sibling may be
     /// mid-draw there; removeFromSuperview sequences on main).
     func teardownScreenSubviews() {
+        // Proxy povs ride the scene graph — detach them with the list
+        // (graveyard: a sibling's in-flight draw may still hold one).
+        for s in screenSubviews where !s.drivesRealNode {
+            s.pov.removeFromParentNode()
+            retire(s.pov)
+        }
         screenSubviews = []
         siblingPoseLock.lock()
         siblingPoseSnapshot = nil
