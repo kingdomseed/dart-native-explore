@@ -1421,9 +1421,19 @@ enum FsceneRealizer {
         /// Segment-count params clamp to ≥1 — a zero/negative on the
         /// wire would NaN the generators' `s / segments` divisions
         /// (the Dart-side contract floors at 1 too).
+        /// Wire tessellation counts clamp to `[1, maxProcSegments]` —
+        /// the Dart `limits.dart` contract (`kD3MaxProcSegments`):
+        /// clamp, never reject, so every platform degrades to the same
+        /// capped mesh instead of hanging on a hostile count.
+        static let maxProcSegments = 512
+        static let maxIcosphereSubdivisions = 6
         private func seg(_ p: [String: Any], _ name: String,
                          _ def: Int) -> Int {
-            max(1, d3Int(p[name]) ?? def)
+            min(max(1, d3Int(p[name]) ?? def), Self.maxProcSegments)
+        }
+
+        private func stations(_ p: [String: Any]) -> Int {
+            min(max(2, d3Int(p["stations"]) ?? 64), Self.maxProcSegments)
         }
 
         func procedural(_ key: UInt64, _ shape: String,
@@ -1452,7 +1462,9 @@ enum FsceneRealizer {
                 return GeometryFactory.makeGeometry(
                     GeometryFactory.icosphere(
                         radius: Float(d3Double(p["radius"]) ?? 0.5),
-                        subdivisions: max(0, d3Int(p["subdivisions"]) ?? 2)))
+                        subdivisions: min(max(0,
+                            d3Int(p["subdivisions"]) ?? 2),
+                            Self.maxIcosphereSubdivisions)))
             case "plane":
                 // XZ +Y — the wire contract; SCNPlane's XY/+Z never
                 // matched it.
@@ -1514,7 +1526,7 @@ enum FsceneRealizer {
                     GeometryFactory.tube(pts,
                         radius: Float(d3Double(p["radius"]) ?? 0.5),
                         radialSegments: seg(p, "radialSegments", 12),
-                        stations: max(2, d3Int(p["stations"]) ?? 64),
+                        stations: stations(p),
                         caps: d3Bool(p["caps"]) != false,
                         closed: d3Bool(p["closed"]) == true))
             case "ribbon":
@@ -1527,7 +1539,7 @@ enum FsceneRealizer {
                 return GeometryFactory.makeGeometry(
                     GeometryFactory.ribbon(pts,
                         width: Float(d3Double(p["width"]) ?? 1),
-                        stations: max(2, d3Int(p["stations"]) ?? 64),
+                        stations: stations(p),
                         up: SIMD3(Float(u[0]), Float(u[1]), Float(-u[2])),
                         closed: d3Bool(p["closed"]) == true))
             case let s where FsceneRealizer.Context.facingShapes
@@ -1728,6 +1740,13 @@ enum FsceneRealizer {
          * vertex data toward the live camera (SceneKit lines are
          * thin; thick lines ride ribbon quads).
          */
+        /// Removes `geometry` from every material's consumer list.
+        func dropMaterialConsumer(_ geometry: SCNGeometry) {
+            for mk in materialConsumers.keys {
+                materialConsumers[mk]?.removeAll { $0 === geometry }
+            }
+        }
+
         func decodeProcMesh(key: UInt64, node: SCNNode,
                             _ p: [String: Any]) {
             guard let shape = d3String(p["shape"]) else {
@@ -1762,6 +1781,11 @@ enum FsceneRealizer {
                 }
             }
             if let old = node.geometry, old !== geometry {
+                // A rebake/re-decode replaces the geometry — its
+                // material-consumer entries go too, or every update
+                // leaks a retained retired geometry that later
+                // material upserts keep rebinding.
+                dropMaterialConsumer(old)
                 host.retire(old)
             }
             node.geometry = geometry
@@ -1969,6 +1993,16 @@ enum FsceneRealizer {
                     d3Log("d3:instances node \(key): geometry unresolved")
                     return
                 }
+                let keep = GeometryFactory.bakedInstanceCount(
+                    transforms.count, baseVertexCount: base.vertexCount)
+                if keep < transforms.count {
+                    host.logOnce("instances.\(key).vertexCap",
+                        "d3:instances node \(key): \(transforms.count)"
+                            + " instances × \(base.vertexCount) base"
+                            + " vertices exceeds the"
+                            + " \(GeometryFactory.maxBakedVertices)-vertex"
+                            + " bake budget — truncated to \(keep)")
+                }
                 parts = GeometryFactory.bakeInstances(
                     base, transforms, colors: colors)
             }
@@ -2005,6 +2039,11 @@ enum FsceneRealizer {
                 geometry.materials = [dm]
             }
             if let old = node.geometry, old !== geometry {
+                // A rebake/re-decode replaces the geometry — its
+                // material-consumer entries go too, or every update
+                // leaks a retained retired geometry that later
+                // material upserts keep rebinding.
+                dropMaterialConsumer(old)
                 host.retire(old)
             }
             node.geometry = geometry
@@ -2119,6 +2158,10 @@ enum FsceneRealizer {
                         + "_output.color.a = 1.0;", cutoff)
                 ]
             default:
+                // Forward-compatible/unknown mode → opaque, and opaque
+                // means `.replace` (the explicit case's reasoning): the
+                // default `.alpha` would still composite source alpha.
+                m.blendMode = .replace
                 host.logOnce("material.\(key).alphaMode.\(alphaMode ?? "?")",
                     "material \(key): unknown alphaMode "
                     + "'\(alphaMode ?? "?")'; kept opaque")
@@ -3373,12 +3416,15 @@ enum FsceneRealizer {
                     for x in 0..<nw {
                         var sx = 0.0, sy = 0.0, sz = 0.0
                         var sa = 0
-                        // Clamped taps: odd dims reweight the edge
-                        // texel — a small bias at NPOT edges, noted.
-                        for dy in 0..<2 {
-                            for dx in 0..<2 {
-                                let px = min(x * 2 + dx, w - 1)
-                                let py = min(y * 2 + dy, h - 1)
+                        // Each destination texel averages its FULL
+                        // source footprint [x·w/nw, (x+1)·w/nw) — on an
+                        // odd (NPOT) edge that is 3 texels, so the last
+                        // row/column is never dropped (a 3×3 → 1×1
+                        // step covers all 9).
+                        let x0 = x * w / nw, x1 = (x + 1) * w / nw
+                        let y0 = y * h / nh, y1 = (y + 1) * h / nh
+                        for py in y0..<max(y1, y0 + 1) {
+                            for px in x0..<max(x1, x0 + 1) {
                                 let o = (py * w + px) * 4
                                 sx += Double(prev[o]) / 127.5 - 1.0
                                 sy += Double(prev[o + 1]) / 127.5 - 1.0
@@ -3386,6 +3432,7 @@ enum FsceneRealizer {
                                 sa += Int(prev[o + 3])
                             }
                         }
+                        let taps = max(x1 - x0, 1) * max(y1 - y0, 1)
                         let d = (y * nw + x) * 4
                         let len = (sx * sx + sy * sy + sz * sz)
                             .squareRoot()
@@ -3401,7 +3448,7 @@ enum FsceneRealizer {
                             next[d] = 128; next[d + 1] = 128
                             next[d + 2] = 255
                         }
-                        next[d + 3] = UInt8(clamping: sa / 4)
+                        next[d + 3] = UInt8(clamping: sa / taps)
                     }
                 }
                 levels.append(next)
@@ -4871,7 +4918,11 @@ enum FsceneRealizer {
                 light.automaticallyAdjustsShadowProjection = false
                 light.orthographicScale = CGFloat(v)
             }
-            switch p["shadowCasterFaces"] as? String ?? "front" {
+            // Dart-authored StringValues arrive tagged ({"s": …}) —
+            // d3String first, a bare string as the fallback.
+            let casterFaces = d3String(p["shadowCasterFaces"])
+                ?? p["shadowCasterFaces"] as? String ?? "front"
+            switch casterFaces {
             case "back":
                 // Second-depth shadow mapping — SceneKit's one
                 // native analog of the wire enum.
@@ -4884,8 +4935,8 @@ enum FsceneRealizer {
                 break
             default:
                 host.logOnce(
-                    "w24.shadowCasterFaces.\(p["shadowCasterFaces"] ?? "?")",
-                    "shadowCasterFaces '\(p["shadowCasterFaces"] ?? "?")' "
+                    "w24.shadowCasterFaces.\(casterFaces)",
+                    "shadowCasterFaces '\(casterFaces)' "
                     + "unknown; kept 'front'")
             }
             // Present-but-unsupported members — one warning per field
@@ -5024,13 +5075,24 @@ enum FsceneRealizer {
             return out
         }
 
-        /// startColor distribution → (particleColor,
-        /// particleColorVariation, overLifeController?) — constant
-        /// maps exactly; uniform folds to mid ± |b−a|/2 per channel;
-        /// gradient becomes a color-over-life keyframe controller.
-        private func d3ColorDist(_ v: Any?)
-            -> (UIColor, SCNVector4, CAKeyframeAnimation?) {
-            guard let m = d3Map(v) else { return (.white, .init(), nil) }
+        /// A decoded color distribution, split the way SceneKit can
+        /// carry it: a base color ± a normalized HSB+alpha variation
+        /// (`particleColorVariation` is hue/saturation/brightness/
+        /// alpha — NOT per-channel RGBA), or a gradient over life.
+        private enum ParticleColor {
+            case fixed(UIColor, SCNVector4)
+            case gradient([(t: Double, c: UIColor)])
+        }
+
+        /// `{'kind': constant|uniform|gradient}` → `ParticleColor`.
+        /// `uniform` is the reference's correlated lerp `a + (b−a)·r`
+        /// (one random scalar for the whole RGBA tuple); SceneKit has
+        /// no such knob, so it approximates as the RGB midpoint ±
+        /// half the HSB/alpha distance between the endpoints — each
+        /// dimension varies independently, so colors off the a→b
+        /// segment are possible (documented limit).
+        private func d3ParticleColor(_ v: Any?) -> ParticleColor {
+            guard let m = d3Map(v) else { return .fixed(.white, .init()) }
             switch d3String(m["kind"]) ?? "constant" {
             case "uniform":
                 let a = d3ColorComponents(m["a"]) ?? [1, 1, 1, 1]
@@ -5038,29 +5100,54 @@ enum FsceneRealizer {
                 let mid = UIColor(
                     red: (a[0] + b[0]) / 2, green: (a[1] + b[1]) / 2,
                     blue: (a[2] + b[2]) / 2, alpha: (a[3] + b[3]) / 2)
-                let v4 = SCNVector4(
-                    Float(abs(b[0] - a[0]) / 2),
-                    Float(abs(b[1] - a[1]) / 2),
-                    Float(abs(b[2] - a[2]) / 2),
-                    Float(abs(b[3] - a[3]) / 2))
-                return (mid, v4, nil)
+                return .fixed(mid, hsbVariation(a, b))
             case "gradient":
                 let stops = d3GradientStops(m["gradient"])
-                guard !stops.isEmpty else { return (.white, .init(), nil) }
-                let anim = CAKeyframeAnimation()
-                anim.keyTimes = stops.map { NSNumber(value: $0.t) }
-                anim.values = stops.map { $0.c }
-                return (stops[0].c, .init(), anim)
+                guard !stops.isEmpty else { return .fixed(.white, .init()) }
+                return .gradient(stops)
             default:
-                return (d3Color(m["color"]) ?? .white, .init(), nil)
+                return .fixed(d3Color(m["color"]) ?? .white, .init())
             }
+        }
+
+        /// Half the HSB/alpha distance between two RGBA endpoints, in
+        /// SceneKit's normalized variation units. Hue wraps (the
+        /// shorter way round the wheel).
+        private func hsbVariation(_ a: [Double], _ b: [Double])
+            -> SCNVector4 {
+            func hsb(_ c: [Double]) -> (CGFloat, CGFloat, CGFloat) {
+                var h: CGFloat = 0, s: CGFloat = 0, v: CGFloat = 0
+                var al: CGFloat = 0
+                UIColor(red: c[0], green: c[1], blue: c[2], alpha: 1)
+                    .getHue(&h, saturation: &s, brightness: &v,
+                            alpha: &al)
+                return (h, s, v)
+            }
+            let ha = hsb(a), hb = hsb(b)
+            var dh = abs(ha.0 - hb.0)
+            if dh > 0.5 { dh = 1 - dh }
+            return SCNVector4(Float(dh / 2),
+                              Float(abs(ha.1 - hb.1) / 2),
+                              Float(abs(ha.2 - hb.2) / 2),
+                              Float(abs(b[3] - a[3]) / 2))
+        }
+
+        /// The color-over-life keyframe animation for gradient stops.
+        private func gradientAnimation(
+            _ stops: [(t: Double, c: UIColor)]
+        ) -> CAKeyframeAnimation {
+            let anim = CAKeyframeAnimation()
+            anim.keyTimes = stops.map { NSNumber(value: $0.t) }
+            anim.values = stops.map { $0.c }
+            return anim
         }
 
         /// Applies one decoded module's contribution — acceleration
         /// folds into `sys.acceleration`, linearDrag into
-        /// `dampingFactor`, size/color-over-life into property
-        /// controllers, flipbook into the image-sequence knobs.
-        /// `turbulence` has no SceneKit counterpart.
+        /// `dampingFactor`, size-over-life into a property
+        /// controller, flipbook into the image-sequence knobs.
+        /// `colorOverLife` is resolved by the caller (it interacts
+        /// with startColor). `turbulence` has no SceneKit counterpart.
         private func applyParticleModule(
             _ sys: SCNParticleSystem, _ m: [String: Any],
             sizeMean: CGFloat, lifeSpan: CGFloat,
@@ -5084,40 +5171,31 @@ enum FsceneRealizer {
                 // size variance under a uniform startSize is lost
                 // (documented in particles-spec.md).
                 if let d = d3Map(m["scale"]) {
-                    let keys = d3FloatDistKeys(d)
-                    if !keys.isEmpty {
-                        let anim = CAKeyframeAnimation()
-                        anim.keyTimes = keys.map { NSNumber(value: $0.t) }
-                        anim.values = keys.map {
-                            NSNumber(value: Double(sizeMean) * $0.v)
-                        }
-                        let ctl = SCNParticlePropertyController(
-                            animation: anim)
-                        ctl.inputMode = .overLife
-                        var pcs = sys.propertyControllers ?? [:]
-                        pcs[.size] = ctl
-                        sys.propertyControllers = pcs
-                    }
-                }
-            case "colorOverLife":
-                if let dist = d3Map(m["color"]) {
-                    let (_, _, anim) = d3ColorDist(dist)
-                    if let anim {
-                        let ctl = SCNParticlePropertyController(
-                            animation: anim)
-                        ctl.inputMode = .overLife
-                        var pcs = sys.propertyControllers ?? [:]
-                        pcs[.color] = ctl
-                        sys.propertyControllers = pcs
-                    }
+                    applySizeOverLife(sys, d3FloatDistKeys(d),
+                                      sizeMean: sizeMean)
                 }
             case "flipbook":
-                let count = d3Int(m["frameCount"])
-                    ?? flipbookCols * flipbookRows
+                let cells = min(max(flipbookCols, 1), Self.maxFlipbookAxis)
+                    * min(max(flipbookRows, 1), Self.maxFlipbookAxis)
+                let count = max(1, min(d3Int(m["frameCount"]) ?? cells,
+                                       cells))
                 sys.imageSequenceColumnCount = max(flipbookCols, 1)
                 sys.imageSequenceRowCount = max(flipbookRows, 1)
                 if let fps = d3Double(m["framesPerSecond"]), fps > 0 {
-                    sys.imageSequenceFrameRate = CGFloat(fps)
+                    if count < cells {
+                        // SceneKit's rate-driven sequence walks EVERY
+                        // atlas cell; the reference wraps
+                        // `age·fps mod frameCount`. Drive the frame
+                        // index directly: a sawtooth over the mean
+                        // lifespan (per-particle lifespan variation
+                        // shifts the wrap points — approximate).
+                        applyFlipbookSawtooth(sys, fps: fps,
+                                              count: count,
+                                              lifeSpan: lifeSpan,
+                                              logKey: logKey)
+                    } else {
+                        sys.imageSequenceFrameRate = CGFloat(fps)
+                    }
                 } else {
                     // No fps → the strip plays once over the life.
                     sys.imageSequenceFrameRate = lifeSpan > 0
@@ -5141,6 +5219,75 @@ enum FsceneRealizer {
             }
         }
 
+        /// Size-over-life keys → an over-life `.size` controller
+        /// (absolute values: scale × the mean start size).
+        private func applySizeOverLife(
+            _ sys: SCNParticleSystem, _ keys: [(t: Double, v: Double)],
+            sizeMean: CGFloat
+        ) {
+            guard !keys.isEmpty else { return }
+            let anim = CAKeyframeAnimation()
+            anim.keyTimes = keys.map { NSNumber(value: $0.t) }
+            anim.values = keys.map {
+                NSNumber(value: Double(sizeMean) * $0.v)
+            }
+            let ctl = SCNParticlePropertyController(animation: anim)
+            ctl.inputMode = .overLife
+            var pcs = sys.propertyControllers ?? [:]
+            pcs[.size] = ctl
+            sys.propertyControllers = pcs
+        }
+
+        /// fps flipbook limited to `count` < atlas cells: an over-life
+        /// `.frame` controller whose keys ramp 0→count and wrap every
+        /// `count/fps` seconds of the mean lifespan (discrete, so the
+        /// index holds whole cells). Capped at 128 wraps.
+        private func applyFlipbookSawtooth(
+            _ sys: SCNParticleSystem, fps: Double, count: Int,
+            lifeSpan: CGFloat, logKey: String
+        ) {
+            let life = Double(lifeSpan)
+            guard life > 0 else { return }
+            let period = Double(count) / fps       // seconds per loop
+            // Clamp in Double first: a huge fps/lifetime makes the
+            // quotient exceed Int.max (or overflow to inf), and the
+            // Int conversion would trap before `min` could cap it.
+            let q = (life / period).rounded(.up)
+            guard !q.isNaN, q > 0 else { return }
+            let wraps = Int(min(q, 128))
+            var times: [NSNumber] = []
+            var values: [NSNumber] = []
+            for w in 0..<max(wraps, 1) {
+                let t0 = Double(w) * period / life
+                guard t0 < 1 else { break }
+                if times.count >= Self.maxFlipbookKeys { break }
+                for f in 0..<count {
+                    if times.count >= Self.maxFlipbookKeys { break }
+                    let t = t0 + Double(f) / fps / life
+                    guard t < 1 else { break }
+                    times.append(NSNumber(value: t))
+                    values.append(NSNumber(value: f))
+                }
+            }
+            // keyTimes must end at 1 for a discrete animation.
+            times.append(1)
+            values.append(values.last ?? 0)
+            let anim = CAKeyframeAnimation()
+            anim.calculationMode = .discrete
+            anim.keyTimes = times
+            anim.values = values
+            let ctl = SCNParticlePropertyController(animation: anim)
+            ctl.inputMode = .overLife
+            var pcs = sys.propertyControllers ?? [:]
+            pcs[.frame] = ctl
+            sys.propertyControllers = pcs
+            sys.imageSequenceFrameRate = 0
+            host.logOnce("\(logKey).flipbookSawtooth",
+                "particleEmitter: fps flipbook with frameCount \(count) "
+                + "< atlas cells — frame index driven over the mean "
+                + "lifespan (approximate under lifetime variation)")
+        }
+
         /// Curve/uniformCurve float distributions → keyframes for a
         /// size controller; constant/uniform fold to a one-key curve.
         private func d3FloatDistKeys(_ m: [String: Any])
@@ -5152,12 +5299,18 @@ enum FsceneRealizer {
                     (t: $0.t, v: $0.v * scale)
                 }
             case "uniformCurve":
-                let lo = d3CurveKeys(m["min"])
-                let hi = d3CurveKeys(m["max"])
                 // Fold to the midpoint curve — the controller writes
                 // absolute values, so per-particle spread is lost.
-                return zip(lo, hi).map { (t: $0.0.t,
-                                         v: ($0.0.v + $0.1.v) / 2) }
+                // The two curves can have different key times/counts:
+                // sample both on the union timeline (an ordinal zip
+                // paired unrelated keys and dropped the longer tail).
+                let times = Set(d3CurveKeys(m["min"]).map { $0.t }
+                    + d3CurveKeys(m["max"]).map { $0.t }).sorted()
+                return times.map { t in
+                    (t: t,
+                     v: (d3CurveSample(m["min"], t: t, fallback: 0)
+                         + d3CurveSample(m["max"], t: t, fallback: 0)) / 2)
+                }
             case "uniform":
                 let lo = d3Double(m["min"]) ?? 0
                 let hi = d3Double(m["max"]) ?? 0
@@ -5165,6 +5318,34 @@ enum FsceneRealizer {
             default:
                 return [(0, d3Double(m["value"]) ?? 0)]
             }
+        }
+
+        /// The legacy flat stack — a component without `modules`
+        /// carries `drag`/`sizeOverLife`/`colorOverLife` as flat
+        /// members (the Dart reference and Android decoders both
+        /// synthesize it). An absent curve/gradient means "no
+        /// shaping": size ×1, color constant opaque white — the
+        /// reference's own legacy default, which overrides
+        /// startColor.
+        private func legacyParticleModules(_ p: [String: Any]) -> [Any] {
+            var out: [Any] = []
+            let drag = d3Double(p["drag"]) ?? 0
+            if drag > 0 {
+                out.append(["kind": "linearDrag", "coefficient": drag])
+            }
+            if p["sizeOverLife"] != nil {
+                out.append(["kind": "sizeOverLife",
+                            "scale": ["kind": "curve",
+                                      "curve": p["sizeOverLife"]!,
+                                      "scale": 1.0]])
+            }
+            out.append(["kind": "colorOverLife",
+                        "color": p["colorOverLife"] != nil
+                            ? ["kind": "gradient",
+                               "gradient": p["colorOverLife"]!]
+                            : ["kind": "constant",
+                               "color": [1.0, 1.0, 1.0, 1.0]]])
+            return out
         }
 
         /// Builds and attaches the `SCNParticleSystem` for a
@@ -5183,18 +5364,34 @@ enum FsceneRealizer {
                     + "a real tick gate)")
                 return
             }
+            // The component contract skips an incomplete mesh
+            // emitter — the sprite degrade would otherwise draw
+            // white/default sprites for it.
+            if mesh, (d3List(props["geometries"])?.isEmpty ?? true)
+                || d3Ref(props["material"]) == nil {
+                host.logOnce("\(logKey).meshIncomplete",
+                    "meshParticleEmitter on node \(key): missing "
+                    + "geometries or material — skipped")
+                return
+            }
             let sys = SCNParticleSystem()
             sys.isLocal = true  // upstream simulates in node space
             sys.birthRate =
-                CGFloat(d3Double(props["emitRate"]) ?? 32)
+                CGFloat(max(d3Double(props["emitRate"]) ?? 32, 0))
             // looping → emit forever: loops repeats the emit/idle
             // cycle and idleDuration defaults to 0, so emission is
             // gapless. emissionDuration must be a SMALL finite value
             // on iOS 26.5 — 0, .infinity, and 1e6 all emit NOTHING
             // (device-proven; likely a birthRate×duration budget).
+            // A nonpositive duration normalizes to the 5 s format
+            // default first (Dart/Android do the same) — 0 is exactly
+            // the emit-nothing value.
             let looping = d3Bool(props["looping"]) ?? true
             sys.loops = looping
-            sys.emissionDuration = CGFloat(d3Double(props["duration"]) ?? 5)
+            let rawDuration = d3Double(props["duration"]) ?? 5
+            let duration = rawDuration > 0 && rawDuration.isFinite
+                ? rawDuration : 5
+            sys.emissionDuration = CGFloat(duration)
             sys.warmupDuration =
                 CGFloat(d3Double(props["prewarm"]) ?? 0)
 
@@ -5210,6 +5407,9 @@ enum FsceneRealizer {
                 d3DistMeanVar(props["startSize"], 0.3)
             sys.particleSize = size
             sys.particleSizeVariation = sizeVar
+            // SceneKit's particleAngle/particleAngularVelocity are
+            // DEGREES (and degrees/s) per SCNParticleSystem.h — the
+            // wire's radians convert here, like spreadingAngle.
             let deg = 180.0 / Double.pi
             let (rot, rotVar) =
                 d3DistMeanVar(props["startRotation"], 0)
@@ -5221,54 +5421,68 @@ enum FsceneRealizer {
             sys.particleAngularVelocityVariation = CGFloat(avelVar * deg)
 
             // Emitter shape → emitterShape + direction knobs. All
-            // fscene vectors mirror z entering SceneKit space.
+            // fscene vectors mirror z entering SceneKit space. An
+            // absent `shape` is the format's default cone (radius
+            // 0.25, angle 0.3) — or the legacy flat `shapeType`/
+            // `shapeRadius`/`shapeAngle` members when present, as the
+            // Dart/Android decoders synthesize.
             var emitDir = SIMD3<Double>(0, 1, 0)
-            if let shape = d3Map(props["shape"]) {
-                switch d3String(shape["kind"]) ?? "cone" {
-                case "point":
-                    if let d = d3Vec3(shape["direction"]),
-                       d.count == 3 {
-                        emitDir = SIMD3(d[0], d[1], d[2])
-                    }
-                case "sphere":
-                    let r = d3Double(shape["radius"]) ?? 1
-                    sys.emitterShape =
-                        SCNSphere(radius: CGFloat(r))
-                    sys.birthLocation =
-                        d3Bool(shape["surfaceOnly"]) == true
-                        ? .surface : .volume
-                    sys.birthDirection = .surfaceNormal
-                    if d3Bool(shape["hemisphere"]) == true {
-                        host.logOnce("\(logKey).hemisphere",
-                            "particleEmitter: sphere 'hemisphere' has "
-                            + "no SceneKit counterpart — full sphere")
-                    }
+            let shape: [String: Any] = d3Map(props["shape"]) ?? {
+                let r = max(d3Double(props["shapeRadius"]) ?? 0.25, 0)
+                let a = max(d3Double(props["shapeAngle"]) ?? 0.3, 0)
+                switch d3String(props["shapeType"]) ?? "cone" {
+                case "point": return ["kind": "point"]
+                case "sphere": return ["kind": "sphere", "radius": r]
                 case "box":
-                    if let he = d3Vec3(shape["halfExtents"]),
-                       he.count == 3 {
-                        sys.emitterShape = SCNBox(
-                            width: CGFloat(he[0] * 2),
-                            height: CGFloat(he[1] * 2),
-                            length: CGFloat(he[2] * 2),
-                            chamferRadius: 0)
-                        sys.birthLocation = .volume
-                    }
-                    if let d = d3Vec3(shape["direction"]),
-                       d.count == 3 {
-                        emitDir = SIMD3(d[0], d[1], d[2])
-                    }
-                default:  // cone — the format default
-                    let r = d3Double(shape["radius"]) ?? 0
-                    if r > 0 {
-                        // A zero-height cylinder's volume is the disc
-                        // the cone emits from.
-                        sys.emitterShape = SCNCylinder(
-                            radius: CGFloat(r), height: 0.001)
-                        sys.birthLocation = .volume
-                    }
-                    sys.spreadingAngle = CGFloat(
-                        (d3Double(shape["angle"]) ?? 0.5) * deg)
+                    return ["kind": "box", "halfExtents": [r, r, r]]
+                default:
+                    return ["kind": "cone", "radius": r, "angle": a]
                 }
+            }()
+            switch d3String(shape["kind"]) ?? "cone" {
+            case "point":
+                if let d = d3Vec3(shape["direction"]),
+                   d.count == 3 {
+                    emitDir = SIMD3(d[0], d[1], d[2])
+                }
+            case "sphere":
+                let r = d3Double(shape["radius"]) ?? 1
+                sys.emitterShape =
+                    SCNSphere(radius: CGFloat(r))
+                sys.birthLocation =
+                    d3Bool(shape["surfaceOnly"]) == true
+                    ? .surface : .volume
+                sys.birthDirection = .surfaceNormal
+                if d3Bool(shape["hemisphere"]) == true {
+                    host.logOnce("\(logKey).hemisphere",
+                        "particleEmitter: sphere 'hemisphere' has "
+                        + "no SceneKit counterpart — full sphere")
+                }
+            case "box":
+                if let he = d3Vec3(shape["halfExtents"]),
+                   he.count == 3 {
+                    sys.emitterShape = SCNBox(
+                        width: CGFloat(he[0] * 2),
+                        height: CGFloat(he[1] * 2),
+                        length: CGFloat(he[2] * 2),
+                        chamferRadius: 0)
+                    sys.birthLocation = .volume
+                }
+                if let d = d3Vec3(shape["direction"]),
+                   d.count == 3 {
+                    emitDir = SIMD3(d[0], d[1], d[2])
+                }
+            default:  // cone — the format default
+                let r = d3Double(shape["radius"]) ?? 0
+                if r > 0 {
+                    // A zero-height cylinder's volume is the disc
+                    // the cone emits from.
+                    sys.emitterShape = SCNCylinder(
+                        radius: CGFloat(r), height: 0.001)
+                    sys.birthLocation = .volume
+                }
+                sys.spreadingAngle = CGFloat(
+                    (d3Double(shape["angle"]) ?? 0.5) * deg)
             }
             sys.emittingDirection = SCNVector3(
                 Float(emitDir.x), Float(emitDir.y), Float(-emitDir.z))
@@ -5312,8 +5526,13 @@ enum FsceneRealizer {
                let tex = textures[texKey]?.contents {
                 sys.particleImage = tex
             }
-            let flipCols = d3Int(props["flipbookColumns"]) ?? 1
-            let flipRows = d3Int(props["flipbookRows"]) ?? 1
+            // Clamped before any product: two huge-but-valid Int dims
+            // overflow `cols * rows` and trap. 4096 per axis is far past
+            // any usable atlas (a cell must still be ≥ 1 texel).
+            let flipCols = min(max(d3Int(props["flipbookColumns"]) ?? 1, 1),
+                               Self.maxFlipbookAxis)
+            let flipRows = min(max(d3Int(props["flipbookRows"]) ?? 1, 1),
+                               Self.maxFlipbookAxis)
             if flipCols > 1 || flipRows > 1 {
                 sys.imageSequenceColumnCount = flipCols
                 sys.imageSequenceRowCount = flipRows
@@ -5321,41 +5540,66 @@ enum FsceneRealizer {
 
             // Mesh emitters degrade to an untextured sprite pass on
             // iOS (SCNParticleSystem is sprite-only) tinted by the
-            // material's base color.
+            // material's AUTHORED baseColor factor — read from the
+            // material def, since `diffuse.contents` holds the image
+            // once a base-color texture binds. Per-particle color is
+            // inert on mesh emitters (upstream parity): startColor
+            // and colorOverLife don't apply.
             if mesh {
-                if let matKey = d3Ref(props["material"]),
-                   let m = materials[matKey],
-                   let c = m.diffuse.contents as? UIColor {
-                    sys.particleColor = c
+                if let matKey = d3Ref(props["material"]) {
+                    let mp = resourceDefs[matKey]?["properties"]
+                        as? [String: Any]
+                    if let c = d3Color(mp?["baseColor"]) {
+                        sys.particleColor = c
+                    } else if let c = materials[matKey]?.diffuse.contents
+                                as? UIColor {
+                        sys.particleColor = c
+                    }
                 }
                 host.logOnce("\(logKey).meshDegrade",
                     "meshParticleEmitter on node \(key): realized as a "
                     + "sprite pass (SCNParticleSystem is sprite-only)")
+            } else {
+                // startColor samples ONCE at spawn — a gradient
+                // contributes its age-0 color (the reference samples
+                // `startColor` at normalized age 0); only a
+                // colorOverLife module animates over life.
+                switch d3ParticleColor(props["startColor"]) {
+                case .fixed(let c, let v):
+                    sys.particleColor = c
+                    sys.particleColorVariation = v
+                case .gradient(let stops):
+                    sys.particleColor = stops[0].c
+                }
             }
 
-            // startColor — constant/uniform set the base; a gradient
-            // is a color-over-life controller.
-            let (pc, pcv, pcAnim) = d3ColorDist(props["startColor"])
-            if !mesh || sys.particleColor == .black {
-                sys.particleColor = pc
-            }
-            sys.particleColorVariation = pcv
-            var colorOverLife = pcAnim
-
-            // Modules, in list order (the decoded list already carries
-            // the default stack when the spec omitted `modules`).
+            // Modules, in list order. A component without `modules`
+            // gets the legacy flat stack.
             var drag = 0.0
-            for e in d3List(props["modules"]) ?? [] {
+            var colorOverLife: CAKeyframeAnimation?
+            let modules = d3List(props["modules"])
+                ?? legacyParticleModules(props)
+            for e in modules {
                 guard let m = d3Map(e) else { continue }
                 if d3String(m["kind"]) == "linearDrag" {
                     drag += d3Double(m["coefficient"]) ?? 0
                     continue
                 }
                 if d3String(m["kind"]) == "colorOverLife" {
-                    // A module-level gradient overrides the
-                    // startColor controller.
-                    if let dist = d3Map(m["color"]) {
-                        colorOverLife = d3ColorDist(dist).2
+                    // Inert on mesh emitters; otherwise it OVERWRITES
+                    // the color each tick (reference semantics): a
+                    // gradient animates, constant/uniform replace the
+                    // spawn color outright.
+                    guard !mesh, let dist = d3Map(m["color"]) else {
+                        continue
+                    }
+                    switch d3ParticleColor(dist) {
+                    case .gradient(let stops):
+                        colorOverLife = gradientAnimation(stops)
+                    case .fixed(let c, let v):
+                        colorOverLife = nil
+                        sys.particleColor = c
+                        sys.particleColorVariation = v
                     }
                     continue
                 }
@@ -5377,11 +5621,6 @@ enum FsceneRealizer {
             if d3Bool(props["paused"]) == true {
                 sys.speedFactor = 0   // frozen sim, particles still draw
             }
-            if d3List(props["bursts"])?.isEmpty == false {
-                host.logOnce("\(logKey).bursts",
-                    "particleEmitter: 'bursts' have no SCNParticleSystem "
-                    + "counterpart — steady birthRate only")
-            }
             if props["seed"] != nil || props["fixedStep"] != nil
                 || props["maxFrameTime"] != nil
                 || props["maxParticles"] != nil {
@@ -5392,6 +5631,131 @@ enum FsceneRealizer {
             }
 
             node.addParticleSystem(sys)
+            scheduleParticleBursts(sys, node: node, props: props,
+                                   looping: looping, duration: duration,
+                                   prewarm: Double(sys.warmupDuration),
+                                   index: index, logKey: logKey)
+        }
+
+        /// The action-key prefix every burst schedule runs under — a
+        /// components re-decode strips them with the particle systems.
+        static let burstActionPrefix = "d3burst:"
+
+        /// Per-axis flipbook atlas cap (overflow guard, see decode).
+        static let maxFlipbookAxis = 4096
+        /// Keyframe cap for the fps-flipbook sawtooth controller.
+        static let maxFlipbookKeys = 4096
+
+        /// `bursts` have no SCNParticleSystem knob; each burst becomes
+        /// a copy of the emitter's system that emits `count`
+        /// particles in one 1/60 s window (birthRate·window = count):
+        /// a node action waits `time`, then attaches it. A repeating
+        /// burst (`interval` > 0) loops that window every `interval`
+        /// (`idleDuration`); `cycles`, or a non-looping emitter's
+        /// `duration` (the reference stops spawning there), end it by
+        /// zeroing the copy's birthRate — live particles finish their
+        /// lives. Bursts at/after a non-looping emitter's duration
+        /// never fire. Approximate: SceneKit meters births per frame,
+        /// so counts can be off by a frame's rounding.
+        private func scheduleParticleBursts(
+            _ base: SCNParticleSystem, node: SCNNode,
+            props: [String: Any], looping: Bool, duration: Double,
+            prewarm: Double, index: Int, logKey: String
+        ) {
+            guard let bursts = d3List(props["bursts"]),
+                  !bursts.isEmpty else { return }
+            let window = 1.0 / 60.0
+            var scheduled = 0
+            for (bi, e) in bursts.enumerated() {
+                guard let m = d3Map(e) else { continue }
+                let time = max(d3Double(m["time"]) ?? 0, 0)
+                let count = max(d3Int(m["count"]) ?? 0, 0)
+                let interval = d3Double(m["interval"]) ?? 0
+                let cycles = d3Int(m["cycles"]).map { max($0, 1) }
+                guard count > 0, time.isFinite else { continue }
+                if !looping && time >= duration { continue }
+                guard let sys = base.copy() as? SCNParticleSystem
+                else { continue }
+                sys.birthRate = CGFloat(Double(count) / window)
+                sys.birthRateVariation = 0
+                sys.emissionDuration = CGFloat(window)
+                sys.emissionDurationVariation = 0
+                sys.warmupDuration = 0
+                var stopAfter: Double? = nil   // seconds after start
+                if interval > 0 && interval < window {
+                    // Sub-frame interval: the reference counts every
+                    // interval crossing inside a step, so the burst is
+                    // really a rate — count/interval per second. Emit
+                    // it continuously; a total that fits in one window
+                    // (cycles·interval < window) goes out as one window
+                    // carrying cycles·count births.
+                    let span = cycles.map { Double($0) * interval }
+                    if let span, span < window {
+                        sys.birthRate = CGFloat(
+                            Double(count) * Double(cycles!) / window)
+                        sys.loops = false
+                    } else {
+                        sys.birthRate = CGFloat(Double(count) / interval)
+                        sys.loops = true
+                        sys.idleDuration = 0
+                        stopAfter = span
+                    }
+                } else if interval > 0 {
+                    sys.loops = true
+                    sys.idleDuration = CGFloat(max(interval - window, 0))
+                    if let cycles {
+                        stopAfter = Double(cycles) * interval - window / 2
+                    }
+                } else {
+                    sys.loops = false
+                }
+                if !looping {
+                    let cap = duration - time
+                    stopAfter = min(stopAfter ?? cap, cap)
+                }
+                // Prewarm advances the reference's system clock through
+                // the spawner too, so bursts inside the warmup fire
+                // during it: live start = time − prewarm. A burst that
+                // started in the warmup attaches at once, warmed by
+                // the part of the warmup after its start (its
+                // particles have aged that long); its stop shifts by
+                // the same amount.
+                let delay = time - (prewarm.isFinite ? max(prewarm, 0) : 0)
+                var aged = max(-delay, 0)
+                // A finite repeating burst (cycles, or a non-looping
+                // emitter's duration) whose stop falls inside the
+                // warmup: SceneKit can't stop mid-warmup, so warming the
+                // whole elapsed span would invent extra repetitions.
+                // Fully expired (stop + longest particle life already
+                // passed) → skip; otherwise warm only up to the stop
+                // and zero births on the first frame — the survivors
+                // are younger than the reference's by (aged − stop),
+                // a documented approximation.
+                if interval > 0, let stop = stopAfter, aged > stop {
+                    let maxLife = Double(sys.particleLifeSpan
+                        + sys.particleLifeSpanVariation)
+                    if aged - stop >= maxLife { continue }
+                    aged = max(stop, 0)
+                }
+                sys.warmupDuration = CGFloat(aged)
+                var steps: [SCNAction] = []
+                if delay > 0 { steps.append(.wait(duration: delay)) }
+                steps.append(.run { n in n.addParticleSystem(sys) })
+                if let stop = stopAfter, interval > 0 {
+                    // At least one frame so the warmup runs emitting.
+                    steps.append(.wait(duration: max(stop - aged, window)))
+                    steps.append(.run { _ in sys.birthRate = 0 })
+                }
+                node.runAction(.sequence(steps),
+                    forKey: "\(Self.burstActionPrefix)\(index).\(bi)")
+                scheduled += 1
+            }
+            if scheduled > 0 {
+                host.logOnce("\(logKey).bursts",
+                    "particleEmitter: \(scheduled) burst(s) emulated "
+                    + "with timed SCNParticleSystem copies "
+                    + "(approximate counts)")
+            }
         }
 
         // MARK: Skins / morphs / animations (W11)
