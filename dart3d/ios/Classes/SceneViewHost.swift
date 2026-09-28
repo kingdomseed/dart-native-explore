@@ -892,7 +892,7 @@ final class SceneViewHost: SCNView {
                 // W15: the re-realize discarded the surgically
                 // streamed subtrees with the rest of the scene —
                 // rebuild each from its recorded load batch.
-                replayStreamedSubtrees()
+                replayAfterRealize()
             }
         }
     }
@@ -974,6 +974,7 @@ final class SceneViewHost: SCNView {
         // any pending visible-stamp with them (its node id belongs to
         // the outgoing scene).
         streamedSubtreeOps.removeAll()
+        nodeOpJournal.removeAll()
         subtreeVisibleStamp = nil
         // Shadow-tier registry is per-scene — repopulated by the
         // coming decode's light pass.
@@ -1101,6 +1102,14 @@ final class SceneViewHost: SCNView {
     /// through the same handlers.
     private func applyCommandJson(_ json: [String: Any]) {
         guard let op = json["op"] as? String else { return }
+        commandDepth += 1
+        defer { commandDepth -= 1 }
+        // Declared after the depth defer, so it runs first — the
+        // journal step still sees this dispatch's depth.
+        let journaled = op == "addNode" || op == "updateNode"
+            || op == "removeNode"
+        if journaled { removedCommandAdded.removeAll() }
+        defer { if journaled { journalNodeOp(op, json) } }
         switch op {
         case "removeNode":
             guard let token = json["node"] as? String,
@@ -1228,9 +1237,10 @@ final class SceneViewHost: SCNView {
         }
         if loading {
             if let i = existing {
-                streamedSubtreeOps[i] = (key: key, ops: ops)
+                streamedSubtreeOps[i].ops = ops
             } else {
-                streamedSubtreeOps.append((key: key, ops: ops))
+                opSeq += 1
+                streamedSubtreeOps.append((key: key, ops: ops, seq: opSeq))
             }
         } else if let i = existing {
             streamedSubtreeOps.remove(at: i)
@@ -1273,7 +1283,103 @@ final class SceneViewHost: SCNView {
     /// streamed. A `removeNode` that dooms a placeholder drops its
     /// record, and `applyLoadScene` clears the list — a new
     /// document's session keys invalidate the old batches.
-    private var streamedSubtreeOps: [(key: UInt64, ops: [Any])] = []
+    private var streamedSubtreeOps:
+        [(key: UInt64, ops: [Any], seq: Int)] = []
+
+    /// Top-level structural node ops (`addNode`/`updateNode`/
+    /// `removeNode`) applied since the last `loadScene`, in arrival
+    /// order — the payload-arrival re-realize rebuilds the scene from
+    /// `lastManifest`, which never saw them, so they replay after it
+    /// (interleaved with the subtree records by `seq`, so a subtree
+    /// grafted under a command-added node, or an op on a streamed
+    /// member, lands in its original order). Pruned as it grows: a
+    /// `removeNode` drops every earlier entry for the doomed ids (and
+    /// isn't itself recorded when the target was command-added), and
+    /// an `updateNode` replaces the previous one for the same id and
+    /// flag set. Nested subtree ops aren't recorded — their batch is
+    /// already the subtree's replay record.
+    private var nodeOpJournal:
+        [(key: UInt64, seq: Int, json: [String: Any])] = []
+    private var opSeq = 0
+    /// >0 while `applyCommandJson` is dispatching — nested (subtree
+    /// batch) ops see depth >1 and stay out of the journal.
+    private var commandDepth = 0
+    /// True while `replayAfterRealize` re-applies recorded ops — they
+    /// must neither re-record nor prune the journal they come from.
+    private var replayingOps = false
+
+    /// Records one top-level node op for replay (see `nodeOpJournal`).
+    private func journalNodeOp(_ op: String, _ json: [String: Any]) {
+        guard !replayingOps, commandDepth == 1,
+              let token = json["node"] as? String,
+              let key = D3Wire.localIdKey(token) else { return }
+        switch op {
+        case "removeNode":
+            // `removeSubtree` already pruned the doomed ids' entries;
+            // a node that only ever existed through a journaled
+            // addNode needs no replayed removal.
+            if removedCommandAdded.contains(key) { return }
+        case "updateNode":
+            let flags = Set(json["flags"] as? [String] ?? [])
+            nodeOpJournal.removeAll {
+                $0.key == key && ($0.json["op"] as? String) == "updateNode"
+                    && Set($0.json["flags"] as? [String] ?? []) == flags
+            }
+        default:
+            break
+        }
+        opSeq += 1
+        nodeOpJournal.append((key: key, seq: opSeq, json: json))
+    }
+
+    /// Ids whose journaled `addNode` the current `removeSubtree`
+    /// pruned — consulted by the `removeNode` journal step.
+    private var removedCommandAdded: Set<UInt64> = []
+
+    /// Replays every live subtree record and journaled node op in
+    /// original order — called right after a payload-arrival
+    /// re-realize has rebuilt the manifest scene.
+    private func replayAfterRealize() {
+        if nodeOpJournal.isEmpty {
+            replayStreamedSubtrees()
+            return
+        }
+        enum Entry { case subtree(Int), op(Int) }
+        var entries: [(seq: Int, e: Entry)] = []
+        for (i, r) in streamedSubtreeOps.enumerated() {
+            entries.append((r.seq, .subtree(i)))
+        }
+        for (i, j) in nodeOpJournal.enumerated() {
+            entries.append((j.seq, .op(i)))
+        }
+        entries.sort { $0.seq < $1.seq }
+        let subtrees = streamedSubtreeOps
+        let journal = nodeOpJournal
+        var dead: Set<UInt64> = []
+        replayingOps = true
+        for entry in entries {
+            switch entry.e {
+            case .subtree(let i):
+                let rec = subtrees[i]
+                // Same dead-placeholder rule as replayStreamedSubtrees.
+                guard nodesById[rec.key] != nil else {
+                    dead.insert(rec.key)
+                    continue
+                }
+                for case let opJson as [String: Any] in rec.ops {
+                    applyCommandJson(opJson)
+                }
+            case .op(let i):
+                applyCommandJson(journal[i].json)
+            }
+        }
+        replayingOps = false
+        if !dead.isEmpty {
+            streamedSubtreeOps.removeAll { dead.contains($0.key) }
+        }
+        d3Log("re-realize replay: \(journal.count) node ops, "
+            + "\(subtrees.count - dead.count) subtrees")
+    }
 
     /// Replays each live subtree's recorded load batch through the
     /// ordinary op dispatch — called right after a payload-arrival
@@ -1281,7 +1387,7 @@ final class SceneViewHost: SCNView {
     private func replayStreamedSubtrees() {
         if streamedSubtreeOps.isEmpty { return }
         var dead: Set<UInt64> = []
-        for (key, ops) in streamedSubtreeOps {
+        for (key, ops, _) in streamedSubtreeOps {
             // A replayed batch can doom a later record's placeholder
             // (a priorRoots `removeNode` taking a placeholder grafted
             // into the doomed subtree): `removeSubtree` drops the
@@ -1342,6 +1448,18 @@ final class SceneViewHost: SCNView {
             // — otherwise the next payload-arrival re-realize would
             // resurrect the streamed subtree.
             streamedSubtreeOps.removeAll { $0.key == k }
+            // The journal's entries for a doomed id die too — a
+            // command-added node's addNode must not resurrect it on
+            // the next re-realize (replay itself never prunes).
+            if !replayingOps {
+                if nodeOpJournal.contains(where: {
+                    $0.key == k
+                        && ($0.json["op"] as? String) == "addNode"
+                }) {
+                    removedCommandAdded.insert(k)
+                }
+                nodeOpJournal.removeAll { $0.key == k }
+            }
             // Node ids can't collide with the resource ids keying the
             // consumer maps — these drops are defensive; the real
             // cleanup is the value-list pass below.
