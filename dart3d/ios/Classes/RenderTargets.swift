@@ -461,7 +461,9 @@ extension SceneViewHost {
     /// objects are UIKit: their build and teardown hop to the main
     /// thread, generation-gated so a superseded build can't install.
     /// The render-queue `screenSubviews` list (rec + proxy) is written
-    /// here so per-frame sync never touches UIKit state.
+    /// here so per-frame sync never touches UIKit state. Host UIView
+    /// state (background, scale) is read inside the main hop, never
+    /// here.
     func updateScreenSubviews() {
         screenSubviewBuild += 1
         let gen = screenSubviewBuild
@@ -474,7 +476,7 @@ extension SceneViewHost {
         // resolvable — the lowest-order view keeps the single-view
         // semantics (allowsCameraControl mutates the real node,
         // authored motion reads it directly). Later views draw
-        // through detached proxies synced per frame.
+        // through detached proxies posed per frame.
         screenSubviews = recs.enumerated().map { i, rec in
             let real = i == 0 ? nodesById[rec.cameraKey] : nil
             return ScreenSubview(
@@ -483,9 +485,7 @@ extension SceneViewHost {
         let povs = screenSubviews.map { $0.pov }
         let snapScene = scene
         let snapControl = allowsCameraControl
-        let snapAA = antialiasingMode
-        let snapScale = contentScaleFactor
-        let snapBg = backgroundColor
+        let quality = currentSubviewQuality()
         DispatchQueue.main.async { [weak self] in
             guard let self,
                   self.screenSubviewBuild == gen,
@@ -501,14 +501,13 @@ extension SceneViewHost {
                 sub.autoenablesDefaultLighting = false
                 sub.isUserInteractionEnabled = i == 0
                 sub.allowsCameraControl = i == 0 && snapControl
-                sub.backgroundColor = snapBg
-                sub.antialiasingMode = snapAA
-                sub.contentScaleFactor = snapScale
                 sub.pointOfView = povs[i]
                 self.addSubview(sub)
                 self.mainScreenSubviews.append((view: sub, rec: rec))
             }
-            self.applyScreenSubviewQuality()
+            self.mainScreenSubviewGen = gen
+            self.applyScreenSubviewQuality(quality)
+            self.applySiblingHostState()
         }
     }
 
@@ -517,6 +516,9 @@ extension SceneViewHost {
     /// mid-draw there; removeFromSuperview sequences on main).
     func teardownScreenSubviews() {
         screenSubviews = []
+        siblingPoseLock.lock()
+        siblingPoseSnapshot = nil
+        siblingPoseLock.unlock()
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             for s in self.mainScreenSubviews {
@@ -526,41 +528,76 @@ extension SceneViewHost {
         }
     }
 
-    /// Per-frame sibling point-of-view sync — runs in
+    /// Per-frame sibling point-of-view capture — runs in
     /// `willRenderScene` (post-physics, same hook the offscreen
-    /// scheduler uses) so a sibling's next draw sees the pose this
-    /// frame's screen pass is about to. The proxy gets a COPY of the
-    /// node's camera each frame: the copy carries the view's own
-    /// `layerMask` (the wire mask is per-view; the SCNCamera mask is
-    /// per-object) plus whatever exposure/effects the stage last
-    /// wrote. Index 0's pov is the real node — the mask write lands
-    /// there instead (the same write `applyScreenViewCamera` does).
+    /// scheduler uses). Index 0's pov is the real node — its mask
+    /// write lands on the real camera here, inside the host scene's
+    /// own callback (the same write `applyScreenViewCamera` does).
+    /// Proxy siblings are NOT touched here: their pose (the camera
+    /// node's presentation transform) and a camera COPY carrying the
+    /// view's `layerMask` are snapshotted for the main-thread poke,
+    /// which applies them right before `setNeedsDisplay` — writing the
+    /// detached proxies on this queue raced the siblings' own draws
+    /// (a torn pose: new transform, old camera, or half a matrix).
     /// A camera that stops resolving keeps its sibling's last pose.
+    /// The leading sibling rebinds when its camera node was replaced
+    /// under the same id (a remove + re-add left the sibling on the
+    /// detached old node) or first becomes resolvable.
     func syncScreenSubviews() {
-        for s in screenSubviews {
+        var poses: [Int: (SCNMatrix4, SCNCamera)] = [:]
+        for (i, s) in screenSubviews.enumerated() {
             guard let camNode = nodesById[s.rec.cameraKey],
                   let cam = camNode.camera else { continue }
             let mask = s.rec.layerMask == UInt32.max
                 ? Int(bitPattern: UInt.max) : Int(s.rec.layerMask)
+            if i == 0 && (!s.drivesRealNode || camNode !== s.pov) {
+                logOnce("w24.rebind.\(s.rec.cameraKey)",
+                    "split view camera \(s.rec.cameraKey) (re)bound; "
+                    + "rebuilding sibling views")
+                updateScreenSubviews()
+                return
+            }
             if s.drivesRealNode {
                 cam.categoryBitMask = mask
                 continue
             }
-            s.pov.transform = camNode.presentation.worldTransform
             if let copy = cam.copy() as? SCNCamera {
                 copy.categoryBitMask = mask
-                s.pov.camera = copy
+                poses[i] = (camNode.presentation.worldTransform, copy)
             }
         }
+        siblingPoseLock.lock()
+        siblingPoseSnapshot = poses.isEmpty
+            ? nil : (gen: screenSubviewBuild, poses: poses)
+        siblingPoseLock.unlock()
     }
 
     /// Pokes every sibling for a redraw — called from
     /// `didRenderScene`. The list lives on main; the hop is once per
-    /// host frame and the draws land on the next display commit.
+    /// host frame and the draws land on the next display commit. The
+    /// frame's pose snapshot applies first, in one transaction, so
+    /// the requested draw sees one consistent pose.
     func pokeScreenSubviews() {
         guard multiScreenMode else { return }
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
+            self.siblingPoseLock.lock()
+            let snap = self.siblingPoseSnapshot
+            self.siblingPoseSnapshot = nil
+            self.siblingPoseLock.unlock()
+            if let snap, snap.gen == self.mainScreenSubviewGen {
+                SCNTransaction.begin()
+                SCNTransaction.disableActions = true
+                for (i, pose) in snap.poses
+                where i < self.mainScreenSubviews.count {
+                    guard let pov =
+                        self.mainScreenSubviews[i].view.pointOfView
+                    else { continue }
+                    pov.transform = pose.0
+                    pov.camera = pose.1
+                }
+                SCNTransaction.commit()
+            }
             for s in self.mainScreenSubviews {
                 s.view.setNeedsDisplay()
             }
@@ -578,12 +615,15 @@ extension SceneViewHost {
     /// `[l,b,w,h]` target-pixel rect → a UIKit points frame. The wire
     /// origin is bottom-left (Filament's convention — the dart3d
     /// contract mirrors it); UIKit's is top-left, so y flips against
-    /// the target height. Target pixels = the host drawable:
-    /// bounds × contentScaleFactor (renderScale rides it, so a scaled
-    /// pass keeps the rect proportional). Absent/malformed → bounds.
+    /// the target height. Target pixels are DEVICE pixels — bounds ×
+    /// the screen scale, the same basis Android's surface size uses.
+    /// `contentScaleFactor` is not the basis: it also carries the
+    /// dynamic `renderScale`, and a quality knob must not move or
+    /// resize split views. Absent/malformed → bounds. Main thread.
     private func screenSubviewFrame(_ vp: [Double]?) -> CGRect {
         guard let vp, vp.count == 4 else { return bounds }
-        let s = contentScaleFactor > 0 ? contentScaleFactor : 1.0
+        let sc = window?.screen.scale ?? UIScreen.main.scale
+        let s = sc > 0 ? sc : 1.0
         let targetH = bounds.height * s
         return CGRect(
             x: vp[0] / s,
@@ -592,28 +632,66 @@ extension SceneViewHost {
             height: vp[3] / s)
     }
 
+    /// Render-queue snapshot of the inputs a sibling's quality
+    /// resolve needs — handed to the main hop so the main side never
+    /// reads render-queue state.
+    struct SubviewQuality {
+        var stageAntiAliasing: String
+        var stageRenderScale: Double
+        var hostAA: SCNAntialiasingMode
+        var screenScale: CGFloat
+    }
+
+    func currentSubviewQuality() -> SubviewQuality {
+        SubviewQuality(stageAntiAliasing: stageAntiAliasing,
+                       stageRenderScale: stageRenderScale,
+                       hostAA: antialiasingMode,
+                       screenScale: screenScale)
+    }
+
     /// Per-sibling quality resolve — view `antiAliasing` (non-'auto')
-    /// > stage (non-'auto') > the sibling's init mode (the host's at
-    /// build); `renderScale` (view > stage) multiplies the screen
-    /// scale into `contentScaleFactor`, the same approximate path
-    /// `applyStageQuality` uses. Runs on main — called from
-    /// `applyStageQuality` and at build.
-    func applyScreenSubviewQuality() {
+    /// > stage (non-'auto') > the host's inherited mode (viewConfig /
+    /// quality tier / setup default — re-applied on every call, so an
+    /// inherited change or a stage switch back to 'auto' reaches the
+    /// visible siblings); `renderScale` (view > stage) multiplies the
+    /// screen scale into `contentScaleFactor`, the same approximate
+    /// path `applyStageQuality` uses. Runs on main — called from
+    /// `applyStageQuality`'s main hop and at build.
+    func applyScreenSubviewQuality(_ q: SubviewQuality) {
         for s in mainScreenSubviews {
             let req = s.rec.aaMode.flatMap { $0 == "auto" ? nil : $0 }
-                ?? (stageAntiAliasing != "auto" ? stageAntiAliasing : nil)
+                ?? (q.stageAntiAliasing != "auto"
+                    ? q.stageAntiAliasing : nil)
             switch req {
             case "none": s.view.antialiasingMode = .none
             case "msaa": s.view.antialiasingMode = .multisampling4X
-            case nil: break
+            case nil: s.view.antialiasingMode = q.hostAA
             default:
+                s.view.antialiasingMode = q.hostAA
                 logOnce("w24.aa.screen.\(req!)",
                     "antiAliasing '\(req!)' unsupported on SceneKit "
                     + "screen views; using the view's mode")
             }
-            s.view.contentScaleFactor =
-                (s.rec.renderScale ?? stageRenderScale)
-                    * (window?.screen.scale ?? UIScreen.main.scale)
+            let target = CGFloat(s.rec.renderScale ?? q.stageRenderScale)
+                * q.screenScale
+            if s.view.contentScaleFactor != target {
+                s.view.contentScaleFactor = target
+            }
+        }
+    }
+
+    /// Copies the host's view-level state onto the split siblings —
+    /// they cover the host, so a host-only write is invisible:
+    /// `backgroundColor`, the TAA flag, and the statistics overlay
+    /// (sibling 0 only — one overlay, on the lowest-order view that
+    /// also owns camera control). Main thread; called at build and
+    /// whenever viewConfig/stage effects change one of them.
+    func applySiblingHostState() {
+        for (i, s) in mainScreenSubviews.enumerated() {
+            s.view.backgroundColor = backgroundColor
+            s.view.isTemporalAntialiasingEnabled =
+                isTemporalAntialiasingEnabled
+            s.view.showsStatistics = i == 0 && showsStatistics
         }
     }
 }
