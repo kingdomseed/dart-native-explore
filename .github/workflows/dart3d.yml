@@ -1,0 +1,36 @@
+name: dart3d
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  dart:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dart3d/example
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install DartNative SDK
+        working-directory: .
+        run: |
+          curl -fsSL https://cdn.dartnative.com/install.sh | sh
+          echo "$HOME/zero/bin" >> "$GITHUB_PATH"
+          echo "engine=$(cat "$HOME/zero/bin/internal/engine.version")" >> "$GITHUB_OUTPUT"
+        id: sdk
+      # Keyed on the installed engine hash so an SDK release never restores
+      # artifacts from the previous engine.
+      - name: Cache DartNative engine artifacts
+        uses: actions/cache@v4
+        with:
+          path: ~/zero/bin/cache
+          key: dn-cache-${{ runner.os }}-${{ steps.sdk.outputs.engine }}
+      - name: Finish the SDK update
+        working-directory: .
+        run: dn upgrade
+      - run: dn --version
+      - run: dn pub get
+      - run: dn analyze
+      - run: dn test
