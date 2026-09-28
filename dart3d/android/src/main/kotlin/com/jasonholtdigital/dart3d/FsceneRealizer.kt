@@ -1483,6 +1483,12 @@ object FsceneRealizer {
             // returns before re-registering) leaves updateCameraFacing
             // uploading into a destroyed buffer.
             host.cameraFacing.remove(key)
+            // The rebuild re-registers its (entity, 0) consumer pair —
+            // drop the old one first, or repeated payload rebakes grow
+            // the list and a material upsert rebinds the slot N times.
+            for ((_, list) in materialConsumers) {
+                list.removeAll { it.first == rec.entity }
+            }
             val rm = host.engine.renderableManager
             if (rm.hasComponent(rec.entity)) rm.destroy(rec.entity)
             rec.procGpuMesh?.let {

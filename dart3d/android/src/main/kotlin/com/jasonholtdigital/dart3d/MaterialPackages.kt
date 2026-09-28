@@ -212,6 +212,23 @@ internal object MaterialPackages {
         t.start()
     }
 
+    private val prewarmAttempts = ConcurrentHashMap<String, Int>()
+    private const val MAX_PREWARM_ATTEMPTS = 2
+
+    /** The base package keys a view needs before it can render. */
+    fun baseKeys(api: MaterialBuilder.TargetApi): List<String> {
+        val keys = ArrayList<String>()
+        for (unlit in listOf(false, true)) {
+            for (mode in listOf(MaterialBuilder.BlendingMode.OPAQUE,
+                    MaterialBuilder.BlendingMode.MASKED,
+                    MaterialBuilder.BlendingMode.TRANSPARENT)) {
+                keys += litKey(unlit, mode, 0, FsceneRealizer.ALL_BASE_SLOTS, api)
+            }
+        }
+        keys += trailKey(api)
+        return keys
+    }
+
     private fun startPrewarm(api: MaterialBuilder.TargetApi) {
         if (!prewarmStarted.add(api.name)) return
         val t = Thread({
@@ -240,9 +257,24 @@ internal object MaterialPackages {
                 // docs/triage/integration.md. A view compiles them on
                 // main at first use, as before 6b4dcca.
             } catch (t: Throwable) {
-                // A prewarm failure only costs the cache — the view
-                // compiles (and reports) on its own path.
+                // A throw (MaterialBuilder.init, a native linkage or
+                // runtime error) creates neither a cache entry nor a
+                // `failed` key, and views only poll the cache for the
+                // base set — so without handling this they'd wait
+                // forever behind a blank surface. Clear the started
+                // marker so the next view's prewarm retries; after
+                // MAX_PREWARM_ATTEMPTS mark the missing base packages
+                // failed, which views surface as a visible init error.
                 Log.w(TAG, "material prewarm failed", t)
+                val attempts = prewarmAttempts.merge(api.name, 1, Int::plus) ?: 1
+                if (attempts >= MAX_PREWARM_ATTEMPTS) {
+                    for (key in baseKeys(api)) {
+                        if (lookup(key) == null) failed.add(key)
+                    }
+                    Log.e(TAG, "material prewarm for ${api.name} failed" +
+                        " $attempts times — base packages marked failed")
+                }
+                prewarmStarted.remove(api.name)
             } finally {
                 if (stale()) prewarmStarted.remove(api.name)
             }
