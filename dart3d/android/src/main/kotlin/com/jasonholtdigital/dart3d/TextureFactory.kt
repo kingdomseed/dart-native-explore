@@ -48,6 +48,22 @@ object TextureFactory {
     private external fun nKtx2Decode(
         nativeEngine: Long, bytes: ByteArray, srgb: Boolean): Long
 
+    private external fun nKtx2Release(nativeEngine: Long)
+
+    /**
+     * Frees the KTX2 provider bound to [engine] (created lazily on the
+     * first ktx2 decode). Call on the Filament thread immediately
+     * BEFORE `engine.destroy()` — the provider references its Engine,
+     * so it must die first; a no-op when no ktx2 was ever decoded.
+     */
+    fun releaseEngine(engine: Engine) {
+        try {
+            nKtx2Release(engine.getNativeObject())
+        } catch (e: UnsatisfiedLinkError) {
+            // dart3d_jni failed to load — nothing was ever created.
+        }
+    }
+
     /** Outcome of one texture-resource decode. */
     sealed class Result {
         /** Upload succeeded — bind this texture. */

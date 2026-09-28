@@ -1358,9 +1358,54 @@ class Dart3dView(context: Context) : FrameLayout(context) {
 
     // MARK: - Lifecycle
 
+    /** True while the view is off-window but not released — the frame
+     * loop is parked and resumes on the next attach. */
+    private var paused = false
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        if (detached) {
+            // Re-attached after release: nothing can draw. Say so —
+            // this is the silent-blank "zombie" the audit flagged.
+            Log.e(TAG, "dart3d view $viewId re-attached after release " +
+                "($releaseReason) — it cannot render; the framework " +
+                "should have created a new view")
+            return
+        }
+        if (paused) {
+            paused = false
+            lastFrameNanos = 0L
+            Choreographer.getInstance().postFrameCallback(frameCallback)
+            Log.i(TAG, "dart3d view $viewId re-attached; frame loop resumed")
+        }
+    }
+
     override fun onDetachedFromWindow() {
+        if (Dart3dBridge.frameworkDisposes && !detached) {
+            // The framework will call disposeView when the element
+            // really goes away; a window detach (activity recreate,
+            // re-parenting on a warm relaunch) only parks the loop.
+            // Releasing here left a re-attached view with a destroyed
+            // Engine that Dart kept driving — blank, no error.
+            paused = true
+            Choreographer.getInstance().removeFrameCallback(frameCallback)
+        } else {
+            release("onDetachedFromWindow")
+        }
+        super.onDetachedFromWindow()
+    }
+
+    private var releaseReason = ""
+
+    /**
+     * Destroys every Filament/Jolt object this view owns. Idempotent;
+     * runs on main (disposeView, or detach on frameworks without it).
+     */
+    fun release(reason: String) {
         if (!detached) {
             detached = true
+            releaseReason = reason
+            Log.i(TAG, "dart3d view $viewId released ($reason)")
             Choreographer.getInstance().removeFrameCallback(frameCallback)
             // detach() fires onDetachedFromSurface → destroys the swap
             // chain while the engine is still alive.
@@ -1462,9 +1507,12 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             engine.destroyScene(scene)
             engine.destroyCameraComponent(cameraEntity)
             EntityManager.get().destroy(cameraEntity)
+            // The KTX2 provider references this Engine — free it
+            // first so a later Engine at the same address can never
+            // inherit it (audit P1: leak + use-after-free).
+            TextureFactory.releaseEngine(engine)
             engine.destroy()
         }
-        super.onDetachedFromWindow()
     }
 
     // MARK: - Mutation application (mirrors SceneViewHost)
@@ -1484,8 +1532,17 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     // decode, not N. Only touched on the drain thread.
     private var realizePending = false
 
+    private var warnedDeadMutation = false
+
     fun onMutation(id: Long, eventTag: Int, data: ByteArray) {
-        if (detached) return
+        if (detached) {
+            if (!warnedDeadMutation) {
+                warnedDeadMutation = true
+                Log.e(TAG, "dart3d view $id: mutation after release " +
+                    "($releaseReason) — dropped; the view is dead")
+            }
+            return
+        }
         pendingWork.offer {
             viewId = id
             if (eventTag == D3_MSG_HELLO) {
