@@ -7,6 +7,7 @@ import 'package:dart3d/dart3d.dart';
 import 'package:dartnative/dartnative.dart' show dnLog;
 import 'package:vector_math/vector_math.dart';
 
+import 'light_aim.dart';
 import 'phase_timers.dart';
 
 /// Builds the W0 feature-matrix scene: the die-and-slab roll plus one
@@ -1212,17 +1213,15 @@ final class FeatureScene {
     doc.createNode(
       name: 'key',
       transform: TrsTransform(
-        rotation: Quaternion.axisAngle(
-          Vector3(0.7, 0.0, 0.7)..normalize(),
-          -0.8,
-        ),
+        // Travels down and away from the camera (upstream +Z travel).
+        rotation: aimAlong(Vector3(0.152, -0.507, 0.848)),
       ),
       components: [
         ComponentSpec(
           'directionalLight',
           properties: {
             'color': ColorValue(1, 1, 1, 1),
-            'intensity': DoubleValue(1400),
+            'intensity': DoubleValue(keyLightIntensity(1400)),
             'castsShadow': BoolValue(true),
             // W6 shadow lane — iOS reads these as
             // shadowRadius/shadowBias; Android maps them onto Filament
@@ -3695,7 +3694,7 @@ final class FeatureScene {
             'directionalLight',
             properties: {
               'color': ColorValue(1, 1, 1, 1),
-              'intensity': DoubleValue(1400),
+              'intensity': DoubleValue(keyLightIntensity(1400)),
               'castsShadow': BoolValue(true),
               // W6 fields — kept so the pass is a superset, not a swap.
               'shadowRadius': DoubleValue(3.0),

@@ -20,6 +20,8 @@ import 'package:dart3d/src/vertex_pack.dart';
 import 'package:dart3d/src/world_bounds.dart';
 import 'package:vector_math/vector_math.dart';
 
+import 'light_aim.dart';
+
 /// One showcase entry: the cycler label, its bundle key, and the
 /// capability line shown under it.
 final class ShowcaseItem {
@@ -276,17 +278,15 @@ ShowcaseScene? loadShowcaseScene(
   doc.createNode(
     name: 'showcase.key',
     transform: TrsTransform(
-      rotation: Quaternion.axisAngle(
-        Vector3(0.6, 0.3, 0.74)..normalize(),
-        -0.85,
-      ),
+      // Travels down and away from the camera (upstream +Z travel).
+      rotation: aimAlong(Vector3(0.3, -0.8, 0.5)),
     ),
     components: [
       ComponentSpec(
         'directionalLight',
         properties: {
           'color': ColorValue(1.0, 0.95, 0.88, 1),
-          'intensity': DoubleValue(1300),
+          'intensity': DoubleValue(keyLightIntensity(1300)),
           'castsShadow': BoolValue(true),
           'shadowRadius': DoubleValue(3.0),
           'shadowDepthBias': DoubleValue(0.01),
@@ -305,7 +305,7 @@ ShowcaseScene? loadShowcaseScene(
         'pointLight',
         properties: {
           'color': ColorValue(0.62, 0.72, 1.0, 1),
-          'intensity': DoubleValue(700 * radius),
+          'intensity': DoubleValue(keyLightIntensity(700 * radius)),
           'range': DoubleValue(radius * 24),
         },
       ),
