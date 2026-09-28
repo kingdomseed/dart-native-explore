@@ -54,7 +54,12 @@ enum GeometryFactory {
     /// sources the payload decoder emits, so materials bind
     /// identically on procedural and payload meshes.
     static func makeGeometry(_ parts: MeshParts) -> SCNGeometry {
-        guard parts.vertexCount > 0 else { return SCNGeometry() }
+        // Empty streams (a facing mesh whose segments all collapsed,
+        // an empty bake) become an empty geometry — never a
+        // force-unwrapped empty buffer.
+        guard parts.vertexCount > 0, !parts.indices.isEmpty else {
+            return SCNGeometry()
+        }
         var sources = [SCNGeometrySource]()
         parts.positions.withUnsafeBufferPointer {
             sources.append(floatSource(
@@ -801,7 +806,9 @@ enum GeometryFactory {
             }
         }
         stitchRings(&b, ringBases, radialSegments + 1)
-        if caps {
+        // A closed path's first and last rings share the loop seam —
+        // caps there would be coincident internal triangles.
+        if caps && !closed {
             tubeCap(&b, frames.first!, radius, radialSegments, atEnd: false)
             tubeCap(&b, frames.last!, radius, radialSegments, atEnd: true)
         }
@@ -1097,8 +1104,24 @@ enum GeometryFactory {
                        tangent: tangent,
                        uv1: hasUv1 ? base.uv1s[v] : nil)
             }
-            for idx in base.indices {
-                b.parts.indices.append(idx + UInt32(base0))
+            // A reflection (negative determinant) reverses the
+            // transformed triangles' orientation — swap each
+            // triangle's last two indices so single-sided materials
+            // still see the front faces.
+            if flip < 0 {
+                var t = 0
+                while t + 2 < base.indices.count {
+                    b.parts.indices.append(base.indices[t] + UInt32(base0))
+                    b.parts.indices.append(
+                        base.indices[t + 2] + UInt32(base0))
+                    b.parts.indices.append(
+                        base.indices[t + 1] + UInt32(base0))
+                    t += 3
+                }
+            } else {
+                for idx in base.indices {
+                    b.parts.indices.append(idx + UInt32(base0))
+                }
             }
         }
         return b.parts
