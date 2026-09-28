@@ -3406,15 +3406,32 @@ object FsceneRealizer {
             rec: NodeRec, p: JSONObject, type: LightManager.Type,
         ) {
             val builder = LightManager.Builder(type)
-            // Emission axis. Wire lights emit along their local −Z
-            // (the example scenes aim +Z at the negated direction);
-            // the z-mirror conversion (S·R·S) turns wire-local −Z into
-            // Filament-local +Z. Filament's builder default is
-            // (0,−1,0) — left unset, every light shone along a
-            // rotated −Y: directional keys grazed the scene and cast
-            // shadows away from every receiver (the "inert shadow
-            // chain" of the stabilization audit).
-            builder.direction(0f, 0f, 1f)
+            // Travel direction in the node's local (wire) space — the
+            // upstream flutter_scene 0.23.0 contract:
+            //  * directionalLight: `localDirection` when serialized,
+            //    else wire-local +Z (DirectionalLightComponent
+            //    .worldDirection = rotation × (0,0,1)).
+            //  * spotLight: `direction` (SpotLightComponent; codec
+            //    default (0,−1,0)).
+            // The z-mirror conversion (S·R·S) maps a wire-local vector
+            // v to Filament-local S·v, so wire +Z is Filament (0,0,−1).
+            // Filament's builder default is (0,−1,0): left unset (as
+            // it was), directional keys grazed the scene and cast
+            // shadows away from every receiver — the audit's "inert
+            // shadow chain".
+            val wireDir: DoubleArray? = when (type) {
+                LightManager.Type.DIRECTIONAL ->
+                    p.tag("localDirection").d3Vec3()
+                        ?: doubleArrayOf(0.0, 0.0, 1.0)
+                LightManager.Type.FOCUSED_SPOT, LightManager.Type.SPOT ->
+                    p.tag("direction").d3Vec3()
+                        ?: doubleArrayOf(0.0, -1.0, 0.0)
+                else -> null
+            }
+            wireDir?.let {
+                val d = D3Wire.position(it)
+                builder.direction(d[0], d[1], d[2])
+            }
             p.tag("color").d3Color()?.let {
                 builder.color(it[0], it[1], it[2])
             }
@@ -3504,9 +3521,8 @@ object FsceneRealizer {
                 // Unmapped upstream `DirectionalLightCodec` members —
                 // warned here, outside the castsShadow gate, since
                 // they aren't shadow fields: `priority` (feature
-                // priority) and `localDirection` (travel dir; dart3d
-                // aims lights by node transform).
-                for (field in listOf("priority", "localDirection")) {
+                // priority). `localDirection` is honored above.
+                for (field in listOf("priority")) {
                     if (p.tag(field) != null) {
                         warnOnce("w24.directional.$field",
                             "directionalLight '$field' is an " +
