@@ -180,6 +180,53 @@ keep only their latest entry per target. Checked:
 | setTransforms (binary message, not a command) | yes (nodes rebuilt at the manifest TRS) | **not replayed, same limitation:** live transform writes revert until the next write. Most producers (physics sync, camera rig) rewrite every frame. Fix together with the body state above (M) |
 | query / render | no (read-only / one-shot) | nothing to replay |
 
+## PR #16 review, round 6 (Codex, 4 threads)
+
+No device use. Green: `compileReleaseKotlin`, JVM tests 34/34, `dn test`
+dart3d 273 / example 126.
+
+| Comment id | File:line | Verdict | Draft reply |
+|---|---|---|---|
+| 4127109903 | Dart3dView.kt:808 | FIXED | Confirmed: `failTerminal()` removes the callback, but the `doFrame` that called it then re-posted unconditionally. `doFrame` now re-arms only while the view is neither detached nor terminally failed. |
+| 4127109916 | Dart3dView.kt:637 | FIXED | Confirmed. The eager property allocations that run before `init` (`createRenderer`/`createScene`/`createView`, `SurfaceView`, `UiHelper`, `JoltWorld`) now go through `guarded { }`. On a throw it frees the KTX2 provider and calls `engine.destroy()` (which also frees the objects it created), then rethrows. `createEngine()` itself allocates nothing on failure. |
+| 4127109921 | Dart3dView.kt:2161 | FIXED | Confirmed: latest-wins compaction can move a render-target upsert behind the `updateViews` that depends on it. The (single, latest) `updateViews` entry now replays after every other journal entry and subtree. Nothing depends on views, and everything views resolve (targets, cameras) is restored by then. |
+| 4127109932 | Dart3dView.kt:2154 | FIXED (P1, real) | Confirmed: `install()` pruned joints against the bare manifest node set, before replay re-created command-added nodes. During a deferred-payload re-realize the prune is now deferred until after the journal replay, and runs against the live node set. `JoltWorld` re-pends joints whose bodies were removed, and re-realizes them when the replayed nodes' bodies are added. A new document (`loadScene`) still prunes at install. |
+
+**Round 6 and the surface lifecycle:** only the `doFrame` re-arm guard
+touches the frame callback. It adds a stop condition (terminal or
+detached) and changes nothing on the surface/swapchain path.
+
+### Follow-up issue (not fixed here): Vulkan warm-relaunch crash
+
+T2 on c679636 found that a Vulkan warm relaunch crashes ~60 ms after
+resume in `Renderer.nBeginFrame` ("Cannot present in swapchain
+error=-1000000000", i.e. `VK_ERROR_SURFACE_LOST_KHR`, plus "enumerate size
+error"). origin/main crashes too, with `vkCreateAndroidSurfaceKHR
+error=-1000000001` (`VK_ERROR_NATIVE_WINDOW_IN_USE_KHR`). My understanding
+of the cause, not device-verified:
+
+- `UiHelper.RendererCallback.onDetachedFromSurface` and
+  `onNativeWindowChanged` call `engine.destroySwapChain()` and return
+  immediately. Filament's destroy is **asynchronous**: the driver thread
+  still holds the `VkSurfaceKHR`/`ANativeWindow` after
+  `surfaceDestroyed` returns and Android tears the window down. Filament's
+  Android samples call `engine.flushAndWait()` right after
+  `destroySwapChain` in `onDetachedFromSurface` for exactly this reason.
+- **On main:** the old view is released on detach, but its Engine's
+  teardown hasn't finished when the new activity's view creates a surface
+  on the same (or a recycled) native window. The window is still
+  connected, which gives `NATIVE_WINDOW_IN_USE`.
+- **On this branch:** detach only parks the view when `disposeView`
+  exists. The first `beginFrame` after resume presents to a swapchain whose
+  window Android already destroyed, which gives `SURFACE_LOST`. That
+  happens either because the destroy was never flushed, or because a
+  swapchain created in `onNativeWindowChanged` raced the old one's async
+  destruction.
+- **Proposed fix (S):** after each `destroySwapChain` in
+  `onDetachedFromSurface`/`onNativeWindowChanged`, call
+  `engine.flushAndWait()`. Also skip `render()` while `uiHelper` reports
+  no valid surface. Verify with a Vulkan warm-relaunch loop on the A142.
+
 ## Needs other owner
 
 - **Dart (example): other hard-coded light rotations assume −Z emission.**

@@ -71,13 +71,31 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     // MARK: - Filament objects (created eagerly — none need the surface)
 
     val engine: Engine = createEngine()
-    private val renderer: Renderer = engine.createRenderer()
-    val scene: Scene = engine.createScene()
-    private val view: View = engine.createView()
+    // Eager allocations run before `init`'s cleanup guard — each is
+    // wrapped so a throw destroys the Engine (and all it owns) before
+    // the exception reaches the bridge.
+    private val renderer: Renderer = guarded { engine.createRenderer() }
+    val scene: Scene = guarded { engine.createScene() }
+    private val view: View = guarded { engine.createView() }
     private var swapChain: SwapChain? = null
 
-    private val surfaceView = SurfaceView(context)
-    private val uiHelper = UiHelper(UiHelper.ContextErrorPolicy.DONT_CHECK)
+    private val surfaceView = guarded { SurfaceView(context) }
+    private val uiHelper =
+        guarded { UiHelper(UiHelper.ContextErrorPolicy.DONT_CHECK) }
+
+    /**
+     * Runs an eager property allocation; on a throw frees the Engine
+     * (which destroys the renderer/scene/view it created) and the KTX2
+     * provider, then rethrows. Used only for initializers that run
+     * before `init` (whose own catch covers the rest).
+     */
+    private inline fun <T> guarded(block: () -> T): T = try {
+        block()
+    } catch (t: Throwable) {
+        try { TextureFactory.releaseEngine(engine) } catch (_: Throwable) {}
+        try { engine.destroy() } catch (_: Throwable) {}
+        throw t
+    }
 
     /**
      * W30 backend selection, resolved once per engine. An explicit
@@ -248,7 +266,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
 
     // MARK: - Jolt world
 
-    val world = JoltWorld()
+    val world = guarded { JoltWorld() }
 
     // MARK: - Registries (mirrors SceneViewHost)
 
@@ -553,6 +571,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 Log.w(TAG, "slow frame ${ms}ms on main: ops=$lastDrainCount" +
                     " realize=$lastFrameRealized")
             }
+            // failTerminal()/release() inside stepFrame removed the
+            // callback, but this doFrame is still executing — don't
+            // re-arm a dead view (it would poll every vsync forever).
+            if (detached || materialsFailed) return
             Choreographer.getInstance().postFrameCallback(this)
         }
     }
@@ -2518,9 +2540,18 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             // Journal order interleaves plain ops and subtree loads
             // exactly as they arrived, so a plain node parented under
             // a streamed member (or vice versa) resolves.
+            // updateViews resolves render targets and cameras but
+            // nothing depends on it, while latest-wins compaction can
+            // move a render-target upsert after it — so the (single,
+            // latest) views entry replays after everything else.
+            var views: JSONObject? = null
             for (e in surgicalJournal.toList()) {
                 when (e) {
                     is JournalEntry.Plain -> {
+                        if (e.op.optString("op") == "updateViews") {
+                            views = e.op
+                            continue
+                        }
                         applyCommandJson(e.op)
                         plain++
                     }
@@ -2530,6 +2561,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             // Records not reached through the journal (a subtree
             // loaded by a nested batch) keep the old replay path.
             for (key in streamedSubtreeOps.keys.toList()) replaySubtree(key)
+            views?.let {
+                applyCommandJson(it)
+                plain++
+            }
         } finally {
             replayingJournal = false
         }
@@ -3852,7 +3887,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // keeps its joint — removeBody re-pends it and the fresh
         // body's addBody re-realizes it; LocalId session keys differ
         // across documents so a stale joint can't attach).
-        world.retainJointsForNodes(nodes.keys)
+        // A deferred-payload re-realize prunes joints only after the
+        // journal replay, when command-added nodes exist again —
+        // pruning against the bare manifest dropped joints on them.
+        if (!deferJointPrune) world.retainJointsForNodes(nodes.keys)
         // W18: particle runtimes own entities + buffers — retire them
         // BEFORE the node sweep (mesh pool slots are transform
         // children of node entities).
@@ -4427,6 +4465,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     // MARK: - Frame pipeline
 
     private var lastDrainCount = 0
+    /** Set around a deferred-payload re-realize + replay. */
+    private var deferJointPrune = false
     private var lastFrameRealized = false
 
     private fun stepFrame(tNanos: Long) {
@@ -4478,12 +4518,21 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 // of replaying the anim-op history, so playback time
                 // continues where it was.
                 val clips = HashMap(animClips)
-                FsceneRealizer.realize(manifest, this,
-                    preserveStage = true)
-                // W15: the re-realize discarded the surgically
-                // streamed subtrees with the rest of the scene —
-                // rebuild each from its recorded load batch.
-                replayStreamedSubtrees()
+                deferJointPrune = true
+                try {
+                    FsceneRealizer.realize(manifest, this,
+                        preserveStage = true)
+                    // W15: the re-realize discarded the surgically
+                    // streamed subtrees with the rest of the scene —
+                    // rebuild each from its recorded load batch.
+                    replayStreamedSubtrees()
+                } finally {
+                    deferJointPrune = false
+                }
+                // Joints on nodes that didn't come back die now;
+                // joints on replayed nodes re-realize as their bodies
+                // are re-added (JoltWorld re-pends on removeBody).
+                world.retainJointsForNodes(nodesById.keys)
                 for ((k, c) in clips) {
                     if (resources.animations.containsKey(k) &&
                         !animClips.containsKey(k)) {
