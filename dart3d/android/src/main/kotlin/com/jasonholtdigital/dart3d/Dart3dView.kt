@@ -512,7 +512,16 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     private val frameCallback = object : Choreographer.FrameCallback {
         override fun doFrame(tNanos: Long) {
             if (detached) return
+            val t0 = android.os.SystemClock.uptimeMillis()
             stepFrame(tNanos)
+            val ms = android.os.SystemClock.uptimeMillis() - t0
+            // Everything here runs on main (Choreographer) — a long
+            // frame blocks input dispatch. Surface it so an ANR has a
+            // culprit in logcat even from a release build.
+            if (ms >= SLOW_FRAME_MS) {
+                Log.w(TAG, "slow frame ${ms}ms on main: ops=$lastDrainCount" +
+                    " realize=$lastFrameRealized")
+            }
             Choreographer.getInstance().postFrameCallback(this)
         }
     }
@@ -723,413 +732,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         extFlags: Int = 0,
         boundSlots: Int = 0,
     ): Material? {
-        // MaterialBuilder.init() is a one-time static init of the
-        // filamat backend — the builder itself is a fresh instance.
-        if (!filamatReady) {
-            MaterialBuilder.init()
-            filamatReady = true
-        }
-        val blendSuffix = when (blending) {
-            MaterialBuilder.BlendingMode.OPAQUE -> ""
-            MaterialBuilder.BlendingMode.MASKED -> "_mask"
-            else -> "_blend"
-        }
-        val extSuffix = if (extFlags != 0) "_e$extFlags" else ""
-        val b = MaterialBuilder()
-            .platform(MaterialBuilder.Platform.MOBILE)
-            // W30: SPIR-V under Vulkan, GLSL under OpenGL — matched to
-            // the backend the engine actually resolved (incl. fallback).
-            // (TargetApi.ALL would be tempting; it doesn't emit Vulkan.)
-            .targetApi(if (engine.backend == Engine.Backend.VULKAN)
-                MaterialBuilder.TargetApi.VULKAN
-                else MaterialBuilder.TargetApi.OPENGL)
-            .name((if (unlit) "d3_unlit" else "d3_lit") + blendSuffix +
-                extSuffix)
-            .shading(if (unlit) MaterialBuilder.Shading.UNLIT
-                else MaterialBuilder.Shading.LIT)
-            // Baked capability so MaterialInstance.setDoubleSided works —
-            // every instance is reset to single-sided at decode unless the
-            // resource opts in (glTF/SceneKit default).
-            .doubleSided(true)
-            .blending(blending)
-        if (extFlags and FsceneRealizer.EXT_TRANSMISSION != 0) {
-            // KHR_materials_transmission → screen-space refraction;
-            // KHR_materials_volume (thickness>0) upgrades the variant
-            // to SOLID so `material.thickness`/`dispersion` are legal
-            // — THIN reads the same thickness uniform as
-            // `microThickness`.
-            b.refractionMode(MaterialBuilder.RefractionMode.SCREEN_SPACE)
-                .refractionType(
-                    if (extFlags and FsceneRealizer.EXT_VOLUME_SOLID != 0)
-                        MaterialBuilder.RefractionType.SOLID
-                    else MaterialBuilder.RefractionType.THIN)
-        }
-        if (extFlags and FsceneRealizer.EXT_CLEARCOAT != 0) {
-            // glTF's fixed-IOR (1.5) coat attenuates the lobes beneath
-            // it — Filament models exactly that attenuation under
-            // clearCoatIorChange.
-            b.clearCoatIorChange(true)
-        }
-        // W21: every mesh record carries uv1 (zero-filled when the
-        // wire layout lacks it), so the slot's `texCoord` can pick
-        // either channel per texture.
-        b.require(MaterialBuilder.VertexAttribute.UV0)
-            .require(MaterialBuilder.VertexAttribute.UV1)
-            // W26: COLOR rides every wire vertex record (white when
-            // absent upstream); instances bake per-instance colors
-            // into it. Meshes lacking the attribute read Filament's
-            // vec4(1) default, so baseColor stays unchanged there.
-            .require(MaterialBuilder.VertexAttribute.COLOR)
-            .uniformParameter(MaterialBuilder.UniformType.FLOAT4, "baseColor")
-            .uniformParameter(MaterialBuilder.UniformType.FLOAT4,
-                "baseColorUVTransform")
-            .uniformParameter(MaterialBuilder.UniformType.FLOAT,
-                "baseColorUVRotation")
-            .uniformParameter(MaterialBuilder.UniformType.FLOAT,
-                "baseColorUVSet")
-        // W22-r3: one declared sampler per *bound* texture slot —
-        // Filament's FL1 cap counts declarations, so an extension
-        // flag must not cost the slots the material leaves unbound.
-        // The body below emits the matching factor-only term for
-        // unbound slots. Prebuilts pass ALL_BASE_SLOTS: their
-        // instances bind 1×1 fallbacks everywhere, keeping every
-        // declared sampler sampled.
-        val baseSlotCount =
-            if (unlit) 1 else FsceneRealizer.BASE_TEXTURE_SLOTS.size
-        for (i in 0 until baseSlotCount) {
-            if (boundSlots and (1 shl i) == 0) continue
-            b.samplerParameter(MaterialBuilder.SamplerType.SAMPLER_2D,
-                MaterialBuilder.SamplerFormat.FLOAT,
-                MaterialBuilder.ParameterPrecision.DEFAULT,
-                FsceneRealizer.BASE_TEXTURE_SLOTS[i].param)
-        }
-        if (!unlit) {
-            b.require(MaterialBuilder.VertexAttribute.TANGENTS)
-                // W25 fix-2: SSR needs materials compiled with
-                // reflectionMode SCREEN_SPACE — without it the shader
-                // never samples the SSR buffer (MATERIAL_HAS_REFLECTIONS
-                // stays off) and the view option alone is a no-op.
-                // Harmless when SSR is disabled: the bound buffer's
-                // zero coverage falls back to IBL specular.
-                .reflectionMode(MaterialBuilder.ReflectionMode
-                    .SCREEN_SPACE)
-                .uniformParameter(MaterialBuilder.UniformType.FLOAT, "metallic")
-                .uniformParameter(MaterialBuilder.UniformType.FLOAT, "roughness")
-                .uniformParameter(MaterialBuilder.UniformType.FLOAT4,
-                    "emissiveColor")
-                .uniformParameter(MaterialBuilder.UniformType.FLOAT,
-                    "emissiveStrength")
-                .uniformParameter(MaterialBuilder.UniformType.FLOAT,
-                    "normalScale")
-                .uniformParameter(MaterialBuilder.UniformType.FLOAT,
-                    "occlusionStrength")
-                .uniformParameter(MaterialBuilder.UniformType.FLOAT4,
-                    "normalUVTransform")
-                .uniformParameter(MaterialBuilder.UniformType.FLOAT,
-                    "normalUVRotation")
-                .uniformParameter(MaterialBuilder.UniformType.FLOAT,
-                    "normalUVSet")
-                .uniformParameter(MaterialBuilder.UniformType.FLOAT4,
-                    "mrUVTransform")
-                .uniformParameter(MaterialBuilder.UniformType.FLOAT,
-                    "mrUVRotation")
-                .uniformParameter(MaterialBuilder.UniformType.FLOAT,
-                    "mrUVSet")
-                .uniformParameter(MaterialBuilder.UniformType.FLOAT4,
-                    "occlusionUVTransform")
-                .uniformParameter(MaterialBuilder.UniformType.FLOAT,
-                    "occlusionUVRotation")
-                .uniformParameter(MaterialBuilder.UniformType.FLOAT,
-                    "occlusionUVSet")
-                .uniformParameter(MaterialBuilder.UniformType.FLOAT4,
-                    "emissiveUVTransform")
-                .uniformParameter(MaterialBuilder.UniformType.FLOAT,
-                    "emissiveUVRotation")
-                .uniformParameter(MaterialBuilder.UniformType.FLOAT,
-                    "emissiveUVSet")
-            // W22: extension slots/factors come from the same registry
-            // buildMaterialInstance walks — the builder declares what
-            // the decode writes, so the shader vocabulary can't drift.
-            // UV uniforms stay flag-gated (uniforms don't hit the
-            // sampler cap); samplers are bound-only.
-            for ((i, slot) in FsceneRealizer.EXT_TEXTURE_SLOTS.withIndex()) {
-                if (extFlags and slot.flag == 0) continue
-                b.uniformParameter(MaterialBuilder.UniformType.FLOAT4,
-                    "${slot.prefix}UVTransform")
-                    .uniformParameter(MaterialBuilder.UniformType.FLOAT,
-                        "${slot.prefix}UVRotation")
-                    .uniformParameter(MaterialBuilder.UniformType.FLOAT,
-                        "${slot.prefix}UVSet")
-                if (boundSlots and FsceneRealizer.extSlotBit(i) != 0) {
-                    b.samplerParameter(
-                        MaterialBuilder.SamplerType.SAMPLER_2D,
-                        MaterialBuilder.SamplerFormat.FLOAT,
-                        MaterialBuilder.ParameterPrecision.DEFAULT,
-                        "${slot.prefix}Map")
-                }
-            }
-            for (f in FsceneRealizer.EXT_FACTORS) {
-                if (extFlags and f.mask == 0) continue
-                b.uniformParameter(
-                    if (f.isColor) MaterialBuilder.UniformType.FLOAT4
-                    else MaterialBuilder.UniformType.FLOAT, f.uniform)
-            }
-            if (extFlags and FsceneRealizer.EXT_TRANSMISSION != 0) {
-                b.uniformParameter(MaterialBuilder.UniformType.FLOAT3,
-                    "absorption")
-            }
-            if (extFlags and FsceneRealizer.EXT_ANISOTROPY != 0) {
-                // 1 when an anisotropyTexture drives the direction —
-                // the flat-normal fallback decodes to direction (0,0),
-                // which normalize() would turn into NaN, so the shader
-                // mixes the tangent-space +X default in instead.
-                b.uniformParameter(MaterialBuilder.UniformType.FLOAT,
-                    "anisotropyUseMap")
-            }
-        }
-        // Per-slot UV transform (KHR_texture_transform):
-        //   uv' = offset + R(rotation)·(scale ⊙ uv)
-        // <slot>UVTransform packs (offset.xy, scale.xy); the mat2 takes
-        // column-major args so (c,s,-s,c) is the standard CCW rotation.
-        // Wire UVs are V=0-top (glTF/SceneKit) and uploads land top-row-
-        // first at texel v=0, so no flipUV — see the report.
-        fun slotBound(i: Int) = boundSlots and (1 shl i) != 0
-        fun extBound(i: Int) =
-            boundSlots and FsceneRealizer.extSlotBit(i) != 0
-        val body = StringBuilder()
-            .append("void material(inout MaterialInputs material) {\n")
-            .append("    vec2 uv0 = getUV0();\n")
-            .append("    vec2 uv1 = getUV1();\n")
-        if (slotBound(0)) {
-            body.append(uvBlock("baseColor"))
-                .append("    material.baseColor = materialParams.baseColor" +
-                    " * texture(materialParams_baseColorMap, baseColorUv)" +
-                    " * getColor();\n")
-        } else {
-            body.append("    material.baseColor = materialParams" +
-                ".baseColor * getColor();\n")
-        }
-        if (!unlit) {
-            if (slotBound(2)) {
-                body.append(uvBlock("mr"))
-                    .append("    vec4 mrTex = texture(" +
-                        "materialParams_metallicRoughnessMap, mrUv);\n")
-                    .append("    material.metallic = mrTex.b" +
-                        " * materialParams.metallic;\n")
-                    .append("    material.roughness = mrTex.g" +
-                        " * materialParams.roughness;\n")
-            } else {
-                body.append("    material.metallic = materialParams" +
-                    ".metallic;\n")
-                    .append("    material.roughness = materialParams" +
-                        ".roughness;\n")
-            }
-            if (slotBound(3)) {
-                body.append(uvBlock("occlusion"))
-                    .append("    material.ambientOcclusion = mix(1.0," +
-                        " texture(materialParams_occlusionMap," +
-                        " occlusionUv).r," +
-                        " materialParams.occlusionStrength);\n")
-            } else {
-                body.append("    material.ambientOcclusion = 1.0;\n")
-            }
-            if (slotBound(1)) {
-                body.append(uvBlock("normal"))
-                    .append("    vec3 nTex = texture(" +
-                        "materialParams_normalMap, normalUv).xyz" +
-                        " * 2.0 - 1.0;\n")
-                    .append("    material.normal = normalize(vec3(" +
-                        "nTex.xy * materialParams.normalScale, nTex.z));\n")
-            } else {
-                body.append("    material.normal =" +
-                    " vec3(0.0, 0.0, 1.0);\n")
-            }
-            if (slotBound(4)) {
-                body.append(uvBlock("emissive"))
-                    .append("    material.emissive = vec4(" +
-                        "materialParams.emissiveColor.rgb *" +
-                        " texture(materialParams_emissiveMap," +
-                        " emissiveUv).rgb *" +
-                        " materialParams.emissiveStrength, 0.0);\n")
-            } else {
-                // fallbackEmissive is black — a texture-less emissive
-                // reads as off (pre-r3 semantics, preserved).
-                body.append("    material.emissive = vec4(0.0);\n")
-            }
-            // W22: extension lobes — one block per feature flag, each
-            // factor×texture matching the glTF channel spec. The
-            // slot-prefixed uvBlocks carry KHR_texture_transform per
-            // extension texture.
-            if (extFlags and FsceneRealizer.EXT_CLEARCOAT != 0) {
-                if (extBound(0)) {
-                    body.append(uvBlock("clearCoat"))
-                        .append("    material.clearCoat = materialParams" +
-                            ".clearCoat * texture(materialParams" +
-                            "_clearCoatMap, clearCoatUv).r;\n")
-                } else {
-                    body.append("    material.clearCoat = materialParams" +
-                        ".clearCoat;\n")
-                }
-                if (extBound(1)) {
-                    body.append(uvBlock("clearCoatRoughness"))
-                        .append("    material.clearCoatRoughness =" +
-                            " materialParams.clearCoatRoughness *" +
-                            " texture(materialParams" +
-                            "_clearCoatRoughnessMap," +
-                            " clearCoatRoughnessUv).g;\n")
-                } else {
-                    body.append("    material.clearCoatRoughness =" +
-                        " materialParams.clearCoatRoughness;\n")
-                }
-                if (extBound(2)) {
-                    body.append(uvBlock("clearCoatNormal"))
-                        .append("    vec3 ccN = texture(materialParams" +
-                            "_clearCoatNormalMap, clearCoatNormalUv).xyz" +
-                            " * 2.0 - 1.0;\n")
-                        .append("    material.clearCoatNormal = normalize(" +
-                            "vec3(ccN.xy * materialParams" +
-                            ".clearCoatNormalScale, ccN.z));\n")
-                } else {
-                    body.append("    material.clearCoatNormal =" +
-                        " vec3(0.0, 0.0, 1.0);\n")
-                }
-            }
-            if (extFlags and FsceneRealizer.EXT_SHEEN != 0) {
-                if (extBound(3)) {
-                    body.append(uvBlock("sheenColor"))
-                        .append("    material.sheenColor = materialParams" +
-                            ".sheenColor.rgb * texture(materialParams" +
-                            "_sheenColorMap, sheenColorUv).rgb;\n")
-                } else {
-                    body.append("    material.sheenColor = materialParams" +
-                        ".sheenColor.rgb;\n")
-                }
-                if (extBound(4)) {
-                    body.append(uvBlock("sheenRoughness"))
-                        .append("    material.sheenRoughness =" +
-                            " materialParams.sheenRoughness * texture(" +
-                            "materialParams_sheenRoughnessMap," +
-                            " sheenRoughnessUv).a;\n")
-                } else {
-                    body.append("    material.sheenRoughness =" +
-                        " materialParams.sheenRoughness;\n")
-                }
-            }
-            if (extFlags and FsceneRealizer.EXT_SPECULAR != 0) {
-                if (extBound(5)) {
-                    body.append(uvBlock("specular"))
-                        .append("    material.specularFactor =" +
-                            " materialParams.specularFactor * texture(" +
-                            "materialParams_specularMap, specularUv).a;\n")
-                } else {
-                    body.append("    material.specularFactor =" +
-                        " materialParams.specularFactor;\n")
-                }
-                if (extBound(6)) {
-                    body.append(uvBlock("specularColor"))
-                        .append("    material.specularColorFactor =" +
-                            " materialParams.specularColorFactor.rgb *" +
-                            " texture(materialParams_specularColorMap," +
-                            " specularColorUv).rgb;\n")
-                } else {
-                    body.append("    material.specularColorFactor =" +
-                        " materialParams.specularColorFactor.rgb;\n")
-                }
-            }
-            if (extFlags and FsceneRealizer.EXT_ANISOTROPY != 0) {
-                // glTF packs the tangent-space direction in rg
-                // ([0,1]→[-1,1]) and the strength in b; the factor's
-                // rotation applies on top in the same space.
-                body.append("    float aCos = cos(materialParams" +
-                    ".anisotropyRotation);\n")
-                    .append("    float aSin = sin(materialParams" +
-                        ".anisotropyRotation);\n")
-                if (extBound(7)) {
-                    body.append(uvBlock("anisotropy"))
-                        .append("    vec4 aTex = texture(materialParams" +
-                            "_anisotropyMap, anisotropyUv);\n")
-                        .append("    vec2 aBase = mix(vec2(1.0, 0.0)," +
-                            " aTex.rg * 2.0 - 1.0, materialParams" +
-                            ".anisotropyUseMap);\n")
-                        .append("    vec2 aDir = mat2(aCos, aSin," +
-                            " -aSin, aCos) * aBase;\n")
-                        .append("    material.anisotropy =" +
-                            " materialParams.anisotropy * aTex.b;\n")
-                } else {
-                    body.append("    vec2 aDir = mat2(aCos, aSin," +
-                        " -aSin, aCos) * vec2(1.0, 0.0);\n")
-                        .append("    material.anisotropy =" +
-                            " materialParams.anisotropy;\n")
-                }
-                body.append("    material.anisotropyDirection = vec3(" +
-                    "aDir, 0.0);\n")
-            }
-            if (extFlags and FsceneRealizer.EXT_TRANSMISSION != 0) {
-                if (extBound(8)) {
-                    body.append(uvBlock("transmission"))
-                        .append("    material.transmission =" +
-                            " materialParams.transmission * texture(" +
-                            "materialParams_transmissionMap," +
-                            " transmissionUv).r;\n")
-                } else {
-                    body.append("    material.transmission =" +
-                        " materialParams.transmission;\n")
-                }
-                body.append("    material.ior = materialParams.ior;\n")
-                    .append("    material.absorption = materialParams" +
-                        ".absorption;\n")
-                if (extFlags and FsceneRealizer.EXT_VOLUME_SOLID != 0) {
-                    if (extBound(9)) {
-                        body.append(uvBlock("thickness"))
-                            .append("    material.thickness =" +
-                                " materialParams.thickness * texture(" +
-                                "materialParams_thicknessMap," +
-                                " thicknessUv).g;\n")
-                    } else {
-                        body.append("    material.thickness =" +
-                            " materialParams.thickness;\n")
-                    }
-                    if (extFlags and FsceneRealizer.EXT_DISPERSION != 0) {
-                        body.append("    material.dispersion =" +
-                            " materialParams.dispersion;\n")
-                    }
-                } else {
-                    // THIN has no `thickness` field — the same uniform
-                    // feeds microThickness (Filament ignores
-                    // thickness/dispersion on thin volumes).
-                    if (extBound(9)) {
-                        body.append(uvBlock("thickness"))
-                            .append("    material.microThickness =" +
-                                " materialParams.thickness * texture(" +
-                                "materialParams_thicknessMap," +
-                                " thicknessUv).g;\n")
-                    } else {
-                        body.append("    material.microThickness =" +
-                            " materialParams.thickness;\n")
-                    }
-                }
-            } else if (extFlags and FsceneRealizer.EXT_IOR != 0) {
-                // KHR_materials_ior without transmission still applies
-                // — Filament accepts `ior` as an alternative to
-                // reflectance on lit materials.
-                body.append("    material.ior = materialParams.ior;\n")
-            }
-        }
-        // prepareMaterial must run AFTER material.normal is set — it
-        // snapshots shading_normal through the tangent frame at call time.
-        body.append("    prepareMaterial(material);\n}\n")
-        // W22-r3: no check→fatal — a rejected package returns null
-        // and the caller degrades to a base prebuilt (warn-once).
-        val pkg = try {
-            b.material(body.toString()).build()
-        } catch (e: Exception) {
-            null
-        }
-        if (pkg == null || !pkg.isValid) return null
+        val bytes = MaterialPackages.litPackage(unlit, blending, extFlags,
+            boundSlots, MaterialPackages.apiFor(engine.backend))
+            ?: return null
         return try {
-            Material.Builder()
-                .payload(pkg.buffer, pkg.buffer.remaining())
-                .build(engine)
+            MaterialPackages.load(engine, bytes)
         } catch (e: Exception) {
             null
         }
@@ -1148,45 +755,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      * authored key.
      */
     private fun buildShadowCatcherMaterial(): Material {
-        if (!filamatReady) {
-            MaterialBuilder.init()
-            filamatReady = true
-        }
-        val b = MaterialBuilder()
-            .platform(MaterialBuilder.Platform.MOBILE)
-            .targetApi(if (engine.backend == Engine.Backend.VULKAN)
-                MaterialBuilder.TargetApi.VULKAN
-                else MaterialBuilder.TargetApi.OPENGL)
-            .name("d3_shadow_catcher")
-            .shading(MaterialBuilder.Shading.UNLIT)
-            .doubleSided(true)
-            .blending(MaterialBuilder.BlendingMode.TRANSPARENT)
-            // The catcher is still a real surface — it joins the
-            // depth prepass like upstream's catcher does, so contact
-            // shadows and occlusion read its depth.
-            .depthWrite(true)
-            .shadowMultiplier(true)
-            .uniformParameter(MaterialBuilder.UniformType.FLOAT4,
-                "shadowColor")
-            .uniformParameter(MaterialBuilder.UniformType.FLOAT,
-                "shadowIntensity")
-        // `shadowMultiplier` makes the engine multiply the FINAL
-        // color — alpha included — by the shadow factor downstream;
-        // no MaterialInputs field exposes it to read (1.71.6 emits
-        // `shadowStrength`, a writable attenuation output). The
-        // material only declares the catcher's max tint/opacity.
-        val body = "void material(inout MaterialInputs material) {\n" +
-            "    prepareMaterial(material);\n" +
-            "    material.baseColor = vec4(" +
-            "materialParams.shadowColor.rgb," +
-            " materialParams.shadowColor.a * " +
-            "materialParams.shadowIntensity);\n" +
-            "}\n"
-        val pkg = b.material(body).build()
-        check(pkg.isValid) { "d3 shadow catcher failed to compile" }
-        return Material.Builder()
-            .payload(pkg.buffer, pkg.buffer.remaining())
-            .build(engine)
+        val bytes = checkNotNull(MaterialPackages.catcherPackage(
+            MaterialPackages.apiFor(engine.backend)))
+            { "d3 shadow catcher failed to compile" }
+        return MaterialPackages.load(engine, bytes)
     }
 
     /**
@@ -1198,42 +770,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      * the path doubles back).
      */
     private fun buildTrailMaterial(): Material {
-        if (!filamatReady) {
-            MaterialBuilder.init()
-            filamatReady = true
-        }
-        val b = MaterialBuilder()
-            .platform(MaterialBuilder.Platform.MOBILE)
-            .targetApi(if (engine.backend == Engine.Backend.VULKAN)
-                MaterialBuilder.TargetApi.VULKAN
-                else MaterialBuilder.TargetApi.OPENGL)
-            .name("d3_trail")
-            .shading(MaterialBuilder.Shading.UNLIT)
-            .doubleSided(true)
-            .blending(MaterialBuilder.BlendingMode.TRANSPARENT)
-            .require(MaterialBuilder.VertexAttribute.COLOR)
-        val pkg = b.material(
-            "void material(inout MaterialInputs material) {\n" +
-                "    prepareMaterial(material);\n" +
-                "    material.baseColor = getColor();\n" +
-                "}\n").build()
-        check(pkg.isValid) { "d3 trail material failed to compile" }
-        return Material.Builder()
-            .payload(pkg.buffer, pkg.buffer.remaining())
-            .build(engine)
-    }
-
-    /**
-     * Emits `vec2 <slot>Uv = offset + R(rot)·(scale ⊙ uvSet)` where the
-     * `<slot>UVSet` uniform selects getUV0()/getUV1() — the wire's
-     * `texCoord` channel index (0 → uv0, ≥1 → uv1).
-     */
-    private fun uvBlock(slot: String): String {
-        val t = "materialParams.${slot}UVTransform"
-        val r = "materialParams.${slot}UVRotation"
-        val s = "materialParams.${slot}UVSet"
-        return "    vec2 ${slot}Uv = $t.xy + mat2(cos($r), sin($r)," +
-            " -sin($r), cos($r)) * ($t.zw * ($s > 0.5 ? uv1 : uv0));\n"
+        val bytes = checkNotNull(MaterialPackages.trailPackage(
+            MaterialPackages.apiFor(engine.backend)))
+            { "d3 trail material failed to compile" }
+        return MaterialPackages.load(engine, bytes)
     }
 
     // MARK: - W18 particles
@@ -1278,56 +818,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      * (upstream's quad UVs are authored v-top).
      */
     private fun buildParticleMaterial(additive: Boolean): Material {
-        if (!filamatReady) {
-            MaterialBuilder.init()
-            filamatReady = true
-        }
-        val frag = StringBuilder()
-            .append("void material(inout MaterialInputs material) {\n")
-            .append("    vec4 tex = mix(texture(materialParams_particleMap," +
-                " getUV0()), texture(materialParams_particleMap," +
-                " getUV1()), variable_blendData.x);\n")
-            .append("    vec4 c = getColor() * tex;\n")
-        if (additive) {
-            // Filament ADD is ONE/ONE — premultiply so the particle
-            // alpha attenuates the contribution.
-            frag.append("    material.baseColor = vec4(c.rgb * c.a," +
-                " c.a);\n")
-        } else {
-            frag.append("    material.baseColor = c;\n")
-        }
-        frag.append("    prepareMaterial(material);\n}\n")
-        val b = MaterialBuilder()
-            .platform(MaterialBuilder.Platform.MOBILE)
-            .targetApi(if (engine.backend == Engine.Backend.VULKAN)
-                MaterialBuilder.TargetApi.VULKAN
-                else MaterialBuilder.TargetApi.OPENGL)
-            .name(if (additive) "d3_particle_add" else "d3_particle_alpha")
-            .shading(MaterialBuilder.Shading.UNLIT)
-            .vertexDomain(MaterialBuilder.VertexDomain.OBJECT)
-            .doubleSided(true)
-            .culling(MaterialBuilder.CullingMode.NONE)
-            .blending(if (additive) MaterialBuilder.BlendingMode.ADD
-                else MaterialBuilder.BlendingMode.TRANSPARENT)
-            .depthWrite(false)
-            .flipUV(false)
-            .require(MaterialBuilder.VertexAttribute.UV0)
-            .require(MaterialBuilder.VertexAttribute.UV1)
-            .require(MaterialBuilder.VertexAttribute.COLOR)
-            .require(MaterialBuilder.VertexAttribute.CUSTOM0)
-            .variable(MaterialBuilder.Variable.CUSTOM0, "blendData")
-            .samplerParameter(MaterialBuilder.SamplerType.SAMPLER_2D,
-                MaterialBuilder.SamplerFormat.FLOAT,
-                MaterialBuilder.ParameterPrecision.DEFAULT, "particleMap")
-            .materialVertex(
-                "void materialVertex(inout MaterialVertexInputs m) {\n" +
-                "    m.blendData = getCustom0();\n}\n")
-            .material(frag.toString())
-        val pkg = b.build()
-        check(pkg.isValid) { "d3 particle material failed to compile" }
-        return Material.Builder()
-            .payload(pkg.buffer, pkg.buffer.remaining())
-            .build(engine)
+        val bytes = checkNotNull(MaterialPackages.particlePackage(additive,
+            MaterialPackages.apiFor(engine.backend)))
+            { "d3 particle material failed to compile" }
+        return MaterialPackages.load(engine, bytes)
     }
 
     /**
@@ -4410,15 +3904,21 @@ class Dart3dView(context: Context) : FrameLayout(context) {
 
     // MARK: - Frame pipeline
 
+    private var lastDrainCount = 0
+    private var lastFrameRealized = false
+
     private fun stepFrame(tNanos: Long) {
         val dt = ((tNanos - lastFrameNanos).coerceIn(0L, 100_000_000L)) / 1e9f
         lastFrameNanos = tNanos
 
         // Drain queued mutations before touching any scene/Jolt state —
         // the iOS twin drains at `updateAtTime`, the same pre-step slot.
+        lastDrainCount = 0
+        lastFrameRealized = false
         while (true) {
             val work = pendingWork.poll() ?: break
             work()
+            lastDrainCount++
         }
         // Payload chunks in this drain may have unblocked deferred
         // resources — a single re-realize resolves every landed claim
@@ -4429,6 +3929,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             realizePending = false
             val manifest = lastManifest
             if (manifest != null && pendingPayloadRefs.isNotEmpty()) {
+                lastFrameRealized = true
                 FsceneRealizer.realize(manifest, this,
                     preserveStage = true)
                 // W15: the re-realize discarded the surgically
@@ -4785,7 +4286,6 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             System.loadLibrary("filament-jni")
         }
 
-        @Volatile private var filamatReady = false
         // Every NodeChange flag — the "treating as update" idempotent
         // addNode path applies the spec as a full update.
         private val ALL_NODE_FLAGS = setOf(
@@ -4796,6 +4296,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         private val JOINT_MOTIONS = setOf("locked", "free", "limited")
         private const val PI_F = 3.1415927f
         // W30: Dart3dSetBackend wire values, shared with the Dart caller.
+        private const val SLOW_FRAME_MS = 250L
         private const val BACKEND_OPENGL = 1
         private const val BACKEND_VULKAN = 2
         /** Auto-mode default, set from the W30 A142 A/B measurement. */
