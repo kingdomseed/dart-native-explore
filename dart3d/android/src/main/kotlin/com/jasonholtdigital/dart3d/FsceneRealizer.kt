@@ -76,17 +76,18 @@ private const val MAX_BAKED_INSTANCES = 16384
 // The bake's allocation is instances × base vertices, so the count cap
 // alone doesn't bound it (a default sphere × 16 384 ≈ 9.2 M vertices).
 // Over this vertex budget the instance tail is truncated (warn-once).
-private const val MAX_BAKED_VERTICES = 262_144
-// Procedural tessellation caps (W26 hang/OOM guard). Mirrored by the
-// Dart builder + iOS — see docs/triage/android.md.
+// Mirrors kD3MaxBakedVertices (dart3d/lib/src/geometry/limits.dart).
+private const val MAX_BAKED_VERTICES = 1 shl 20
+// Procedural tessellation caps (W26 hang/OOM guard) — the Dart wire
+// contract in dart3d/lib/src/geometry/limits.dart; clamp, never reject.
 //  * segment-style counts (segments, rings, radial/tubular/height
-//    segments, capRings, segmentsX/Z): 1..256
-//  * icosphere subdivisions: 0..6 (20·4⁶ = 81 920 faces)
-//  * tube: radialSegments 3..256, stations 2..1024
-private const val MAX_PROC_SEGMENTS = 256
+//    segments, capRings, segmentsX/Z, tube stations): ..512
+//    (kD3MaxProcSegments)
+//  * icosphere subdivisions: 0..6 (kD3MaxIcosphereSubdivisions)
+//  * tube: radialSegments ≥3, stations ≥2 (the Dart builder's minimums)
+private const val MAX_PROC_SEGMENTS = 512
 private const val MAX_ICOSPHERE_SUBDIVISIONS = 6
 private const val MIN_TUBE_RADIAL = 3
-private const val MAX_TUBE_STATIONS = 1024
 
 /** Wire `alphaMode` vocabulary (lowercase in the spec). */
 private val ALPHA_MODES = setOf("opaque", "mask", "blend")
@@ -1312,8 +1313,7 @@ object FsceneRealizer {
                     return MeshFactory.tube(pts,
                         (p.tag("radius").d3Double() ?: 0.5).toFloat(),
                         seg(p, "radialSegments", 12, min = MIN_TUBE_RADIAL),
-                        seg(p, "stations", 64, min = 2,
-                            max = MAX_TUBE_STATIONS),
+                        seg(p, "stations", 64, min = 2),
                         p.tag("caps").d3Bool() != false,
                         p.tag("closed").d3Bool() == true)
                 }
@@ -1750,6 +1750,16 @@ object FsceneRealizer {
                         " unresolved")
                     return
                 }
+                if (base.topology != MeshFactory.Topology.TRIANGLES) {
+                    // The bake emits an indexed triangle list; lines,
+                    // points and strips would be reinterpreted as
+                    // unrelated triangles. iOS rejects them too.
+                    warnOnce("instances.$key.topology",
+                        "d3:instances node $key: ${base.topology}" +
+                            " geometry can't be instanced (triangle" +
+                            " lists only) — not baked")
+                    return
+                }
                 if (base.hasSkinning) {
                     warnOnce("instances.$key.skinning",
                         "d3:instances node $key: skinned geometry" +
@@ -1762,16 +1772,11 @@ object FsceneRealizer {
                             " bakes unmorphed — morph targets" +
                             " are dropped")
                 }
-                val maxByVerts =
-                    MAX_BAKED_VERTICES / maxOf(1, base.vertexCount)
-                if (maxByVerts == 0) {
-                    warnOnce("instances.$key.vertexCap",
-                        "d3:instances node $key: base mesh has" +
-                            " ${base.vertexCount} vertices, over the" +
-                            " $MAX_BAKED_VERTICES-vertex bake budget" +
-                            " — not baked")
-                    return
-                }
+                // d3BakedInstanceCount: a base mesh larger than the
+                // whole budget still keeps one instance (the per-shape
+                // caps already bound it).
+                val maxByVerts = maxOf(1,
+                    MAX_BAKED_VERTICES / maxOf(1, base.vertexCount))
                 if (transforms.size > maxByVerts) {
                     warnOnce("instances.$key.vertexCap",
                         "d3:instances node $key: ${transforms.size}" +

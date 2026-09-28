@@ -468,6 +468,30 @@ class MeshFactoryTest {
     }
 
     @Test
+    fun `mirrored instances are rewound to face outward`() {
+        val mirror = floatArrayOf(
+            -1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f,
+            0f, 0f, 1f, 0f, 3f, 0f, 0f, 1f)
+        val baked = MeshFactory.bakeInstances(
+            MeshFactory.cuboid(1f, 1f, 1f), listOf(mirror))
+        assertWindsOutward(baked)
+    }
+
+    @Test
+    fun `degenerate dash patterns render solid instead of looping`() {
+        val pts = listOf(MeshFactory.V3(0f, 0f, 0f), MeshFactory.V3(10f, 0f, 0f))
+        val view = MeshFactory.V3(0f, 0f, 1f)
+        val solid = MeshFactory.polyline(pts, 0.1f, view)
+        for ((on, off) in listOf(0f to 0f, 0f to 1f, Float.NaN to 1f)) {
+            val m = MeshFactory.dashedPolyline(pts, 0.1f, view, on, off)
+            assertEquals(solid.vertexCount, m.vertexCount)
+        }
+        // A microscopic pattern hits the span cap and renders solid.
+        val tiny = MeshFactory.dashedPolyline(pts, 0.1f, view, 1e-4f, 1e-4f)
+        assertEquals(solid.vertexCount, tiny.vertexCount)
+    }
+
+    @Test
     fun `tube tolerates zero subdivision counts`() {
         val pts = listOf(MeshFactory.V3(0f, 0f, 0f), MeshFactory.V3(0f, 1f, 0f))
         val mesh = MeshFactory.tube(pts, 0.1f, 0, 0, caps = true,
