@@ -4261,11 +4261,11 @@ extension SceneViewHost: SCNSceneRendererDelegate {
         drainPendingWork()
         sampleAnimations(at: time)
         // W16: trails record after the sampler — the head follows
-        // this frame's sampled pose; lods then re-select and rebind
-        // against this frame's camera (Android's `updateTrailsLods`
-        // slot — post-camera, pre-render).
+        // this frame's sampled pose. LOD selection runs later, in
+        // `willRenderScene`: a physics-driven node's pose is only
+        // final after the sim step, and selecting here read the
+        // pre-sim pose (a one-frame lag on moving bodies).
         updateTrails(at: time)
-        updateLods()
     }
 
     /// W16 per-frame trail pass — `TrailComponent.update` ported:
@@ -4419,10 +4419,11 @@ extension SceneViewHost: SCNSceneRendererDelegate {
         // Both positions live in the same LH→RH-mirrored space — a
         // mirror is an isometry, so the Euclidean distances the
         // metric wants match the authored ones.
+        // Presentation poses — the drawn ones: post-sim for physics
+        // bodies, mid-flight for implicit animations/camera control.
+        let camWorld = pov.presentation.simdWorldPosition
         let camPos = simd_float3(
-            Float(pov.simdWorldPosition.x),
-            Float(pov.simdWorldPosition.y),
-            Float(pov.simdWorldPosition.z))
+            Float(camWorld.x), Float(camWorld.y), Float(camWorld.z))
         for (key, spec) in lodSpecs where !spec.suspended {
             guard let node = nodesById[key] else { continue }
             updateLod(spec, node: node, camPos: camPos,
@@ -4448,7 +4449,7 @@ extension SceneViewHost: SCNSceneRendererDelegate {
             bindLodLevel(spec, node, 0)
             return
         }
-        let m = node.simdWorldTransform
+        let m = node.presentation.simdWorldTransform
         var lo = simd_float3(repeating: Float.greatestFiniteMagnitude)
         var hi = simd_float3(repeating: -Float.greatestFiniteMagnitude)
         for xs in [spec.boundMin.x, spec.boundMax.x] {
@@ -4544,7 +4545,13 @@ extension SceneViewHost: SCNSceneRendererDelegate {
         if let old = node.geometry, old !== g,
            !spec.geoCopies.contains(where: { $0 === old }) {
             // A foreign geometry (a `mesh`'s) retires here; the
-            // spec's own level copies stay alive on the spec.
+            // spec's own level copies stay alive on the spec. Its
+            // material-consumer entries go with it — a later material
+            // upsert would otherwise keep rebinding (and retaining)
+            // the dead geometry.
+            for mk in materialConsumers.keys {
+                materialConsumers[mk]?.removeAll { $0 === old }
+            }
             retire(old)
         }
         node.geometry = g
@@ -4562,6 +4569,9 @@ extension SceneViewHost: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer,
                   willRenderScene scene: SCNScene,
                   atTime time: TimeInterval) {
+        // W16: post-physics, pre-draw — Android's `updateTrailsLods`
+        // slot (post-camera, pre-render) for the lod half.
+        updateLods()
         updateCameraFacing()
         renderDueTargets(at: time)
         syncScreenSubviews()
