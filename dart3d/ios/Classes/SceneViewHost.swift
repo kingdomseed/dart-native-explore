@@ -980,6 +980,7 @@ final class SceneViewHost: SCNView {
         // the outgoing scene).
         streamedSubtreeOps.removeAll()
         nodeOpJournal.removeAll()
+        commandCreatedKeys.removeAll()
         subtreeVisibleStamp = nil
         // Shadow-tier registry is per-scene — repopulated by the
         // coming decode's light pass.
@@ -1114,6 +1115,14 @@ final class SceneViewHost: SCNView {
         let journaled = op == "addNode" || op == "updateNode"
             || op == "removeNode"
         if journaled { removedCommandAdded.removeAll() }
+        // An addNode CREATES only when the id isn't live — a re-sent
+        // batch's addNode on a live (e.g. manifest) node degrades to
+        // an update and must not mark the node command-created.
+        if op == "addNode", !replayingOps, commandDepth == 1,
+           let token = json["node"] as? String,
+           let key = D3Wire.localIdKey(token), nodesById[key] == nil {
+            commandCreatedKeys.insert(key)
+        }
         defer { if journaled { journalNodeOp(op, json) } }
         switch op {
         case "removeNode":
@@ -1320,9 +1329,11 @@ final class SceneViewHost: SCNView {
               let key = D3Wire.localIdKey(token) else { return }
         switch op {
         case "removeNode":
-            // `removeSubtree` already pruned the doomed ids' entries;
-            // a node that only ever existed through a journaled
-            // addNode needs no replayed removal.
+            // `removeSubtree` already pruned the doomed ids' add/update
+            // entries. A node a journaled addNode CREATED needs no
+            // replayed removal — unless an earlier removal of the same
+            // id (a manifest node removed, then re-created) is still
+            // journaled, in which case that entry already covers it.
             if removedCommandAdded.contains(key) { return }
         case "updateNode":
             let flags = Set(json["flags"] as? [String] ?? [])
@@ -1341,12 +1352,21 @@ final class SceneViewHost: SCNView {
     /// pruned — consulted by the `removeNode` journal step.
     private var removedCommandAdded: Set<UInt64> = []
 
+    /// Ids a top-level addNode created (absent when it applied) since
+    /// the last `loadScene` — the only nodes whose removal needn't be
+    /// replayed. Cleared with the journal.
+    private var commandCreatedKeys: Set<UInt64> = []
+
     /// Replays every live subtree record and journaled node op in
     /// original order — called right after a payload-arrival
     /// re-realize has rebuilt the manifest scene.
     private func replayAfterRealize() {
         if nodeOpJournal.isEmpty {
+            // Same guard as the merged path: the batches' nested node
+            // ops dispatch at depth 1 here and must not journal.
+            replayingOps = true
             replayStreamedSubtrees()
+            replayingOps = false
             return
         }
         enum Entry { case subtree(Int), op(Int) }
@@ -1457,13 +1477,15 @@ final class SceneViewHost: SCNView {
             // command-added node's addNode must not resurrect it on
             // the next re-realize (replay itself never prunes).
             if !replayingOps {
-                if nodeOpJournal.contains(where: {
-                    $0.key == k
-                        && ($0.json["op"] as? String) == "addNode"
-                }) {
+                if commandCreatedKeys.remove(k) != nil {
                     removedCommandAdded.insert(k)
                 }
-                nodeOpJournal.removeAll { $0.key == k }
+                // Earlier removals of this id stay: they undo a
+                // manifest node the replayed re-realize brings back.
+                nodeOpJournal.removeAll {
+                    $0.key == k
+                        && ($0.json["op"] as? String) != "removeNode"
+                }
             }
             // Node ids can't collide with the resource ids keying the
             // consumer maps — these drops are defensive; the real
