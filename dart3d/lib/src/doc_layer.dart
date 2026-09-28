@@ -53,18 +53,15 @@ const _documentOps = {
 /// reproduces the scene — including payload chunks, whose bytes ride the
 /// binary channel and so cannot appear in the JSON tree.
 ///
-/// `encodeDocument` drops the dart3d `viewport` view extension
-/// (upstream `_encodeView`), so the snapshot's view list is re-decoded
-/// through the dart3d codec pair the same way the wire manifest is —
-/// `loadSceneBytes`'s encode half feeding `decodeViewSpec` (W24).
+/// The round-trip runs through the extension-aware codec pair
+/// ([writeFsceneWithExtensions] → [readFsceneWithExtensions]), the same
+/// one the wire manifest uses, so view `viewport`s (W24), W26
+/// procedural-shape resources ([d3ExtensionResources]), and dart3d
+/// `featuresRequired` names survive. Persist the snapshot with
+/// [writeFsceneWithExtensions] — plain upstream `writeFscene` drops
+/// those extensions.
 SceneDocument serializeScene(SceneDocument live) {
-  final snapshot = decodeDocument(encodeDocument(live));
-  if (live.views.isNotEmpty) {
-    final idKey = manifestIdKey(live);
-    for (var i = 0; i < live.views.length; i++) {
-      snapshot.views[i] = decodeViewSpec(encodeViewSpec(live.views[i], idKey));
-    }
-  }
+  final snapshot = readFsceneWithExtensions(writeFsceneWithExtensions(live));
   for (final entry in live.payloads.entries) {
     final bytes = entry.value.bytes;
     snapshot.payloads[entry.key]?.bytes = bytes == null
@@ -158,12 +155,24 @@ void foldCommandIntoDocument(SceneDocument doc, Map<String, Object?> op) {
         _attach(doc, node.id, _opParent(op));
       }
     case 'upsertResource':
-      doc.resources[_opId(op, 'id')] = _decodeEntry<ResourceSpec>(
+      final id = _opId(op, 'id');
+      final entry = op['resource'];
+      // A W26 procedural shape can't decode into upstream's sealed
+      // model (`Unknown procedural geometry shape`) — hold the raw
+      // entry as a dart3d extension resource instead of dropping it.
+      if (isD3ExtensionResourceJson(entry)) {
+        doc.resources.remove(id);
+        d3ExtensionResources(doc)[id] = (jsonDecode(jsonEncode(entry)) as Map)
+            .cast<String, Object?>();
+        return;
+      }
+      doc.resources[id] = _decodeEntry<ResourceSpec>(
         doc,
         'resources',
         op['id'],
-        op['resource'],
+        entry,
       );
+      d3ExtensionResources(doc).remove(id);
     case 'upsertPayload':
       _upsertPayload(doc, op);
     case 'updateStage':

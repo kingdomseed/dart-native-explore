@@ -53,6 +53,7 @@ library;
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'compose_extensions.dart';
 import 'diff_apply.dart';
 import 'scene_model.dart';
 
@@ -127,7 +128,7 @@ final class StreamedSubtree {
   List<LocalId> priorRoots = const [],
 }) => _encodeFromComposed(
   placeholder,
-  composed: composeScene(
+  composed: composeSceneWithExtensions(
     _instanceScratch(placeholder, hostDoc),
     resolve: resolve,
   ),
@@ -147,7 +148,7 @@ encodeSubtreeLoadAsync(
   List<LocalId> priorRoots = const [],
 }) async => _encodeFromComposed(
   placeholder,
-  composed: await composeSceneAsync(
+  composed: await composeSceneAsyncWithExtensions(
     _instanceScratch(placeholder, hostDoc),
     load: loadPrefab,
   ),
@@ -291,6 +292,20 @@ _encodeFromComposed(
       'op': 'upsertResource',
       'id': idKey(entry.key),
       'resource': encodeResource(entry.value, idKey),
+    });
+  }
+  // W26 procedural-shape resources ride outside `resources`
+  // (compose_extensions.dart carries them through the compose).
+  final hostExt = hostDoc == null ? null : d3ExtensionResources(hostDoc);
+  for (final entry in d3ExtensionResources(composed).entries) {
+    final old = hostExt?[entry.key];
+    if (old != null && canonicalJson(old) == canonicalJson(entry.value)) {
+      continue;
+    }
+    ops.add({
+      'op': 'upsertResource',
+      'id': idKey(entry.key),
+      'resource': entry.value,
     });
   }
   ops.add({

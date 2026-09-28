@@ -9,6 +9,7 @@ import 'scene_model.dart';
 
 import 'animation.dart';
 import 'components.dart';
+import 'compose_extensions.dart';
 import 'diff_apply.dart';
 import 'dispatch.dart';
 import 'doc_layer.dart' as doc_layer;
@@ -150,15 +151,19 @@ final class SceneController {
   /// Host asset resolution stays with the caller: [loadPrefab] maps
   /// each `instance.source` AssetRef to its decoded (uncomposed)
   /// document, exactly as `composeSceneAsync`'s `load` contract
-  /// specifies.
+  /// specifies. [strictFeatures] follows [loadDocument] and applies to
+  /// the composed result, so a document requiring `prefabInstances`
+  /// passes once its eager instances are expanded.
   Future<void> loadDocumentComposed(
     SceneDocument doc, {
     required AsyncPrefabLoader loadPrefab,
     LutResolver? resolveLuts,
+    bool strictFeatures = false,
   }) async {
     loadDocument(
-      await composeSceneAsync(doc, load: loadPrefab),
+      await composeSceneAsyncWithExtensions(doc, load: loadPrefab),
       resolveLuts: resolveLuts,
+      strictFeatures: strictFeatures,
     );
   }
 
@@ -206,13 +211,15 @@ final class SceneController {
   /// (W29). Everything sent since the last load is folded in:
   /// [applyCommands] structural ops, [setNodeTransforms] writes, and
   /// [sendPayload] deliveries, so a scene built or edited at runtime
-  /// serializes truthfully. Serialize the result with `writeFscene`;
-  /// reload it with [loadDocument] or [loadFscene].
+  /// serializes truthfully. Reload it with [loadDocument] or
+  /// [loadFscene].
   ///
   /// Returns null until the first document or structural op lands.
   /// Runtime state the format doesn't model — animation playheads,
   /// physics poses, joint constraints, morph weights — is not captured,
-  /// same as upstream.
+  /// same as upstream. Persist the result with
+  /// `writeFsceneWithExtensions` — plain upstream `writeFscene` drops
+  /// the dart3d view `viewport`s and W26 procedural-shape resources.
   SceneDocument? serializeScene() {
     final doc = _document;
     return doc == null ? null : doc_layer.serializeScene(doc);

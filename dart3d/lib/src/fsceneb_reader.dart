@@ -132,11 +132,10 @@ SceneDocument readFsceneb(Uint8List bytes) {
   if (manifest == null) {
     throw const FscenebFormatException('Container has no JSON manifest chunk');
   }
-  final document = readFscene(manifest);
-  // W24: upstream's `_decodeView` drops the dart3d `viewport`
-  // extension — re-decode the manifest's raw `views` entries through
-  // dart3d's codec so it survives the round-trip.
-  applyViewExtensions(document, jsonDecode(manifest) as Map<String, Object?>);
+  // W24/W26: upstream's decoder drops the dart3d `viewport` view
+  // extension and refuses W26 procedural-shape resources — decode
+  // through dart3d's extension-aware reader so both survive.
+  final document = readFsceneWithExtensions(manifest);
   blobs.forEach((id, payload) {
     document.payload(id)?.bytes = payload;
   });
