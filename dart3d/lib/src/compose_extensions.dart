@@ -7,13 +7,16 @@
 /// composition drops them. The composed mesh keeps a geometry ref that
 /// resolves to nothing, and the natives draw nothing.
 ///
-/// These wrappers stand each extension resource in as a placeholder
-/// upstream resource for the length of the compose call, so upstream
-/// copies and remaps it like any other resource. They then swap every
-/// placeholder in the output back to its extension entry under the
-/// remapped id. The placeholders are removed from the input documents
-/// (the host and every prefab the resolver hands out) before the call
-/// returns, even when composition throws.
+/// These wrappers give upstream a per-call shallow clone of each input
+/// document (the host, and every prefab the resolver/loader returns)
+/// in which each extension resource stands in as a placeholder upstream
+/// resource. Upstream then copies and remaps it like any other
+/// resource, and the wrapper swaps every placeholder in the output back
+/// to its extension entry under the remapped id. Input documents are
+/// never mutated. A prefab cache shared by concurrent composes (for
+/// example two `loadSubtreeAsync` calls) is safe: each call sees only
+/// its own clones. The clones share node/component/resource objects
+/// with the inputs, which upstream composition only reads.
 library;
 
 import 'package:vector_math/vector_math.dart';
@@ -28,20 +31,14 @@ SceneDocument composeSceneWithExtensions(
   SceneDocument document, {
   required PrefabResolver resolve,
 }) {
-  final stash = _Stash()..stand(document);
-  try {
-    final out = composeScene(
-      document,
-      resolve: (ref) {
-        final prefab = resolve(ref);
-        stash.stand(prefab);
-        return prefab;
-      },
-    );
-    return stash.harvest(out);
-  } finally {
-    stash.restore();
-  }
+  // Nothing to expand: upstream returns the host itself, and so do we.
+  if (!_hasEager(document)) return document;
+  final stash = _Stash();
+  final out = composeScene(
+    stash.stand(document),
+    resolve: (ref) => stash.stand(resolve(ref)),
+  );
+  return stash.harvest(out);
 }
 
 /// [composeSceneAsync] that keeps [d3ExtensionResources]; see
@@ -50,45 +47,61 @@ Future<SceneDocument> composeSceneAsyncWithExtensions(
   SceneDocument document, {
   required AsyncPrefabLoader load,
 }) async {
-  final stash = _Stash()..stand(document);
-  try {
-    final out = await composeSceneAsync(
-      document,
-      load: (ref) async {
-        final prefab = await load(ref);
-        stash.stand(prefab);
-        return prefab;
-      },
-    );
-    return stash.harvest(out);
-  } finally {
-    stash.restore();
-  }
+  if (!_hasEager(document)) return document;
+  final stash = _Stash();
+  final out = await composeSceneAsync(
+    stash.stand(document),
+    load: (ref) async => stash.stand(await load(ref)),
+  );
+  return stash.harvest(out);
 }
+
+bool _hasEager(SceneDocument doc) => doc.nodes.values.any(
+  (n) => n.instance != null && n.instance!.load == LoadPolicy.eager,
+);
 
 /// The placeholder bookkeeping for one compose call. A placeholder is
 /// a cuboid with extents `(-1, -1, token)`. Negative extents never
-/// occur in a real document, and `token` indexes [_entries].
+/// occur in a real document, and `token` indexes [_entries], which
+/// belong to this call alone.
 final class _Stash {
   final List<Map<String, Object?>> _entries = [];
-  final Map<SceneDocument, List<LocalId>> _stood = Map.identity();
 
-  void stand(SceneDocument doc) {
-    if (_stood.containsKey(doc)) return;
-    final ids = <LocalId>[];
-    _stood[doc] = ids;
-    for (final entry in d3ExtensionResources(doc).entries) {
-      if (doc.resources.containsKey(entry.key)) continue;
+  /// A shallow clone of [doc] with its extension resources stood in as
+  /// placeholders. [doc] is untouched.
+  SceneDocument stand(SceneDocument doc) {
+    final ext = d3ExtensionResources(doc);
+    if (ext.isEmpty) return doc;
+    final clone =
+        SceneDocument(
+            documentId: doc.documentId,
+            allocator: doc.allocator,
+            stage: doc.stage,
+          )
+          ..formatVersion = doc.formatVersion
+          ..generator = doc.generator
+          ..payloadSource = doc.payloadSource;
+    clone.featuresUsed.addAll(doc.featuresUsed);
+    clone.featuresRequired.addAll(doc.featuresRequired);
+    clone.resources.addAll(doc.resources);
+    clone.nodes.addAll(doc.nodes);
+    clone.roots.addAll(doc.roots);
+    clone.skins.addAll(doc.skins);
+    clone.animations.addAll(doc.animations);
+    clone.payloads.addAll(doc.payloads);
+    clone.views.addAll(doc.views);
+    for (final entry in ext.entries) {
+      if (clone.resources.containsKey(entry.key)) continue;
       final token = _entries.length;
       _entries.add(entry.value);
-      doc.resources[entry.key] = GeometryResource(
+      clone.resources[entry.key] = GeometryResource(
         entry.key,
         procedural: CuboidGeometrySpec(
           extents: Vector3(-1, -1, token.toDouble()),
         ),
       );
-      ids.add(entry.key);
     }
+    return clone;
   }
 
   SceneDocument harvest(SceneDocument out) {
@@ -100,14 +113,6 @@ final class _Stash {
       ext[id] = copyExtensionEntry(_entries[token]);
     }
     return out;
-  }
-
-  void restore() {
-    for (final e in _stood.entries) {
-      for (final id in e.value) {
-        e.key.resources.remove(id);
-      }
-    }
   }
 
   int? _tokenOf(ResourceSpec? r) {
