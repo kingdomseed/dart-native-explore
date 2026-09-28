@@ -158,3 +158,17 @@ cross-platform sweep/caps work and one belongs to the iOS owner.
 | 4122294463 | `lib/src/diff_apply.dart:558` | P2: Reject unsupported procedural shape names | FIX | 25b1222. Reproduced: `isD3ExtensionResourceJson` accepted `cylnder`. Now only `kD3ProcShapes` count, and a typo gets upstream's `FsceneFormatException` |
 | 4122294474 | `lib/src/diff_apply.dart:527` | P2: Preserve extension resources through prefab composition | FIX | 25b1222. Reproduced: upstream `composeScene` output had neither the resource nor an extension entry. `composeScene[Async]WithExtensions` carries and remaps them; used by `loadDocumentComposed` and `loadSubtree[Async]` |
 | 4122294480 | `lib/src/geometry/mesh_data.dart:188` | P2: Preserve normals for singular instance transforms | FIX | 25b1222. Reproduced: `diag(1,1,0)` zeroed the `(0,0,1)` normal. Now uses the cofactor normal matrix and falls back to the source normal. **Natives:** the Android bake keeps the source frame when singular. The Dart cofactor result differs from that for a rotated flattening (Dart rotates the surviving normal), so natives should adopt the cofactor form |
+
+## PR #14 review threads, round 2
+
+| Comment | File:line | Summary | Verdict | Evidence |
+|---|---|---|---|---|
+| 4122712642 | `lib/src/compose_extensions.dart:81` | P2: Avoid mutating shared prefab documents during composition | FIX | 6901693. Reproduced with two concurrent `composeSceneAsyncWithExtensions` calls sharing a cached prefab and staggered loads: a sentinel cuboid leaked into one output. Placeholders now go on per-call shallow clones; inputs are never mutated |
+| 4122712653 | `lib/src/geometry/instances.dart:259` | P2: Cap matrix decoding before allocating transforms | FIX | 3e375f8. Confirmed by code reading: both bounds callers decoded every matrix, then truncated. `d3DecodeMatrices` now stops at `maxCount` (default `kD3MaxBakedInstances`) |
+| 4122712661 | `example/lib/main.dart:420` | P2: Stop W25's roll from rearming auto-rerolls | FIX | a17ea6f. Confirmed by code reading: `_onPhysicsEvent` re-armed the 3 s reroll on every settle. wLoose's own timed rolls already did this before W25, so the "cancelled by wLoose" comment was never true. `AutoRerollGate`: wLoose suspends it for the generation, and a reload resumes it. Not device-verified |
+
+### Draft replies (for the coordinator to post)
+
+- **4122712642:** "Confirmed and fixed in 6901693. I reproduced it with two concurrent `composeSceneAsyncWithExtensions` calls sharing a cached prefab: the second call saw the first call's placeholder, skipped it, and leaked a sentinel cuboid into its output. Placeholders now go on per-call shallow clones of the host and each resolved prefab, so inputs are never mutated and there's no restore step. Test: `pr14_review_test` '4122712642 — concurrent composes share a cached prefab'."
+- **4122712653:** "Confirmed and fixed in 3e375f8. Both bounds callers decoded the whole payload and then truncated. `d3DecodeMatrices` now takes `maxCount` (default `kD3MaxBakedInstances`) and never allocates past it. Test: `instance_bounds_test` 'matrix decode cap'."
+- **4122712661:** "Confirmed and fixed in a17ea6f. Every settle re-armed the 3 s auto-reroll, so W25's close-out roll restarted the loop before W18. wLoose's own timed rolls already did that, so the loop was never really off after +78 s. A settle now re-arms only while `AutoRerollGate` is open: wLoose closes it for the rest of the scene generation, and a reload reopens it. Unit-tested (`phase_timers_test` 'auto-reroll gate'). Not verified on a device."
