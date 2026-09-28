@@ -2136,6 +2136,10 @@ enum FsceneRealizer {
                         + "_output.color.a = 1.0;", cutoff)
                 ]
             default:
+                // Forward-compatible/unknown mode → opaque, and opaque
+                // means `.replace` (the explicit case's reasoning): the
+                // default `.alpha` would still composite source alpha.
+                m.blendMode = .replace
                 host.logOnce("material.\(key).alphaMode.\(alphaMode ?? "?")",
                     "material \(key): unknown alphaMode "
                     + "'\(alphaMode ?? "?")'; kept opaque")
@@ -3390,12 +3394,15 @@ enum FsceneRealizer {
                     for x in 0..<nw {
                         var sx = 0.0, sy = 0.0, sz = 0.0
                         var sa = 0
-                        // Clamped taps: odd dims reweight the edge
-                        // texel — a small bias at NPOT edges, noted.
-                        for dy in 0..<2 {
-                            for dx in 0..<2 {
-                                let px = min(x * 2 + dx, w - 1)
-                                let py = min(y * 2 + dy, h - 1)
+                        // Each destination texel averages its FULL
+                        // source footprint [x·w/nw, (x+1)·w/nw) — on an
+                        // odd (NPOT) edge that is 3 texels, so the last
+                        // row/column is never dropped (a 3×3 → 1×1
+                        // step covers all 9).
+                        let x0 = x * w / nw, x1 = (x + 1) * w / nw
+                        let y0 = y * h / nh, y1 = (y + 1) * h / nh
+                        for py in y0..<max(y1, y0 + 1) {
+                            for px in x0..<max(x1, x0 + 1) {
                                 let o = (py * w + px) * 4
                                 sx += Double(prev[o]) / 127.5 - 1.0
                                 sy += Double(prev[o + 1]) / 127.5 - 1.0
@@ -3403,6 +3410,7 @@ enum FsceneRealizer {
                                 sa += Int(prev[o + 3])
                             }
                         }
+                        let taps = max(x1 - x0, 1) * max(y1 - y0, 1)
                         let d = (y * nw + x) * 4
                         let len = (sx * sx + sy * sy + sz * sz)
                             .squareRoot()
@@ -3418,7 +3426,7 @@ enum FsceneRealizer {
                             next[d] = 128; next[d + 1] = 128
                             next[d + 2] = 255
                         }
-                        next[d + 3] = UInt8(clamping: sa / 4)
+                        next[d + 3] = UInt8(clamping: sa / taps)
                     }
                 }
                 levels.append(next)
@@ -4888,7 +4896,11 @@ enum FsceneRealizer {
                 light.automaticallyAdjustsShadowProjection = false
                 light.orthographicScale = CGFloat(v)
             }
-            switch p["shadowCasterFaces"] as? String ?? "front" {
+            // Dart-authored StringValues arrive tagged ({"s": …}) —
+            // d3String first, a bare string as the fallback.
+            let casterFaces = d3String(p["shadowCasterFaces"])
+                ?? p["shadowCasterFaces"] as? String ?? "front"
+            switch casterFaces {
             case "back":
                 // Second-depth shadow mapping — SceneKit's one
                 // native analog of the wire enum.
@@ -4901,8 +4913,8 @@ enum FsceneRealizer {
                 break
             default:
                 host.logOnce(
-                    "w24.shadowCasterFaces.\(p["shadowCasterFaces"] ?? "?")",
-                    "shadowCasterFaces '\(p["shadowCasterFaces"] ?? "?")' "
+                    "w24.shadowCasterFaces.\(casterFaces)",
+                    "shadowCasterFaces '\(casterFaces)' "
                     + "unknown; kept 'front'")
             }
             // Present-but-unsupported members — one warning per field
