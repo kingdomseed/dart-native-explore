@@ -724,11 +724,12 @@ DiceTableScene? buildDiceTable({
 
   // Warm key steeply overhead — shadows sit mostly under the dice
   // like the lamp-over-table reference — plus a cool fill; studio env
-  // dimmed so the key's shadows stay visible. Lights emit along −Z —
-  // same Ry(yaw)·Rx(pitch) decomposition as the showcase camera,
-  // aiming +Z at the negated light direction.
+  // dimmed so the key's shadows stay visible. Lights emit along +Z
+  // (upstream DirectionalLightComponent.worldDirection = rotation ×
+  // (0,0,1)) — same Ry(yaw)·Rx(pitch) decomposition as the showcase
+  // camera, aiming +Z along the light's travel direction.
   Quaternion aimLight(Vector3 dir) {
-    final fwd = -dir;
+    final fwd = dir;
     final pitch = -asin(fwd.y.clamp(-1.0, 1.0));
     final yaw = atan2(fwd.x, fwd.z);
     return Quaternion.axisAngle(Vector3(0, 1, 0), yaw) *
