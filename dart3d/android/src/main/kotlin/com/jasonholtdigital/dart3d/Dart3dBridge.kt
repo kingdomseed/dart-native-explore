@@ -62,7 +62,7 @@ object Dart3dBridge : DNAndroidPluginProvider {
             val ctx: Context? = DNAppContext.get()
             val vulkan = ctx?.packageManager?.hasSystemFeature(
                 PackageManager.FEATURE_VULKAN_HARDWARE_VERSION) ?: true
-            MaterialPackages.prewarm(
+            MaterialPackages.prewarmSpeculative(
                 if (vulkan) MaterialBuilder.TargetApi.VULKAN
                 else MaterialBuilder.TargetApi.OPENGL)
         } catch (t: Throwable) {
