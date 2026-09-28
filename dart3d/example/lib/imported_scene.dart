@@ -208,7 +208,7 @@ const importedDice = [
         'directionalLight',
         properties: {
           'color': ColorValue(1, 1, 1, 1),
-          'intensity': DoubleValue(1400),
+          'intensity': DoubleValue(keyLightIntensity(1400)),
           'castsShadow': BoolValue(true),
           'shadowRadius': DoubleValue(3.0),
           'shadowDepthBias': DoubleValue(0.005),

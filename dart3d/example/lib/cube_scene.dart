@@ -141,7 +141,7 @@ final class CubeScene {
           'directionalLight',
           properties: {
             'color': ColorValue(1, 1, 1, 1),
-            'intensity': DoubleValue(1400),
+            'intensity': DoubleValue(keyLightIntensity(1400)),
             'castsShadow': BoolValue(true),
           },
         ),

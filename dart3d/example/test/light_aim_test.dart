@@ -44,6 +44,11 @@ void main() {
     }
   });
 
+  test('keyLightIntensity scales only on iOS', () {
+    expect(keyLightIntensity(2400, ios: false), 2400);
+    expect(keyLightIntensity(2400, ios: true), closeTo(2400 * 0.2604, 1e-6));
+  });
+
   test('zero vector falls back to identity', () {
     final q = aimAlong(Vector3.zero());
     expect(q.w, closeTo(1, 1e-9));
