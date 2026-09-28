@@ -1283,24 +1283,24 @@ object FsceneRealizer {
                     (p.tag("bottomRadius").d3Double() ?: 0.5).toFloat(),
                     (p.tag("topRadius").d3Double() ?: 0.5).toFloat(),
                     (p.tag("height").d3Double() ?: 1.0).toFloat(),
-                    seg(p, "radialSegments", 32),
+                    seg(p, "radialSegments", 32, min = 3),
                     seg(p, "heightSegments", 1),
                     p.tag("bottomCap").d3Bool() != false,
                     p.tag("topCap").d3Bool() != false)
                 "cone" -> return MeshFactory.cylinder(
                     (p.tag("radius").d3Double() ?: 0.5).toFloat(), 0f,
                     (p.tag("height").d3Double() ?: 1.0).toFloat(),
-                    seg(p, "radialSegments", 32),
+                    seg(p, "radialSegments", 32, min = 3),
                     seg(p, "heightSegments", 1),
                     p.tag("bottomCap").d3Bool() != false, false)
                 "capsule" -> return MeshFactory.capsule(
                     (p.tag("radius").d3Double() ?: 0.5).toFloat(),
                     (p.tag("height").d3Double() ?: 1.0).toFloat(),
-                    seg(p, "radialSegments", 32),
+                    seg(p, "radialSegments", 32, min = 3),
                     seg(p, "capRings", 8))
                 "disc" -> return MeshFactory.disc(
                     (p.tag("radius").d3Double() ?: 0.5).toFloat(),
-                    seg(p, "segments", 32))
+                    seg(p, "segments", 32, min = 3))
                 "tube" -> {
                     val pts = d3PointList(p, "points")
                     if (pts == null || pts.size < 2) {
@@ -1327,7 +1327,7 @@ object FsceneRealizer {
                         ?: doubleArrayOf(0.0, 1.0, 0.0)
                     return MeshFactory.ribbon(pts,
                         (p.tag("width").d3Double() ?: 1.0).toFloat(),
-                        maxOf(2, p.tag("stations").d3Int() ?: 64),
+                        seg(p, "stations", 64, min = 2),
                         MeshFactory.V3(
                             u[0].toFloat(), u[1].toFloat(), -u[2].toFloat()),
                         p.tag("closed").d3Bool() == true)
