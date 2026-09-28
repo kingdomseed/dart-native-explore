@@ -150,15 +150,19 @@ final class SceneController {
   /// Host asset resolution stays with the caller: [loadPrefab] maps
   /// each `instance.source` AssetRef to its decoded (uncomposed)
   /// document, exactly as `composeSceneAsync`'s `load` contract
-  /// specifies.
+  /// specifies. [strictFeatures] follows [loadDocument] and applies to
+  /// the composed result, so a document requiring `prefabInstances`
+  /// passes once its eager instances are expanded.
   Future<void> loadDocumentComposed(
     SceneDocument doc, {
     required AsyncPrefabLoader loadPrefab,
     LutResolver? resolveLuts,
+    bool strictFeatures = false,
   }) async {
     loadDocument(
       await composeSceneAsync(doc, load: loadPrefab),
       resolveLuts: resolveLuts,
+      strictFeatures: strictFeatures,
     );
   }
 

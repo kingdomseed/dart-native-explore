@@ -609,9 +609,9 @@ void main() {
 
     test('missingRequiredFeatures names only the unrealized required set', () {
       final doc = SceneDocument()
-        ..featuresRequired.addAll({'skinning', 'streaming', 'renderTextures'})
-        ..featuresUsed.add('prefabInstances');
-      expect(missingRequiredFeatures(doc), {'streaming'});
+        ..featuresRequired.addAll({'skinning', 'streaming', 'gaussianSplats'})
+        ..featuresUsed.add('decals');
+      expect(missingRequiredFeatures(doc), {'gaussianSplats'});
     });
   });
 
