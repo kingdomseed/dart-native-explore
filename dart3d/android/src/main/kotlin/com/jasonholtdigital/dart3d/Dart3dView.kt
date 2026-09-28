@@ -1987,11 +1987,76 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     private val surgicalJournal = ArrayList<JournalEntry>()
     private var replayingJournal = false
 
+    /** The flag set of an `updateNode` op (empty for other ops). */
+    private fun opFlags(json: JSONObject): Set<String> {
+        val a = json.optJSONArray("flags") ?: return emptySet()
+        return (0 until a.length()).mapTo(HashSet()) { a.optString(it) }
+    }
+
+    private fun opNode(e: JournalEntry): Long? =
+        (e as? JournalEntry.Plain)?.op?.let { jsonKey(it) }
+
+    /**
+     * Appends a structural op, pruning what it makes obsolete so the
+     * journal tracks current structure rather than full history
+     * (a long-lived document's repeated updates would otherwise grow
+     * memory and the main-thread replay without bound):
+     *  - `updateNode` drops earlier updates of the same node whose flag
+     *    set it covers — the later spec rewrites those fields;
+     *  - `removeNode` drops the node's earlier updates, and when the
+     *    node itself was command-added (its `addNode` is journaled) and
+     *    no journaled op still names it as a parent, the add and the
+     *    remove cancel out entirely.
+     */
+    private fun compactInto(op: String, json: JSONObject) {
+        val key = jsonKey(json)
+        if (key != null) {
+            when (op) {
+                "updateNode" -> {
+                    val flags = opFlags(json)
+                    if (flags.isNotEmpty()) {
+                        surgicalJournal.removeAll { e ->
+                            e is JournalEntry.Plain &&
+                                e.op.optString("op") == "updateNode" &&
+                                opNode(e) == key &&
+                                flags.containsAll(opFlags(e.op))
+                        }
+                    }
+                }
+                "removeNode" -> {
+                    surgicalJournal.removeAll { e ->
+                        e is JournalEntry.Plain &&
+                            e.op.optString("op") == "updateNode" &&
+                            opNode(e) == key
+                    }
+                    val add = surgicalJournal.indexOfFirst { e ->
+                        e is JournalEntry.Plain &&
+                            e.op.optString("op") == "addNode" &&
+                            opNode(e) == key
+                    }
+                    val token = json.optString("node")
+                    val parentOfOthers = surgicalJournal.any { e ->
+                        e is JournalEntry.Plain &&
+                            e.op.optString("parent") == token
+                    }
+                    if (add >= 0 && !parentOfOthers) {
+                        surgicalJournal.removeAt(add)
+                        return
+                    }
+                }
+            }
+        }
+        surgicalJournal.add(JournalEntry.Plain(json))
+        if (surgicalJournal.size == JOURNAL_WARN_SIZE) {
+            Log.w(TAG, "surgical journal reached $JOURNAL_WARN_SIZE " +
+                "entries — a deferred-payload re-realize replays them all")
+        }
+    }
+
     private fun journalTopLevel(json: JSONObject) {
         if (replayingJournal) return
-        when (json.optString("op")) {
-            "addNode", "updateNode", "removeNode" ->
-                surgicalJournal.add(JournalEntry.Plain(json))
+        when (val op = json.optString("op")) {
+            "addNode", "updateNode", "removeNode" -> compactInto(op, json)
             "loadSubtree" -> {
                 val key = jsonKey(json) ?: return
                 // A re-load keeps its first slot (load order).
@@ -3042,10 +3107,14 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         }
         // W5: vertex/index chunks backing geometry resources —
         // re-decode each claiming geometry and rebind its consumers.
+        // Every claimant is serviced — one chunk may back several
+        // consumers (instance matrices reused as skin IBMs, floats
+        // shared by an animation), like applyPayload's binary path.
+        var claimed = false
         // W26: instance transform/color chunks re-bake their nodes.
         if (FsceneRealizer.surgicalContext(this)
                 .redecodeInstancesForPayload(key) > 0) {
-            return
+            claimed = true
         }
         val geoKeys = resources.geometryPayloadIds
             .filter { key in it.value }.keys.toList()
@@ -3055,7 +3124,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 val spec = resources.geometryResources[geoKey] ?: continue
                 ctx.redecodeGeometry(geoKey, spec)
             }
-            return
+            claimed = true
         }
         // W11: an IBM chunk re-decodes its skin; a timeline/keyframes
         // chunk re-decodes its animation (live clips keep playback —
@@ -3066,7 +3135,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             for (skinKey in skinKeys) {
                 resources.skinDefs[skinKey]?.let { redecodeSkin(skinKey, it) }
             }
-            return
+            claimed = true
         }
         val animKeys = resources.animPayloadIds
             .filter { key in it.value }.keys.toList()
@@ -3076,8 +3145,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     redecodeAnimation(animKey, it)
                 }
             }
-            return
+            claimed = true
         }
+        if (claimed) return
         // W25 fix-2: every claim map was checked surgically above —
         // reaching here means no installed or deferred resource awaits
         // this chunk, so a manifest re-realize would gain nothing (and
@@ -4235,6 +4305,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         lastFrameNanos = tNanos
 
         if (!materialsReady) {
+            // Idempotent while a prewarm runs; restarts one whose
+            // thread threw (bounded retries, then a visible failure).
+            MaterialPackages.prewarm(MaterialPackages.apiFor(engine.backend))
             materialsReady = tryLoadBaseMaterials()
             if (materialsFailed) {
                 // Dead view: drop queued mutations rather than hold
@@ -4646,6 +4719,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         private const val PI_F = 3.1415927f
         // W30: Dart3dSetBackend wire values, shared with the Dart caller.
         private const val SLOW_FRAME_MS = 250L
+        private const val JOURNAL_WARN_SIZE = 2048
         private const val MAX_LUT_CACHE_ENTRIES = 4
         private const val BACKEND_OPENGL = 1
         private const val BACKEND_VULKAN = 2

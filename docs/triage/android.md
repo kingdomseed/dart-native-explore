@@ -113,6 +113,23 @@ simulator.
 | 4122634329 | Dart3dView.kt:1480 | FIXED | Confirmed: only `rawDt` honored the `lastFrameNanos == 0` sentinel, so a resume injected a 100 ms physics/animation/trail step. The general `dt` is now 0 on the sentinel frame as well, which also applies to the very first frame. |
 | 4122634342 | ParticleRuntime.kt:1338 | FIXED | Confirmed: radial distance misorders laterally offset particles and anything under an ortho camera. The key is now view depth, `(p − camPos) · camForward` (the camera's world forward is passed into `tick`), mapped through an order-preserving float→int transform so negative depths sort correctly too. |
 
+## PR #16 review, round 3 (Codex, 6 threads)
+
+The branch is rebased onto `main` (1c3f961, PR #14 merged), with the
+integration fixes cherry-picked from `origin/stabilize/integration`
+(51ec9d3, 3673e02, 8aa13fa, e0c5b41, c115d3e, a6b8c1a, ab62511,
+62b3a19). Green without devices: `compileReleaseKotlin`, JVM tests
+34/34, `dn analyze` clean, `dn test` dart3d 273 / example 126.
+
+| Comment id | File:line | Verdict | Draft reply |
+|---|---|---|---|
+| 4123023188 | FsceneRealizer.kt:3452 | FIXED (integration) | Right: the demo keys were authored for −Z. They now all aim through the shared `aimAlong` helper (`example/lib/light_aim.dart`), which points node +Z along the intended travel direction: cube, imported, feature and showcase keys in 51ec9d3, and the "keys travel with the camera" correction in a6b8c1a. Verified on the A142 and the iOS sim in the integration T2 run (`docs/triage/integration.md`). |
+| 4123023200 | example/lib/dice_table_scene.dart:732 | FIXED (integration, stopgap) | Confirmed. The iOS directional intensities are now scaled by `kIosDirectionalScale` (SceneKit's 1000-per-unit vs Android's calibrated 10 lx/unit at Filament's default exposure) through `keyLightIntensity` (3673e02; showcase fill c115d3e). The direction stays corrected. Unifying the native unit mapping is tracked in `docs/triage/integration.md` as the real fix. |
+| 4123023209 | Dart3dView.kt:3026 | FIXED | Confirmed. `applyUpsertPayload` now services every claimant: the instance rebake, geometry, skin and animation handlers each run when they claim the chunk. The "unclaimed" log fires only when none did, matching `applyPayload`'s binary path. |
+| 4123023220 | FsceneRealizer.kt:1677 | FIXED | Confirmed. `destroyProcRenderable` now removes the entity's `(entity, slot)` pairs from `materialConsumers` before a rebuild re-registers them, so repeated payload rebakes no longer grow the list or cause repeated rebinds. |
+| 4123023229 | MaterialPackages.kt:244 | FIXED | Confirmed: a throwing prewarm left `prewarmStarted` set with no cache or `failed` entry, so views polled forever. The catch now clears the marker and the waiting view's frame loop re-requests the prewarm. After 2 thrown attempts per API, the missing base packages are marked failed, which the view surfaces as its visible init-failure notice. |
+| 4123023236 | Dart3dView.kt:1972 | FIXED | Confirmed. The journal now compacts as ops arrive. An `updateNode` drops earlier updates of the same node whose flags it covers. A `removeNode` drops the node's earlier updates, and cancels out entirely against a journaled `addNode` of that node when nothing journaled still names it as a parent. A one-time warning fires if the journal still reaches 2048 entries. |
+
 ## Needs other owner
 
 - **Dart (example): other hard-coded light rotations assume −Z emission.**
