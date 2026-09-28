@@ -54,7 +54,12 @@ enum GeometryFactory {
     /// sources the payload decoder emits, so materials bind
     /// identically on procedural and payload meshes.
     static func makeGeometry(_ parts: MeshParts) -> SCNGeometry {
-        guard parts.vertexCount > 0 else { return SCNGeometry() }
+        // Empty streams (a facing mesh whose segments all collapsed,
+        // an empty bake) become an empty geometry — never a
+        // force-unwrapped empty buffer.
+        guard parts.vertexCount > 0, !parts.indices.isEmpty else {
+            return SCNGeometry()
+        }
         var sources = [SCNGeometrySource]()
         parts.positions.withUnsafeBufferPointer {
             sources.append(floatSource(
@@ -801,7 +806,9 @@ enum GeometryFactory {
             }
         }
         stitchRings(&b, ringBases, radialSegments + 1)
-        if caps {
+        // A closed path's first and last rings share the loop seam —
+        // caps there would be coincident internal triangles.
+        if caps && !closed {
             tubeCap(&b, frames.first!, radius, radialSegments, atEnd: false)
             tubeCap(&b, frames.last!, radius, radialSegments, atEnd: true)
         }
@@ -924,6 +931,16 @@ enum GeometryFactory {
     ) -> MeshParts {
         guard points.count >= 2 else { return MeshParts() }
         let pts = closed ? points + [points[0]] : points
+        // Span budget: a nonpositive/non-finite period (the `(0,0)`
+        // hang) or a pattern finer than the cap renders solid.
+        var total = Float(0)
+        for i in 0..<pts.count - 1 { total += simd_length(pts[i + 1] - pts[i]) }
+        let period = onLen + offLen
+        if !(onLen > 0) || !(offLen >= 0) || !period.isFinite
+            || total / period > Float(maxDashSpans) {
+            return polyline(points, width: width, viewDir: viewDir,
+                            colors: colors, widths: widths, closed: closed)
+        }
         var b = ProcBuilder()
         var distance = Float(0)
         var on = true
@@ -1050,10 +1067,22 @@ enum GeometryFactory {
     /// transform by the matrix itself (re-orthogonalized against the
     /// new normal, bitangent handedness `w` flipping with the
     /// determinant), and uv0/color/uv1 pass through per vertex.
+    /// `kD3MaxBakedVertices` (Dart `limits.dart`): total vertices in
+    /// one baked instance mesh. The instance list truncates from the
+    /// tail to fit; a base mesh larger than the budget keeps one.
+    static let maxBakedVertices = 1 << 20
+    /// `kD3MaxDashSpans`: a dash pattern that would emit more on-spans
+    /// renders solid instead (and a nonpositive period can't advance).
+    static let maxDashSpans = 16384
+
     static func bakeInstances(
-        _ base: MeshParts, _ matrices: [simd_float4x4],
+        _ base: MeshParts, _ allMatrices: [simd_float4x4],
         colors: [SIMD4<Float>]?
     ) -> MeshParts {
+        let keep = min(allMatrices.count,
+                       max(1, maxBakedVertices / max(base.vertexCount, 1)))
+        let matrices = allMatrices.count > keep
+            ? Array(allMatrices.prefix(keep)) : allMatrices
         var b = ProcBuilder()
         let hasTangents = base.tangents.count == base.vertexCount
         let hasUv1 = base.uv1s.count == base.vertexCount
@@ -1097,8 +1126,24 @@ enum GeometryFactory {
                        tangent: tangent,
                        uv1: hasUv1 ? base.uv1s[v] : nil)
             }
-            for idx in base.indices {
-                b.parts.indices.append(idx + UInt32(base0))
+            // A reflection (negative determinant) reverses the
+            // transformed triangles' orientation — swap each
+            // triangle's last two indices so single-sided materials
+            // still see the front faces.
+            if flip < 0 {
+                var t = 0
+                while t + 2 < base.indices.count {
+                    b.parts.indices.append(base.indices[t] + UInt32(base0))
+                    b.parts.indices.append(
+                        base.indices[t + 2] + UInt32(base0))
+                    b.parts.indices.append(
+                        base.indices[t + 1] + UInt32(base0))
+                    t += 3
+                }
+            } else {
+                for idx in base.indices {
+                    b.parts.indices.append(idx + UInt32(base0))
+                }
             }
         }
         return b.parts

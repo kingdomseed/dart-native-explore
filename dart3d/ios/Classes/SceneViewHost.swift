@@ -205,6 +205,56 @@ final class SceneViewHost: SCNView {
     /// rather than behind a lock: every access site is main-thread.
     var mainScreenSubviews: [(view: SCNView, rec: ViewRec)] = []
 
+    /// MAIN-THREAD: the pov node each sibling was built with, by index
+    /// — the pose poke writes these directly (SCNView's `pointOfView`
+    /// getter is not a reliable handle on a detached proxy).
+    var mainScreenSubviewPovs: [SCNNode] = []
+
+    /// MAIN-THREAD: the `screenSubviewBuild` generation the installed
+    /// `mainScreenSubviews` belong to — a pose snapshot from another
+    /// generation is dropped instead of posing the wrong sibling.
+    var mainScreenSubviewGen = 0
+
+    /// W24 torn-pose fix: the render queue captures each proxy
+    /// sibling's pose in `willRenderScene` (post-physics) and parks it
+    /// here; the main-thread poke applies it in one `SCNTransaction`
+    /// right before `setNeedsDisplay`, so a sibling never draws a
+    /// proxy the render queue is halfway through rewriting.
+    var siblingPoseSnapshot:
+        (gen: Int, poses: [Int: (SCNMatrix4, SCNCamera)])?
+    let siblingPoseLock = NSLock()
+
+    /// UIKit facts the render queue needs, snapshotted on MAIN
+    /// (`didMoveToWindow`/`layoutSubviews`) — `window`, `bounds` and
+    /// `UIScreen` are main-thread-only UIView/UIKit API, so the render
+    /// path reads these copies instead. Guarded by `uiSnapshotLock`.
+    private var _screenScale: CGFloat = UIScreen.main.scale
+    private var _boundsAspect: Double = 1.0
+    private let uiSnapshotLock = NSLock()
+
+    /// The device (screen) scale — NOT `contentScaleFactor`, which
+    /// also carries the dynamic `renderScale`.
+    var screenScale: CGFloat {
+        uiSnapshotLock.lock(); defer { uiSnapshotLock.unlock() }
+        return _screenScale
+    }
+
+    /// width / height of the host's bounds at the last layout.
+    var boundsAspect: Double {
+        uiSnapshotLock.lock(); defer { uiSnapshotLock.unlock() }
+        return _boundsAspect
+    }
+
+    /// Main thread only — refreshes the render-queue UIKit snapshot.
+    private func refreshUISnapshot() {
+        let scale = window?.screen.scale ?? UIScreen.main.scale
+        let aspect = Double(bounds.width) / Double(max(bounds.height, 1))
+        uiSnapshotLock.lock()
+        _screenScale = scale
+        _boundsAspect = aspect
+        uiSnapshotLock.unlock()
+    }
+
     /// The host's point-of-view in split mode — a detached node whose
     /// camera sees nothing (mask 0), so the host pass contributes
     /// clear/background only while every declared screen view owns a
@@ -406,6 +456,13 @@ final class SceneViewHost: SCNView {
         #else
         isTemporalAntialiasingEnabled = taa.enabled
         #endif
+        // W24: split siblings are the visible views — they copy the
+        // host's view-level TAA flag (main-thread UIKit state).
+        if multiScreenMode {
+            DispatchQueue.main.async { [weak self] in
+                self?.applySiblingHostState()
+            }
+        }
         if taa.enabled
             && (taa.minimumCurrentWeight != 0.1
                 || taa.varianceGamma != 1.0 || taa.sharpness != 0
@@ -761,7 +818,19 @@ final class SceneViewHost: SCNView {
     /// view's `viewport` rect re-maps into the new target space.
     override func layoutSubviews() {
         super.layoutSubviews()
+        refreshUISnapshot()
         layoutScreenSubviews()
+    }
+
+    /// A new window can carry a different screen scale — re-snapshot
+    /// and re-run the quality chain (its `contentScaleFactor` write
+    /// multiplies the screen scale in) on the render queue.
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        refreshUISnapshot()
+        if window != nil {
+            enqueueSceneWork { [weak self] in self?.applyStageQuality() }
+        }
     }
 
     // MARK: - Mutation application (called from Dart3dPlugin.swift)
@@ -828,7 +897,7 @@ final class SceneViewHost: SCNView {
                 // W15: the re-realize discarded the surgically
                 // streamed subtrees with the rest of the scene —
                 // rebuild each from its recorded load batch.
-                replayStreamedSubtrees()
+                replayAfterRealize()
             }
         }
     }
@@ -858,6 +927,11 @@ final class SceneViewHost: SCNView {
         }
         if let v = json["showsStatistics"] as? Bool {
             showsStatistics = v
+            // W24: split siblings cover the host — sibling 0 carries
+            // the statistics overlay (main-thread UIKit state).
+            DispatchQueue.main.async { [weak self] in
+                self?.applySiblingHostState()
+            }
         }
         if let v = json["antialiasingMode"] as? Int {
             antialiasingMode = v >= 4 ? .multisampling4X
@@ -869,12 +943,23 @@ final class SceneViewHost: SCNView {
             applyViewQuality()
         }
         if let argb = json["backgroundColor"] as? Int {
-            backgroundColor = UIColor(
+            let color = UIColor(
                 red: CGFloat((argb >> 16) & 0xFF) / 255.0,
                 green: CGFloat((argb >> 8) & 0xFF) / 255.0,
                 blue: CGFloat(argb & 0xFF) / 255.0,
                 alpha: CGFloat((argb >> 24) & 0xFF) / 255.0
             )
+            // `backgroundColor` is UIView state — this drain runs on
+            // SceneKit's render queue, so the write (and the W24
+            // sibling copies, which cover the host in split mode)
+            // hops to main. Async: the render queue never waits on
+            // main, so no deadlock against a main-thread SceneKit
+            // lock.
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                self.backgroundColor = color
+                self.applySiblingHostState()
+            }
         }
         // W14: a viewConfig AA write loses to a non-'auto' stage/view
         // mode — re-apply the precedence chain after the config lands.
@@ -894,6 +979,8 @@ final class SceneViewHost: SCNView {
         // any pending visible-stamp with them (its node id belongs to
         // the outgoing scene).
         streamedSubtreeOps.removeAll()
+        nodeOpJournal.removeAll()
+        commandCreatedKeys.removeAll()
         subtreeVisibleStamp = nil
         // Shadow-tier registry is per-scene — repopulated by the
         // coming decode's light pass.
@@ -1021,6 +1108,22 @@ final class SceneViewHost: SCNView {
     /// through the same handlers.
     private func applyCommandJson(_ json: [String: Any]) {
         guard let op = json["op"] as? String else { return }
+        commandDepth += 1
+        defer { commandDepth -= 1 }
+        // Declared after the depth defer, so it runs first — the
+        // journal step still sees this dispatch's depth.
+        let journaled = op == "addNode" || op == "updateNode"
+            || op == "removeNode"
+        if journaled { removedCommandAdded.removeAll() }
+        // An addNode CREATES only when the id isn't live — a re-sent
+        // batch's addNode on a live (e.g. manifest) node degrades to
+        // an update and must not mark the node command-created.
+        if op == "addNode", !replayingOps, commandDepth == 1,
+           let token = json["node"] as? String,
+           let key = D3Wire.localIdKey(token), nodesById[key] == nil {
+            commandCreatedKeys.insert(key)
+        }
+        defer { if journaled { journalNodeOp(op, json) } }
         switch op {
         case "removeNode":
             guard let token = json["node"] as? String,
@@ -1148,9 +1251,10 @@ final class SceneViewHost: SCNView {
         }
         if loading {
             if let i = existing {
-                streamedSubtreeOps[i] = (key: key, ops: ops)
+                streamedSubtreeOps[i].ops = ops
             } else {
-                streamedSubtreeOps.append((key: key, ops: ops))
+                opSeq += 1
+                streamedSubtreeOps.append((key: key, ops: ops, seq: opSeq))
             }
         } else if let i = existing {
             streamedSubtreeOps.remove(at: i)
@@ -1193,7 +1297,114 @@ final class SceneViewHost: SCNView {
     /// streamed. A `removeNode` that dooms a placeholder drops its
     /// record, and `applyLoadScene` clears the list — a new
     /// document's session keys invalidate the old batches.
-    private var streamedSubtreeOps: [(key: UInt64, ops: [Any])] = []
+    private var streamedSubtreeOps:
+        [(key: UInt64, ops: [Any], seq: Int)] = []
+
+    /// Top-level structural node ops (`addNode`/`updateNode`/
+    /// `removeNode`) applied since the last `loadScene`, in arrival
+    /// order — the payload-arrival re-realize rebuilds the scene from
+    /// `lastManifest`, which never saw them, so they replay after it
+    /// (interleaved with the subtree records by `seq`, so a subtree
+    /// grafted under a command-added node, or an op on a streamed
+    /// member, lands in its original order). Pruned as it grows: a
+    /// `removeNode` drops every earlier entry for the doomed ids (and
+    /// isn't itself recorded when the target was command-added), and
+    /// an `updateNode` replaces the previous one for the same id and
+    /// flag set. Nested subtree ops aren't recorded — their batch is
+    /// already the subtree's replay record.
+    private var nodeOpJournal:
+        [(key: UInt64, seq: Int, json: [String: Any])] = []
+    private var opSeq = 0
+    /// >0 while `applyCommandJson` is dispatching — nested (subtree
+    /// batch) ops see depth >1 and stay out of the journal.
+    private var commandDepth = 0
+    /// True while `replayAfterRealize` re-applies recorded ops — they
+    /// must neither re-record nor prune the journal they come from.
+    private var replayingOps = false
+
+    /// Records one top-level node op for replay (see `nodeOpJournal`).
+    private func journalNodeOp(_ op: String, _ json: [String: Any]) {
+        guard !replayingOps, commandDepth == 1,
+              let token = json["node"] as? String,
+              let key = D3Wire.localIdKey(token) else { return }
+        switch op {
+        case "removeNode":
+            // `removeSubtree` already pruned the doomed ids' add/update
+            // entries. A node a journaled addNode CREATED needs no
+            // replayed removal — unless an earlier removal of the same
+            // id (a manifest node removed, then re-created) is still
+            // journaled, in which case that entry already covers it.
+            if removedCommandAdded.contains(key) { return }
+        case "updateNode":
+            let flags = Set(json["flags"] as? [String] ?? [])
+            nodeOpJournal.removeAll {
+                $0.key == key && ($0.json["op"] as? String) == "updateNode"
+                    && Set($0.json["flags"] as? [String] ?? []) == flags
+            }
+        default:
+            break
+        }
+        opSeq += 1
+        nodeOpJournal.append((key: key, seq: opSeq, json: json))
+    }
+
+    /// Ids whose journaled `addNode` the current `removeSubtree`
+    /// pruned — consulted by the `removeNode` journal step.
+    private var removedCommandAdded: Set<UInt64> = []
+
+    /// Ids a top-level addNode created (absent when it applied) since
+    /// the last `loadScene` — the only nodes whose removal needn't be
+    /// replayed. Cleared with the journal.
+    private var commandCreatedKeys: Set<UInt64> = []
+
+    /// Replays every live subtree record and journaled node op in
+    /// original order — called right after a payload-arrival
+    /// re-realize has rebuilt the manifest scene.
+    private func replayAfterRealize() {
+        if nodeOpJournal.isEmpty {
+            // Same guard as the merged path: the batches' nested node
+            // ops dispatch at depth 1 here and must not journal.
+            replayingOps = true
+            replayStreamedSubtrees()
+            replayingOps = false
+            return
+        }
+        enum Entry { case subtree(Int), op(Int) }
+        var entries: [(seq: Int, e: Entry)] = []
+        for (i, r) in streamedSubtreeOps.enumerated() {
+            entries.append((r.seq, .subtree(i)))
+        }
+        for (i, j) in nodeOpJournal.enumerated() {
+            entries.append((j.seq, .op(i)))
+        }
+        entries.sort { $0.seq < $1.seq }
+        let subtrees = streamedSubtreeOps
+        let journal = nodeOpJournal
+        var dead: Set<UInt64> = []
+        replayingOps = true
+        for entry in entries {
+            switch entry.e {
+            case .subtree(let i):
+                let rec = subtrees[i]
+                // Same dead-placeholder rule as replayStreamedSubtrees.
+                guard nodesById[rec.key] != nil else {
+                    dead.insert(rec.key)
+                    continue
+                }
+                for case let opJson as [String: Any] in rec.ops {
+                    applyCommandJson(opJson)
+                }
+            case .op(let i):
+                applyCommandJson(journal[i].json)
+            }
+        }
+        replayingOps = false
+        if !dead.isEmpty {
+            streamedSubtreeOps.removeAll { dead.contains($0.key) }
+        }
+        d3Log("re-realize replay: \(journal.count) node ops, "
+            + "\(subtrees.count - dead.count) subtrees")
+    }
 
     /// Replays each live subtree's recorded load batch through the
     /// ordinary op dispatch — called right after a payload-arrival
@@ -1201,7 +1412,7 @@ final class SceneViewHost: SCNView {
     private func replayStreamedSubtrees() {
         if streamedSubtreeOps.isEmpty { return }
         var dead: Set<UInt64> = []
-        for (key, ops) in streamedSubtreeOps {
+        for (key, ops, _) in streamedSubtreeOps {
             // A replayed batch can doom a later record's placeholder
             // (a priorRoots `removeNode` taking a placeholder grafted
             // into the doomed subtree): `removeSubtree` drops the
@@ -1262,6 +1473,20 @@ final class SceneViewHost: SCNView {
             // — otherwise the next payload-arrival re-realize would
             // resurrect the streamed subtree.
             streamedSubtreeOps.removeAll { $0.key == k }
+            // The journal's entries for a doomed id die too — a
+            // command-added node's addNode must not resurrect it on
+            // the next re-realize (replay itself never prunes).
+            if !replayingOps {
+                if commandCreatedKeys.remove(k) != nil {
+                    removedCommandAdded.insert(k)
+                }
+                // Earlier removals of this id stay: they undo a
+                // manifest node the replayed re-realize brings back.
+                nodeOpJournal.removeAll {
+                    $0.key == k
+                        && ($0.json["op"] as? String) != "removeNode"
+                }
+            }
             // Node ids can't collide with the resource ids keying the
             // consumer maps — these drops are defensive; the real
             // cleanup is the value-list pass below.
@@ -1535,6 +1760,11 @@ final class SceneViewHost: SCNView {
             retire(ps)
         }
         node.removeAllParticleSystems()
+        // W18: pending/looping burst schedules die with the systems.
+        for k in node.actionKeys where k.hasPrefix(
+            FsceneRealizer.Context.burstActionPrefix) {
+            node.removeAction(forKey: k)
+        }
         // W11: the skinner/morpher ride on the geometry — drop them
         // with it; `decodeMesh` re-attaches on the rebuild.
         node.skinner = nil
@@ -1746,6 +1976,10 @@ final class SceneViewHost: SCNView {
         if let scene, let pov = docPov, pov.camera != nil,
             top === scene.rootNode
         {
+            // A screen view on this same camera wrote its per-view
+            // layerMask onto the SCNCamera (`applyScreenViewCamera`);
+            // the document pass renders every layer again.
+            pov.camera?.categoryBitMask = Int(bitPattern: UInt.max)
             pointOfView = pov
             applyStageExposure(stageExposure)
             applyStageEffects()
@@ -2372,20 +2606,31 @@ final class SceneViewHost: SCNView {
             }
         }
         // Approximate path: scales the drawable backing factor.
+        // `contentScaleFactor` is UIView state and this runs on the
+        // render queue (every drain that touches views/stage), so the
+        // write hops to main — async, never sync: the render queue
+        // must not block on main (main can be waiting on SceneKit's
+        // own scene lock, which this queue holds mid-callback). The
+        // screen scale comes from the main-side snapshot.
         let scale = screenViews.first?.renderScale ?? stageRenderScale
-        contentScaleFactor =
-            scale * (window?.screen.scale ?? UIScreen.main.scale)
+        let target = CGFloat(scale) * screenScale
+        let quality = currentSubviewQuality()
+        let split = multiScreenMode
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            if self.contentScaleFactor != target {
+                self.contentScaleFactor = target
+            }
+            // W24: each sibling resolves its own view's AA/scale —
+            // the sibling list is main-thread state.
+            if split {
+                self.applyScreenSubviewQuality(quality)
+            }
+        }
         if stageFilterQuality != "medium" {
             logOnce("w14.filterQuality",
                 "filterQuality '\(stageFilterQuality)' unsupported on "
                 + "SceneKit; ignored")
-        }
-        // W24: each sibling resolves its own view's AA/scale — the
-        // sibling list is main-thread state.
-        if multiScreenMode {
-            DispatchQueue.main.async { [weak self] in
-                self?.applyScreenSubviewQuality()
-            }
         }
     }
 
@@ -4048,11 +4293,11 @@ extension SceneViewHost: SCNSceneRendererDelegate {
         drainPendingWork()
         sampleAnimations(at: time)
         // W16: trails record after the sampler — the head follows
-        // this frame's sampled pose; lods then re-select and rebind
-        // against this frame's camera (Android's `updateTrailsLods`
-        // slot — post-camera, pre-render).
+        // this frame's sampled pose. LOD selection runs later, in
+        // `willRenderScene`: a physics-driven node's pose is only
+        // final after the sim step, and selecting here read the
+        // pre-sim pose (a one-frame lag on moving bodies).
         updateTrails(at: time)
-        updateLods()
     }
 
     /// W16 per-frame trail pass — `TrailComponent.update` ported:
@@ -4200,17 +4445,17 @@ extension SceneViewHost: SCNSceneRendererDelegate {
         // viewport aspect.
         var fovRadY = Double(cam.fieldOfView) * .pi / 180
         if cam.projectionDirection == .horizontal {
-            let aspect =
-                Double(bounds.width) / Double(max(bounds.height, 1))
+            let aspect = boundsAspect
             fovRadY = 2 * atan(tan(fovRadY / 2) / max(aspect, 1e-9))
         }
         // Both positions live in the same LH→RH-mirrored space — a
         // mirror is an isometry, so the Euclidean distances the
         // metric wants match the authored ones.
+        // Presentation poses — the drawn ones: post-sim for physics
+        // bodies, mid-flight for implicit animations/camera control.
+        let camWorld = pov.presentation.simdWorldPosition
         let camPos = simd_float3(
-            Float(pov.simdWorldPosition.x),
-            Float(pov.simdWorldPosition.y),
-            Float(pov.simdWorldPosition.z))
+            Float(camWorld.x), Float(camWorld.y), Float(camWorld.z))
         for (key, spec) in lodSpecs where !spec.suspended {
             guard let node = nodesById[key] else { continue }
             updateLod(spec, node: node, camPos: camPos,
@@ -4236,7 +4481,7 @@ extension SceneViewHost: SCNSceneRendererDelegate {
             bindLodLevel(spec, node, 0)
             return
         }
-        let m = node.simdWorldTransform
+        let m = node.presentation.simdWorldTransform
         var lo = simd_float3(repeating: Float.greatestFiniteMagnitude)
         var hi = simd_float3(repeating: -Float.greatestFiniteMagnitude)
         for xs in [spec.boundMin.x, spec.boundMax.x] {
@@ -4332,7 +4577,13 @@ extension SceneViewHost: SCNSceneRendererDelegate {
         if let old = node.geometry, old !== g,
            !spec.geoCopies.contains(where: { $0 === old }) {
             // A foreign geometry (a `mesh`'s) retires here; the
-            // spec's own level copies stay alive on the spec.
+            // spec's own level copies stay alive on the spec. Its
+            // material-consumer entries go with it — a later material
+            // upsert would otherwise keep rebinding (and retaining)
+            // the dead geometry.
+            for mk in materialConsumers.keys {
+                materialConsumers[mk]?.removeAll { $0 === old }
+            }
             retire(old)
         }
         node.geometry = g
@@ -4350,6 +4601,9 @@ extension SceneViewHost: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer,
                   willRenderScene scene: SCNScene,
                   atTime time: TimeInterval) {
+        // W16: post-physics, pre-draw — Android's `updateTrailsLods`
+        // slot (post-camera, pre-render) for the lod half.
+        updateLods()
         updateCameraFacing()
         renderDueTargets(at: time)
         syncScreenSubviews()
@@ -4376,7 +4630,10 @@ extension SceneViewHost: SCNSceneRendererDelegate {
                 cameraFacing.removeValue(forKey: key)
                 continue
             }
-            let inv = SCNMatrix4Invert(node.worldTransform)
+            // The drawn (presentation) pose — the camera side already
+            // reads presentation; a physics-driven or implicitly
+            // animated node's model transform lags it.
+            let inv = SCNMatrix4Invert(node.presentation.worldTransform)
             func localDir(_ d: SIMD3<Float>) -> SIMD3<Float> {
                 SIMD3<Float>(
                     inv.m11 * d.x + inv.m21 * d.y + inv.m31 * d.z,
