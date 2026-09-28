@@ -229,13 +229,16 @@ internal object MaterialPackages {
                 }
                 if (stale()) return@Thread
                 trailPackage(api)
-                // Lazily-used packages next — a view compiles these on
-                // main at first use if the prewarm hasn't reached them.
-                if (stale()) return@Thread
-                catcherPackage(api)
-                if (stale()) return@Thread
-                particlePackage(false, api)
-                particlePackage(true, api)
+                // The lazily-used catcher + particle packages are NOT
+                // prewarmed (integration, 2026-09-28): compiling them
+                // here — i.e. concurrently with the first realized
+                // frames — reproducibly ended in a Mali CS_BUS_FAULT /
+                // GPU page fault ("cpu queue set unrecoverable error")
+                // ~0.5 s after the last one finished on the A142
+                // Vulkan materials lane (4/4 runs; 0/1 without them,
+                // GL unaffected). Mechanism not yet understood — see
+                // docs/triage/integration.md. A view compiles them on
+                // main at first use, as before 6b4dcca.
             } catch (t: Throwable) {
                 // A prewarm failure only costs the cache — the view
                 // compiles (and reports) on its own path.
