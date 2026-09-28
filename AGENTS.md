@@ -43,7 +43,9 @@ named `mythic_scene` or anything infringing on `flutter_scene` naming.
 - Active plan: `docs/program-v2.md` (tracks S/E/P/R, verification tiers
   T1–T4, decisions D1–D8). Why it was reset: `docs/program-audit-2026-09-28.md`.
 - `docs/full-engine-program.md` is superseded; use it only for W17–W34 scope text.
-- Parity pin: flutter_scene 0.23.0 / scene 0.3.0 (bdero/flutter_scene `0dc6ee80`).
+- Parity: milestone flutter_scene 0.23.0 / scene 0.3.0 (bdero/flutter_scene
+  `0dc6ee80`); final goal flutter_scene 0.24 / scene 0.4 (Track V), after
+  the existing work is finished.
 
 ## Repo layout
 
