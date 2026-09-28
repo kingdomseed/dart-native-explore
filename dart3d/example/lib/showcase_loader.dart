@@ -279,7 +279,7 @@ ShowcaseScene? loadShowcaseScene(
     name: 'showcase.key',
     transform: TrsTransform(
       // Travels down and away from the camera (upstream +Z travel).
-      rotation: aimAlong(Vector3(0.074, -0.527, -0.847)),
+      rotation: aimAlong(Vector3(0.3, -0.8, 0.5)),
     ),
     components: [
       ComponentSpec(
