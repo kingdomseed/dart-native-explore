@@ -172,3 +172,15 @@ cross-platform sweep/caps work and one belongs to the iOS owner.
 - **4122712642:** "Confirmed and fixed in 6901693. I reproduced it with two concurrent `composeSceneAsyncWithExtensions` calls sharing a cached prefab: the second call saw the first call's placeholder, skipped it, and leaked a sentinel cuboid into its output. Placeholders now go on per-call shallow clones of the host and each resolved prefab, so inputs are never mutated and there's no restore step. Test: `pr14_review_test` '4122712642 — concurrent composes share a cached prefab'."
 - **4122712653:** "Confirmed and fixed in 3e375f8. Both bounds callers decoded the whole payload and then truncated. `d3DecodeMatrices` now takes `maxCount` (default `kD3MaxBakedInstances`) and never allocates past it. Test: `instance_bounds_test` 'matrix decode cap'."
 - **4122712661:** "Confirmed and fixed in a17ea6f. Every settle re-armed the 3 s auto-reroll, so W25's close-out roll restarted the loop before W18. wLoose's own timed rolls already did that, so the loop was never really off after +78 s. A settle now re-arms only while `AutoRerollGate` is open: wLoose closes it for the rest of the scene generation, and a reload reopens it. Unit-tested (`phase_timers_test` 'auto-reroll gate'). Not verified on a device."
+
+## PR #14 review threads, round 3
+
+| Comment | File:line | Summary | Verdict | Evidence |
+|---|---|---|---|---|
+| 4123065167 | `lib/src/compose_extensions.dart:125` | P2: Avoid confusing authored cuboids with extension sentinels | FIX | 7f2b31c. Reproduced: an authored cuboid `(-1, -1, 0.5)` was swapped for an unrelated extension resource. Placeholders are now recognized by object identity: upstream passes `procedural` through by reference, and the specs are held in an identity map |
+| 4123065174 | `example/lib/feature_scene.dart:4118` | P2: Own the W25 settle subscription | FIX | 23e6ac0. Confirmed: a test shows `firstWhere(...).timeout(...)` leaves a listener after timing out. The new `PhaseTimers.firstWithin` owns the listener and cancels it on match, on timeout, and on `cancelAll`; W25 uses it |
+
+### Draft replies (for the coordinator to post)
+
+- **4123065167:** "Confirmed and fixed in 7f2b31c. A test composing a host that authors `CuboidGeometrySpec(extents: (-1, -1, 0.5))` showed it replaced by an extension entry. Upstream `_remapResource` passes `procedural` through by reference, so each placeholder's spec object is now the key in an identity map, and dimensions no longer matter. Test: `pr14_review_test` '4123065167 — authored cuboids are never mistaken for sentinels'."
+- **4123065174:** "Confirmed and fixed in 23e6ac0. A test shows `firstWhere(...).timeout(...)` leaves `hasListener` true after the timeout. The new `PhaseTimers.firstWithin` registers the listener with the generation and cancels it on match, on timeout, and on `cancelAll`, returning null on timeout. The W25 close-out uses it. Tests: `phase_timers_test` 'firstWithin' group. Not verified on a device."
