@@ -3326,6 +3326,15 @@ object FsceneRealizer {
             rec: NodeRec, p: JSONObject, type: LightManager.Type,
         ) {
             val builder = LightManager.Builder(type)
+            // Emission axis. Wire lights emit along their local −Z
+            // (the example scenes aim +Z at the negated direction);
+            // the z-mirror conversion (S·R·S) turns wire-local −Z into
+            // Filament-local +Z. Filament's builder default is
+            // (0,−1,0) — left unset, every light shone along a
+            // rotated −Y: directional keys grazed the scene and cast
+            // shadows away from every receiver (the "inert shadow
+            // chain" of the stabilization audit).
+            builder.direction(0f, 0f, 1f)
             p.tag("color").d3Color()?.let {
                 builder.color(it[0], it[1], it[2])
             }
@@ -3378,7 +3387,7 @@ object FsceneRealizer {
                 builder.shadowOptions(so)
                 Log.i(TAG, "shadow options: mapSize=${so.mapSize}" +
                     " cascades=${so.shadowCascades}" +
-                    " maxDist=${so.maxShadowDistance}" +
+                    " far=${so.shadowFar} contactDist=${so.maxShadowDistance}" +
                     " contact=${so.screenSpaceContactShadows}" +
                     " bias=${so.constantBias} normalBias=${so.normalBias}" +
                     " bulbRadius=${so.shadowBulbRadius}")
@@ -3389,7 +3398,17 @@ object FsceneRealizer {
                 // shadow option, so it applies whether or not the
                 // light casts (matches iOS's decode placement).
                 p.tag("angularRadius").d3Double()?.let {
-                    builder.sunAngularRadius(it.toFloat())
+                    // Wire radians → Filament degrees. Filament reads
+                    // sunAngularRadius only on SUN lights (the sky
+                    // disk); this DIRECTIONAL light keeps its shadow
+                    // penumbra from shadowRadius/shadowSoftness — say
+                    // so rather than claim the mapping.
+                    builder.sunAngularRadius(
+                        Math.toDegrees(it).toFloat())
+                    warnOnce("w24.directional.angularRadius",
+                        "angularRadius has no effect on a Filament " +
+                            "DIRECTIONAL light (SUN-only); shadow " +
+                            "softness follows shadowSoftness")
                 }
                 // The contact-shadow extensions still need a casting
                 // light — warn rather than drop silently.
@@ -3447,7 +3466,11 @@ object FsceneRealizer {
                 so.shadowCascades = it.toInt().coerceIn(1, 4)
             }
             p.tag("shadowMaxDistance").d3Double()?.let {
-                so.maxShadowDistance = it.toFloat()
+                // The camera-distance range the shadow map covers —
+                // Filament's `shadowFar`. (`maxShadowDistance` is the
+                // CONTACT-shadow ray length; writing the range there
+                // left the map spanning the whole camera frustum.)
+                so.shadowFar = it.toFloat()
             }
             p.tag("shadowNormalBias").d3Double()?.let {
                 // Exact — overrides the shadowDepthBias 2:1 split's
@@ -3458,18 +3481,14 @@ object FsceneRealizer {
                 // dart3d wire extension — upstream carries it on
                 // `sunLight`, deferred here. Exact — Filament's
                 // screen-space contact-shadow chain.
-                // `contactShadowDistance` has no distance knob (the
-                // march's reach is fixed by the light), so an
-                // authored value only rides the approximation note.
                 so.screenSpaceContactShadows = it
             }
-            if (p.tag("contactShadowDistance").d3Double() != null) {
+            p.tag("contactShadowDistance").d3Double()?.let {
                 // dart3d wire extension — upstream carries it on
-                // `sunLight`, deferred here.
-                warnOnce("w24.contactShadowDistance",
-                    "contactShadowDistance has no Filament equivalent " +
-                        "— screen-space contact shadows march a fixed " +
-                        "reach; ignored")
+                // `sunLight`, deferred here. Exact — Filament's
+                // `maxShadowDistance` is the contact-shadow march's
+                // world-space reach.
+                so.maxShadowDistance = it.toFloat()
             }
             p.tag("shadowSoftness").d3Double()?.let {
                 // World-space penumbra → the bulb radius PCSS-style
@@ -3484,7 +3503,8 @@ object FsceneRealizer {
             p.tag("shadowCascadeSplitLambda").d3Double()?.let { lambda ->
                 if (so.shadowCascades > 1) {
                     so.cascadeSplitPositions = cascadeSplits(
-                        lambda.toFloat(), so.shadowCascades)
+                        lambda.toFloat(), so.shadowCascades,
+                        so.shadowFar)
                 }
             }
             for (field in listOf("shadowFadeRange",
@@ -3510,22 +3530,24 @@ object FsceneRealizer {
          * The practical (log/linear blend) cascade split scheme —
          * `split_i = λ·n·(f/n)^(i/N) + (1−λ)·(n + (f−n)·i/N)` for
          * i = 1..N−1, normalized to (0,1) fractions of the shadow
-         * range Filament expects. `n` is nominal — the view camera's
-         * near isn't known at light decode; 0.1 m is the authored
-         * scenes' band.
+         * range Filament expects. The split distances are computed in
+         * world units over the actual shadow range (`shadowFar`, or a
+         * nominal 100 when unset — the camera far isn't known at
+         * light decode) and then divided by it; `n` is a nominal
+         * 0.1 near (the view camera's near isn't known either).
          */
         private fun cascadeSplits(
-            lambda: Float, cascades: Int,
+            lambda: Float, cascades: Int, shadowFar: Float,
         ): FloatArray {
-            val n = 0.1f
-            val f = 1.0f // normalized — splits are fractions of maxShadowDistance
+            val f = if (shadowFar > 0f) shadowFar else 100f
+            val n = minOf(0.1f, f * 0.01f)
             val out = FloatArray(3) { 1.0f }
             for (i in 1 until cascades.coerceAtMost(4)) {
                 val t = i.toFloat() / cascades
                 val log = n * Math.pow((f / n).toDouble(),
                     t.toDouble()).toFloat()
                 val uni = n + (f - n) * t
-                out[i - 1] = lambda * log + (1 - lambda) * uni
+                out[i - 1] = (lambda * log + (1 - lambda) * uni) / f
             }
             return out
         }
