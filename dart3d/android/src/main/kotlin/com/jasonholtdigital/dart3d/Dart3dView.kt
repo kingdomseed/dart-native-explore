@@ -177,6 +177,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      */
     private var materialsReady = false
     private var materialsFailed = false
+    /** True once `init` finished. Declared before `init` on purpose:
+     * properties declared after it (pendingWork, terminalReason, …)
+     * aren't initialized yet while `init` runs. */
+    private var constructed = false
     /**
      * W24 `shadowCatcher` — the Filament unlit+shadowMultiplier path.
      * Built lazily on first use: a compile failure degrades catcher
@@ -554,75 +558,100 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     }
 
     init {
-        addView(surfaceView, LayoutParams(
-            LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
-        // Touch events reach the manipulator only while
-        // allowsCameraControl has attached one; unconsumed otherwise.
-        surfaceView.setOnTouchListener { _, event ->
-            gestureDetector?.let { it.onTouchEvent(event); true } ?: false
+        try {
+            addView(surfaceView, LayoutParams(
+                LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+            // Touch events reach the manipulator only while
+            // allowsCameraControl has attached one; unconsumed otherwise.
+            surfaceView.setOnTouchListener { _, event ->
+                gestureDetector?.let { it.onTouchEvent(event); true } ?: false
+            }
+            // The six prebuilts declare every base slot (instances bind
+            // 1×1 fallbacks, so all five stay sampled) — boundSlots is
+            // the full base mask. A prebuilt that can't compile leaves
+            // nothing to fall back to; the check stays fatal there.
+            // Never compile on main here: DNPluginRegistry.createView runs
+            // on the UI thread, and a cold compile of the lit set parked it
+            // for ~12 s (the captured ANR). Load whatever the process cache
+            // already holds; otherwise make sure a background compile for
+            // this engine's API is running and let stepFrame finish init.
+            MaterialPackages.prewarm(MaterialPackages.apiFor(engine.backend))
+            materialsReady = tryLoadBaseMaterials()
+
+            fallbackWhite = TextureFactory.solid(engine, 255, 255, 255, 255)
+            fallbackNormal = TextureFactory.solid(engine, 128, 128, 255, 255)
+            fallbackEmissive = TextureFactory.solid(engine, 0, 0, 0, 255)
+
+            cameraEntity = EntityManager.get().create()
+            camera = engine.createCamera(cameraEntity)
+
+            view.scene = scene
+            view.camera = camera
+            // Filament shows layer 0 only by default; the upstream view
+            // mask is all-layers — widen so node `layers` is the only gate.
+            view.setVisibleLayers(0xFF, 0xFF)
+            // Lights declaring castsShadow need a shadow type on the view —
+            // Filament renders no shadow maps without one. DPCF (dithered
+            // PCF) keeps a soft edge at fixed-kernel cost — PCSS's blocker
+            // search runs ~300ms/frame on Mali at these world scales.
+            view.setShadowType(View.ShadowType.DPCF)
+            // W22: KHR_materials_transmission variants render through
+            // screen-space refraction — without the flag Filament skips
+            // the refraction pass even for refraction-enabled materials.
+            view.setScreenSpaceRefractionEnabled(true)
+            applyClearColor()
+
+            uiHelper.renderCallback = object : UiHelper.RendererCallback {
+                override fun onNativeWindowChanged(surface: Surface) {
+                    swapChain?.let { engine.destroySwapChain(it) }
+                    swapChain = engine.createSwapChain(surface, uiHelper.swapChainFlags)
+                }
+                override fun onDetachedFromSurface() {
+                    swapChain?.let { engine.destroySwapChain(it) }
+                    swapChain = null
+                }
+                override fun onResized(width: Int, height: Int) {
+                    viewportW = width; viewportH = height
+                    view.viewport = Viewport(0, 0, width, height)
+                    manipulator?.setViewport(width, height)
+                    applyProjection()
+                }
+            }
+            uiHelper.attachTo(surfaceView)
+
+            // W8: contact events surface through the same fireEvent path
+            // as settled — JoltWorld reports in engine space, the encode
+            // mirrors to the wire frame.
+            world.onContact = { ev -> fireContactEvent(ev) }
+            // W9: joint `broke` events — same sink pattern.
+            world.onJointBroke = { ev -> fireJointBroke(ev) }
+
+            Choreographer.getInstance().postFrameCallback(frameCallback)
+            constructed = true
+        } catch (t: Throwable) {
+            // The bridge turns this into an InitFailedView and never
+            // sees this object again — free the eagerly created Engine
+            // (and everything it owns), Jolt world and KTX2 provider
+            // before the exception leaves, or every failed attempt
+            // leaks them until process death.
+            releasePartial()
+            throw t
         }
-        // The six prebuilts declare every base slot (instances bind
-        // 1×1 fallbacks, so all five stay sampled) — boundSlots is
-        // the full base mask. A prebuilt that can't compile leaves
-        // nothing to fall back to; the check stays fatal there.
-        // Never compile on main here: DNPluginRegistry.createView runs
-        // on the UI thread, and a cold compile of the lit set parked it
-        // for ~12 s (the captured ANR). Load whatever the process cache
-        // already holds; otherwise make sure a background compile for
-        // this engine's API is running and let stepFrame finish init.
-        MaterialPackages.prewarm(MaterialPackages.apiFor(engine.backend))
-        materialsReady = tryLoadBaseMaterials()
-
-        fallbackWhite = TextureFactory.solid(engine, 255, 255, 255, 255)
-        fallbackNormal = TextureFactory.solid(engine, 128, 128, 255, 255)
-        fallbackEmissive = TextureFactory.solid(engine, 0, 0, 0, 255)
-
-        cameraEntity = EntityManager.get().create()
-        camera = engine.createCamera(cameraEntity)
-
-        view.scene = scene
-        view.camera = camera
-        // Filament shows layer 0 only by default; the upstream view
-        // mask is all-layers — widen so node `layers` is the only gate.
-        view.setVisibleLayers(0xFF, 0xFF)
-        // Lights declaring castsShadow need a shadow type on the view —
-        // Filament renders no shadow maps without one. DPCF (dithered
-        // PCF) keeps a soft edge at fixed-kernel cost — PCSS's blocker
-        // search runs ~300ms/frame on Mali at these world scales.
-        view.setShadowType(View.ShadowType.DPCF)
-        // W22: KHR_materials_transmission variants render through
-        // screen-space refraction — without the flag Filament skips
-        // the refraction pass even for refraction-enabled materials.
-        view.setScreenSpaceRefractionEnabled(true)
-        applyClearColor()
-
-        uiHelper.renderCallback = object : UiHelper.RendererCallback {
-            override fun onNativeWindowChanged(surface: Surface) {
-                swapChain?.let { engine.destroySwapChain(it) }
-                swapChain = engine.createSwapChain(surface, uiHelper.swapChainFlags)
-            }
-            override fun onDetachedFromSurface() {
-                swapChain?.let { engine.destroySwapChain(it) }
-                swapChain = null
-            }
-            override fun onResized(width: Int, height: Int) {
-                viewportW = width; viewportH = height
-                view.viewport = Viewport(0, 0, width, height)
-                manipulator?.setViewport(width, height)
-                applyProjection()
-            }
-        }
-        uiHelper.attachTo(surfaceView)
-
-        // W8: contact events surface through the same fireEvent path
-        // as settled — JoltWorld reports in engine space, the encode
-        // mirrors to the wire frame.
-        world.onContact = { ev -> fireContactEvent(ev) }
-        // W9: joint `broke` events — same sink pattern.
-        world.onJointBroke = { ev -> fireJointBroke(ev) }
-
-        Choreographer.getInstance().postFrameCallback(frameCallback)
     }
+
+    private fun releasePartial() {
+        detached = true
+        releaseReason = "construction failed"
+        try { Choreographer.getInstance().removeFrameCallback(frameCallback) }
+        catch (_: Throwable) {}
+        try { uiHelper.detach() } catch (_: Throwable) {}
+        try { world.close() } catch (_: Throwable) {}
+        try { TextureFactory.releaseEngine(engine) } catch (_: Throwable) {}
+        // Engine.destroy() frees every object still owned by the
+        // engine (renderer, scene, view, textures, materials).
+        try { engine.destroy() } catch (_: Throwable) {}
+    }
+
 
     // MARK: - Materials
 
@@ -761,6 +790,27 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         }
     }
 
+    /**
+     * Terminal init failure: the view can never render. Shows the
+     * on-screen notice, stops the frame loop, drops queued work and
+     * makes [onMutation] reject (and log) everything after. Resources
+     * are still released by disposeView/detach as usual.
+     */
+    private fun failTerminal(reason: String) {
+        // During construction (a cached compile failure found by the
+        // first tryLoadBaseMaterials) throw instead: the bridge turns
+        // it into the visible InitFailedView, and later-declared state
+        // this path touches isn't initialized yet.
+        if (!constructed) throw IllegalStateException(reason)
+        if (materialsFailed) return
+        materialsFailed = true
+        terminalReason = reason
+        Choreographer.getInstance().removeFrameCallback(frameCallback)
+        pendingWork.clear()
+        showInitFailure(reason)
+    }
+    private var terminalReason = ""
+
     /** Overlays a visible, non-interactive init-failure notice. */
     private fun showInitFailure(reason: String) {
         if (initFailureShown) return
@@ -819,18 +869,29 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         keys += MaterialPackages.trailKey(api)
         val failed = keys.filter { MaterialPackages.hasFailed(it) }
         if (failed.isNotEmpty()) {
-            materialsFailed = true
             Log.e(TAG, "dart3d: base material compile FAILED ($failed) —" +
                 " this scene view cannot render")
             // The compile runs after createView returned, so the
             // bridge's InitFailedView can't catch this — show the same
             // on-screen failure here instead of a live blank surface.
-            showInitFailure("base material compile failed for " +
+            failTerminal("base material compile failed for " +
                 "${api.name}: ${failed.joinToString()}")
             return false
         }
         val bytes = keys.map { MaterialPackages.peek(it) ?: return false }
-        val loaded = bytes.map { MaterialPackages.load(engine, it) }
+        val loaded = ArrayList<Material>(bytes.size)
+        try {
+            for (b in bytes) loaded += MaterialPackages.load(engine, b)
+        } catch (t: Throwable) {
+            // Runs from stepFrame on a cold start — outside the
+            // bridge's constructor catch. Free what loaded, then go
+            // terminal instead of crashing the UI thread.
+            for (m in loaded) engine.destroyMaterial(m)
+            Log.e(TAG, "dart3d: base material load FAILED", t)
+            failTerminal("base material load failed for ${api.name}: " +
+                "${t.javaClass.simpleName}: ${t.message}")
+            return false
+        }
         litMaterial = loaded[0]
         litMaskedMaterial = loaded[1]
         litBlendMaterial = loaded[2]
@@ -1518,7 +1579,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 "should have created a new view")
             return
         }
-        if (paused) {
+        if (paused && !materialsFailed) {
             paused = false
             lastFrameNanos = 0L
             Choreographer.getInstance().postFrameCallback(frameCallback)
@@ -1692,6 +1753,14 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     private var warnedDeadMutation = false
 
     fun onMutation(id: Long, eventTag: Int, data: ByteArray) {
+        if (materialsFailed) {
+            if (!warnedDeadMutation) {
+                warnedDeadMutation = true
+                Log.e(TAG, "dart3d view $id: mutation on a view whose " +
+                    "init failed ($terminalReason) — dropped")
+            }
+            return
+        }
         if (detached) {
             if (!warnedDeadMutation) {
                 warnedDeadMutation = true
@@ -2057,12 +2126,55 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         if (replayingJournal) return
         when (val op = json.optString("op")) {
             "addNode", "updateNode", "removeNode" -> compactInto(op, json)
+            "upsertResource" -> {
+                // install() swaps the live resource registries for the
+                // manifest's on a re-realize, so op-created/replaced
+                // resources must replay too — in arrival order, ahead
+                // of the structural ops that reference them. A later
+                // upsert of the same id supersedes the earlier one.
+                val id = json.optString("id")
+                if (id.isNotEmpty()) {
+                    surgicalJournal.removeAll { e ->
+                        e is JournalEntry.Plain &&
+                            e.op.optString("op") == "upsertResource" &&
+                            e.op.optString("id") == id
+                    }
+                }
+                surgicalJournal.add(JournalEntry.Plain(json))
+            }
             "loadSubtree" -> {
                 val key = jsonKey(json) ?: return
-                // A re-load keeps its first slot (load order).
-                if (surgicalJournal.none {
-                        it is JournalEntry.Subtree && it.key == key }) {
+                val slot = surgicalJournal.indexOfFirst {
+                    it is JournalEntry.Subtree && it.key == key }
+                if (slot < 0) {
                     surgicalJournal.add(JournalEntry.Subtree(key))
+                } else {
+                    // A re-load keeps its FIRST slot (load order): a
+                    // subtree grafted under one of its members after
+                    // the first load must still replay after it —
+                    // re-sequencing would break that (same choice as
+                    // iOS, PR #15). The re-load's batch supersedes any
+                    // later top-level op on its members, so prune those
+                    // instead; replay then yields the re-loaded state.
+                    val members = HashSet<Long>()
+                    json.optJSONArray("ops")?.let { ops ->
+                        for (i in 0 until ops.length()) {
+                            ops.optJSONObject(i)?.let { o ->
+                                jsonKey(o)?.let { members += it }
+                            }
+                        }
+                    }
+                    if (members.isNotEmpty()) {
+                        var i = surgicalJournal.size - 1
+                        while (i > slot) {
+                            val e = surgicalJournal[i]
+                            if (e is JournalEntry.Plain &&
+                                opNode(e) in members) {
+                                surgicalJournal.removeAt(i)
+                            }
+                            i--
+                        }
+                    }
                 }
             }
             "unloadSubtree" -> {
@@ -4309,12 +4421,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             // thread threw (bounded retries, then a visible failure).
             MaterialPackages.prewarm(MaterialPackages.apiFor(engine.backend))
             materialsReady = tryLoadBaseMaterials()
-            if (materialsFailed) {
-                // Dead view: drop queued mutations rather than hold
-                // them forever (logged once by onMutation's dead path).
-                pendingWork.clear()
-                return
-            }
+            if (materialsFailed) return  // failTerminal stopped the loop
             if (!materialsReady) {
                 // Mutations stay queued (FIFO preserved) until the
                 // background compile lands; nothing to draw yet.
