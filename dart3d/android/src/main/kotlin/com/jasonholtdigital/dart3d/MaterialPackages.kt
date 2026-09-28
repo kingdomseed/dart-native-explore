@@ -145,28 +145,75 @@ internal object MaterialPackages {
         }
     }
 
+    /** The API a live view actually needs — speculative work for any
+     * other API stops so it can't hold the compile lock. */
+    @Volatile private var activeApi: MaterialBuilder.TargetApi? = null
+
+    /** Called by a view for its engine's API (non-blocking). */
     fun prewarm(api: MaterialBuilder.TargetApi) {
+        activeApi = api
+        startPrewarm(api)
+    }
+
+    /**
+     * Plugin-registration prewarm. The app's backend pref
+     * (Dart3dSetBackend) lands from Dart main a few hundred ms after
+     * registration, so wait briefly, then compile for the pref — or
+     * [guess] (the `auto` resolution) when none was set.
+     */
+    fun prewarmSpeculative(guess: MaterialBuilder.TargetApi) {
+        val t = Thread({
+            try {
+                Thread.sleep(400)
+            } catch (e: InterruptedException) {
+                return@Thread
+            }
+            val pref = try {
+                Dart3dJni.nativeBackendPref()
+            } catch (t: Throwable) {
+                0
+            }
+            val api = activeApi ?: when (pref) {
+                1 -> MaterialBuilder.TargetApi.OPENGL
+                2 -> MaterialBuilder.TargetApi.VULKAN
+                else -> guess
+            }
+            startPrewarm(api)
+        }, "dart3d-matprewarm-wait")
+        t.isDaemon = true
+        t.start()
+    }
+
+    private fun startPrewarm(api: MaterialBuilder.TargetApi) {
         if (!prewarmStarted.add(api.name)) return
         val t = Thread({
+            // Abandon a speculative API once a view needs another one.
+            fun stale() = activeApi.let { it != null && it != api }
             try {
                 for (unlit in listOf(false, true)) {
                     for (mode in listOf(MaterialBuilder.BlendingMode.OPAQUE,
                             MaterialBuilder.BlendingMode.MASKED,
                             MaterialBuilder.BlendingMode.TRANSPARENT)) {
+                        if (stale()) return@Thread
                         litPackage(unlit, mode, 0,
                             FsceneRealizer.ALL_BASE_SLOTS, api)
                     }
                 }
+                if (stale()) return@Thread
                 trailPackage(api)
                 // Lazily-used packages next — a view compiles these on
                 // main at first use if the prewarm hasn't reached them.
+                if (stale()) return@Thread
                 catcherPackage(api)
+                if (stale()) return@Thread
                 particlePackage(false, api)
                 particlePackage(true, api)
             } catch (t: Throwable) {
                 // A prewarm failure only costs the cache — the view
                 // compiles (and reports) on its own path.
                 Log.w(TAG, "material prewarm failed", t)
+            } finally {
+                if (stale()) prewarmStarted.remove(api.name)
             }
         }, "dart3d-matprewarm")
         t.isDaemon = true
