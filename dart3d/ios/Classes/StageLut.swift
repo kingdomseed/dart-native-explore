@@ -21,6 +21,7 @@ struct StageLut {
         case badSize
         case tooManyRows
         case missingRows
+        case nonFinite
         var description: String {
             switch self {
             case .oneDimensional:
@@ -31,6 +32,9 @@ struct StageLut {
                 return "The .cube table has more rows than its size."
             case .missingRows:
                 return "The .cube table is missing rows."
+            case .nonFinite:
+                return "The .cube table contains a non-finite value "
+                    + "(nan/inf or an overflowing exponent)."
             }
         }
     }
@@ -40,7 +44,12 @@ struct StageLut {
     /// that carry fewer than three tokens are skipped, matching the
     /// upstream tolerance. A malformed numeric token in a data row
     /// becomes `0` (`?? 0`) where upstream's `double.parse` throws —
-    /// a deliberate robustness choice, not strict parity.
+    /// a deliberate robustness choice, not strict parity. A token that
+    /// parses to a NON-finite value (`nan`, `inf`, `1e999`) rejects the
+    /// whole table with `.nonFinite`: Swift's `Float(String)` accepts
+    /// them, and a NaN survives the clamp in `stripBytes` (`min`/`max`
+    /// propagate it) into a trapping `UInt8` conversion; an infinity
+    /// times a `lutBlend` of 0 is NaN too.
     static func parse(_ content: String) throws -> StageLut {
         var size = 0
         var values: [Float] = []
@@ -72,9 +81,11 @@ struct StageLut {
             if cursor + 3 > values.count {
                 throw ParseError.tooManyRows
             }
-            values[cursor] = Float(tokens[0]) ?? 0
-            values[cursor + 1] = Float(tokens[1]) ?? 0
-            values[cursor + 2] = Float(tokens[2]) ?? 0
+            for c in 0..<3 {
+                let v = Float(tokens[c]) ?? 0
+                guard v.isFinite else { throw ParseError.nonFinite }
+                values[cursor + c] = v
+            }
             cursor += 3
         }
         guard !values.isEmpty, cursor == values.count else {
@@ -102,8 +113,16 @@ struct StageLut {
         let n = size
         var bytes = [UInt8](repeating: 255, count: n * n * n * 4)
         let stripWidth = n * n
-        let b01 = Float(min(max(blend, 0), 1))
+        let b01 = blend.isFinite ? Float(min(max(blend, 0), 1)) : 1
         let denom = Float(n - 1)
+        // Defense in depth — `parse` already rejects non-finite rows, but
+        // a NaN reaching `UInt8(_:)` traps the process, so no value
+        // gets there unguarded (a table built another way, or a
+        // non-finite blend, lands on the identity/0 instead).
+        func byte(_ v: Float) -> UInt8 {
+            guard v.isFinite else { return 0 }
+            return UInt8((min(max(v, 0), 1) * 255).rounded())
+        }
         for i in 0..<(n * n * n) {
             let r = i % n
             let g = (i / n) % n
@@ -117,9 +136,9 @@ struct StageLut {
             let vr = idr + (values[i * 3] - idr) * b01
             let vg = idg + (values[i * 3 + 1] - idg) * b01
             let vb = idb + (values[i * 3 + 2] - idb) * b01
-            bytes[pixel] = UInt8((min(max(vr, 0), 1) * 255).rounded())
-            bytes[pixel + 1] = UInt8((min(max(vg, 0), 1) * 255).rounded())
-            bytes[pixel + 2] = UInt8((min(max(vb, 0), 1) * 255).rounded())
+            bytes[pixel] = byte(vr)
+            bytes[pixel + 1] = byte(vg)
+            bytes[pixel + 2] = byte(vb)
             bytes[pixel + 3] = 255
         }
         return Data(bytes)
