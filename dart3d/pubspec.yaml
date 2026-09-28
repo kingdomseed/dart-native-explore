@@ -33,3 +33,7 @@ dartnative:
       - package:dart3d/dart3d.dart
     calls:
       - Dart3dFFIBindings.loadSymbols();
+
+dev_dependencies:
+  test: ^1.25.0
+  image: ^4.0.0
