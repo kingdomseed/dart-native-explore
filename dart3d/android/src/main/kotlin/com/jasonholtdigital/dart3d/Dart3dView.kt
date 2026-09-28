@@ -1671,6 +1671,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // any pending visible-stamp with them (its node id belongs to
         // the outgoing scene).
         streamedSubtreeOps.clear()
+        surgicalJournal.clear()
         subtreeVisibleStamp = null
         FsceneRealizer.realize(data, this)
     }
@@ -1799,7 +1800,50 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         val json = try { JSONObject(String(data, Charsets.UTF_8)) }
             catch (e: Exception) {
                 Log.w(TAG, "command parse failed: ${data.size}B"); return }
+        journalTopLevel(json)
         applyCommandJson(json)
+    }
+
+    /**
+     * One entry of the surgical replay journal — a top-level structural
+     * op, or a pointer to a streamed subtree's recorded load batch.
+     */
+    private sealed class JournalEntry {
+        class Plain(val op: JSONObject) : JournalEntry()
+        class Subtree(val key: Long) : JournalEntry()
+    }
+
+    /**
+     * Top-level structural commands since the last `loadScene`, in
+     * arrival order. A payload-arrival re-realize rebuilds the manifest
+     * scene wholesale; replaying this journal restores what commands
+     * built on top of it — plain `addNode`s included (previously only
+     * streamed subtrees replayed, so command-added nodes vanished on
+     * the first deferred chunk; audit P1). Nested ops inside a
+     * subtree batch are not journaled — the batch replays them.
+     */
+    private val surgicalJournal = ArrayList<JournalEntry>()
+    private var replayingJournal = false
+
+    private fun journalTopLevel(json: JSONObject) {
+        if (replayingJournal) return
+        when (json.optString("op")) {
+            "addNode", "updateNode", "removeNode" ->
+                surgicalJournal.add(JournalEntry.Plain(json))
+            "loadSubtree" -> {
+                val key = jsonKey(json) ?: return
+                // A re-load keeps its first slot (load order).
+                if (surgicalJournal.none {
+                        it is JournalEntry.Subtree && it.key == key }) {
+                    surgicalJournal.add(JournalEntry.Subtree(key))
+                }
+            }
+            "unloadSubtree" -> {
+                val key = jsonKey(json) ?: return
+                surgicalJournal.removeAll {
+                    it is JournalEntry.Subtree && it.key == key }
+            }
+        }
     }
 
     /**
@@ -2065,19 +2109,24 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      * ordinary op dispatch — called right after a payload-arrival
      * re-realize has rebuilt the manifest scene. */
     private fun replayStreamedSubtrees() {
-        if (streamedSubtreeOps.isEmpty()) return
+        if (streamedSubtreeOps.isEmpty() && surgicalJournal.isEmpty()) {
+            return
+        }
         // A replayed batch can doom a later record's placeholder
         // (a priorRoots removeNode taking a placeholder grafted
         // into the doomed subtree): removeNode prunes the map
-        // inline, so iterate a snapshot — and skip records whose
+        // inline, so iterate snapshots — and skip records whose
         // placeholder is already dead, since their addNodes would
         // resolve a dead parent and root the resurrected members
         // at scene root.
         val dead = HashSet<Long>()
-        for ((key, ops) in streamedSubtreeOps.toList()) {
+        val replayed = HashSet<Long>()
+        fun replaySubtree(key: Long) {
+            val ops = streamedSubtreeOps[key] ?: return
+            if (!replayed.add(key)) return
             if (nodesById[key] == null) {
                 dead += key
-                continue
+                return
             }
             for (i in 0 until ops.length()) {
                 ops.optJSONObject(i)?.let { applyCommandJson(it) }
@@ -2087,7 +2136,32 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     " missing after re-realize")
             }
         }
+        var plain = 0
+        replayingJournal = true
+        try {
+            // Journal order interleaves plain ops and subtree loads
+            // exactly as they arrived, so a plain node parented under
+            // a streamed member (or vice versa) resolves.
+            for (e in surgicalJournal.toList()) {
+                when (e) {
+                    is JournalEntry.Plain -> {
+                        applyCommandJson(e.op)
+                        plain++
+                    }
+                    is JournalEntry.Subtree -> replaySubtree(e.key)
+                }
+            }
+            // Records not reached through the journal (a subtree
+            // loaded by a nested batch) keep the old replay path.
+            for (key in streamedSubtreeOps.keys.toList()) replaySubtree(key)
+        } finally {
+            replayingJournal = false
+        }
         streamedSubtreeOps.keys.removeAll(dead)
+        surgicalJournal.removeAll {
+            it is JournalEntry.Subtree && it.key !in streamedSubtreeOps }
+        Log.i(TAG, "re-realize replay: $plain plain op(s), " +
+            "${replayed.size - dead.size} subtree(s)")
     }
 
     /**
