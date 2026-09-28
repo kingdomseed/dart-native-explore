@@ -98,6 +98,51 @@ ALREADY FIXED 4, WON'T-FIX 1, DEFER 2.
 | W26: no caps on closed tubes | FIX | `a3ca8ad` |
 | W26: per-segment line colors, closed-polyline attribute wrap, ribbon normals, billboard scale-then-rotate, icosphere seam split | DEFER (M, ~half a day together) | Each one needs porting against `d3BakeInstances`/`proc.dart` on the Dart branch and a visual check. They are not crashes, so they were left for a focused W26 geometry pass |
 
+## PR #15 review threads (Codex on stabilize/ios)
+
+| Comment id | file:line | Summary | Verdict | SHA / evidence |
+|---|---|---|---|---|
+| 4122494237 | SceneViewHost.swift:1350 | empty-journal re-realize replays subtrees without the replay guard | FIX (real P1) | `ce9d0f8`. Confirmed by reading the code: `replayStreamedSubtrees()` dispatched the batch's nested ops at depth 1 with `replayingOps == false`, so `journalNodeOp` recorded them |
+| 4122494246 | SceneViewHost.swift:1464 | a re-sent addNode on a live node is classified as command-created | FIX (real) | `ce9d0f8`. Creation is now recorded only when a top-level addNode finds the id absent (`commandCreatedKeys`). Earlier removeNode entries survive pruning, so a remove / re-create / remove sequence still replays the manifest removal |
+| 4122494250 | FsceneRealizer.swift:5241 | flipbook wrap count converts to Int before clamping (trap) | FIX (real P1) | `ce9d0f8`. `Int(Double)` traps on a quotient that is > Int.max or inf. The quotient is now clamped in Double first, and NaN or ≤ 0 values return early |
+| 4122494259 | FsceneRealizer.swift:5654 | bursts ignore prewarm | FIX (real) | `ce9d0f8`. Confirmed in the reference: `particle_sim.dart:1172-1176` prewarm calls `_stepFixed`, which runs the spawner. The live start is now `time − prewarm`, and a burst that started inside the warmup attaches immediately with `warmupDuration` set to the elapsed part |
+
+## Light direction check (coordinator follow-up, Android `264c2e0`)
+
+**Verdict: the iOS decode is correct against upstream; the example scene
+is aimed backwards. No iOS change.**
+
+- **Upstream contract.** flutter_scene 0.23.0 `DirectionalLightComponent.worldDirection`
+  (`lib/src/components/directional_light_component.dart:93`) is
+  `node.globalTransform.getRotation() * Vector3(0, 0, 1)`. A directional
+  light travels along node-local **+Z**, the same forward axis as upstream
+  cameras.
+- **iOS mapping.** iOS converts rotations as `S·R·S` (`D3Wire.quaternion`
+  gives `(−x,−y,z,w)`), so wire-local +Z becomes SceneKit-local −Z. That is
+  the axis SceneKit lights shine along, so iOS emits along the wire's +Z,
+  which is upstream parity. Cameras work the same way, which is why the
+  dice camera (authored "forward +Z") frames correctly.
+- **The example is inverted.** In `dice_table_scene.dart:727-736`,
+  `aimLight` aims **+Z at the negated direction**, and its comment says
+  "Lights emit along −Z". That contradicts upstream, so under upstream
+  semantics the key light travels (0.28, 1, 0.22), which is upward.
+- **Sim evidence.**
+  - `light-key-as-authored-upward.png`: as authored on iOS, the table top
+    gets no key light and the dice cast no visible shadows (the key shines
+    from below the table).
+  - `light-key-aim-flipped-diagnostic.png`: with a temporary, uncommitted
+    one-line example change (`fwd = dir`, which aims +Z along the light
+    direction per upstream), the key lights the table and dice tops from
+    above.
+- **Android divergence.** Android `264c2e0` sets Filament
+  `direction(0,0,1)`, which is wire-local −Z. That matches the example's
+  inverted convention but diverges from upstream +Z, so upstream-authored
+  `.fscene` lights, such as those in the showcase corpus, would now shine
+  backwards on Android. The consistent fix is:
+  - Example: flip `aimLight` to aim +Z along `dir`, and fix the comment.
+  - Android: use Filament-local **−Z** (wire +Z), then re-shoot the A142
+    shadow evidence.
+
 ## Verification
 
 - `swiftc -typecheck` (iPhoneSimulator 27 SDK, arm64, target iOS 16) is
@@ -170,6 +215,11 @@ ALREADY FIXED 4, WON'T-FIX 1, DEFER 2.
   does not frame the dice area on iOS, so the split lane's right half shows
   only background. Re-aim it at the dice area, for example with a
   look-at-origin rotation, and check that Android frames it the same way.
+- **Example + Android (light direction):** In the example,
+  `dice_table_scene.dart` `aimLight` should aim +Z along the light
+  direction (the upstream convention). Android `264c2e0` should emit along
+  Filament-local −Z (wire +Z) rather than +Z. Evidence is in "Light
+  direction check" above.
 - **Dart/docs** (`dart3d/lib/**` / docs owner): `docs/particles-spec.md`
   should record the new iOS burst, flipbook, and uniformColor
   approximations listed above.
