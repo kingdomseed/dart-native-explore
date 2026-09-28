@@ -302,6 +302,39 @@ void main() {
       expect(snapshot(a), first);
     });
 
+    test('reset rewinds stateful modules (turbulence clock)', () {
+      ParticleSystem turbulent() => particleSystemFromProperties({
+        'emitRate': DoubleValue(60),
+        'seed': IntValue(3),
+        'lifetime': constantFloat(2),
+        'startSpeed': constantFloat(1),
+        'modules': ListValue([
+          turbulenceModule(
+            strength: 4.0,
+            frequency: 0.7,
+            scroll: Vector3(1.5, 0.5, -1),
+            seed: 11,
+          ),
+        ]),
+      });
+      final a = turbulent();
+      for (var i = 0; i < 40; i++) {
+        a.step(kParticleFixedStep);
+      }
+      final first = snapshot(a);
+      a.reset();
+      for (var i = 0; i < 40; i++) {
+        a.step(kParticleFixedStep);
+      }
+      expect(snapshot(a), first);
+      // And a fresh system agrees with the replay.
+      final b = turbulent();
+      for (var i = 0; i < 40; i++) {
+        b.step(kParticleFixedStep);
+      }
+      expect(snapshot(b), first);
+    });
+
     test('prewarm advances the system before first render', () {
       final warm = particleSystemFromProperties({
         'emitRate': DoubleValue(60),

@@ -25,21 +25,30 @@ import 'package:vector_math/vector_math.dart';
 Vector3 vertex(D3MeshData m, int i) =>
     Vector3(m.positions[i * 3], m.positions[i * 3 + 1], m.positions[i * 3 + 2]);
 
+/// Distinct vertex positions — the icosphere's shared-vertex topology,
+/// ignoring the seam/pole UV copies.
+int uniquePositions(D3MeshData m) => {
+  for (var i = 0; i < m.vertexCount; i++)
+    [
+      for (var k = 0; k < 3; k++) (m.positions[i * 3 + k] * 1e5).round(),
+    ].join(','),
+}.length;
+
 void main() {
   group('icosphere (real subdivided icosahedron)', () {
     test('subdivision 0 is the base icosahedron', () {
       final m = buildIcosphere(radius: 1.0, subdivisions: 0);
-      expect(m.vertexCount, 12);
+      expect(uniquePositions(m), 12);
       expect(m.triangleCount, 20);
     });
 
     test('each subdivision quadruples faces via midpoint splits', () {
       // Euler characteristic: V1 = 12 + 30 edges, V2 = 42 + 120.
       final s1 = buildIcosphere(radius: 1.0, subdivisions: 1);
-      expect(s1.vertexCount, 42);
+      expect(uniquePositions(s1), 42);
       expect(s1.triangleCount, 80);
       final s2 = buildIcosphere(radius: 1.0, subdivisions: 2);
-      expect(s2.vertexCount, 162);
+      expect(uniquePositions(s2), 162);
       expect(s2.triangleCount, 320);
     });
 

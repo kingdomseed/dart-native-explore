@@ -21,18 +21,19 @@ import 'dart:typed_data';
 import 'package:vector_math/vector_math.dart';
 
 import '../scene_model.dart';
+import 'mesh_data.dart';
 import 'proc.dart';
 
 /// Per-instance attribute data: an inline vector list or a payload
 /// chunk (`floats`/`bytes` encoding — four floats per instance).
 final class D3InstanceAttribute {
   /// Creates an attribute from inline values.
-  const D3InstanceAttribute.inline(this.values) : payload = null;
+  const D3InstanceAttribute.inline(List<Vector4> this.values) : payload = null;
 
   /// Creates an attribute referencing [payload] — a `floats` or
   /// `bytes` chunk with `count * 4` floats (or bytes normalized by the
   /// native decoder for `bytes`).
-  const D3InstanceAttribute.payload(this.payload) : values = null;
+  const D3InstanceAttribute.payload(LocalId this.payload) : values = null;
 
   /// Inline `vec4` values, one per instance.
   final List<Vector4>? values;
@@ -53,11 +54,12 @@ final class D3InstanceAttribute {
 final class D3InstanceTransforms {
   /// Creates transforms from inline matrices (column-major storage
   /// order on the wire).
-  const D3InstanceTransforms.inline(this.matrices) : payload = null;
+  const D3InstanceTransforms.inline(List<Matrix4> this.matrices)
+    : payload = null;
 
   /// Creates transforms referencing a `matrices` payload chunk —
   /// `count` packed column-major 4x4 float32 matrices.
-  const D3InstanceTransforms.payload(this.payload) : matrices = null;
+  const D3InstanceTransforms.payload(LocalId this.payload) : matrices = null;
 
   /// Inline instance local transforms (doc space; natives mirror).
   final List<Matrix4>? matrices;
@@ -162,21 +164,43 @@ final class D3InstancesSpec {
   }
 
   /// The component's local-space bounds: the geometry bounds unioned
-  /// over every inline instance transform (payload transforms expand
-  /// as points — payload matrices aren't readable here). Billboard
-  /// mode pads by the quad size.
-  BoundsSpec? bounds(GeometryResource? geometryResource) {
-    final geomBounds =
-        proc?.bounds ??
-        geometryResource?.bounds ??
-        _resourceProceduralBounds(geometryResource?.procedural);
-    final pad = billboard ? (size?.x ?? 1.0) : 0.0;
+  /// over the instance transforms — inline, or decoded from
+  /// [transformsPayload] when the transforms are a payload ref (pass
+  /// the document's `PayloadSpec`; without bytes the untransformed
+  /// geometry bounds come back). Only the first [kD3MaxBakedInstances]
+  /// count, as the natives truncate the tail. Billboard mode ignores
+  /// the geometry (natives draw quads only) and pads each instance
+  /// center by the quad's half-diagonal.
+  BoundsSpec? bounds(
+    GeometryResource? geometryResource, {
+    PayloadSpec? transformsPayload,
+  }) {
+    final geomBounds = billboard
+        ? null
+        : proc?.bounds ??
+              geometryResource?.bounds ??
+              _resourceProceduralBounds(geometryResource?.procedural);
+    final pad = billboard
+        ? d3BillboardRadius(size?.x ?? 1.0, size?.y ?? 1.0)
+        : 0.0;
     final local = geomBounds;
     if (local == null && pad == 0) return null;
     final min = Vector3.all(double.infinity);
     final max = Vector3.all(-double.infinity);
-    final mats = transforms.matrices;
-    if (mats == null || mats.isEmpty) return local;
+    var mats = transforms.matrices;
+    final payloadBytes = transformsPayload?.bytes;
+    if (mats == null && payloadBytes != null) {
+      mats = d3DecodeMatrices(payloadBytes);
+    }
+    if (mats == null || mats.isEmpty) {
+      return local ??
+          (pad > 0
+              ? BoundsSpec(min: Vector3.all(-pad), max: Vector3.all(pad))
+              : null);
+    }
+    if (mats.length > kD3MaxBakedInstances) {
+      mats = mats.sublist(0, kD3MaxBakedInstances);
+    }
     final corner = Vector3.zero();
     for (final m in mats) {
       if (local != null) {
@@ -223,6 +247,77 @@ PayloadSpec d3MatricesPayload(LocalId id, List<Matrix4> matrices) {
     length: data.lengthInBytes,
     bytes: data.buffer.asUint8List(),
   );
+}
+
+/// Decodes a `matrices` payload chunk — packed column-major float32
+/// 4×4s, little-endian — into matrices. A trailing partial matrix is
+/// ignored (the natives drop it too).
+List<Matrix4> d3DecodeMatrices(Uint8List bytes) {
+  final data = ByteData.sublistView(bytes);
+  final count = bytes.lengthInBytes ~/ 64;
+  return [
+    for (var i = 0; i < count; i++)
+      Matrix4.fromList([
+        for (var k = 0; k < 16; k++)
+          data.getFloat32(i * 64 + k * 4, Endian.little),
+      ]),
+  ];
+}
+
+/// The CPU reference for the native `d3:instances` bake: [base] copied
+/// once per transform into one mesh, with [colors] (one rgba per
+/// instance, multiplied into any base color) stamped on each copy.
+///
+/// The instance count is capped by [d3BakedInstanceCount]
+/// ([kD3MaxBakedInstances] and the [kD3MaxBakedVertices] budget) and
+/// the tail is truncated. Normals use each matrix's normal matrix
+/// (inverse transpose — translation never touches them), and a
+/// reflecting transform (negative determinant) reverses its copy's
+/// triangles so mirrored instances keep outward winding. The natives
+/// mirror this contract (see `docs/triage/dart.md`).
+D3MeshData d3BakeInstances(
+  D3MeshData base,
+  List<Matrix4> transforms, {
+  List<Vector4>? colors,
+}) {
+  final count = d3BakedInstanceCount(transforms.length, base.vertexCount);
+  final out = D3MeshBuilder();
+  final hasBaseColor = base.colors.length == base.vertexCount * 4;
+  for (var k = 0; k < count; k++) {
+    final copy = D3MeshBuilder();
+    final tint = colors != null && k < colors.length ? colors[k] : null;
+    for (var i = 0; i < base.vertexCount; i++) {
+      List<double>? color;
+      if (tint != null || hasBaseColor) {
+        final c = hasBaseColor
+            ? [for (var j = 0; j < 4; j++) base.colors[i * 4 + j]]
+            : [1.0, 1.0, 1.0, 1.0];
+        color = tint == null
+            ? c
+            : [c[0] * tint.x, c[1] * tint.y, c[2] * tint.z, c[3] * tint.w];
+      }
+      copy.emit(
+        Vector3(
+          base.positions[i * 3],
+          base.positions[i * 3 + 1],
+          base.positions[i * 3 + 2],
+        ),
+        n: Vector3(
+          base.normals[i * 3],
+          base.normals[i * 3 + 1],
+          base.normals[i * 3 + 2],
+        ),
+        uv: Vector2(base.uvs[i * 2], base.uvs[i * 2 + 1]),
+        color: color,
+      );
+    }
+    for (var t = 0; t + 2 < base.indices.length; t += 3) {
+      copy.tri(base.indices[t], base.indices[t + 1], base.indices[t + 2]);
+    }
+    copy.transform(transforms[k]);
+    out.addMesh(copy.build());
+  }
+  return out.build();
 }
 
 /// Packs vec4 lists as a `floats` payload — four float32 per entry.

@@ -15,6 +15,7 @@ library;
 
 export 'src/animation.dart';
 export 'src/components.dart';
+export 'src/compose_extensions.dart';
 export 'src/diff_apply.dart';
 export 'src/doc_layer.dart';
 export 'src/fsceneb_reader.dart';
