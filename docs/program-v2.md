@@ -26,7 +26,7 @@ where this file re-scopes it. Why the reset: see
 | D5 | **Audio ships as a sibling package `dart3d_audio`,** not in the core plugin. | Filament has no audio; Android needs its own backend (Oboe/AAudio). Keeps the core small; mirrors upstream's split (soloud/fmod packages). |
 | D6 | **W33 splits:** W33a external textures and W33b semantics proceed; W33c widget-to-texture is blocked on DartNative (no offscreen widget capture) — file a feature request upstream. | DartNative renders widgets as native views; no `toImage`, `RepaintBoundary` is a no-op. |
 | D7 | **Out of scope:** upstream `kit/` (day-night, water, joystick, third-person, steering, spawners…), editor/MCP, networking. These are app-level on top of dart3d. | The old Appendix B was silent on them. |
-| D8 | **In scope, newly added:** camera controllers + pointer picking (U1), Wedge/Ring/Extrude + point/spot shadows + shadow-catcher bake (U2), rendering extras (U3: selection outline, iOS tone-mapper selection, sprites + texture atlas), animation property resolver (U4). | Upstream 0.23.0 surface no unit covered; picking and orbit cameras are also what the dice app and demos need. |
+| D8 | **In scope, newly added:** camera controllers + pointer picking (U1), Wedge/Ring/Extrude + spot shadows + shadow-catcher bake (U2; 0.23.0 ships `spot_shadow.dart` only — point-light shadows are 0.24, V3), rendering extras (U3: selection outline, iOS tone-mapper selection, sprites + texture atlas), animation property resolver (U4). | Upstream 0.23.0 surface no unit covered; picking and orbit cameras are also what the dice app and demos need. |
 | D9 | **Out of scope as engine parity:** upstream declarative widgets (`widgets/declarative.dart`, `render_texture_view.dart` — Flutter-widget API, replaced by dart3d's own `SceneView`/`SceneController` on DartNative) and upstream profiling (`memory_report.dart`, `render_profile.dart` — Impeller-internal; dart3d exposes native stats instead, tracked in E9 debug views). | They describe the host framework, not the scene contract. |
 
 **Open for the operator (defaults apply unless changed):**
@@ -69,18 +69,18 @@ Rules:
 |---|---|
 | E1 Filament upgrade + GPU instancing | W26 instancing lanes render identically to pre-upgrade screenshots; 10k-instance scene frame time measured before/after; W18 particles + W22 materials lanes unchanged; no material compile errors on either backend |
 | U1 cameras + picking | orbit/fly/follow each driven by gestures with screenshots at 3 poses; tap-to-pick returns the expected node id on 5 targets incl. a skinned mesh and an instanced mesh |
-| U2 geometry + shadows | Wedge/Ring/Extrude render with correct normals (lit from 2 angles); point + spot shadows visible on a receiver; catcher bake mode shows a baked patch |
+| U2 geometry + shadows | Wedge/Ring/Extrude render with correct normals (lit from 2 angles); spot-light shadows visible on a receiver; catcher bake mode shows a baked patch |
 | U3 rendering extras | selection outline on a picked node; each iOS tone-mapper visibly distinct; sprite atlas frames advance |
 | U4 property resolver | a clip animating a material color and a light intensity plays on both platforms |
 | V0 re-pin | the published tags' `.fscene`/`.fsceneb` versions recorded; every 0.24 example `.fscene` loads in dart3d's Dart mirror with no unknown-component warnings except those assigned to V1–V6 |
-| V1 wire fields | a document using each new field (`shadowCastingMode` values, SMAA settings) round-trips through `serializeScene`; each `shadowCastingMode` value visibly differs on both platforms |
+| V1 wire fields | a document using each new field round-trips through `serializeScene`; each `shadowCastingMode` value visibly differs on both platforms; each supported SMAA setting produces a visible edge difference (zoomed crop) or a renderer diagnostic confirming it applied, on A142 Vulkan, A142 GL and iOS — unsupported settings log a warn-once and are listed as limits |
 | V2 ortho | an upstream 0.24 ortho-camera example matches upstream framing (screenshot overlay); splats sort correctly under ortho (after W31) |
 | V3 point shadows | a point light casts shadows onto a floor and a wall from an occluder on both platforms |
 | V4 decals | the upstream 0.24 decal example renders with correct projection and fade; a `d3:decal` document from E7 still loads (migrated or aliased) |
-| V5 `.fmat` | an additive-blended material, a depth-write-off material and an unlit engine-input material each render as in the upstream example; a malformed `.fmat` surfaces its diagnostics |
-| V6 runtime | 64 point lights render without per-light cost cliffs (frame time recorded); sun sweep with progressive prefilter holds frame budget; spatial audio pans with the camera; character yaw follows movement |
+| V5 `.fmat` | an additive-blended material, a depth-write-off material, a depth-test-off material (draws over an occluder) and an unlit engine-input material each render as in the upstream example; a material without a precision qualifier compiles at mediump on both platforms (compiled-shader dump or diagnostic) and a highp-requiring case still renders correctly; a malformed `.fmat` surfaces its diagnostics |
+| V6 runtime | 64 point lights render without per-light cost cliffs (frame time recorded); sun sweep with progressive prefilter holds frame budget; spatial audio pans with the camera; character yaw follows movement; every 0.24 debug-view mode dart3d supports renders its channel on both platforms (one screenshot per mode) |
 | V7 breaking changes | a written map of each upstream breaking change to the dart3d behavior (changed / not applicable), with one test per changed behavior |
-| V8 conformance | every example in the published 0.24 corpus screenshotted on A142 (Vulkan) and iOS sim next to the upstream render, pass/fail per example in `verification-matrix.md` |
+| V8 conformance | every example in the published 0.24 corpus screenshotted on A142 Vulkan, A142 GL and iOS sim next to the upstream render, pass/fail per example in `verification-matrix.md` |
 
 ## Tracks and order
 
@@ -110,7 +110,7 @@ Rules:
 | E2 | **U1 camera controllers + picking** (new) | Orbit/fly/follow controllers, `scene_pointer` hit tests (BVH or native hit test). | M | — |
 | E3 | **W17 sky / environment** | Generate the equirect natively, not in Dart (Dart per-pixel scatter won't hit the A142 budget). Rate-limit IBL re-prefilter on sun sweeps. | M–L | — |
 | E4 | **W19 character controller** | Upstream `CharacterController` codec (D4); Android `CharacterVirtual` + `CustomCharacterContactListener` in plain Kotlin (jolt-jni ≥ 6.0.0); iOS sweep-and-slide. | L | — |
-| E5 | **U2 geometry + shadow breadth** (new) | Wedge/Ring/Extrude; point/spot shadows; shadow-catcher bake mode. | M | — |
+| E5 | **U2 geometry + shadow breadth** (new) | Wedge/Ring/Extrude; spot-light shadows (point shadows are the 0.24 delta, V3); shadow-catcher bake mode. | M | — |
 | E5b | **U3 rendering extras** (new) | Selection outline, iOS tone-mapper selection, sprites + texture atlas. | M | E2 |
 | E5c | **U4 animation property resolver** (new) | Animate non-transform properties (material, light, camera params). | M | — |
 | E6 | **W28 shader contract** | Prototype first. Scope after S1: one translator (Filament only) or two (Filament + SceneKit modifiers). | XL | S1 |
@@ -155,7 +155,7 @@ re-cut this list; items below are from the 2026-09-27 master preview.
       fields/API in scene 0.4, the `Lighting` projection scale/offset
       semantics (shared with V7), and splat sorting under ortho once W31
       lands.
-- [ ] V3 Point-light shadows (extends U2's spot/point work).
+- [ ] V3 Point-light shadows — new in 0.24 (0.23.0 has spot shadows only, covered by U2); cube/omni shadow maps on Filament and SceneKit.
 - [ ] V4 Decals against the published `DecalNode` contract — reconcile
       E7's `d3:decal` extension with upstream (migrate or alias).
 - [ ] V5 `.fmat` additions (W28 follow-up): `blending: additive`,
@@ -186,7 +186,8 @@ re-cut this list; items below are from the 2026-09-27 master preview.
 
 ## Operating rules
 
-- One PR per unit, branch `e<N>-<slug>` / `p<N>-<slug>` / `r<N>-<slug>`,
+- One PR per unit, branch `s<N>-<slug>` / `e<N>-<slug>` / `p<N>-<slug>` /
+  `r<N>-<slug>` / `v<N>-<slug>` (by track),
   base `main`, the operator merges.
 - Platform owners keep disjoint file boundaries (`dart3d/ios/**`,
   `dart3d/android/**`, `dart3d/lib/**` + `example/**`, `docs/**`).
