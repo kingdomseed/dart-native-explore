@@ -1615,7 +1615,7 @@ object FsceneRealizer {
             key: Long, p: JSONObject,
         ): List<FloatArray>? {
             val attrs = p.tag("attributes").d3Map() ?: return null
-            val color = attrs["color"] ?: return null
+            val color = attrs.opt("color") ?: return null
             color.d3List()?.let { list ->
                 val out = ArrayList<FloatArray>(list.length())
                 for (i in 0 until list.length()) {
@@ -1655,6 +1655,27 @@ object FsceneRealizer {
          * COLOR stream. `billboard: true` swaps the mesh for
          * camera-facing quads re-faced per frame (FacingSpec).
          */
+        /**
+         * Re-bakes every live `d3:instances` node whose `transforms`
+         * or `color` attribute is backed by payload [payloadKey] — a
+         * replaced matrices/floats/bytes chunk otherwise left the baked
+         * mesh stale (the claim tables only tracked env/texture/
+         * geometry/skin/animation consumers). Returns the count.
+         */
+        fun redecodeInstancesForPayload(payloadKey: Long): Int {
+            var n = 0
+            for ((nodeKey, rec) in nodes.entries.toList()) {
+                val p = rec.instancesProps ?: continue
+                val tRef = p.tag("transforms")?.d3Ref()
+                val cRef = p.tag("attributes").d3Map()?.opt("color").d3Ref()
+                if (tRef != payloadKey && cRef != payloadKey) continue
+                decodeInstances(nodeKey, rec, p)
+                applyVisibility(nodeKey)
+                n++
+            }
+            return n
+        }
+
         private fun decodeInstances(key: Long, rec: NodeRec, p: JSONObject) {
             var transforms = d3InstanceTransforms(key, p)
             if (transforms == null) {
@@ -1811,9 +1832,15 @@ object FsceneRealizer {
                     rec.procMaterialInstance = it
                 }
             } else shared
-            matKey?.let {
-                materialConsumers.getOrPut(it) { ArrayList() }
-                    .add(Pair(rec.entity, 0))
+            // The snapshot duplicate must not be a shared-material
+            // consumer: upsertMaterial would rebind slot 0 to the fresh
+            // single-sided instance and silently restore back-face
+            // culling. (It stays a snapshot, per the contract doc.)
+            if (!doubleSided) {
+                matKey?.let {
+                    materialConsumers.getOrPut(it) { ArrayList() }
+                        .add(Pair(rec.entity, 0))
+                }
             }
             RenderableManager.Builder(1)
                 .boundingBox(Box(gm.bounds[0], gm.bounds[1], gm.bounds[2],
