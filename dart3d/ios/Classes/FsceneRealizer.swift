@@ -1993,6 +1993,16 @@ enum FsceneRealizer {
                     d3Log("d3:instances node \(key): geometry unresolved")
                     return
                 }
+                let keep = GeometryFactory.bakedInstanceCount(
+                    transforms.count, baseVertexCount: base.vertexCount)
+                if keep < transforms.count {
+                    host.logOnce("instances.\(key).vertexCap",
+                        "d3:instances node \(key): \(transforms.count)"
+                            + " instances × \(base.vertexCount) base"
+                            + " vertices exceeds the"
+                            + " \(GeometryFactory.maxBakedVertices)-vertex"
+                            + " bake budget — truncated to \(keep)")
+                }
                 parts = GeometryFactory.bakeInstances(
                     base, transforms, colors: colors)
             }
@@ -5165,7 +5175,8 @@ enum FsceneRealizer {
                                       sizeMean: sizeMean)
                 }
             case "flipbook":
-                let cells = max(flipbookCols, 1) * max(flipbookRows, 1)
+                let cells = min(max(flipbookCols, 1), Self.maxFlipbookAxis)
+                    * min(max(flipbookRows, 1), Self.maxFlipbookAxis)
                 let count = max(1, min(d3Int(m["frameCount"]) ?? cells,
                                        cells))
                 sys.imageSequenceColumnCount = max(flipbookCols, 1)
@@ -5249,7 +5260,9 @@ enum FsceneRealizer {
             for w in 0..<max(wraps, 1) {
                 let t0 = Double(w) * period / life
                 guard t0 < 1 else { break }
+                if times.count >= Self.maxFlipbookKeys { break }
                 for f in 0..<count {
+                    if times.count >= Self.maxFlipbookKeys { break }
                     let t = t0 + Double(f) / fps / life
                     guard t < 1 else { break }
                     times.append(NSNumber(value: t))
@@ -5513,8 +5526,13 @@ enum FsceneRealizer {
                let tex = textures[texKey]?.contents {
                 sys.particleImage = tex
             }
-            let flipCols = d3Int(props["flipbookColumns"]) ?? 1
-            let flipRows = d3Int(props["flipbookRows"]) ?? 1
+            // Clamped before any product: two huge-but-valid Int dims
+            // overflow `cols * rows` and trap. 4096 per axis is far past
+            // any usable atlas (a cell must still be ≥ 1 texel).
+            let flipCols = min(max(d3Int(props["flipbookColumns"]) ?? 1, 1),
+                               Self.maxFlipbookAxis)
+            let flipRows = min(max(d3Int(props["flipbookRows"]) ?? 1, 1),
+                               Self.maxFlipbookAxis)
             if flipCols > 1 || flipRows > 1 {
                 sys.imageSequenceColumnCount = flipCols
                 sys.imageSequenceRowCount = flipRows
@@ -5623,6 +5641,11 @@ enum FsceneRealizer {
         /// components re-decode strips them with the particle systems.
         static let burstActionPrefix = "d3burst:"
 
+        /// Per-axis flipbook atlas cap (overflow guard, see decode).
+        static let maxFlipbookAxis = 4096
+        /// Keyframe cap for the fps-flipbook sawtooth controller.
+        static let maxFlipbookKeys = 4096
+
         /// `bursts` have no SCNParticleSystem knob; each burst becomes
         /// a copy of the emitter's system that emits `count`
         /// particles in one 1/60 s window (birthRate·window = count):
@@ -5680,7 +5703,22 @@ enum FsceneRealizer {
                 // particles have aged that long); its stop shifts by
                 // the same amount.
                 let delay = time - (prewarm.isFinite ? max(prewarm, 0) : 0)
-                let aged = max(-delay, 0)
+                var aged = max(-delay, 0)
+                // A finite repeating burst (cycles, or a non-looping
+                // emitter's duration) whose stop falls inside the
+                // warmup: SceneKit can't stop mid-warmup, so warming the
+                // whole elapsed span would invent extra repetitions.
+                // Fully expired (stop + longest particle life already
+                // passed) → skip; otherwise warm only up to the stop
+                // and zero births on the first frame — the survivors
+                // are younger than the reference's by (aged − stop),
+                // a documented approximation.
+                if interval > 0, let stop = stopAfter, aged > stop {
+                    let maxLife = Double(sys.particleLifeSpan
+                        + sys.particleLifeSpanVariation)
+                    if aged - stop >= maxLife { continue }
+                    aged = max(stop, 0)
+                }
                 sys.warmupDuration = CGFloat(aged)
                 var steps: [SCNAction] = []
                 if delay > 0 { steps.append(.wait(duration: delay)) }
