@@ -1477,7 +1477,12 @@ object FsceneRealizer {
          *  decoders — unlike mesh nodes (shared gpuMeshes rebound in
          *  place), a proc/instances re-decode replaces its private
          *  buffers wholesale. */
-        private fun destroyProcRenderable(rec: NodeRec) {
+        private fun destroyProcRenderable(key: Long, rec: NodeRec) {
+            // The facing entry points at procGpuMesh's VertexBuffer —
+            // drop it with the buffer, or an empty rebake (which
+            // returns before re-registering) leaves updateCameraFacing
+            // uploading into a destroyed buffer.
+            host.cameraFacing.remove(key)
             val rm = host.engine.renderableManager
             if (rm.hasComponent(rec.entity)) rm.destroy(rec.entity)
             rec.procGpuMesh?.let {
@@ -1530,7 +1535,7 @@ object FsceneRealizer {
             val shape = p.tag("shape").d3String() ?: run {
                 Log.w(TAG, "d3:procMesh node $key: missing shape"); return
             }
-            destroyProcRenderable(rec)
+            destroyProcRenderable(key, rec)
             val facing = shape in FACING_SHAPES
             val fp = if (facing) parseFacing(key, p) else null
             if (fp != null) {
@@ -1676,6 +1681,28 @@ object FsceneRealizer {
             return n
         }
 
+        /**
+         * Rebuilds the doubleSided snapshot duplicate of every live
+         * `d3:instances` node bound to material [materialKey]. Those
+         * snapshots aren't shared-material consumers (upsertMaterial
+         * would rebind them single-sided), so when a background KHR
+         * variant compile lands, the node would keep the base stand-in
+         * it duplicated at decode — re-bake it against the fresh
+         * instance. Returns the count.
+         */
+        fun redecodeDoubleSidedInstancesForMaterial(materialKey: Long): Int {
+            var n = 0
+            for ((nodeKey, rec) in nodes.entries.toList()) {
+                val p = rec.instancesProps ?: continue
+                if (p.tag("doubleSided").d3Bool() != true) continue
+                if (p.tag("material").d3Ref() != materialKey) continue
+                decodeInstances(nodeKey, rec, p)
+                applyVisibility(nodeKey)
+                n++
+            }
+            return n
+        }
+
         private fun decodeInstances(key: Long, rec: NodeRec, p: JSONObject) {
             var transforms = d3InstanceTransforms(key, p)
             if (transforms == null) {
@@ -1690,7 +1717,7 @@ object FsceneRealizer {
                 transforms = transforms.take(MAX_BAKED_INSTANCES)
             }
             rec.instancesProps = p
-            destroyProcRenderable(rec)
+            destroyProcRenderable(key, rec)
             val colors = d3InstanceColors(key, p)
             val billboard = p.tag("billboard").d3Bool() == true
             // Wire precedence (mirrors FsceneRealizer.swift):

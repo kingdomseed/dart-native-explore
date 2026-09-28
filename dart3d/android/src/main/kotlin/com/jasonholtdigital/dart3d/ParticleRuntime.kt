@@ -1231,8 +1231,19 @@ abstract class ParticleRuntime(
         private set
     var layers = 1
 
+    /** The camera's world forward (unit) — set by [tick]; the alpha
+     * sort keys on view depth along it. */
+    protected val camForward = floatArrayOf(0f, 0f, -1f)
+
     /** Advance (unless paused) then repack — upstream update() order. */
-    fun tick(dt: Double, camPos: FloatArray, nodeWorld: FloatArray) {
+    fun tick(
+        dt: Double, camPos: FloatArray, nodeWorld: FloatArray,
+        camFwd: FloatArray? = null,
+    ) {
+        if (camFwd != null) {
+            camForward[0] = camFwd[0]; camForward[1] = camFwd[1]
+            camForward[2] = camFwd[2]
+        }
         if (!paused) system.step(dt)
         repack(camPos, nodeWorld)
     }
@@ -1335,11 +1346,17 @@ class SpriteParticleRuntime(
                     nodeWorld[9] * lz + nodeWorld[13] - camPos[1]
                 val dz = nodeWorld[2] * lx + nodeWorld[6] * ly +
                     nodeWorld[10] * lz + nodeWorld[14] - camPos[2]
-                val d2 = dx * dx + dy * dy + dz * dz
-                // Non-negative floats order like their bit patterns;
-                // invert for descending (farthest first).
-                val key = Int.MAX_VALUE - java.lang.Float.floatToRawIntBits(
-                    if (d2.isFinite()) d2 else Float.MAX_VALUE)
+                // View depth along the camera forward — radial distance
+                // misorders laterally offset particles (and everything
+                // under an orthographic camera).
+                val depth = dx * camForward[0] + dy * camForward[1] +
+                    dz * camForward[2]
+                // Order-preserving float → int bits (sign-flip trick),
+                // inverted for descending (farthest first).
+                val bits = java.lang.Float.floatToRawIntBits(
+                    if (depth.isFinite()) depth else Float.MAX_VALUE)
+                val ordered = if (bits < 0) bits.inv() else bits or Int.MIN_VALUE
+                val key = (ordered xor Int.MIN_VALUE).inv()
                 sortKeys[i] = (key.toLong() shl 32) or i.toLong()
             }
             java.util.Arrays.sort(sortKeys, 0, count)
