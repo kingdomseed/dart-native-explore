@@ -60,12 +60,14 @@ bool _hasEager(SceneDocument doc) => doc.nodes.values.any(
   (n) => n.instance != null && n.instance!.load == LoadPolicy.eager,
 );
 
-/// The placeholder bookkeeping for one compose call. A placeholder is
-/// a cuboid with extents `(-1, -1, token)`. Negative extents never
-/// occur in a real document, and `token` indexes [_entries], which
-/// belong to this call alone.
+/// The placeholder bookkeeping for one compose call. Each placeholder
+/// is a geometry resource whose `procedural` spec is a fresh object
+/// minted here. Upstream's `_remapResource` passes `procedural` through
+/// by reference, so placeholders are recognized by object identity,
+/// never by their dimensions. An authored cuboid of any extents can't
+/// collide with one.
 final class _Stash {
-  final List<Map<String, Object?>> _entries = [];
+  final Map<ProceduralGeometry, Map<String, Object?>> _entries = Map.identity();
 
   /// A shallow clone of [doc] with its extension resources stood in as
   /// placeholders. [doc] is untouched.
@@ -92,13 +94,11 @@ final class _Stash {
     clone.views.addAll(doc.views);
     for (final entry in ext.entries) {
       if (clone.resources.containsKey(entry.key)) continue;
-      final token = _entries.length;
-      _entries.add(entry.value);
+      final marker = CuboidGeometrySpec(extents: Vector3.all(1));
+      _entries[marker] = entry.value;
       clone.resources[entry.key] = GeometryResource(
         entry.key,
-        procedural: CuboidGeometrySpec(
-          extents: Vector3(-1, -1, token.toDouble()),
-        ),
+        procedural: marker,
       );
     }
     return clone;
@@ -107,21 +107,15 @@ final class _Stash {
   SceneDocument harvest(SceneDocument out) {
     final ext = d3ExtensionResources(out);
     for (final id in out.resources.keys.toList()) {
-      final token = _tokenOf(out.resources[id]);
-      if (token == null) continue;
+      final r = out.resources[id];
+      if (r is! GeometryResource) continue;
+      final procedural = r.procedural;
+      if (procedural == null) continue;
+      final entry = _entries[procedural];
+      if (entry == null) continue;
       out.resources.remove(id);
-      ext[id] = copyExtensionEntry(_entries[token]);
+      ext[id] = copyExtensionEntry(entry);
     }
     return out;
-  }
-
-  int? _tokenOf(ResourceSpec? r) {
-    if (r is! GeometryResource) return null;
-    final p = r.procedural;
-    if (p is! CuboidGeometrySpec) return null;
-    final e = p.extents;
-    if (e.x != -1 || e.y != -1) return null;
-    final token = e.z.toInt();
-    return token >= 0 && token < _entries.length ? token : null;
   }
 }
