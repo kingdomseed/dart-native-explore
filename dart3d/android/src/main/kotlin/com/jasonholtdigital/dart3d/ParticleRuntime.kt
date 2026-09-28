@@ -390,9 +390,11 @@ class BoxEmitterShape(halfExtents: FloatArray, direction: FloatArray) :
 
 private fun normalize3(v: FloatArray): FloatArray {
     val l = sqrt((v[0] * v[0] + v[1] * v[1] + v[2] * v[2]).toDouble())
+    // An explicit zero direction stays zero (the Dart reference keeps
+    // particles still); an omitted one already arrives as +Y.
     return if (l > 0.0) floatArrayOf(
         (v[0] / l).toFloat(), (v[1] / l).toFloat(), (v[2] / l).toFloat())
-    else floatArrayOf(0f, 1f, 0f)
+    else floatArrayOf(0f, 0f, 0f)
 }
 
 // ---------------------------------------------------------------------------
@@ -448,6 +450,8 @@ class Spawner(var rate: Double = 0.0, val bursts: List<ParticleBurst>) {
 abstract class ParticleModule {
     open fun spawn(s: ParticleStorage, index: Int) {}
     open fun update(s: ParticleStorage, dt: Double) {}
+    /** Clears per-run module state (the Dart `ParticleModule.reset`). */
+    open fun reset() {}
 }
 
 class AccelerationModule(private val acceleration: FloatArray) :
@@ -536,21 +540,29 @@ class TurbulenceModule(
     private val scroll = scroll
     private var time = 0.0
     private val curl = FloatArray(3)
+    override fun reset() {
+        time = 0.0
+    }
+
     override fun update(s: ParticleStorage, dt: Double) {
         time += dt
         val ox = scroll[0] * time * frequency
         val oy = scroll[1] * time * frequency
         val oz = scroll[2] * time * frequency
         for (i in 0 until s.aliveCount) {
+            // Positions and scroll are z-mirrored into Filament space;
+            // curl noise isn't reflection-symmetric, so sample the
+            // field at the WIRE coordinate (unmirror z) and mirror the
+            // returned curl's z back — the Dart/wire-space field.
             noiseCurl3(
                 s.posX[i] * frequency - ox,
                 s.posY[i] * frequency - oy,
-                s.posZ[i] * frequency - oz,
+                -(s.posZ[i] * frequency - oz),
                 seed = seed, out = curl,
             )
             s.velX[i] += (curl[0] * strength * dt).toFloat()
             s.velY[i] += (curl[1] * strength * dt).toFloat()
-            s.velZ[i] += (curl[2] * strength * dt).toFloat()
+            s.velZ[i] -= (curl[2] * strength * dt).toFloat()
         }
     }
 }
@@ -808,6 +820,9 @@ class ParticleSystem(
         random = Random(seed.toLong())
         accumulator = 0.0
         systemTime = 0.0
+        // Module clocks (turbulence scroll) restart with the system —
+        // a reset emitter replays the same field.
+        for (m in modules) m.reset()
     }
 
     private fun stepFixed(dt: Double) {
@@ -1278,6 +1293,9 @@ class SpriteParticleRuntime(
         .order(ByteOrder.nativeOrder())
     private val floats = cpuBuf.asFloatBuffer()
     private var liveDrawCount = -1
+    // Back-to-front pack order for alpha emitters — (depth key, index)
+    // packed into longs so the per-frame sort is primitive (no boxing).
+    private val sortKeys = LongArray(system.storage.capacity)
 
     override fun repack(camPos: FloatArray, nodeWorld: FloatArray) {
         val s = system.storage
@@ -1302,7 +1320,33 @@ class SpriteParticleRuntime(
         val right = FloatArray(3)
         val up = FloatArray(3)
 
-        for (i in 0 until count) {
+        // One batch = one renderable: Filament sorts it against other
+        // transparent renderables, never the quads inside it. With
+        // depth writes off, src-over needs farther quads packed first;
+        // additive blending is order-independent and keeps storage
+        // order.
+        val sorted = spec.blendMode != "additive" && count > 1
+        if (sorted) {
+            for (i in 0 until count) {
+                val lx = s.posX[i]; val ly = s.posY[i]; val lz = s.posZ[i]
+                val dx = nodeWorld[0] * lx + nodeWorld[4] * ly +
+                    nodeWorld[8] * lz + nodeWorld[12] - camPos[0]
+                val dy = nodeWorld[1] * lx + nodeWorld[5] * ly +
+                    nodeWorld[9] * lz + nodeWorld[13] - camPos[1]
+                val dz = nodeWorld[2] * lx + nodeWorld[6] * ly +
+                    nodeWorld[10] * lz + nodeWorld[14] - camPos[2]
+                val d2 = dx * dx + dy * dy + dz * dz
+                // Non-negative floats order like their bit patterns;
+                // invert for descending (farthest first).
+                val key = Int.MAX_VALUE - java.lang.Float.floatToRawIntBits(
+                    if (d2.isFinite()) d2 else Float.MAX_VALUE)
+                sortKeys[i] = (key.toLong() shl 32) or i.toLong()
+            }
+            java.util.Arrays.sort(sortKeys, 0, count)
+        }
+
+        for (n in 0 until count) {
+            val i = if (sorted) (sortKeys[n] and 0xFFFFFFFFL).toInt() else n
             val size = s.size[i]
             var width = (size * spec.aspectRatio).toFloat()
             if (spec.randomFlipX && s.random01[i] < 0.5f) width = -width
@@ -1368,8 +1412,15 @@ class SpriteParticleRuntime(
                         var rx = wuy * fwdZ - wuz * fwdY
                         var ry = wuz * fwdX - wux * fwdZ
                         var rz = wux * fwdY - wuy * fwdX
-                        val rl = sqrt(rx * rx + ry * ry + rz * rz)
-                        if (rl > 1e-5f) { rx /= rl; ry /= rl; rz /= rl }
+                        var rl = sqrt(rx * rx + ry * ry + rz * rz)
+                        if (rl <= 1e-5f) {
+                            // Pole-on: fwd ∥ world up — take right
+                            // from world +Z instead (never collapse).
+                            rx = fwdY; ry = -fwdX; rz = 0f
+                            rl = sqrt(rx * rx + ry * ry)
+                            if (rl <= 1e-5f) { rx = 1f; ry = 0f; rl = 1f }
+                        }
+                        rx /= rl; ry /= rl; rz /= rl
                         right[0] = rx; right[1] = ry; right[2] = rz
                         up[0] = fwdY * rz - fwdZ * ry
                         up[1] = fwdZ * rx - fwdX * rz
@@ -1395,8 +1446,15 @@ class SpriteParticleRuntime(
                     var rx = wuy * fwdZ - wuz * fwdY
                     var ry = wuz * fwdX - wux * fwdZ
                     var rz = wux * fwdY - wuy * fwdX
-                    val rl = sqrt(rx * rx + ry * ry + rz * rz)
-                    if (rl > 1e-5f) { rx /= rl; ry /= rl; rz /= rl }
+                    var rl = sqrt(rx * rx + ry * ry + rz * rz)
+                    if (rl <= 1e-5f) {
+                        // Pole-on: fwd ∥ world up — take right from
+                        // world +Z instead (never collapse the quad).
+                        rx = fwdY; ry = -fwdX; rz = 0f
+                        rl = sqrt(rx * rx + ry * ry)
+                        if (rl <= 1e-5f) { rx = 1f; ry = 0f; rl = 1f }
+                    }
+                    rx /= rl; ry /= rl; rz /= rl
                     right[0] = rx; right[1] = ry; right[2] = rz
                     up[0] = fwdY * rz - fwdZ * ry
                     up[1] = fwdZ * rx - fwdX * rz
@@ -1406,8 +1464,10 @@ class SpriteParticleRuntime(
 
             // Flipbook cells — the shader math verbatim.
             val frame = s.frame[i].toDouble()
-            val frame0 = if (blendOn > 0.0) floor(frame)
-                else floor(frame + 0.5)
+            // Rounding can land frame0 on `total` (the last half-frame)
+            // — wrap it like frame1 so it never addresses past the atlas.
+            val frame0 = (if (blendOn > 0.0) floor(frame)
+                else floor(frame + 0.5)) % total
             val frame1 = (frame0 + 1.0) % total
             val blend = ((frame - frame0) * blendOn).toFloat()
             val f0col = frame0 % cols
@@ -1718,8 +1778,12 @@ class MeshParticleRuntime(
         val dx = vx / speed; val dy = vy / speed; val dz = vz / speed
         val dotUp = dy.coerceIn(-1f, 1f)
         val align: FloatArray
+        // The velocity axis is already z-mirrored (S·v); a rotation
+        // about a mirrored axis needs the negated angle
+        // (S·R(a,θ)·S = R(S·a, −θ)) — the tumble path instead stores
+        // (−x,−y,z) with the angle unchanged.
         if (dotUp > 1f - 1e-6f) {
-            align = quatAxisAngle(dx, dy, dz, s.rotation[i])
+            align = quatAxisAngle(dx, dy, dz, -s.rotation[i])
             return align
         }
         if (dotUp < -1f + 1e-6f) {
@@ -1733,7 +1797,7 @@ class MeshParticleRuntime(
             align = quatAxisAngle(ax, ay, az,
                 acos(dotUp.toDouble()).toFloat())
         }
-        val spin = quatAxisAngle(dx, dy, dz, s.rotation[i])
+        val spin = quatAxisAngle(dx, dy, dz, -s.rotation[i])
         return quatMul(spin, align)
     }
 
