@@ -1114,7 +1114,10 @@ final class SceneViewHost: SCNView {
         // journal step still sees this dispatch's depth.
         let journaled = op == "addNode" || op == "updateNode"
             || op == "removeNode"
-        if journaled { removedCommandAdded.removeAll() }
+        if journaled {
+            removedCommandAdded.removeAll()
+            removedNotCreated.removeAll()
+        }
         // An addNode CREATES only when the id isn't live — a re-sent
         // batch's addNode on a live (e.g. manifest) node degrades to
         // an update and must not mark the node command-created.
@@ -1270,6 +1273,10 @@ final class SceneViewHost: SCNView {
                 nodeOpJournal.removeAll {
                     $0.seq > oldSeq && members.contains($0.key)
                 }
+                // Their superseded adds took any command-created
+                // ownership with them — the batch owns the members
+                // again, so a later removal must be journaled.
+                commandCreatedKeys.subtract(members)
                 streamedSubtreeOps[i].ops = ops
             } else {
                 opSeq += 1
@@ -1353,7 +1360,20 @@ final class SceneViewHost: SCNView {
             // replayed removal — unless an earlier removal of the same
             // id (a manifest node removed, then re-created) is still
             // journaled, in which case that entry already covers it.
-            if removedCommandAdded.contains(key) { return }
+            if removedCommandAdded.contains(key) {
+                // The root itself needs no replayed removal, but a
+                // doomed descendant it didn't create (a manifest or
+                // streamed node reparented under it) would come back
+                // with the re-realize — journal those removals.
+                for k in removedNotCreated where k != key {
+                    opSeq += 1
+                    nodeOpJournal.append((key: k, seq: opSeq, json: [
+                        "op": "removeNode",
+                        "node": D3Wire.localIdToken(k),
+                    ]))
+                }
+                return
+            }
         case "updateNode":
             let flags = Set(json["flags"] as? [String] ?? [])
             nodeOpJournal.removeAll {
@@ -1370,6 +1390,9 @@ final class SceneViewHost: SCNView {
     /// Ids whose journaled `addNode` the current `removeSubtree`
     /// pruned — consulted by the `removeNode` journal step.
     private var removedCommandAdded: Set<UInt64> = []
+    /// Doomed ids of the current `removeSubtree` that no top-level
+    /// addNode created (manifest/streamed nodes) — in doom order.
+    private var removedNotCreated: [UInt64] = []
 
     /// Ids a top-level addNode created (absent when it applied) since
     /// the last `loadScene` — the only nodes whose removal needn't be
@@ -1498,6 +1521,8 @@ final class SceneViewHost: SCNView {
             if !replayingOps {
                 if commandCreatedKeys.remove(k) != nil {
                     removedCommandAdded.insert(k)
+                } else {
+                    removedNotCreated.append(k)
                 }
                 // Earlier removals of this id stay: they undo a
                 // manifest node the replayed re-realize brings back.
