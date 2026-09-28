@@ -107,6 +107,22 @@ ALREADY FIXED 4, WON'T-FIX 1, DEFER 2.
 | 4122494250 | FsceneRealizer.swift:5241 | flipbook wrap count converts to Int before clamping (trap) | FIX (real P1) | `ce9d0f8`. `Int(Double)` traps on a quotient that is > Int.max or inf. The quotient is now clamped in Double first, and NaN or ≤ 0 values return early |
 | 4122494259 | FsceneRealizer.swift:5654 | bursts ignore prewarm | FIX (real) | `ce9d0f8`. Confirmed in the reference: `particle_sim.dart:1172-1176` prewarm calls `_stepFixed`, which runs the spawner. The live start is now `time − prewarm`, and a burst that started inside the warmup attaches immediately with `warmupDuration` set to the elapsed part |
 
+### Round 2 (Codex on the rebased PR #15)
+
+| Comment id | file:line | Summary | Verdict | Evidence / fix |
+|---|---|---|---|---|
+| 4122726812 | SceneViewHost.swift:1254 | a re-loaded subtree keeps its first `seq`, so newer journaled member ops replay after it | FIX (real), with a different mechanism than suggested | The scenario is real. Re-sequencing the batch as suggested would break a subtree grafted under one of its members after the first load: that dependent would replay before its placeholder exists and be dropped. The batch therefore keeps its `seq`, and the re-load prunes journaled ops on its members that have `seq` greater than the first load's (live, the re-load already overwrote them) |
+| 4122726818 | FsceneRealizer.swift:5684 | a finite repeating burst warms past its cycle cap | FIX (real, approximate) | The stop only ran after attachment. Now a burst that is fully expired (stop plus the longest particle life already passed) is skipped. Otherwise it warms only up to its stop and zeroes births on the first frame. Survivors are younger than the reference's by (aged − stop), which is documented |
+| 4122726829 | GeometryFactory.swift:1085 | the baked-vertex cap diverges across runtimes | WON'T-FIX the cap; FIX the silent truncation | The reviewer compared against `main`. The stabilization set shares the cap: `origin/stabilize/dart` `lib/src/geometry/limits.dart` has `kD3MaxBakedVertices = 1<<20` and `d3BakedInstanceCount`, which `d3BakeInstances` uses, and `origin/stabilize/android` `FsceneRealizer.kt:80` / `:1800` truncates by the same budget. iOS now uses a `bakedInstanceCount` twin and logs a `vertexCap` warning when it truncates, like Android. `docs/payload-geometry-spec.md` should document the budget (docs owner) |
+| 4122726839 | FsceneRealizer.swift:5170 | atlas `cols × rows` overflow traps | FIX (real P1) | This regressed with my `e7c8335`: the product is now evaluated unconditionally. Both dimensions are clamped to [1, 4096] at the component decode and again in the module, and the sawtooth controller's keyframes are capped at 4096 (a huge fps × count loop was unbounded) |
+
+Draft replies, for the coordinator to post:
+
+- **4122726812:** "Confirmed the stale-replay case. I didn't re-sequence the batch: a subtree grafted under one of its members after the first load would then replay before its placeholder and be dropped. Instead the re-load prunes journaled ops on the batch's members that arrived after the first load (the live re-load already overwrote them). Fixed in 76d2f7b."
+- **4122726818:** "Confirmed — the stop only applied after attach. A fully expired finite burst (stop + max particle life inside the prewarm) is now skipped. Otherwise warmup is capped at the stop and births are zeroed on the first frame (documented: survivors are slightly younger than the reference's). 76d2f7b."
+- **4122726829:** "The cap is shared by the stabilization set, just not by main yet: dart `limits.dart` kD3MaxBakedVertices = 1<<20 + d3BakedInstanceCount (used by d3BakeInstances) and Android FsceneRealizer.kt:80/:1800 truncate by the same budget. Keeping it. I did fix the silent part: iOS now logs a vertexCap warning when it truncates, like Android. 76d2f7b."
+- **4122726839:** "Confirmed, and it regressed in e7c8335. Atlas dims now clamp to [1, 4096] before any product, and the sawtooth keyframes cap at 4096. 76d2f7b."
+
 ## Light direction check (coordinator follow-up, Android `264c2e0`)
 
 **Verdict: the iOS decode is correct against upstream; the example scene
