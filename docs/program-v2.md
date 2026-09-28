@@ -9,7 +9,8 @@ where this file re-scopes it. Why the reset: see
 ## Goals
 
 1. **Engine:** full parity with a *pinned* upstream `flutter_scene`
-   surface, on iOS and Android, with evidence a reviewer can re-check.
+   surface — **final target flutter_scene 0.24 / scene 0.4**, reached
+   through the 0.23.0 milestone below — on iOS and Android, with evidence a reviewer can re-check.
 2. **Product:** a DartNative Mythic dice app on dart3d, using
    `mythic_dice_parser`, with the dice feel the operator asked for.
 3. **Release:** dart3d published on dartpub.dev as the first 3D plugin.
@@ -18,7 +19,7 @@ where this file re-scopes it. Why the reset: see
 
 | # | Decision | Why |
 |---|---|---|
-| D1 | **Parity pin: flutter_scene 0.23.0 / scene 0.3.0, commit `0dc6ee80` (bdero/flutter_scene), `.fscene` v5, `.fsceneb` v2.** Unreleased master (0.24.0 preview, `b02c99989`) is a reference only, for decal and `.fmat` blending semantics. Re-pin when 0.24.0/0.4.0 publish. | The old plan cited a `/tmp` monorepo that no longer exists; "parity" had no fixed target. |
+| D1 | **Two-stage parity pin.** Milestone: flutter_scene 0.23.0 / scene 0.3.0, commit `0dc6ee80` (bdero/flutter_scene), `.fscene` v5, `.fsceneb` v2 — finish the existing work (Tracks S, E) against this first. **Final goal: flutter_scene 0.24 / scene 0.4** (Track V), pinned to the published 0.24.0/0.4.0 tags when they ship; until then unreleased master (`b02c99989`, 2026-09-27) is the preview reference. | The old plan cited a `/tmp` monorepo that no longer exists; "parity" had no fixed target. |
 | D2 | **Keep SceneKit on iOS for now; run a time-boxed Filament-on-Metal spike (S1) before W28.** | SceneKit is soft-deprecated (WWDC25) but the iOS 27 SDK carries no deprecation annotations. A single Filament renderer would collapse the iOS halves of W28/W20/W31 into the Android implementation, but costs a rewrite of SceneKit-provided pieces (particles, floor mirror, physics via Jolt C++). Decide with data, not now. RealityKit is ruled out (weaker shader control, no decal/planar primitives). |
 | D3 | **Upgrade Filament 1.71.6 → 1.77.2+ in lockstep (filament-android, filament-utils-android, filamat-android, gltfio-android) once 1.77.2 is on Maven;** replace CPU-baked instancing with GPU instancing. | `RenderableManager.Builder.instances(n)` + `getInstanceIndex()` already works in the Java API; Java `InstanceBuffer` lands in 1.77.2. Unblocks W31 and mesh particles. Materials recompile automatically (runtime filamat). |
 | D4 | **Mirror upstream vocabulary; invent `d3:` extensions only where upstream has no wire form**, and model them on upstream's runtime API. | Keeps `.fscene` interchange. Applies to W19 (upstream `CharacterController` codec exists → use it, drop the invented `characterMove` op) and W27 (`DecalNode` is runtime-only upstream → `d3:decal` modeled on it). |
@@ -126,6 +127,37 @@ Rules:
 - [ ] P4 Demo app (**depends on E2** for the orbit controller): curated showcase (not test lanes) with a stage,
       orbit camera, side-by-side reference against flutter_scene demos;
       3D animated DartNative logo centerpiece (Blender).
+
+### Track V — 0.24 parity (final goal; after Track E closes on 0.23.0)
+
+Scope = the upstream delta from `0dc6ee80` to the published
+flutter_scene 0.24.0 / scene 0.4.0 tags. Before starting, re-diff the
+published tags (master is 200+ commits ahead and still moving) and
+re-cut this list; items below are from the 2026-09-27 master preview.
+
+- [ ] V0 Re-pin to the published 0.24.0/0.4.0 tags; diff `packages/scene`
+      (wire) and `packages/flutter_scene` (runtime) changelogs; confirm
+      `.fscene` stays v5 or add the migration.
+- [ ] V1 Wire additions: `Node.shadowCastingMode`, SMAA fields, any new
+      codecs; both natives + Dart mirror.
+- [ ] V2 Orthographic cameras (incl. splat sorting under ortho once W31
+      lands).
+- [ ] V3 Point-light shadows (extends U2's spot/point work).
+- [ ] V4 Decals against the published `DecalNode` contract — reconcile
+      E7's `d3:decal` extension with upstream (migrate or alias).
+- [ ] V5 `.fmat` additions (W28 follow-up): `blending: additive`,
+      `depth_write`/`depth_test`, unlit `engine_inputs`, compile
+      diagnostics, mediump default.
+- [ ] V6 Lighting/runtime semantics: froxel-clustered lights (light-count
+      scaling on both platforms), progressive radiance prefilter (W20
+      follow-up), spatial audio following the view camera
+      (`dart3d_audio`), character `rotatesToMovement`/`yaw` (W19
+      follow-up), debug views (W34 follow-up).
+- [ ] V7 Breaking-change audit: `Lighting` projection scale/offset
+      (replaces `tanHalfFov`), `initializeStaticResources()` throwing —
+      map to dart3d equivalents or record as not applicable.
+- [ ] V8 Conformance: run the 0.24 example corpus through dart3d on both
+      platforms; T3 evidence per item.
 
 ### Track R — release (after S0; before first publish)
 
