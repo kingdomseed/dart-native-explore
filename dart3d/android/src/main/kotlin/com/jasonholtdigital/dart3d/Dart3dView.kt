@@ -664,6 +664,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         alphaMode: String,
         extFlags: Int,
         boundSlots: Int,
+        materialKey: Long? = null,
     ): VariantPick {
         val flags = if (unlit) 0 else extFlags
         fun base() = VariantPick(
@@ -687,6 +688,29 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             return base()
         }
         if (key in failedVariants) return base()
+        // A cold variant compile is seconds on the A142 (3.4 s seen
+        // for d3_lit_e20) and this runs inside the main-thread frame
+        // drain. Compile it in the background, render the base
+        // prebuilt meanwhile, and re-decode the waiting material
+        // resources when the package lands.
+        val api = MaterialPackages.apiFor(engine.backend)
+        val pkgKey = MaterialPackages.litKey(unlit, blendingForMode(mode),
+            flags, boundSlots, api)
+        if (MaterialPackages.peek(pkgKey) == null &&
+            !MaterialPackages.hasFailed(pkgKey)) {
+            materialKey?.let {
+                variantWaiters.getOrPut(key) { HashSet() }.add(it)
+            }
+            if (variantInflight.add(key)) {
+                Log.i(TAG, "material variant d3_lit_e$flags/$mode " +
+                    "compiling in background; base material meanwhile")
+                MaterialPackages.litPackageAsync(unlit,
+                    blendingForMode(mode), flags, boundSlots, api) {
+                    pendingWork.offer { onVariantCompiled(key) }
+                }
+            }
+            return base()
+        }
         val built = try {
             buildMaterial(unlit, blendingForMode(mode), flags,
                 boundSlots)
@@ -707,6 +731,21 @@ class Dart3dView(context: Context) : FrameLayout(context) {
 
     private fun warnOnce(tag: String, msg: String) {
         if (warnedOnce.add(tag)) Log.w(TAG, msg)
+    }
+
+    /** Variant keys with a background compile in flight. */
+    private val variantInflight = HashSet<VariantKey>()
+    /** Material resource keys rendering a base stand-in while their
+     * variant compiles — re-decoded when it lands. */
+    private val variantWaiters = HashMap<VariantKey, MutableSet<Long>>()
+
+    /** Frame-thread continuation of a background variant compile. */
+    private fun onVariantCompiled(key: VariantKey) {
+        variantInflight.remove(key)
+        val waiters = variantWaiters.remove(key) ?: return
+        for (mk in waiters) {
+            resources.materialResources[mk]?.let { upsertMaterial(mk, it) }
+        }
     }
 
     /**
