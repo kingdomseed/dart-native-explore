@@ -356,6 +356,12 @@ internal object MaterialPackages {
             // resource opts in (glTF/SceneKit default).
             .doubleSided(true)
             .blending(blending)
+            // Filament's MaterialBuilder defaults flipUV to TRUE (the
+            // vertex shader rewrites v → 1 − v). Wire UVs are glTF
+            // V=0-top and TextureFactory uploads top-row-first, so the
+            // flip samples every texture upside down (dash-materials
+            // investigation). The particle package already opts out.
+            .flipUV(false)
         if (extFlags and FsceneRealizer.EXT_TRANSMISSION != 0) {
             // KHR_materials_transmission → screen-space refraction;
             // KHR_materials_volume (thickness>0) upgrades the variant
@@ -496,7 +502,8 @@ internal object MaterialPackages {
         // <slot>UVTransform packs (offset.xy, scale.xy); the mat2 takes
         // column-major args so (c,s,-s,c) is the standard CCW rotation.
         // Wire UVs are V=0-top (glTF/SceneKit) and uploads land top-row-
-        // first at texel v=0, so no flipUV — see the report.
+        // first at texel v=0, so the builder above disables Filament's
+        // default flipUV.
         fun slotBound(i: Int) = boundSlots and (1 shl i) != 0
         fun extBound(i: Int) =
             boundSlots and FsceneRealizer.extSlotBit(i) != 0
