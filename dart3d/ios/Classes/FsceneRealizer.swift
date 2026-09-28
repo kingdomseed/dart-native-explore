@@ -5682,7 +5682,25 @@ enum FsceneRealizer {
                 sys.emissionDurationVariation = 0
                 sys.warmupDuration = 0
                 var stopAfter: Double? = nil   // seconds after start
-                if interval > 0 {
+                if interval > 0 && interval < window {
+                    // Sub-frame interval: the reference counts every
+                    // interval crossing inside a step, so the burst is
+                    // really a rate — count/interval per second. Emit
+                    // it continuously; a total that fits in one window
+                    // (cycles·interval < window) goes out as one window
+                    // carrying cycles·count births.
+                    let span = cycles.map { Double($0) * interval }
+                    if let span, span < window {
+                        sys.birthRate = CGFloat(
+                            Double(count) * Double(cycles!) / window)
+                        sys.loops = false
+                    } else {
+                        sys.birthRate = CGFloat(Double(count) / interval)
+                        sys.loops = true
+                        sys.idleDuration = 0
+                        stopAfter = span
+                    }
+                } else if interval > 0 {
                     sys.loops = true
                     sys.idleDuration = CGFloat(max(interval - window, 0))
                     if let cycles {
