@@ -15,6 +15,7 @@
 #include <dlfcn.h>
 #include <atomic>
 #include <mutex>
+#include <unordered_map>
 #include <android/log.h>
 
 #define LOG_TAG "dart3d"
@@ -136,9 +137,15 @@ typedef filament::gltfio::TextureProvider* (*CreateKtx2ProviderFn)(
 typedef void (*DestroyTextureFn)(filament::Engine*,
     const filament::Texture*);
 
+// One provider per live Engine. A provider holds a reference to the
+// Engine it was created with, so its lifetime is tied to that Engine
+// explicitly: Dart3dView calls nKtx2Release BEFORE engine.destroy(),
+// which deletes the provider while its Engine is still valid. Keying
+// by Engine* is safe only because release always precedes destroy — a
+// later Engine that reuses the address finds no stale entry.
 static std::mutex g_ktx2Mutex;
-static filament::gltfio::TextureProvider* g_ktx2Provider = nullptr;
-static filament::Engine* g_ktx2Engine = nullptr;
+static std::unordered_map<filament::Engine*,
+    filament::gltfio::TextureProvider*> g_ktx2Providers;
 
 static void* ktx2Symbol(const char* name) {
     void* sym = dlsym(RTLD_DEFAULT, name);
@@ -186,29 +193,27 @@ Java_com_jasonholtdigital_dart3d_TextureFactory_nKtx2Decode(
     if (len <= 0) return 0;
 
     std::lock_guard<std::mutex> lock(g_ktx2Mutex);
-    if (g_ktx2Engine != engine || g_ktx2Provider == nullptr) {
-        // A stale provider's Engine may already be destroyed — deleting
-        // it would dereference the dead engine, so abandon it (a
-        // provider is a reader object + an empty queue; it dies with
-        // the process/engine teardown).
-        g_ktx2Provider = create(engine);
-        g_ktx2Engine = engine;
+    filament::gltfio::TextureProvider*& slot = g_ktx2Providers[engine];
+    if (slot == nullptr) {
+        slot = create(engine);
     }
-    if (!g_ktx2Provider) {
+    if (!slot) {
+        g_ktx2Providers.erase(engine);
         LOGW("ktx2: createKtx2Provider returned null");
         return 0;
     }
+    filament::gltfio::TextureProvider* provider = slot;
 
     jbyte* data = env->GetByteArrayElements(bytes, nullptr);
     if (!data) return 0;
-    filament::Texture* pushed = g_ktx2Provider->pushTexture(
+    filament::Texture* pushed = provider->pushTexture(
         reinterpret_cast<const uint8_t*>(data), (size_t)len,
         "image/ktx2",
         srgb ? filament::gltfio::TextureProvider::TextureFlags::sRGB
              : filament::gltfio::TextureProvider::TextureFlags::NONE);
     env->ReleaseByteArrayElements(bytes, data, JNI_ABORT);
     if (!pushed) {
-        const char* msg = g_ktx2Provider->getPushMessage();
+        const char* msg = provider->getPushMessage();
         LOGW("ktx2: pushTexture failed: %s", msg ? msg : "no message");
         return 0;
     }
@@ -216,14 +221,14 @@ Java_com_jasonholtdigital_dart3d_TextureFactory_nKtx2Decode(
     // Transcoding ran on the engine's JobSystem; wait it out, then let
     // updateQueue() perform the Texture::setImage uploads and move the
     // item to the poppable set.
-    g_ktx2Provider->waitForCompletion();
+    provider->waitForCompletion();
     filament::Texture* ours = nullptr;
     bool oursComplete = false;
     for (int i = 0; i < 8 && !ours; i++) {
-        g_ktx2Provider->updateQueue();
+        provider->updateQueue();
         filament::Texture* popped;
-        while ((popped = g_ktx2Provider->popTexture()) != nullptr) {
-            const char* msg = g_ktx2Provider->getPopMessage();
+        while ((popped = provider->popTexture()) != nullptr) {
+            const char* msg = provider->getPopMessage();
             if (popped == pushed) {
                 ours = popped;
                 oursComplete = (msg == nullptr);
@@ -250,4 +255,29 @@ Java_com_jasonholtdigital_dart3d_TextureFactory_nKtx2Decode(
         return 0;
     }
     return reinterpret_cast<jlong>(ours);
+}
+
+/**
+ * Destroys the KTX2 provider created for `nativeEngine`, if any. Must
+ * run on the Filament thread while the Engine is still alive (the
+ * provider's destructor cancels pending decodes against it) — the
+ * Kotlin side calls it immediately before `engine.destroy()`.
+ */
+extern "C" JNIEXPORT void JNICALL
+Java_com_jasonholtdigital_dart3d_TextureFactory_nKtx2Release(
+        JNIEnv*, jobject, jlong nativeEngine) {
+    auto* engine = reinterpret_cast<filament::Engine*>(nativeEngine);
+    filament::gltfio::TextureProvider* provider = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(g_ktx2Mutex);
+        auto it = g_ktx2Providers.find(engine);
+        if (it == g_ktx2Providers.end()) return;
+        provider = it->second;
+        g_ktx2Providers.erase(it);
+    }
+    if (provider) {
+        provider->cancelDecoding();
+        delete provider;
+        LOGI("ktx2: provider released with its engine");
+    }
 }

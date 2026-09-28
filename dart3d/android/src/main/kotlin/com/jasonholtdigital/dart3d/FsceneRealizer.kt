@@ -73,6 +73,21 @@ private const val FOUR_PI_STERADIANS = 4.0 * kotlin.math.PI
 // tail is truncated with a warn-once (upstream's GPU instancing has
 // no equivalent limit; documented in payload-geometry-spec).
 private const val MAX_BAKED_INSTANCES = 16384
+// The bake's allocation is instances × base vertices, so the count cap
+// alone doesn't bound it (a default sphere × 16 384 ≈ 9.2 M vertices).
+// Over this vertex budget the instance tail is truncated (warn-once).
+// Mirrors kD3MaxBakedVertices (dart3d/lib/src/geometry/limits.dart).
+private const val MAX_BAKED_VERTICES = 1 shl 20
+// Procedural tessellation caps (W26 hang/OOM guard) — the Dart wire
+// contract in dart3d/lib/src/geometry/limits.dart; clamp, never reject.
+//  * segment-style counts (segments, rings, radial/tubular/height
+//    segments, capRings, segmentsX/Z, tube stations): ..512
+//    (kD3MaxProcSegments)
+//  * icosphere subdivisions: 0..6 (kD3MaxIcosphereSubdivisions)
+//  * tube: radialSegments ≥3, stations ≥2 (the Dart builder's minimums)
+private const val MAX_PROC_SEGMENTS = 512
+private const val MAX_ICOSPHERE_SUBDIVISIONS = 6
+private const val MIN_TUBE_RADIAL = 3
 
 /** Wire `alphaMode` vocabulary (lowercase in the spec). */
 private val ALPHA_MODES = setOf("opaque", "mask", "blend")
@@ -1215,11 +1230,20 @@ object FsceneRealizer {
             )
         }
 
-        /** Segment-count params clamp to ≥1 — a zero/negative on the
-         *  wire would NaN the generators' `s / segments` divisions
-         *  (FsceneRealizer.swift's `seg` does the same). */
-        private fun seg(p: JSONObject, name: String, def: Int): Int =
-            maxOf(1, p.tag(name).d3Int() ?: def)
+        /** Segment-count params clamp to 1..[MAX_PROC_SEGMENTS] — a
+         *  zero/negative on the wire would NaN the generators'
+         *  `s / segments` divisions (FsceneRealizer.swift's `seg` does
+         *  the same); an unbounded count hangs/OOMs the decode. */
+        private fun seg(p: JSONObject, name: String, def: Int,
+                        min: Int = 1, max: Int = MAX_PROC_SEGMENTS): Int {
+            val raw = p.tag(name).d3Int() ?: def
+            val v = raw.coerceIn(min, max)
+            if (v != raw) {
+                warnOnce("proc.clamp.$name",
+                    "procedural '$name'=$raw clamped to $v ($min..$max)")
+            }
+            return v
+        }
 
         private fun procedural(
             key: Long, shape: String, p: JSONObject,
@@ -1240,7 +1264,8 @@ object FsceneRealizer {
                     // GeometryFactory.swift generate).
                     return MeshFactory.icosphere(
                         (p.tag("radius").d3Double() ?: 0.5).toFloat(),
-                        maxOf(0, p.tag("subdivisions").d3Int() ?: 2))
+                        seg(p, "subdivisions", 2, min = 0,
+                            max = MAX_ICOSPHERE_SUBDIVISIONS))
                 }
                 "plane" -> return MeshFactory.plane(
                     (p.tag("width").d3Double() ?: 1.0).toFloat(),
@@ -1258,34 +1283,37 @@ object FsceneRealizer {
                     (p.tag("bottomRadius").d3Double() ?: 0.5).toFloat(),
                     (p.tag("topRadius").d3Double() ?: 0.5).toFloat(),
                     (p.tag("height").d3Double() ?: 1.0).toFloat(),
-                    seg(p, "radialSegments", 32),
+                    seg(p, "radialSegments", 32, min = 3),
                     seg(p, "heightSegments", 1),
                     p.tag("bottomCap").d3Bool() != false,
                     p.tag("topCap").d3Bool() != false)
                 "cone" -> return MeshFactory.cylinder(
                     (p.tag("radius").d3Double() ?: 0.5).toFloat(), 0f,
                     (p.tag("height").d3Double() ?: 1.0).toFloat(),
-                    seg(p, "radialSegments", 32),
+                    seg(p, "radialSegments", 32, min = 3),
                     seg(p, "heightSegments", 1),
                     p.tag("bottomCap").d3Bool() != false, false)
                 "capsule" -> return MeshFactory.capsule(
                     (p.tag("radius").d3Double() ?: 0.5).toFloat(),
                     (p.tag("height").d3Double() ?: 1.0).toFloat(),
-                    seg(p, "radialSegments", 32),
+                    seg(p, "radialSegments", 32, min = 3),
                     seg(p, "capRings", 8))
                 "disc" -> return MeshFactory.disc(
                     (p.tag("radius").d3Double() ?: 0.5).toFloat(),
-                    seg(p, "segments", 32))
+                    seg(p, "segments", 32, min = 3))
                 "tube" -> {
                     val pts = d3PointList(p, "points")
                     if (pts == null || pts.size < 2) {
                         Log.w(TAG, "tube: needs at least two points")
                         return null
                     }
+                    // The generator divides by both counts and its caps
+                    // read the first/last frame — Dart requires ≥3
+                    // radial segments and ≥2 stations.
                     return MeshFactory.tube(pts,
                         (p.tag("radius").d3Double() ?: 0.5).toFloat(),
-                        seg(p, "radialSegments", 12),
-                        maxOf(2, p.tag("stations").d3Int() ?: 64),
+                        seg(p, "radialSegments", 12, min = MIN_TUBE_RADIAL),
+                        seg(p, "stations", 64, min = 2),
                         p.tag("caps").d3Bool() != false,
                         p.tag("closed").d3Bool() == true)
                 }
@@ -1299,7 +1327,7 @@ object FsceneRealizer {
                         ?: doubleArrayOf(0.0, 1.0, 0.0)
                     return MeshFactory.ribbon(pts,
                         (p.tag("width").d3Double() ?: 1.0).toFloat(),
-                        maxOf(2, p.tag("stations").d3Int() ?: 64),
+                        seg(p, "stations", 64, min = 2),
                         MeshFactory.V3(
                             u[0].toFloat(), u[1].toFloat(), -u[2].toFloat()),
                         p.tag("closed").d3Bool() == true)
@@ -1587,7 +1615,7 @@ object FsceneRealizer {
             key: Long, p: JSONObject,
         ): List<FloatArray>? {
             val attrs = p.tag("attributes").d3Map() ?: return null
-            val color = attrs["color"] ?: return null
+            val color = attrs.opt("color") ?: return null
             color.d3List()?.let { list ->
                 val out = ArrayList<FloatArray>(list.length())
                 for (i in 0 until list.length()) {
@@ -1627,6 +1655,27 @@ object FsceneRealizer {
          * COLOR stream. `billboard: true` swaps the mesh for
          * camera-facing quads re-faced per frame (FacingSpec).
          */
+        /**
+         * Re-bakes every live `d3:instances` node whose `transforms`
+         * or `color` attribute is backed by payload [payloadKey] — a
+         * replaced matrices/floats/bytes chunk otherwise left the baked
+         * mesh stale (the claim tables only tracked env/texture/
+         * geometry/skin/animation consumers). Returns the count.
+         */
+        fun redecodeInstancesForPayload(payloadKey: Long): Int {
+            var n = 0
+            for ((nodeKey, rec) in nodes.entries.toList()) {
+                val p = rec.instancesProps ?: continue
+                val tRef = p.tag("transforms")?.d3Ref()
+                val cRef = p.tag("attributes").d3Map()?.opt("color").d3Ref()
+                if (tRef != payloadKey && cRef != payloadKey) continue
+                decodeInstances(nodeKey, rec, p)
+                applyVisibility(nodeKey)
+                n++
+            }
+            return n
+        }
+
         private fun decodeInstances(key: Long, rec: NodeRec, p: JSONObject) {
             var transforms = d3InstanceTransforms(key, p)
             if (transforms == null) {
@@ -1722,6 +1771,16 @@ object FsceneRealizer {
                         " unresolved")
                     return
                 }
+                if (base.topology != MeshFactory.Topology.TRIANGLES) {
+                    // The bake emits an indexed triangle list; lines,
+                    // points and strips would be reinterpreted as
+                    // unrelated triangles. iOS rejects them too.
+                    warnOnce("instances.$key.topology",
+                        "d3:instances node $key: ${base.topology}" +
+                            " geometry can't be instanced (triangle" +
+                            " lists only) — not baked")
+                    return
+                }
                 if (base.hasSkinning) {
                     warnOnce("instances.$key.skinning",
                         "d3:instances node $key: skinned geometry" +
@@ -1733,6 +1792,19 @@ object FsceneRealizer {
                         "d3:instances node $key: morphed geometry" +
                             " bakes unmorphed — morph targets" +
                             " are dropped")
+                }
+                // d3BakedInstanceCount: a base mesh larger than the
+                // whole budget still keeps one instance (the per-shape
+                // caps already bound it).
+                val maxByVerts = maxOf(1,
+                    MAX_BAKED_VERTICES / maxOf(1, base.vertexCount))
+                if (transforms.size > maxByVerts) {
+                    warnOnce("instances.$key.vertexCap",
+                        "d3:instances node $key: ${transforms.size}" +
+                            " × ${base.vertexCount} vertices exceeds the" +
+                            " $MAX_BAKED_VERTICES-vertex bake budget" +
+                            " — truncated to $maxByVerts instances")
+                    transforms = transforms.take(maxByVerts)
                 }
                 md = MeshFactory.bakeInstances(base, transforms, colors)
             }
@@ -1760,9 +1832,15 @@ object FsceneRealizer {
                     rec.procMaterialInstance = it
                 }
             } else shared
-            matKey?.let {
-                materialConsumers.getOrPut(it) { ArrayList() }
-                    .add(Pair(rec.entity, 0))
+            // The snapshot duplicate must not be a shared-material
+            // consumer: upsertMaterial would rebind slot 0 to the fresh
+            // single-sided instance and silently restore back-face
+            // culling. (It stays a snapshot, per the contract doc.)
+            if (!doubleSided) {
+                matKey?.let {
+                    materialConsumers.getOrPut(it) { ArrayList() }
+                        .add(Pair(rec.entity, 0))
+                }
             }
             RenderableManager.Builder(1)
                 .boundingBox(Box(gm.bounds[0], gm.bounds[1], gm.bounds[2],
@@ -2165,6 +2243,12 @@ object FsceneRealizer {
         /** The visibility-aware scene add — [attachToScene]'s per-node
          * body, reused by the W5 node ops. */
         private fun attachIfRenderable(rec: NodeRec) {
+            // W18: particle entities are runtime-owned (a sprite's
+            // dedicated batch entity; a mesh pool's children) — the
+            // node entity's component test doesn't cover them, and LOD
+            // culling removes only rec.entity, so they re-attach even
+            // while the LOD holds the node's renderable out.
+            for (rt in rec.particleRuntimes) rt.setSceneVisible(true)
             // W16: an lod-culled node keeps its renderable out of the
             // scene until the frame pass rebinds a level — a
             // visibility re-eval must not re-attach it.
@@ -2178,10 +2262,6 @@ object FsceneRealizer {
             if (rm.hasComponent(rec.entity) || lm.hasComponent(rec.entity)) {
                 host.scene.addEntity(rec.entity)
             }
-            // W18: particle entities are runtime-owned (a sprite's
-            // dedicated batch entity; a mesh pool's children) — the
-            // node entity's component test doesn't cover them.
-            for (rt in rec.particleRuntimes) rt.setSceneVisible(true)
         }
 
         /** True when the node or any ancestor carries `visible:false`. */
@@ -3326,6 +3406,32 @@ object FsceneRealizer {
             rec: NodeRec, p: JSONObject, type: LightManager.Type,
         ) {
             val builder = LightManager.Builder(type)
+            // Travel direction in the node's local (wire) space — the
+            // upstream flutter_scene 0.23.0 contract:
+            //  * directionalLight: `localDirection` when serialized,
+            //    else wire-local +Z (DirectionalLightComponent
+            //    .worldDirection = rotation × (0,0,1)).
+            //  * spotLight: `direction` (SpotLightComponent; codec
+            //    default (0,−1,0)).
+            // The z-mirror conversion (S·R·S) maps a wire-local vector
+            // v to Filament-local S·v, so wire +Z is Filament (0,0,−1).
+            // Filament's builder default is (0,−1,0): left unset (as
+            // it was), directional keys grazed the scene and cast
+            // shadows away from every receiver — the audit's "inert
+            // shadow chain".
+            val wireDir: DoubleArray? = when (type) {
+                LightManager.Type.DIRECTIONAL ->
+                    p.tag("localDirection").d3Vec3()
+                        ?: doubleArrayOf(0.0, 0.0, 1.0)
+                LightManager.Type.FOCUSED_SPOT, LightManager.Type.SPOT ->
+                    p.tag("direction").d3Vec3()
+                        ?: doubleArrayOf(0.0, -1.0, 0.0)
+                else -> null
+            }
+            wireDir?.let {
+                val d = D3Wire.position(it)
+                builder.direction(d[0], d[1], d[2])
+            }
             p.tag("color").d3Color()?.let {
                 builder.color(it[0], it[1], it[2])
             }
@@ -3378,7 +3484,7 @@ object FsceneRealizer {
                 builder.shadowOptions(so)
                 Log.i(TAG, "shadow options: mapSize=${so.mapSize}" +
                     " cascades=${so.shadowCascades}" +
-                    " maxDist=${so.maxShadowDistance}" +
+                    " far=${so.shadowFar} contactDist=${so.maxShadowDistance}" +
                     " contact=${so.screenSpaceContactShadows}" +
                     " bias=${so.constantBias} normalBias=${so.normalBias}" +
                     " bulbRadius=${so.shadowBulbRadius}")
@@ -3389,7 +3495,17 @@ object FsceneRealizer {
                 // shadow option, so it applies whether or not the
                 // light casts (matches iOS's decode placement).
                 p.tag("angularRadius").d3Double()?.let {
-                    builder.sunAngularRadius(it.toFloat())
+                    // Wire radians → Filament degrees. Filament reads
+                    // sunAngularRadius only on SUN lights (the sky
+                    // disk); this DIRECTIONAL light keeps its shadow
+                    // penumbra from shadowRadius/shadowSoftness — say
+                    // so rather than claim the mapping.
+                    builder.sunAngularRadius(
+                        Math.toDegrees(it).toFloat())
+                    warnOnce("w24.directional.angularRadius",
+                        "angularRadius has no effect on a Filament " +
+                            "DIRECTIONAL light (SUN-only); shadow " +
+                            "softness follows shadowSoftness")
                 }
                 // The contact-shadow extensions still need a casting
                 // light — warn rather than drop silently.
@@ -3405,9 +3521,8 @@ object FsceneRealizer {
                 // Unmapped upstream `DirectionalLightCodec` members —
                 // warned here, outside the castsShadow gate, since
                 // they aren't shadow fields: `priority` (feature
-                // priority) and `localDirection` (travel dir; dart3d
-                // aims lights by node transform).
-                for (field in listOf("priority", "localDirection")) {
+                // priority). `localDirection` is honored above.
+                for (field in listOf("priority")) {
                     if (p.tag(field) != null) {
                         warnOnce("w24.directional.$field",
                             "directionalLight '$field' is an " +
@@ -3447,7 +3562,11 @@ object FsceneRealizer {
                 so.shadowCascades = it.toInt().coerceIn(1, 4)
             }
             p.tag("shadowMaxDistance").d3Double()?.let {
-                so.maxShadowDistance = it.toFloat()
+                // The camera-distance range the shadow map covers —
+                // Filament's `shadowFar`. (`maxShadowDistance` is the
+                // CONTACT-shadow ray length; writing the range there
+                // left the map spanning the whole camera frustum.)
+                so.shadowFar = it.toFloat()
             }
             p.tag("shadowNormalBias").d3Double()?.let {
                 // Exact — overrides the shadowDepthBias 2:1 split's
@@ -3458,18 +3577,14 @@ object FsceneRealizer {
                 // dart3d wire extension — upstream carries it on
                 // `sunLight`, deferred here. Exact — Filament's
                 // screen-space contact-shadow chain.
-                // `contactShadowDistance` has no distance knob (the
-                // march's reach is fixed by the light), so an
-                // authored value only rides the approximation note.
                 so.screenSpaceContactShadows = it
             }
-            if (p.tag("contactShadowDistance").d3Double() != null) {
+            p.tag("contactShadowDistance").d3Double()?.let {
                 // dart3d wire extension — upstream carries it on
-                // `sunLight`, deferred here.
-                warnOnce("w24.contactShadowDistance",
-                    "contactShadowDistance has no Filament equivalent " +
-                        "— screen-space contact shadows march a fixed " +
-                        "reach; ignored")
+                // `sunLight`, deferred here. Exact — Filament's
+                // `maxShadowDistance` is the contact-shadow march's
+                // world-space reach.
+                so.maxShadowDistance = it.toFloat()
             }
             p.tag("shadowSoftness").d3Double()?.let {
                 // World-space penumbra → the bulb radius PCSS-style
@@ -3484,7 +3599,8 @@ object FsceneRealizer {
             p.tag("shadowCascadeSplitLambda").d3Double()?.let { lambda ->
                 if (so.shadowCascades > 1) {
                     so.cascadeSplitPositions = cascadeSplits(
-                        lambda.toFloat(), so.shadowCascades)
+                        lambda.toFloat(), so.shadowCascades,
+                        so.shadowFar)
                 }
             }
             for (field in listOf("shadowFadeRange",
@@ -3510,22 +3626,24 @@ object FsceneRealizer {
          * The practical (log/linear blend) cascade split scheme —
          * `split_i = λ·n·(f/n)^(i/N) + (1−λ)·(n + (f−n)·i/N)` for
          * i = 1..N−1, normalized to (0,1) fractions of the shadow
-         * range Filament expects. `n` is nominal — the view camera's
-         * near isn't known at light decode; 0.1 m is the authored
-         * scenes' band.
+         * range Filament expects. The split distances are computed in
+         * world units over the actual shadow range (`shadowFar`, or a
+         * nominal 100 when unset — the camera far isn't known at
+         * light decode) and then divided by it; `n` is a nominal
+         * 0.1 near (the view camera's near isn't known either).
          */
         private fun cascadeSplits(
-            lambda: Float, cascades: Int,
+            lambda: Float, cascades: Int, shadowFar: Float,
         ): FloatArray {
-            val n = 0.1f
-            val f = 1.0f // normalized — splits are fractions of maxShadowDistance
+            val f = if (shadowFar > 0f) shadowFar else 100f
+            val n = minOf(0.1f, f * 0.01f)
             val out = FloatArray(3) { 1.0f }
             for (i in 1 until cascades.coerceAtMost(4)) {
                 val t = i.toFloat() / cascades
                 val log = n * Math.pow((f / n).toDouble(),
                     t.toDouble()).toFloat()
                 val uni = n + (f - n) * t
-                out[i - 1] = lambda * log + (1 - lambda) * uni
+                out[i - 1] = (lambda * log + (1 - lambda) * uni) / f
             }
             return out
         }
@@ -4825,11 +4943,16 @@ object FsceneRealizer {
             } else if (envRes.has("effects")) {
                 envKey?.let { lutPayloadIds.remove(it) }
             }
+            // An env upsert without `effects` retains the prior LUT
+            // claim — fingerprint the retained chunk too, or a rewrite
+            // of it would hit the early return and keep the old LUT.
+            val lutClaimKey = lutPayloadKey
+                ?: envKey?.let { lutPayloadIds[it] }
             val envFingerprint = listOf(
                 stage?.toString() ?: "∅", envRes.toString(),
                 envPayloadKey?.let {
                     host.payloadStore[it]?.contentHashCode() },
-                lutPayloadKey?.let {
+                lutClaimKey?.let {
                     host.payloadStore[it]?.contentHashCode() })
                 .hashCode()
             if (envFingerprint == host.lastEnvFingerprint) return
@@ -5226,7 +5349,7 @@ object FsceneRealizer {
         val boundMask = if (extFlags == 0) 0
             else boundTextureMask(props, extFlags)
         val pick = host.materialForVariant(
-            unlit, alphaMode, extFlags, boundMask)
+            unlit, alphaMode, extFlags, boundMask, key)
         val mi = pick.material.createInstance()
         val shaderFlags = pick.extFlags
         fun slotBound(i: Int) = pick.boundSlots and (1 shl i) != 0
