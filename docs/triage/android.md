@@ -146,6 +146,40 @@ example 126, `dn analyze` clean.
 | 4124223033 | Dart3dView.kt:4316 | FIXED | Confirmed. A new `failTerminal()` path marks the view dead: it shows the on-screen notice, removes the frame callback, clears queued work, and makes `onMutation` reject later mutations (with a one-time error log). A later re-attach no longer restarts the loop. |
 | 4124223041 | Dart3dView.kt:833 | FIXED | Confirmed. Loading the cached base packages into the Engine is now wrapped. On a throw, the already-loaded `Material`s are destroyed and the view goes through `failTerminal()` instead of crashing the UI thread from the Choreographer callback. During construction, the terminal path throws instead, so the bridge shows `InitFailedView`; state declared after `init` isn't initialized yet at that point. |
 
+## PR #16 review, round 5 (Codex, 2 threads) + replay-path self-review
+
+No device use. Green: `compileReleaseKotlin`, JVM tests 34/34, `dn test`
+dart3d 273 / example 126.
+
+| Comment id | File:line | Verdict | Draft reply |
+|---|---|---|---|
+| 4124448401 | Dart3dView.kt:2163 | FIXED | Confirmed: the reload member scan only read `node`, so a later top-level `upsertResource` for one of the batch's own resources survived and overwrote the reloaded definition on replay. The scan now collects the batch's node ids and its resource slots (the same latest-wins keys the journal uses for `upsertResource`/skins/animations). Later top-level ops on either are pruned. |
+| 4124448417 | Dart3dView.kt:2128 | FIXED | Confirmed: `install()` re-applies the manifest `views`. `updateViews` is now journaled latest-wins, so replay restores the live camera, render-target, order and quality list. |
+
+**Self-review: every command op against what a deferred-payload
+re-realize (`realize` + `install`) resets.** The journal now holds two
+kinds of entry. Structural ops (`addNode`/`updateNode`/`removeNode`,
+compacted) and subtree loads replay in arrival order. Live-state ops
+keep only their latest entry per target. Checked:
+
+| Op | install() resets it? | Handling |
+|---|---|---|
+| addNode / updateNode / removeNode | yes (nodes rebuilt from the manifest) | journaled, compacted (rounds 3–4) |
+| loadSubtree / unloadSubtree | yes | journaled, first-load slot plus member pruning (round 4, this round) |
+| upsertResource | yes (registries replaced) | journaled latest-wins per id (round 4) |
+| upsertSkin / removeSkin | yes (`resources.skins` replaced) | **journaled latest-wins per id (new)** |
+| upsertAnimation / removeAnimation | yes (`resources.animations` replaced) | **journaled latest-wins per id (new)** |
+| selectVariant | yes (`variantComponents` rebuilt from the manifest) | **journaled latest-wins per node (new)**; `removeNode` drops it |
+| setMorphWeights | yes (renderables rebuilt at authored weights) | **journaled latest-wins per node (new)**; `removeNode` drops it |
+| updateViews | yes (`applyViews(manifest views)`) | **journaled latest-wins (new, 4124448417)** |
+| anim (play/pause/stop/time/timeScale/weight/loop) | yes (`animClips.clear()`) | **clip state carried across the re-realize (new)** rather than replaying op history, so playback time continues; dropped only if the animation no longer exists |
+| updateStage | no | `realize(…, preserveStage = true)` re-decodes the live stage |
+| upsertPayload | no | `payloadStore` persists; `opPayloadSpecs` merge back in `install()` |
+| addJoint / updateJoint / removeJoint | no | `world.retainJointsForNodes(nodes.keys)` keeps command joints for surviving nodes. Not re-verified in this round |
+| applyImpulse / applyTorque / setVelocity / clearForces | yes (bodies rebuilt at the manifest pose) | **not replayed, by design:** transient impulses against a pose that no longer exists. Losing dynamic body state on a re-realize is the known pre-existing limitation (Devin followups #1: "deferred-payload re-realize destroys live state"). Proper fix: preserve body poses/velocities across install (M) |
+| setTransforms (binary message, not a command) | yes (nodes rebuilt at the manifest TRS) | **not replayed, same limitation:** live transform writes revert until the next write. Most producers (physics sync, camera rig) rewrite every frame. Fix together with the body state above (M) |
+| query / render | no (read-only / one-shot) | nothing to replay |
+
 ## Needs other owner
 
 - **Dart (example): other hard-coded light rotations assume −Z emission.**
