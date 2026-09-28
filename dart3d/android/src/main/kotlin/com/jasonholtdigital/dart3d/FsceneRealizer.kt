@@ -73,6 +73,20 @@ private const val FOUR_PI_STERADIANS = 4.0 * kotlin.math.PI
 // tail is truncated with a warn-once (upstream's GPU instancing has
 // no equivalent limit; documented in payload-geometry-spec).
 private const val MAX_BAKED_INSTANCES = 16384
+// The bake's allocation is instances × base vertices, so the count cap
+// alone doesn't bound it (a default sphere × 16 384 ≈ 9.2 M vertices).
+// Over this vertex budget the instance tail is truncated (warn-once).
+private const val MAX_BAKED_VERTICES = 262_144
+// Procedural tessellation caps (W26 hang/OOM guard). Mirrored by the
+// Dart builder + iOS — see docs/triage/android.md.
+//  * segment-style counts (segments, rings, radial/tubular/height
+//    segments, capRings, segmentsX/Z): 1..256
+//  * icosphere subdivisions: 0..6 (20·4⁶ = 81 920 faces)
+//  * tube: radialSegments 3..256, stations 2..1024
+private const val MAX_PROC_SEGMENTS = 256
+private const val MAX_ICOSPHERE_SUBDIVISIONS = 6
+private const val MIN_TUBE_RADIAL = 3
+private const val MAX_TUBE_STATIONS = 1024
 
 /** Wire `alphaMode` vocabulary (lowercase in the spec). */
 private val ALPHA_MODES = setOf("opaque", "mask", "blend")
@@ -1215,11 +1229,20 @@ object FsceneRealizer {
             )
         }
 
-        /** Segment-count params clamp to ≥1 — a zero/negative on the
-         *  wire would NaN the generators' `s / segments` divisions
-         *  (FsceneRealizer.swift's `seg` does the same). */
-        private fun seg(p: JSONObject, name: String, def: Int): Int =
-            maxOf(1, p.tag(name).d3Int() ?: def)
+        /** Segment-count params clamp to 1..[MAX_PROC_SEGMENTS] — a
+         *  zero/negative on the wire would NaN the generators'
+         *  `s / segments` divisions (FsceneRealizer.swift's `seg` does
+         *  the same); an unbounded count hangs/OOMs the decode. */
+        private fun seg(p: JSONObject, name: String, def: Int,
+                        min: Int = 1, max: Int = MAX_PROC_SEGMENTS): Int {
+            val raw = p.tag(name).d3Int() ?: def
+            val v = raw.coerceIn(min, max)
+            if (v != raw) {
+                warnOnce("proc.clamp.$name",
+                    "procedural '$name'=$raw clamped to $v ($min..$max)")
+            }
+            return v
+        }
 
         private fun procedural(
             key: Long, shape: String, p: JSONObject,
@@ -1240,7 +1263,8 @@ object FsceneRealizer {
                     // GeometryFactory.swift generate).
                     return MeshFactory.icosphere(
                         (p.tag("radius").d3Double() ?: 0.5).toFloat(),
-                        maxOf(0, p.tag("subdivisions").d3Int() ?: 2))
+                        seg(p, "subdivisions", 2, min = 0,
+                            max = MAX_ICOSPHERE_SUBDIVISIONS))
                 }
                 "plane" -> return MeshFactory.plane(
                     (p.tag("width").d3Double() ?: 1.0).toFloat(),
@@ -1282,10 +1306,14 @@ object FsceneRealizer {
                         Log.w(TAG, "tube: needs at least two points")
                         return null
                     }
+                    // The generator divides by both counts and its caps
+                    // read the first/last frame — Dart requires ≥3
+                    // radial segments and ≥2 stations.
                     return MeshFactory.tube(pts,
                         (p.tag("radius").d3Double() ?: 0.5).toFloat(),
-                        seg(p, "radialSegments", 12),
-                        maxOf(2, p.tag("stations").d3Int() ?: 64),
+                        seg(p, "radialSegments", 12, min = MIN_TUBE_RADIAL),
+                        seg(p, "stations", 64, min = 2,
+                            max = MAX_TUBE_STATIONS),
                         p.tag("caps").d3Bool() != false,
                         p.tag("closed").d3Bool() == true)
                 }
@@ -1733,6 +1761,24 @@ object FsceneRealizer {
                         "d3:instances node $key: morphed geometry" +
                             " bakes unmorphed — morph targets" +
                             " are dropped")
+                }
+                val maxByVerts =
+                    MAX_BAKED_VERTICES / maxOf(1, base.vertexCount)
+                if (maxByVerts == 0) {
+                    warnOnce("instances.$key.vertexCap",
+                        "d3:instances node $key: base mesh has" +
+                            " ${base.vertexCount} vertices, over the" +
+                            " $MAX_BAKED_VERTICES-vertex bake budget" +
+                            " — not baked")
+                    return
+                }
+                if (transforms.size > maxByVerts) {
+                    warnOnce("instances.$key.vertexCap",
+                        "d3:instances node $key: ${transforms.size}" +
+                            " × ${base.vertexCount} vertices exceeds the" +
+                            " $MAX_BAKED_VERTICES-vertex bake budget" +
+                            " — truncated to $maxByVerts instances")
+                    transforms = transforms.take(maxByVerts)
                 }
                 md = MeshFactory.bakeInstances(base, transforms, colors)
             }

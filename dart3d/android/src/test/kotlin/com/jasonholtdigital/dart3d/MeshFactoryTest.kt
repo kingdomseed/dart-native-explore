@@ -437,6 +437,44 @@ class MeshFactoryTest {
         }
     }
 
+    @Test
+    fun `cuboid winds every face outward including -Y`() {
+        assertWindsOutward(MeshFactory.cuboid(2f, 4f, 6f))
+    }
+
+    @Test
+    fun `large spheres and tori switch to 32-bit indices`() {
+        val sphere = MeshFactory.sphere(1f, segments = 256, rings = 256)
+        assertTrue(sphere.vertexCount > 0x10000)
+        assertEquals(MeshFactory.IndexWidth.UINT32, sphere.indexWidth)
+        assertEquals(sphere.indexCount * 4, sphere.indices.capacity())
+        var max = 0
+        for (i in 0 until sphere.indexCount) max = maxOf(max, indexAt(sphere, i))
+        assertEquals(sphere.vertexCount - 1, max)
+        assertWindsOutward(sphere)
+
+        val torus = MeshFactory.torus(1f, 0.25f, rings = 256, sectors = 256)
+        assertEquals(MeshFactory.IndexWidth.UINT32, torus.indexWidth)
+        // Small meshes keep 16-bit indices.
+        assertEquals(MeshFactory.IndexWidth.UINT16,
+            MeshFactory.sphere(1f).indexWidth)
+    }
+
+    @Test
+    fun `icosphere subdivisions are capped`() {
+        // 20·4⁶ faces at the cap; a huge request must not go further.
+        val capped = MeshFactory.icosphere(1f, 30)
+        assertEquals(20 * 4096 * 3, capped.indexCount)
+    }
+
+    @Test
+    fun `tube tolerates zero subdivision counts`() {
+        val pts = listOf(MeshFactory.V3(0f, 0f, 0f), MeshFactory.V3(0f, 1f, 0f))
+        val mesh = MeshFactory.tube(pts, 0.1f, 0, 0, caps = true,
+            closed = false)
+        assertTrue(mesh.vertexCount > 0)
+    }
+
     // ---- helpers ----
 
     // Reads the first 13 floats of vertex `v` from the packed record.
@@ -467,7 +505,34 @@ class MeshFactoryTest {
     }
 
     private fun indexAt(mesh: MeshFactory.MeshData, i: Int): Int =
-        mesh.indices.getShort(i * 2).toInt() and 0xFFFF
+        if (mesh.indexWidth == MeshFactory.IndexWidth.UINT32) {
+            mesh.indices.getInt(i * 4)
+        } else {
+            mesh.indices.getShort(i * 2).toInt() and 0xFFFF
+        }
+
+    // Asserts every triangle's geometric normal agrees with its
+    // vertices' attribute normals (outward winding).
+    private fun assertWindsOutward(mesh: MeshFactory.MeshData) {
+        for (t in 0 until mesh.indexCount / 3) {
+            val a = vert(mesh, indexAt(mesh, t * 3))
+            val b = vert(mesh, indexAt(mesh, t * 3 + 1))
+            val c = vert(mesh, indexAt(mesh, t * 3 + 2))
+            val e1x = b[0] - a[0]; val e1y = b[1] - a[1]; val e1z = b[2] - a[2]
+            val e2x = c[0] - a[0]; val e2y = c[1] - a[1]; val e2z = c[2] - a[2]
+            val nx = e1y * e2z - e1z * e2y
+            val ny = e1z * e2x - e1x * e2z
+            val nz = e1x * e2y - e1y * e2x
+            if (nx * nx + ny * ny + nz * nz < 1e-10f) continue
+            var anx = 0f; var any = 0f; var anz = 0f
+            for (k in 0 until 3) {
+                val n = normalOf(record(mesh, indexAt(mesh, t * 3 + k)))
+                anx += n[0]; any += n[1]; anz += n[2]
+            }
+            assertTrue("triangle $t winds inward",
+                nx * anx + ny * any + nz * anz > 0f)
+        }
+    }
 
     // Shared record contract: positions inside the declared bounds,
     // unit-length tangent quat, non-degenerate uvs in [0,1], white
