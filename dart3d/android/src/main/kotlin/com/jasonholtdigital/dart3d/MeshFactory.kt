@@ -1305,7 +1305,7 @@ object MeshFactory {
             }
         }
         stitchRings(b, ringBases, radialSegments + 1)
-        if (caps) {
+        if (caps && !closed) {
             tubeCap(b, frames.first(), radius, radialSegments, atEnd = false)
             tubeCap(b, frames.last(), radius, radialSegments, atEnd = true)
         }
@@ -1351,7 +1351,12 @@ object MeshFactory {
             var sideways = frame.tangent.cross(up)
             if (sideways.length2 < 1e-12f) sideways = frame.binormal
             val across = sideways.normalized()
-            val normal = up.normalized()
+            // Perpendicular to both the path tangent and the across
+            // axis — raw `up` tilts off the surface on any climbing
+            // segment (Dart reference).
+            var normal = across.cross(frame.tangent)
+            if (normal.length2 < 1e-12f) normal = up
+            normal = normal.normalized()
             val v = if (stations == 1) 0f else length * i / (stations - 1)
             ringBases.add(b.vertexCount)
             b.emit(frame.position - across * half, normal, 0f, v)
@@ -1501,8 +1506,12 @@ object MeshFactory {
         val b = ProcBuilder()
         var i = 0
         while (i + 1 < points.size) {
+            // `colors` is one entry per segment (point pair) — the
+            // segment is flat-colored (Dart reference), not a gradient
+            // into the next segment's color.
+            val c = colors?.getOrNull(i / 2)
             emitLineQuad(b, points[i], points[i + 1], width, width,
-                viewDir, colors?.getOrNull(i), colors?.getOrNull(i + 1))
+                viewDir, c, c)
             i += 2
         }
         return b.build()
@@ -1564,9 +1573,12 @@ object MeshFactory {
         val corners = listOf(-0.5f to -0.5f, 0.5f to -0.5f,
             -0.5f to 0.5f, 0.5f to 0.5f)
         for ((dx, dy) in corners) {
-            val rx = dx * cosR - dy * sinR
-            val ry = dx * sinR + dy * cosR
-            b.emit(r * (rx * sizeX) + u * (ry * sizeY), n,
+            // Size first, then rotate — rotating the unit square and
+            // scaling after shears a non-square quad (Dart reference).
+            val sx = dx * sizeX; val sy = dy * sizeY
+            val rx = sx * cosR - sy * sinR
+            val ry = sx * sinR + sy * cosR
+            b.emit(r * rx + u * ry, n,
                 dx + 0.5f, dy + 0.5f, color[0], color[1], color[2], color[3])
         }
         b.quad(0, 1, 2, 3)
@@ -1802,9 +1814,10 @@ object MeshFactory {
             val col = colors?.getOrNull(i) ?: WHITE4
             val v0 = b.vertexCount
             for ((dx, dy) in corners) {
-                val rx = dx * cosR - dy * sinR
-                val ry = dx * sinR + dy * cosR
-                b.emit(c + r * (rx * sizeX) + u * (ry * sizeY), n,
+                val sx = dx * sizeX; val sy = dy * sizeY
+                val rx = sx * cosR - sy * sinR
+                val ry = sx * sinR + sy * cosR
+                b.emit(c + r * rx + u * ry, n,
                     dx + 0.5f, dy + 0.5f, col[0], col[1], col[2], col[3])
             }
             b.quad(v0, v0 + 1, v0 + 2, v0 + 3)
