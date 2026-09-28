@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'components.dart';
 import 'scene_model.dart';
 
 /// The `SceneDiff` → `command`-op bridge (W5 structural mutations).
@@ -97,6 +98,22 @@ List<Map<String, Object?>> diffCommands(
       'op': 'upsertResource',
       'id': idKey(id),
       'resource': encodeResource(newDoc.resources[id]!, idKey),
+    });
+  }
+  // dart3d extension resources (W26 procedural shapes upstream's model
+  // can't hold) diff by their canonical manifest entry.
+  final oldExt = oldDoc == null ? null : _extensionResources[oldDoc];
+  for (final entry
+      in (_extensionResources[newDoc] ?? const <LocalId, Map<String, Object?>>{})
+          .entries) {
+    final old = oldExt?[entry.key];
+    if (old != null && canonicalJson(old) == canonicalJson(entry.value)) {
+      continue;
+    }
+    ops.add({
+      'op': 'upsertResource',
+      'id': idKey(entry.key),
+      'resource': entry.value,
     });
   }
   // Added nodes emit parents before children — `addNode` self-attaches
@@ -414,10 +431,22 @@ RenderViewSpec decodeViewSpec(Map<String, Object?> json) =>
       antiAliasingMode: json['antiAliasing'] as String?,
       renderScale: (json['renderScale'] as num?)?.toDouble(),
       filterQuality: json['filterQuality'] as String?,
-      viewport: (json['viewport'] as List?)
-          ?.map((v) => (v as num).toDouble())
-          .toList(),
+      viewport: _decodeViewport(json['viewport']),
     );
+
+/// The `viewport` member as four finite numbers, or null for anything
+/// else (absent, a non-list, the wrong length, a null or non-numeric
+/// entry) — the same drop-to-full-target the native decoders apply,
+/// rather than a `TypeError` that rejects the whole scene.
+List<double>? _decodeViewport(Object? json) {
+  if (json is! List || json.length != 4) return null;
+  final out = <double>[];
+  for (final v in json) {
+    if (v is! num || !v.isFinite) return null;
+    out.add(v.toDouble());
+  }
+  return out;
+}
 
 /// Re-decodes [doc]'s view list from the raw `.fscene` manifest
 /// object so the dart3d view extensions survive — upstream's
@@ -436,19 +465,147 @@ void applyViewExtensions(SceneDocument doc, Map<String, Object?> manifest) {
 }
 
 /// The `.fscene` text decode dart3d callers use — upstream
-/// [readFscene] plus [applyViewExtensions], so a `viewport` on a
-/// manifest `views` entry reaches `doc.views` instead of being
-/// dropped by upstream's `_decodeView` (W24).
+/// [readFscene] (migrations included) plus the dart3d document
+/// extensions upstream's decoder would drop or refuse:
+///
+/// - a `viewport` on a manifest `views` entry reaches `doc.views`
+///   ([applyViewExtensions], W24);
+/// - geometry resources whose `procedural.shape` is a W26 dart3d shape
+///   (upstream throws `Unknown procedural geometry shape`) are held
+///   verbatim in [d3ExtensionResources] instead;
+/// - `featuresRequired` names dart3d realizes but upstream's
+///   `supportedFeatures` doesn't list ([kD3ExtensionFeatures]) no
+///   longer fail the decode — they're stripped for upstream and
+///   restored on the document.
+///
+/// [writeFsceneWithExtensions] is the inverse.
 SceneDocument readFsceneWithExtensions(String manifest) {
-  final doc = readFscene(manifest);
   // `stripJsonc` matches upstream's own reader tolerance — the logged
   // path (W29's `readFsceneLogged`) decodes through here too.
-  applyViewExtensions(
-    doc,
-    jsonDecode(stripJsonc(manifest)) as Map<String, Object?>,
-  );
+  final Object? raw;
+  try {
+    raw = jsonDecode(stripJsonc(manifest));
+  } on FormatException {
+    return readFscene(manifest); // throws upstream's own error
+  }
+  if (raw is! Map) return readFscene(manifest);
+  final json = migrateFscene(Map<String, dynamic>.from(raw));
+
+  final extFeatures = <String>[];
+  final required = json['featuresRequired'];
+  if (required is List) {
+    final kept = <Object?>[];
+    for (final f in required) {
+      if (f is String && kD3ExtensionFeatures.contains(f)) {
+        extFeatures.add(f);
+      } else {
+        kept.add(f);
+      }
+    }
+    json['featuresRequired'] = kept;
+  }
+
+  final ext = <LocalId, Map<String, Object?>>{};
+  final resources = json['resources'];
+  if (resources is Map) {
+    final kept = <String, dynamic>{};
+    for (final entry in resources.entries) {
+      final value = entry.value;
+      if (isD3ExtensionResourceJson(value)) {
+        ext[LocalId.parse(entry.key as String)] = _deepCopy(
+          Map<String, Object?>.from(value as Map),
+        );
+      } else {
+        kept[entry.key as String] = value;
+      }
+    }
+    json['resources'] = kept;
+  }
+
+  final doc = decodeDocument(json);
+  doc.featuresRequired.addAll(extFeatures);
+  if (ext.isNotEmpty) d3ExtensionResources(doc).addAll(ext);
+  applyViewExtensions(doc, json);
   return doc;
 }
+
+/// The procedural shapes upstream's `ProceduralGeometry` can hold —
+/// every other `procedural.shape` is a dart3d extension (W26).
+const kUpstreamProceduralShapes = {
+  'cuboid',
+  'plane',
+  'sphere',
+  'torus',
+  'icosphere',
+};
+
+/// `featuresRequired` names dart3d realizes that upstream's decoder
+/// refuses (they're outside its `supportedFeatures`): stripped before
+/// the upstream decode and restored after, so a document that
+/// truthfully requires them still loads.
+final Set<String> kD3ExtensionFeatures = kRealizedFeatures.difference(
+  supportedFeatures,
+);
+
+/// Whether a manifest `resources` entry is a geometry resource with a
+/// dart3d-only procedural shape — one upstream's sealed
+/// `ProceduralGeometry` can't represent.
+bool isD3ExtensionResourceJson(Object? entry) {
+  if (entry is! Map || entry['kind'] != 'geometry') return false;
+  final procedural = entry['procedural'];
+  if (procedural is! Map) return false;
+  final shape = procedural['shape'];
+  return shape is String && !kUpstreamProceduralShapes.contains(shape);
+}
+
+final _extensionResources = Expando<Map<LocalId, Map<String, Object?>>>(
+  'dart3d extension resources',
+);
+
+/// [doc]'s dart3d extension resources: geometry resources with a W26
+/// procedural shape (`tube`, `polyline`, `cylinder`, …), held as their
+/// raw manifest entries keyed by resource id, because upstream's
+/// sealed `ResourceSpec`/`ProceduralGeometry` hierarchy has no slot
+/// for them. The natives realize them like any other resource.
+///
+/// They travel with the document through [readFsceneWithExtensions],
+/// [writeFsceneWithExtensions] (and so `D3Protocol.loadSceneBytes`),
+/// [diffCommands], the controller's document mirror, and
+/// `serializeScene`. An id lives in at most one of this map and
+/// `doc.resources`. Plain upstream `readFscene`/`writeFscene` don't
+/// know about them.
+Map<LocalId, Map<String, Object?>> d3ExtensionResources(SceneDocument doc) =>
+    _extensionResources[doc] ??= {};
+
+/// Canonical `.fscene` JSON for [doc] including the dart3d extensions
+/// upstream's `writeFscene` drops: view `viewport`s ([encodeViewSpec])
+/// and [d3ExtensionResources]. For a document with neither, the output
+/// is byte-identical to `writeFscene`. Read it back with
+/// [readFsceneWithExtensions] (or `SceneController.loadFscene`).
+String writeFsceneWithExtensions(SceneDocument doc) {
+  final ext = _extensionResources[doc];
+  if (doc.views.isEmpty && (ext == null || ext.isEmpty)) {
+    return writeFscene(doc);
+  }
+  final manifest = encodeDocument(doc);
+  final idKey = manifestIdKey(doc);
+  if (doc.views.isNotEmpty) {
+    manifest['views'] = [for (final v in doc.views) encodeViewSpec(v, idKey)];
+  }
+  if (ext != null && ext.isNotEmpty) {
+    final resources = <String, dynamic>{
+      ...?(manifest['resources'] as Map?)?.cast<String, dynamic>(),
+    };
+    for (final entry in ext.entries) {
+      resources[idKey(entry.key)] = entry.value;
+    }
+    manifest['resources'] = resources;
+  }
+  return canonicalJson(manifest);
+}
+
+Map<String, Object?> _deepCopy(Map<String, Object?> m) =>
+    (jsonDecode(jsonEncode(m)) as Map).cast<String, Object?>();
 
 /// [doc]'s view list as canonical JSON, encoded with the document's
 /// own manifest id keys — the compare form the `updateViews` emit
@@ -532,6 +689,9 @@ String Function(LocalId) manifestIdKey(SceneDocument doc) {
     for (final id in doc.animations.keys) id: 'anim',
     for (final id in doc.payloads.keys) id: 'chunk',
   };
+  for (final id in _extensionResources[doc]?.keys ?? const <LocalId>[]) {
+    prefixes[id] = 'geo';
+  }
   for (final r in doc.resources.values) {
     prefixes[r.id] = switch (r) {
       GeometryResource() => 'geo',
