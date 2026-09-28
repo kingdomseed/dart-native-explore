@@ -201,7 +201,7 @@ const importedDice = [
     name: 'key',
     transform: TrsTransform(
       // Travels down and away from the camera (upstream +Z travel).
-      rotation: aimAlong(Vector3(-0.152, -0.507, -0.848)),
+      rotation: aimAlong(Vector3(0.152, -0.507, 0.848)),
     ),
     components: [
       ComponentSpec(

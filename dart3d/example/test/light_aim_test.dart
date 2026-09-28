@@ -22,8 +22,8 @@ void main() {
     for (final d in [
       Vector3(0, -1, 0),
       Vector3(-0.28, -1.0, -0.22),
-      Vector3(-0.152, -0.507, -0.848),
-      Vector3(0.074, -0.527, -0.847),
+      Vector3(0.152, -0.507, 0.848),
+      Vector3(0.3, -0.8, 0.5),
       Vector3(1, 0, 0),
       Vector3(0, 0, -1),
     ]) {
@@ -34,13 +34,30 @@ void main() {
   test('example key lights all travel downward', () {
     for (final d in [
       Vector3(-0.28, -1.0, -0.22), // dice table
-      Vector3(-0.152, -0.507, -0.848), // cube / imported / feature
-      Vector3(0.074, -0.527, -0.847), // showcase
+      Vector3(0.152, -0.507, 0.848), // cube / imported / feature
+      Vector3(0.3, -0.8, 0.5), // showcase
     ]) {
       expect(
         (aimAlong(d).asRotationMatrix() * Vector3(0, 0, 1)).y,
         lessThan(-0.4),
       );
+    }
+  });
+
+  test('example keys travel with the camera (front-lit, not back-lit)', () {
+    // Cameras look along their +Z too: the cube/imported/feature
+    // cameras sit at −Z pitched about X; the showcase camera looks
+    // along −cameraDir.
+    final pitchedFwd =
+        Quaternion.axisAngle(Vector3(1, 0, 0), 0.5).asRotationMatrix() *
+        Vector3(0, 0, 1);
+    final showcaseFwd = -(Vector3(-0.52, 0.36, -0.77)..normalize());
+    for (final (key, fwd) in [
+      (Vector3(0.152, -0.507, 0.848), pitchedFwd),
+      (Vector3(0.3, -0.8, 0.5), showcaseFwd),
+    ]) {
+      final travel = aimAlong(key).asRotationMatrix() * Vector3(0, 0, 1);
+      expect(travel.dot(fwd), greaterThan(0.3), reason: '$key');
     }
   });
 
