@@ -1710,6 +1710,12 @@ object FsceneRealizer {
         }
 
         private fun decodeInstances(key: Long, rec: NodeRec, p: JSONObject) {
+            // Retained BEFORE resolving transforms: a payload-backed
+            // node usually decodes before its matrices chunk lands, and
+            // redecodeInstancesForPayload finds pending nodes through
+            // this spec when the chunk arrives (no claim table covers
+            // node-keyed instance payloads).
+            rec.instancesProps = p
             var transforms = d3InstanceTransforms(key, p)
             if (transforms == null) {
                 Log.i(TAG, "d3:instances node $key: transforms unresolved")

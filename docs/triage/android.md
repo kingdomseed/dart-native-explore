@@ -130,6 +130,22 @@ integration fixes cherry-picked from `origin/stabilize/integration`
 | 4123023229 | MaterialPackages.kt:244 | FIXED | Confirmed: a throwing prewarm left `prewarmStarted` set with no cache or `failed` entry, so views polled forever. The catch now clears the marker and the waiting view's frame loop re-requests the prewarm. After 2 thrown attempts per API, the missing base packages are marked failed, which the view surfaces as its visible init-failure notice. |
 | 4123023236 | Dart3dView.kt:1972 | FIXED | Confirmed. The journal now compacts as ops arrive. An `updateNode` drops earlier updates of the same node whose flags it covers. A `removeNode` drops the node's earlier updates, and cancels out entirely against a journaled `addNode` of that node when nothing journaled still names it as a parent. A one-time warning fires if the journal still reaches 2048 entries. |
 
+## PR #16 review, round 4 (Codex, 6 threads)
+
+The branch is rebased onto `main` with PR #15 merged. There was no
+device use (the A142 is off-limits pending the operator). Green:
+`compileReleaseKotlin`, JVM tests 34/34, `dn test` dart3d 273 /
+example 126, `dn analyze` clean.
+
+| Comment id | File:line | Verdict | Draft reply |
+|---|---|---|---|
+| 4124222987 | Dart3dView.kt:2059 | FIXED (P1, real) | Confirmed: `install()` swaps in the manifest's resource registries, and the journal held only structural ops. Top-level `upsertResource` ops are now journaled in arrival order, ahead of the structural ops that reference them. A later upsert of the same id supersedes the earlier entry, so replay restores op-created and replaced textures, materials, geometry and render targets before dependents resolve. |
+| 4124223003 | Dart3dView.kt:2065 | FIXED (aligned with iOS, PR #15 r2) | The ordering problem is real, but moving the reload to the end breaks subtrees grafted under one of its members after the first load. As on iOS, a re-load keeps its first-load slot, and every top-level journal op after that slot that names a member of the re-loaded batch is pruned. The re-load superseded those ops live, so replay reproduces the re-loaded state without re-sequencing. |
+| 4124223014 | Dart3dBridge.kt:84 | FIXED | Confirmed. `Dart3dView`'s `init` body is now wrapped: on any throw it releases the Choreographer callback, UiHelper, Jolt world and KTX2 provider, then calls `engine.destroy()` (which frees the renderer, scene, view, textures and materials the Engine still owns) before rethrowing to the bridge's `InitFailedView`. |
+| 4124223024 | FsceneRealizer.kt:1680 | FIXED (P1, real) | Confirmed: `instancesProps` was assigned only after the transforms resolved, so a payload-backed node that decoded before its matrices chunk arrived was invisible to `redecodeInstancesForPayload`. The spec is now retained before transforms are resolved, so the chunk's arrival (binary `applyPayload` or `upsertPayload`) rebakes it. |
+| 4124223033 | Dart3dView.kt:4316 | FIXED | Confirmed. A new `failTerminal()` path marks the view dead: it shows the on-screen notice, removes the frame callback, clears queued work, and makes `onMutation` reject later mutations (with a one-time error log). A later re-attach no longer restarts the loop. |
+| 4124223041 | Dart3dView.kt:833 | FIXED | Confirmed. Loading the cached base packages into the Engine is now wrapped. On a throw, the already-loaded `Material`s are destroyed and the view goes through `failTerminal()` instead of crashing the UI thread from the Choreographer callback. During construction, the terminal path throws instead, so the bridge shows `InitFailedView`; state declared after `init` isn't initialized yet at that point. |
+
 ## Needs other owner
 
 - **Dart (example): other hard-coded light rotations assume −Z emission.**
