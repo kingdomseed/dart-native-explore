@@ -205,16 +205,20 @@ object TextureFactory {
     }
 
     /**
-     * Encoded container (PNG/JPEG) via BitmapFactory. `ARGB_8888`
-     * little-endian memory is B,G,R,A and the Java `Texture.Format` enum
-     * has no `BGRA`, so the upload repacks to RGBA in-place (B↔R swap).
+     * Encoded container (PNG/JPEG) via BitmapFactory. Android's
+     * `ARGB_8888` is R,G,B,A in memory (Skia's RGBA_8888 — the name
+     * describes a packed int, not byte order), so `copyPixelsToBuffer`
+     * already yields what `Texture.Format.RGBA` expects: no swizzle.
+     * Decoded unpremultiplied — glTF texels are straight alpha, and an
+     * opaque material must see the RGB under alpha=0 texels, not black.
      */
     private fun uploadEncoded(
         host: Dart3dView, key: Long, bytes: ByteArray, content: String,
     ): Result {
         val start = SystemClock.uptimeMillis()
         val decoded = try {
-            BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+            BitmapFactory.decodeByteArray(bytes, 0, bytes.size,
+                BitmapFactory.Options().apply { inPremultiplied = false })
         } catch (e: Exception) {
             null
         }
@@ -240,13 +244,6 @@ object TextureFactory {
             .order(ByteOrder.nativeOrder())
         bitmap.copyPixelsToBuffer(buf)
         bitmap.recycle()
-        // B,G,R,A → R,G,B,A in place.
-        for (i in 0 until w * h) {
-            val p = i * 4
-            val b = buf.get(p)
-            buf.put(p, buf.get(p + 2))
-            buf.put(p + 2, b)
-        }
         buf.rewind()
         val tex = upload(host.engine, key, buf, w, h,
             Texture.Format.RGBA, srgb = content == "color",
