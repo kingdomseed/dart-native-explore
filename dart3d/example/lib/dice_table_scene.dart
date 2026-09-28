@@ -15,6 +15,8 @@ import 'package:dart3d/src/physics.dart';
 import 'package:dart3d/src/scene_model.dart';
 import 'package:vector_math/vector_math.dart';
 
+import 'light_aim.dart';
+
 /// One rollable face of a die: the outward [normal] in the mesh's local
 /// (Y-up) space and the [value] that face reports.
 final class DieFace {
@@ -724,22 +726,13 @@ DiceTableScene? buildDiceTable({
 
   // Warm key steeply overhead — shadows sit mostly under the dice
   // like the lamp-over-table reference — plus a cool fill; studio env
-  // dimmed so the key's shadows stay visible. Lights emit along +Z
+  // dimmed so the key's shadows stay visible. Lights travel along +Z
   // (upstream DirectionalLightComponent.worldDirection = rotation ×
-  // (0,0,1)) — same Ry(yaw)·Rx(pitch) decomposition as the showcase
-  // camera, aiming +Z along the light's travel direction.
-  Quaternion aimLight(Vector3 dir) {
-    final fwd = dir;
-    final pitch = -asin(fwd.y.clamp(-1.0, 1.0));
-    final yaw = atan2(fwd.x, fwd.z);
-    return Quaternion.axisAngle(Vector3(0, 1, 0), yaw) *
-        Quaternion.axisAngle(Vector3(1, 0, 0), pitch);
-  }
-
+  // (0,0,1)); `aimAlong` points +Z along the travel direction.
   composed.createNode(
     name: 'table.key',
     transform: TrsTransform(
-      rotation: aimLight(Vector3(-0.28, -1.0, -0.22)..normalize()),
+      rotation: aimAlong(Vector3(-0.28, -1.0, -0.22)),
     ),
     components: [
       ComponentSpec(
