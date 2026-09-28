@@ -34,7 +34,7 @@ surgical journal 2048 warn: 0
 
 ## ft-vk-surfaces (logcat)
 
-> **Scope correction:** this count covers only this capture window (surfaces + dice). The Vulkan warm-relaunch step at this head was checked separately with a native-only grep and missed a Java `RuntimeException`; its PASS is withdrawn (see `docs/triage/integration.md` §Final T2 and #18). Later runs (`android-c67ffac/`) grep `FATAL EXCEPTION` / `E AndroidRuntime` / `am_crash` across every capture.
+> **Scope correction:** this count covers only this capture window (surfaces + dice). The Vulkan warm-relaunch step at this head was checked separately with a native-only grep and missed a Java `RuntimeException`; its PASS is withdrawn (see `docs/triage/integration.md` §Final T2 and #18). Later runs (`android-c67ffac/`) grep `FATAL EXCEPTION` / `E AndroidRuntime` across every capture.
 
 Fatal-pattern lines (`FATAL|Fatal signal|CS_FATAL|unrecoverable|E AndroidRuntime|init failed|cannot render|compile FAILED`): 0
 surgical journal 2048 warn: 0
