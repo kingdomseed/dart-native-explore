@@ -39,7 +39,24 @@ helpers (`addNode`, `updateNode`, `setBodyVelocity`,
 `selectMaterialVariant`, `renderTexture`, `updateViews`, physics
 queries, animation control).
 
+dart3d adds a few document extensions upstream's codec doesn't carry
+(a view `viewport`, W26 procedural shapes as geometry resources, and
+`featuresRequired` names such as `d3Instances`). Read and write
+`.fscene` text with `readFsceneWithExtensions` /
+`writeFsceneWithExtensions` (or `SceneController.loadFscene`) to keep
+them; plain upstream `readFscene`/`writeFscene` drops or refuses them.
+
 See `example/` for a live feature harness that exercises the surface.
+
+## Verification status
+
+Everything below is implemented and covered by Dart unit/wire-contract
+tests, but live device evidence is uneven. W21 and W30 have recorded
+device runs; W15's was taken before its last fix round; W16, W18,
+W22–W26, and W29 have none recorded yet. Known open defects are
+tracked in `../docs/program-audit-2026-09-28.md` §3. One of them
+matters for anything shadow-related: Android directional shadows are
+currently inert.
 
 ## What's implemented
 
@@ -73,16 +90,65 @@ See `example/` for a live feature harness that exercises the surface.
   `SCNParticleSystem`; Android runs a Kotlin port of upstream's CPU
   sim feeding a Filament vertex-expanded billboard batch — see
   `../docs/particles-spec.md`.
-- Feature-capability warnings: `featuresRequired`/`featuresUsed`
-  documents degrade with named-workstream warnings.
+- Prefab instances and subtree streaming (W15):
+  `loadDocumentComposed` expands eager instances with upstream
+  `composeSceneAsync` before the manifest goes out. Lazy instances
+  arrive as placeholders that `loadSubtree`/`loadSubtreeAsync`/
+  `unloadSubtree` stream in and out. The natives never compose, so an
+  eager instance sent through plain `loadDocument` renders empty (and
+  `strictFeatures` refuses it).
+- Trails and LOD (W16): `trail` ribbons and `lod` level switching with
+  hysteresis. `blendRange` decodes but doesn't cross-fade, and LOD
+  selects against the primary view only.
+- glTF material extensions (W21/W22): KTX2 textures (iOS decodes only
+  non-supercompressed KTX2; BasisU logs a warning) and the
+  KHR_materials set, with per-platform drops listed in
+  `../docs/verification-matrix.md`. Neither platform renders
+  iridescence or diffuseTransmission. iOS also drops specular,
+  anisotropy, IOR, volume, and dispersion.
+- Physics events, queries, and joints (W23): contact/trigger events,
+  raycast/overlap/shape-cast queries, joint break events. Android
+  reports a single contact point per manifold. See
+  `../docs/joints-spec.md` for how joints map to native constraints.
+- Split-screen views and shadow breadth (W24): per-view `viewport`
+  rects (iOS realizes screen splits as sibling `SCNView`s, Android as
+  Filament viewports), directional-shadow options, and a
+  `shadowCatcher` material (live mode only, with no baked mode).
+- Stage effects (W25): a `.cube` LUT via asset path or payload chunk,
+  lift/gamma/gain, film grain, auto-exposure, SSR, lens flare, god
+  rays, chromatic aberration. Unsupported pieces log a declared
+  limit: on iOS SSR, GI, and god rays (and lift/gamma/gain currently
+  has no effect there); on Android CA, GI, god rays, and metering.
+- Expanded geometry and instancing (W26): `d3:procMesh` shapes
+  (cylinder, cone, capsule, disc, tube, ribbon, camera-facing
+  polyline/lineSegments/billboard, a real icosphere) and
+  `d3:instances`. Instancing is **CPU-baked** into one mesh on both
+  platforms (no hardware instancing, because Filament's Java binding
+  lacks `InstanceBuffer`). Tessellation, subdivision, instance, and
+  dash counts are capped (`lib/src/geometry/limits.dart`,
+  `../docs/triage/dart.md`).
+- Document layer (W29): `SceneController.serializeScene` (the live
+  graph, including runtime ops, as a `SceneDocument`), `.fscene`
+  version migration on load, and runtime `.glb`/`.gltf` import
+  (`loadGlb`/`loadGltf`). There is no `.fsceneb` writer.
+- Android Vulkan (W30): Filament's Vulkan backend with a GL fallback.
+  The example selects it with `--dart-define=DART3D_BACKEND=`, but
+  there is no plugin-level API yet, and a forced Vulkan request that
+  fails falls back to GL without telling you.
+- Feature-capability warnings: unrealized `featuresRequired`/
+  `featuresUsed` names log warnings, and `strictFeatures: true`
+  refuses them.
 
 ## Platform deltas (documented)
 
 Where a native facility has no faithful counterpart, dart3d ships the
 closest approximation and logs once:
 
-- iOS screen-target views: the lowest-`order` view owns `pointOfView`;
-  split-screen is offscreen-only (render to textures instead).
+- iOS screen-target views: one screen view with no `viewport` drives
+  the host `SCNView`'s `pointOfView`. Two or more screen views, or any
+  `viewport` rect, realize as sibling `SCNView`s over the host, one per
+  view (W24). iOS logs and skips directional cascades and contact
+  shadows.
 - Android `layerMask` uses the low 8 bits (Filament layer limit);
   high bits warn.
 - `filterQuality` decodes and is retained but has no faithful native
@@ -157,8 +223,9 @@ Run the example harness and tests through the DartNative toolchain
 (`dn`), which supplies the `dartnative_*` package resolution:
 
 ```bash
+dn test          # package tests (test/): codecs, geometry, physics, …
 cd example
-dn test          # unit + wire-contract tests
+dn test          # harness-level tests (assets, tool/, example lib)
 dn run           # live harness on a connected device/simulator
 ```
 
