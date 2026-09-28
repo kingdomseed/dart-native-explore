@@ -1188,11 +1188,23 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             ?.let { ref -> resolveLutBuffer(ref, fx.colorGrading.lutBlend) }
             ?.let { (buf, size) -> cgBuilder.customLut(buf, size) }
         val cg = cgBuilder.build(engine)
+        // Keep `mapper` strongly reachable until build() has run: the
+        // Builder only holds the ToneMapper's raw native pointer, so
+        // once the local is dead ART may finalize it (deleting the
+        // native object) mid-apply — the W25 LUT resolve between
+        // toneMapper() and build() allocates enough to trigger a GC.
+        // That was the A142 SIGBUS (pc 0x12) inside
+        // ColorGrading::Builder::build at the harness `LUT blend 0.35`.
+        envToneMapper = mapper
         view.colorGrading = cg
         envColorGrading?.let {
             if (it !== cg) engine.destroyColorGrading(it) }
         envColorGrading = cg
     }
+
+    /** The last ToneMapper handed to a ColorGrading.Builder — held so
+     * it can't be finalized before `build` consumes it. */
+    private var envToneMapper: ToneMapper? = null
 
     /**
      * W13 `effects` post-stack → Filament View options. Absolute
