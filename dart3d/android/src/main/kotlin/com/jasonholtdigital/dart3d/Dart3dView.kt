@@ -1552,8 +1552,13 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 scene.removeEntity(rec.entity)
                 engine.destroyEntity(rec.entity)
                 EntityManager.get().destroy(rec.entity)
+                rec.procGpuMesh?.destroy(engine)
+                rec.procMaterialInstance?.let {
+                    engine.destroyMaterialInstance(it)
+                }
             }
             nodesById.clear()
+            cameraFacing.clear()
             bodies.clear()
             dynamicBodyKeys.clear()
             for ((_, g) in gpuMeshes) {
@@ -1812,6 +1817,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             if (id !in pids) continue
             resources.animDefs[animKey]?.let { redecodeAnimation(animKey, it) }
         }
+        // W26: a rewritten instance matrices/color chunk re-bakes its
+        // already-resolved consumers (pending ones retry below).
+        FsceneRealizer.surgicalContext(this).redecodeInstancesForPayload(id)
         // W25 fix-2: only a chunk a still-deferred texture or geometry
         // awaits earns the manifest re-realize — the deferred set holds
         // resource ids, so map through the claim tables. Never-landing
@@ -1996,6 +2004,18 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     engine.destroyEntity(rec.entity)
                     EntityManager.get().destroy(rec.entity)
                     destroyedEntities.add(rec.entity)
+                    // W26: component-owned mesh buffers, a doubleSided
+                    // duplicate instance and the facing registration
+                    // aren't owned by the entity — route removal
+                    // through the same cleanup teardownComponents does
+                    // (repeated subtree streaming leaked them).
+                    cameraFacing.remove(id)
+                    rec.procGpuMesh?.destroy(engine)
+                    rec.procGpuMesh = null
+                    rec.procMaterialInstance?.let {
+                        engine.destroyMaterialInstance(it)
+                    }
+                    rec.procMaterialInstance = null
                     // W12: the node's own component-joint registrations
                     // first — the world sweep below then sees only
                     // command joints and other nodes' component joints
@@ -2975,6 +2995,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         }
         // W5: vertex/index chunks backing geometry resources —
         // re-decode each claiming geometry and rebind its consumers.
+        // W26: instance transform/color chunks re-bake their nodes.
+        if (FsceneRealizer.surgicalContext(this)
+                .redecodeInstancesForPayload(key) > 0) {
+            return
+        }
         val geoKeys = resources.geometryPayloadIds
             .filter { key in it.value }.keys.toList()
         if (geoKeys.isNotEmpty()) {
@@ -3590,8 +3615,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             engine.destroyEntity(rec.entity)
             EntityManager.get().destroy(rec.entity)
             // W26: component-owned proc/instances buffers aren't in
-            // the shared gpuMeshes map — they die with their node.
+            // the shared gpuMeshes map — they die with their node, as
+            // does a doubleSided duplicate material instance.
             rec.procGpuMesh?.destroy(engine)
+            rec.procMaterialInstance?.let { engine.destroyMaterialInstance(it) }
         }
         // W26: facing-spec VertexBuffers belonged to the old scene's
         // component-owned meshes — the fresh decode re-registers.
@@ -4423,6 +4450,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         val uWorld = floatArrayOf(camWorld[4], camWorld[5], camWorld[6])
         val pWorld = floatArrayOf(camWorld[12], camWorld[13], camWorld[14])
         val tm = engine.transformManager
+        val rm = engine.renderableManager
         val wm = FloatArray(16)
         val inv = FloatArray(16)
         for ((_, spec) in cameraFacing) {
@@ -4466,6 +4494,16 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             }
             md.vertices.rewind()
             spec.vertexBuffer.setBufferAt(engine, 0, md.vertices)
+            // The re-faced vertices moved — Filament culls (frustum and
+            // shadow) against the renderable's AABB, which still held
+            // the decode-time orientation (a billboard baked in XY had
+            // zero Z extent seen side-on and could vanish).
+            val ri = rm.getInstance(spec.entity)
+            if (ri != 0) {
+                val b = md.bounds
+                rm.setAxisAlignedBoundingBox(ri,
+                    Box(b[0], b[1], b[2], b[3], b[4], b[5]))
+            }
         }
     }
 
