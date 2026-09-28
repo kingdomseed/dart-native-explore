@@ -255,3 +255,10 @@ is aimed backwards. No iOS change.**
 - **Dart/docs** (`dart3d/lib/**` / docs owner): `docs/particles-spec.md`
   should record the new iOS burst, flipbook, and uniformColor
   approximations listed above.
+
+## Deferred findings → issues
+
+Every DEFER row above is tracked: W26 geometry (caps, `widthInPixels`,
+closed sweeps, ribbon scale, iOS parity ports) → #20; per-view camera
+facing → #21; iOS late-binding consumers → #22; particle pause/enabled
+toggles → #23; Vulkan warm relaunch → #18.

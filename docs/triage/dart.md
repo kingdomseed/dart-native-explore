@@ -184,3 +184,10 @@ cross-platform sweep/caps work and one belongs to the iOS owner.
 
 - **4123065167:** "Confirmed and fixed in 7f2b31c. A test composing a host that authors `CuboidGeometrySpec(extents: (-1, -1, 0.5))` showed it replaced by an extension entry. Upstream `_remapResource` passes `procedural` through by reference, so each placeholder's spec object is now the key in an identity map, and dimensions no longer matter. Test: `pr14_review_test` '4123065167 — authored cuboids are never mistaken for sentinels'."
 - **4123065174:** "Confirmed and fixed in 23e6ac0. A test shows `firstWhere(...).timeout(...)` leaves `hasListener` true after the timeout. The new `PhaseTimers.firstWithin` registers the listener with the generation and cancels it on match, on timeout, and on `cancelAll`, returning null on timeout. The W25 close-out uses it. Tests: `phase_timers_test` 'firstWithin' group. Not verified on a device."
+
+## Deferred findings → issues
+
+Every DEFER row above is tracked: W26 geometry (caps, `widthInPixels`,
+closed sweeps, ribbon scale, iOS parity ports) → #20; per-view camera
+facing → #21; iOS late-binding consumers → #22; particle pause/enabled
+toggles → #23; Vulkan warm relaunch → #18.

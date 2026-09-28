@@ -90,11 +90,14 @@ Rules:
 - [ ] S0f Move `docs/artifacts/w30-review.mp4` (57 MB) and the root `DartNativeX-*.mp4` to GitHub release assets and link them; history rewrite to reclaim clone size is an operator decision (force-push)
 - [x] S0b P1 fixes + review-thread triage — PRs #14 (Dart), #15 (iOS),
       #16 (Android); 7 Codex review rounds, every thread verified and
-      answered; triage tables in `docs/triage/`
+      answered; triage tables in `docs/triage/`; every deferred finding
+      is tracked in an issue (#18, #20–#23)
 - [ ] S0c **Verification backfill** — *partial.* Done: combined T2 on the
-      merged heads (A142 Vulkan + GL, iOS sim — `docs/triage/integration.md`
-      §Final T2). Open: the key T3 lanes for W15, W16, W18, W22, W23, W24,
-      W25, W26, W29 on both platforms; iOS tab-switch/ROLL input; update
+      merged heads for A142 Vulkan + GL (`docs/triage/integration.md`
+      §Final T2). iOS T2 is **still open**: harness-driven rolls settled,
+      but the ROLL-button roll + settle and tab switching were never
+      exercised (no simulator input access). Also open: the key T3 lanes for W15, W16, W18, W22, W23, W24,
+      W25, W26, W29 on both platforms; update
       `verification-matrix.md`
 - [ ] S0d Doc truth pass: `extended-surface-audit.md`,
       `environment-ibl-spec.md`, `texture-material-spec.md`, README
