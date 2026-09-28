@@ -30,6 +30,9 @@ internal object MaterialPackages {
 
     private const val TAG = "dart3d"
 
+    // filament::UserVariantFilterBit
+    private const val VARIANT_STE = 0x80
+
     private val cache = ConcurrentHashMap<String, ByteArray>()
     private val failed = ConcurrentHashMap.newKeySet<String>()
 
@@ -85,6 +88,19 @@ internal object MaterialPackages {
         }
     }
 
+    /** Cached bytes for [key] without compiling (null while pending). */
+    fun peek(key: String): ByteArray? = cache[key]
+
+    /** True when filamat rejected [key]'s package. */
+    fun hasFailed(key: String): Boolean = key in failed
+
+    fun litKey(unlit: Boolean, blending: MaterialBuilder.BlendingMode,
+               extFlags: Int, boundSlots: Int,
+               api: MaterialBuilder.TargetApi): String =
+        "lit|$unlit|$blending|e$extFlags|s$boundSlots|$api"
+
+    fun trailKey(api: MaterialBuilder.TargetApi): String = "trail|$api"
+
     /** Loads cached package bytes into [engine] (cheap; no compile). */
     fun load(engine: Engine, bytes: ByteArray): Material {
         val buf = ByteBuffer.allocateDirect(bytes.size)
@@ -98,7 +114,10 @@ internal object MaterialPackages {
      * Compiles the six base prebuilts for [api] off the main thread.
      * Idempotent — cache hits return immediately.
      */
+    private val prewarmStarted = ConcurrentHashMap.newKeySet<String>()
+
     fun prewarm(api: MaterialBuilder.TargetApi) {
+        if (!prewarmStarted.add(api.name)) return
         val t = Thread({
             try {
                 for (unlit in listOf(false, true)) {
@@ -110,6 +129,11 @@ internal object MaterialPackages {
                     }
                 }
                 trailPackage(api)
+                // Lazily-used packages next — a view compiles these on
+                // main at first use if the prewarm hasn't reached them.
+                catcherPackage(api)
+                particlePackage(false, api)
+                particlePackage(true, api)
             } catch (t: Throwable) {
                 // A prewarm failure only costs the cache — the view
                 // compiles (and reports) on its own path.
@@ -160,7 +184,7 @@ internal object MaterialPackages {
 
     /** W16 trail ribbon — vertex-color unlit + blend. */
     fun trailPackage(api: MaterialBuilder.TargetApi): ByteArray? =
-        compile("trail|$api") {
+        compile(trailKey(api)) {
             MaterialBuilder()
                 .platform(MaterialBuilder.Platform.MOBILE)
                 .targetApi(api)
@@ -624,7 +648,12 @@ internal object MaterialPackages {
         body.append("    prepareMaterial(material);\n}\n")
         // W22-r3: no check→fatal — a rejected package returns null
         // and the caller degrades to a base prebuilt (warn-once).
-        val key = "lit|$unlit|$blending|e$extFlags|s$boundSlots|$api"
+        // Stereo (STE) variants are never rendered — filtering them
+        // trims the compile. (VSM must stay: 1.71.6 requests the 0x40
+        // variant bit for DPCF/SSR passes too — filtering it aborted
+        // with "Requested variant 71 does not exist".)
+        b.variantFilter(VARIANT_STE)
+        val key = litKey(unlit, blending, extFlags, boundSlots, api)
         return compile(key) { b.material(body.toString()) }
     }
 
