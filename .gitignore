@@ -35,3 +35,6 @@ GoogleService-Info.plist
 # Secrets
 .env
 .env.*
+
+# Claude Code agent worktrees
+.claude/worktrees/

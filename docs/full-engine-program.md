@@ -1,5 +1,7 @@
 # dart3d full-engine program plan
 
+> **Superseded 2026-09-28 by [`program-v2.md`](program-v2.md).** Keep this file as the per-unit scope reference for W17–W34; the execution protocol, gate, and ordering below no longer apply. Status as of the handoff: [`program-audit-2026-09-28.md`](program-audit-2026-09-28.md).
+
 dart3d grows from a verified core engine to full `flutter_scene`-surface parity. For app authors, every upstream document feature, material path, and platform capability works on SceneKit and Filament+Jolt with the same behavior. For the next engineer, every remaining feature lands as a verified unit on both platforms. Workstreams W15 through W34 run in dependency order, each as one PR on the public repo.
 
 ## How to read this
