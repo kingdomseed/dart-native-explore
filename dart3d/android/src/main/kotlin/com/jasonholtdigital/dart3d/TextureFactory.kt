@@ -48,6 +48,22 @@ object TextureFactory {
     private external fun nKtx2Decode(
         nativeEngine: Long, bytes: ByteArray, srgb: Boolean): Long
 
+    private external fun nKtx2Release(nativeEngine: Long)
+
+    /**
+     * Frees the KTX2 provider bound to [engine] (created lazily on the
+     * first ktx2 decode). Call on the Filament thread immediately
+     * BEFORE `engine.destroy()` — the provider references its Engine,
+     * so it must die first; a no-op when no ktx2 was ever decoded.
+     */
+    fun releaseEngine(engine: Engine) {
+        try {
+            nKtx2Release(engine.getNativeObject())
+        } catch (e: UnsatisfiedLinkError) {
+            // dart3d_jni failed to load — nothing was ever created.
+        }
+    }
+
     /** Outcome of one texture-resource decode. */
     sealed class Result {
         /** Upload succeeded — bind this texture. */
@@ -189,16 +205,20 @@ object TextureFactory {
     }
 
     /**
-     * Encoded container (PNG/JPEG) via BitmapFactory. `ARGB_8888`
-     * little-endian memory is B,G,R,A and the Java `Texture.Format` enum
-     * has no `BGRA`, so the upload repacks to RGBA in-place (B↔R swap).
+     * Encoded container (PNG/JPEG) via BitmapFactory. Android's
+     * `ARGB_8888` is R,G,B,A in memory (Skia's RGBA_8888 — the name
+     * describes a packed int, not byte order), so `copyPixelsToBuffer`
+     * already yields what `Texture.Format.RGBA` expects: no swizzle.
+     * Decoded unpremultiplied — glTF texels are straight alpha, and an
+     * opaque material must see the RGB under alpha=0 texels, not black.
      */
     private fun uploadEncoded(
         host: Dart3dView, key: Long, bytes: ByteArray, content: String,
     ): Result {
         val start = SystemClock.uptimeMillis()
         val decoded = try {
-            BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+            BitmapFactory.decodeByteArray(bytes, 0, bytes.size,
+                BitmapFactory.Options().apply { inPremultiplied = false })
         } catch (e: Exception) {
             null
         }
@@ -224,13 +244,6 @@ object TextureFactory {
             .order(ByteOrder.nativeOrder())
         bitmap.copyPixelsToBuffer(buf)
         bitmap.recycle()
-        // B,G,R,A → R,G,B,A in place.
-        for (i in 0 until w * h) {
-            val p = i * 4
-            val b = buf.get(p)
-            buf.put(p, buf.get(p + 2))
-            buf.put(p + 2, b)
-        }
         buf.rewind()
         val tex = upload(host.engine, key, buf, w, h,
             Texture.Format.RGBA, srgb = content == "color",

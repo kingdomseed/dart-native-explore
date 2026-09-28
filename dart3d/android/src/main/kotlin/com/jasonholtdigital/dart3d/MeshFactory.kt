@@ -36,6 +36,9 @@ object MeshFactory {
         PAYLOAD_VERTEX_STRIDE_BYTES + 24
 
     enum class IndexWidth { UINT16, UINT32 }
+
+    /** kD3MaxDashSpans (dart3d/lib/src/geometry/limits.dart). */
+    const val MAX_DASH_SPANS = 16384
     enum class Topology { TRIANGLES, TRIANGLE_STRIP, LINES, LINE_STRIP, POINTS }
 
     class PayloadDecodeException(message: String) : Exception(message)
@@ -549,8 +552,9 @@ object MeshFactory {
                 buf.flip()
             }
 
-    private fun indexBufferOf(indices: List<Int>): ByteBuffer =
-        indexBufferOf(indices.toIntArray(), IndexWidth.UINT16)
+    /** UINT16 while every index fits (0..65535), else UINT32. */
+    fun indexWidthFor(vertexCount: Int): IndexWidth =
+        if (vertexCount <= 0x10000) IndexWidth.UINT16 else IndexWidth.UINT32
 
     private fun indexBufferOf(indices: IntArray, width: IndexWidth): ByteBuffer {
         val bytesPerIndex = if (width == IndexWidth.UINT16) 2 else 4
@@ -700,7 +704,7 @@ object MeshFactory {
             V3(-hx, hy, hz), V3(hx, hy, hz),
             V3(-hx, hy, -hz), V3(hx, hy, -hz))
         face(V3(0f, -1f, 0f),
-            V3(hx, -hy, -hz), V3(-hx, -hy, -hz),
+            V3(-hx, -hy, -hz), V3(hx, -hy, -hz),
             V3(-hx, -hy, hz), V3(hx, -hy, hz))
         return b.build(floatArrayOf(0f, 0f, 0f, hx, hy, hz))
     }
@@ -745,11 +749,13 @@ object MeshFactory {
                 idx.addAll(listOf(a, a + 1, b, a + 1, b + 1, b))
             }
         }
+        val vc = verts.size / FLOATS_PER_VERTEX
+        val width = indexWidthFor(vc)
         return MeshData(
-            bufferOf(verts), indexBufferOf(idx),
-            verts.size / FLOATS_PER_VERTEX, idx.size,
+            bufferOf(verts), indexBufferOf(idx.toIntArray(), width),
+            vc, idx.size,
             floatArrayOf(0f, 0f, 0f, radius, radius, radius),
-            hasUvColor = true,
+            hasUvColor = true, indexWidth = width,
         )
     }
 
@@ -828,11 +834,13 @@ object MeshFactory {
                 idx.addAll(listOf(a, a + 1, b, a + 1, b + 1, b))
             }
         }
+        val vc = verts.size / FLOATS_PER_VERTEX
+        val width = indexWidthFor(vc)
         return MeshData(
-            bufferOf(verts), indexBufferOf(idx),
-            verts.size / FLOATS_PER_VERTEX, idx.size,
+            bufferOf(verts), indexBufferOf(idx.toIntArray(), width),
+            vc, idx.size,
             floatArrayOf(0f, 0f, 0f, ringR + tubeR, tubeR, ringR + tubeR),
-            hasUvColor = true,
+            hasUvColor = true, indexWidth = width,
         )
     }
 
@@ -907,7 +915,7 @@ object MeshFactory {
             topology: Topology = Topology.TRIANGLES,
         ): MeshData {
             val vc = vertexCount
-            val width = if (vc <= 0x10000) IndexWidth.UINT16 else IndexWidth.UINT32
+            val width = indexWidthFor(vc)
             val vb = bufferOf(verts)
             val b = bounds ?: scanBounds(vb, vc, PROCEDURAL_VERTEX_STRIDE_BYTES)
             vb.rewind()
@@ -1045,7 +1053,9 @@ object MeshFactory {
     /** A real subdivided icosahedron projected to [radius] — replaces
      *  the UV-sphere stand-in for `icosphere` (midpoint edge cache,
      *  spherical UVs, outward winding; proc.dart buildIcosphere). */
-    fun icosphere(radius: Float, subdivisions: Int): MeshData {
+    fun icosphere(radius: Float, subdivisionsIn: Int): MeshData {
+        // 20·4ⁿ faces — bounded here as well as at decode.
+        val subdivisions = subdivisionsIn.coerceIn(0, 6)
         val t = ((1 + sqrt(5.0)) / 2).toFloat()
         val verts = mutableListOf(
             V3(-1f, t, 0f), V3(1f, t, 0f), V3(-1f, -t, 0f), V3(1f, -t, 0f),
@@ -1269,10 +1279,14 @@ object MeshFactory {
      *  proc.dart's buildTube (rotation-minimizing frames, ring
      *  stitching, fan caps). [points] are native-space. */
     fun tube(
-        points: List<V3>, radius: Float, radialSegments: Int,
-        stations: Int, caps: Boolean, closed: Boolean,
+        points: List<V3>, radius: Float, radialSegmentsIn: Int,
+        stationsIn: Int, caps: Boolean, closed: Boolean,
     ): MeshData {
         if (points.size < 2) return ProcBuilder().build()
+        // Guarded here too (the decoder already clamps): the ring loop
+        // divides by both counts and caps read the first/last frame.
+        val radialSegments = radialSegmentsIn.coerceAtLeast(3)
+        val stations = stationsIn.coerceAtLeast(2)
         val path = catmullRomPath(points, closed)
         val frames = path.evenlySpacedFrames(stations)
         val length = path.length
@@ -1291,7 +1305,7 @@ object MeshFactory {
             }
         }
         stitchRings(b, ringBases, radialSegments + 1)
-        if (caps) {
+        if (caps && !closed) {
             tubeCap(b, frames.first(), radius, radialSegments, atEnd = false)
             tubeCap(b, frames.last(), radius, radialSegments, atEnd = true)
         }
@@ -1337,7 +1351,12 @@ object MeshFactory {
             var sideways = frame.tangent.cross(up)
             if (sideways.length2 < 1e-12f) sideways = frame.binormal
             val across = sideways.normalized()
-            val normal = up.normalized()
+            // Perpendicular to both the path tangent and the across
+            // axis — raw `up` tilts off the surface on any climbing
+            // segment (Dart reference).
+            var normal = across.cross(frame.tangent)
+            if (normal.length2 < 1e-12f) normal = up
+            normal = normal.normalized()
             val v = if (stations == 1) 0f else length * i / (stations - 1)
             ringBases.add(b.vertexCount)
             b.emit(frame.position - across * half, normal, 0f, v)
@@ -1394,12 +1413,16 @@ object MeshFactory {
     ): MeshData {
         if (points.size < 2) return ProcBuilder().build()
         val pts = if (closed) points + points.first() else points
+        val n = points.size
         val b = ProcBuilder()
         for (i in 0 until pts.size - 1) {
+            // The closing segment's end attributes are point 0's —
+            // `i + 1 == n` wraps instead of reading past the list.
+            val j = (i + 1) % n
             emitLineQuad(b, pts[i], pts[i + 1],
                 widths?.getOrNull(i) ?: width,
-                widths?.getOrNull(i + 1) ?: width,
-                viewDir, colors?.getOrNull(i), colors?.getOrNull(i + 1))
+                widths?.getOrNull(j) ?: width,
+                viewDir, colors?.getOrNull(i), colors?.getOrNull(j))
         }
         return b.build()
     }
@@ -1414,8 +1437,17 @@ object MeshFactory {
         closed: Boolean = false,
     ): MeshData {
         if (points.size < 2) return ProcBuilder().build()
+        // d3DashPatternValid: `(0, x)` emitted nothing and `(0, 0)`
+        // never advanced the cursor (an infinite loop) — an invalid
+        // pattern renders solid, like the Dart reference.
+        if (!(onLen.isFinite() && offLen.isFinite() && onLen > 0f &&
+                offLen >= 0f)) {
+            return polyline(points, width, viewDir, colors, widths, closed)
+        }
         val pts = if (closed) points + points.first() else points
+        val n = points.size
         val b = ProcBuilder()
+        var spans = 0
         var distance = 0f
         var on = true
         var nextBoundary = onLen
@@ -1427,6 +1459,7 @@ object MeshFactory {
         for (i in 0 until pts.size - 1) {
             val a = pts[i]
             val c = pts[i + 1]
+            val j = (i + 1) % n
             val dir = c - a
             val segLen = dir.length
             if (segLen < 1e-12f) continue
@@ -1436,15 +1469,22 @@ object MeshFactory {
                 val t1 = if (remain > 0f)
                     (nextBoundary - distance) / segLen else 1f
                 if (on) {
+                    // kD3MaxDashSpans: a microscopic pattern against a
+                    // long line renders solid instead of millions of
+                    // quads.
+                    if (++spans > MAX_DASH_SPANS) {
+                        return polyline(points, width, viewDir, colors,
+                            widths, closed)
+                    }
                     val wa = (widths?.getOrNull(i) ?: width) +
-                        ((widths?.getOrNull(i + 1) ?: width) -
+                        ((widths?.getOrNull(j) ?: width) -
                             (widths?.getOrNull(i) ?: width)) * t0
                     val wb = (widths?.getOrNull(i) ?: width) +
-                        ((widths?.getOrNull(i + 1) ?: width) -
+                        ((widths?.getOrNull(j) ?: width) -
                             (widths?.getOrNull(i) ?: width)) * t1
                     emitLineQuad(b, a + dir * t0, a + dir * t1,
-                        wa, wb, viewDir, lerpColor(i, i + 1, t0),
-                        lerpColor(i, i + 1, t1))
+                        wa, wb, viewDir, lerpColor(i, j, t0),
+                        lerpColor(i, j, t1))
                 }
                 t0 = t1
                 if (distance + t0 * segLen >= nextBoundary - 1e-9f) {
@@ -1466,8 +1506,12 @@ object MeshFactory {
         val b = ProcBuilder()
         var i = 0
         while (i + 1 < points.size) {
+            // `colors` is one entry per segment (point pair) — the
+            // segment is flat-colored (Dart reference), not a gradient
+            // into the next segment's color.
+            val c = colors?.getOrNull(i / 2)
             emitLineQuad(b, points[i], points[i + 1], width, width,
-                viewDir, colors?.getOrNull(i), colors?.getOrNull(i + 1))
+                viewDir, c, c)
             i += 2
         }
         return b.build()
@@ -1529,9 +1573,12 @@ object MeshFactory {
         val corners = listOf(-0.5f to -0.5f, 0.5f to -0.5f,
             -0.5f to 0.5f, 0.5f to 0.5f)
         for ((dx, dy) in corners) {
-            val rx = dx * cosR - dy * sinR
-            val ry = dx * sinR + dy * cosR
-            b.emit(r * (rx * sizeX) + u * (ry * sizeY), n,
+            // Size first, then rotate — rotating the unit square and
+            // scaling after shears a non-square quad (Dart reference).
+            val sx = dx * sizeX; val sy = dy * sizeY
+            val rx = sx * cosR - sy * sinR
+            val ry = sx * sinR + sy * cosR
+            b.emit(r * rx + u * ry, n,
                 dx + 0.5f, dy + 0.5f, color[0], color[1], color[2], color[3])
         }
         b.quad(0, 1, 2, 3)
@@ -1677,6 +1724,7 @@ object MeshFactory {
             }
             src.rewind()
             val ints = base.indices
+            val idxStart = b.idx.size
             when (base.indexWidth) {
                 IndexWidth.UINT16 -> {
                     val shorts = ints.asShortBuffer()
@@ -1689,6 +1737,18 @@ object MeshFactory {
                     for (k in 0 until base.indexCount) {
                         b.idx.add(ib.get(k) + base0)
                     }
+                }
+            }
+            // A reflecting transform (det < 0) reverses the triangles'
+            // screen orientation — rewind each so the mirrored copy's
+            // exterior isn't back-face culled (d3BakeInstances).
+            if (flip < 0f) {
+                var t = idxStart
+                while (t + 2 < b.idx.size) {
+                    val tmp = b.idx[t + 1]
+                    b.idx[t + 1] = b.idx[t + 2]
+                    b.idx[t + 2] = tmp
+                    t += 3
                 }
             }
         }
@@ -1754,9 +1814,10 @@ object MeshFactory {
             val col = colors?.getOrNull(i) ?: WHITE4
             val v0 = b.vertexCount
             for ((dx, dy) in corners) {
-                val rx = dx * cosR - dy * sinR
-                val ry = dx * sinR + dy * cosR
-                b.emit(c + r * (rx * sizeX) + u * (ry * sizeY), n,
+                val sx = dx * sizeX; val sy = dy * sizeY
+                val rx = sx * cosR - sy * sinR
+                val ry = sx * sinR + sy * cosR
+                b.emit(c + r * rx + u * ry, n,
                     dx + 0.5f, dy + 0.5f, col[0], col[1], col[2], col[3])
             }
             b.quad(v0, v0 + 1, v0 + 2, v0 + 3)
