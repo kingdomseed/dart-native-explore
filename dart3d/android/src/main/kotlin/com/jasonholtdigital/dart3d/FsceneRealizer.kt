@@ -5299,7 +5299,7 @@ object FsceneRealizer {
         val boundMask = if (extFlags == 0) 0
             else boundTextureMask(props, extFlags)
         val pick = host.materialForVariant(
-            unlit, alphaMode, extFlags, boundMask)
+            unlit, alphaMode, extFlags, boundMask, key)
         val mi = pick.material.createInstance()
         val shaderFlags = pick.extFlags
         fun slotBound(i: Int) = pick.boundSlots and (1 shl i) != 0

@@ -116,6 +116,35 @@ internal object MaterialPackages {
      */
     private val prewarmStarted = ConcurrentHashMap.newKeySet<String>()
 
+    /** Background lane for on-demand variant compiles. */
+    private val variantExecutor = java.util.concurrent.Executors
+        .newSingleThreadExecutor { r ->
+            Thread(r, "dart3d-matvariant").also {
+                it.isDaemon = true
+                it.priority = Thread.NORM_PRIORITY - 1
+            }
+        }
+
+    /**
+     * Compiles a lit variant off the calling thread; [done] runs on the
+     * compile thread with the bytes (null when filamat rejected it).
+     */
+    fun litPackageAsync(
+        unlit: Boolean, blending: MaterialBuilder.BlendingMode,
+        extFlags: Int, boundSlots: Int, api: MaterialBuilder.TargetApi,
+        done: (ByteArray?) -> Unit,
+    ) {
+        variantExecutor.execute {
+            val bytes = try {
+                litPackage(unlit, blending, extFlags, boundSlots, api)
+            } catch (t: Throwable) {
+                Log.w(TAG, "variant compile failed", t)
+                null
+            }
+            done(bytes)
+        }
+    }
+
     fun prewarm(api: MaterialBuilder.TargetApi) {
         if (!prewarmStarted.add(api.name)) return
         val t = Thread({
