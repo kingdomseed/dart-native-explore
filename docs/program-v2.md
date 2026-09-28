@@ -92,8 +92,8 @@ Rules:
       #16 (Android); 7 Codex review rounds, every thread verified and
       answered; triage tables in `docs/triage/`; every deferred finding
       is tracked in an issue (#18, #20–#23)
-- [ ] S0c **Verification backfill** — *partial.* Done: combined T2 on the
-      merged heads for A142 Vulkan + GL (`docs/triage/integration.md`
+- [ ] S0c **Verification backfill** — *partial.* Done: T2 on the merged tree
+      `e19e031` (equivalence recorded in §Final T2) for A142 Vulkan + GL (`docs/triage/integration.md`
       §Final T2). iOS T2 is **still open**: harness-driven rolls settled,
       but the ROLL-button roll + settle and tab switching were never
       exercised (no simulator input access). Also open: the key T3 lanes for W15, W16, W18, W22, W23, W24,
