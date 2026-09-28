@@ -13,6 +13,11 @@ named `mythic_scene` or anything infringing on `flutter_scene` naming.
 
 - `dn` CLI: `/Users/jasonholt/zero/bin/dn` (DartNative 3.45.0-0.1.pre, engine
   cached in `~/zero/bin/cache`). Wraps flutter_tools, points at Zero engine.
+  Framework `4c1cdb074e0` (2026-09-26 release). Update: `dn upgrade` prints
+  the installer command (`curl -fsSL https://cdn.dartnative.com/install.sh | sh`);
+  run it, then `dn upgrade` again.
+- Xcode 27: `dn build ios --simulator` fails (`lipo -verify_arch` now takes one
+  arch; flutter_tools passes two). Use `dn run -d <sim-id>` instead.
 - PATH: `~/zero/bin` is appended LAST in `.zshrc`. DO NOT move it to the front
   — `zero/bin` contains its own `flutter`/`dart` binaries that would shadow the
   real Flutter at `~/repos/sdk/flutter/bin`. The `dn doctor` warnings about

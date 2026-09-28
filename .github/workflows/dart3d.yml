@@ -1,0 +1,29 @@
+name: dart3d
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  dart:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dart3d/example
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache DartNative SDK
+        uses: actions/cache@v4
+        with:
+          path: ~/zero/bin/cache
+          key: dn-cache-${{ runner.os }}-v1
+      - name: Install DartNative SDK
+        working-directory: .
+        run: |
+          curl -fsSL https://cdn.dartnative.com/install.sh | sh
+          echo "$HOME/zero/bin" >> "$GITHUB_PATH"
+      - run: dn --version
+      - run: dn pub get
+      - run: dn analyze
+      - run: dn test
