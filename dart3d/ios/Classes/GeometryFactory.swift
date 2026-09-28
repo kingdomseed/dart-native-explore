@@ -1075,12 +1075,21 @@ enum GeometryFactory {
     /// renders solid instead (and a nonpositive period can't advance).
     static let maxDashSpans = 16384
 
+    /// Dart `d3BakedInstanceCount` twin: requested instances capped by
+    /// the vertex budget (a base larger than the budget keeps one).
+    static func bakedInstanceCount(_ requested: Int,
+                                   baseVertexCount: Int) -> Int {
+        guard requested > 0 else { return 0 }
+        return min(requested,
+                   max(1, maxBakedVertices / max(baseVertexCount, 1)))
+    }
+
     static func bakeInstances(
         _ base: MeshParts, _ allMatrices: [simd_float4x4],
         colors: [SIMD4<Float>]?
     ) -> MeshParts {
-        let keep = min(allMatrices.count,
-                       max(1, maxBakedVertices / max(base.vertexCount, 1)))
+        let keep = bakedInstanceCount(allMatrices.count,
+                                      baseVertexCount: base.vertexCount)
         let matrices = allMatrices.count > keep
             ? Array(allMatrices.prefix(keep)) : allMatrices
         var b = ProcBuilder()
