@@ -9,6 +9,7 @@ import 'scene_model.dart';
 
 import 'animation.dart';
 import 'components.dart';
+import 'compose_extensions.dart';
 import 'diff_apply.dart';
 import 'dispatch.dart';
 import 'doc_layer.dart' as doc_layer;
@@ -160,7 +161,7 @@ final class SceneController {
     bool strictFeatures = false,
   }) async {
     loadDocument(
-      await composeSceneAsync(doc, load: loadPrefab),
+      await composeSceneAsyncWithExtensions(doc, load: loadPrefab),
       resolveLuts: resolveLuts,
       strictFeatures: strictFeatures,
     );

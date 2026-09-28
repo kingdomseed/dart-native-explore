@@ -178,14 +178,25 @@ final class D3MeshBuilder {
   /// so translated, rotated, and non-uniformly scaled meshes all keep
   /// correct lighting. A reflecting [m] (negative determinant) also
   /// reverses every triangle so the front faces stay outward-wound.
+  ///
+  /// The normal matrix is computed as the cofactor matrix (`det · M⁻ᵀ`,
+  /// sign-corrected), which stays defined when [m] is singular: a
+  /// flattening such as `diag(1, 1, 0)` keeps the collapsed axis as
+  /// the surviving surface normal. Where even that vanishes (a rank ≤ 1
+  /// collapse) the source normal is kept.
   void transform(Matrix4 m) {
     final upper = m.getRotation();
     final det = upper.determinant();
-    final normalMatrix = det.abs() > 1e-30
-        ? (Matrix3.copy(upper)
-            ..invert()
-            ..transpose())
-        : upper;
+    final c0 = upper.getColumn(0);
+    final c1 = upper.getColumn(1);
+    final c2 = upper.getColumn(2);
+    final normalMatrix = Matrix3.columns(
+      c1.cross(c2),
+      c2.cross(c0),
+      c0.cross(c1),
+    );
+    if (det < 0) normalMatrix.scale(-1.0);
+    final source = Vector3.zero();
     final v = Vector3.zero();
     final n = Vector3.zero();
     for (var i = 0; i < _positions.length; i += 3) {
@@ -195,8 +206,13 @@ final class D3MeshBuilder {
       _positions[i + 1] = v.y;
       _positions[i + 2] = v.z;
       n.setValues(_normals[i], _normals[i + 1], _normals[i + 2]);
+      source.setFrom(n);
       normalMatrix.transform(n);
-      if (n.length2 > 1e-20) n.normalize();
+      if (n.length2 > 1e-20 && n.x.isFinite && n.y.isFinite && n.z.isFinite) {
+        n.normalize();
+      } else {
+        n.setFrom(source);
+      }
       _normals[i] = n.x;
       _normals[i + 1] = n.y;
       _normals[i + 2] = n.z;
