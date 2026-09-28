@@ -123,6 +123,22 @@ Draft replies, for the coordinator to post:
 - **4122726829:** "The cap is shared by the stabilization set, just not by main yet: dart `limits.dart` kD3MaxBakedVertices = 1<<20 + d3BakedInstanceCount (used by d3BakeInstances) and Android FsceneRealizer.kt:80/:1800 truncate by the same budget. Keeping it. I did fix the silent part: iOS now logs a vertexCap warning when it truncates, like Android. 76d2f7b."
 - **4122726839:** "Confirmed, and it regressed in e7c8335. Atlas dims now clamp to [1, 4096] before any product, and the sawtooth keyframes cap at 4096. 76d2f7b."
 
+### Round 3 (Codex on PR #15, after the rebase onto main `1c3f961`)
+
+| Comment id | file:line | Summary | Verdict | Evidence / fix |
+|---|---|---|---|---|
+| 4122981023 | SceneViewHost.swift:1271 | a subtree reload leaves stale command-created ownership behind | FIX (real) | `f7870c3`. The failing path was traced: the member was removed, re-created by a top-level addNode (which put it in `commandCreatedKeys`), and the subtree was then reloaded, pruning the journal. A later removeNode was suppressed, and the retained batch re-added the member after a re-realize. The reload now also runs `commandCreatedKeys.subtract(members)` |
+| 4122981030 | SceneViewHost.swift:1356 | removing a command-created root loses the removals of manifest descendants | FIX (real) | `f7870c3`. `removeSubtree` prunes the descendant's reparent update, and the root's removeNode was suppressed, so the manifest node came back. Doomed ids that no top-level addNode created are now collected, and each gets a journaled `removeNode` (token via `D3Wire.localIdToken`) when the root's own removal is suppressed |
+| 4122981040 | FsceneRealizer.swift:5689 | burst intervals shorter than one frame collapse to one burst per frame | FIX (real) | `f7870c3`. A repeating burst with `0 < interval < 1/60` now emits as a rate (count/interval) until its cycle stop. When all cycles fit inside one window, it emits a single window carrying cycles × count births. This matches the reference spawner counting every crossing within a step |
+
+Draft replies, for the coordinator to post:
+
+- **4122981023:** "Confirmed (member removed, then re-created top-level, then the subtree reloaded: ownership survived and the next removal went unjournaled). The reload now also drops its members from commandCreatedKeys. Fixed in f7870c3."
+- **4122981030:** "Confirmed — the reparent update was pruned and the root removal suppressed. When a command-created root's removal is suppressed, every doomed descendant it didn't create now gets its own journaled removeNode. Fixed in f7870c3."
+- **4122981040:** "Confirmed. A sub-frame interval now emits as a rate (count/interval) up to the cycle stop, or as one window of cycles·count births when all cycles fit in a frame, so repetition counts match the reference. Fixed in f7870c3."
+
+Round-3 verification: `swiftc -typecheck` is clean. In `dart3d/example`, `dn analyze` is clean and `dn test` passes 121/121 (main after #14 carries 121 example tests). No device run was made; the coordinator runs a final T2.
+
 ## Light direction check (coordinator follow-up, Android `264c2e0`)
 
 **Verdict: the iOS decode is correct against upstream; the example scene
