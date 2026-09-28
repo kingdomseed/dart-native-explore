@@ -1421,9 +1421,19 @@ enum FsceneRealizer {
         /// Segment-count params clamp to ≥1 — a zero/negative on the
         /// wire would NaN the generators' `s / segments` divisions
         /// (the Dart-side contract floors at 1 too).
+        /// Wire tessellation counts clamp to `[1, maxProcSegments]` —
+        /// the Dart `limits.dart` contract (`kD3MaxProcSegments`):
+        /// clamp, never reject, so every platform degrades to the same
+        /// capped mesh instead of hanging on a hostile count.
+        static let maxProcSegments = 512
+        static let maxIcosphereSubdivisions = 6
         private func seg(_ p: [String: Any], _ name: String,
                          _ def: Int) -> Int {
-            max(1, d3Int(p[name]) ?? def)
+            min(max(1, d3Int(p[name]) ?? def), Self.maxProcSegments)
+        }
+
+        private func stations(_ p: [String: Any]) -> Int {
+            min(max(2, d3Int(p["stations"]) ?? 64), Self.maxProcSegments)
         }
 
         func procedural(_ key: UInt64, _ shape: String,
@@ -1452,7 +1462,9 @@ enum FsceneRealizer {
                 return GeometryFactory.makeGeometry(
                     GeometryFactory.icosphere(
                         radius: Float(d3Double(p["radius"]) ?? 0.5),
-                        subdivisions: max(0, d3Int(p["subdivisions"]) ?? 2)))
+                        subdivisions: min(max(0,
+                            d3Int(p["subdivisions"]) ?? 2),
+                            Self.maxIcosphereSubdivisions)))
             case "plane":
                 // XZ +Y — the wire contract; SCNPlane's XY/+Z never
                 // matched it.
@@ -1514,7 +1526,7 @@ enum FsceneRealizer {
                     GeometryFactory.tube(pts,
                         radius: Float(d3Double(p["radius"]) ?? 0.5),
                         radialSegments: seg(p, "radialSegments", 12),
-                        stations: max(2, d3Int(p["stations"]) ?? 64),
+                        stations: stations(p),
                         caps: d3Bool(p["caps"]) != false,
                         closed: d3Bool(p["closed"]) == true))
             case "ribbon":
@@ -1527,7 +1539,7 @@ enum FsceneRealizer {
                 return GeometryFactory.makeGeometry(
                     GeometryFactory.ribbon(pts,
                         width: Float(d3Double(p["width"]) ?? 1),
-                        stations: max(2, d3Int(p["stations"]) ?? 64),
+                        stations: stations(p),
                         up: SIMD3(Float(u[0]), Float(u[1]), Float(-u[2])),
                         closed: d3Bool(p["closed"]) == true))
             case let s where FsceneRealizer.Context.facingShapes
