@@ -238,3 +238,32 @@ so that iOS evidence carries over.
 6. **Dice readout:** the fix above (Dart).
 7. **iOS T2 still owes** a tab-switch soak and a ROLL-button roll. They
    need simulator input access.
+
+## Final T2 — merged heads (2026-09-28)
+
+**Merged-head equivalence (T2 reuse justification).** main after #16 is
+`e19e031`. `git diff c67ffac e19e031` is empty, so the Android runs at
+`c67ffac` are on the merged tree byte-for-byte. The iOS run at `7c6dbcb`
+differs from `e19e031` only under `dart3d/android/` and `docs/`
+(`git diff 7c6dbcb e19e031 -- dart3d/ios dart3d/lib dart3d/example` is
+empty), none of which an iOS build compiles, so the iOS evidence applies
+to `e19e031` for the checks it covered.
+
+Evidence: `docs/artifacts/integration/final/` (per-run counts in each `logs.md`).
+
+| Head | Surface | Result |
+|---|---|---|
+| main 1c3f961 + ios ae4d876 + android c3635e1 (`7c6dbcb`) | iOS sim | **PARTIAL** (T2 not closed) — harness complete, 0 crash lines; W15 reload/remove cycles; W18 sub-frame bursts; dice settle; dash/fcar/glb/materials. Not exercised: tab switching and the ROLL-button roll + settle (no simulator input access) — iOS T2 stays open until those run. → merged as #15 |
+| android c679636 | A142 Vulkan / GL | Vulkan PASS except warm relaunch; GL PASS incl. 5/5 warm relaunches (`android-c679636/`) |
+| android **c67ffac** (merged as #16) | A142 Vulkan | **PASS** — harness complete; 0 native fatal, 0 Java exceptions, 0 `E dart3d`; replay 55 ops; dice settle; dash; materials not black (`android-c67ffac/`) |
+| android **c67ffac** | A142 GL | **PASS** — same counts (`android-c67ffac/`) |
+
+**Correction:** the Vulkan warm-relaunch PASS reported above for `ab62511`
+and `7c6dbcb` only grepped native `Fatal signal` lines and missed a Java
+`RuntimeException`; treat it as unverified. Vulkan warm relaunch crashes on
+every head including `main` before this work — tracked in #18.
+
+**Incident (7c6dbcb GL run):** another app (Chrome) took the A142 foreground
+mid-run and blind `adb input` taps landed in it; reported to the operator,
+who cleared the device. All later runs gate every input on the foreground
+package being `com.jasonholtdigital.dart3d_example`.
