@@ -10,6 +10,7 @@ import 'package:vector_math/vector_math.dart';
 import 'dartnative_plugin_registrant.dart';
 import 'dice_table.dart';
 import 'feature_scene.dart';
+import 'phase_timers.dart';
 import 'imported_scene.dart';
 import 'showcase_scene.dart';
 
@@ -140,8 +141,10 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
   StreamSubscription<SceneJointBroke>? _joints;
   Timer? _reroll;
   Timer? _watchdog;
-  Timer? _queryBattery;
-  Timer? _jointTimer;
+  // The current scene generation's timers: the outer phase kicks, the
+  // query battery, the joint rig, and every phase's nested follow-ups.
+  // Cancelled wholesale on reload, model switch, and dispose.
+  PhaseTimers? _phaseTimers;
   int Function()? _jointRig;
   void Function(void Function(int playing) report)? _w11Phase;
   void Function()? _w12Phase;
@@ -151,18 +154,8 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
   void Function()? _w15Phase;
   void Function(({double w, double h}) Function() targetPx)? _w24Phase;
   void Function()? _w16Phase;
-  void Function()? _w25Phase;
+  void Function(void Function() rollDie)? _w25Phase;
   void Function()? _w18Phase;
-  Timer? _w11Timer;
-  Timer? _w12Timer;
-  Timer? _w13Timer;
-  Timer? _w14Timer;
-  Timer? _wLooseTimer;
-  Timer? _w15Timer;
-  Timer? _w24Timer;
-  Timer? _w16Timer;
-  Timer? _w25Timer;
-  Timer? _w18Timer;
   int _animsPlaying = 0;
   LocalId? _die;
   LocalId? _ball;
@@ -205,11 +198,15 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
   /// Rebuilds the document and loads it — a full replace, so ids are
   /// re-minted and bodies reset to their spawn poses.
   void _loadScene() {
+    // The outgoing generation's timers and subscriptions reference its
+    // ids — none may fire into the replacement.
+    _phaseTimers?.cancelAll();
     final scene = FeatureScene.build(
       ortho: _ortho,
       env: _env,
       controller: _controller,
     );
+    final timers = _phaseTimers = scene.timers;
     _die = scene.die;
     _ball = scene.ball;
     _hidden = scene.hidden;
@@ -229,64 +226,53 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     // The W11 lane lands at +14 s — after the joint rig — so its
     // skinned flag and morph blob don't contend with the +8 s diff
     // or the +10 s query battery.
-    _w11Timer?.cancel();
-    _w11Timer = Timer(const Duration(seconds: 14), _runW11);
+    timers.after(const Duration(seconds: 14), _runW11);
     // W12's component-parity lane lands at +22 s — after W11's
     // +18 s seek/weight-write and its reference-trace window.
-    _w12Timer?.cancel();
-    _w12Timer = Timer(const Duration(seconds: 22), _runW12);
+    timers.after(const Duration(seconds: 22), _runW12);
     // W13's environment-effects lane lands at +34 s — after W12's
     // last inner timer (+22 s + 11 s pose evidence).
-    _w13Timer?.cancel();
-    _w13Timer = Timer(const Duration(seconds: 34), _runW13);
+    timers.after(const Duration(seconds: 34), _runW13);
     // W14's render-texture/views lane lands at +50 s — after W13's
     // last inner timer (+34 s + 14 s overridesEffects flip).
-    _w14Timer?.cancel();
-    _w14Timer = Timer(const Duration(seconds: 50), _runW14);
+    timers.after(const Duration(seconds: 50), _runW14);
     // The loose-ends evidence lane lands at +78 s — after W14's last
     // inner timer (+50 s + 12 s showcase), leaving its probe drops,
     // pose reads, and three timed rolls clear of the render-texture
     // churn.
-    _wLooseTimer?.cancel();
-    _wLooseTimer = Timer(const Duration(seconds: 78), _runWLoose);
+    timers.after(const Duration(seconds: 78), _runWLoose);
     // W15's subtree-streaming lane lands at +112 s — after wLoose's
     // last inner timer (+78 s + 30 s settle-window close), so the
     // grid load/unload cycles are clear of every earlier probe.
-    _w15Timer?.cancel();
-    _w15Timer = Timer(const Duration(seconds: 112), _runW15);
+    timers.after(const Duration(seconds: 112), _runW15);
     // W24's views/shadow-breadth lane lands at +126 s — after W15's
     // lane-complete log (+112 s + 12 s), so the view-list churn is
     // clear of the streaming cycles.
-    _w24Timer?.cancel();
-    _w24Timer = Timer(const Duration(seconds: 126), _runW24);
+    timers.after(const Duration(seconds: 126), _runW24);
     // The W16 trails/LOD lane lands at +140 s — after W15's +112 s
     // subtree-streaming lane closes its last inner timer (+12 s), so
     // the mover's transform stream can't contend with the grid
     // load/unload cycles.
-    _w16Timer?.cancel();
-    _w16Timer = Timer(const Duration(seconds: 140), _runW16);
+    timers.after(const Duration(seconds: 140), _runW16);
     // W25's stage-effects matrix lane lands at +166 s — after W16's
     // +140 s trails/LOD lane drives the mover home (+24 s of 100 ms
     // ticks = +164 s), so the LUT and post-stack sweeps run on a
     // settled scene.
-    _w25Timer?.cancel();
-    _w25Timer = Timer(const Duration(seconds: 166), _runW25);
-    // W18's particle lane lands at +170 s — after W15's last inner
-    // timer (+112 s + 12 s close), so the emitters run on a quiet
-    // scene (the auto-reroll was already cancelled by wLoose).
-    _w18Timer?.cancel();
-    _w18Timer = Timer(const Duration(seconds: 170), _runW18);
+    timers.after(const Duration(seconds: 166), _runW25);
+    // W18's particle lane lands at +192 s — after W25's +14 s
+    // dice-regression roll (+180 s) and its 10 s settle window
+    // (+190 s), so the emitters don't contend with the effects sweep.
+    // It used to land at +170 s, inside W25's sweep.
+    timers.after(const Duration(seconds: 192), _runW18);
     _jointsBroke = 0;
     _controller.loadDocument(scene.document);
     // W8: the query battery fires at +10 s — after the +8 s diff — and
     // aims at this generation's die, so re-arm on every reload (a
     // reload re-mints the ids it queries).
-    _queryBattery?.cancel();
-    _queryBattery = Timer(const Duration(seconds: 10), _runQueryBattery);
+    timers.after(const Duration(seconds: 10), _runQueryBattery);
     // W9: the joint rig lands at +12 s — its bodies and joints all
     // ride command ops, so a reload needs a fresh rig on fresh ids.
-    _jointTimer?.cancel();
-    _jointTimer = Timer(const Duration(seconds: 12), _runJointRig);
+    timers.after(const Duration(seconds: 12), _runJointRig);
   }
 
   void _onContactEvent(SceneCollisionEvent event) {
@@ -403,6 +389,9 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
       'contact shadows, catcher, layerMask',
     );
     _w24Phase?.call(() {
+      // The phase's timers die with the screen, but guard the context
+      // anyway — MediaQuery on a disposed element throws.
+      if (!mounted) return (w: 0.0, h: 0.0);
       final mq = MediaQuery.of(context);
       final size = mq.size;
       final dpr = mq.devicePixelRatio;
@@ -428,10 +417,10 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
   /// dice-regression close-out. The phase logs each step itself.
   void _runW25() {
     dnLog('dart3d: w25 phase — LUT + effects matrix lanes');
-    _w25Phase?.call();
+    _w25Phase?.call(_roll);
   }
 
-  /// The W18 particle phase at +170 s — three live emitters (a
+  /// The W18 particle phase at +192 s — three live emitters (a
   /// spherical flipbook fountain, additive velocity-stretched
   /// bursts, a two-bucket tumbling mesh pool) plus an `enabled:false`
   /// gate the phase flips on, hides/restores the streaks node, and
@@ -667,18 +656,8 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
   /// body on the mesh root, so the Roll button and settle event work
   /// unchanged.
   void _loadImported(ImportedModel model) {
-    _w11Timer?.cancel();
-    _w12Timer?.cancel();
-    _w13Timer?.cancel();
-    _w14Timer?.cancel();
-    _wLooseTimer?.cancel();
-    _w15Timer?.cancel();
-    _w24Timer?.cancel();
-    _w16Timer?.cancel();
-    _w25Timer?.cancel();
-    _w18Timer?.cancel();
-    _queryBattery?.cancel();
-    _jointTimer?.cancel();
+    _phaseTimers?.cancelAll();
+    _phaseTimers = null;
     _reroll?.cancel();
     _watchdog?.cancel();
     final loaded = loadImportedScene(model);
@@ -729,18 +708,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
     _joints?.cancel();
     _reroll?.cancel();
     _watchdog?.cancel();
-    _queryBattery?.cancel();
-    _jointTimer?.cancel();
-    _w11Timer?.cancel();
-    _w12Timer?.cancel();
-    _w13Timer?.cancel();
-    _w14Timer?.cancel();
-    _wLooseTimer?.cancel();
-    _w15Timer?.cancel();
-    _w24Timer?.cancel();
-    _w16Timer?.cancel();
-    _w25Timer?.cancel();
-    _w18Timer?.cancel();
+    _phaseTimers?.cancelAll();
     super.dispose();
   }
 
