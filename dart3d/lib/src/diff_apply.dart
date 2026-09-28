@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'components.dart';
+import 'geometry/proc.dart' show kD3ProcShapes;
 import 'scene_model.dart';
 
 /// The `SceneDiff` → `command`-op bridge (W5 structural mutations).
@@ -104,7 +105,8 @@ List<Map<String, Object?>> diffCommands(
   // can't hold) diff by their canonical manifest entry.
   final oldExt = oldDoc == null ? null : _extensionResources[oldDoc];
   for (final entry
-      in (_extensionResources[newDoc] ?? const <LocalId, Map<String, Object?>>{})
+      in (_extensionResources[newDoc] ??
+              const <LocalId, Map<String, Object?>>{})
           .entries) {
     final old = oldExt?[entry.key];
     if (old != null && canonicalJson(old) == canonicalJson(entry.value)) {
@@ -512,7 +514,7 @@ SceneDocument readFsceneWithExtensions(String manifest) {
     for (final entry in resources.entries) {
       final value = entry.value;
       if (isD3ExtensionResourceJson(value)) {
-        ext[LocalId.parse(entry.key as String)] = _deepCopy(
+        ext[LocalId.parse(entry.key as String)] = copyExtensionEntry(
           Map<String, Object?>.from(value as Map),
         );
       } else {
@@ -548,14 +550,19 @@ final Set<String> kD3ExtensionFeatures = kRealizedFeatures.difference(
 );
 
 /// Whether a manifest `resources` entry is a geometry resource with a
-/// dart3d-only procedural shape — one upstream's sealed
-/// `ProceduralGeometry` can't represent.
+/// dart3d-only procedural shape — one of [kD3ProcShapes] that
+/// upstream's sealed `ProceduralGeometry` can't represent. Any other
+/// shape name (a typo, a future shape) is left to upstream's decoder,
+/// which refuses it with `Unknown procedural geometry shape` rather
+/// than letting it realize as an empty mesh.
 bool isD3ExtensionResourceJson(Object? entry) {
   if (entry is! Map || entry['kind'] != 'geometry') return false;
   final procedural = entry['procedural'];
   if (procedural is! Map) return false;
   final shape = procedural['shape'];
-  return shape is String && !kUpstreamProceduralShapes.contains(shape);
+  return shape is String &&
+      kD3ProcShapes.contains(shape) &&
+      !kUpstreamProceduralShapes.contains(shape);
 }
 
 final _extensionResources = Expando<Map<LocalId, Map<String, Object?>>>(
@@ -604,7 +611,8 @@ String writeFsceneWithExtensions(SceneDocument doc) {
   return canonicalJson(manifest);
 }
 
-Map<String, Object?> _deepCopy(Map<String, Object?> m) =>
+/// A detached deep copy of an extension-resource manifest entry.
+Map<String, Object?> copyExtensionEntry(Map<String, Object?> m) =>
     (jsonDecode(jsonEncode(m)) as Map).cast<String, Object?>();
 
 /// [doc]'s view list as canonical JSON, encoded with the document's
