@@ -301,3 +301,10 @@ of the cause, not device-verified:
   compile in the background (~10–12 s on the A142). The scene stays
   blank that long, but main is free. Later views in the same process
   load instantly.
+
+## Deferred findings → issues
+
+Every DEFER row above is tracked: W26 geometry (caps, `widthInPixels`,
+closed sweeps, ribbon scale, iOS parity ports) → #20; per-view camera
+facing → #21; iOS late-binding consumers → #22; particle pause/enabled
+toggles → #23; Vulkan warm relaunch → #18.
