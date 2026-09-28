@@ -2056,6 +2056,22 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     private val surgicalJournal = ArrayList<JournalEntry>()
     private var replayingJournal = false
 
+    /**
+     * The supersession key of a latest-wins journaled op: ops with the
+     * same key replace each other. Null for ops outside that set.
+     */
+    private fun replaySlotKey(op: JSONObject): String? =
+        when (op.optString("op")) {
+            "upsertResource" -> "res:" + op.optString("id")
+            "upsertSkin", "removeSkin" -> "skin:" + op.optString("id")
+            "upsertAnimation", "removeAnimation" ->
+                "animres:" + op.optString("id")
+            "selectVariant" -> "variant:" + op.optString("node")
+            "setMorphWeights" -> "morph:" + op.optString("node")
+            "updateViews" -> "views"
+            else -> null
+        }
+
     /** The flag set of an `updateNode` op (empty for other ops). */
     private fun opFlags(json: JSONObject): Set<String> {
         val a = json.optJSONArray("flags") ?: return emptySet()
@@ -2095,7 +2111,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 "removeNode" -> {
                     surgicalJournal.removeAll { e ->
                         e is JournalEntry.Plain &&
-                            e.op.optString("op") == "updateNode" &&
+                            e.op.optString("op") in NODE_STATE_OPS &&
                             opNode(e) == key
                     }
                     val add = surgicalJournal.indexOfFirst { e ->
@@ -2126,18 +2142,20 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         if (replayingJournal) return
         when (val op = json.optString("op")) {
             "addNode", "updateNode", "removeNode" -> compactInto(op, json)
-            "upsertResource" -> {
-                // install() swaps the live resource registries for the
-                // manifest's on a re-realize, so op-created/replaced
-                // resources must replay too — in arrival order, ahead
-                // of the structural ops that reference them. A later
-                // upsert of the same id supersedes the earlier one.
-                val id = json.optString("id")
-                if (id.isNotEmpty()) {
+            // install() swaps the live resource registries, skins/
+            // animations, variant selections, morph weights and the view
+            // list for the manifest's on a re-realize, so these replay
+            // too — in arrival order, ahead of the structural ops that
+            // reference them. Each keeps only its LATEST op per target
+            // (a later upsert/remove of the same id, or a later
+            // selection/weights for the same node, supersedes it).
+            "upsertResource", "upsertSkin", "removeSkin",
+            "upsertAnimation", "removeAnimation",
+            "selectVariant", "setMorphWeights", "updateViews" -> {
+                val slot = replaySlotKey(json)
+                if (slot != null) {
                     surgicalJournal.removeAll { e ->
-                        e is JournalEntry.Plain &&
-                            e.op.optString("op") == "upsertResource" &&
-                            e.op.optString("id") == id
+                        e is JournalEntry.Plain && replaySlotKey(e.op) == slot
                     }
                 }
                 surgicalJournal.add(JournalEntry.Plain(json))
@@ -2156,20 +2174,27 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     // iOS, PR #15). The re-load's batch supersedes any
                     // later top-level op on its members, so prune those
                     // instead; replay then yields the re-loaded state.
+                    // Members = the batch's node ids AND its resource
+                    // slots (subtree_stream.dart ships each load batch
+                    // with its upsertResource ops) — a later top-level
+                    // override of either was superseded by the reload.
                     val members = HashSet<Long>()
+                    val slots = HashSet<String>()
                     json.optJSONArray("ops")?.let { ops ->
                         for (i in 0 until ops.length()) {
                             ops.optJSONObject(i)?.let { o ->
                                 jsonKey(o)?.let { members += it }
+                                replaySlotKey(o)?.let { slots += it }
                             }
                         }
                     }
-                    if (members.isNotEmpty()) {
+                    if (members.isNotEmpty() || slots.isNotEmpty()) {
                         var i = surgicalJournal.size - 1
                         while (i > slot) {
                             val e = surgicalJournal[i]
                             if (e is JournalEntry.Plain &&
-                                opNode(e) in members) {
+                                (opNode(e) in members ||
+                                    replaySlotKey(e.op) in slots)) {
                                 surgicalJournal.removeAt(i)
                             }
                             i--
@@ -4448,12 +4473,23 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             val manifest = lastManifest
             if (manifest != null && pendingPayloadRefs.isNotEmpty()) {
                 lastFrameRealized = true
+                // Clip playback (anim ops) is live state, not document
+                // state: install() clears it. Carry it across instead
+                // of replaying the anim-op history, so playback time
+                // continues where it was.
+                val clips = HashMap(animClips)
                 FsceneRealizer.realize(manifest, this,
                     preserveStage = true)
                 // W15: the re-realize discarded the surgically
                 // streamed subtrees with the rest of the scene —
                 // rebuild each from its recorded load batch.
                 replayStreamedSubtrees()
+                for ((k, c) in clips) {
+                    if (resources.animations.containsKey(k) &&
+                        !animClips.containsKey(k)) {
+                        animClips[k] = c
+                    }
+                }
             }
         }
 
@@ -4827,6 +4863,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // W30: Dart3dSetBackend wire values, shared with the Dart caller.
         private const val SLOW_FRAME_MS = 250L
         private const val JOURNAL_WARN_SIZE = 2048
+        /** Journaled ops that target one node's live state. */
+        private val NODE_STATE_OPS =
+            setOf("updateNode", "selectVariant", "setMorphWeights")
         private const val MAX_LUT_CACHE_ENTRIES = 4
         private const val BACKEND_OPENGL = 1
         private const val BACKEND_VULKAN = 2
