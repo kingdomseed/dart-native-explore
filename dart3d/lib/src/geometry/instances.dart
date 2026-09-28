@@ -16,6 +16,7 @@
 /// instanced mesh for camera-facing quads re-faced per frame.
 library;
 
+import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:vector_math/vector_math.dart';
@@ -251,10 +252,16 @@ PayloadSpec d3MatricesPayload(LocalId id, List<Matrix4> matrices) {
 
 /// Decodes a `matrices` payload chunk — packed column-major float32
 /// 4×4s, little-endian — into matrices. A trailing partial matrix is
-/// ignored (the natives drop it too).
-List<Matrix4> d3DecodeMatrices(Uint8List bytes) {
+/// ignored (the natives drop it too). At most [maxCount] matrices are
+/// decoded (default [kD3MaxBakedInstances], the count the natives
+/// draw), so an oversized or hostile payload costs no more than the
+/// cap — the tail is never allocated.
+List<Matrix4> d3DecodeMatrices(
+  Uint8List bytes, {
+  int maxCount = kD3MaxBakedInstances,
+}) {
   final data = ByteData.sublistView(bytes);
-  final count = bytes.lengthInBytes ~/ 64;
+  final count = math.min(bytes.lengthInBytes ~/ 64, math.max(0, maxCount));
   return [
     for (var i = 0; i < count; i++)
       Matrix4.fromList([

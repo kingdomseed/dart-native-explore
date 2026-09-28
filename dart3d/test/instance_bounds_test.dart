@@ -77,4 +77,37 @@ void main() {
       expect(max.x, closeTo(1, 1e-6));
     });
   });
+
+  group('matrix decode cap (PR #14 4122712653)', () {
+    PayloadSpec oversized(int extra) {
+      final mats = [
+        for (var i = 0; i < kD3MaxBakedInstances; i++) Matrix4.identity(),
+        // Past the cap: never drawn, so never decoded or bounded.
+        for (var i = 0; i < extra; i++)
+          Matrix4.translationValues(1000.0 + i, 0, 0),
+      ];
+      return d3MatricesPayload(const LocalId(3, 1), mats);
+    }
+
+    test('decodes at most the cap, and honours maxCount', () {
+      final p = oversized(64);
+      expect(d3DecodeMatrices(p.bytes!), hasLength(kD3MaxBakedInstances));
+      expect(d3DecodeMatrices(p.bytes!, maxCount: 3), hasLength(3));
+      expect(d3DecodeMatrices(p.bytes!, maxCount: -1), isEmpty);
+    });
+
+    test('bounds ignore matrices past the cap', () {
+      final p = oversized(8);
+      final doc = SceneDocument();
+      doc.payloads[p.id] = p;
+      doc.createNode().components.add(
+        D3InstancesSpec(
+          proc: D3CuboidProc(extents: Vector3.all(1)),
+          transforms: D3InstanceTransforms.payload(p.id),
+        ).toComponent(),
+      );
+      final (_, max) = documentWorldBounds(doc)!;
+      expect(max.x, closeTo(0.5, 1e-6));
+    });
+  });
 }
