@@ -4603,7 +4603,10 @@ extension SceneViewHost: SCNSceneRendererDelegate {
                 cameraFacing.removeValue(forKey: key)
                 continue
             }
-            let inv = SCNMatrix4Invert(node.worldTransform)
+            // The drawn (presentation) pose — the camera side already
+            // reads presentation; a physics-driven or implicitly
+            // animated node's model transform lags it.
+            let inv = SCNMatrix4Invert(node.presentation.worldTransform)
             func localDir(_ d: SIMD3<Float>) -> SIMD3<Float> {
                 SIMD3<Float>(
                     inv.m11 * d.x + inv.m21 * d.y + inv.m31 * d.z,

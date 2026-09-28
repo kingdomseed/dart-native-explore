@@ -1728,6 +1728,13 @@ enum FsceneRealizer {
          * vertex data toward the live camera (SceneKit lines are
          * thin; thick lines ride ribbon quads).
          */
+        /// Removes `geometry` from every material's consumer list.
+        func dropMaterialConsumer(_ geometry: SCNGeometry) {
+            for mk in materialConsumers.keys {
+                materialConsumers[mk]?.removeAll { $0 === geometry }
+            }
+        }
+
         func decodeProcMesh(key: UInt64, node: SCNNode,
                             _ p: [String: Any]) {
             guard let shape = d3String(p["shape"]) else {
@@ -1762,6 +1769,11 @@ enum FsceneRealizer {
                 }
             }
             if let old = node.geometry, old !== geometry {
+                // A rebake/re-decode replaces the geometry — its
+                // material-consumer entries go too, or every update
+                // leaks a retained retired geometry that later
+                // material upserts keep rebinding.
+                dropMaterialConsumer(old)
                 host.retire(old)
             }
             node.geometry = geometry
@@ -2005,6 +2017,11 @@ enum FsceneRealizer {
                 geometry.materials = [dm]
             }
             if let old = node.geometry, old !== geometry {
+                // A rebake/re-decode replaces the geometry — its
+                // material-consumer entries go too, or every update
+                // leaks a retained retired geometry that later
+                // material upserts keep rebinding.
+                dropMaterialConsumer(old)
                 host.retire(old)
             }
             node.geometry = geometry
