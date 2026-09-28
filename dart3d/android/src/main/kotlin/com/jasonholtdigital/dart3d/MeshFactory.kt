@@ -549,8 +549,9 @@ object MeshFactory {
                 buf.flip()
             }
 
-    private fun indexBufferOf(indices: List<Int>): ByteBuffer =
-        indexBufferOf(indices.toIntArray(), IndexWidth.UINT16)
+    /** UINT16 while every index fits (0..65535), else UINT32. */
+    fun indexWidthFor(vertexCount: Int): IndexWidth =
+        if (vertexCount <= 0x10000) IndexWidth.UINT16 else IndexWidth.UINT32
 
     private fun indexBufferOf(indices: IntArray, width: IndexWidth): ByteBuffer {
         val bytesPerIndex = if (width == IndexWidth.UINT16) 2 else 4
@@ -700,7 +701,7 @@ object MeshFactory {
             V3(-hx, hy, hz), V3(hx, hy, hz),
             V3(-hx, hy, -hz), V3(hx, hy, -hz))
         face(V3(0f, -1f, 0f),
-            V3(hx, -hy, -hz), V3(-hx, -hy, -hz),
+            V3(-hx, -hy, -hz), V3(hx, -hy, -hz),
             V3(-hx, -hy, hz), V3(hx, -hy, hz))
         return b.build(floatArrayOf(0f, 0f, 0f, hx, hy, hz))
     }
@@ -745,11 +746,13 @@ object MeshFactory {
                 idx.addAll(listOf(a, a + 1, b, a + 1, b + 1, b))
             }
         }
+        val vc = verts.size / FLOATS_PER_VERTEX
+        val width = indexWidthFor(vc)
         return MeshData(
-            bufferOf(verts), indexBufferOf(idx),
-            verts.size / FLOATS_PER_VERTEX, idx.size,
+            bufferOf(verts), indexBufferOf(idx.toIntArray(), width),
+            vc, idx.size,
             floatArrayOf(0f, 0f, 0f, radius, radius, radius),
-            hasUvColor = true,
+            hasUvColor = true, indexWidth = width,
         )
     }
 
@@ -828,11 +831,13 @@ object MeshFactory {
                 idx.addAll(listOf(a, a + 1, b, a + 1, b + 1, b))
             }
         }
+        val vc = verts.size / FLOATS_PER_VERTEX
+        val width = indexWidthFor(vc)
         return MeshData(
-            bufferOf(verts), indexBufferOf(idx),
-            verts.size / FLOATS_PER_VERTEX, idx.size,
+            bufferOf(verts), indexBufferOf(idx.toIntArray(), width),
+            vc, idx.size,
             floatArrayOf(0f, 0f, 0f, ringR + tubeR, tubeR, ringR + tubeR),
-            hasUvColor = true,
+            hasUvColor = true, indexWidth = width,
         )
     }
 
@@ -907,7 +912,7 @@ object MeshFactory {
             topology: Topology = Topology.TRIANGLES,
         ): MeshData {
             val vc = vertexCount
-            val width = if (vc <= 0x10000) IndexWidth.UINT16 else IndexWidth.UINT32
+            val width = indexWidthFor(vc)
             val vb = bufferOf(verts)
             val b = bounds ?: scanBounds(vb, vc, PROCEDURAL_VERTEX_STRIDE_BYTES)
             vb.rewind()
@@ -1045,7 +1050,9 @@ object MeshFactory {
     /** A real subdivided icosahedron projected to [radius] — replaces
      *  the UV-sphere stand-in for `icosphere` (midpoint edge cache,
      *  spherical UVs, outward winding; proc.dart buildIcosphere). */
-    fun icosphere(radius: Float, subdivisions: Int): MeshData {
+    fun icosphere(radius: Float, subdivisionsIn: Int): MeshData {
+        // 20·4ⁿ faces — bounded here as well as at decode.
+        val subdivisions = subdivisionsIn.coerceIn(0, 6)
         val t = ((1 + sqrt(5.0)) / 2).toFloat()
         val verts = mutableListOf(
             V3(-1f, t, 0f), V3(1f, t, 0f), V3(-1f, -t, 0f), V3(1f, -t, 0f),
@@ -1269,10 +1276,14 @@ object MeshFactory {
      *  proc.dart's buildTube (rotation-minimizing frames, ring
      *  stitching, fan caps). [points] are native-space. */
     fun tube(
-        points: List<V3>, radius: Float, radialSegments: Int,
-        stations: Int, caps: Boolean, closed: Boolean,
+        points: List<V3>, radius: Float, radialSegmentsIn: Int,
+        stationsIn: Int, caps: Boolean, closed: Boolean,
     ): MeshData {
         if (points.size < 2) return ProcBuilder().build()
+        // Guarded here too (the decoder already clamps): the ring loop
+        // divides by both counts and caps read the first/last frame.
+        val radialSegments = radialSegmentsIn.coerceAtLeast(3)
+        val stations = stationsIn.coerceAtLeast(2)
         val path = catmullRomPath(points, closed)
         val frames = path.evenlySpacedFrames(stations)
         val length = path.length
