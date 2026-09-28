@@ -1221,7 +1221,7 @@ final class FeatureScene {
           'directionalLight',
           properties: {
             'color': ColorValue(1, 1, 1, 1),
-            'intensity': DoubleValue(1400),
+            'intensity': DoubleValue(keyLightIntensity(1400)),
             'castsShadow': BoolValue(true),
             // W6 shadow lane — iOS reads these as
             // shadowRadius/shadowBias; Android maps them onto Filament
@@ -3694,7 +3694,7 @@ final class FeatureScene {
             'directionalLight',
             properties: {
               'color': ColorValue(1, 1, 1, 1),
-              'intensity': DoubleValue(1400),
+              'intensity': DoubleValue(keyLightIntensity(1400)),
               'castsShadow': BoolValue(true),
               // W6 fields — kept so the pass is a superset, not a swap.
               'shadowRadius': DoubleValue(3.0),

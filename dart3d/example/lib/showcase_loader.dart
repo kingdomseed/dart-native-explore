@@ -286,7 +286,7 @@ ShowcaseScene? loadShowcaseScene(
         'directionalLight',
         properties: {
           'color': ColorValue(1.0, 0.95, 0.88, 1),
-          'intensity': DoubleValue(1300),
+          'intensity': DoubleValue(keyLightIntensity(1300)),
           'castsShadow': BoolValue(true),
           'shadowRadius': DoubleValue(3.0),
           'shadowDepthBias': DoubleValue(0.01),
