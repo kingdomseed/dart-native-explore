@@ -205,6 +205,51 @@ final class SceneViewHost: SCNView {
     /// rather than behind a lock: every access site is main-thread.
     var mainScreenSubviews: [(view: SCNView, rec: ViewRec)] = []
 
+    /// MAIN-THREAD: the `screenSubviewBuild` generation the installed
+    /// `mainScreenSubviews` belong to — a pose snapshot from another
+    /// generation is dropped instead of posing the wrong sibling.
+    var mainScreenSubviewGen = 0
+
+    /// W24 torn-pose fix: the render queue captures each proxy
+    /// sibling's pose in `willRenderScene` (post-physics) and parks it
+    /// here; the main-thread poke applies it in one `SCNTransaction`
+    /// right before `setNeedsDisplay`, so a sibling never draws a
+    /// proxy the render queue is halfway through rewriting.
+    var siblingPoseSnapshot:
+        (gen: Int, poses: [Int: (SCNMatrix4, SCNCamera)])?
+    let siblingPoseLock = NSLock()
+
+    /// UIKit facts the render queue needs, snapshotted on MAIN
+    /// (`didMoveToWindow`/`layoutSubviews`) — `window`, `bounds` and
+    /// `UIScreen` are main-thread-only UIView/UIKit API, so the render
+    /// path reads these copies instead. Guarded by `uiSnapshotLock`.
+    private var _screenScale: CGFloat = UIScreen.main.scale
+    private var _boundsAspect: Double = 1.0
+    private let uiSnapshotLock = NSLock()
+
+    /// The device (screen) scale — NOT `contentScaleFactor`, which
+    /// also carries the dynamic `renderScale`.
+    var screenScale: CGFloat {
+        uiSnapshotLock.lock(); defer { uiSnapshotLock.unlock() }
+        return _screenScale
+    }
+
+    /// width / height of the host's bounds at the last layout.
+    var boundsAspect: Double {
+        uiSnapshotLock.lock(); defer { uiSnapshotLock.unlock() }
+        return _boundsAspect
+    }
+
+    /// Main thread only — refreshes the render-queue UIKit snapshot.
+    private func refreshUISnapshot() {
+        let scale = window?.screen.scale ?? UIScreen.main.scale
+        let aspect = Double(bounds.width) / Double(max(bounds.height, 1))
+        uiSnapshotLock.lock()
+        _screenScale = scale
+        _boundsAspect = aspect
+        uiSnapshotLock.unlock()
+    }
+
     /// The host's point-of-view in split mode — a detached node whose
     /// camera sees nothing (mask 0), so the host pass contributes
     /// clear/background only while every declared screen view owns a
@@ -406,6 +451,13 @@ final class SceneViewHost: SCNView {
         #else
         isTemporalAntialiasingEnabled = taa.enabled
         #endif
+        // W24: split siblings are the visible views — they copy the
+        // host's view-level TAA flag (main-thread UIKit state).
+        if multiScreenMode {
+            DispatchQueue.main.async { [weak self] in
+                self?.applySiblingHostState()
+            }
+        }
         if taa.enabled
             && (taa.minimumCurrentWeight != 0.1
                 || taa.varianceGamma != 1.0 || taa.sharpness != 0
@@ -761,7 +813,19 @@ final class SceneViewHost: SCNView {
     /// view's `viewport` rect re-maps into the new target space.
     override func layoutSubviews() {
         super.layoutSubviews()
+        refreshUISnapshot()
         layoutScreenSubviews()
+    }
+
+    /// A new window can carry a different screen scale — re-snapshot
+    /// and re-run the quality chain (its `contentScaleFactor` write
+    /// multiplies the screen scale in) on the render queue.
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        refreshUISnapshot()
+        if window != nil {
+            enqueueSceneWork { [weak self] in self?.applyStageQuality() }
+        }
     }
 
     // MARK: - Mutation application (called from Dart3dPlugin.swift)
@@ -858,6 +922,11 @@ final class SceneViewHost: SCNView {
         }
         if let v = json["showsStatistics"] as? Bool {
             showsStatistics = v
+            // W24: split siblings cover the host — sibling 0 carries
+            // the statistics overlay (main-thread UIKit state).
+            DispatchQueue.main.async { [weak self] in
+                self?.applySiblingHostState()
+            }
         }
         if let v = json["antialiasingMode"] as? Int {
             antialiasingMode = v >= 4 ? .multisampling4X
@@ -869,12 +938,23 @@ final class SceneViewHost: SCNView {
             applyViewQuality()
         }
         if let argb = json["backgroundColor"] as? Int {
-            backgroundColor = UIColor(
+            let color = UIColor(
                 red: CGFloat((argb >> 16) & 0xFF) / 255.0,
                 green: CGFloat((argb >> 8) & 0xFF) / 255.0,
                 blue: CGFloat(argb & 0xFF) / 255.0,
                 alpha: CGFloat((argb >> 24) & 0xFF) / 255.0
             )
+            // `backgroundColor` is UIView state — this drain runs on
+            // SceneKit's render queue, so the write (and the W24
+            // sibling copies, which cover the host in split mode)
+            // hops to main. Async: the render queue never waits on
+            // main, so no deadlock against a main-thread SceneKit
+            // lock.
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                self.backgroundColor = color
+                self.applySiblingHostState()
+            }
         }
         // W14: a viewConfig AA write loses to a non-'auto' stage/view
         // mode — re-apply the precedence chain after the config lands.
@@ -1746,6 +1826,10 @@ final class SceneViewHost: SCNView {
         if let scene, let pov = docPov, pov.camera != nil,
             top === scene.rootNode
         {
+            // A screen view on this same camera wrote its per-view
+            // layerMask onto the SCNCamera (`applyScreenViewCamera`);
+            // the document pass renders every layer again.
+            pov.camera?.categoryBitMask = Int(bitPattern: UInt.max)
             pointOfView = pov
             applyStageExposure(stageExposure)
             applyStageEffects()
@@ -2372,20 +2456,31 @@ final class SceneViewHost: SCNView {
             }
         }
         // Approximate path: scales the drawable backing factor.
+        // `contentScaleFactor` is UIView state and this runs on the
+        // render queue (every drain that touches views/stage), so the
+        // write hops to main — async, never sync: the render queue
+        // must not block on main (main can be waiting on SceneKit's
+        // own scene lock, which this queue holds mid-callback). The
+        // screen scale comes from the main-side snapshot.
         let scale = screenViews.first?.renderScale ?? stageRenderScale
-        contentScaleFactor =
-            scale * (window?.screen.scale ?? UIScreen.main.scale)
+        let target = CGFloat(scale) * screenScale
+        let quality = currentSubviewQuality()
+        let split = multiScreenMode
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            if self.contentScaleFactor != target {
+                self.contentScaleFactor = target
+            }
+            // W24: each sibling resolves its own view's AA/scale —
+            // the sibling list is main-thread state.
+            if split {
+                self.applyScreenSubviewQuality(quality)
+            }
+        }
         if stageFilterQuality != "medium" {
             logOnce("w14.filterQuality",
                 "filterQuality '\(stageFilterQuality)' unsupported on "
                 + "SceneKit; ignored")
-        }
-        // W24: each sibling resolves its own view's AA/scale — the
-        // sibling list is main-thread state.
-        if multiScreenMode {
-            DispatchQueue.main.async { [weak self] in
-                self?.applyScreenSubviewQuality()
-            }
         }
     }
 
@@ -4200,8 +4295,7 @@ extension SceneViewHost: SCNSceneRendererDelegate {
         // viewport aspect.
         var fovRadY = Double(cam.fieldOfView) * .pi / 180
         if cam.projectionDirection == .horizontal {
-            let aspect =
-                Double(bounds.width) / Double(max(bounds.height, 1))
+            let aspect = boundsAspect
             fovRadY = 2 * atan(tan(fovRadY / 2) / max(aspect, 1e-9))
         }
         // Both positions live in the same LH→RH-mirrored space — a
