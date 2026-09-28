@@ -30,10 +30,38 @@ internal object MaterialPackages {
 
     private const val TAG = "dart3d"
 
+    /** Variant packages kept in the process LRU (~100–300 KiB each). */
+    private const val MAX_VARIANT_PACKAGES = 12
+
     // filament::UserVariantFilterBit
     private const val VARIANT_STE = 0x80
 
+    // Fixed-vocabulary packages (the base lit/unlit set, trail,
+    // catcher, particles — a bounded handful per target API) stay for
+    // the process. On-demand KHR variants are keyed by extension flags
+    // × bound-slot mask × blend × API — unbounded across documents —
+    // so they live in a small LRU; an evicted variant just recompiles
+    // (in the background) if a later document needs it again.
     private val cache = ConcurrentHashMap<String, ByteArray>()
+    private val variantCache = object :
+        LinkedHashMap<String, ByteArray>(16, 0.75f, true) {
+        override fun removeEldestEntry(
+            eldest: MutableMap.MutableEntry<String, ByteArray>?,
+        ): Boolean = size > MAX_VARIANT_PACKAGES
+    }
+
+    /** Lit packages with a non-zero extension mask are variants. */
+    private fun isVariant(key: String): Boolean =
+        key.startsWith("lit|") && !key.contains("|e0|")
+
+    private fun lookup(key: String): ByteArray? =
+        if (isVariant(key)) synchronized(variantCache) { variantCache[key] }
+        else cache[key]
+
+    private fun store(key: String, bytes: ByteArray) {
+        if (isVariant(key)) synchronized(variantCache) { variantCache[key] = bytes }
+        else cache[key] = bytes
+    }
     private val failed = ConcurrentHashMap.newKeySet<String>()
 
     // filamat's toolchain (glslang process state) is initialized once
@@ -62,10 +90,10 @@ internal object MaterialPackages {
      * failure so a bad variant isn't recompiled per decode).
      */
     fun compile(key: String, builder: () -> MaterialBuilder): ByteArray? {
-        cache[key]?.let { return it }
+        lookup(key)?.let { return it }
         if (key in failed) return null
         synchronized(compileLock) {
-            cache[key]?.let { return it }
+            lookup(key)?.let { return it }
             if (key in failed) return null
             ensureInit()
             val start = android.os.SystemClock.uptimeMillis()
@@ -81,7 +109,7 @@ internal object MaterialPackages {
             val buf = pkg.buffer
             val bytes = ByteArray(buf.remaining())
             buf.get(bytes)
-            cache[key] = bytes
+            store(key, bytes)
             Log.i(TAG, "material package $key compiled in " +
                 "${android.os.SystemClock.uptimeMillis() - start}ms")
             return bytes
@@ -89,7 +117,7 @@ internal object MaterialPackages {
     }
 
     /** Cached bytes for [key] without compiling (null while pending). */
-    fun peek(key: String): ByteArray? = cache[key]
+    fun peek(key: String): ByteArray? = lookup(key)
 
     /** True when filamat rejected [key]'s package. */
     fun hasFailed(key: String): Boolean = key in failed

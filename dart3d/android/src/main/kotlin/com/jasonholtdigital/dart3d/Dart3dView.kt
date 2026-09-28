@@ -752,10 +752,28 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     private fun onVariantCompiled(key: VariantKey) {
         variantInflight.remove(key)
         val waiters = variantWaiters.remove(key) ?: return
+        val ctx = FsceneRealizer.surgicalContext(this)
         for (mk in waiters) {
             resources.materialResources[mk]?.let { upsertMaterial(mk, it) }
+            // doubleSided d3:instances snapshots aren't consumers of
+            // the shared instance — re-bake them against the variant.
+            ctx.redecodeDoubleSidedInstancesForMaterial(mk)
         }
     }
+
+    /** Overlays a visible, non-interactive init-failure notice. */
+    private fun showInitFailure(reason: String) {
+        if (initFailureShown) return
+        initFailureShown = true
+        addView(TextView(context).apply {
+            setBackgroundColor(android.graphics.Color.rgb(40, 0, 0))
+            setTextColor(android.graphics.Color.rgb(255, 180, 180))
+            textSize = 14f
+            gravity = Gravity.CENTER
+            text = "dart3d: scene view failed to initialize\n$reason"
+        }, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+    }
+    private var initFailureShown = false
 
     /**
      * Compiles one material package. Returns null when filamat or the
@@ -804,6 +822,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             materialsFailed = true
             Log.e(TAG, "dart3d: base material compile FAILED ($failed) —" +
                 " this scene view cannot render")
+            // The compile runs after createView returned, so the
+            // bridge's InitFailedView can't catch this — show the same
+            // on-screen failure here instead of a live blank surface.
+            showInitFailure("base material compile failed for " +
+                "${api.name}: ${failed.joinToString()}")
             return false
         }
         val bytes = keys.map { MaterialPackages.peek(it) ?: return false }
@@ -960,6 +983,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         if (particleRuntimes.isEmpty()) return
         val camPos = FloatArray(3)
         camera.getPosition(camPos)
+        val camFwd = FloatArray(3)
+        camera.getForwardVector(camFwd)
         val tcm = engine.transformManager
         val wm = FloatArray(16)
         val it = particleRuntimes.entries.iterator()
@@ -975,7 +1000,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             val inst = tcm.getInstance(rec.entity)
             if (inst == 0) continue
             tcm.getWorldTransform(inst, wm)
-            for (rt in list) rt.tick(dt, camPos, wm)
+            for (rt in list) rt.tick(dt, camPos, wm, camFwd)
         }
     }
 
@@ -4181,11 +4206,20 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // resume's first frame); everything else keeps the 100 ms cap.
         val rawDt = if (lastFrameNanos == 0L) 0.0
             else ((tNanos - lastFrameNanos).coerceIn(0L, 10_000_000_000L)) / 1e9
-        val dt = ((tNanos - lastFrameNanos).coerceIn(0L, 100_000_000L)) / 1e9f
+        // lastFrameNanos == 0 is the first frame (or a re-attach
+        // resume): no time has elapsed for the sim, animations, trails.
+        val dt = if (lastFrameNanos == 0L) 0f
+            else ((tNanos - lastFrameNanos).coerceIn(0L, 100_000_000L)) / 1e9f
         lastFrameNanos = tNanos
 
         if (!materialsReady) {
             materialsReady = tryLoadBaseMaterials()
+            if (materialsFailed) {
+                // Dead view: drop queued mutations rather than hold
+                // them forever (logged once by onMutation's dead path).
+                pendingWork.clear()
+                return
+            }
             if (!materialsReady) {
                 // Mutations stay queued (FIFO preserved) until the
                 // background compile lands; nothing to draw yet.

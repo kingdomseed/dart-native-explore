@@ -96,6 +96,23 @@ normals, per-segment lineSegments colors, no caps on closed tubes, ribbon
 `stations` cap (8572f74, 8865095); `attributes` without `color` threw
 `JSONException` (c10cc91).
 
+## PR #16 review (Codex, 6 threads)
+
+All six claims hold against the code at `b6fa42b`, and all are fixed in
+one commit (see the git log for "PR #16 review fixes"). Verification is
+`compileReleaseKotlin`, JVM tests 34/34 and `dn test` 321/321. There
+was no device run, because the integration agent holds the A142 and the
+simulator.
+
+| Comment id | File:line | Verdict | Draft reply |
+|---|---|---|---|
+| 4122634272 | FsceneRealizer.kt:1673 | FIXED (P1, real) | Confirmed: an empty billboard rebake destroyed `procGpuMesh` and returned before re-registering, leaving `cameraFacing` pointing at the dead VertexBuffer. `destroyProcRenderable` now drops the node's facing entry along with the buffers, so every rebuild path (procMesh and instances) re-registers only when it produces geometry. |
+| 4122634293 | Dart3dView.kt:807 | FIXED | Confirmed: an async base-package rejection left a live blank view. The view now overlays the same on-screen "failed to initialize" notice as `InitFailedView` (with the failed package keys and API), and drops queued mutations instead of holding them forever. |
+| 4122634307 | FsceneRealizer.kt:1843 | FIXED | Confirmed: a doubleSided `d3:instances` snapshot taken while its KHR variant was compiling kept the base stand-in. When a variant lands, `onVariantCompiled` now also re-bakes every doubleSided instances node bound to that material (`redecodeDoubleSidedInstancesForMaterial`), recreating the duplicate from the variant instance. |
+| 4122634320 | MaterialPackages.kt:36 | FIXED | Confirmed. The fixed vocabulary (base lit/unlit, trail, catcher, particles: a handful per API) stays process-lifetime. KHR variant packages (non-zero extension mask) now live in a 12-entry access-order LRU; an evicted variant recompiles in the background on its next use. |
+| 4122634329 | Dart3dView.kt:1480 | FIXED | Confirmed: only `rawDt` honored the `lastFrameNanos == 0` sentinel, so a resume injected a 100 ms physics/animation/trail step. The general `dt` is now 0 on the sentinel frame as well, which also applies to the very first frame. |
+| 4122634342 | ParticleRuntime.kt:1338 | FIXED | Confirmed: radial distance misorders laterally offset particles and anything under an ortho camera. The key is now view depth, `(p − camPos) · camForward` (the camera's world forward is passed into `tick`), mapped through an order-preserving float→int transform so negative depths sort correctly too. |
+
 ## Needs other owner
 
 - **Dart (example): other hard-coded light rotations assume −Z emission.**
