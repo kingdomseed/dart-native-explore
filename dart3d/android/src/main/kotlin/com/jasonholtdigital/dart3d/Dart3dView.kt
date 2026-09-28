@@ -1184,27 +1184,33 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // bytes land; an asset path resolves from the app assets.
         // `lutBlend` bakes into the uploaded texels (lerp toward the
         // identity cell) since `customLut` has no mix knob.
-        fx?.colorGrading?.lut?.takeIf { it.isNotEmpty() }
+        val lut = fx?.colorGrading?.lut?.takeIf { it.isNotEmpty() }
             ?.let { ref -> resolveLutBuffer(ref, fx.colorGrading.lutBlend) }
-            ?.let { (buf, size) -> cgBuilder.customLut(buf, size) }
+        lut?.let { (buf, size) -> cgBuilder.customLut(buf, size) }
         val cg = cgBuilder.build(engine)
-        // Keep `mapper` strongly reachable until build() has run: the
-        // Builder only holds the ToneMapper's raw native pointer, so
-        // once the local is dead ART may finalize it (deleting the
-        // native object) mid-apply — the W25 LUT resolve between
-        // toneMapper() and build() allocates enough to trigger a GC.
-        // That was the A142 SIGBUS (pc 0x12) inside
-        // ColorGrading::Builder::build at the harness `LUT blend 0.35`.
-        envToneMapper = mapper
+        // Reachability fence (minSdk 26 has no Reference.
+        // reachabilityFence): the Java Builder, the ToneMapper and the
+        // LUT buffer each own native memory freed by a finalizer, and
+        // the Builder only holds raw native pointers to the other two.
+        // In the R8-minified release build ART may treat an object as
+        // dead as soon as its `long` handle is loaded, so a GC between
+        // toneMapper()/customLut() and build() (the W25 LUT resolve
+        // allocates MiBs) finalized them mid-apply. A142 crashes at the
+        // harness W25 LUT lanes: SIGBUS pc=0x12 in
+        // ColorGrading::Builder::build, SIGSEGV in
+        // ColorGrading::Builder::customLut. The field write after
+        // build keeps all three alive through every native call.
+        colorGradingKeepAlive = arrayOf(cgBuilder, mapper, lut?.first)
         view.colorGrading = cg
         envColorGrading?.let {
             if (it !== cg) engine.destroyColorGrading(it) }
         envColorGrading = cg
     }
 
-    /** The last ToneMapper handed to a ColorGrading.Builder — held so
-     * it can't be finalized before `build` consumes it. */
-    private var envToneMapper: ToneMapper? = null
+    /** Last ColorGrading inputs (Builder, ToneMapper, LUT buffer) —
+     * written after `build` purely as a reachability fence. */
+    @Volatile
+    private var colorGradingKeepAlive: Array<Any?>? = null
 
     /**
      * W13 `effects` post-stack → Filament View options. Absolute
@@ -1567,6 +1573,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             envSkyboxTextures.clear()
             envColorGrading?.let { engine.destroyColorGrading(it) }
             envColorGrading = null
+            // Read (not just written) so R8 can't strip the fence field.
+            if (colorGradingKeepAlive?.isNotEmpty() == true) {
+                colorGradingKeepAlive = null
+            }
             iblEquirect?.destroy()
             iblSpecular?.destroy()
             iblPrefilter?.destroy()
