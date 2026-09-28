@@ -150,3 +150,11 @@ cross-platform sweep/caps work and one belongs to the iOS owner.
   it proves the sim is alive, not that this particular throw landed.
 - Everything here is verified by `dn analyze` plus `dn test` only. No
   device runs.
+
+## PR #14 review threads (stabilize/dart)
+
+| Comment | File:line | Summary | Verdict | Evidence |
+|---|---|---|---|---|
+| 4122294463 | `lib/src/diff_apply.dart:558` | P2: Reject unsupported procedural shape names | FIX | 25b1222. Reproduced: `isD3ExtensionResourceJson` accepted `cylnder`. Now only `kD3ProcShapes` count, and a typo gets upstream's `FsceneFormatException` |
+| 4122294474 | `lib/src/diff_apply.dart:527` | P2: Preserve extension resources through prefab composition | FIX | 25b1222. Reproduced: upstream `composeScene` output had neither the resource nor an extension entry. `composeScene[Async]WithExtensions` carries and remaps them; used by `loadDocumentComposed` and `loadSubtree[Async]` |
+| 4122294480 | `lib/src/geometry/mesh_data.dart:188` | P2: Preserve normals for singular instance transforms | FIX | 25b1222. Reproduced: `diag(1,1,0)` zeroed the `(0,0,1)` normal. Now uses the cofactor normal matrix and falls back to the source normal. **Natives:** the Android bake keeps the source frame when singular. The Dart cofactor result differs from that for a rotated flattening (Dart rotates the surviving normal), so natives should adopt the cofactor form |
