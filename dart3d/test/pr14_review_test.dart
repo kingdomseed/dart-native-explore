@@ -177,6 +177,77 @@ void main() {
     });
   });
 
+  group('4122712642 — concurrent composes share a cached prefab', () {
+    test('both outputs carry the real extension resource', () async {
+      // Call A loads the shared prefab P early, then waits on Q; call B
+      // loads P while A still holds it. Any per-document mutation by A
+      // is visible to B at that moment.
+      final cached = docWithExtension(
+        const LocalId(9, 1),
+        const LocalId(9, 2),
+        'tube',
+      );
+      final other = docWithExtension(
+        const LocalId(8, 1),
+        const LocalId(8, 2),
+        'capsule',
+      );
+      AsyncPrefabLoader loader(Map<String, int> delays) => (ref) async {
+        await Future<void>.delayed(Duration(milliseconds: delays[ref.key]!));
+        return ref.key == 'p' ? cached : other;
+      };
+
+      SceneDocument host(String shape, List<String> refs) {
+        final h = docWithExtension(
+          const LocalId(1, 20),
+          const LocalId(1, 21),
+          shape,
+        );
+        for (final r in refs) {
+          h.createNode(root: true).instance = PrefabInstanceSpec(
+            source: AssetRef(r),
+          );
+        }
+        return h;
+      }
+
+      final results = await Future.wait([
+        composeSceneAsyncWithExtensions(
+          host('ribbon', ['q', 'p']),
+          load: loader({'p': 5, 'q': 60}),
+        ),
+        composeSceneAsyncWithExtensions(
+          host('disc', ['p']),
+          load: loader({'p': 25}),
+        ),
+      ]);
+      for (final out in results) {
+        expect(out.resources, isEmpty, reason: 'no sentinel may leak');
+        final shapes = [
+          for (final e in d3ExtensionResources(out).values)
+            (e['procedural']! as Map)['shape'],
+        ];
+        expect(shapes, contains('tube'));
+      }
+      expect(cached.resources, isEmpty);
+      expect(d3ExtensionResources(cached).keys, [const LocalId(9, 1)]);
+    });
+
+    test('a document without eager instances is returned as is', () {
+      final doc = docWithExtension(
+        const LocalId(1, 30),
+        const LocalId(1, 31),
+        'tube',
+      );
+      final out = composeSceneWithExtensions(
+        doc,
+        resolve: (_) => throw StateError('no prefab'),
+      );
+      expect(identical(out, doc), isTrue);
+      expect(doc.resources, isEmpty);
+    });
+  });
+
   group('4122294480 — singular transforms keep usable normals', () {
     D3MeshData transformed(Matrix4 m, Vector3 n) {
       final b = D3MeshBuilder()
