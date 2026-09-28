@@ -305,7 +305,7 @@ ShowcaseScene? loadShowcaseScene(
         'pointLight',
         properties: {
           'color': ColorValue(0.62, 0.72, 1.0, 1),
-          'intensity': DoubleValue(700 * radius),
+          'intensity': DoubleValue(keyLightIntensity(700 * radius)),
           'range': DoubleValue(radius * 24),
         },
       ),
