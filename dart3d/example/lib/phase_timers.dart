@@ -78,3 +78,21 @@ final class PhaseTimers {
 
   static Timer _inert() => Timer(Duration.zero, () {})..cancel();
 }
+
+/// Whether a settle event re-arms the harness demo's automatic
+/// re-throw. On by default; the measurement lanes suspend it for the
+/// rest of the scene generation so a lane's own one-shot roll (W25's
+/// dice-regression close-out) can't restart the loop under a later
+/// lane (W18). A scene reload resumes it.
+final class AutoRerollGate {
+  bool _suspended = false;
+
+  /// Whether the next settle should schedule another throw.
+  bool get rearmAfterSettle => !_suspended;
+
+  /// Stops settles from re-arming the loop.
+  void suspend() => _suspended = true;
+
+  /// Restores the self-running loop (new scene generation).
+  void resume() => _suspended = false;
+}

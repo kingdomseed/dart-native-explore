@@ -140,6 +140,10 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
   StreamSubscription<SceneCollisionEvent>? _contacts;
   StreamSubscription<SceneJointBroke>? _joints;
   Timer? _reroll;
+  // The self-running demo's settle → re-throw loop. wLoose turns it off
+  // for the rest of the generation so later lanes (the W25 one-shot
+  // roll, W18's particles) never re-arm it; a reload turns it back on.
+  final _autoReroll = AutoRerollGate();
   Timer? _watchdog;
   // The current scene generation's timers: the outer phase kicks, the
   // query battery, the joint rig, and every phase's nested follow-ups.
@@ -198,6 +202,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
   /// Rebuilds the document and loads it — a full replace, so ids are
   /// re-minted and bodies reset to their spawn poses.
   void _loadScene() {
+    _autoReroll.resume();
     // The outgoing generation's timers and subscriptions reference its
     // ids — none may fire into the replacement.
     _phaseTimers?.cancelAll();
@@ -363,6 +368,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
   /// phase logs each PASS/FAIL itself.
   void _runWLoose() {
     dnLog('dart3d: wloose phase — ccd + bowl + margin + settle latency');
+    _autoReroll.suspend();
     _reroll?.cancel();
     _watchdog?.cancel();
     _wLoosePhase?.call();
@@ -465,7 +471,9 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
         // Self-running demo: throw again shortly after every settle.
         _watchdog?.cancel();
         _reroll?.cancel();
-        _reroll = Timer(const Duration(seconds: 3), _roll);
+        if (_autoReroll.rearmAfterSettle) {
+          _reroll = Timer(const Duration(seconds: 3), _roll);
+        }
     }
   }
 
@@ -656,6 +664,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
   /// body on the mesh root, so the Roll button and settle event work
   /// unchanged.
   void _loadImported(ImportedModel model) {
+    _autoReroll.resume();
     _phaseTimers?.cancelAll();
     _phaseTimers = null;
     _reroll?.cancel();
