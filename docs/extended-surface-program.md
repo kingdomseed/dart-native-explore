@@ -464,7 +464,7 @@ renderable pool** rather than one instanced draw — upstream's
 `_hiddenTransform` slot pattern, documented in the spec. `enabled`
 became the first real component tick gate on both platforms (`false`
 skips creation entirely; upstream gates update+repack, which is the
-same observable state). The harness lane lives at +170 s
+same observable state). The harness lane lives at +192 s
 (`w18Phase`): fountain + burst + mesh pool + the enabled gate, plus
 `visible` and `removeNode` lifecycle probes.
 

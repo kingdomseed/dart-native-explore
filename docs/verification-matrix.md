@@ -463,7 +463,7 @@ dice 7 settled total 42. `dn test` 150/150.
 
 ## W18 — particles (harness landed; device verification pending)
 
-`docs/particles-spec.md`. `w18Phase` fires at +170 s — after W15's
+`docs/particles-spec.md`. `w18Phase` fires at +192 s — after W15's
 lane closes and the auto-reroll is parked — and adds four emitters
 live: `w18.fountain` (spherical flipbook sprites on a generated 2×2
 atlas, size/color-over-life, turbulence, `randomFlipX`),
