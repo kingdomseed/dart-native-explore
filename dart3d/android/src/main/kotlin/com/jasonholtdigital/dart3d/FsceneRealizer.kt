@@ -4900,11 +4900,16 @@ object FsceneRealizer {
             } else if (envRes.has("effects")) {
                 envKey?.let { lutPayloadIds.remove(it) }
             }
+            // An env upsert without `effects` retains the prior LUT
+            // claim — fingerprint the retained chunk too, or a rewrite
+            // of it would hit the early return and keep the old LUT.
+            val lutClaimKey = lutPayloadKey
+                ?: envKey?.let { lutPayloadIds[it] }
             val envFingerprint = listOf(
                 stage?.toString() ?: "∅", envRes.toString(),
                 envPayloadKey?.let {
                     host.payloadStore[it]?.contentHashCode() },
-                lutPayloadKey?.let {
+                lutClaimKey?.let {
                     host.payloadStore[it]?.contentHashCode() })
                 .hashCode()
             if (envFingerprint == host.lastEnvFingerprint) return
