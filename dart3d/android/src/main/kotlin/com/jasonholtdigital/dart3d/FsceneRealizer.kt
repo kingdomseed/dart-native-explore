@@ -2216,6 +2216,12 @@ object FsceneRealizer {
         /** The visibility-aware scene add — [attachToScene]'s per-node
          * body, reused by the W5 node ops. */
         private fun attachIfRenderable(rec: NodeRec) {
+            // W18: particle entities are runtime-owned (a sprite's
+            // dedicated batch entity; a mesh pool's children) — the
+            // node entity's component test doesn't cover them, and LOD
+            // culling removes only rec.entity, so they re-attach even
+            // while the LOD holds the node's renderable out.
+            for (rt in rec.particleRuntimes) rt.setSceneVisible(true)
             // W16: an lod-culled node keeps its renderable out of the
             // scene until the frame pass rebinds a level — a
             // visibility re-eval must not re-attach it.
@@ -2229,10 +2235,6 @@ object FsceneRealizer {
             if (rm.hasComponent(rec.entity) || lm.hasComponent(rec.entity)) {
                 host.scene.addEntity(rec.entity)
             }
-            // W18: particle entities are runtime-owned (a sprite's
-            // dedicated batch entity; a mesh pool's children) — the
-            // node entity's component test doesn't cover them.
-            for (rt in rec.particleRuntimes) rt.setSceneVisible(true)
         }
 
         /** True when the node or any ancestor carries `visible:false`. */

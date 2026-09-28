@@ -947,7 +947,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
 
     /** Advances every live emitter then repacks — before render(),
      * after the camera pose settles (billboards face it). */
-    private fun tickParticles(dt: Float) {
+    private fun tickParticles(dt: Double) {
         if (particleRuntimes.isEmpty()) return
         val camPos = FloatArray(3)
         camera.getPosition(camPos)
@@ -966,7 +966,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             val inst = tcm.getInstance(rec.entity)
             if (inst == 0) continue
             tcm.getWorldTransform(inst, wm)
-            for (rt in list) rt.tick(dt.toDouble(), camPos, wm)
+            for (rt in list) rt.tick(dt, camPos, wm)
         }
     }
 
@@ -4104,6 +4104,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     private var lastFrameRealized = false
 
     private fun stepFrame(tNanos: Long) {
+        // Particle systems apply their own authored maxFrameTime —
+        // they get the unclamped interval (bounded only against a
+        // resume's first frame); everything else keeps the 100 ms cap.
+        val rawDt = if (lastFrameNanos == 0L) 0.0
+            else ((tNanos - lastFrameNanos).coerceIn(0L, 10_000_000_000L)) / 1e9
         val dt = ((tNanos - lastFrameNanos).coerceIn(0L, 100_000_000L)) / 1e9f
         lastFrameNanos = tNanos
 
@@ -4178,7 +4183,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // each runtime, then repack render state — after the camera
         // pose settles (billboards face it), before render. Upstream's
         // update() slot.
-        tickParticles(dt)
+        tickParticles(rawDt)
         // W16: trails record/refill and lods rebind for this frame's
         // camera — the same pre-render slot iOS's renderer delegate
         // uses (node poses and camera are final here).
