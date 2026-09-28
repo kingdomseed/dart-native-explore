@@ -21,6 +21,8 @@ import 'package:dart3d/dart3d.dart';
 import 'package:dartnative/dartnative.dart';
 import 'package:vector_math/vector_math.dart';
 
+import 'light_aim.dart';
+
 /// One loadable upstream asset: the cycler label plus its bundle key.
 final class ImportedModel {
   /// Creates an entry pairing [label] with the bundled [assetKey].
@@ -198,10 +200,8 @@ const importedDice = [
   doc.createNode(
     name: 'key',
     transform: TrsTransform(
-      rotation: Quaternion.axisAngle(
-        Vector3(0.7, 0.0, 0.7)..normalize(),
-        -0.8,
-      ),
+      // Travels down and away from the camera (upstream +Z travel).
+      rotation: aimAlong(Vector3(-0.152, -0.507, -0.848)),
     ),
     components: [
       ComponentSpec(
