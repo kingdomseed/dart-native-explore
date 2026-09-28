@@ -1733,6 +1733,11 @@ final class SceneViewHost: SCNView {
             retire(ps)
         }
         node.removeAllParticleSystems()
+        // W18: pending/looping burst schedules die with the systems.
+        for k in node.actionKeys where k.hasPrefix(
+            FsceneRealizer.Context.burstActionPrefix) {
+            node.removeAction(forKey: k)
+        }
         // W11: the skinner/morpher ride on the geometry — drop them
         // with it; `decodeMesh` re-attaches on the rebuild.
         node.skinner = nil
