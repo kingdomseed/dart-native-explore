@@ -381,6 +381,29 @@ void main() {
   });
 
   group('anim command encoding', () {
+    test('switch batch: outgoing stop at weight 0, incoming plays at 1 '
+        '(#33)', () {
+      expect(encodeSwitchAnimCommands(from: waveId, to: pulseId, loop: true), [
+        {'op': 'anim', 'anim': waveId.toToken(), 'stop': true, 'weight': 0.0},
+        {
+          'op': 'anim',
+          'anim': pulseId.toToken(),
+          'play': true,
+          'time': 0.0,
+          'weight': 1.0,
+          'loop': true,
+        },
+      ]);
+      // Nothing playing yet, or a restart of the same clip: no stop op.
+      for (final from in [null, pulseId]) {
+        final ops = encodeSwitchAnimCommands(from: from, to: pulseId);
+        expect(ops, hasLength(1));
+        expect(ops.single['play'], isTrue);
+        expect(ops.single['weight'], 1.0);
+        expect(ops.single['loop'], isFalse);
+      }
+    });
+
     test('play / pause / stop verbs', () {
       expect(encodeAnimCommand(waveId, play: true), {
         'op': 'anim',

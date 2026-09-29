@@ -2390,13 +2390,13 @@ final class FeatureScene {
         if (++ticks >= 12) timer.cancel();
       });
 
-      // #33 stop-returns-to-rest lane (+21.5 s, after the trace):
-      // switch wave → tilt in one batch (the showcase chip's shape),
-      // then stop tilt. A stopped clip must leave the blend: j1's
-      // world rotation reads tilt's full +0.5 rad about Z while tilt
-      // plays (pre-fix: ~0.17 — the stopped clips diluted it), then
-      // the bind identity once tilt stops (pre-fix: tilt's t=0 pose
-      // kept blending).
+      // #33 clip-switch lane (+21.5 s, after the trace): hand wave →
+      // tilt with the switch batch (the showcase chip's shape), then
+      // stop tilt at weight 0. Upstream semantics keep a stopped clip
+      // blending at its weight, so only weight 0 retires it: j1's world
+      // rotation must read tilt's full +0.5 rad while tilt plays (a
+      // stop-only switch reads ~0.17 — the stopped clips dilute it),
+      // then the bind identity once every clip is at weight 0.
       void expectJ1(String step, double angle) {
         c.poseOf(j1.id).then((pose) {
           final want = Quaternion.axisAngle(Vector3(0, 0, 1), angle);
@@ -2419,19 +2419,20 @@ final class FeatureScene {
 
       timers.after(const Duration(milliseconds: 7500), () {
         c.applyCommands([
-          encodeAnimCommand(wave.id, stop: true),
           // pulse ended at +18 s but still counts in the weight total
           // (upstream normalizes across every registered clip), so
-          // stop it too — tilt is then the only clip in the blend.
-          encodeAnimCommand(pulse.id, stop: true),
-          encodeAnimCommand(tilt.id, play: true, loop: true),
+          // zero it too — tilt is then the only weighted clip.
+          encodeAnimCommand(pulse.id, weight: 0),
+          ...encodeSwitchAnimCommands(from: wave.id, to: tilt.id, loop: true),
         ]);
         timers.after(
           const Duration(milliseconds: 500),
           () => expectJ1('switch', 0.5),
         );
         timers.after(const Duration(seconds: 1), () {
-          c.stopAnimation(tilt.id);
+          c.applyCommands([
+            encodeAnimCommand(tilt.id, stop: true, weight: 0),
+          ]);
           timers.after(
             const Duration(milliseconds: 500),
             () => expectJ1('rest', 0),

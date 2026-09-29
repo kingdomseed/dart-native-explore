@@ -6,13 +6,13 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * #33 regression coverage for the clip verb rules and the blend
- * weights `Dart3dView.sampleAnimations` samples with. A stopped clip
- * must leave the blend so the channels it drove return to rest —
- * before the fix it kept blending its t=0 pose at full weight, and a
- * clip cycler (stop old, play next) left every visited clip in the
- * blend: Dash's eyes stayed half-closed from Jump's t=0 squash.
- * Pure JVM — no Filament.
+ * The clip verb rules and blend weights `Dart3dView.sampleAnimations`
+ * samples with — upstream `AnimationClip`/`AnimationPlayer` semantics.
+ * #33: a stopped clip stays in the blend at its weight (upstream's
+ * `stop` is pause + rewind), so a stop-only clip switcher left every
+ * visited clip blending its t=0 pose and Dash's eyes half-closed.
+ * Switching clips means dropping the outgoing clip's weight to 0 —
+ * `SceneController.switchAnimation`. Pure JVM — no Filament.
  */
 class AnimClipsTest {
 
@@ -20,63 +20,69 @@ class AnimClipsTest {
         AnimClipState().apply(block)
 
     @Test
-    fun `stop takes the clip out of the blend`() {
-        val a = clip { applyOp(endTime = 1.0, play = true) }
-        assertEquals(mapOf(1L to 1f), blendWeights(mapOf(1L to a)))
-
+    fun `stop pauses and rewinds but keeps blending at its weight`() {
+        val a = clip { applyOp(endTime = 1.0, play = true, time = 0.6) }
+        val b = clip { applyOp(endTime = 1.0, play = true) }
         a.applyOp(endTime = 1.0, stop = true)
         assertFalse(a.playing)
         assertEquals(0.0, a.time, 0.0)
-        // No active clip → nothing blends; the sampler's write-back
-        // then holds every recorded node at its bind pose.
-        assertTrue(blendWeights(mapOf(1L to a)).isEmpty())
-    }
-
-    @Test
-    fun `switching clips leaves only the next clip at full weight`() {
-        val clips = HashMap<Long, AnimClipState>()
-        // Cycle 9 clips 3× the way the showcase chip does.
-        var current = 0L
-        clips.getOrPut(current) { AnimClipState() }
-            .applyOp(endTime = 1.0, play = true, loop = true)
-        repeat(27) {
-            clips.getValue(current).applyOp(endTime = 1.0, stop = true)
-            current = (current + 1) % 9
-            clips.getOrPut(current) { AnimClipState() }
-                .applyOp(endTime = 1.0, play = true, loop = true)
-            assertEquals(mapOf(current to 1f), blendWeights(clips))
-        }
-        assertEquals(9, clips.size)
-    }
-
-    @Test
-    fun `paused clips keep blending and normalize with the rest`() {
-        val a = clip { applyOp(endTime = 1.0, play = true, time = 0.4) }
-        val b = clip { applyOp(endTime = 1.0, play = true) }
-        a.applyOp(endTime = 1.0, pause = true)
+        // Upstream parity: the stopped clip still takes half the blend.
         assertEquals(mapOf(1L to 0.5f, 2L to 0.5f),
             blendWeights(mapOf(1L to a, 2L to b)))
     }
 
     @Test
-    fun `play or seek brings a stopped clip back`() {
-        val a = clip { applyOp(endTime = 2.0, play = true) }
-        a.applyOp(endTime = 2.0, stop = true)
-        a.applyOp(endTime = 2.0, time = 5.0)
-        assertTrue(a.active)
-        assertEquals(2.0, a.time, 0.0)   // seek clamps to endTime
-        assertFalse(a.playing)
-
-        a.applyOp(endTime = 2.0, stop = true)
-        a.applyOp(endTime = 2.0, play = true)
-        assertTrue(a.active && a.playing)
+    fun `a weight-0 clip contributes nothing`() {
+        val a = clip { applyOp(endTime = 1.0, stop = true, weight = 0.0) }
+        val b = clip { applyOp(endTime = 1.0, play = true, weight = 1.0) }
+        assertEquals(mapOf(1L to 0f, 2L to 1f),
+            blendWeights(mapOf(1L to a, 2L to b)))
+        // Only zero-weight clips left → every effective weight is 0, so
+        // the sampler writes each bound node back at its bind pose.
+        b.applyOp(endTime = 1.0, stop = true, weight = 0.0)
+        assertTrue(blendWeights(mapOf(1L to a, 2L to b)).values.all { it == 0f })
     }
 
     @Test
-    fun `stop then play in one op restarts from zero`() {
+    fun `a 9-clip switch cycle via weight 0 leaves only the current clip`() {
+        val clips = HashMap<Long, AnimClipState>()
+        var current = 0L
+        clips.getOrPut(current) { AnimClipState() }
+            .applyOp(endTime = 1.0, play = true, weight = 1.0, loop = true)
+        repeat(27) {
+            // switchAnimation's batch: outgoing stop + weight 0, then
+            // incoming play at weight 1.
+            clips.getValue(current)
+                .applyOp(endTime = 1.0, stop = true, weight = 0.0)
+            current = (current + 1) % 9
+            clips.getOrPut(current) { AnimClipState() }
+                .applyOp(endTime = 1.0, play = true, weight = 1.0, loop = true)
+            val w = blendWeights(clips)
+            assertEquals(1f, w.getValue(current))
+            assertTrue(w.filterKeys { it != current }.values.all { it == 0f })
+        }
+        assertEquals(9, clips.size)
+    }
+
+    @Test
+    fun `a stop-only cycle dilutes the current clip (the #33 shape)`() {
+        val clips = HashMap<Long, AnimClipState>()
+        for (k in 0L until 9L) {
+            clips.values.forEach { it.applyOp(endTime = 1.0, stop = true) }
+            clips.getOrPut(k) { AnimClipState() }
+                .applyOp(endTime = 1.0, play = true, loop = true)
+        }
+        assertEquals(1f / 9f, blendWeights(clips).getValue(8L), 1e-6f)
+    }
+
+    @Test
+    fun `play trumps stop and seeks clamp to endTime`() {
         val a = clip { applyOp(endTime = 1.0, play = true, time = 0.7) }
         a.applyOp(endTime = 1.0, stop = true, play = true)
-        assertTrue(a.active && a.playing)
+        assertTrue(a.playing)
         assertEquals(0.0, a.time, 0.0)
+        a.applyOp(endTime = 1.0, time = 5.0, weight = 3.0)
+        assertEquals(1.0, a.time, 0.0)
+        assertEquals(1.0, a.weight, 0.0)
     }
 }

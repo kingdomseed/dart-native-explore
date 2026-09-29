@@ -744,16 +744,6 @@ final class SceneViewHost: SCNView {
         var timeScale = 1.0
         var weight = 1.0          // clamped [0,1] on assignment
         var loop = false
-        /// Whether the clip takes part in the blend. `stop` clears it
-        /// — a stopped clip contributes nothing and adds nothing to
-        /// the weight total, so the channels it drove return to bind
-        /// (or to whatever the remaining clips drive). `play` and a
-        /// seek set it again. Upstream's `stop` leaves the clip
-        /// blending its t=0 pose at full weight, which is what left
-        /// Dash's eyes half-closed after cycling clips (#33): every
-        /// visited clip stayed in the blend as a frozen t=0 layer and
-        /// the playing clip fell to 1/N of the weight.
-        var active = true
     }
 
     /// Per-node captured bind state — upstream's `AnimationTransforms`.
@@ -3719,9 +3709,7 @@ final class SceneViewHost: SCNView {
     /// exist as defs; nothing autoplays). Verbs apply in
     /// pause→stop→play order so `play` trumps; `time` then seeks
     /// (clamped to `[0, endTime]` — `play`+`time` is `gotoAndPlay`);
-    /// `timeScale`/`weight`/`loop` are the knob writes. `stop` also
-    /// takes the clip out of the blend until the next `play`/seek, so
-    /// its channels fall back to bind (#33; see `AnimClipState`).
+    /// `timeScale`/`weight`/`loop` are the knob writes.
     private func applyAnim(_ json: [String: Any]) {
         guard let token = json["anim"] as? String,
               let key = D3Wire.localIdKey(token) else { return }
@@ -3736,15 +3724,10 @@ final class SceneViewHost: SCNView {
         if (json["stop"] as? Bool) == true {
             clip.playing = false
             clip.time = 0
-            clip.active = false
         }
-        if (json["play"] as? Bool) == true {
-            clip.playing = true
-            clip.active = true
-        }
+        if (json["play"] as? Bool) == true { clip.playing = true }
         if let t = (json["time"] as? NSNumber)?.doubleValue {
             clip.time = min(max(t, 0), def.endTime)
-            clip.active = true
         }
         if let ts = (json["timeScale"] as? NSNumber)?.doubleValue {
             clip.timeScale = ts
@@ -3950,11 +3933,8 @@ final class SceneViewHost: SCNView {
 
         // Resolve bindings and total the clip weights — upstream
         // normalizes by Σ every registered clip's weight.
-        // Stopped clips sit out of both the total and the blend (#33).
         var totalWeight = 0.0
-        for clip in animClips.values where clip.active {
-            totalWeight += clip.weight
-        }
+        for clip in animClips.values { totalWeight += clip.weight }
         let mult = totalWeight > 1 ? 1 / totalWeight : 1
 
         /// Accumulating pose state for one bound node this frame.
@@ -3973,7 +3953,7 @@ final class SceneViewHost: SCNView {
         // bind) per upstream's createAnimationClip; only the value
         // contribution gates on w.
         for animKey in animClips.keys.sorted() {
-            guard let clip = animClips[animKey], clip.active,
+            guard let clip = animClips[animKey],
                   let def = animationsById[animKey] else { continue }
             let w = Float(clip.weight * mult)
             for ch in def.channels {

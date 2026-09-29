@@ -20,22 +20,12 @@ internal class AnimClipState {
     var loop = false
 
     /**
-     * Whether the clip takes part in the blend. `stop` clears it — a
-     * stopped clip contributes nothing and adds nothing to the weight
-     * total, so the channels it drove return to bind (or to whatever
-     * the remaining clips drive). `play` and a seek set it again.
-     * Upstream's `stop` leaves the clip blending its t=0 pose at full
-     * weight, which is what left Dash's eyes half-closed after cycling
-     * clips (#33): every visited clip stayed in the blend as a frozen
-     * t=0 layer and the playing clip fell to 1/N of the weight.
-     */
-    var active = true
-
-    /**
      * Applies one `anim` op's verbs and knobs. Verbs apply in
      * pause→stop→play order so `play` trumps; [time] then seeks
      * (clamped to `[0, endTime]` — `play`+`time` is `gotoAndPlay`);
      * the rest are knob writes. Null knobs leave the field alone.
+     * `stop` is upstream's: pause + rewind — the clip stays in the
+     * blend at its weight (switch clips by dropping the weight to 0).
      */
     fun applyOp(
         endTime: Double,
@@ -51,16 +41,9 @@ internal class AnimClipState {
         if (stop) {
             playing = false
             this.time = 0.0
-            active = false
         }
-        if (play) {
-            playing = true
-            active = true
-        }
-        if (time != null) {
-            this.time = time.coerceIn(0.0, endTime)
-            active = true
-        }
+        if (play) playing = true
+        if (time != null) this.time = time.coerceIn(0.0, endTime)
         if (timeScale != null) this.timeScale = timeScale
         if (weight != null) this.weight = weight.coerceIn(0.0, 1.0)
         if (loop != null) this.loop = loop
@@ -68,20 +51,19 @@ internal class AnimClipState {
 }
 
 /**
- * Each blending clip's effective weight this frame — upstream's
- * `AnimationPlayer.update` normalization (`weight × 1/Σweights` once
- * the sum exceeds 1) over the ACTIVE clips only. Stopped clips are
- * absent from the result: they neither contribute nor dilute the
- * others (#33).
+ * Each registered clip's effective weight this frame, in key order —
+ * upstream's `AnimationPlayer.update` normalization: `weight × 1/Σ`
+ * once the sum of every clip's weight exceeds 1. A weight-0 clip maps
+ * to 0 and contributes nothing, so a node only zero-weight clips bind
+ * writes back at its bind pose.
  */
 internal fun blendWeights(clips: Map<Long, AnimClipState>): Map<Long, Float> {
     var total = 0.0
-    for (clip in clips.values) if (clip.active) total += clip.weight
+    for (clip in clips.values) total += clip.weight
     val mult = if (total > 1.0) 1.0 / total else 1.0
     val out = LinkedHashMap<Long, Float>()
     for (key in clips.keys.sorted()) {
-        val clip = clips.getValue(key)
-        if (clip.active) out[key] = (clip.weight * mult).toFloat()
+        out[key] = (clips.getValue(key).weight * mult).toFloat()
     }
     return out
 }

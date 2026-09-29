@@ -93,6 +93,30 @@ Map<String, Object?> encodeAnimCommand(
   if (loop != null) 'loop': loop,
 };
 
+/// The command batch that hands playback from [from] to [to] —
+/// upstream's clip-switch idiom, where only weight decides what a clip
+/// contributes.
+///
+/// A stopped clip still blends its t=0 pose at its weight (upstream
+/// `AnimationClip.stop` is pause + rewind), so a switcher that only
+/// stops the outgoing clip leaves every clip it ever played in the
+/// blend, and the playing clip's share shrinks to 1/N (#33). This
+/// batch zeroes and stops [from], then plays [to] from the start at
+/// weight 1: [to] is the only contributing clip, and every channel
+/// [from] drove that [to] doesn't returns to its bind pose.
+///
+/// Emit it as one `applyCommands` batch so both ops land in the same
+/// native drain — no frame shows the bind pose between clips. [from]
+/// may be null (nothing playing yet) or equal to [to] (a restart).
+List<Map<String, Object?>> encodeSwitchAnimCommands({
+  LocalId? from,
+  required LocalId to,
+  bool loop = false,
+}) => [
+  if (from != null && from != to) encodeAnimCommand(from, stop: true, weight: 0),
+  encodeAnimCommand(to, play: true, time: 0, weight: 1, loop: loop),
+];
+
 /// `{"op":"setMorphWeights",…}` — a direct write of a node's morph
 /// target weights (upstream's `SCNMorpher.weights` /
 /// `RenderableManager.setMorphWeights` path), independent of any

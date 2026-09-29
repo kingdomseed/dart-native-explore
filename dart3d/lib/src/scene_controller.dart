@@ -611,13 +611,22 @@ final class SceneController {
     applyCommands([encodeAnimCommand(id, pause: true)]);
   }
 
-  /// Pauses animation [id], seeks it back to the beginning, and takes
-  /// it out of the blend: until the next [playAnimation] or
-  /// [seekAnimation] it contributes nothing, so every channel it drove
-  /// returns to its bind pose (or to what the other clips drive).
-  /// Use [pauseAnimation] to hold a clip's pose instead.
+  /// Pauses animation [id] and seeks it back to the beginning.
   void stopAnimation(LocalId id) {
     applyCommands([encodeAnimCommand(id, stop: true)]);
+  }
+
+  /// Hands playback from animation [from] to [to] in one batch: [from]
+  /// is stopped at weight 0 and [to] plays from the start at weight 1
+  /// ([loop] as given) — see [encodeSwitchAnimCommands].
+  ///
+  /// Use this (not [stopAnimation] + [playAnimation]) to change clips.
+  /// A stopped clip keeps blending its first frame at its weight, as in
+  /// upstream, so switching by stop alone leaves every clip ever
+  /// played mixed into the pose. [from] may be null when nothing plays
+  /// yet.
+  void switchAnimation({LocalId? from, required LocalId to, bool loop = false}) {
+    applyCommands(encodeSwitchAnimCommands(from: from, to: to, loop: loop));
   }
 
   /// Seeks animation [id] to [time] (clamped to `[0, endTime]`

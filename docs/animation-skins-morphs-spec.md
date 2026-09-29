@@ -153,13 +153,12 @@ already own) and morph weights (`SCNMorpher.weights` /
 - `SceneController.playAnimation(id, {loop, weight, timeScale,
   time})`, `pauseAnimation`, `stopAnimation`, `seekAnimation(id,
   time)` — thin wrappers over the `anim` op.
-- **Divergence (#33):** `stop` takes the clip out of the blend until
-  the next `play`/seek — it neither contributes nor counts in the
-  weight total, so its channels fall back to bind. Upstream's
-  `AnimationClip.stop` keeps the clip blending its t=0 pose at full
-  weight; with a stop-then-play clip switcher that left every visited
-  clip in the blend (Dash's eyes stuck half-closed from Jump's t=0
-  squash). `pause` still holds and blends the paused pose.
+- `SceneController.switchAnimation({from, to, loop})` — the clip-switch
+  idiom as one batch (`encodeSwitchAnimCommands`): `from` stops at
+  weight 0, `to` plays from 0 at weight 1. `stop` keeps upstream
+  semantics (pause + rewind, the clip still blends at its weight), so a
+  switcher must drop the outgoing weight; a weight-0 clip contributes
+  nothing and its channels write back at bind (#33).
 - `SceneController.setMorphWeights(node, weights)` over the
   `setMorphWeights` op.
 - `SceneAnimation` info handle (id, name, channelCount, duration) —

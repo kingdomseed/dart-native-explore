@@ -3997,8 +3997,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     /// The clip is created lazily, paused at t=0, on first reference —
     /// upstream's `createAnimationClip` contract (a doc's animations
     /// exist as defs; nothing autoplays). Verb order and the knob
-    /// writes live in [AnimClipState.applyOp]; `stop` also takes the
-    /// clip out of the blend until the next `play`/seek (#33).
+    /// writes live in [AnimClipState.applyOp].
     private fun applyAnim(json: JSONObject) {
         val token = json.optString("anim")
         val key = D3Wire.localIdKey(token) ?: return
@@ -4159,9 +4158,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             clip.time = t
         }
 
-        // Effective per-clip weights — upstream normalizes by Σ the
-        // registered clips' weights; stopped clips sit out of both the
-        // total and the blend (#33).
+        // Effective per-clip weights — upstream normalizes by Σ every
+        // registered clip's weight; a weight-0 clip contributes nothing.
         val weights = blendWeights(animClips)
 
         /// Accumulating pose state for one bound node this frame —

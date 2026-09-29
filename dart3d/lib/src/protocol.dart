@@ -108,12 +108,8 @@ import 'scene_model.dart';
 /// - `{"op":"anim","anim":"<id>","play":true|"pause":true|
 ///    "stop":true,"time":<s>?,"timeScale":<f>?,"weight":<f>?,
 ///    "loop":<bool>?}` — `play` starts/resumes (with `time` it is
-///    `gotoAndPlay`), `pause` holds the playhead, `stop` pauses,
-///    rewinds, and takes the clip out of the blend (it contributes
-///    nothing and adds nothing to the weight total until the next
-///    `play` or seek, so the channels it drove return to bind — a
-///    deliberate divergence from upstream, whose stopped clip keeps
-///    blending its t=0 pose; #33). With no verb the op is a pure knob write: `time` seeks
+///    `gotoAndPlay`), `pause` holds the playhead, `stop` pauses and
+///    rewinds. With no verb the op is a pure knob write: `time` seeks
 ///    (clamped to `[0, endTime]`), `timeScale` scales the advance,
 ///    `weight` is the clip's blend weight (clamped `[0, 1]`), `loop`
 ///    toggles wrap-at-end.
