@@ -267,3 +267,14 @@ every head including `main` before this work — tracked in #18.
 mid-run and blind `adb input` taps landed in it; reported to the operator,
 who cleared the device. All later runs gate every input on the foreground
 package being `com.jasonholtdigital.dart3d_example`.
+
+### iOS T2 close-out — main `4e12ef3` (2026-09-29)
+
+Driven through the simulator input tool on the iPhone 17 Pro sim (debug):
+ROLL button → dice rolled and settled (log `rolled … total 123`, screenshot
+`ios-main/ios-roll-button-settled.png`); tab storm Dice → Showcase → Harness
+→ Dice → Showcase → no crash, 0 error/exception lines; Dash rendered after a
+~3 s load (`ios-after-tab-storm-dash.png`). iOS T2 is **PASS** for the
+merged tree. Notes: Showcase shows a black view with no loading indicator
+while Dash loads (UX follow-up); the d20 readout mismatch (7 vs visible 12)
+is the known readout bug in S0g; Dash remains paler than on Android (S0g).

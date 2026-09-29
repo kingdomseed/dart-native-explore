@@ -97,9 +97,9 @@ Rules:
       is tracked in an issue (#18, #20–#23)
 - [ ] S0c **Verification backfill** — *partial.* Done: T2 on the merged tree
       `e19e031` (equivalence recorded in §Final T2) for A142 Vulkan + GL (`docs/triage/integration.md`
-      §Final T2). iOS T2 is **still open**: harness-driven rolls settled,
-      but the ROLL-button roll + settle and tab switching were never
-      exercised (no simulator input access). Also open: the key T3 lanes for W15, W16, W18, W22, W23, W24,
+      §Final T2). iOS T2 closed on main `4e12ef3` (ROLL-button roll +
+      settle and a Dice/Showcase/Harness tab storm, 0 error lines —
+      `docs/artifacts/integration/final/ios-main/`). Still open: the key T3 lanes for W15, W16, W18, W22, W23, W24,
       W25, W26, W29 on both platforms; update
       `verification-matrix.md`
 - [ ] S0d Doc truth pass: `extended-surface-audit.md`,

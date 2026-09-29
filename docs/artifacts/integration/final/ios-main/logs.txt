@@ -1,0 +1,6 @@
+dartnative: [DN] Licence valid (community), expires 2027-09-14
+dartnative: [DN] lifecycle → AppLifecycleState.resumed
+dartnative: dart3d: rolled d4:3 d6:1 d8:1 d10t:0 d10u:0 d12:1 d20:1 d%:100  ·  total 107
+dartnative: dart3d: rolled d4:4 d6:6 d8:8 d10t:80 d10u:7 d12:11 d20:7 d%:87  ·  total 123
+dartnative: dart3d: showcase — dash: 41 nodes · 2 geo · 2 mat · 2 tex · 1 skins · 9 anims
+dartnative: [DN] _performRebuild: root native view changed 1 → 21, re-emitting grow:1
