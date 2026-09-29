@@ -15,6 +15,7 @@ import 'dart:math';
 
 import 'package:dart3d/dart3d.dart';
 import 'package:dartnative/dartnative.dart';
+import 'package:vector_math/vector_math.dart' show Vector3;
 
 import 'dn_logo_stage.dart';
 import 'hero_motion.dart';
@@ -111,26 +112,41 @@ class _HeroScreenState extends State<HeroScreen>
 
   HeroScene? _scene;
   bool _loaded = false;
+
+  /// The 3D logo failed to load — the copy and the way into the other
+  /// screens still show, over a short note in the stage.
+  bool _failed = false;
+
+  /// The aspect the camera is currently framed for.
+  double _framedAspect = 0;
   Duration _lastTick = Duration.zero;
   double _lastGlowAt = -1;
   double _lastGlow = -1;
+  bool _entranceScaleDone = false;
 
   /// One-finger drag bookkeeping — DartNative's iOS scale recognizer
   /// claims one-finger drags too (see showcase_scene.dart, #27), so
   /// both streams feed the orbit and the first to deliver owns it.
   _DragSource? _dragOwner;
-  Offset? _lastFocal;
+  final _focal = HeroFocalTracker();
 
   final _perfStats = _HeroPerf();
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (_loaded) return;
     final size = MediaQuery.of(context).size;
     if (size.width <= 0 || size.height <= 0) return;
-    _loaded = true;
-    _load(size.width / size.height);
+    final aspect = size.width / size.height;
+    if (!_loaded) {
+      _loaded = true;
+      // The copy and the way into the other screens rise in whether or
+      // not the 3D stage loads.
+      _entrance.forward();
+      _load(aspect);
+    } else if ((aspect - _framedAspect).abs() > 0.01) {
+      _reframe(aspect);
+    }
   }
 
   void _load(double aspect) {
@@ -142,14 +158,38 @@ class _HeroScreenState extends State<HeroScreen>
       initialPitch: _orbit.pitch,
       log: dnLog,
     );
-    if (scene == null) return;
+    if (scene == null) {
+      dnLog('dart3d: hero — logo asset failed to load; showing fallback');
+      setState(() => _failed = true);
+      return;
+    }
     _scene = scene;
-    // The logo blooms in from no glow (brief §3.6).
+    _framedAspect = aspect;
+    // The logo blooms in from no glow and 0.965 scale (brief §3.6).
     heroGlowOps(scene.document, scene.glowMaterials, 0);
+    scene.document.nodes[scene.pivot]?.transform = TrsTransform(
+      translation: scene.center.clone(),
+      rotation: heroPivotRotation(_orbit.yaw, _orbit.pitch),
+      scale: Vector3.all(1 / heroEntranceScale(0)),
+    );
     _controller.loadDocument(scene.document);
     _lastGlow = 0;
     _ticker.start();
-    _entrance.forward();
+  }
+
+  /// Re-aims the camera for a new viewport aspect (rotation, split
+  /// screen, window resize) — one camera transform, no reload.
+  void _reframe(double aspect) {
+    final scene = _scene;
+    if (scene == null) return;
+    _framedAspect = aspect;
+    final pose = heroCameraPose(heroFramingFor(scene.frameRadius, aspect));
+    _controller.setNodeTransforms([
+      NodeTransform(scene.camera, translation: pose.$1, rotation: pose.$2),
+    ]);
+    final mq = MediaQuery.of(context);
+    dnLog('dart3d: hero — reframed for aspect ${aspect.toStringAsFixed(3)} '
+        '(size ${mq.size} padding ${mq.padding} viewPadding ${mq.viewPadding})');
   }
 
   void _onTick(Duration elapsed) {
@@ -161,20 +201,38 @@ class _HeroScreenState extends State<HeroScreen>
     // A stalled frame (backgrounding, a GC) shouldn't jump the orbit.
     _orbit.tick(dt.clamp(0.0, 0.1));
 
+    // Entrance bloom: the logo grows 0.965 → 1.0 over the first second.
+    // The camera and rig are the pivot's children, so the pivot scales
+    // by the inverse — the boom lengthens by 1/s and the logo reads s×
+    // as large (the lights' directions are unchanged by a uniform scale).
+    Vector3? scale;
+    if (!_entranceScaleDone) {
+      scale = Vector3.all(1 / heroEntranceScale(t));
+      if (t >= 1.0) _entranceScaleDone = true;
+    }
     final sw = Stopwatch()..start();
     _controller.setNodeTransforms([
       NodeTransform(
         scene.pivot,
         rotation: heroPivotRotation(_orbit.yaw % (2 * pi), _orbit.pitch),
+        scale: scale,
       ),
     ]);
     final transformUs = sw.elapsedMicroseconds;
 
     int? glowUs;
-    final glow = _glowAt(t);
-    if (_glowHz > 0 &&
-        (glow - _lastGlow).abs() > 0.004 &&
-        t - _lastGlowAt >= 1 / _glowHz - 0.002) {
+    // With the breath off (`DART3D_HERO_PULSE_HZ=0`) or pinned
+    // (`DART3D_HERO_GLOW`), the entrance ramp still runs at 10 Hz and
+    // then holds a static glow — no re-sends once it settles.
+    final glow = heroGlowAt(
+      t,
+      low: _stage.emissiveGlow,
+      pinned: _pinnedGlow,
+      breathing: _glowHz > 0,
+    );
+    final hz = _glowHz > 0 ? _glowHz : 10.0;
+    if ((glow - _lastGlow).abs() > 0.004 &&
+        t - _lastGlowAt >= 1 / hz - 0.002) {
       sw.reset();
       _controller.applyCommands(
         heroGlowOps(_controller.document ?? scene.document,
@@ -194,16 +252,6 @@ class _HeroScreenState extends State<HeroScreen>
     }
   }
 
-  /// The emissive factor at [t]: a 1 s expo-out ramp from 0 into the
-  /// breath's low point, then the breath (or the pinned value).
-  double _glowAt(double t) {
-    final low = _stage.emissiveGlow;
-    final pinned = _pinnedGlow;
-    if (pinned != null) return pinned * heroEase(t / 1.0);
-    if (t < 1.0) return low * heroEase(t);
-    return heroBreath(t - 1.0, low: low, high: low + 0.3);
-  }
-
   void _dragBy(_DragSource source, Offset delta) {
     _dragOwner ??= source;
     if (_dragOwner != source) return;
@@ -212,7 +260,7 @@ class _HeroScreenState extends State<HeroScreen>
 
   void _endDrag() {
     _dragOwner = null;
-    _lastFocal = null;
+    _focal.end();
     _orbit.release();
   }
 
@@ -236,11 +284,16 @@ class _HeroScreenState extends State<HeroScreen>
     );
     return AnimatedBuilder(
       animation: anim,
-      builder: (context, child) => Opacity(
-        opacity: anim.value,
-        child: Transform.translate(
-          offset: Offset(0, 26 * (1 - anim.value)),
-          child: child,
+      // Controls only take input once they're visibly in — an Opacity
+      // at 0 still hit-tests.
+      builder: (context, child) => IgnorePointer(
+        ignoring: anim.value < 0.6,
+        child: Opacity(
+          opacity: anim.value,
+          child: Transform.translate(
+            offset: Offset(0, 26 * (1 - anim.value)),
+            child: child,
+          ),
         ),
       ),
       child: child,
@@ -251,6 +304,17 @@ class _HeroScreenState extends State<HeroScreen>
   Widget build(BuildContext context) {
     final mono = Platform.isIOS ? 'Menlo' : 'monospace';
     final size = MediaQuery.of(context).size;
+    final padding = MediaQuery.of(context).padding;
+    final landscape = size.width >= size.height;
+    // Landscape insets (camera cutout / nav bar) sit on the sides.
+    final double copyLeft = landscape ? size.width / 2 : 24 + padding.left;
+    // DartNative quirk (A142, landscape): `size` spans the full display
+    // while the window loses the 48 dp display-cutout band on the side,
+    // and the cutout inset is reported in `padding.top` (t:48, r:0). So
+    // in landscape the side margin takes the larger of the two.
+    final copyRight =
+        24.0 +
+        (landscape ? max(padding.right, padding.top) + 16 : padding.right);
     return Scaffold(
       brightness: Brightness.dark,
       backgroundColor: _bg,
@@ -263,12 +327,19 @@ class _HeroScreenState extends State<HeroScreen>
                 if (d.pointerCount == 1) _dragBy(_DragSource.pan, d.delta);
               },
               onPanEnd: (_) => _endDrag(),
-              onScaleStart: (d) => _lastFocal = d.focalPoint,
+              onScaleStart: (d) => _focal.start(
+                d.focalPoint.dx,
+                d.focalPoint.dy,
+                d.pointerCount,
+              ),
               onScaleUpdate: (d) {
-                final last = _lastFocal;
-                _lastFocal = d.focalPoint;
-                if (d.pointerCount == 1 && last != null) {
-                  _dragBy(_DragSource.scale, d.focalPoint - last);
+                final delta = _focal.update(
+                  d.focalPoint.dx,
+                  d.focalPoint.dy,
+                  d.pointerCount,
+                );
+                if (delta != null) {
+                  _dragBy(_DragSource.scale, Offset(delta.$1, delta.$2));
                 }
               },
               onScaleEnd: (_) => _endDrag(),
@@ -286,18 +357,22 @@ class _HeroScreenState extends State<HeroScreen>
           ),
           // Scrim: keeps the glow off the copy (brief §3.7).
           Positioned(
-            left: 0,
+            left: landscape ? size.width * 0.45 : 0,
             right: 0,
             bottom: 0,
-            height: size.height * 0.5,
+            top: landscape ? 0 : size.height * 0.5,
             child: IgnorePointer(
               child: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0x00090E12), Color(0xE6090E12)],
-                    stops: [0, 0.55],
+                    begin: landscape
+                        ? Alignment.centerLeft
+                        : Alignment.topCenter,
+                    end: landscape
+                        ? Alignment.centerRight
+                        : Alignment.bottomCenter,
+                    colors: const [Color(0x00090E12), Color(0xE6090E12)],
+                    stops: const [0, 0.55],
                   ),
                 ),
               ),
@@ -305,13 +380,15 @@ class _HeroScreenState extends State<HeroScreen>
           ),
           Positioned(
             left: 24,
-            top: MediaQuery.of(context).padding.top + 14,
+            top: padding.top + 14,
+            // The brief's identity guardrail: our wordmark leads; the
+            // DartNative name appears only as "for DartNative".
             // Static, not a rise-in: on Android a faded-in Text
             // straight over the SurfaceView (no ancestor but the
             // Stack) came back invisible when the hero re-entered —
             // present in the view tree, never drawn.
             child: const Text(
-              'DartNative 3D',
+              'dart3d',
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
@@ -320,115 +397,162 @@ class _HeroScreenState extends State<HeroScreen>
               ),
             ),
           ),
+          if (_failed)
+            Positioned(
+              left: landscape ? 24 : 0,
+              right: landscape ? size.width / 2 : 0,
+              top: padding.top + 56,
+              height: landscape ? size.height * 0.6 : size.height * 0.3,
+              child: const Center(
+                child: Text(
+                  '3D stage unavailable — the screens below still work.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 13, color: _muted),
+                ),
+              ),
+            ),
+          // The copy: bottom-anchored in portrait, the right half in
+          // landscape. Bounded above (clear of the wordmark and, in
+          // portrait, the logo) and scrollable, so short viewports and
+          // large text scales can't push it off-screen.
           Positioned(
-            left: 24,
-            right: 24,
-            bottom: MediaQuery.of(context).padding.bottom + 16,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _rise(
-                  400,
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 3,
-                        decoration: const BoxDecoration(
-                          gradient: _brandGradient,
-                          borderRadius: BorderRadius.all(Radius.circular(2)),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      Text(
-                        'COMMUNITY PLUGIN · FOR DARTNATIVE',
-                        style: TextStyle(
-                          fontFamily: mono,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 1.3,
-                          color: _accent,
-                        ),
-                      ),
-                    ],
-                  ),
+            left: copyLeft,
+            right: copyRight,
+            top: landscape
+                ? padding.top + 16
+                : max(padding.top + 56, size.height * 0.36),
+            bottom: padding.bottom + 16,
+            // Bottom-aligned, shrink-wrapped; scrolls only when the
+            // copy outgrows the region. (A `reverse: true` scroll view
+            // latched its offset before the text finished laying out on
+            // Android's fresh launch and clipped the eyebrow.)
+            child: Align(
+              alignment: Alignment.bottomLeft,
+              child: SingleChildScrollView(
+                child: SizedBox(
+                  // Full region width, so the centred CTA row centres on
+                  // the region, not on the widest text line.
+                  width: landscape
+                      // Capped: text measured wider than it drew on the
+                      // A142 in landscape (see the inset quirk above).
+                      ? min(size.width - copyLeft - copyRight, 320)
+                      : size.width - copyLeft - copyRight,
+                  child: _copy(mono, compact: landscape),
                 ),
-                const SizedBox(height: 12),
-                _rise(
-                  520,
-                  const Text(
-                    "Real 3D, on the platform's own GPU.",
-                    style: TextStyle(
-                      fontSize: 34,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.8,
-                      height: 1.05,
-                      color: _text,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                _rise(
-                  640,
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _prop('Native renderers.',
-                          ' SceneKit on iOS, Filament on Android.'),
-                      const SizedBox(height: 6),
-                      _prop('One Dart scene graph.',
-                          ' flutter_scene documents, loaded as-is.'),
-                      const SizedBox(height: 6),
-                      _prop('PBR, physics, particles.',
-                          ' No Flutter renderer required.'),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                _rise(
-                  740,
-                  Column(
-                    children: [
-                      Button(
-                        onPressed: () => widget.onOpen(0),
-                        shape: const StadiumBorder(),
-                        color: _accent,
-                        foregroundColor: _accentInk,
-                        height: 52,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
-                        child: const Text('Roll the dice'),
-                      ),
-                      const SizedBox(height: 6),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _link('Showcase', () => widget.onOpen(1)),
-                          const Text('·',
-                              style: TextStyle(color: _muted, fontSize: 15)),
-                          _link('Harness', () => widget.onOpen(2)),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      const Text(
-                        'Community plugin, not affiliated with or endorsed by '
-                        'Presence Network Inc. DartNative and its logo belong '
-                        'to their owners.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 11, color: _muted, height: 1.35),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ],
       ),
     );
   }
+
+  /// The copy block; [compact] (landscape) tightens the headline so the
+  /// CTA stays on screen on a short viewport.
+  Widget _copy(String mono, {bool compact = false}) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _rise(
+            400,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 40,
+                  height: 3,
+                  decoration: const BoxDecoration(
+                    gradient: _brandGradient,
+                    borderRadius: BorderRadius.all(Radius.circular(2)),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  'COMMUNITY PLUGIN · FOR DARTNATIVE',
+                  style: TextStyle(
+                    fontFamily: mono,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 1.3,
+                    color: _accent,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          _rise(
+            520,
+            Text(
+              "Real 3D, on the platform's own GPU.",
+              style: TextStyle(
+                fontSize: compact ? 26 : 34,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.8,
+                height: 1.05,
+                color: _text,
+              ),
+            ),
+          ),
+          // Landscape (compact) drops the value props so the CTA stays
+          // above the fold on a ~400 dp-tall viewport (the block still
+          // scrolls if a large text scale outgrows it).
+          if (!compact) const SizedBox(height: 16),
+          if (!compact)
+          _rise(
+            640,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _prop('Native renderers.',
+                    ' SceneKit on iOS, Filament on Android.'),
+                const SizedBox(height: 6),
+                _prop('One Dart scene graph.',
+                    ' flutter_scene documents, loaded as-is.'),
+                const SizedBox(height: 6),
+                _prop('PBR, physics, particles.',
+                    ' No Flutter renderer required.'),
+              ],
+            ),
+          ),
+          SizedBox(height: compact ? 18 : 24),
+          _rise(
+            740,
+            Column(
+              children: [
+                Button(
+                  onPressed: () => widget.onOpen(0),
+                  shape: const StadiumBorder(),
+                  color: _accent,
+                  foregroundColor: _accentInk,
+                  height: 52,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w600,
+                  child: const Text('Roll the dice'),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _link('Showcase', () => widget.onOpen(1)),
+                    const Text('·',
+                        style: TextStyle(color: _muted, fontSize: 15)),
+                    _link('Harness', () => widget.onOpen(2)),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'dart3d is a community plugin, not affiliated with or '
+                  'endorsed by Presence Network Inc. DartNative and its logo '
+                  'belong to their owners.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 11, color: _muted, height: 1.35),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
 
   Widget _prop(String lead, String rest) => RichText(
         text: TextSpan(

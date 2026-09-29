@@ -148,6 +148,81 @@ void main() {
     });
   });
 
+  group('entrance + glow', () {
+    test('entrance scale blooms 0.965 → 1.0 over 1 s', () {
+      expect(heroEntranceScale(0), closeTo(0.965, 1e-12));
+      expect(heroEntranceScale(1), closeTo(1.0, 1e-12));
+      expect(heroEntranceScale(5), closeTo(1.0, 1e-12));
+      expect(heroEntranceScale(0.3), inExclusiveRange(0.965, 1.0));
+    });
+
+    test('glow ramps in, then breathes', () {
+      expect(heroGlowAt(0, low: 0.35), 0);
+      expect(heroGlowAt(1.0, low: 0.35), closeTo(0.35, 1e-9));
+      expect(heroGlowAt(1.0 + 2.4, low: 0.35), closeTo(0.65, 1e-9));
+    });
+
+    test('pulse off holds the static stage glow (not zero)', () {
+      expect(heroGlowAt(0.5, low: 0.35, breathing: false), greaterThan(0));
+      for (final t in [1.0, 3.4, 10.0]) {
+        expect(heroGlowAt(t, low: 0.35, breathing: false), 0.35);
+      }
+    });
+
+    test('a pinned glow wins over the breath', () {
+      for (final t in [1.0, 3.4, 10.0]) {
+        expect(heroGlowAt(t, low: 0.35, pinned: 0.65), 0.65);
+      }
+    });
+  });
+
+  group('HeroFraming', () {
+    const fov = 32 * _deg;
+
+    test('portrait: centred horizontally, lifted above centre', () {
+      final f = HeroFraming.forView(
+        frameRadius: 1,
+        fovY: fov,
+        aspect: 402 / 874,
+      );
+      expect(f.aimYaw, 0);
+      expect(tan(f.aimDrop) / tan(fov / 2), closeTo(0.44, 1e-9));
+    });
+
+    test('landscape: target a quarter in from the left, sphere in the '
+        'left half', () {
+      const aspect = 874 / 402;
+      final f = HeroFraming.forView(frameRadius: 1, fovY: fov, aspect: aspect);
+      expect(f.aimDrop, 0);
+      final tanX = tan(fov / 2) * aspect;
+      expect(tan(f.aimYaw) / tanX, closeTo(0.5, 1e-9));
+      // Sphere half-width ≤ a quarter of the view width.
+      expect(1 / (f.distance * tanX), lessThanOrEqualTo(0.25 + 1e-9));
+    });
+
+    test('a portrait → landscape change reframes (distance differs)', () {
+      final p = HeroFraming.forView(frameRadius: 1, fovY: fov, aspect: 0.46);
+      final l = HeroFraming.forView(frameRadius: 1, fovY: fov, aspect: 2.17);
+      expect(p.distance, isNot(closeTo(l.distance, 1e-3)));
+    });
+  });
+
+  group('HeroFocalTracker', () {
+    test('one finger yields deltas', () {
+      final f = HeroFocalTracker()..start(10, 10, 1);
+      expect(f.update(15, 12, 1), (5.0, 2.0));
+    });
+
+    test('2 → 1 finger rebases instead of snapping', () {
+      final f = HeroFocalTracker()..start(100, 100, 2);
+      expect(f.update(120, 100, 2), isNull);
+      // A finger lifts: the focal point jumps from the centroid to the
+      // remaining finger — no delta for that step.
+      expect(f.update(300, 400, 1), isNull);
+      expect(f.update(305, 400, 1), (5.0, 0.0));
+    });
+  });
+
   group('buildHeroScene', () {
     final hero = buildHeroScene(
       bytesFor: bytesFromDisk,

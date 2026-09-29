@@ -115,13 +115,19 @@ class _Dart3dExampleAppState extends State<Dart3dExampleApp> {
     final nav = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        // A labelled pill, not a bare icon: DartNative has no Semantics
+        // widget, and the native button's title is what VoiceOver /
+        // TalkBack read — so the label doubles as the accessible name.
         Button(
           onPressed: () => setState(() => _screen = _hero),
-          shape: const CircleBorder(),
+          title: 'Home',
+          shape: const StadiumBorder(),
           color: const Color(0x66101014),
           foregroundColor: const Color(0xEEFFFFFF),
-          padding: const EdgeInsets.all(8),
-          child: const Icon(CupertinoIcons.house_fill, size: 16),
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+          child: const Icon(CupertinoIcons.house_fill, size: 14),
         ),
         const SizedBox(width: 8),
         SegmentedControl(

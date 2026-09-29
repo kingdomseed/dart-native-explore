@@ -190,3 +190,102 @@ double heroBoomDistance({
 /// sits in the upper part of the screen, clear of the text block.
 double heroAimDrop({required double fovY, required double screenLift}) =>
     atan(screenLift * tan(fovY / 2));
+
+/// The logo's entrance "bloom" scale at [seconds] after load: 0.965 →
+/// 1.0 over [duration] on the site curve (the site's `hero-bloom`).
+double heroEntranceScale(double seconds, {double duration = 1.0}) =>
+    0.965 + 0.035 * heroEase(seconds / duration);
+
+/// The emissive factor at [seconds] after load: a 1 s ramp from 0 into
+/// [low], then — when [breathing] — the [heroBreath] low → high → low;
+/// otherwise it holds [pinned] (or [low]) as a static glow.
+double heroGlowAt(
+  double seconds, {
+  required double low,
+  double amplitude = 0.3,
+  double? pinned,
+  bool breathing = true,
+}) {
+  final target = pinned ?? low;
+  if (seconds < 1.0) return target * heroEase(seconds);
+  if (!breathing || pinned != null) return target;
+  return heroBreath(seconds - 1.0, low: low, high: low + amplitude);
+}
+
+/// How the hero frames the logo for a view of a given aspect: the boom
+/// [distance] and the camera's aim offsets — [aimYaw] turns the view
+/// right (so the target sits left of centre) and [aimDrop] tips it down
+/// (so the target sits above centre).
+final class HeroFraming {
+  const HeroFraming({
+    required this.distance,
+    required this.aimYaw,
+    required this.aimDrop,
+  });
+
+  final double distance;
+  final double aimYaw;
+  final double aimDrop;
+
+  /// Portrait (aspect < 1): the sphere at [portraitWidth] of the width,
+  /// lifted [portraitLift] of the half-height above centre, clear of
+  /// the bottom-anchored copy. Landscape: the sphere in the left half
+  /// (centred a quarter of the width in), the copy on the right.
+  factory HeroFraming.forView({
+    required double frameRadius,
+    required double fovY,
+    required double aspect,
+    double portraitWidth = 0.5,
+    double portraitLift = 0.44,
+    double heightFraction = 0.34,
+  }) {
+    final landscape = aspect >= 1;
+    final distance = heroBoomDistance(
+      frameRadius: frameRadius,
+      fovY: fovY,
+      aspect: aspect,
+      widthFraction: landscape ? portraitWidth / 2 : portraitWidth,
+      heightFraction: heightFraction,
+    );
+    final tanX = tan(fovY / 2) * aspect;
+    return HeroFraming(
+      distance: distance,
+      // Target at NDC x = −0.5 (a quarter of the width from the left).
+      aimYaw: landscape ? atan(0.5 * tanX) : 0,
+      aimDrop: landscape
+          ? 0
+          : heroAimDrop(fovY: fovY, screenLift: portraitLift),
+    );
+  }
+}
+
+/// Focal-point bookkeeping for a one-finger orbit fed by a scale
+/// recognizer (mirrors the Showcase handler): a delta is reported only
+/// when both this and the previous update were single-pointer, so a
+/// finger lifting out of a two-finger contact — whose focal point was
+/// the centroid — can't snap the orbit.
+final class HeroFocalTracker {
+  (double, double)? _last;
+  int _pointers = 0;
+
+  void start(double x, double y, int pointers) {
+    _last = (x, y);
+    _pointers = pointers;
+  }
+
+  /// The one-finger delta, or null when the pointer count is or was not
+  /// 1 (the focal point is rebased either way).
+  (double, double)? update(double x, double y, int pointers) {
+    final last = _last;
+    final prev = _pointers;
+    _last = (x, y);
+    _pointers = pointers;
+    if (pointers != 1 || prev != 1 || last == null) return null;
+    return (x - last.$1, y - last.$2);
+  }
+
+  void end() {
+    _last = null;
+    _pointers = 0;
+  }
+}

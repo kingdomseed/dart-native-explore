@@ -27,18 +27,6 @@ import 'showcase_loader.dart';
 /// flat, product-shot perspective.
 const double heroFovY = 32 * 3.141592653589793 / 180;
 
-/// The logo's bounding sphere fills this fraction of the view width —
-/// deliberately small: the operator asked for a generous zoom-out.
-const double heroWidthFraction = 0.5;
-
-/// Cap on the sphere's share of the view height (landscape / tablets).
-const double heroHeightFraction = 0.34;
-
-/// The orbit target sits this far above screen centre, as a fraction
-/// of the half-height — the logo lives in the upper part of the
-/// screen, over the text block.
-const double heroScreenLift = 0.44;
-
 /// Node names the loader gives the camera and the light rig — the
 /// hero reparents all of them under the pivot.
 const heroRigNodeNames = {
@@ -57,6 +45,7 @@ final class HeroScene {
     required this.center,
     required this.frameRadius,
     required this.distance,
+    required this.camera,
     required this.glowMaterials,
   });
 
@@ -72,6 +61,9 @@ final class HeroScene {
   final double frameRadius;
   final double distance;
 
+  /// The camera node (a pivot child) — [heroCameraPose] reframes it.
+  final LocalId camera;
+
   /// The self-glowing (textured) materials — the breath re-sends these
   /// with a new emissive factor.
   final List<LocalId> glowMaterials;
@@ -83,6 +75,22 @@ final class HeroScene {
 Quaternion heroPivotRotation(double yaw, double pitch) =>
     Quaternion.axisAngle(Vector3(0, 1, 0), yaw) *
     Quaternion.axisAngle(Vector3(1, 0, 0), pitch);
+
+/// The camera's pivot-local pose for [framing]: on the pivot's −Z axis
+/// at the boom distance, looking +Z, turned by the framing's aim offsets.
+(Vector3, Quaternion) heroCameraPose(HeroFraming framing) => (
+  Vector3(0, 0, -framing.distance),
+  Quaternion.axisAngle(Vector3(0, 1, 0), framing.aimYaw) *
+      Quaternion.axisAngle(Vector3(1, 0, 0), framing.aimDrop),
+);
+
+/// The framing for a view of [aspect] around a subject of [frameRadius].
+HeroFraming heroFramingFor(double frameRadius, double aspect) =>
+    HeroFraming.forView(
+      frameRadius: frameRadius,
+      fovY: heroFovY,
+      aspect: aspect,
+    );
 
 /// Where the camera sits in world space for an orbit at [yaw] /
 /// [pitch] around [center] at [distance] — the pivot composition, for
@@ -127,13 +135,8 @@ HeroScene? buildHeroScene({
   if (scene == null) return null;
   final doc = scene.document;
   final center = scene.cameraTarget;
-  final distance = heroBoomDistance(
-    frameRadius: scene.frameRadius,
-    fovY: heroFovY,
-    aspect: aspect,
-    widthFraction: heroWidthFraction,
-    heightFraction: heroHeightFraction,
-  );
+  final framing = heroFramingFor(scene.frameRadius, aspect);
+  final distance = framing.distance;
 
   final pivot = doc.createNode(
     name: 'hero.pivot',
@@ -157,19 +160,16 @@ HeroScene? buildHeroScene({
     }
   }
 
-  // The camera: on the pivot's −Z axis looking +Z, tipped down so the
-  // target rides above screen centre; the hero lens.
+  // The camera: on the pivot's −Z axis looking +Z, aimed so the target
+  // sits clear of the copy (above centre in portrait, left in
+  // landscape); the hero lens.
   final camera = doc.nodes[scene.cameraNode]!;
-  camera.transform = TrsTransform(
-    translation: Vector3(0, 0, -distance),
-    rotation: Quaternion.axisAngle(
-      Vector3(1, 0, 0),
-      heroAimDrop(fovY: heroFovY, screenLift: heroScreenLift),
-    ),
-  );
+  final pose = heroCameraPose(framing);
+  camera.transform = TrsTransform(translation: pose.$1, rotation: pose.$2);
   final cam = camera.components.firstWhere((c) => c.type == 'camera');
   cam.properties['fovRadiansY'] = DoubleValue(heroFovY);
-  cam.properties['far'] = DoubleValue(distance + scene.frameRadius * 40);
+  // Far enough for any reframe (landscape pulls the boom back further).
+  cam.properties['far'] = DoubleValue(distance * 4 + scene.frameRadius * 40);
 
   final glow = [
     for (final r in doc.resources.values)
@@ -187,6 +187,7 @@ HeroScene? buildHeroScene({
     center: center,
     frameRadius: scene.frameRadius,
     distance: distance,
+    camera: scene.cameraNode,
     glowMaterials: glow,
   );
 }

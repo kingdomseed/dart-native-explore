@@ -41,6 +41,28 @@ const _reelItem = ShowcaseItem(
   frameMargin: _reelFrameMargin,
 );
 
+/// The reel's camera pose for a view of [aspect]: the framed radius fit
+/// into the horizontal half-angle (portrait narrows fovY·aspect), at
+/// least the showcase's 2.8 × radius, looking back along [dir].
+(Vector3, Quaternion) reelCameraPose({
+  required Vector3 target,
+  required Vector3 dir,
+  required double frameRadius,
+  required double aspect,
+  double fovY = 0.8,
+}) {
+  final dist = max(
+    frameRadius * 2.8,
+    frameRadius / (tan(fovY / 2) * aspect),
+  );
+  final fwd = -dir;
+  return (
+    target + dir * dist,
+    Quaternion.axisAngle(Vector3(0, 1, 0), atan2(fwd.x, fwd.z)) *
+        Quaternion.axisAngle(Vector3(1, 0, 0), -asin(fwd.y.clamp(-1.0, 1.0))),
+  );
+}
+
 /// Full-screen capture view for the social reel — nothing but the
 /// SceneView.
 class ReelScreen extends StatefulWidget {
@@ -56,6 +78,8 @@ class ReelScreen extends StatefulWidget {
 class _ReelScreenState extends State<ReelScreen> {
   final _controller = SceneController();
   bool _loaded = false;
+  ShowcaseScene? _scene;
+  double _framedAspect = 0;
 
   @override
   void initState() {
@@ -66,11 +90,32 @@ class _ReelScreenState extends State<ReelScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (_loaded) return;
     final size = MediaQuery.of(context).size;
     if (size.width <= 0 || size.height <= 0) return;
-    _loaded = true;
-    _load(size.width / size.height);
+    final aspect = size.width / size.height;
+    if (!_loaded) {
+      _loaded = true;
+      _load(aspect);
+    } else if ((aspect - _framedAspect).abs() > 0.01) {
+      // Rotation / resize: re-fit the boom so a landscape-framed logo
+      // isn't cropped in portrait (and vice versa).
+      final scene = _scene;
+      if (scene == null) return;
+      _framedAspect = aspect;
+      final pose = reelCameraPose(
+        target: scene.cameraTarget,
+        dir: scene.cameraDir,
+        frameRadius: scene.frameRadius,
+        aspect: aspect,
+      );
+      _controller.setNodeTransforms([
+        NodeTransform(
+          scene.cameraNode,
+          translation: pose.$1,
+          rotation: pose.$2,
+        ),
+      ]);
+    }
   }
 
   void _load(double aspect) {
@@ -80,21 +125,18 @@ class _ReelScreenState extends State<ReelScreen> {
       log: dnLog,
     );
     if (scene == null) return;
-    // Fit the framed radius into the horizontal half-angle (portrait
-    // narrows fovY·aspect), then author the pose into the document
-    // before it ships.
-    const fovY = 0.8;
-    final dist = max(
-      scene.frameRadius * 2.8,
-      scene.frameRadius / (tan(fovY / 2) * aspect),
+    _scene = scene;
+    _framedAspect = aspect;
+    // Author the fitted pose into the document before it ships.
+    final pose = reelCameraPose(
+      target: scene.cameraTarget,
+      dir: scene.cameraDir,
+      frameRadius: scene.frameRadius,
+      aspect: aspect,
     );
-    final dir = scene.cameraDir;
-    final fwd = -dir;
     scene.document.nodes[scene.cameraNode]?.transform = TrsTransform(
-      translation: scene.cameraTarget + dir * dist,
-      rotation:
-          Quaternion.axisAngle(Vector3(0, 1, 0), atan2(fwd.x, fwd.z)) *
-          Quaternion.axisAngle(Vector3(1, 0, 0), -asin(fwd.y.clamp(-1.0, 1.0))),
+      translation: pose.$1,
+      rotation: pose.$2,
     );
     _controller.loadDocument(scene.document);
     final spin = _controller.animations.values
@@ -109,7 +151,8 @@ class _ReelScreenState extends State<ReelScreen> {
     }
     dnLog(
       'dart3d: reel — frameRadius ${scene.frameRadius.toStringAsFixed(3)} '
-      'dist ${dist.toStringAsFixed(3)} spin ${spin != null}',
+      'dist ${(pose.$1 - scene.cameraTarget).length.toStringAsFixed(3)} '
+      'spin ${spin != null}',
     );
   }
 
