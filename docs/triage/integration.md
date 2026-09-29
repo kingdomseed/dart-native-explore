@@ -303,7 +303,7 @@ hits, both explained: line 192 `Errored: 0` (a harness counter) and line 490
 terminating the app at 08:35:30 for a reinstall by another agent's `dn run`
 on the same simulator (runningboardd "termination request from
 installcoordinationd", then `InstallsStarted`), after the storm had
-completed. No crash report was written (`DiagnosticReports`, no `Runner*`).
+completed (excerpt committed: `ios-main/simulator-termination-0835.log` — line 96 `Received termination request from [osservice<com.apple.installcoordinationd>]`, line 109 `terminate_with_reason` for pid 33097, lines 179/194 `InstallsStarted`). No crash report was written (`DiagnosticReports`, no `Runner*`).
 Lesson recorded: one agent per simulator at a time.
 
 An earlier short run on the same tree (`ios-roll-button-settled.png`,
