@@ -38,3 +38,7 @@ GoogleService-Info.plist
 
 # Claude Code agent worktrees
 .claude/worktrees/
+
+# Videos go to release assets, never into git
+*.mp4
+*.mov

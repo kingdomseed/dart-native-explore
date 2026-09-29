@@ -87,7 +87,10 @@ Rules:
 ### Track S — stabilize (S0 blocks Tracks E and R; S1 blocks only E6)
 
 - [x] S0a Repo hygiene + CI (PR #12)
-- [ ] S0f Move `docs/artifacts/w30-review.mp4` (57 MB) and the root `DartNativeX-*.mp4` to GitHub release assets and link them; history rewrite to reclaim clone size is an operator decision (force-push)
+- [x] S0f Videos out of git: `w30-review.mp4` is a release asset
+      (`docs/artifacts/README.md`); the third-party DartNativeX clip was
+      removed (kept locally, not republished); history rewritten 2026-09-29 to
+      drop both plus the old `.cxx` build output
 - [x] S0b P1 fixes + review-thread triage — PRs #14 (Dart), #15 (iOS),
       #16 (Android); 7 Codex review rounds, every thread verified and
       answered; triage tables in `docs/triage/`; every deferred finding

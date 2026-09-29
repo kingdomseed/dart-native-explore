@@ -948,7 +948,7 @@ Each live lane drives the real surfaces. Android lanes use the phone A142 (`adb 
 **Review gate.** The operator reviews before merge.
 
 - [ ] Copy lane screenshots into `docs/artifacts/w30-review-<slug>.png`.
-- [ ] Record a video of the showcase tour under Vulkan. Save it as `docs/artifacts/w30-review.mp4`.
+- [ ] Record a video of the showcase tour under Vulkan. Save it as a release asset (now: release `media-w30-review`, see `docs/artifacts/README.md`).
 - [ ] Post the screenshots and the video in chat. Stop at merge-ready. Wait for the operator's click.
 
 **Merge.**
