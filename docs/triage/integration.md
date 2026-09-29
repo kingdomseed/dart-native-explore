@@ -283,13 +283,28 @@ from pre-rewrite heads:
    `w18 lane complete`.
 2. Dice tab → **ROLL button** → rolled and settled (`rolled … total 51`;
    `ios-main/ios-harness-run-roll.png`).
-3. Tab storm Showcase → Harness → Showcase → Dash renders
-   (`ios-main/ios-harness-run-after-tabs.png`); app process still alive
-   (`launchctl list` shows the example).
+3. Showcase → Dash renders (`ios-main/ios-harness-run-after-tabs.png`).
+   (A Harness tap in this session did not register — no log evidence — so
+   the tab storm was re-run separately, below.)
 
 **Error scan over the complete capture** (`ios-main/ios-harness-roll-tabs-full.log`, 666 lines, launch → end):
 `grep -ciE 'fatal|crash|exception|error|sigabrt|sigsegv|lost connection'` → **0**.
 Crash reports: `find ~/Library/Logs/DiagnosticReports -newermt @<run start> -iname '*Runner*'` → **0**.
+
+**Tab storm, separate session** on main `4e12ef3` (default mode;
+`ios-main/ios-tab-storm-full.log`, 489 lines). Each switch is confirmed by a
+log line and/or screenshot: Dice (line 15) → **Harness**
+(`storm-1-harness.png`, 60 fps, rolling) → **Showcase** (line 328,
+`storm-2-showcase.png`) → **Harness revisit** (`storm-3-harness-revisit.png`,
+settled) → **Dice** (line 487). Scan
+`grep -ciE 'fatal|crash|exception|error|sigabrt|sigsegv|lost connection'` → 2
+hits, both explained: line 192 `Errored: 0` (a harness counter) and line 490
+`Lost connection to device.` — the simulator log shows `installcoordinationd`
+terminating the app at 08:35:30 for a reinstall by another agent's `dn run`
+on the same simulator (runningboardd "termination request from
+installcoordinationd", then `InstallsStarted`), after the storm had
+completed. No crash report was written (`DiagnosticReports`, no `Runner*`).
+Lesson recorded: one agent per simulator at a time.
 
 An earlier short run on the same tree (`ios-roll-button-settled.png`,
 `ios-after-tab-storm-dash.png`) showed the same behaviour.

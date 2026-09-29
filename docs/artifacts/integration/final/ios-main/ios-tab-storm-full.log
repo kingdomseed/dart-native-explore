@@ -1,0 +1,490 @@
+Resolving dependencies...
+Downloading packages...
+  archive 4.2.0 (4.3.0 available)
+! dartnative 1.0.0 from path .dart_tool/dartnative_sdk/dartnative (overridden)
+  vector_math 2.4.2 (2.4.3 available)
+Got dependencies!
+2 packages have newer versions incompatible with dependency constraints.
+Try `dart pub outdated` for more information.
+dartnative: a newer framework build is available for this SDK (edition 7ae29132). Run `dn upgrade` to install it — nothing changes until you do.
+Launching lib/main.dart on iPhone 17 Pro in debug mode...
+Running Xcode build...                                          
+Xcode build done.                                           15.9s
+dartnative: [DN] Licence valid (community), expires 2027-09-14
+dartnative: [DN] lifecycle → AppLifecycleState.inactive
+dartnative: dart3d: dice table — 7 dice, 17 nodes, 29 payloads
+Syncing files to device iPhone 17 Pro...                        
+dartnative: [DN] lifecycle → AppLifecycleState.resumed
+Syncing files to device iPhone 17 Pro...                            73ms
+
+DartNative run key commands.
+r Hot reload. 🔥🔥🔥
+R Hot restart.
+h List all available interactive commands.
+d Detach (terminate "dn run" but leave application running).
+c Clear the screen
+q Quit (terminate the application on the device).
+
+A Dart VM Service on iPhone 17 Pro is available at: http://127.0.0.1:56546/3m8AVRlfy_s=/
+The DartNative DevTools debugger and profiler on iPhone 17 Pro is available at: http://127.0.0.1:56546/3m8AVRlfy_s=/devtools/?uri=ws://127.0.0.1:56546/3m8AVRlfy_s=/ws
+dartnative: dart3d: rolled d4:3 d6:1 d8:1 d10t:0 d10u:0 d12:1 d20:1 d%:100  ·  total 107
+dartnative: [DN] _performRebuild: root native view changed 1 → 15, re-emitting grow:1
+dartnative: dart3d: contact began a=82 b=84 pts=1
+dartnative: dart3d: contact began a=82 b=84 pts=1
+dartnative: dart3d: contact began a=82 b=84 pts=1
+dartnative: dart3d: contact began a=82 b=84 pts=1
+dartnative: dart3d: contact triggerEntered a=87 b=80
+dartnative: dart3d: contact triggerEntered a=87 b=80
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact triggerExited a=87 b=80
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=82 b=80 pts=1
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact ended a=82 b=79
+dartnative: dart3d: contact ended a=82 b=79
+dartnative: dart3d: contact ended a=85 b=82
+dartnative: dart3d: contact ended a=85 b=82
+dartnative: dart3d: contact ended a=85 b=82
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=84 b=82 pts=1
+dartnative: dart3d: contact began a=84 b=82 pts=1
+dartnative: dart3d: contact began a=84 b=82 pts=1
+dartnative: dart3d: contact began a=84 b=82 pts=1
+dartnative: dart3d: contact triggerEntered a=87 b=80
+dartnative: dart3d: contact triggerEntered a=87 b=80
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact triggerExited a=87 b=80
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=80 b=82 pts=1
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact ended a=82 b=79
+dartnative: dart3d: contact ended a=82 b=79
+dartnative: dart3d: contact ended a=85 b=82
+dartnative: dart3d: contact ended a=85 b=82
+dartnative: dart3d: contact ended a=85 b=82
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact began a=82 b=84 pts=1
+dartnative: dart3d: contact began a=82 b=84 pts=1
+dartnative: dart3d: contact began a=82 b=84 pts=1
+dartnative: dart3d: contact began a=82 b=84 pts=1
+dartnative: dart3d: contact triggerEntered a=87 b=80
+dartnative: dart3d: contact triggerEntered a=87 b=80
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact triggerExited a=87 b=80
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=82 b=80 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact ended a=82 b=79
+dartnative: dart3d: contact ended a=82 b=79
+dartnative: dart3d: contact ended a=85 b=82
+dartnative: dart3d: contact ended a=85 b=82
+dartnative: dart3d: contact ended a=85 b=82
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+-[WFIsolatedShortcutRunner init] Taking sandbox extensions for execution
+-[WFIsolatedShortcutRunner init]_block_invoke Sandbox extensions acquired
+Indexing for request: <WFToolKitIndexingRequest: 0x10519c320>, changeset: .partial(updatedCount: 1 removedCount: 0 updated: ["com.jasonholtdigital.dart3dExample"], removed: [], provenance: [VoiceShortcutClient.ToolKitIndexingReason.Changeset.Provenance.launchServicesSnapshot(<LaunchServicesSnapshot uuid=E96AE0FA-775F-4AF8-BBB9-5B54BB499C80, v=3060)> ["com.apple.TransparencySettingsIntents", "com.apple.TelephonyUtilities.IntelligenceIntents", "com.apple.PassbookUISceneService", "com.apple.FinanceUIService", "com.apple.AppleCashStickerPackHost", "com.apple.fullkeyboardaccess", "com.apple.ctkui", "com.apple.livetranscriptionui", "com.apple.FCAuthenticationUI", "com.apple.AppProtectionUIHost", "com.apple.ClockAngel", "com.apple.GradientPoster", "com.apple.Animoji.StickersApp", "com.apple.findmy.remoteuiservice", "com.apple.SOS.SettingsSOSAppIntentsExtension", "com.apple.GameCenterRemoteAlert", "com.apple.datadetectors.DDActionsService", "com.apple.systemactions", "com.apple.FinanceStub", "com.apple.CTNotifyUIService", "com.apple.Pr<…>, priority: <decode: missing data>
+Indexed: 0
+Errored: 0
+Skipped: [:]
+Finished in 0.745803s
+-[WFIsolatedShortcutRunner unaliveProcess] Releasing sandbox extensions
+dartnative: dart3d: contact ended a=82 b=79
+dartnative: dart3d: contact ended a=82 b=79
+dartnative: dart3d: contact ended a=82 b=79
+dartnative: dart3d: contact ended a=82 b=79
+dartnative: dart3d: contact triggerEntered a=87 b=80
+dartnative: dart3d: contact triggerEntered a=87 b=80
+dartnative: dart3d: contact began a=82 b=41 pts=1
+dartnative: dart3d: contact began a=82 b=41 pts=1
+dartnative: dart3d: contact began a=82 b=41 pts=1
+dartnative: dart3d: contact began a=82 b=41 pts=1
+dartnative: dart3d: contact triggerExited a=87 b=80
+dartnative: dart3d: contact began a=82 b=80 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact ended a=102 b=79
+dartnative: dart3d: contact ended a=102 b=79
+dartnative: dart3d: contact ended a=102 b=79
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact ended a=102 b=79
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact ended a=102 b=79
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact ended a=102 b=79
+dartnative: dart3d: contact ended a=102 b=79
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact ended a=102 b=79
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact ended a=102 b=79
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact ended a=102 b=79
+dartnative: dart3d: contact ended a=102 b=79
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact ended a=102 b=79
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact ended a=102 b=79
+dartnative: dart3d: contact ended a=102 b=79
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact ended a=102 b=79
+dartnative: dart3d: contact ended a=102 b=79
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: queries: pose:(0.25,0.45,1.45) · ray:n79@1.50,n102@2.50,n82@2.95,n86@4.95 · overlap:5 · cast:n79@1.20,n102@2.20
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: joint rig landed — 10 joints
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: joint broke #9 a=57 b=58
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=82 b=41 pts=1
+dartnative: dart3d: contact began a=82 b=41 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=84 b=82 pts=1
+dartnative: dart3d: contact began a=84 b=82 pts=1
+dartnative: dart3d: contact began a=80 b=82 pts=1
+dartnative: dart3d: contact began a=82 b=41 pts=1
+dartnative: dart3d: contact began a=82 b=41 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=84 b=82 pts=1
+dartnative: dart3d: contact began a=84 b=82 pts=1
+dartnative: dart3d: contact began a=80 b=82 pts=1
+dartnative: dart3d: contact began a=82 b=41 pts=1
+dartnative: dart3d: contact began a=82 b=41 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=84 b=82 pts=1
+dartnative: dart3d: contact began a=84 b=82 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact began a=82 b=48 pts=1
+dartnative: dart3d: contact began a=82 b=48 pts=1
+dartnative: dart3d: contact began a=82 b=48 pts=1
+dartnative: dart3d: contact began a=82 b=48 pts=1
+dartnative: dart3d: contact ended a=82 b=48
+dartnative: dart3d: contact ended a=82 b=48
+dartnative: dart3d: contact ended a=82 b=48
+dartnative: dart3d: contact ended a=82 b=48
+dartnative: dart3d: contact began a=82 b=48 pts=1
+dartnative: dart3d: contact began a=82 b=48 pts=1
+dartnative: dart3d: contact began a=82 b=48 pts=1
+dartnative: dart3d: contact began a=82 b=48 pts=1
+dartnative: dart3d: showcase — dash: 41 nodes · 2 geo · 2 mat · 2 tex · 1 skins · 9 anims
+dartnative: [DN] _performRebuild: root native view changed 15 → 48, re-emitting grow:1
+dartnative: [DN] _performRebuild: root native view changed 48 → 69, re-emitting grow:1
+dartnative: dart3d: contact began a=84 b=82 pts=1
+dartnative: dart3d: contact began a=84 b=82 pts=1
+dartnative: dart3d: contact began a=84 b=82 pts=1
+dartnative: dart3d: contact began a=84 b=82 pts=1
+dartnative: dart3d: contact triggerEntered a=87 b=80
+dartnative: dart3d: contact triggerEntered a=87 b=80
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact triggerExited a=87 b=80
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=80 b=82 pts=1
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: contact ended a=85 b=82
+dartnative: dart3d: contact ended a=85 b=82
+dartnative: dart3d: contact ended a=85 b=82
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=84 b=82 pts=1
+dartnative: dart3d: contact began a=84 b=82 pts=1
+dartnative: dart3d: contact began a=84 b=82 pts=1
+dartnative: dart3d: contact began a=84 b=82 pts=1
+dartnative: dart3d: contact triggerEntered a=87 b=80
+dartnative: dart3d: contact triggerEntered a=87 b=80
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact triggerExited a=87 b=80
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=80 b=82 pts=1
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact ended a=82 b=79
+dartnative: dart3d: contact ended a=82 b=79
+dartnative: dart3d: contact ended a=85 b=82
+dartnative: dart3d: contact ended a=85 b=82
+dartnative: dart3d: contact ended a=85 b=82
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=82 b=79 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact began a=84 b=82 pts=1
+dartnative: dart3d: contact began a=84 b=82 pts=1
+dartnative: dart3d: contact began a=84 b=82 pts=1
+dartnative: dart3d: contact began a=84 b=82 pts=1
+dartnative: dart3d: contact triggerEntered a=87 b=80
+dartnative: dart3d: contact triggerEntered a=87 b=80
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact triggerExited a=87 b=80
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=82 b=80 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=82 pts=1
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: contact ended a=85 b=82
+dartnative: dart3d: contact ended a=85 b=82
+dartnative: dart3d: contact ended a=85 b=82
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: dice table — 7 dice, 17 nodes, 29 payloads
+dartnative: [DN] _performRebuild: root native view changed 69 → 102, re-emitting grow:1
+dartnative: dart3d: rolled d4:3 d6:1 d8:1 d10t:0 d10u:0 d12:1 d20:1 d%:100  ·  total 107
+Lost connection to device.
