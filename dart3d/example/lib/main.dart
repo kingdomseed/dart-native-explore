@@ -12,6 +12,7 @@ import 'dice_table.dart';
 import 'feature_scene.dart';
 import 'phase_timers.dart';
 import 'imported_scene.dart';
+import 'reel_scene.dart';
 import 'showcase_scene.dart';
 
 void main() {
@@ -51,7 +52,8 @@ void _applyBackendDefine() {
 ///   phases exercise the feature matrix (W0–W16, wloose, W18, W24, W25).
 ///
 /// Boot overrides: `--dart-define=DART3D_SCENE=dice|showcase|harness`
-/// picks the screen; `--dart-define=DART3D_MODEL=<label>` boots the
+/// picks the screen (`reel` boots the chrome-free logo capture view —
+/// see `reel_scene.dart`); `--dart-define=DART3D_MODEL=<label>` boots the
 /// showcase with that item selected (the old single-model lane);
 /// `--dart-define=DART3D_QUALITY=low|medium|high` pins the view tier.
 /// `--dart-define=DART3D_BACKEND=auto|opengl|vulkan` picks the Filament
@@ -85,6 +87,7 @@ class _Dart3dExampleAppState extends State<Dart3dExampleApp> {
   int _bootIndex() {
     if (Dart3dExampleApp._bootModel.isNotEmpty) return 1;
     return switch (Dart3dExampleApp._bootScene) {
+      'reel' => 3,
       'harness' => 2,
       'showcase' || 'gallery' => 1,
       _ => 0,
@@ -93,6 +96,7 @@ class _Dart3dExampleAppState extends State<Dart3dExampleApp> {
 
   @override
   Widget build(BuildContext context) {
+    if (_screen == 3) return ReelScreen(quality: Dart3dExampleApp.bootQuality);
     final nav = Center(
       child: SegmentedControl(
         segments: const ['Dice', 'Showcase', 'Harness'],

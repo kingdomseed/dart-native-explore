@@ -242,51 +242,49 @@ ShowcaseScene? loadShowcaseScene(
 
   // A slab under the lowest bound gives the key light something to
   // throw shadows onto; visual only, no physics in the gallery.
-  final slabMat = doc.addResource(
-    stage != null
-        ? dnLogoSlabMaterial(doc)
-        : MaterialResource(
-            doc.newId(),
-            type: 'physicallyBased',
-            properties: {
-              'baseColor': ColorValue(0.13, 0.14, 0.17, 1),
-              'roughness': DoubleValue(0.92),
-              'metallic': DoubleValue(0.0),
-            },
-          ),
-  );
-  final slabGeo = doc.addResource(
-    GeometryResource(
-      doc.newId(),
-      procedural: CuboidGeometrySpec(
-        extents: Vector3(
-          frameRadius * 8,
-          radius * 0.04,
-          frameRadius * 8,
+  if (stage?.groundSlab ?? true) {
+    final slabMat = doc.addResource(
+      stage != null
+          ? dnLogoSlabMaterial(doc)
+          : MaterialResource(
+              doc.newId(),
+              type: 'physicallyBased',
+              properties: {
+                'baseColor': ColorValue(0.13, 0.14, 0.17, 1),
+                'roughness': DoubleValue(0.92),
+                'metallic': DoubleValue(0.0),
+              },
+            ),
+    );
+    final slabGeo = doc.addResource(
+      GeometryResource(
+        doc.newId(),
+        procedural: CuboidGeometrySpec(
+          extents: Vector3(frameRadius * 8, radius * 0.04, frameRadius * 8),
         ),
       ),
-    ),
-  );
-  doc.createNode(
-    name: 'showcase.slab',
-    transform: TrsTransform(
-      translation: Vector3(
-        center.x,
-        (hasBounds ? bmin.y : 0) - radius * 0.02,
-        center.z,
+    );
+    doc.createNode(
+      name: 'showcase.slab',
+      transform: TrsTransform(
+        translation: Vector3(
+          center.x,
+          (hasBounds ? bmin.y : 0) - radius * 0.02,
+          center.z,
+        ),
       ),
-    ),
-    components: [
-      ComponentSpec(
-        'mesh',
-        properties: {
-          'geometry': ResourceRefValue(slabGeo.id),
-          'material': ResourceRefValue(slabMat.id),
-        },
-      ),
-    ],
-    root: true,
-  );
+      components: [
+        ComponentSpec(
+          'mesh',
+          properties: {
+            'geometry': ResourceRefValue(slabGeo.id),
+            'material': ResourceRefValue(slabMat.id),
+          },
+        ),
+      ],
+      root: true,
+    );
+  }
 
   // The 3/4 model-viewer camera: up and south-west of center (unless
   // the item authors its own direction). With the
