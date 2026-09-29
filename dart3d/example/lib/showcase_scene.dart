@@ -218,9 +218,15 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
 
   void _cycleAnim() {
     if (_anims.isEmpty) return;
-    _controller.stopAnimation(_anims[_animIndex].id);
+    final previous = _anims[_animIndex].id;
     _animIndex = (_animIndex + 1) % _anims.length;
-    _controller.playAnimation(_anims[_animIndex].id, loop: true);
+    // One batch, so the stop (which takes the old clip out of the
+    // blend) and the play land in the same native drain — no frame
+    // shows the bind pose between the two clips.
+    _controller.applyCommands([
+      encodeAnimCommand(previous, stop: true),
+      encodeAnimCommand(_anims[_animIndex].id, play: true, loop: true),
+    ]);
     setState(() {});
   }
 

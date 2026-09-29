@@ -611,7 +611,11 @@ final class SceneController {
     applyCommands([encodeAnimCommand(id, pause: true)]);
   }
 
-  /// Pauses animation [id] and seeks it back to the beginning.
+  /// Pauses animation [id], seeks it back to the beginning, and takes
+  /// it out of the blend: until the next [playAnimation] or
+  /// [seekAnimation] it contributes nothing, so every channel it drove
+  /// returns to its bind pose (or to what the other clips drive).
+  /// Use [pauseAnimation] to hold a clip's pose instead.
   void stopAnimation(LocalId id) {
     applyCommands([encodeAnimCommand(id, stop: true)]);
   }

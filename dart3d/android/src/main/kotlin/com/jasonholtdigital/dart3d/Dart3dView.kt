@@ -501,23 +501,6 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     internal var nodeSkinning: MutableMap<Long, NodeSkin> = HashMap()
 
     /**
-     * W11 clip playback state — upstream's `AnimationClip` knobs. A
-     * clip exists only after an `anim` op names its animation —
-     * upstream's `createAnimationClip` shape: no clip, no
-     * contribution (a doc load never snaps animated nodes to a key-0
-     * pose). Channel data is read live from `resources.animations` so
-     * an `upsertAnimation`/payload re-decode refreshes the curves
-     * underneath a live clip.
-     */
-    private class AnimClipState {
-        var playing = false
-        var time = 0.0            // playbackTime, seconds
-        var timeScale = 1.0
-        var weight = 1.0          // clamped [0,1] on assignment
-        var loop = false
-    }
-
-    /**
      * Per-node captured bind state — upstream's `AnimationTransforms`.
      * Captured ONCE when a channel first binds the node and kept even
      * after its clips go away (upstream keeps `_targetTransforms`
@@ -4013,10 +3996,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     /// `{"op":"anim","anim":"<id>",…}` — the runtime clip control.
     /// The clip is created lazily, paused at t=0, on first reference —
     /// upstream's `createAnimationClip` contract (a doc's animations
-    /// exist as defs; nothing autoplays). Verbs apply in
-    /// pause→stop→play order so `play` trumps; `time` then seeks
-    /// (clamped to `[0, endTime]` — `play`+`time` is `gotoAndPlay`);
-    /// `timeScale`/`weight`/`loop` are the knob writes.
+    /// exist as defs; nothing autoplays). Verb order and the knob
+    /// writes live in [AnimClipState.applyOp]; `stop` also takes the
+    /// clip out of the blend until the next `play`/seek (#33).
     private fun applyAnim(json: JSONObject) {
         val token = json.optString("anim")
         val key = D3Wire.localIdKey(token) ?: return
@@ -4025,23 +4007,18 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 "anim on unknown animation $key; ignoring")
             return
         }
-        val clip = animClips.getOrPut(key) { AnimClipState() }
-        if (json.optBoolean("pause")) clip.playing = false
-        if (json.optBoolean("stop")) {
-            clip.playing = false
-            clip.time = 0.0
-        }
-        if (json.optBoolean("play")) clip.playing = true
-        if (json.has("time")) {
-            clip.time = json.optDouble("time").coerceIn(0.0, def.endTime)
-        }
-        if (json.has("timeScale")) {
-            clip.timeScale = json.optDouble("timeScale")
-        }
-        if (json.has("weight")) {
-            clip.weight = json.optDouble("weight").coerceIn(0.0, 1.0)
-        }
-        if (json.has("loop")) clip.loop = json.optBoolean("loop")
+        animClips.getOrPut(key) { AnimClipState() }.applyOp(
+            endTime = def.endTime,
+            play = json.optBoolean("play"),
+            pause = json.optBoolean("pause"),
+            stop = json.optBoolean("stop"),
+            time = if (json.has("time")) json.optDouble("time") else null,
+            timeScale =
+                if (json.has("timeScale")) json.optDouble("timeScale")
+                else null,
+            weight = if (json.has("weight")) json.optDouble("weight") else null,
+            loop = if (json.has("loop")) json.optBoolean("loop") else null,
+        )
     }
 
     /// `{"op":"upsertSkin","id":"<id>","skin":{…}}` — re-decode one
@@ -4182,11 +4159,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             clip.time = t
         }
 
-        // Resolve bindings and total the clip weights — upstream
-        // normalizes by Σ every registered clip's weight.
-        var totalWeight = 0.0
-        for (clip in animClips.values) totalWeight += clip.weight
-        val mult = if (totalWeight > 1.0) 1.0 / totalWeight else 1.0
+        // Effective per-clip weights — upstream normalizes by Σ the
+        // registered clips' weights; stopped clips sit out of both the
+        // total and the blend (#33).
+        val weights = blendWeights(animClips)
 
         /// Accumulating pose state for one bound node this frame —
         /// starts at the captured bind pose / rest weights.
@@ -4208,10 +4184,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // still registers its nodes' bind poses and drives them (to
         // bind) per upstream's createAnimationClip; only the value
         // contribution gates on w.
-        for (animKey in animClips.keys.sorted()) {
+        for ((animKey, w) in weights) {
             val clip = animClips[animKey] ?: continue
             val def = resources.animations[animKey] ?: continue
-            val w = (clip.weight * mult).toFloat()
             for (ch in def.channels) {
                 val nk = animTarget(ch) ?: continue
                 val rec = nodesById[nk] ?: continue
