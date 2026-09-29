@@ -306,7 +306,12 @@ class _HeroScreenState extends State<HeroScreen>
     final size = MediaQuery.of(context).size;
     final padding = MediaQuery.of(context).padding;
     final landscape = size.width >= size.height;
-    // Landscape insets (camera cutout / nav bar) sit on the sides.
+    // Horizontal safe area for the wordmark: landscape insets (notch /
+    // cutout) sit on the sides — on the A142 the cutout arrives in
+    // `padding.top` (see copyRight), so take the larger of the two.
+    final double wordmarkLeft =
+        24 + (landscape ? max(padding.left, padding.top) : padding.left);
+    // Landscape: the copy takes the right half.
     final double copyLeft = landscape ? size.width / 2 : 24 + padding.left;
     // DartNative quirk (A142, landscape): `size` spans the full display
     // while the window loses the 48 dp display-cutout band on the side,
@@ -379,7 +384,7 @@ class _HeroScreenState extends State<HeroScreen>
             ),
           ),
           Positioned(
-            left: 24,
+            left: wordmarkLeft,
             top: padding.top + 14,
             // The brief's identity guardrail: our wordmark leads; the
             // DartNative name appears only as "for DartNative".
