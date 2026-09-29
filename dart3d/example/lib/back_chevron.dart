@@ -3,7 +3,9 @@ import 'dart:math';
 import 'package:dartnative/dartnative.dart';
 
 /// The way back to the hero from the Dice and Showcase screens: a small
-/// chevron disc at the top-left, inside the safe area. Returns a
+/// "‹ Back" pill at the top-left, inside the safe area. The visible title
+/// is also the accessible name — DartNative has no `Semantics` widget, and
+/// VoiceOver / TalkBack read the native button's title. Returns a
 /// [Positioned] for the screen's root `Stack`.
 Widget backChevron(BuildContext context, VoidCallback onPressed) {
   final size = MediaQuery.of(context).size;
@@ -19,11 +21,14 @@ Widget backChevron(BuildContext context, VoidCallback onPressed) {
     top: padding.top + 8,
     child: Button(
       onPressed: onPressed,
-      shape: const CircleBorder(),
+      title: 'Back',
+      shape: const StadiumBorder(),
       color: const Color(0x66101014),
       foregroundColor: const Color(0xEEFFFFFF),
-      padding: const EdgeInsets.all(12),
-      child: const Icon(CupertinoIcons.chevron_left, size: 18),
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+      padding: const EdgeInsets.fromLTRB(10, 8, 14, 8),
+      child: const Icon(CupertinoIcons.chevron_left, size: 16),
     ),
   );
 }
