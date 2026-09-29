@@ -141,22 +141,35 @@ Rules:
 
 ### Track P — product (parallel with E if O1 = lift)
 
-- [ ] P1 Define the parser → scene contract (`parse → RollSpec → outcome`)
-      in `mythic_dice_parser`; decide physics-outcome vs parser-outcome
-      reconciliation (recommended: physics picks faces, parser evaluates
-      the expression over the rolled faces).
-- [ ] P2 DartNative dice app shell (`dn create`), wired to the parser and
-      dart3d. Replaces the example's dice tab as the dice product.
-- [ ] P3 Dice feel, from the 09-17 feedback: pick-up-and-toss roll,
-      labeled Reset, table follows screen aspect (edges = glass walls,
-      survives pan), in-app quality picker (auto by device + override),
-      iPad white screen root cause.
-- [ ] P4 Demo app (**depends on E2** for the orbit controller): curated showcase (not test lanes) with a stage,
-      orbit camera, side-by-side reference against flutter_scene demos;
-      3D animated DartNative logo centerpiece (Blender).
-      - Logo asset + Showcase entry landed on `p4-dn-logo-3d`
-        (`tool/dn_logo/build.sh`, `lib/dn_logo_stage.dart`; evidence
-        `docs/artifacts/p4-dn-logo/`). Hero launch scene is a follow-up.
+Demo plan and upstream mapping: `docs/design/demo-program.md` (operator
+decisions in §8). Principle: today's harness lanes and dice table are
+scaffolding, not the demo.
+
+- [ ] P1 Parser → scene contract (`parse → RollSpec → outcome`): physics
+      picks faces, `mythic_dice_parser` evaluates over them
+      (`PreRolledDiceRoller`). No extraction/package split planned.
+- [ ] P2 **Standalone dice-roller app** — dice rolling only, mobile only,
+      built on dart3d, operator's portfolio (possibly published free or
+      paid). Separate project; starts after the example's dice experience
+      reaches R3.
+- [ ] P3 **Dice experience in the example** — far nicer than today's
+      table; beat upstream's "Dice Shadows" (demo-program §5 phases R1–R5:
+      readout fix + screen-fitted walls + labeled Reset → aim/toss/sweep →
+      notation + count-up + audio → juice → polish). Includes the 09-17
+      feedback (pick-up-and-toss, walls = screen edges, quality picker,
+      iPad white screen).
+- [ ] P4 Hero launch scene + 3D DartNative logo. Logo landed (#26);
+      hero scene in progress (`docs/design/hero-scene-brief.md`).
+- [ ] P5 Demo program D2–D17 (demo-program §4 + §8): showroom, physics
+      playground, road trip, campfire, explosions, material gallery, …;
+      engine-gated demos follow their units. New flagships: **D16 pirate
+      ship on water** (E6) and **D17 Frankfurt street-corner diorama with a
+      streetcar** (OSM footprints + Blender + Kenney; never commit the
+      private address).
+- [ ] P6 License-clean replacements for Dash and fcar before any public
+      demo build (Kenney CC0 / Khronos samples / own Blender models).
+- [ ] P7 Full UI design pass with Claude Design — at the END of the demo
+      work.
 
 ### Track V — 0.24 parity (final goal; after Track E closes on 0.23.0)
 
