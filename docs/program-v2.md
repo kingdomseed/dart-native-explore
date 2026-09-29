@@ -117,6 +117,15 @@ Rules:
       remaining Filament builder sites for the GC-reachability hazard;
       W25 settle lane never passes after wLoose; body poses/velocities
       across deferred re-realize (M)
+- [ ] S0h Android cold-start material compile: on a fresh install the
+      first scene waits ~14 s — Filament compiles the lit material
+      packages one after another (~3.5 s each: `lit|false|OPAQUE|e0`,
+      `MASKED`, `TRANSPARENT`, then `OPAQUE|e1`; A142 Vulkan logcat,
+      #31). The P4 hero shows its copy over an empty stage meanwhile.
+      Options: compile the packages in parallel; persist compiled
+      packages to disk across launches; a tasteful loading state on the
+      hero (e.g. the logo fades in on its first rendered frame) until
+      the first frame lands. (M)
 - [ ] S1 **Renderer spike** (≤ 3 days): Filament 1.77 on iOS Metal
       rendering the dice table + one showcase asset; measure binary size,
       frame time, integration cost. Output: go/no-go on D2.
