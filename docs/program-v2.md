@@ -147,23 +147,28 @@ scaffolding, not the demo.
 
 - [ ] P1 Parser → scene contract (`parse → RollSpec → outcome`): physics
       picks faces, `mythic_dice_parser` evaluates over them
-      (`PreRolledDiceRoller`). No extraction/package split planned.
+      (`PreRolledDiceRoller`) for rolls whose dice are known up front.
+      **Exploding/reroll expressions** (e.g. `4d6!`) need an extra physical
+      throw mid-evaluation, which requires `CallbackDiceRoller` to become
+      async in `mythic_dice_parser` — an explicit P1 dependency; until it
+      lands, P3 scopes explode/reroll to the pre-rolled fallback (extra dice
+      rolled virtually, shown after). No extraction/package split planned.
 - [ ] P2 **Standalone dice-roller app** — dice rolling only, mobile only,
       built on dart3d, operator's portfolio (possibly published free or
       paid). Separate project; starts after the example's dice experience
-      reaches R3.
+      reaches DR3.
 - [ ] P3 **Dice experience in the example** — far nicer than today's
-      table; beat upstream's "Dice Shadows" (demo-program §5 phases R1–R5:
+      table; beat upstream's "Dice Shadows" (demo-program §5 phases DR1–DR5:
       readout fix + screen-fitted walls + labeled Reset → aim/toss/sweep →
       notation + count-up + audio → juice → polish). Includes the 09-17
       feedback (pick-up-and-toss, walls = screen edges, quality picker,
       iPad white screen).
 - [ ] P4 Hero launch scene + 3D DartNative logo. Logo landed (#26);
       hero scene in progress (`docs/design/hero-scene-brief.md`).
-- [ ] P5 Demo program D2–D17 (demo-program §4 + §8): showroom, physics
+- [ ] P5 Demo program M2–M17 (demo-program §4 + §8): showroom, physics
       playground, road trip, campfire, explosions, material gallery, …;
-      engine-gated demos follow their units. New flagships: **D16 pirate
-      ship on water** (E6) and **D17 Frankfurt street-corner diorama with a
+      engine-gated demos follow their units. New flagships: **M16 pirate
+      ship on water** (E6) and **M17 Frankfurt street-corner diorama with a
       streetcar** (OSM footprints + Blender + Kenney; never commit the
       private address).
 - [ ] P6 License-clean replacements for Dash and fcar before any public
