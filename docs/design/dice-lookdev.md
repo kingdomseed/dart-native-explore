@@ -6,11 +6,6 @@ is app code. Source of truth for the renders:
 `docs/design/dice-lookdev/`. Context: `docs/design/demo-program.md` §3
 (upstream's roller) and §5 (our Dice Roller plan).
 
-> **Push 1 of 2.** This push has the readability system, the d4 shard and
-> the round-2 renders of Emberforged, Frostbound, Arcane Study, Northfield
-> Relay and Vermilion Court. Fate Engine, Celestial, Hearthside, Old Road,
-> Voltline and Gemcutter (their links below) land in the next push.
-
 Eleven themes. Each is a **dice set plus the environment it is rolled in**:
 an engraved rolling surface as a hero object, framing props, a lighting
 mood and atmosphere. The two signature sets are Emberforged (fire) and
@@ -61,7 +56,7 @@ vendored in `tool/dice_lookdev/fonts/` with its licence).
 
 | Feedback | Change |
 |---|---|
-| "Dice numbers must be super readable no matter what." | A readability system (§0.2) with a measured gate on the top-down view; every set passes. Numerals are 20–30% bigger and every set has a chosen numeral treatment. |
+| "Dice numbers must be super readable no matter what." | A readability system (§0.2) with a measured gate on the top-down view; every set passes. Numerals are 20–40% bigger relative to their face (and the dice 1.3× bigger), and every set has a chosen numeral treatment. |
 | Vermilion Court too dark to read | Brighter vermilion lacquer; gold-leaf numerals (part diffuse) in a black-lacquer keyline; side key placed so its mirror image misses the tray; a soft overhead for the gold; matte-ish tray lacquer (round 1 mirrored the lanterns as white discs). A z-fight between the tray floor and its base (half the floor went black) is fixed, in every environment that had it. |
 | "You can't see the arcane ones" | The tray bed is now a brushed-brass field with the sigil engraved dark; oak shows as a border. A warm candle key pools on the tray from the candle cluster; the gilt numerals glow softly. Far-side numerals no longer show through the body (transmission 0.25 → 0.04). |
 | "Camera is still face down" | The primary render is the app's camera: straight down, fov 0.95 rad (`dice_table_scene.dart`), 1179×2556, rims at the screen edges, every die settled with a result up. Dice are 1.3× larger (in-app size: `dice_table_scene` uses ~23–33 mm dice in a 132 mm tray). |
@@ -72,7 +67,7 @@ vendored in `tool/dice_lookdev/fonts/` with its licence).
 | Emberforged molten channel pale | A deep-orange melt with dark crust rafts whose edges burn yellow. |
 | Celestial dice grey-violet | Saturated indigo → violet → magenta nebula with cyan wisps and more glow. |
 | Gemcutter banding | Domain-warped noise swirl (deep emerald, jade ribbons, thin pearl wisps) replaces the regular wave bands. |
-| Posterized renders | Full-colour JPEG q90; renders total under 20 MB. |
+| Posterized renders | Full-colour JPEG q90, pixel-for-pixel the measured render (only JPEG compression in between); ~10 MB for everything. |
 
 Every set and every tray from round 1 is kept. Low props were added to the
 strips above and below each tray so the environment reads at top-down (tall
@@ -96,11 +91,13 @@ papers, a fan, loose gears, a phone, a compass...).
    the atlas layout (`<theme>_halo.png`: R = numeral dilated by ~0.2 face
    inradius, G = soft glow), so it is exact per glyph.
 4. **Die vs tray**: the die's silhouette must separate from the tray around
-   it by **≥ 2 : 1** (the better of the die's median body tone and its
-   mean, which counts glowing numerals and metal edges). This drove a
-   lighter or darker field under several sets (Arcane brass field,
-   Frostbound slate, Gemcutter grey velvet, Fate Engine bright steel,
-   Voltline lightbox, Hearthside tea-stained vellum, Old Road dark map).
+   it by **≥ 2 : 1**, taking the best of three readings: the die's median
+   body tone, its mean (which counts glowing numerals and metal edges),
+   and its outline (the die's outer 2 px, for rim-lit or neon-edged dice;
+   only Voltline needs it). This drove a lighter or darker field under
+   most sets (Arcane brass field, Frostbound slate, Gemcutter light grey
+   velvet, Fate Engine bright steel, Voltline lightbox, Hearthside
+   tea-stained vellum, Old Road dark map, Northfield dark-green mat).
 5. **Top-down lighting rules** (the round-1 failures were mostly these):
    - Never put a small, bright light near the camera axis: its reflection
      lands on the top faces as a hotspot over the numeral.
@@ -125,7 +122,8 @@ top-down render (`render_set.py --check`, always on in `render.sh`):
   surround = median over the top face in a ring 1…1+r px around the
   numeral (r = 8% of the numeral's pixel height). Also a "plain body"
   ratio over the rest of the face (where the keyline doesn't reach) for
-  reference, and die vs a 3–12 px ring of tray.
+  reference, and die vs a 3–12 px ring of tray (other dice excluded,
+  contact shadow included).
 - Results merge into `readability.json`; `readability_check.py --table`
   prints the table below. `readability-crops.jpg` shows exactly the
   pixels that were measured.
@@ -144,8 +142,14 @@ Blender --background --python dart3d/example/tool/dice_lookdev/readability_check
 | Emberforged | glowing: white-hot emissive numerals in a soot keyline | 15.8:1 (d4) | 3.7:1 | 2.7:1 | 26 px | 0.41 | PASS |
 | Frostbound | glowing: emissive rime numerals on a deep-blue keyline | 14.6:1 (d8) | 3.1:1 | 2.4:1 | 25 px | 0.41 | PASS |
 | Arcane Study | glowing: warm spell-lit gilt numerals, midnight keyline | 9.2:1 (d4) | 6.0:1 | 2.1:1 | 26 px | 0.42 | PASS |
+| Fate Engine | glowing: aqua-charged numerals in a dark keyline | 16.6:1 (d8) | 14.2:1 | 2.2:1 | 26 px | 0.42 | PASS |
+| Celestial Observatory | glowing: starlight-silver numerals in an indigo keyline | 18.7:1 (d10u) | 9.8:1 | 2.7:1 | 26 px | 0.41 | PASS |
+| Hearthside Tome | inked: engraved, filled with sepia-black ink | 5.1:1 (d10t) | 5.4:1 | 2.1:1 | 23 px | 0.43 | PASS |
+| Old Road | enamel fill: black niello in bright worn gold | 6.2:1 (d10t) | 5.9:1 | 2.1:1 | 28 px | 0.46 | PASS |
 | Northfield Relay | inked: near-black instrument print on warm-white ABS | 8.1:1 (d4) | 7.9:1 | 4.6:1 | 22 px | 0.41 | PASS |
+| Voltline | glowing: magenta neon numerals in a black keyline | 14.3:1 (d4) | 14.3:1 | 4.6:1 | 29 px | 0.41 | PASS |
 | Vermilion Court | bright metal + keyline: gold leaf in a black-lacquer keyline | 5.4:1 (d10u) | 2.0:1 | 2.1:1 | 27 px | 0.44 | PASS |
+| Gemcutter | bright enamel + keyline: warm-gold enamel in a deep-green keyline | 8.2:1 (d4) | 3.8:1 | 2.1:1 | 24 px | 0.41 | PASS |
 
 "vs plain body" is the numeral against the face beyond the keyline; it
 shows which sets lean on the keyline (Vermilion, Frostbound, Celestial) and
@@ -211,7 +215,7 @@ environment's default is 128–160) with OpenImageDenoise, **Khronos PBR
 Neutral** view transform. AgX bleached the fire to white; PBR Neutral keeps
 emissive hues and is also a tone mapper the real-time path can match.
 Output: full-colour JPEG q90 (`env_common.save_jpeg`); the lossless PNG is
-kept only in the temp dir for the readability check. About 1 h for all
+kept only in the temp dir for the readability check. About 1.5 h for all
 eleven sets on an M4. Do not run two renders at once: Cycles runs out of
 GPU memory.
 
@@ -641,8 +645,9 @@ chart, a silver compass, loose amethyst.
 ![hero](dice-lookdev/hearthside-hero.jpg)
 
 **Round 2.** Treatment: *inked* — engraved and filled with sepia-black
-ink. The pages are tea-stained vellum a few steps darker than the bone, so
-the dice separate. The top-down layout keeps dice off the gutter's slope
+ink. The pages are tea-stained vellum a few steps darker than the bone,
+and a side reading key (plus +0.7 exposure) keeps the bone bright, so the
+dice separate. The top-down layout keeps dice off the gutter's slope
 (the physics floor will be flat). The mug and the velvet pouch sit at the
 top corners of the phone frame, wax seals at the bottom.
 
@@ -680,8 +685,9 @@ top corners of the phone frame, wax seals at the bottom.
 **Round 2.** Treatment: *enamel fill* — numerals cut deep and filled
 with black niello in bright worn gold. The gold needed a strong soft
 overhead to read straight down (a top-down metal face mirrors the ceiling)
-and a side key; the map is now dark tobacco vellum so the gold dice stand
-out. Strips: the clay pipe, coins and a sheathed knife.
+and a side key, and a warm dim room instead of black (most faces of a die
+seen straight down mirror the room, not the ceiling); the map is now dark
+tobacco vellum so the gold dice stand out. Strips: the clay pipe, coins and a sheathed knife.
 
 **Dice**:
 
@@ -732,12 +738,16 @@ dark green, so the white dice separate.
 
 **Environment: Kitchen Table, 1986.**
 
-- A pale birch kitchen table under a low orange pendant lamp.
-- The tray is a beige instrument case lined with a sage rubber mat printed
-  with a 1 cm / 5 cm calibration grid.
-- A chunky CRT terminal glows green (scanlines, blocky text), next to an
-  odd teal field instrument with dials, toggles and LEDs.
-- A coffee cup, a coiled cable, a printout, and a grey-blue dusk window.
+- A 1980s farmhouse kitchen table: wood-grain laminate with an aluminium
+  edge band, under a warm pendant lamp (round 2; see the note above).
+- The tray is a beige instrument case lined with a dark-green rubber mat
+  printed with a 1 cm / 5 cm calibration grid.
+- A chunky CRT terminal glows green (scanlines, blocky text) at the head of
+  the table, its keyboard in front; an odd teal field instrument with
+  dials, toggles and LEDs.
+- Breakfast things and paperwork: mug, plate and crumbs, newspaper,
+  notebook and pencil, pocket radio, salt shaker; a coiled cable; a
+  grey-blue dusk window.
 
 **Real time:**
 
@@ -754,9 +764,10 @@ dark green, so the white dice separate.
 ![hero](dice-lookdev/voltline-hero.jpg)
 
 **Round 2.** Treatment: *glowing* — magenta neon numerals in a black
-keyline. The holo tray is a lightbox under smoked glass (a soft indigo
-glow everywhere), so the black-chrome dice read as crisp silhouettes;
-their clearcoat is lower so the slanted faces don't mirror the glow back.
+keyline, and a thin cyan neon line along every edge (the atlas's bevel
+mask), so each black die keeps a lit outline. The holo tray is a lightbox
+under smoked glass (a soft indigo glow everywhere); the chrome is darker
+with less clearcoat so the slanted faces don't mirror the glow back.
 Strips: a phone with a lit screen, a receipt, a straw.
 
 **Dice**:
@@ -832,8 +843,9 @@ Strips: a folding fan, a celadon cup on a saucer, fallen petals.
 **Round 2.** Treatment: *bright enamel + keyline* — warm-gold enamel
 numerals in a deep-green keyline. The swirl is a domain-warped noise
 (deep emerald, jade ribbons, thin pearl wisps) instead of regular bands.
-The tray velvet is jeweler's dove-grey (round 1's teal matched the
-emerald). Strips: gem paper with loose stones, tweezers, the loupe.
+The tray velvet is a light jeweler's grey (round 1's teal matched the
+emerald; at top-down under the daylight lamp it reads almost white, which
+the operator may want a step darker — the gate allows down to ~0.3 grey). Strips: gem paper with loose stones, tweezers, the loupe.
 
 **Dice**:
 

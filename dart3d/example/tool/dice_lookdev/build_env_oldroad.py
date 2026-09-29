@@ -28,10 +28,12 @@ def leather(name="Saddle leather", color=(0.2, 0.08, 0.03)):
 
 
 def build(scene):
-    E.world(scene, color=(0.01, 0.012, 0.02), strength=1.0)
+    # a warm, dim room (not black): worn gold mirrors its surroundings, and
+    # straight down most faces of a die see the room, not the ceiling
+    E.world(scene, color=(0.1, 0.075, 0.05), strength=1.0)
     table = P.dark_wood("Inn table", c1=(0.05, 0.03, 0.015), c2=(0.18, 0.1, 0.05), rough=0.75, varnish=0.0)
     E.cube("table", (200, 150, 6), (0, 20, -3.0), table, bevel=0.5)
-    E.plane("map", W + 2 * RIM_T, D + 2 * RIM_T, (0, 0, 0.36), P.parchment("Travel map", tone=((0.12, 0.075, 0.035), (0.24, 0.16, 0.08), (0.3, 0.21, 0.11))), subdiv=1)
+    E.plane("map", W + 2 * RIM_T, D + 2 * RIM_T, (0, 0, 0.36), P.parchment("Travel map", tone=((0.08, 0.05, 0.022), (0.16, 0.1, 0.05), (0.2, 0.14, 0.07))), subdiv=1)
     E.cube("map_board", (W + 2 * RIM_T + 1, D + 2 * RIM_T + 1, 0.7), (0, 0, 0), leather("Board leather",
                                                                                     (0.1, 0.04, 0.02)), bevel=0.3)
     E.rim("rim", W + RIM_T, D + RIM_T, 3.0, RIM_H, RIM_T, leather(), z0=0.35)

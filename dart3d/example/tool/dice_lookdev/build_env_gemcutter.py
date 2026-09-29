@@ -49,7 +49,7 @@ def build(scene):
                                                             c2=(0.16, 0.08, 0.04), varnish=0.7), bevel=0.5)
     # Round 2: jeweler's dove-grey velvet (round 1's deep teal matched the
     # emerald dice at top-down)
-    vel = P.velvet("Grey velvet", color=(0.3, 0.31, 0.31), stars=False)
+    vel = P.velvet("Grey velvet", color=(0.42, 0.43, 0.43), stars=False)
     E.plane("velvet", W + 2 * RIM_T, D + 2 * RIM_T, (0, 0, 0.41), vel)
     E.cube("tray_base", (W + 2 * RIM_T + 1, D + 2 * RIM_T + 1, 0.8), (0, 0, 0),
            P.dark_wood("Tray walnut", varnish=0.9), bevel=0.3)
@@ -101,8 +101,8 @@ def build(scene):
                segs=48, r2=7.0, cap=False).rotation_euler = (math.radians(200), 0, 0)
     E.light(scene, "AREA", "bench_lamp", (12, top + 14, 36), 20000, color=(0.95, 0.97, 1.0), size=10,
             target=(0, 0, 0))
-    E.light(scene, "AREA", "fill", (-40, -40, 40), 1500, color=(1.0, 0.85, 0.7), size=40, target=(0, 0, 0))
-    E.overhead(scene, 5000, color=(0.95, 0.97, 1.0), size=90, height=110)  # gold enamel reads top-down
+    E.light(scene, "AREA", "fill", (-35, -45, 35), 10000, color=(1.0, 0.85, 0.7), size=40, target=(0, 0, 0))
+    E.overhead(scene, 9000, color=(0.95, 0.97, 1.0), size=90, height=110)  # gold enamel reads top-down
     E.light(scene, "AREA", "rim", (30, 60, 20), 2000, color=(0.7, 0.9, 1.0), size=30, target=(0, 0, 2))
     return dict(
         samples=128, exposure=0.5, topdown=dict(width=W + 2 * RIM_T + 1.0), hero=dict(dist=32, elev=30, az=-8, lens=65, fstop=2.8),

@@ -69,7 +69,7 @@ def steel_plate(mask, size):
     # Round 2: bright brushed steel with the pattern inlaid in brass (round
     # 1's dark plate + teal grooves read green and swallowed the dice); the
     # grooves keep only a whisper of charge.
-    col = k.ramp(grime, [(0.3, (0.36, 0.36, 0.35)), (0.7, (0.55, 0.54, 0.52))])
+    col = k.ramp(grime, [(0.3, (0.4, 0.38, 0.35)), (0.7, (0.6, 0.57, 0.52))])
     steel = k.bsdf(Base_Color=col, Metallic=0.65, Roughness=k.math("ADD", k.math("MULTIPLY", streak, 0.15), 0.42),
                    Normal=nrm)
     inlay = k.bsdf(Base_Color=(0.9, 0.64, 0.28, 1), Metallic=1.0, Roughness=0.3, Normal=nrm,
@@ -86,7 +86,7 @@ def charge_fluid():
     b = k.math("LESS_THAN", bub.outputs["Distance"], 0.12)
     v = k.node("ShaderNodeVolumePrincipled")
     k.set(v, Density=0.15, Color=(0.6, 1.0, 0.95, 1), Emission_Color=(*TEAL, 1))
-    k.link(k.math("ADD", k.math("MULTIPLY", n, 1.2), k.math("MULTIPLY", b, 3.5)), v.inputs["Emission Strength"])
+    k.link(k.math("ADD", k.math("MULTIPLY", n, 0.5), k.math("MULTIPLY", b, 1.5)), v.inputs["Emission Strength"])
     k.volume(v.outputs[0])
     return m
 
@@ -129,7 +129,7 @@ def build(scene):
     P.torus("cradle_outer", 8.0, 0.55, (0, cy, cz), brass, rot=(math.radians(90), 0, 0))
     P.torus("cradle_mid", 6.6, 0.4, (0, cy, cz), dark_brass, rot=(math.radians(90), 0, math.radians(90)))
     P.torus("cradle_inner", 5.4, 0.35, (0, cy, cz), brass, rot=(math.radians(35), math.radians(20), 0))
-    core = E.sphere("core", 2.4, (0, cy, cz), E.emissive("Core", TEAL, 5.0), subdiv=4)
+    core = E.sphere("core", 2.4, (0, cy, cz), E.emissive("Core", TEAL, 2.5), subdiv=4)
     E.sphere("core_glass", 3.4, (0, cy, cz), glass, subdiv=4)
     E.light(scene, "POINT", "core_light", (0, cy - 3, cz), 200, color=TEAL, size=3.0)
     for sx in (-1, 1):
@@ -164,8 +164,8 @@ def build(scene):
 
     # Light: warm workshop key, teal machine glow, cool rim.
     # side key: its mirror image in the steel plate lands off the tray
-    E.light(scene, "AREA", "key", (-48, -18, 40), 14000, color=(1.0, 0.78, 0.55), size=25, target=(0, 0, 0))
-    E.overhead(scene, 6000, color=(1.0, 0.88, 0.7), size=90, height=110)
+    E.light(scene, "AREA", "key", (-48, -18, 40), 22000, color=(1.0, 0.72, 0.46), size=25, target=(0, 0, 0))
+    E.overhead(scene, 9000, color=(1.0, 0.82, 0.6), size=90, height=110)
     # Top-down framing: loose gears, screws and a schematic in the strips.
     bot = -D / 2 - RIM_T
     P.paper(3.0, bot - 4.0, 0.0, 18, 8, rot=0.05, curl=0.2, seed=31)

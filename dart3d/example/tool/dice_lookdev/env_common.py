@@ -569,18 +569,31 @@ def overhead(scene, energy, color=(1.0, 0.95, 0.88), size=45.0, height=90.0, y=0
 JPEG_QUALITY = 90
 
 
-def save_jpeg(src_png, dst, quality=JPEG_QUALITY, scale=1.0):
-    """Re-encode a rendered PNG as a JPEG (no palette, no dither)."""
+def save_jpeg(src_png, dst, quality=JPEG_QUALITY):
+    """Re-encode a display-referred PNG as a JPEG without changing its pixels.
+
+    save_render() applies the scene's colour management, so it is switched to
+    a neutral Standard / exposure 0 / gamma 1 for the save (otherwise the view
+    transform and exposure would be applied a second time).
+    """
     img = bpy.data.images.load(str(src_png))
-    if scale != 1.0:
-        img.scale(int(img.size[0] * scale), int(img.size[1] * scale))
     sc = bpy.context.scene
-    st = sc.render.image_settings
-    old = (st.file_format, st.quality, st.color_mode)
+    st, vs = sc.render.image_settings, sc.view_settings
+    old = (st.file_format, st.quality, st.color_mode, vs.view_transform, vs.look, vs.exposure, vs.gamma)
     st.file_format, st.quality, st.color_mode = "JPEG", quality, "RGB"
-    img.save_render(str(dst), scene=sc)
-    st.file_format, st.quality, st.color_mode = old
-    bpy.data.images.remove(img)
+    vs.view_transform, vs.exposure, vs.gamma = "Standard", 0.0, 1.0
+    vs.look = "None"
+    try:
+        img.save_render(str(dst), scene=sc)
+    finally:
+        st.file_format, st.quality, st.color_mode = old[:3]
+        vs.view_transform = old[3]
+        try:
+            vs.look = old[4]
+        except TypeError:
+            pass
+        vs.exposure, vs.gamma = old[5], old[6]
+        bpy.data.images.remove(img)
     return Path(dst).stat().st_size
 
 

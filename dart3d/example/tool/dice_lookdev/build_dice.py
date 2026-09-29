@@ -1036,11 +1036,14 @@ def material_voltline(img):
     smudge = k.noise(obj, 6.0, 6, 0.6).outputs["Fac"]
     rough = k.math("MULTIPLY_ADD", smudge, 0.1, 0.03)
     nrm = _engrave(k, h, strength=0.6, dist=0.03)
-    chrome = k.bsdf(Base_Color=(0.1, 0.1, 0.12, 1), Metallic=1.0, Roughness=rough, Normal=nrm,
+    chrome = k.bsdf(Base_Color=(0.06, 0.06, 0.075, 1), Metallic=1.0, Roughness=rough, Normal=nrm,
                     Coat_Weight=0.35, Coat_Roughness=0.05)  # round 2: less mirror, darker silhouette on the lightbox
-    cyan = k.emission((0.05, 0.85, 1.0, 1), 7.0)
+    cyan = k.emission((0.05, 0.85, 1.0, 1), 11.0)
     pink = k.emission((1.0, 0.08, 0.6, 1), 9.0)
     s = k.mix_shader(dec, chrome, cyan)
+    # round 2: a thin neon line along every edge (atlas A = bevel strip), so
+    # the black dice keep a lit outline on the glowing holo tray
+    s = k.mix_shader(k.math("MULTIPLY", k.edge, 0.7), s, k.emission((0.05, 0.85, 1.0, 1), 4.0))
     s = k.keyline(s, (0.004, 0.004, 0.005), rough=0.6)  # neon glyph, black keyline
     k.surface(k.mix_shader(num, s, pink))
     return m
@@ -1183,7 +1186,7 @@ def material_hearthside(img):
     grain = k.noise(mp.outputs[0], 4.0, 8, 0.6).outputs["Fac"]
     ao = k.node("ShaderNodeAmbientOcclusion", samples=8)
     ao.inputs["Distance"].default_value = 0.2
-    col = k.ramp(grain, [(0.3, (0.66, 0.56, 0.4)), (0.7, (0.88, 0.82, 0.68))])
+    col = k.ramp(grain, [(0.3, (0.74, 0.66, 0.5)), (0.7, (0.92, 0.88, 0.76))])
     col = k.mix(k.math("MULTIPLY", k.math("SUBTRACT", 1.0, ao.outputs["AO"]), 0.8), col, (0.3, 0.2, 0.1, 1))
     nrm = _engrave(k, h, normal=k.bump(grain, 0.1, 0.02), strength=0.8, dist=0.05)
     bone = k.bsdf(Base_Color=col, Roughness=0.38, Subsurface_Weight=0.35, Subsurface_Radius=(0.5, 0.35, 0.2),

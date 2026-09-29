@@ -40,7 +40,7 @@ def holo_floor():
                Emission_Color=(*CYAN, 1), Emission_Strength=k.math("MULTIPLY", lines, k.math("MULTIPLY", pulse, 1.2)))
     # Round 2: the tray is a lightbox under smoked glass: a soft indigo glow
     # everywhere, so the black-chrome dice read as crisp silhouettes.
-    field = k.emission((0.14, 0.1, 0.42, 1), k.math("ADD", 0.6, k.math("MULTIPLY", pulse, 0.4)))
+    field = k.emission((0.14, 0.1, 0.42, 1), k.math("ADD", 0.62, k.math("MULTIPLY", pulse, 0.3)))
     k.surface(k.add_shader(s, field))
     return m
 

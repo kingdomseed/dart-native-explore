@@ -43,4 +43,4 @@ done
   | grep -E '^dice_lookdev|Error|Traceback'
 "$BLENDER" --background --python "$HERE/readability_check.py" -- --table "$OUT/readability.json" 2>/dev/null \
   | grep -E '^\|'
-du -ch "$OUT"/*.jpg "$OUT"/*.png 2>/dev/null | tail -1
+du -ch "$OUT"/*.jpg | tail -1

@@ -22,9 +22,11 @@ How it measures (per die, on its TOP face only)
      contrast = (Lhi + 0.05) / (Llo + 0.05)  -> gate: >= 4.5 on every die.
      "body" = the rest of the top face (informational: the ring is where a
      keyline or halo lives; the body shows how the plain face reads).
-  4. Die vs tray: luminance of the die's silhouette (the better of its median
-     body tone and its mean, which counts glowing numerals and edges) vs a 3..12 px ring
-     of tray around it (contact shadow included, other dice excluded)
+  4. Die vs tray: the die against a 3..12 px ring of tray around it (contact
+     shadow included, other dice excluded), taking the best of three readings:
+     its median body tone, its mean (which counts glowing numerals and metal
+     edges) and its outline (median of the die's outer 2 px band, for
+     rim-lit or neon-edged dice)
      -> gate: >= 2.0 (silhouette separation; WCAG's non-text 3:1 is reported).
   5. Numeral size: numeral height / face inscribed width, from the atlas, worst
      face of each die -> gate: >= 0.40. Also the top numeral's height in px.
@@ -219,9 +221,15 @@ def measure(scene, cam, objs, specs, beauty_png, theme, tmp, crops_dir=None):
             # takes the better of the two; both are recorded.
             med = ratio(float(np.median(Lc[sil])), float(np.median(Lc[ring])))
             mean = ratio(float(Lc[sil].mean()), float(Lc[ring].mean()))
+            # A third reading for rim-lit / neon-edged dice: the die's outer
+            # band (its first 2 px) against the tray ring, i.e. the outline
+            # the eye tracks.
+            band = d & ~erode(d, 2)
+            outline = ratio(float(np.median(Lc[band])), float(np.median(Lc[ring])))
             res["contrast_silhouette_median"] = round(med, 2)
             res["contrast_silhouette_mean"] = round(mean, 2)
-            res["contrast_silhouette"] = round(max(med, mean), 2)
+            res["contrast_silhouette_outline"] = round(outline, 2)
+            res["contrast_silhouette"] = round(max(med, mean, outline), 2)
             res["L_die_median"] = round(float(np.median(Lc[sil])), 4)
             res["L_tray_median"] = round(float(np.median(Lc[ring])), 4)
         else:

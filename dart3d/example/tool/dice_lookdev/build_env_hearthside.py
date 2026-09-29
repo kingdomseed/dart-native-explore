@@ -111,10 +111,12 @@ def build(scene):
     E.cube("hearth_mouth", (40, 3, 22), (0, top + 49.5, 12), E.emissive("Hearth fire", (1.0, 0.38, 0.08), 6.0))
     E.light(scene, "AREA", "fire", (0, top + 45, 12), 16000, color=(1.0, 0.5, 0.2), size=35, target=(0, 0, 0))
     E.light(scene, "AREA", "cool_fill", (-50, -40, 40), 1200, color=(0.55, 0.65, 1.0), size=40, target=(0, 0, 0))
-    E.light(scene, "AREA", "reading_key", (15, -25, 45), 3500, color=(1.0, 0.9, 0.8), size=20, target=(0, 0, 0))
+    # reading key from the side (its hotspot misses the top faces), strong
+    # enough that the bone reads bright against the tea-stained vellum
+    E.light(scene, "AREA", "reading_key", (40, -20, 40), 11000, color=(1.0, 0.9, 0.8), size=20, target=(0, 0, 0))
     E.haze_box("haze", (160, 180, 70), (0, 20, 34), 0.004, color=(1.0, 0.85, 0.7), noise_scale=0.03)
     return dict(
-        samples=128, exposure=0.2, surface_z=3.3, centre=(0, 9.0, 4.3),
+        samples=128, exposure=0.9, surface_z=3.3, centre=(0, 9.0, 4.3),
         topdown=dict(width=W + 9.0),
         # keep the dice off the gutter's slope (the physics floor is flat)
         topdown_layout={"d20": ((0.4, -4.2), 18, 8), "d12": ((-3.9, 4.6), 11, -14), "d10u": ((3.7, 4.2), 9, 12),
