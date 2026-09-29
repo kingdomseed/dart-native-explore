@@ -10,6 +10,7 @@ import 'package:vector_math/vector_math.dart';
 import 'dartnative_plugin_registrant.dart';
 import 'dice_table.dart';
 import 'feature_scene.dart';
+import 'hero_screen.dart';
 import 'phase_timers.dart';
 import 'imported_scene.dart';
 import 'reel_scene.dart';
@@ -51,7 +52,11 @@ void _applyBackendDefine() {
 /// - **Harness** — the deterministic verification scene whose timed
 ///   phases exercise the feature matrix (W0–W16, wloose, W18, W24, W25).
 ///
-/// Boot overrides: `--dart-define=DART3D_SCENE=dice|showcase|harness`
+/// The app launches into the **hero** (`hero_screen.dart`): the 3D
+/// DartNative logo on a dark stage with the way into the three screens;
+/// the house button on each screen's nav row comes back to it.
+///
+/// Boot overrides: `--dart-define=DART3D_SCENE=hero|dice|showcase|harness`
 /// picks the screen (`reel` boots the chrome-free logo capture view —
 /// see `reel_scene.dart`); `--dart-define=DART3D_MODEL=<label>` boots the
 /// showcase with that item selected (the old single-model lane);
@@ -64,7 +69,7 @@ class Dart3dExampleApp extends StatefulWidget {
 
   static const _bootScene = String.fromEnvironment(
     'DART3D_SCENE',
-    defaultValue: 'dice',
+    defaultValue: 'hero',
   );
   static const _bootModel = String.fromEnvironment('DART3D_MODEL');
   static const _bootQuality = String.fromEnvironment('DART3D_QUALITY');
@@ -90,19 +95,41 @@ class _Dart3dExampleAppState extends State<Dart3dExampleApp> {
       'reel' => 3,
       'harness' => 2,
       'showcase' || 'gallery' => 1,
-      _ => 0,
+      'dice' => 0,
+      _ => _hero,
     };
   }
+
+  /// The launch hero's screen index.
+  static const _hero = -1;
 
   @override
   Widget build(BuildContext context) {
     if (_screen == 3) return ReelScreen(quality: Dart3dExampleApp.bootQuality);
-    final nav = Center(
-      child: SegmentedControl(
-        segments: const ['Dice', 'Showcase', 'Harness'],
-        selectedIndex: _screen,
-        onValueChanged: (i) => setState(() => _screen = i),
-      ),
+    if (_screen == _hero) {
+      return HeroScreen(
+        quality: Dart3dExampleApp.bootQuality,
+        onOpen: (i) => setState(() => _screen = i),
+      );
+    }
+    final nav = Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Button(
+          onPressed: () => setState(() => _screen = _hero),
+          shape: const CircleBorder(),
+          color: const Color(0x66101014),
+          foregroundColor: const Color(0xEEFFFFFF),
+          padding: const EdgeInsets.all(8),
+          child: const Icon(CupertinoIcons.house_fill, size: 16),
+        ),
+        const SizedBox(width: 8),
+        SegmentedControl(
+          segments: const ['Dice', 'Showcase', 'Harness'],
+          selectedIndex: _screen,
+          onValueChanged: (i) => setState(() => _screen = i),
+        ),
+      ],
     );
     return switch (_screen) {
       1 => ShowcaseScreen(

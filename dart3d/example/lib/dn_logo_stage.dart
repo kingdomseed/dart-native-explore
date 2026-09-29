@@ -38,6 +38,9 @@ final class DnLogoStage {
     this.exposure = 1.0,
     this.flatBackdrop = false,
     this.groundSlab = true,
+    this.saturation = 1.0,
+    this.contrast = 1.0,
+    this.backdrop,
   });
 
   /// The values the Showcase entry uses.
@@ -62,6 +65,53 @@ final class DnLogoStage {
     exposure: 1.35,
     flatBackdrop: true,
     groundSlab: false,
+  );
+
+  /// The launch hero on Android (Filament) — the reel rig, tuned on
+  /// the A142 for a full orbit: the light-unit mismatch renders
+  /// Filament darker than SceneKit, so exposure and the rig run hot.
+  /// Stopgap until native light-unit unification (S0g) lands.
+  static const heroAndroid = DnLogoStage(
+    emissiveGlow: 0.35,
+    bloomIntensity: 0.5,
+    bloomThreshold: 0.45,
+    bloomScatter: 0.7,
+    vignetteIntensity: 0,
+    environmentIntensity: 0.55,
+    keyIntensity: 2600,
+    rimPinkIntensity: 3600,
+    rimCyanIntensity: 3400,
+    fillIntensity: 260,
+    exposure: 1.6,
+    flatBackdrop: true,
+    groundSlab: false,
+    backdrop: (0.026, 0.03, 0.033),
+  );
+
+  /// The launch hero on iOS (SceneKit). SceneKit keeps its filmic
+  /// tone curve whatever `toneMapping` asks for, which washes the
+  /// gradient toward pastel at the Android values — so exposure and
+  /// the IBL come down and color grading adds saturation/contrast
+  /// back. Stopgap until native light-unit unification (S0g) lands.
+  static const heroIos = DnLogoStage(
+    emissiveGlow: 0.35,
+    bloomIntensity: 0.3,
+    bloomThreshold: 0.5,
+    bloomScatter: 0.65,
+    vignetteIntensity: 0,
+    environmentIntensity: 0.3,
+    keyIntensity: 1900,
+    rimPinkIntensity: 2400,
+    rimCyanIntensity: 2200,
+    fillIntensity: 160,
+    exposure: 0.7,
+    flatBackdrop: true,
+    groundSlab: false,
+    saturation: 1.5,
+    contrast: 1.15,
+    // SceneKit maps the sky's linear values straight to sRGB (no
+    // Filament toe), so site `--bg` #090E12 is its plain linear value.
+    backdrop: (0.0046, 0.0058, 0.0074),
   );
 
   /// The pulse parameter. The logo emits its own baked gradient (the
@@ -107,6 +157,15 @@ final class DnLogoStage {
   /// under the logo. The reel floats the logo in the void instead —
   /// the hotter rig lit the slab into a grey horizon band.
   final bool groundSlab;
+
+  /// Color-grading saturation / contrast (1 = off). Grading turns on
+  /// only when either differs from 1.
+  final double saturation;
+  final double contrast;
+
+  /// The flat backdrop's linear sky color (with [flatBackdrop]); null
+  /// uses the Android-tuned default (`_dnBgSky`).
+  final (double, double, double)? backdrop;
 }
 
 /// Makes every textured material in [doc] emit its own base-color
@@ -249,9 +308,9 @@ EnvironmentResource dnLogoEnvironment(
     stage.flatBackdrop
         // Site `--bg` #090E12 in linear light (pre-exposure).
         ? GradientSkySpec(
-            zenithColor: _dnBgSky,
-            horizonColor: _dnBgSky,
-            groundColor: _dnBgSky,
+            zenithColor: _backdrop(stage),
+            horizonColor: _backdrop(stage),
+            groundColor: _backdrop(stage),
             sunColor: Vector3.zero(),
           )
         : GradientSkySpec(
@@ -262,6 +321,9 @@ EnvironmentResource dnLogoEnvironment(
           ),
   ),
   effects: EnvironmentEffectsSpec(
+    colorGradingEnabled: stage.saturation != 1.0 || stage.contrast != 1.0,
+    saturation: stage.saturation,
+    contrast: stage.contrast,
     bloomEnabled: true,
     bloomThreshold: stage.bloomThreshold,
     bloomIntensity: stage.bloomIntensity,
@@ -277,4 +339,9 @@ EnvironmentResource dnLogoEnvironment(
 /// pick: on the A142 at the reel exposure it renders ≈ (3, 7, 12)/255,
 /// a deep blue-black just under site `--bg` #090E12; the reel's
 /// ffmpeg grade lifts the floor the rest of the way.
+Vector3 _backdrop(DnLogoStage stage) {
+  final b = stage.backdrop;
+  return b == null ? _dnBgSky.clone() : Vector3(b.$1, b.$2, b.$3);
+}
+
 final Vector3 _dnBgSky = Vector3(0.0164, 0.0202, 0.0239);

@@ -164,8 +164,14 @@ scaffolding, not the demo.
       notation + count-up + audio → juice → polish). Includes the 09-17
       feedback (pick-up-and-toss, walls = screen edges, quality picker,
       iPad white screen).
-- [ ] P4 Hero launch scene + 3D DartNative logo. Logo landed (#26);
-      hero scene in progress (`docs/design/hero-scene-brief.md`).
+- [ ] P4 Hero launch scene + 3D DartNative logo. Logo landed (#26).
+      Hero (M0) landed on `p4-hero-scene` (#31; spec
+      `docs/design/hero-scene-brief.md`; `lib/hero_screen.dart`,
+      `hero_scene.dart`, `hero_motion.dart`; evidence
+      `docs/artifacts/p4-hero/`). Interim orbit is Dart-driven (one
+      pivot transform per frame) until E2's orbit controller lands.
+      Per-platform `DnLogoStage.heroIos`/`heroAndroid` values are a
+      stopgap for the light-unit / tone-mapper mismatch (S0g).
 - [ ] P5 Demo program M2–M18 (demo-program §4 + §8): showroom, physics
       playground, road trip, campfire, explosions, material gallery, …;
       engine-gated demos follow their units. New flagships: **M16 pirate
