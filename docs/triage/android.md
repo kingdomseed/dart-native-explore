@@ -227,6 +227,13 @@ of the cause, not device-verified:
   `engine.flushAndWait()`. Also skip `render()` while `uiHelper` reports
   no valid surface. Verify with a Vulkan warm-relaunch loop on the A142.
 
+**Resolved in S0g (#18).** The cause is confirmed on the device: a 0.3 s
+Home → relaunch crashes the unfixed head on the first iteration. The fix
+adds `flushAndWait()` after every swapchain destroy and skips `render()`
+while there is no surface, and it passes 10/10 on Vulkan and GL. The drain
+takes 34–239 ms, so the driver really was still holding the window. See
+`docs/artifacts/s0g-vulkan-relaunch/logs.md`.
+
 ## Needs other owner
 
 - **Dart (example): other hard-coded light rotations assume −Z emission.**
