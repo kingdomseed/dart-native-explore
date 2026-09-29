@@ -3,8 +3,9 @@
 Status: design brief, research only, no code. Written 2026-09-29.
 Scope: the new launch "hero" for `dart3d/example`. It shows a 3D DartNative
 logo on a dark stage, with a slow camera drift and a subtle glow pulse.
-Over it sit a headline, three value props, and a way into the existing
-**Dice / Showcase / Harness** screens. Context: `docs/program-v2.md`
+Over it sit a headline, three value props, and a way into the
+**Dice** and **Showcase** screens (the harness is not user-facing; see
+Navigation below). Context: `docs/program-v2.md`
 Track P, P4. P4 depends on E2 (orbit controller). §3.4 gives an interim
 path that doesn't need E2.
 
@@ -431,7 +432,7 @@ Portrait phone layout sketch (iPhone 17 Pro, 402×874pt):
 │  ╭──────────────────────────────╮    │
 │  │         Roll the dice         │    │  ← primary pill, lime #A1EA5A / ink #121F05
 │  ╰──────────────────────────────╯    │
-│     Showcase      ·      Harness     │  ← TextButtons, #B2B8BF
+│             Showcase                 │  ← TextButton, #B2B8BF
 │                                      │
 │  Community plugin · not affiliated   │
 │  with Presence Network               │  ← 11pt #757B81 (see §4)
@@ -450,12 +451,14 @@ Portrait phone layout sketch (iPhone 17 Pro, 402×874pt):
   (`StadiumBorder`), fill `#A1EA5A`, label `#121F05` 17pt w600, height 52.
   On iOS 26 a `prominentGlass` tinted lime is an alternative. Keep it
   opaque for contrast.
-- Navigation: "Roll the dice" → Dice (index 0); "Showcase" → 1;
-  "Harness" → 2. The hero becomes a new first screen, and the existing
-  `SegmentedControl` shell is unchanged behind it. Add a small "Home"
-  way back, e.g. a leading item on the shell's nav row.
-- The Harness link can sit lower, or only in debug builds. It's a test
-  surface, and P4 asks for a curated showcase, "not test lanes".
+- Navigation (as built, operator decision 2026-09-29): "Roll the dice"
+  → Dice, "Showcase" → Showcase. There is no nav row or segmented
+  control: each screen has a small back chevron at the top-left (inside
+  the safe area) and Android's system back returns to the hero.
+  Routing: `dart3d/example/lib/app_route.dart`.
+- The harness is not in the UI at all. It is a test surface, reachable
+  only by booting with `--dart-define=DART3D_SCENE=harness` (likewise
+  `DART3D_SCENE=reel` for the logo capture view).
 
 **Headline copy options** (ours; informed by their positioning, not
 reusing their sentences):

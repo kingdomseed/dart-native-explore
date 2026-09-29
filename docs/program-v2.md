@@ -46,7 +46,7 @@ stayed empty. The new gate is smaller and mandatory.
 | Tier | When | Required evidence |
 |---|---|---|
 | **T1 — CI** | every PR | `dn analyze` + `dn test` in **every Dart package the PR changes** (`dart3d/`, `dart3d/example/`, and each new package such as `dart3d_audio/` or the dice app gets its own CI step when it is created). Target (R3): add Android `compileReleaseKotlin` and iOS `swiftc -typecheck` jobs. |
-| **T2 — device smoke** | every PR touching `dart3d/android/**`, `dart3d/ios/**`, or the wire vocabulary | On A142 **Vulkan and GL** and on the iOS sim: app boots, harness runs to completion, dice roll and settle, zero FATAL/crash in logs. One screenshot per surface + log excerpt, committed under `docs/artifacts/<unit>/`. |
+| **T2 — device smoke** | every PR touching `dart3d/android/**`, `dart3d/ios/**`, or the wire vocabulary | On A142 **Vulkan and GL** and on the iOS sim: app boots, harness (booted with `--dart-define=DART3D_SCENE=harness`; it has no UI entry) runs to completion, dice roll and settle, zero FATAL/crash in logs. One screenshot per surface + log excerpt, committed under `docs/artifacts/<unit>/`. |
 | **T3 — feature lanes** | every unit | The unit's own live checks, same evidence rules: the subset of its old "Verify, live" block that exercises new behavior, or for units new in v2, the checks listed under **New-unit T3** below. |
 | **T4 — review** | units that change what users see | Operator reviews screenshots (video optional) in the PR before merge. |
 | **Perf** | only units that claim a perf number | The measured number, device, and method, committed. |

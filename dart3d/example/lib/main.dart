@@ -7,6 +7,7 @@ import 'package:dart3d/dart3d.dart';
 import 'package:dartnative/dartnative.dart';
 import 'package:vector_math/vector_math.dart';
 
+import 'app_route.dart';
 import 'dartnative_plugin_registrant.dart';
 import 'dice_table.dart';
 import 'feature_scene.dart';
@@ -41,29 +42,29 @@ void _applyBackendDefine() {
       )(pref);
 }
 
-/// The example app's shell — three screens switched by a segmented
-/// control:
+/// The example app's shell. It launches into the **hero**
+/// (`hero_screen.dart`) — the 3D DartNative logo on a dark stage — which
+/// leads to two screens:
 ///
-/// - **Dice** — the user-facing table: seven upstream-imported dice on
-///   a felt tray, tap to select, Roll throws the selection (or all).
+/// - **Dice** ("Roll the dice") — seven upstream-imported dice on a
+///   felt tray, tap to select, Roll throws the selection (or all).
 /// - **Showcase** — the broader `flutter_scene` corpus (dash, fcar,
-///   the Flutter logo, skinning/animation/texture coverage) plus the
-///   single-die physics lane.
-/// - **Harness** — the deterministic verification scene whose timed
-///   phases exercise the feature matrix (W0–W16, wloose, W18, W24, W25).
+///   skinning/animation/texture coverage) plus the single-die physics
+///   lane.
 ///
-/// The app launches into the **hero** (`hero_screen.dart`): the 3D
-/// DartNative logo on a dark stage with the way into the three screens;
-/// the house button on each screen's nav row comes back to it.
+/// Each has a back chevron at the top-left, and Android's system back
+/// returns to the hero as well. Routing lives in `app_route.dart`.
 ///
-/// Boot overrides: `--dart-define=DART3D_SCENE=hero|dice|showcase|harness`
-/// picks the screen (`reel` boots the chrome-free logo capture view —
-/// see `reel_scene.dart`); `--dart-define=DART3D_MODEL=<label>` boots the
-/// showcase with that item selected (the old single-model lane);
-/// `--dart-define=DART3D_QUALITY=low|medium|high` pins the view tier.
-/// `--dart-define=DART3D_BACKEND=auto|opengl|vulkan` picks the Filament
-/// backend (Android only); `--dart-define=DART3D_STATS=1` turns the
-/// showcase view's stats HUD on (and its ~4 Hz `stats:` logcat line).
+/// Boot overrides: `--dart-define=DART3D_SCENE=hero|dice|showcase` picks
+/// the screen. Two screens exist only behind that define:
+/// `DART3D_SCENE=harness` boots the deterministic verification scene
+/// ([FeatureMatrixScreen]) and `DART3D_SCENE=reel` the chrome-free logo
+/// capture view (`reel_scene.dart`). `--dart-define=DART3D_MODEL=<label>`
+/// boots the showcase with that item selected (the old single-model
+/// lane); `--dart-define=DART3D_QUALITY=low|medium|high` pins the view
+/// tier. `--dart-define=DART3D_BACKEND=auto|opengl|vulkan` picks the
+/// Filament backend (Android only); `--dart-define=DART3D_STATS=1` turns
+/// the showcase view's stats HUD on (and its ~4 Hz `stats:` logcat line).
 class Dart3dExampleApp extends StatefulWidget {
   const Dart3dExampleApp({super.key});
 
@@ -87,68 +88,45 @@ class Dart3dExampleApp extends StatefulWidget {
 }
 
 class _Dart3dExampleAppState extends State<Dart3dExampleApp> {
-  late int _screen = _bootIndex();
+  final _route = AppRoute.boot(
+    scene: Dart3dExampleApp._bootScene,
+    model: Dart3dExampleApp._bootModel,
+  );
 
-  int _bootIndex() {
-    if (Dart3dExampleApp._bootModel.isNotEmpty) return 1;
-    return switch (Dart3dExampleApp._bootScene) {
-      'reel' => 3,
-      'harness' => 2,
-      'showcase' || 'gallery' => 1,
-      'dice' => 0,
-      _ => _hero,
-    };
-  }
+  void _open(AppScreen next) => setState(() => _route.open(next));
 
-  /// The launch hero's screen index.
-  static const _hero = -1;
+  void _back() => setState(() => _route.back());
 
   @override
   Widget build(BuildContext context) {
-    if (_screen == 3) return ReelScreen(quality: Dart3dExampleApp.bootQuality);
-    if (_screen == _hero) {
-      return HeroScreen(
-        quality: Dart3dExampleApp.bootQuality,
-        onOpen: (i) => setState(() => _screen = i),
-      );
-    }
-    final nav = Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // A labelled pill, not a bare icon: DartNative has no Semantics
-        // widget, and the native button's title is what VoiceOver /
-        // TalkBack read — so the label doubles as the accessible name.
-        Button(
-          onPressed: () => setState(() => _screen = _hero),
-          title: 'Home',
-          shape: const StadiumBorder(),
-          color: const Color(0x66101014),
-          foregroundColor: const Color(0xEEFFFFFF),
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-          child: const Icon(CupertinoIcons.house_fill, size: 14),
-        ),
-        const SizedBox(width: 8),
-        SegmentedControl(
-          segments: const ['Dice', 'Showcase', 'Harness'],
-          selectedIndex: _screen,
-          onValueChanged: (i) => setState(() => _screen = i),
-        ),
-      ],
-    );
-    return switch (_screen) {
-      1 => ShowcaseScreen(
-        nav: nav,
-        initialLabel: Dart3dExampleApp._bootModel.isEmpty
-            ? null
-            : Dart3dExampleApp._bootModel,
-        quality: Dart3dExampleApp.bootQuality,
+    final quality = Dart3dExampleApp.bootQuality;
+    return switch (_route.screen) {
+      AppScreen.hero => HeroScreen(quality: quality, onOpen: _open),
+      AppScreen.dice => _backable(
+        DiceTableScreen(onBack: _back, quality: quality),
       ),
-      2 => FeatureMatrixScreen(nav: nav, quality: Dart3dExampleApp.bootQuality),
-      _ => DiceTableScreen(nav: nav, quality: Dart3dExampleApp.bootQuality),
+      AppScreen.showcase => _backable(
+        ShowcaseScreen(
+          onBack: _back,
+          initialLabel: Dart3dExampleApp._bootModel.isEmpty
+              ? null
+              : Dart3dExampleApp._bootModel,
+          quality: quality,
+        ),
+      ),
+      AppScreen.harness => FeatureMatrixScreen(quality: quality),
+      AppScreen.reel => ReelScreen(quality: quality),
     };
   }
+
+  /// Routes Android's system back to the hero instead of leaving the app.
+  Widget _backable(Widget screen) => PopScope(
+    canPop: false,
+    onPopInvokedWithResult: (didPop, _) {
+      if (!didPop) _back();
+    },
+    child: screen,
+  );
 }
 
 /// The W0 verification scene — a physically simulated die and ball on
@@ -158,10 +136,7 @@ class _Dart3dExampleAppState extends State<Dart3dExampleApp> {
 /// plus the ball's rest position from the poses. Toggles exercise the
 /// view-config and camera manifest fields.
 class FeatureMatrixScreen extends StatefulWidget {
-  const FeatureMatrixScreen({super.key, this.nav, this.quality});
-
-  /// The app shell's screen switcher, overlaid at the top edge.
-  final Widget? nav;
+  const FeatureMatrixScreen({super.key, this.quality});
 
   /// The `DART3D_QUALITY` boot tier — null runs the widget defaults.
   final SceneQuality? quality;
@@ -801,8 +776,6 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
               quality: widget.quality,
             ),
           ),
-          if (widget.nav != null)
-            Positioned(left: 0, right: 0, top: 56, child: widget.nav!),
           Positioned(
             left: 0,
             right: 0,

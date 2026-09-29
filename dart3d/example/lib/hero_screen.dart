@@ -1,7 +1,7 @@
 /// The launch hero (P4): the 3D DartNative logo on a dark stage,
 /// orbiting slowly and breathing its own gradient glow, under a short
-/// headline, three value props, and the way into the Dice / Showcase /
-/// Harness screens. Spec: docs/design/hero-scene-brief.md (operator
+/// headline, three value props, and the way into the Dice and Showcase
+/// screens. Spec: docs/design/hero-scene-brief.md (operator
 /// overrides: full 360° orbit, glow from the logo itself, zoomed out).
 ///
 /// Motion is Dart-driven: one ticker writes the orbit pivot's rotation
@@ -17,6 +17,7 @@ import 'package:dart3d/dart3d.dart';
 import 'package:dartnative/dartnative.dart';
 import 'package:vector_math/vector_math.dart' show Vector3;
 
+import 'app_route.dart';
 import 'dn_logo_stage.dart';
 import 'hero_motion.dart';
 import 'hero_scene.dart';
@@ -79,12 +80,12 @@ final double? _pinnedYawDeg = double.tryParse(
 const _perf = bool.fromEnvironment('DART3D_HERO_PERF') ||
     String.fromEnvironment('DART3D_HERO_PERF') == '1';
 
-/// The launch screen. [onOpen] enters the app's screen at that index
-/// (0 Dice, 1 Showcase, 2 Harness).
+/// The launch screen. [onOpen] enters [AppScreen.dice] ("Roll the
+/// dice") or [AppScreen.showcase].
 class HeroScreen extends StatefulWidget {
   const HeroScreen({super.key, required this.onOpen, this.quality});
 
-  final void Function(int screen) onOpen;
+  final void Function(AppScreen screen) onOpen;
 
   /// The `DART3D_QUALITY` boot tier — null runs the widget defaults.
   final SceneQuality? quality;
@@ -526,7 +527,7 @@ class _HeroScreenState extends State<HeroScreen>
             Column(
               children: [
                 Button(
-                  onPressed: () => widget.onOpen(0),
+                  onPressed: () => widget.onOpen(AppScreen.dice),
                   shape: const StadiumBorder(),
                   color: _accent,
                   foregroundColor: _accentInk,
@@ -536,14 +537,15 @@ class _HeroScreenState extends State<HeroScreen>
                   child: const Text('Roll the dice'),
                 ),
                 const SizedBox(height: 6),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _link('Showcase', () => widget.onOpen(1)),
-                    const Text('·',
-                        style: TextStyle(color: _muted, fontSize: 15)),
-                    _link('Harness', () => widget.onOpen(2)),
-                  ],
+                Button(
+                  onPressed: () => widget.onOpen(AppScreen.showcase),
+                  color: const Color(0x00000000),
+                  foregroundColor: _text2,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  child: const Text('Showcase'),
                 ),
                 const SizedBox(height: 10),
                 const Text(
@@ -570,16 +572,6 @@ class _HeroScreenState extends State<HeroScreen>
             TextSpan(text: rest),
           ],
         ),
-      );
-
-  Widget _link(String label, VoidCallback onTap) => Button(
-        onPressed: onTap,
-        color: const Color(0x00000000),
-        foregroundColor: _text2,
-        fontSize: 15,
-        fontWeight: FontWeight.w500,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        child: Text(label),
       );
 }
 
