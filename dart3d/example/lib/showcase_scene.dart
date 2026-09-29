@@ -70,6 +70,17 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
   double _distAtScaleStart = 0;
   bool _aspectFramed = false;
 
+  /// One-finger orbit bookkeeping. DartNative's iOS scale recognizer
+  /// claims one-finger drags too (it reports `pointerCount == 1`
+  /// updates and `onPanUpdate` never fires alongside it), so the orbit
+  /// reads focal-point deltas from the scale stream as well as pan
+  /// deltas. Whichever recognizer delivers the first one-finger delta
+  /// of a gesture owns it, so a platform that fires both can't
+  /// double-rotate (#27).
+  _OrbitSource? _orbitOwner;
+  Offset? _lastFocal;
+  int _scalePointers = 0;
+
   /// The screen's width / height, once known — lets [_load] author the
   /// aspect-fitted boom into the document itself (see [_fitBoom]).
   double? _viewAspect;
@@ -254,10 +265,54 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
   /// swings the camera right, drag down lifts it toward top-down.
   /// Two-finger drags belong to the pinch zoom.
   void _orbit(DragUpdateDetails d) {
-    if (d.pointerCount != 1 || _cameraNode == null) return;
-    _yaw -= d.delta.dx * 0.008;
-    _pitch = (_pitch + d.delta.dy * 0.008).clamp(0.05, 1.45);
+    if (d.pointerCount != 1) return;
+    _orbitBy(_OrbitSource.pan, d.delta);
+  }
+
+  /// Applies one orbit [delta] from [source] unless the other
+  /// recognizer already owns this gesture.
+  void _orbitBy(_OrbitSource source, Offset delta) {
+    if (_cameraNode == null) return;
+    _orbitOwner ??= source;
+    if (_orbitOwner != source) return;
+    _yaw -= delta.dx * 0.008;
+    _pitch = (_pitch + delta.dy * 0.008).clamp(0.05, 1.45);
     _writeCamera();
+  }
+
+  void _onScaleStart(ScaleStartDetails d) {
+    _distAtScaleStart = _dist;
+    _lastFocal = d.focalPoint;
+    _scalePointers = d.pointerCount;
+  }
+
+  void _onScaleUpdate(ScaleUpdateDetails d) {
+    final last = _lastFocal;
+    final pointers = _scalePointers;
+    _lastFocal = d.focalPoint;
+    _scalePointers = d.pointerCount;
+    if (d.pointerCount == 1) {
+      // Guarded on the previous count too, so a finger lifting out of
+      // a pinch doesn't jump the orbit by the centroid shift.
+      if (pointers == 1 && last != null) {
+        _orbitBy(_OrbitSource.scale, d.focalPoint - last);
+      }
+      return;
+    }
+    // A pinch that grew out of a one-finger drag re-bases the zoom on
+    // the current boom — `scale` restarts from the second finger.
+    if (pointers < 2) _distAtScaleStart = _dist;
+    final next = (_distAtScaleStart / d.scale).clamp(_distMin, _distMax);
+    if ((next - _dist).abs() > _dist * 0.005) {
+      _dist = next;
+      _writeCamera();
+    }
+  }
+
+  void _endGesture() {
+    _orbitOwner = null;
+    _lastFocal = null;
+    _scalePointers = 0;
   }
 
   @override
@@ -284,16 +339,12 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
                   if (_dist > before) _writeCamera();
                 }
                 return GestureDetector(
+                  onPanStart: (_) => _orbitOwner = null,
                   onPanUpdate: _orbit,
-                  onScaleStart: (_) => _distAtScaleStart = _dist,
-                  onScaleUpdate: (d) {
-                    final next = (_distAtScaleStart / d.scale)
-                        .clamp(_distMin, _distMax);
-                    if ((next - _dist).abs() > _dist * 0.005) {
-                      _dist = next;
-                      _writeCamera();
-                    }
-                  },
+                  onPanEnd: (_) => _endGesture(),
+                  onScaleStart: _onScaleStart,
+                  onScaleUpdate: _onScaleUpdate,
+                  onScaleEnd: (_) => _endGesture(),
                   child: SceneView(
                     controller: _controller,
                     quality: widget.quality,
@@ -436,3 +487,7 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
     );
   }
 }
+
+/// The recognizer driving a one-finger orbit — see
+/// [_ShowcaseScreenState._orbitOwner].
+enum _OrbitSource { pan, scale }
