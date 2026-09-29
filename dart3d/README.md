@@ -1,4 +1,8 @@
-# dart3d
+# DartNative 3D
+
+> Package: `dart3d` · a community plugin for [DartNative](https://dartnative.com).
+> Not affiliated with or endorsed by Presence Network / DartNative;
+> "DartNative" and the DartNative logo belong to their respective owners.
 
 A general-purpose 3D scene plugin for DartNative applications. Apps
 describe scenes as `.fscene` documents — the same engine-agnostic
