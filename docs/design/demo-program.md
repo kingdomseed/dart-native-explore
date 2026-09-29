@@ -100,8 +100,11 @@ applies a tuned post-FX preset to each example.
 | 23 | Toon (.fmat) (281) | F | `.fmat` typed params, hot reload | **Blocked [E6]** (hot reload in W28). |
 | 24 | Custom vertices (.fmat) (357) | W | Gerstner ocean and curved endless-runner road | **Blocked [E6]** (vertex stage). |
 | 25 | Materialize (.fmat) (445) | W | DamagedHelmet: wireframe, then glass shards, then PBR | **Blocked [E6 + V5]** (additive blending, barycentrics). |
-| 26 | DICOM Volume (683 + 826) | W/F | MRI raymarch MPR/MIP/DVR | **Blocked [E6]** + r32Float upload. **Proposed exclusion** (niche medical
-viewer) — needs operator approval before V8; otherwise assign r32Float upload to V5. |
+| 26 | DICOM Volume (683 + 826) | W/F | MRI raymarch MPR/MIP/DVR | **Blocked [E6]** + r32Float upload. **Deferred (operator, 2026-09-29): excluded at
+least until E6 lands, then revisited.** It is upstream's capability showcase
+(slice-atlas raymarch MPR/MIP/DVR via private GPU-shim internals, not the
+scene contract). At revisit, check whether upstream promoted data/float/3D
+textures to public API; if so, add float data-texture upload to V5 and port. |
 | 27 | Custom Skybox (631) | W | `.fmat` gradient and Menger skies re-baked to IBL | **Blocked [E6 + E3]** (sky `.fmat` → IBL bake). |
 | 28 | Audio (272) | F | Spatial music, tap plucks, buses | **Blocked [E11]**, spatial panning [V6]. |
 | 29 | Widget Texture (546), Widget Input inset (258) | W / F | Live widgets on a CRT mesh | **Blocked (decision D6)**. DartNative has no offscreen widget capture. |

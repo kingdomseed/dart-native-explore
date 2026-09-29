@@ -207,6 +207,13 @@ re-cut this list; items below are from the 2026-09-27 master preview.
       follow-up), spatial audio following the view camera
       (`dart3d_audio`), character `rotatesToMovement`/`yaw` (W19
       follow-up), debug views (W34 follow-up).
+- [ ] V5b **DICOM volume example — deferred** (operator, 2026-09-29):
+      excluded from V8 until E6 lands, then revisited. Upstream's example is a
+      capability showcase using private Flutter GPU internals (r32Float slice
+      atlas + raymarch `.fmat`), not scene-contract behavior. At revisit:
+      if upstream exposes data/float/3D textures publicly, add float
+      data-texture upload (S–M) and port; otherwise decide on a dart3d-own
+      showpiece.
 - [ ] V6b `Scene.screenDistortion` (radial refraction post pass, 0.24):
       realize on both platforms or record an operator-approved exclusion
       before V8.
