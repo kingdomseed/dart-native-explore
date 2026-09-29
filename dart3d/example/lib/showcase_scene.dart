@@ -218,9 +218,16 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
 
   void _cycleAnim() {
     if (_anims.isEmpty) return;
-    _controller.stopAnimation(_anims[_animIndex].id);
+    final previous = _anims[_animIndex].id;
     _animIndex = (_animIndex + 1) % _anims.length;
-    _controller.playAnimation(_anims[_animIndex].id, loop: true);
+    // Weight 0 on the outgoing clip, not just a stop: a stopped clip
+    // keeps blending its first frame (upstream semantics), which left
+    // every visited clip mixed into Dash's pose (#33).
+    _controller.switchAnimation(
+      from: previous,
+      to: _anims[_animIndex].id,
+      loop: true,
+    );
     setState(() {});
   }
 

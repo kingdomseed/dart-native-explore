@@ -2147,6 +2147,14 @@ final class FeatureScene {
         PayloadEncoding.floats,
         _f32([for (final a in j1Angles) ..._quatZ(a)]),
       );
+      // #33 lane: `tilt` holds j0 at a constant +0.5 rad about Z —
+      // its t=0 pose is NOT the bind pose, so a stopped clip that
+      // still blended (the pre-fix behavior) shows up in the j1 pose.
+      final tiltTimes = chunk(PayloadEncoding.floats, _f32(const [0, 1]));
+      final tiltJ0 = chunk(
+        PayloadEncoding.floats,
+        _f32([..._quatZ(0.5), ..._quatZ(0.5)]),
+      );
       final pulseTimes = chunk(PayloadEncoding.floats, _f32(const [0, 1, 2]));
       // The flattened glTF weights shape — one weight per target per
       // keyframe: [0,0] → [1,0] (puff) → [0,1] (squash).
@@ -2298,7 +2306,22 @@ final class FeatureScene {
           ],
         ),
       );
-      for (final anim in [wave, pulse]) {
+      final tilt = live.addAnimation(
+        AnimationSpec(
+          live.newId(),
+          name: 'tilt',
+          channels: [
+            AnimationChannelSpec(
+              target: j0.id,
+              targetName: j0.name,
+              property: AnimationProperty.rotation,
+              timeline: tiltTimes.id,
+              keyframes: tiltJ0.id,
+            ),
+          ],
+        ),
+      );
+      for (final anim in [wave, pulse, tilt]) {
         ops.add({
           'op': 'upsertAnimation',
           'id': 'anim:${anim.id.toToken()}',
@@ -2365,6 +2388,56 @@ final class FeatureScene {
           );
         });
         if (++ticks >= 12) timer.cancel();
+      });
+
+      // #33 clip-switch lane (+21.5 s, after the trace): hand wave →
+      // tilt with the switch batch (the showcase chip's shape), then
+      // stop tilt at weight 0. Upstream semantics keep a stopped clip
+      // blending at its weight, so only weight 0 retires it: j1's world
+      // rotation must read tilt's full +0.5 rad while tilt plays (a
+      // stop-only switch reads ~0.17 — the stopped clips dilute it),
+      // then the bind identity once every clip is at weight 0.
+      void expectJ1(String step, double angle) {
+        c.poseOf(j1.id).then((pose) {
+          final want = Quaternion.axisAngle(Vector3(0, 0, 1), angle);
+          final r = pose?.rotation;
+          // |dot| ≈ 1 ⇔ same rotation (q and -q included).
+          final dot = r == null
+              ? 0.0
+              : (r.x * want.x + r.y * want.y + r.z * want.z + r.w * want.w)
+                    .abs();
+          final pass = dot > 0.9995;
+          dnLog(
+            'dart3d: w11 stop-rest $step '
+            '${pass ? 'PASS' : 'FAIL'} want=${angle.toStringAsFixed(2)}rad '
+            'live=${r == null ? 'null' : '(${r.x.toStringAsFixed(3)},'
+                      '${r.y.toStringAsFixed(3)},${r.z.toStringAsFixed(3)},'
+                      '${r.w.toStringAsFixed(3)})'}',
+          );
+        });
+      }
+
+      timers.after(const Duration(milliseconds: 7500), () {
+        c.applyCommands([
+          // pulse ended at +18 s but still counts in the weight total
+          // (upstream normalizes across every registered clip), so
+          // zero it too — tilt is then the only weighted clip.
+          encodeAnimCommand(pulse.id, weight: 0),
+          ...encodeSwitchAnimCommands(from: wave.id, to: tilt.id, loop: true),
+        ]);
+        timers.after(
+          const Duration(milliseconds: 500),
+          () => expectJ1('switch', 0.5),
+        );
+        timers.after(const Duration(seconds: 1), () {
+          c.applyCommands([
+            encodeAnimCommand(tilt.id, stop: true, weight: 0),
+          ]);
+          timers.after(
+            const Duration(milliseconds: 500),
+            () => expectJ1('rest', 0),
+          );
+        });
       });
     }
 

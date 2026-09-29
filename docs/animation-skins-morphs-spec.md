@@ -153,6 +153,12 @@ already own) and morph weights (`SCNMorpher.weights` /
 - `SceneController.playAnimation(id, {loop, weight, timeScale,
   time})`, `pauseAnimation`, `stopAnimation`, `seekAnimation(id,
   time)` — thin wrappers over the `anim` op.
+- `SceneController.switchAnimation({from, to, loop})` — the clip-switch
+  idiom as one batch (`encodeSwitchAnimCommands`): `from` stops at
+  weight 0, `to` plays from 0 at weight 1. `stop` keeps upstream
+  semantics (pause + rewind, the clip still blends at its weight), so a
+  switcher must drop the outgoing weight; a weight-0 clip contributes
+  nothing and its channels write back at bind (#33).
 - `SceneController.setMorphWeights(node, weights)` over the
   `setMorphWeights` op.
 - `SceneAnimation` info handle (id, name, channelCount, duration) —
