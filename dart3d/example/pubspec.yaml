@@ -61,7 +61,7 @@ dartnative:
     - assets/dice/dice_faces.json
     - assets/showcase/dash.fsceneb
     - assets/showcase/fcar.fsceneb
-    - assets/showcase/flutter_logo_baked.fsceneb
+    - assets/showcase/dn_logo.fsceneb
     - assets/showcase/two_triangles.fsceneb
     - assets/showcase/cube.fscene
     - assets/showcase/cube.glb

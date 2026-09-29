@@ -153,6 +153,9 @@ Rules:
 - [ ] P4 Demo app (**depends on E2** for the orbit controller): curated showcase (not test lanes) with a stage,
       orbit camera, side-by-side reference against flutter_scene demos;
       3D animated DartNative logo centerpiece (Blender).
+      - Logo asset + Showcase entry landed on `p4-dn-logo-3d`
+        (`tool/dn_logo/build.sh`, `lib/dn_logo_stage.dart`; evidence
+        `docs/artifacts/p4-dn-logo/`). Hero launch scene is a follow-up.
 
 ### Track V — 0.24 parity (final goal; after Track E closes on 0.23.0)
 

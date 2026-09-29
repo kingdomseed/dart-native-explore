@@ -69,6 +69,11 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
   double _frameRadius = 0;
   double _distAtScaleStart = 0;
   bool _aspectFramed = false;
+
+  /// The screen's width / height, once known — lets [_load] author the
+  /// aspect-fitted boom into the document itself (see [_fitBoom]).
+  double? _viewAspect;
+  bool _loadedOnce = false;
   String _status = 'loading…';
 
   int _initialIndex() {
@@ -78,10 +83,19 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
     return i < 0 ? 0 : i;
   }
 
+  // The first load waits for didChangeDependencies so the screen's
+  // aspect ratio is known before the document ships.
   @override
-  void initState() {
-    super.initState();
-    _load(_items[_index]);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final size = MediaQuery.of(context).size;
+    if (size.width > 0 && size.height > 0) {
+      _viewAspect = size.width / size.height;
+    }
+    if (!_loadedOnce) {
+      _loadedOnce = true;
+      _load(_items[_index]);
+    }
   }
 
   void _load(ShowcaseItem item) {
@@ -100,22 +114,35 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
       return;
     }
     _scene = scene;
-    if (item.assetKey == kBuiltinDocRoundtripKey) {
-      _runDocRoundtrip(scene.document);
-    } else {
-      _controller.loadDocument(scene.document);
-    }
     _cameraNode = scene.cameraNode;
     _cameraTarget = scene.cameraTarget;
     _cameraDir = scene.cameraDir;
     _yaw = atan2(_cameraDir.x, _cameraDir.z);
     _pitch = asin(_cameraDir.y.clamp(-1.0, 1.0));
-    // The authored boom distance; first layout may widen it for the
-    // aspect ratio, and pinch zooms within [_distMin, _distMax].
+    // The authored boom distance, widened for the aspect ratio when it
+    // is known; pinch zooms within [_distMin, _distMax].
     _dist = scene.frameRadius * 2.8;
     _distMin = scene.frameRadius * 0.8;
     _distMax = scene.frameRadius * 30;
     _frameRadius = scene.frameRadius;
+    final aspect = _viewAspect;
+    if (aspect != null) {
+      _fitBoom(aspect);
+      // Author the fitted pose into the document before it ships: a
+      // setNodeTransforms sent right behind loadScene can land before
+      // the native side has realized the camera node and be lost.
+      final pose = _cameraPose();
+      scene.document.nodes[scene.cameraNode]?.transform = TrsTransform(
+        translation: pose.$1,
+        rotation: pose.$2,
+      );
+      _aspectFramed = true;
+    }
+    if (item.assetKey == kBuiltinDocRoundtripKey) {
+      _runDocRoundtrip(scene.document);
+    } else {
+      _controller.loadDocument(scene.document);
+    }
     setState(() => _status = '${item.label} — ${item.note}');
     _installAnims();
   }
@@ -192,26 +219,35 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
   void _writeCamera() {
     final node = _cameraNode;
     if (node == null || _dist <= 0) return;
+    final pose = _cameraPose();
+    _controller.setNodeTransforms([
+      NodeTransform(node, translation: pose.$1, rotation: pose.$2),
+    ]);
+  }
+
+  /// The boom pose for the current orbit angles and distance.
+  (Vector3, Quaternion) _cameraPose() {
     _cameraDir = Vector3(
       cos(_pitch) * sin(_yaw),
       sin(_pitch),
       cos(_pitch) * cos(_yaw),
     );
     final fwd = -_cameraDir;
-    _controller.setNodeTransforms([
-      NodeTransform(
-        node,
-        translation: _cameraTarget + _cameraDir * _dist,
-        rotation: Quaternion.axisAngle(
-              Vector3(0, 1, 0),
-              atan2(fwd.x, fwd.z),
-            ) *
-            Quaternion.axisAngle(
-              Vector3(1, 0, 0),
-              -asin(fwd.y.clamp(-1.0, 1.0)),
-            ),
-      ),
-    ]);
+    return (
+      _cameraTarget + _cameraDir * _dist,
+      Quaternion.axisAngle(Vector3(0, 1, 0), atan2(fwd.x, fwd.z)) *
+          Quaternion.axisAngle(
+            Vector3(1, 0, 0),
+            -asin(fwd.y.clamp(-1.0, 1.0)),
+          ),
+    );
+  }
+
+  /// Widens the boom until the bounds diameter fits the horizontal
+  /// half-angle (fovY·aspect narrows on portrait screens).
+  void _fitBoom(double aspect) {
+    final needed = _frameRadius * 1.2 / (tan(0.8 / 2) * aspect);
+    if (needed > _dist) _dist = min(needed, _distMax);
   }
 
   /// One-finger drag orbits the camera around the target — drag right
@@ -234,19 +270,18 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
           Positioned.fill(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                if (!_aspectFramed && _frameRadius > 0) {
+                // Wait for a real size: a first pass at 0×0 would
+                // latch `_aspectFramed` with a NaN/∞ aspect and leave
+                // portrait screens on the unwidened boom.
+                if (!_aspectFramed &&
+                    _frameRadius > 0 &&
+                    constraints.maxWidth > 0 &&
+                    constraints.maxHeight > 0 &&
+                    constraints.maxHeight.isFinite) {
                   _aspectFramed = true;
-                  // Widen the boom until the bounds diameter fits the
-                  // horizontal half-angle (fovY·aspect narrows on
-                  // portrait screens).
-                  final aspect =
-                      constraints.maxWidth / constraints.maxHeight;
-                  final needed =
-                      _frameRadius * 1.2 / (tan(0.8 / 2) * aspect);
-                  if (needed > _dist) {
-                    _dist = min(needed, _distMax);
-                    _writeCamera();
-                  }
+                  final before = _dist;
+                  _fitBoom(constraints.maxWidth / constraints.maxHeight);
+                  if (_dist > before) _writeCamera();
                 }
                 return GestureDetector(
                   onPanUpdate: _orbit,
