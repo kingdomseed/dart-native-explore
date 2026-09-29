@@ -234,7 +234,7 @@ glow, native controls, expo-out entrances, and very little ambient motion.
 | ~~Soft glow behind the logo~~ | **Discarded (operator, §3.4/§3.5): no separate glow card, quad or halo — the logo's own gradient emission + bloom is the glow.** Original recipe (unlit radial-gradient quad) kept only as history. |
 | IBL | `environment: {type: studio}` for reflections and specular on the logo. **No skybox**, so the clear colour shows. | studio IBL verified both (W7 matrix rows 159–163) |
 | Env intensity | Tune per platform. The W-HDR lane needed `1.0` on iOS but `0.08` on Android (`verification-matrix.md:447`). Expect the same kind of split here. | known quirk |
-| Option: gradient sky | `skybox.source.type: gradient` (zenith `#0E1318`, horizon `#13191F`, ground `#090E12`, no sun). It's in code on both platforms (`FsceneRealizer.swift:~6394`, `EnvironmentFactory.kt:~143`), but I found **no verification row** for it. Use only after a T1 check. | code only **If chosen, it needs a T3 live check on the A142 (Vulkan + GL) and the iOS sim before merge — a T1 run can't show it renders.** |
+| Option: gradient sky | `skybox.source.type: gradient` (zenith `#0E1318`, horizon `#13191F`, ground `#090E12`, no sun). It's in code on both platforms (`FsceneRealizer.swift:~6394`, `EnvironmentFactory.kt:~143`), but I found **no verification row** for it. | code only. **If chosen, it needs a T3 live check on the A142 (Vulkan + GL) and the iOS sim before merge — a T1 run can't show it renders.** |
 | Floor or shadows | **None, as an aesthetic choice** — the logo floats. (Android directional shadows work since #16; a soft floor shadow remains an option if it looks better.) |
 
 ### 3.2 Lighting

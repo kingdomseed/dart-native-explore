@@ -46,7 +46,7 @@ this document treats master `26678127` as the demo reference.
 - **Point-light cube shadows**, `Node.shadowCastingMode`
   (on/off/doubleSided/shadowsOnly), per-light caster channel masks (V1, V3).
 - **`DecalNode`** projected decals (V4), **`Scene.screenDistortion`**
-  shockwaves (**not in any V unit**, see §7), `.fmat` additive blending,
+  shockwaves (owned by **V6b** in program-v2, see §7), `.fmat` additive blending,
   depth state, unlit `engine_inputs` (V5).
 - Display-referred surfaces (for widgets, decision D9 / N/A), surface debug views
   (E9 / V6), `renderStats`, `renderQuality` tiers with an adaptive mode,
@@ -308,7 +308,7 @@ including T2/T4 evidence.
 | **M5** | **Campfire Night**: flipbook fire, curl smoke, embers with trails, flicker light, fog, starfield | Particles (flagship), Explosions | Partial now (W18/W16/fog/bloom); later E6 (grass/heat `.fmat`), V3 (flicker shadows), E1 (instanced debris) | **now** (v1), upgrade after E6/V3 | Upstream's flagship visual; particles plus light are the most "alive" demo | L (v1 M) |
 | **M6** | **Explosions**: a tap-to-detonate button inside M5 or M3 | Explosions | as M5; mesh debris after E1 (iOS stays sprites) | after M5 v1 | Visceral one-tap payoff; reuses M1's shockwave/confetti code | S |
 | **M7** | **Material Gallery**: curated Khronos glTF-Sample-Assets (FlightHelmet, ABeautifulGame, sheen/clearcoat/transmission tests, DamagedHelmet), env switcher, **upstream reference image side by side** | Stress Tests, Configurator, README "HelmetPhase2" | OK now (W21/W22 `loadGlb`); limits shown per model | **now** | Proves material fidelity; the side-by-side is the credibility piece for dartpub.dev. Doubles as V8 prep. | M |
-| **M8** | **Dash Adventure**: third-person Dash, spring-arm camera, platforms, bridge, seesaw, water with buoyancy, day/night | Gameplay Kit, Physics (Dash) | **E4** (character), E2 (spring arm/follow), E3 (sky), E6 (water vertex `.fmat`) | after E4 | Playable game on a phone: the "tons of incredible 3D" moment | L |
+| **M8** | **Adventure**: a third-person character (license-clean replacement for Dash, e.g. a Kenney CC0 character — P6), spring-arm camera, platforms, bridge, seesaw, water with buoyancy, day/night | Gameplay Kit, Physics (Dash) | **E4** (character), E2 (spring arm/follow), E3 (sky), **E6** (water vertex `.fmat`) | **after E4 and E6** (water + buoyancy are core; no interim water path) | Playable game on a phone: the "tons of incredible 3D" moment | L |
 | **M9** | **Shader Lab**: toon Dash, Gerstner ocean, endless runner, Menger sky, Materialize helmet | Toon, Custom vertices, Custom Skybox, Materialize | **E6**, V5 (additive/depth/unlit), E3 (sky → IBL) | after E6 (+V5 for Materialize) | Custom shading is what separates a 3D engine from a model viewer | L |
 | **M10** | **Mirror Hall**: planar mirror floor, reflection-probe room, SSR comparison | Planar Mirror, Reflection Probes, SSR | E6 + E8 (iOS `SCNFloor` ok), SSR Android-only | after E8 | Reflections are a classic wow; also shows platform honesty | M |
 | **M11** | **Splats**: strawberry macro and a room capture with a PBR sphere | Gaussian Splats | **E12** (after E1) | after E12 | Cutting-edge; README gallery shot | M |
@@ -337,7 +337,7 @@ M2 Showroom ─ (E2 swap-in)   │
 M3 Physics Playground        │
 M4 Road Trip   M7 Material Gallery
 M5 Campfire v1 → M6 Explosions ─── (E6/V3/E1 upgrades)
-                          after E4: M8 Dash Adventure
+                          after E4 + E6: M8 Adventure
                           after E6: M9 Shader Lab (+V5) → M10 Mirror Hall (+E8)
                           after E12: M11 Splats   after E11: M14 Sound Stage
                           after X3/X4 approval: M12 Car Physics, M13 Cloth
