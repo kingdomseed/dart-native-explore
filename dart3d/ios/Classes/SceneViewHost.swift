@@ -892,12 +892,32 @@ final class SceneViewHost: SCNView {
                 // preserveStage re-decodes the LIVE stage so
                 // updateStage/LUT/effects state survives.
                 shadowAuthored.removeAll()
+                // Clip playback (anim ops) is live state, not document
+                // state: install() clears it. Carry it across so an
+                // `anim` op that drained ahead of the last payload
+                // chunk keeps playing (#27; the Android twin has done
+                // this since #16). Bind poses are NOT carried — the
+                // re-realized nodes come back at the manifest pose,
+                // which the sampler re-captures on first bind.
+                animLock.lock()
+                let carriedClips = animClips
+                animLock.unlock()
                 FsceneRealizer.realize(manifest: manifest, into: self,
                                        preserveStage: true)
                 // W15: the re-realize discarded the surgically
                 // streamed subtrees with the rest of the scene —
                 // rebuild each from its recorded load batch.
                 replayAfterRealize()
+                animLock.lock()
+                for (key, clip) in carriedClips
+                where animationsById[key] != nil && animClips[key] == nil {
+                    animClips[key] = clip
+                }
+                animLock.unlock()
+                if !carriedClips.isEmpty {
+                    d3Log("deferred re-realize: carried "
+                        + "\(carriedClips.count) clip state(s)")
+                }
             }
         }
     }
