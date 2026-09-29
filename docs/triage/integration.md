@@ -236,8 +236,13 @@ so that iOS evidence carries over.
    page fault come from this class of bug.
 5. **W25 close-out lane:** settle-event absence (Dart).
 6. **Dice readout:** the fix above (Dart).
-7. **iOS T2 still owes** a tab-switch soak and a ROLL-button roll. They
-   need simulator input access.
+7. ~~iOS T2 tab-switch soak and ROLL-button roll~~ — done on main `4e12ef3` (§iOS T2 close-out).
+8. **Showcase shows a black view with no loading indicator** while a large
+   asset (Dash, ~9 MB) loads — about 3 s on the iOS sim. Add a loading state (example UX).
+9. **Dice can come to rest under the tab bar**: on iOS a die settled against the
+   top wall beneath the segmented control (`ios-main/ios-harness-run-roll.png`) —
+   the tray doesn't account for the overlay insets (part of the P3 "table follows
+   screen aspect" item).
 
 ## Final T2 — merged heads (2026-09-28)
 
@@ -270,11 +275,24 @@ package being `com.jasonholtdigital.dart3d_example`.
 
 ### iOS T2 close-out — main `4e12ef3` (2026-09-29)
 
-Driven through the simulator input tool on the iPhone 17 Pro sim (debug):
-ROLL button → dice rolled and settled (log `rolled … total 123`, screenshot
-`ios-main/ios-roll-button-settled.png`); tab storm Dice → Showcase → Harness
-→ Dice → Showcase → no crash, 0 error/exception lines; Dash rendered after a
-~3 s load (`ios-after-tab-storm-dash.png`). iOS T2 is **PASS** for the
-merged tree. Notes: Showcase shows a black view with no loading indicator
-while Dash loads (UX follow-up); the d20 readout mismatch (7 vs visible 12)
-is the known readout bug in S0g; Dash remains paler than on Android (S0g).
+One continuous session on the rewritten main `4e12ef3` (iPhone 17 Pro sim,
+debug, driven through the simulator input tool), so no evidence is reused
+from pre-rewrite heads:
+
+1. `dn run -d 9151BBE4-… --dart-define=DART3D_SCENE=harness` → harness ran to
+   `w18 lane complete`.
+2. Dice tab → **ROLL button** → rolled and settled (`rolled … total 51`;
+   `ios-main/ios-harness-run-roll.png`).
+3. Tab storm Showcase → Harness → Showcase → Dash renders
+   (`ios-main/ios-harness-run-after-tabs.png`); app process still alive
+   (`launchctl list` shows the example).
+
+**Error scan over the complete capture** (`ios-main/ios-harness-roll-tabs-full.log`, 666 lines, launch → end):
+`grep -ciE 'fatal|crash|exception|error|sigabrt|sigsegv|lost connection'` → **0**.
+Crash reports: `find ~/Library/Logs/DiagnosticReports -newermt @<run start> -iname '*Runner*'` → **0**.
+
+An earlier short run on the same tree (`ios-roll-button-settled.png`,
+`ios-after-tab-storm-dash.png`) showed the same behaviour.
+
+**iOS T2: PASS** on main `4e12ef3`. Known items seen: d20 readout mismatch (S0g),
+Dash paler than Android (S0g), follow-ups 8–9 above.
