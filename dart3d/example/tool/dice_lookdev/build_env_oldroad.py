@@ -31,7 +31,7 @@ def build(scene):
     E.world(scene, color=(0.01, 0.012, 0.02), strength=1.0)
     table = P.dark_wood("Inn table", c1=(0.05, 0.03, 0.015), c2=(0.18, 0.1, 0.05), rough=0.75, varnish=0.0)
     E.cube("table", (200, 150, 6), (0, 20, -3.0), table, bevel=0.5)
-    E.plane("map", W + 2 * RIM_T, D + 2 * RIM_T, (0, 0, 0.35), P.parchment("Travel map"), subdiv=1)
+    E.plane("map", W + 2 * RIM_T, D + 2 * RIM_T, (0, 0, 0.36), P.parchment("Travel map", tone=((0.12, 0.075, 0.035), (0.24, 0.16, 0.08), (0.3, 0.21, 0.11))), subdiv=1)
     E.cube("map_board", (W + 2 * RIM_T + 1, D + 2 * RIM_T + 1, 0.7), (0, 0, 0), leather("Board leather",
                                                                                     (0.1, 0.04, 0.02)), bevel=0.3)
     E.rim("rim", W + RIM_T, D + RIM_T, 3.0, RIM_H, RIM_T, leather(), z0=0.35)
@@ -49,9 +49,10 @@ def build(scene):
     P.candle(scene, lx, ly, 1.5, h=5, r=1.0, holder=False, energy=140)
     # clay pipe
     clay = E.simple("Clay pipe", (0.22, 0.12, 0.07), 0.45, Coat_Weight=0.3)
-    E.cylinder("pipe_bowl", 1.1, 2.6, (W / 2 + 9, -6, 1.6), clay, segs=24, r2=1.3)
-    stem = E.cylinder("pipe_stem", 0.3, 14, (W / 2 + 9 + 6.5, -6 - 2.0, 0.6), clay, segs=10)
-    stem.rotation_euler = (0, math.radians(86), math.radians(-18))
+    px, py = W / 2 - 1.0, top + 3.4  # top-right strip of the phone frame
+    E.cylinder("pipe_bowl", 1.1, 2.6, (px, py, 1.6), clay, segs=24, r2=1.3)
+    stem = E.cylinder("pipe_stem", 0.3, 14, (px - 6.5, py + 1.0, 0.6), clay, segs=10)
+    stem.rotation_euler = (0, math.radians(86), math.radians(172))
     # satchel strap + buckle
     strap = E.plane("strap", 4, 70, (W / 2 + 16, 10, 0.2), leather("Strap"), subdiv=30)
     strap.rotation_euler = (0, 0, 0.25)
@@ -60,19 +61,22 @@ def build(scene):
     P.torus("buckle", 2.2, 0.25, (W / 2 + 15.5, 2, 0.6), P.brass("Buckle brass", worn=0.8), minor_seg=8)
     E.rock("satchel", 12, (W / 2 + 24, top + 8, 6), leather("Satchel", (0.16, 0.07, 0.03)), seed=3,
            squash=(1.2, 0.8, 0.7), strength=0.12)
-    for i, (x, y) in enumerate(((-W / 2 - 6, -D / 2 + 3), (-W / 2 - 8.5, -D / 2 + 6), (-W / 2 - 5, -D / 2 + 8))):
+    bot = -D / 2 - RIM_T
+    for i, (x, y) in enumerate(((-W / 2 + 1.5, bot - 3.0), (-W / 2 + 4.2, bot - 4.2), (-W / 2 + 2.6, bot - 5.6),
+                                (W / 2 - 3.0, bot - 3.6))):
         P.coin(x, y, 0.0, r=1.4, tilt=(0.03 * i, -0.02 * i))
     E.rock("bread", 5.5, (-W / 2 - 13, 6, 3), E.simple("Bread crust", (0.35, 0.16, 0.05), 0.7), seed=6,
            squash=(1.3, 0.9, 0.7), strength=0.1)
     E.cylinder("mug", 3.8, 10, (-W / 2 - 12, top - 4, 5), P.dark_wood("Mug wood"), segs=32, bevel=0.3)
     P.backdrop_window(0, top + 75, 45, 70, 80, sky_top=(0.03, 0.06, 0.18), sky_bot=(0.25, 0.2, 0.3), moon=False)
     E.light(scene, "AREA", "blue_hour", (0, top + 70, 50), 9000, color=(0.5, 0.6, 1.0), size=50, target=(0, 0, 0))
-    E.light(scene, "AREA", "warm_key", (-25, -20, 40), 6000, color=(1.0, 0.75, 0.5), size=20, target=(0, 0, 0))
+    # side key (its reflection in the gold lands off the tray) + a soft warm
+    # overhead: worn gold seen straight down mirrors whatever is above it
+    E.light(scene, "AREA", "warm_key", (-44, -16, 38), 12000, color=(1.0, 0.75, 0.5), size=20, target=(0, 0, 0))
+    E.overhead(scene, 20000, color=(1.0, 0.85, 0.65), size=90, height=110)
+    E.cube("dagger_sheath", (1.6, 13, 0.9), (1.0, bot - 4.4, 0.45), leather("Sheath", (0.12, 0.05, 0.02)),
+           bevel=0.3).rotation_euler = (0, 0, math.radians(84))
     E.haze_box("haze", (160, 180, 70), (0, 20, 34), 0.003, color=(1.0, 0.9, 0.8), noise_scale=0.03)
     return dict(
-        samples=128, exposure=1.0, hero=dict(dist=32, elev=30, az=-6, lens=65, fstop=2.8),
-        roll=dict(settled={"d12": ((-4.5, -7.0), 12, 20), "d6": ((5.5, -3.0), 6, -10), "d10t": ((-2.0, 4.0), 0, 30),
-                           "d4": ((6.0, 9.0), 4, 0)},
-                  airborne={"d20": ((0.5, -2.5, 3.0), (1.2, 2.5, 0.2)), "d8": ((-5.5, 7.0, 5.0), (2.0, -1.0, -0.5)),
-                            "d10u": ((4.0, 14.0, 2.2), (-1.5, -2.0, 0.3))}),
+        samples=128, exposure=0.6, topdown=dict(width=W + 2 * RIM_T + 1.0), hero=dict(dist=32, elev=30, az=-6, lens=65, fstop=2.8),
     )

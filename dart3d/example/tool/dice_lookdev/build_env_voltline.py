@@ -38,7 +38,10 @@ def holo_floor():
     pulse = k.noise(obj, 0.08, 2).outputs["Fac"]
     s = k.bsdf(Base_Color=(0.005, 0.006, 0.01, 1), Roughness=0.08, Coat_Weight=1.0, Coat_Roughness=0.02,
                Emission_Color=(*CYAN, 1), Emission_Strength=k.math("MULTIPLY", lines, k.math("MULTIPLY", pulse, 1.2)))
-    k.surface(s)
+    # Round 2: the tray is a lightbox under smoked glass: a soft indigo glow
+    # everywhere, so the black-chrome dice read as crisp silhouettes.
+    field = k.emission((0.14, 0.1, 0.42, 1), k.math("ADD", 0.6, k.math("MULTIPLY", pulse, 0.4)))
+    k.surface(k.add_shader(s, field))
     return m
 
 
@@ -74,7 +77,7 @@ def neon_tube(name, pts, color, strength=30.0, r=0.35):
 def build(scene):
     E.world(scene, color=(0.004, 0.004, 0.008), strength=1.0)
     E.cube("counter", (220, 70, 6), (0, 8, -3.0), wet_counter(), bevel=0.6)
-    E.plane("holo_floor", W + 2 * RIM_T, D + 2 * RIM_T, (0, 0, 0.25), holo_floor())
+    E.plane("holo_floor", W + 2 * RIM_T, D + 2 * RIM_T, (0, 0, 0.26), holo_floor())
     E.cube("holo_base", (W + 2 * RIM_T + 1, D + 2 * RIM_T + 1, 0.5), (0, 0, 0),
            E.simple("Anodized black", (0.01, 0.01, 0.012), 0.3, 1.0), bevel=0.2)
     E.rim("rim_body", W + RIM_T, D + RIM_T, 2.5, RIM_H, RIM_T,
@@ -111,6 +114,17 @@ def build(scene):
                segs=40, r2=4.2)
     E.cylinder("cup_band", 4.0, 3, (W / 2 + 10, top - 6, 6), E.simple("Cup band", (0.9, 0.1, 0.4), 0.5), segs=40,
                r2=4.15)
+    bot = -D / 2 - RIM_T
+    E.cube("phone_low", (7.5, 15.5, 0.8), (W / 2 - 0.5, bot - 8.6, 0.4), E.simple("Phone low black", (0.01, 0.01, 0.01),
+                                                                                  0.1, Coat_Weight=1.0),
+           bevel=0.6).rotation_euler = (0, 0, 1.35)
+    scr = E.cube("phone_screen", (6.6, 14.2, 0.05), (W / 2 - 0.5, bot - 8.6, 0.82),
+                 E.emissive("Phone screen", (0.2, 0.35, 0.9), 1.2))
+    scr.rotation_euler = (0, 0, 1.35)
+    rc = P.paper(-W / 2 + 2.5, top + 3.5, 0.0, 5, 12, rot=1.45, mat=E.simple("Receipt", (0.85, 0.84, 0.8), 0.7),
+                 curl=0.3, seed=51)
+    E.cylinder("straw", 0.25, 14, (-1.0, bot - 2.4, 0.3), E.simple("Straw", (1.0, 0.1, 0.5), 0.3),
+               segs=10).rotation_euler = (0, math.radians(90), 0.08)
     E.cube("phone", (7.5, 15.5, 0.8), (W / 2 + 12, -8, 0.4), E.simple("Phone black", (0.01, 0.01, 0.01), 0.1,
                                                                        Coat_Weight=1.0), bevel=0.6).rotation_euler = (0, 0, -0.3)
     E.light(scene, "AREA", "neon_m", (-22, top + 60, 50), 12000, color=MAGENTA, size=30, target=(0, 0, 0))
@@ -118,9 +132,5 @@ def build(scene):
     E.light(scene, "AREA", "key", (0, -40, 50), 1800, color=(0.8, 0.85, 1.0), size=25, target=(0, 0, 0))
     E.haze_box("haze", (200, 200, 80), (0, 60, 40), 0.004, color=(0.9, 0.9, 1.0), noise_scale=0.03)
     return dict(
-        samples=128, exposure=0.2, hero=dict(dist=32, elev=28, az=6, lens=65, fstop=2.8),
-        roll=dict(settled={"d12": ((-4.5, -7.0), 12, 20), "d6": ((5.5, -3.0), 6, -10), "d10t": ((-2.0, 4.0), 0, 30),
-                           "d4": ((6.0, 9.0), 4, 0)},
-                  airborne={"d20": ((0.5, -2.5, 3.0), (1.2, 2.5, 0.2)), "d8": ((-5.5, 7.0, 5.0), (2.0, -1.0, -0.5)),
-                            "d10u": ((4.0, 14.0, 2.2), (-1.5, -2.0, 0.3))}),
+        samples=128, exposure=0.2, topdown=dict(width=W + 2 * RIM_T + 1.0), hero=dict(dist=32, elev=28, az=6, lens=65, fstop=2.8),
     )

@@ -24,7 +24,9 @@ def page_mat():
     m, k = E.material("Tome page")
     obj = k.coords().outputs["Object"]
     n = k.noise(obj, 0.3, 8, 0.6).outputs["Fac"]
-    col = k.ramp(n, [(0.3, (0.6, 0.5, 0.34)), (0.7, (0.86, 0.78, 0.6))])
+    # Round 2: tea-stained vellum, a few steps darker than the bone dice so
+    # they separate at top-down (round 1's cream pages matched the dice).
+    col = k.ramp(n, [(0.3, (0.33, 0.24, 0.13)), (0.7, (0.5, 0.39, 0.24))])
     sep = k.node("ShaderNodeSeparateXYZ")
     k.link(obj, sep.inputs[0])
     # ruled text blocks: rows of short dashes, leaving an illustration window
@@ -79,17 +81,18 @@ def build(scene):
     top = D / 2 + 6
     # stoneware mug
     mug_m = E.simple("Stoneware", (0.25, 0.2, 0.16), 0.5, Coat_Weight=0.6)
-    mug = E.cylinder("mug", 4.0, 9, (W / 2 + 11, top - 4, 4.5), mug_m, segs=48, bevel=0.4)
-    P.torus("mug_handle", 2.4, 0.6, (W / 2 + 15.5, top - 4, 5), mug_m, rot=(math.radians(90), 0, 0))
-    E.cylinder("tea", 3.6, 0.2, (W / 2 + 11, top - 4, 8.2), E.simple("Tea", (0.1, 0.04, 0.01), 0.05))
+    mx, my = W / 2 + 5.5, top + 1.5  # top-right corner of the phone frame
+    mug = E.cylinder("mug", 4.0, 9, (mx, my, 4.5), mug_m, segs=48, bevel=0.4)
+    P.torus("mug_handle", 2.4, 0.6, (mx + 4.5, my, 5), mug_m, rot=(math.radians(90), 0, 0))
+    E.cylinder("tea", 3.6, 0.2, (mx, my, 8.2), E.simple("Tea", (0.1, 0.04, 0.01), 0.05))
     # velvet pouch
-    pouch = E.rock("pouch", 5.0, (-W / 2 - 10, top - 10, 3.5), P.velvet("Pouch velvet", color=(0.12, 0.02, 0.1),
+    pouch = E.rock("pouch", 5.0, (-W / 2 - 5.5, top + 0.5, 3.5), P.velvet("Pouch velvet", color=(0.12, 0.02, 0.1),
                                                                          stars=False), seed=4,
                    squash=(1, 1, 0.9), strength=0.2)
-    E.cylinder("pouch_neck", 1.8, 3, (-W / 2 - 10, top - 10, 8.5), P.velvet("Pouch velvet"), segs=24, r2=2.6)
+    E.cylinder("pouch_neck", 1.8, 3, (-W / 2 - 5.5, top + 0.5, 8.5), P.velvet("Pouch velvet"), segs=24, r2=2.6)
     # wax seals + lavender
     wax = E.simple("Seal wax", (0.35, 0.02, 0.02), 0.35, Coat_Weight=0.5)
-    for i, (x, y) in enumerate(((W / 2 + 7, -D / 2 + 2), (W / 2 + 10, -D / 2 - 3))):
+    for i, (x, y) in enumerate(((W / 2 + 1.5, -D / 2 - 7.8), (W / 2 + 5.0, -D / 2 - 9.0))):
         E.cylinder("seal", 1.8, 0.5, (x, y, 0.25), wax, segs=32, bevel=0.15)
     rng = random.Random(8)
     stem = E.simple("Lavender stem", (0.18, 0.25, 0.12), 0.6)
@@ -112,9 +115,10 @@ def build(scene):
     E.haze_box("haze", (160, 180, 70), (0, 20, 34), 0.004, color=(1.0, 0.85, 0.7), noise_scale=0.03)
     return dict(
         samples=128, exposure=0.2, surface_z=3.3, centre=(0, 9.0, 4.3),
+        topdown=dict(width=W + 9.0),
+        # keep the dice off the gutter's slope (the physics floor is flat)
+        topdown_layout={"d20": ((0.4, -4.2), 18, 8), "d12": ((-3.9, 4.6), 11, -14), "d10u": ((3.7, 4.2), 9, 12),
+                        "d10t": ((-0.3, 9.0), 40, -6), "d8": ((-3.8, -8.6), 5, 16), "d6": ((3.8, -8.4), 3, -9),
+                        "d4": ((0.4, 13.0), 3, 22)},
         hero=dict(dist=32, elev=30, az=-8, lens=65, fstop=2.8),
-        roll=dict(settled={"d12": ((-4.5, -9.0), 12, 20), "d6": ((5.5, -12.0), 6, -10),
-                           "d10t": ((-3.0, 8.0), 0, 30), "d4": ((6.0, 12.0), 4, 0)},
-                  airborne={"d20": ((0.5, -4.5, 3.0), (1.2, 2.5, 0.2)), "d8": ((-5.5, 14.0, 5.0), (2.0, -1.0, -0.5)),
-                            "d10u": ((4.0, 5.0, 2.2), (-1.5, -2.0, 0.3))}),
     )

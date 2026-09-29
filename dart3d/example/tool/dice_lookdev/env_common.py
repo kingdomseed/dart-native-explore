@@ -9,13 +9,10 @@ from __future__ import annotations
 
 import math
 import random
-import struct
-import zlib
 from pathlib import Path
 
 import bmesh
 import bpy
-import numpy as np
 from mathutils import Euler, Matrix, Quaternion, Vector
 
 from build_dice import NodeKit
@@ -382,136 +379,220 @@ def grid_lines(k, vec_socket, spacing, width):
 
 # Hero arrangement (x, y offsets in cm around the set centre) and value shown.
 HERO_LAYOUT = {
-    "d20": ((0.2, -1.8), 20, 0),
-    "d12": ((-3.0, 0.1), 12, 12),
-    "d10u": ((2.8, 0.0), 0, -15),
-    "d10t": ((4.7, 2.7), 0, 20),
-    "d8": ((-4.8, 2.9), 8, -10),
-    "d6": ((1.1, 3.1), 6, 18),
-    "d4": ((-1.8, 4.2), 4, -8),
+    "d20": ((0.3, -2.4), 20, 0),
+    "d12": ((-3.9, 0.2), 12, 12),
+    "d10u": ((3.6, -0.2), 0, -15),
+    "d10t": ((4.9, 3.9), 0, 20),
+    "d8": ((-4.9, 4.2), 8, -10),
+    "d6": ((1.4, 4.1), 6, 18),
+    "d4": ((-1.6, 7.2), 4, 58),
 }
 
+# The in-app top-down result: every die settled, its number up. Yaw = numeral
+# rotation away from reading upright on the phone (small, like a real roll).
+# Values include two-digit and dotted numerals (the hardest to read).
+TOPDOWN_LAYOUT = {
+    "d20": ((0.4, -1.6), 18, 8),
+    "d12": ((-3.9, 2.2), 11, -14),
+    "d10u": ((3.7, 1.9), 9, 12),
+    "d10t": ((-0.3, 6.4), 40, -6),
+    "d8": ((-3.8, -6.2), 5, 16),
+    "d6": ((3.8, -6.0), 3, -9),
+    "d4": ((0.4, 11.0), 3, 22),
+}
+REST_GAP = 0.004  # cm between a die's lowest point and the surface it rests on
 
-def place_hero(objs, specs, cam_loc, centre=(0, 0), surface_z=0.0, layout=None):
-    from build_dice import face_quaternion, rest_height
-    layout = layout or HERO_LAYOUT
+
+def place_layout(objs, specs, layout, centre=(0, 0), facing_from=None):
+    """Orient each die (value up, numeral facing the viewer) and put it at its xy.
+
+    facing_from: a camera location to face the numerals towards (hero);
+    None faces them up the screen (+Y, the top-down phone view).
+    Heights are set by settle(), which rests every die on whatever is under it.
+    """
+    from build_dice import face_quaternion
     for kind, ob in objs.items():
         (dx, dy), value, yaw = layout[kind]
         p = Vector((centre[0] + dx, centre[1] + dy, 0))
-        facing = (p - Vector(cam_loc)).to_2d().to_3d().normalized()
+        if facing_from is not None:
+            facing = (p - Vector(facing_from)).to_2d().to_3d().normalized()
+        else:
+            facing = Vector((0, 1, 0))
         facing = Quaternion((0, 0, 1), math.radians(yaw)) @ facing
-        q = face_quaternion(specs[kind], value, facing=facing)
+        ob.animation_data_clear()
         ob.rotation_mode = "QUATERNION"
-        ob.rotation_quaternion = q
-        ob.location = (p.x, p.y, surface_z + rest_height(specs[kind]))
-        ob.animation_data_clear()
+        ob.rotation_quaternion = face_quaternion(specs[kind], value, facing=facing)
+        ob.location = (p.x, p.y, 50.0)
+    settle(objs)
 
 
-def place_roll(objs, specs, settled, airborne, surface_z=0.0, seed=7, frame=1):
-    """Some dice settled, the rest tumbling in the air with motion blur keys.
+def _dice_set(objs):
+    s = set(objs.values())
+    for ob in objs.values():
+        s.update(ob.children)
+    return s
 
-    settled: {kind: ((x, y), value, yaw_deg)}; airborne: {kind: ((x, y, z), (vx, vy, vz))}
+
+def _ignored(ob, dice):
+    # dice, and the shadowless scatter (motes, snow, embers) never support a die
+    return ob in dice or not ob.visible_shadow or ob.hide_render
+
+
+def floor_below(scene, x, y, z_top, dice):
+    """Height of the first solid surface under (x, y) starting at z_top."""
+    dg = bpy.context.evaluated_depsgraph_get()
+    origin = Vector((x, y, z_top))
+    for _ in range(64):
+        hit, loc, _n, _i, ob, _m = scene.ray_cast(dg, origin, Vector((0, 0, -1)))
+        if not hit:
+            return None
+        if not _ignored(ob, dice):
+            return loc.z
+        origin = loc - Vector((0, 0, 1e-3))
+    return None
+
+
+def _world_verts(ob):
+    M = ob.matrix_world
+    return [M @ v.co for v in ob.data.vertices]
+
+
+def settle(objs, gap=REST_GAP):
+    """Drop every die straight down until its lowest vertex rests on the surface.
+
+    The surface is ray-cast at the die's centre and at its lowest vertices, and
+    the highest hit wins, so a die never sinks into a floor, a bowed page or a
+    rim lip. Faces stay flat (the orientation comes from the face map).
     """
-    from build_dice import face_quaternion, rest_height
-    rng = random.Random(seed)
-    for kind, ((x, y), value, yaw) in settled.items():
-        ob = objs[kind]
-        ob.animation_data_clear()
-        q = face_quaternion(specs[kind], value,
-                            facing=Quaternion((0, 0, 1), math.radians(yaw)) @ Vector((0, 1, 0)))
-        ob.rotation_quaternion = q
-        ob.location = (x, y, surface_z + rest_height(specs[kind]))
-    for kind, (pos, vel) in airborne.items():
-        ob = objs[kind]
-        ob.animation_data_clear()
-        axis = Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(-1, 1))).normalized()
-        q0 = Quaternion(axis, rng.uniform(0, 6.28))
-        spin = Quaternion(Vector((vel[1], -vel[0], 0.3)).normalized(), 0.9)
-        p = Vector(pos)
-        v = Vector(vel)
-        for f, t in ((frame - 1, -1), (frame + 1, 1)):
-            ob.location = p + v * t
-            ob.rotation_quaternion = (spin if t > 0 else spin.inverted()) @ q0
-            ob.keyframe_insert("location", frame=f)
-            ob.keyframe_insert("rotation_quaternion", frame=f)
-    bpy.context.scene.frame_set(frame)
+    scene = bpy.context.scene
+    dice = _dice_set(objs)
+    for ob in objs.values():
+        bpy.context.view_layer.update()
+        vs = _world_verts(ob)
+        minz = min(v.z for v in vs)
+        z_top = max(v.z for v in vs) + 3.0
+        # every vertex in the lower third: how far must the die rise so that
+        # none of them is below the surface directly under it?
+        need = []
+        for v in vs:
+            if v.z < minz + 0.35:
+                f = floor_below(scene, v.x, v.y, z_top, dice)
+                if f is not None:
+                    need.append(f - v.z)
+        ob.location.z += (max(need) if need else -minz) + gap
+    bpy.context.view_layer.update()
 
 
-# --------------------------------------------------------------------------
-# Output: palette PNG (keeps the committed renders small)
-# --------------------------------------------------------------------------
+def contact_report(objs):
+    """Per die: gap to the surface below its lowest point, and any interpenetration.
 
-def _bayer(n=8):
-    m = np.array([[0]])
-    while m.shape[0] < n:
-        m = np.block([[4 * m, 4 * m + 2], [4 * m + 3, 4 * m + 1]])
-    return (m + 0.5) / (n * n) - 0.5
-
-
-def quantize_png(src, dst, colors=256, dither=3.0, max_width=1600, seed=0):
-    """8-bit palette PNG via k-means + light ordered dither. Pure numpy/zlib."""
-    img = bpy.data.images.load(str(src))
-    w, h = img.size
-    a = np.array(img.pixels[:], dtype=np.float32).reshape(h, w, 4)[::-1, :, :3] * 255.0
-    bpy.data.images.remove(img)
-    if w > max_width:
-        f = w // max_width if w % max_width == 0 else None
-        if f:
-            a = a.reshape(h // f, f, w // f, f, 3).mean(axis=(1, 3))
-            h, w = a.shape[:2]
-    rng = np.random.default_rng(seed)
-    flat = a.reshape(-1, 3)
-    sample = flat[rng.choice(len(flat), size=min(80000, len(flat)), replace=False)]
-    pal = sample[rng.choice(len(sample), size=colors, replace=False)].copy()
-    for _ in range(12):
-        idx = _nearest(sample, pal)
-        for c in range(colors):
-            sel = sample[idx == c]
-            if len(sel):
-                pal[c] = sel.mean(axis=0)
-            else:
-                pal[c] = sample[rng.integers(len(sample))]
-    b = _bayer(8)
-    noise = np.tile(b, (h // 8 + 1, w // 8 + 1))[:h, :w, None] * dither
-    idx = _nearest((a + noise).reshape(-1, 3), pal).astype(np.uint8).reshape(h, w)
-    pal8 = np.clip(np.round(pal), 0, 255).astype(np.uint8)
-    _write_indexed_png(dst, idx, pal8)
-    return Path(dst).stat().st_size
-
-
-def _nearest(px, pal, chunk=65536):
-    out = np.empty(len(px), dtype=np.int32)
-    pp = (pal ** 2).sum(axis=1)
-    for i in range(0, len(px), chunk):
-        c = px[i:i + chunk]
-        d = pp[None, :] - 2.0 * c @ pal.T
-        out[i:i + chunk] = d.argmin(axis=1)
+    Returns {kind: {"gap_cm": float, "overlaps": [names]}}. A settled die should
+    have 0 <= gap < 0.01 and no overlaps (dice or environment).
+    """
+    scene = bpy.context.scene
+    dice = _dice_set(objs)
+    trees = {kind: world_tree(ob) for kind, ob in objs.items()}
+    env = []
+    for ob in scene.objects:
+        if ob.type not in ("MESH", "CURVE") or _ignored(ob, dice):
+            continue
+        env.append(ob)
+    out = {}
+    for kind, ob in objs.items():
+        vs = _world_verts(ob)
+        minz = min(v.z for v in vs)
+        z_top = max(v.z for v in vs) + 3.0
+        gaps = []
+        for v in vs:
+            if v.z < minz + 0.35:
+                f = floor_below(scene, v.x, v.y, z_top, dice)
+                if f is not None:
+                    gaps.append(v.z - f)
+        gap = min(gaps) if gaps else float("nan")
+        bb = [ob.matrix_world @ Vector(c) for c in ob.bound_box]
+        mn = Vector((min(c.x for c in bb), min(c.y for c in bb), min(c.z for c in bb)))
+        mx = Vector((max(c.x for c in bb), max(c.y for c in bb), max(c.z for c in bb)))
+        hits = []
+        for k2, t2 in trees.items():
+            if k2 != kind and trees[kind].overlap(t2):
+                hits.append(k2)
+        for e in env:
+            eb = [e.matrix_world @ Vector(c) for c in e.bound_box]
+            if (min(c.x for c in eb) > mx.x or max(c.x for c in eb) < mn.x or min(c.y for c in eb) > mx.y
+                    or max(c.y for c in eb) < mn.y or min(c.z for c in eb) > mx.z or max(c.z for c in eb) < mn.z):
+                continue
+            t = world_tree(e)
+            if t is not None and trees[kind].overlap(t):
+                hits.append(e.name)
+        out[kind] = {"gap_cm": round(gap, 4), "overlaps": hits}
     return out
 
 
-def _write_indexed_png(path, idx, pal):
-    h, w = idx.shape
+def world_tree(ob):
+    """BVH of the evaluated object in world space (None if it has no faces)."""
+    from mathutils.bvhtree import BVHTree
+    dg = bpy.context.evaluated_depsgraph_get()
+    ev = ob.evaluated_get(dg)
+    try:
+        me = ev.to_mesh()
+    except RuntimeError:
+        return None
+    if me is None or not len(me.polygons):
+        ev.to_mesh_clear()
+        return None
+    M = ob.matrix_world
+    verts = [M @ v.co for v in me.vertices]
+    polys = [tuple(p.vertices) for p in me.polygons]
+    ev.to_mesh_clear()
+    return BVHTree.FromPolygons(verts, polys)
 
-    def chunk(tag, data):
-        c = struct.pack(">I", len(data)) + tag + data
-        return c + struct.pack(">I", zlib.crc32(tag + data) & 0xFFFFFFFF)
 
-    raw = b"".join(b"\x00" + idx[y].tobytes() for y in range(h))
-    png = b"\x89PNG\r\n\x1a\n"
-    png += chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 3, 0, 0, 0))
-    png += chunk(b"PLTE", pal.tobytes())
-    png += chunk(b"IDAT", zlib.compress(raw, 9))
-    png += chunk(b"IEND", b"")
-    Path(path).write_bytes(png)
+# --------------------------------------------------------------------------
+# Lighting helpers
+# --------------------------------------------------------------------------
+
+def overhead(scene, energy, color=(1.0, 0.95, 0.88), size=45.0, height=90.0, y=0.0, name="overhead"):
+    """A big soft source above the tray: the thing top-down metal reflects.
+
+    Viewed straight down, a metal numeral mirrors whatever is above the
+    camera; without this it mirrors a black ceiling and goes dark. Real time:
+    the zenith of the IBL / a large unshadowed area or directional fill.
+    """
+    return light(scene, "AREA", name, (0, y, height), energy, color=color, size=size, target=(0, y, 0),
+                 shadow=True)
 
 
-def render_to(scene, cam, path_tmp, path_out, colors=256, dither=3.0):
+# --------------------------------------------------------------------------
+# Output: full-colour JPEG (q 90) for the committed renders
+# --------------------------------------------------------------------------
+
+JPEG_QUALITY = 90
+
+
+def save_jpeg(src_png, dst, quality=JPEG_QUALITY, scale=1.0):
+    """Re-encode a rendered PNG as a JPEG (no palette, no dither)."""
+    img = bpy.data.images.load(str(src_png))
+    if scale != 1.0:
+        img.scale(int(img.size[0] * scale), int(img.size[1] * scale))
+    sc = bpy.context.scene
+    st = sc.render.image_settings
+    old = (st.file_format, st.quality, st.color_mode)
+    st.file_format, st.quality, st.color_mode = "JPEG", quality, "RGB"
+    img.save_render(str(dst), scene=sc)
+    st.file_format, st.quality, st.color_mode = old
+    bpy.data.images.remove(img)
+    return Path(dst).stat().st_size
+
+
+def render_to(scene, cam, path_tmp, path_out, quality=JPEG_QUALITY):
+    """Render `cam` to a lossless PNG at path_tmp, then a JPEG at path_out."""
     import time
     scene.camera = cam
     scene.render.filepath = str(path_tmp)
+    scene.render.image_settings.file_format = "PNG"
     t0 = time.time()
     bpy.ops.render.render(write_still=True)
     t1 = time.time()
-    size = quantize_png(path_tmp, path_out, colors=colors, dither=dither)
+    size = save_jpeg(path_tmp, path_out, quality)
     print(f"dice_lookdev: {path_out} {size // 1024} KB render {t1 - t0:.0f}s", flush=True)
     return size

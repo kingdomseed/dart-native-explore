@@ -1,4 +1,5 @@
-"""Build docs/design/dice-lookdev/all-sets.png from the per-theme hero renders.
+"""Contact sheets from the per-theme renders: all-sets-topdown.jpg (primary), all-sets-hero.jpg,
+readability-crops.jpg (from the per-set crop strips readability_check leaves in out/crops/).
 
 Blender --background --python contact_sheet.py -- --dir docs/design/dice-lookdev --themes a,b,c
 Labels are rendered with Workbench (Inter) and composited with numpy.
@@ -77,37 +78,57 @@ def labels(texts, sheet_w, sheet_h, positions):
     return load(tmp)[:, :, 0]
 
 
+def save_jpeg(sheet, path):
+    H, W = sheet.shape[:2]
+    tmp = Path(tempfile.mkdtemp()) / "sheet.png"
+    img = bpy.data.images.new("sheet", W, H, alpha=False)
+    px = np.ones((H, W, 4), dtype=np.float32)
+    px[:, :, :3] = np.clip(sheet[::-1], 0, 1)
+    img.pixels.foreach_set(px.ravel())
+    img.filepath_raw = str(tmp)
+    img.file_format = "PNG"
+    img.save()
+    bpy.data.images.remove(img)
+    return E.save_jpeg(tmp, path)
+
+
+def grid(d, themes, suffix, cw, ch, cols, out_name, src=None):
+    rows = (len(themes) + cols - 1) // cols
+    W, H = cols * cw + 1, rows * (ch + LAB)
+    sheet = np.full((H, W, 3), 0.035, dtype=np.float32)
+    pos, texts = [], []
+    for i, t in enumerate(themes):
+        r, c = divmod(i, cols)
+        x, y = c * cw, r * (ch + LAB)
+        sheet[y:y + ch, x:x + cw - 1] = resize(load((src or d) / f"{t}-{suffix}"), cw - 1, ch)
+        pos.append((x + 10, y + ch))
+        th = build_dice.THEMES[t]
+        texts.append((th["title"], "" if cw < 450 else th.get("env", "")))
+    lab = labels(texts, W, H, pos)
+    sheet = sheet * (1 - lab[:, :, None]) + lab[:, :, None] * np.array([0.95, 0.9, 0.8])
+    size = save_jpeg(sheet, d / out_name)
+    print(f"dice_lookdev: {out_name} {size // 1024} KB ({len(themes)} themes)")
+
+
 def main():
     argv = sys.argv[sys.argv.index("--") + 1:]
     ap = argparse.ArgumentParser()
     ap.add_argument("--dir", required=True)
     ap.add_argument("--themes", required=True)
+    ap.add_argument("--crops", default=str(HERE / "out" / "crops"), help="readability_check crop strips")
     a = ap.parse_args(argv)
     d = Path(a.dir)
-    themes = [t for t in a.themes.split(",") if (d / f"{t}-hero.png").exists()]
-    rows = (len(themes) + COLS - 1) // COLS
-    W, H = COLS * CW + 1, rows * (CH + LAB)
-    sheet = np.full((H, W, 3), 0.035, dtype=np.float32)
-    pos, texts = [], []
-    for i, t in enumerate(themes):
-        r, c = divmod(i, COLS)
-        x, y = c * CW, r * (CH + LAB)
-        sheet[y:y + CH, x:x + CW - 1] = resize(load(d / f"{t}-hero.png"), CW - 1, CH)
-        pos.append((x + 12, y + CH))
-        th = build_dice.THEMES[t]
-        texts.append((th["title"], th.get("env", "")))
-    lab = labels(texts, W, H, pos)
-    sheet = sheet * (1 - lab[:, :, None]) + lab[:, :, None] * np.array([0.95, 0.9, 0.8])
-    tmp = Path(tempfile.mkdtemp()) / "sheet.png"
-    img = bpy.data.images.new("sheet", W, H, alpha=False)
-    px = np.ones((H, W, 4), dtype=np.float32)
-    px[:, :, :3] = sheet[::-1]
-    img.pixels.foreach_set(px.ravel())
-    img.filepath_raw = str(tmp)
-    img.file_format = "PNG"
-    img.save()
-    size = E.quantize_png(tmp, d / "all-sets.png", max_width=4000)
-    print(f"dice_lookdev: all-sets.png {size // 1024} KB ({len(themes)} themes)")
+    themes = [t for t in a.themes.split(",") if (d / f"{t}-topdown.jpg").exists()]
+    # The primary sheet: every set as the phone shows it (straight down).
+    grid(d, themes, "topdown.jpg", 360, 780, 6, "all-sets-topdown.jpg")
+    heroes = [t for t in themes if (d / f"{t}-hero.jpg").exists()]
+    if heroes:
+        grid(d, heroes, "hero.jpg", 533, 300, 3, "all-sets-hero.jpg")
+    cd = Path(a.crops)
+    crops = [t for t in themes if (cd / f"{t}-crops.png").exists()]
+    if crops:
+        # the seven dice of every set at phone pixels (1:1), one row per set
+        grid(d, crops, "crops.png", 1260, 180, 1, "readability-crops.jpg", src=cd)
 
 
 main()

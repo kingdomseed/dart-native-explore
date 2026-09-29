@@ -20,18 +20,21 @@ W, D = E.TRAY_W, E.TRAY_D
 RIM_T, RIM_H = 2.6, 3.2
 
 
-def granite(name, snow=0.0, frost_lines=None, size=None):
+def granite(name, snow=0.0, frost_lines=None, size=None, dark=False):
     m, k = E.material(name)
     tc = k.coords()
     obj = tc.outputs["Object"]
     n = k.noise(obj, 0.8, 10, 0.62).outputs["Fac"]
     speck = k.voronoi(obj, 9.0).outputs["Distance"]
-    col = k.ramp(n, [(0.2, (0.2, 0.24, 0.3)), (0.8, (0.38, 0.42, 0.5))])
+    # dark=True: the altar's play field is blue-black slate (round 2), so
+    # the clear-ice dice and their glowing numerals separate at top-down
+    col = k.ramp(n, [(0.2, (0.02, 0.028, 0.045)), (0.8, (0.06, 0.075, 0.1))] if dark else
+                 [(0.2, (0.2, 0.24, 0.3)), (0.8, (0.38, 0.42, 0.5))])
     col = k.mix(k.math("LESS_THAN", speck, 0.08), col, (0.25, 0.28, 0.33, 1))
     nrm = k.bump(n, 0.5, 0.3)
     rough = 0.7
     frost = k.ramp(k.noise(obj, 2.5, 6, 0.6).outputs["Fac"], [(0.5, (0, 0, 0)), (0.72, (1, 1, 1))])
-    col = k.mix(k.math("MULTIPLY", frost, 0.35), col, (0.6, 0.7, 0.8, 1))
+    col = k.mix(k.math("MULTIPLY", frost, 0.1 if dark else 0.35), col, (0.6, 0.7, 0.8, 1))
     emis = (0, 0, 0, 1)
     estr = 0.0
     if frost_lines is not None:
@@ -99,8 +102,8 @@ def build(scene):
     circle = P.mask_texture("frost_circle", P.sigil_strokes(seed=21, points=6, runes=24,
                                                             rings=(0.47, 0.455, 0.37, 0.18), w=0.0035),
                             E.TMP)
-    E.plane("altar_floor", W + 2 * RIM_T, D + 2 * RIM_T, (0, 0, 0.0),
-            granite("Altar granite", frost_lines=circle, size=W * 0.95))
+    E.plane("altar_floor", W + 2 * RIM_T, D + 2 * RIM_T, (0, 0, 0.01),
+            granite("Altar granite", frost_lines=circle, size=W * 0.95, dark=True))
     E.cube("altar_block", (W + 30, D + 26, 14), (0, 0, -7.0), granite("Altar block", snow=0.6), bevel=1.2)
     prof = E.profile_curve("altar_rim_profile", [(-1.3, -1.6), (1.3, -1.6), (1.3, 0.9), (0.8, 1.6),
                                                  (-0.8, 1.6), (-1.3, 0.9)])
@@ -132,6 +135,10 @@ def build(scene):
     crystal_cluster(W / 2 + 9, -D / 2 - 3, 0.3, 5, 3, ice_m, 0.6)
     crystal_cluster(-W / 2 - 9, -D / 2 - 5, 0.3, 4, 4, ice_m, 0.5)
     crystal_cluster(-W / 2 - 10, 2, 0.3, 3, 5, ice_m, 0.45)
+    # low shards in the strips above/below the tray (read at top-down)
+    crystal_cluster(-W / 2 + 1.5, D / 2 + RIM_T + 3.4, 0.3, 4, 11, ice_m, 0.28)
+    crystal_cluster(W / 2 - 1.0, -D / 2 - RIM_T - 3.2, 0.3, 5, 12, ice_m, 0.3)
+    crystal_cluster(W / 2 + 1.5, D / 2 + RIM_T + 4.0, 0.3, 3, 13, ice_m, 0.22)
     # cave wall of ice behind
     for i, (x, y, r) in enumerate(((-70, 190, 60), (40, 210, 70), (130, 160, 55), (-150, 150, 50))):
         E.rock(f"ice_wall{i}", r, (x, y, 10), ice("Cave wall ice", glow=1.2), seed=99 + i, squash=(1.0, 0.7, 1.4),
@@ -149,17 +156,10 @@ def build(scene):
     flake = E.simple("Snowflake", (0.95, 0.97, 1.0), 0.5, Emission_Color=(0.8, 0.9, 1.0, 1),
                      Emission_Strength=0.6)
     E.scatter("snow", 700, ((-60, -60, 1), (60, 90, 70)), 0.09, flake, seed=8, scale_range=(0.4, 1.2),
-              avoid=lambda p: abs(p.x) < W / 2 and abs(p.y) < D / 2 and p.z < 6)
+              avoid=lambda p: abs(p.x) < W / 2 + 4 and abs(p.y) < D / 2 + 6)  # none between camera and dice
     E.haze_box("mist", (170, 200, 12), (0, 20, -8), 0.02, color=(0.8, 0.9, 1.0), essential=True)
     E.haze_box("air", (160, 220, 80), (0, 30, 45), 0.0015, color=(0.7, 0.85, 1.0))
     return dict(
-        samples=160, exposure=0.2, hero=dict(dist=32, elev=26, az=10, lens=70, fstop=2.8),
-        d20=dict(dist=11, elev=50, az=12, lens=100, fstop=4.0),
-        env=dict(target=(0, 10, 4), dist=100, elev=32, az=-20, lens=35, fstop=8.0, focus=(0, 2, 2)),
-        roll=dict(
-            settled={"d12": ((5.0, -8.0), 12, -20), "d6": ((-6.0, -3.0), 6, 10), "d10t": ((3.0, 4.0), 0, -30),
-                     "d4": ((-6.0, 9.5), 4, 0)},
-            airborne={"d20": ((-0.5, -2.0, 3.0), (-1.2, 2.5, 0.2)), "d8": ((6.0, 7.0, 5.0), (-2.0, -1.0, -0.5)),
-                      "d10u": ((-4.0, 15.0, 2.2), (1.5, -2.0, 0.3))}),
+        samples=160, exposure=0.2, topdown=dict(width=W + 2 * RIM_T + 1.0), hero=dict(dist=32, elev=26, az=10, lens=70, fstop=2.8),
     )
 

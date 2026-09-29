@@ -143,7 +143,7 @@ def build(scene):
     obj = k.coords().outputs["Object"]
     n = k.noise(obj, 1.3, 10, 0.6).outputs["Fac"]
     ham = k.voronoi(obj, 0.9).outputs["Distance"]
-    ash = k.ramp(n, [(0.35, (0.028, 0.025, 0.024)), (0.75, (0.07, 0.062, 0.058))])
+    ash = k.ramp(n, [(0.35, (0.03, 0.027, 0.025)), (0.75, (0.075, 0.066, 0.06))])
     sm = k.node("ShaderNodeMapping")
     sm.inputs["Scale"].default_value = (1 / (W * 0.92), 1 / (W * 0.92), 1)
     sm.inputs["Location"].default_value = (0.5, 0.5, 0)
@@ -159,13 +159,21 @@ def build(scene):
                      Emission_Strength=k.math("MULTIPLY", groove, k.math("MULTIPLY", flick, 0.9))))
     lava, k = E.material("Molten channel")
     obj = k.coords().outputs["Object"]
-    cr = k.voronoi(obj, 0.7, feature="DISTANCE_TO_EDGE")
-    crust = k.math("GREATER_THAN", cr.outputs["Distance"], 0.07)
-    heat = k.noise(obj, 0.5, 4, 0.6).outputs["Fac"]
-    col = k.ramp(heat, [(0.35, (0.9, 0.06, 0.0)), (0.7, (1.0, 0.3, 0.02))])
-    k.surface(k.bsdf(Base_Color=(0.02, 0.015, 0.01, 1), Roughness=0.9, Emission_Color=col,
-                     Emission_Strength=k.math("MULTIPLY", k.math("SUBTRACT", 1.0, k.math("MULTIPLY", crust, 0.8)),
-                                              2.2)))
+    # Round 2: real molten metal, not a pale salmon band: a deep-orange melt
+    # with small dark crust rafts drifting on it, their edges burning yellow.
+    warp = k.noise(obj, 0.35, 3).outputs["Color"]
+    wv = k.mix(0.35, obj, warp, "LINEAR_LIGHT")
+    cr = k.voronoi(wv, 1.6, feature="DISTANCE_TO_EDGE")
+    raft = k.math("GREATER_THAN", cr.outputs["Distance"], 0.12)
+    keep = k.math("GREATER_THAN", k.noise(obj, 0.5, 2).outputs["Fac"], 0.55)
+    crust = k.math("MULTIPLY", raft, keep)
+    heat = k.noise(obj, 0.8, 5, 0.6).outputs["Fac"]
+    col = k.ramp(heat, [(0.3, (1.0, 0.13, 0.0)), (0.55, (1.0, 0.26, 0.01)), (0.75, (1.0, 0.42, 0.03))])
+    melt = k.math("SUBTRACT", 1.0, crust)
+    rim_hot = k.math("MULTIPLY", k.math("LESS_THAN", cr.outputs["Distance"], 0.2), crust)
+    strength = k.math("ADD", k.math("MULTIPLY", melt, 1.1), k.math("MULTIPLY", rim_hot, 1.6))
+    crust_col = k.ramp(k.noise(obj, 2.0, 4).outputs["Fac"], [(0.4, (0.012, 0.008, 0.006)), (0.7, (0.06, 0.025, 0.012))])
+    k.surface(k.bsdf(Base_Color=crust_col, Roughness=0.9, Emission_Color=col, Emission_Strength=strength))
     E.rim("molten_channel", W - 1.6, D - 1.6, 2.2, 0.55, 0.55, lava, z0=-0.35)
     E.plane("tray_floor", W + RIM_T * 2, D + RIM_T * 2, (0, 0, 0.001), floor_m)
     im = iron()
@@ -201,21 +209,14 @@ def build(scene):
               stretch=lambda p, r: Vector((r.uniform(-0.3, 0.3), r.uniform(-0.3, 0.3), 1)) * r.uniform(4, 12))
     ember = E.emissive("Drift ember", (1.0, 0.35, 0.05), 30.0)
     E.scatter("embers", 90, ((-30, -30, 4), (30, 40, 30)), 0.09, ember, seed=5,
-              avoid=lambda p: abs(p.x) < W / 2 and abs(p.y) < D / 2 and p.z < 9)
+              avoid=lambda p: abs(p.x) < W / 2 and abs(p.y) < D / 2 and p.z < 60)
     E.haze_box("smoke", (150, 150, 70), (0, 10, 35), 0.0035, color=(1.0, 0.8, 0.65), noise_scale=0.03)
 
     # Lights: warm soft key over the tray, cold rim for separation.
-    E.light(scene, "AREA", "key", (-18, -30, 40), 3200, color=(1.0, 0.85, 0.72), size=22, target=(0, 0, 0))
+    E.light(scene, "AREA", "key", (-14, -22, 46), 6500, color=(1.0, 0.85, 0.72), size=22, target=(0, 0, 0))
     E.light(scene, "AREA", "cold_rim", (26, 30, 18), 2200, color=(0.35, 0.5, 1.0), size=18, target=(0, 0, 0))
     E.light(scene, "AREA", "fill", (10, -40, 8), 250, color=(0.6, 0.55, 0.9), size=30, target=(0, 0, 2))
 
     return dict(
-        samples=160, exposure=0.1, hero=dict(dist=32, elev=26, az=-8, lens=70, fstop=2.8),
-        d20=dict(dist=11, elev=52, az=-18, lens=100, fstop=4.0),
-        env=dict(target=(0, 10, 4), dist=100, elev=30, az=22, lens=35, fstop=8.0, focus=(0, 2, 2)),
-        roll=dict(
-            settled={"d12": ((-5.0, -9.0), 12, 20), "d6": ((6.0, -4.0), 6, -10), "d10t": ((-2.0, 3.0), 0, 30),
-                     "d4": ((7.0, 8.5), 4, 0)},
-            airborne={"d20": ((0.5, -3.0, 3.2), (1.2, 2.5, 0.2)), "d8": ((-6.5, 6.0, 5.5), (2.0, -1.0, -0.5)),
-                      "d10u": ((4.5, 14.0, 2.4), (-1.5, -2.0, 0.3))}),
+        samples=160, exposure=0.1, topdown=dict(width=W + 2 * RIM_T + 1.0), hero=dict(dist=32, elev=26, az=-8, lens=70, fstop=2.8),
     )

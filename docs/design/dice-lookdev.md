@@ -1,44 +1,188 @@
 # Dice look-dev: themed sets and their rolling environments (plan P3)
 
-Status: look-dev for operator review, 2026-09-29. Nothing here is app code.
-Source of truth for the renders: `dart3d/example/tool/dice_lookdev/`
-(Blender 5.2.2, Cycles). Renders: `docs/design/dice-lookdev/`.
-Context: `docs/design/demo-program.md` §3 (upstream's roller) and §5 (our
-Dice Roller plan).
+Status: look-dev **round 2** for operator review, 2026-09-29. Nothing here
+is app code. Source of truth for the renders:
+`dart3d/example/tool/dice_lookdev/` (Blender 5.2.2, Cycles). Renders:
+`docs/design/dice-lookdev/`. Context: `docs/design/demo-program.md` §3
+(upstream's roller) and §5 (our Dice Roller plan).
+
+> **Push 1 of 2.** This push has the readability system, the d4 shard and
+> the round-2 renders of Emberforged, Frostbound, Arcane Study, Northfield
+> Relay and Vermilion Court. Fate Engine, Celestial, Hearthside, Old Road,
+> Voltline and Gemcutter (their links below) land in the next push.
 
 Eleven themes. Each is a **dice set plus the environment it is rolled in**:
-an engraved rolling surface as a hero object, a wall, framing props, a
-lighting mood and atmosphere. The two signature sets are Emberforged (fire)
-and Frostbound (ice).
+an engraved rolling surface as a hero object, framing props, a lighting
+mood and atmosphere. The two signature sets are Emberforged (fire) and
+Frostbound (ice).
 
-| # | Set | Environment | Batch | Renders |
-|---|---|---|---|---|
-| 1 | **Emberforged** | The Forge Hearth | 1 | hero, d20, env, phone |
-| 2 | **Frostbound** | The Frozen Altar | 1 | hero, d20, env, phone |
-| 3 | **Arcane Study** | The Night Study | 1 | hero, d20, env, phone |
-| 4 | **Fate Engine** | The Fate Engine | 1 | hero, d20, env, phone |
-| 5 | Celestial Observatory | The Star Balcony | 2 | hero, phone |
-| 6 | Hearthside Tome | Fireside Reading | 2 | hero, phone |
-| 7 | Old Road | The Wayfarer's Table | 2 | hero, phone |
-| 8 | Northfield Relay | Kitchen Table, 1986 | 2 | hero, phone |
-| 9 | Voltline | Rain Counter | 2 | hero, phone |
-| 10 | Vermilion Court | Lantern Pavilion | 2 | hero, phone |
-| 11 | Gemcutter | The Jeweler's Bench | 2 | hero, phone |
+**Judge from `all-sets-topdown.jpg` first.** The app's camera looks
+straight down, so every set now has a top-down in-app view as its primary
+render, and every set has to pass a measured readability gate on that view
+(§0.2).
 
-`all-sets.png` is the contact sheet (heroes only). Per set:
-`<theme>-hero.png` (1600×900, full set settled, 3/4 view),
-`<theme>-d20.png` (1200×675 close-up), `<theme>-env.png` (1200×675
-establishing shot, three dice mid-roll with motion blur) and
-`<theme>-phone.png` (554×1200 portrait "in-app" view, 9:19.5).
+| # | Set | Environment | Top-down (primary) | Hero | d4 close-up |
+|---|---|---|---|---|---|
+| 1 | **Emberforged** | The Forge Hearth | [topdown](dice-lookdev/emberforged-topdown.jpg) | [hero](dice-lookdev/emberforged-hero.jpg) | [d4](dice-lookdev/emberforged-d4.jpg) |
+| 2 | **Frostbound** | The Frozen Altar | [topdown](dice-lookdev/frostbound-topdown.jpg) | [hero](dice-lookdev/frostbound-hero.jpg) | [d4](dice-lookdev/frostbound-d4.jpg) |
+| 3 | **Arcane Study** | The Night Study | [topdown](dice-lookdev/arcane-topdown.jpg) | [hero](dice-lookdev/arcane-hero.jpg) | [d4](dice-lookdev/arcane-d4.jpg) |
+| 4 | **Fate Engine** | The Fate Engine | [topdown](dice-lookdev/fateengine-topdown.jpg) | [hero](dice-lookdev/fateengine-hero.jpg) | [d4](dice-lookdev/fateengine-d4.jpg) |
+| 5 | Celestial Observatory | The Star Balcony | [topdown](dice-lookdev/celestial-topdown.jpg) | [hero](dice-lookdev/celestial-hero.jpg) | [d4](dice-lookdev/celestial-d4.jpg) |
+| 6 | Hearthside Tome | Fireside Reading | [topdown](dice-lookdev/hearthside-topdown.jpg) | [hero](dice-lookdev/hearthside-hero.jpg) | [d4](dice-lookdev/hearthside-d4.jpg) |
+| 7 | Old Road | The Wayfarer's Table | [topdown](dice-lookdev/oldroad-topdown.jpg) | [hero](dice-lookdev/oldroad-hero.jpg) | [d4](dice-lookdev/oldroad-d4.jpg) |
+| 8 | Northfield Relay | Kitchen Table, 1986 | [topdown](dice-lookdev/northfield-topdown.jpg) | [hero](dice-lookdev/northfield-hero.jpg) | [d4](dice-lookdev/northfield-d4.jpg) |
+| 9 | Voltline | Rain Counter | [topdown](dice-lookdev/voltline-topdown.jpg) | [hero](dice-lookdev/voltline-hero.jpg) | [d4](dice-lookdev/voltline-d4.jpg) |
+| 10 | Vermilion Court | Lantern Pavilion | [topdown](dice-lookdev/vermilion-topdown.jpg) | [hero](dice-lookdev/vermilion-hero.jpg) | [d4](dice-lookdev/vermilion-d4.jpg) |
+| 11 | Gemcutter | The Jeweler's Bench | [topdown](dice-lookdev/gemcutter-topdown.jpg) | [hero](dice-lookdev/gemcutter-hero.jpg) | [d4](dice-lookdev/gemcutter-d4.jpg) |
+
+Sheets: `all-sets-topdown.jpg` (every set as the phone shows it),
+`all-sets-hero.jpg` (heroes), `readability-crops.jpg` (the seven dice of
+every set at phone pixels, 1:1). Per set: `<theme>-topdown.jpg`
+(1179×2556, iPhone portrait, straight down with the app's fov),
+`<theme>-hero.jpg` (1600×900, 3/4 view) and `<theme>-d4.jpg` (1000×625).
+All renders are full-colour JPEG q90 (round 1's 128-colour palette PNGs
+are gone). `readability.json` holds every measurement.
 
 **IP guardrail.** Every name, symbol and pattern here is original. The
 TTRPG lines and the operator's AI mood boards were inspiration only: no
 game titles, logos, trademarked symbols or fonts, no copied slogans (props
-carry no text at all; the engine's nameplate is blank). Runes and sigils are
-generated from strokes by our own code (`_rune`, `sigil_strokes`) and are
-not a real script. Fonts: Inter (OFL, bundled with Blender), DejaVu Sans
-Mono (Bitstream Vera licence, bundled with Blender) and EB Garamond (OFL,
+carry no text at all; the engine's nameplate is blank, the newspaper and
+notebook are abstract strokes). Runes and sigils are generated from
+strokes by our own code (`_rune`, `sigil_strokes`) and are not a real
+script. Fonts: Inter (OFL, bundled with Blender), DejaVu Sans Mono
+(Bitstream Vera licence, bundled with Blender) and EB Garamond (OFL,
 vendored in `tool/dice_lookdev/fonts/` with its licence).
+
+---
+
+## 0. Round 2
+
+### 0.1 What changed (operator feedback → change)
+
+| Feedback | Change |
+|---|---|
+| "Dice numbers must be super readable no matter what." | A readability system (§0.2) with a measured gate on the top-down view; every set passes. Numerals are 20–30% bigger and every set has a chosen numeral treatment. |
+| Vermilion Court too dark to read | Brighter vermilion lacquer; gold-leaf numerals (part diffuse) in a black-lacquer keyline; side key placed so its mirror image misses the tray; a soft overhead for the gold; matte-ish tray lacquer (round 1 mirrored the lanterns as white discs). A z-fight between the tray floor and its base (half the floor went black) is fixed, in every environment that had it. |
+| "You can't see the arcane ones" | The tray bed is now a brushed-brass field with the sigil engraved dark; oak shows as a border. A warm candle key pools on the tray from the candle cluster; the gilt numerals glow softly. Far-side numerals no longer show through the body (transmission 0.25 → 0.04). |
+| "Camera is still face down" | The primary render is the app's camera: straight down, fov 0.95 rad (`dice_table_scene.dart`), 1179×2556, rims at the screen edges, every die settled with a result up. Dice are 1.3× larger (in-app size: `dice_table_scene` uses ~23–33 mm dice in a 132 mm tray). |
+| No tetrahedron d4 | The d4 is a long crystal **shard** that rests on a long face; the result is the big numeral on the top face (§0.3). Face map updated. |
+| "Kitchen table doesn't look like a kitchen table" | Northfield is now a 1980s kitchen table seen from above: wood-grain laminate, a stoneware mug on a cork coaster, a plate with a toast crust and crumbs, the morning paper, a spiral notebook with a pencil, a pocket radio and salt shaker, plus the CRT keyboard, field instrument and coiled cable; the calibration mat is dark green. |
+| Dice clipping into the tray (coordinator) | Every die is dropped onto whatever is under it (ray-cast per low vertex) and a contact report checks gap and interpenetration per die per shot (§0.4). |
+| Fate Engine too green | Bright brushed-steel plate with a brass-inlaid gear pattern, sigils on the dice in brass, teal only in the numerals and the machine's core/tubes (dimmed). |
+| Emberforged molten channel pale | A deep-orange melt with dark crust rafts whose edges burn yellow. |
+| Celestial dice grey-violet | Saturated indigo → violet → magenta nebula with cyan wisps and more glow. |
+| Gemcutter banding | Domain-warped noise swirl (deep emerald, jade ribbons, thin pearl wisps) replaces the regular wave bands. |
+| Posterized renders | Full-colour JPEG q90; renders total under 20 MB. |
+
+Every set and every tray from round 1 is kept. Low props were added to the
+strips above and below each tray so the environment reads at top-down (tall
+props leave the frame under perspective, so the strips carry coins,
+papers, a fan, loose gears, a phone, a compass...).
+
+### 0.2 The readability system
+
+**Rules (every set):**
+
+1. **Numeral contrast** on the top face, as rendered (display sRGB after
+   tone mapping, not albedo): WCAG relative luminance, numeral vs the face
+   immediately around it, **≥ 4.5 : 1** on every die.
+2. **Numeral size**: the top-face numeral's height is **≥ 40% of the
+   face's inscribed width** (worst face of each die, measured from the
+   atlas). All dice are also 1.3× the round-1 size, so a d20 numeral is
+   ~26 px tall on a 1179 px wide phone render and the d6's ~56 px.
+3. **A numeral treatment chosen per theme** (table below): glowing
+   (emissive numerals, usually inside a dark keyline), inked/filled, bright
+   metal or enamel with a dark keyline. The keyline is a second texture in
+   the atlas layout (`<theme>_halo.png`: R = numeral dilated by ~0.2 face
+   inradius, G = soft glow), so it is exact per glyph.
+4. **Die vs tray**: the die's silhouette must separate from the tray around
+   it by **≥ 2 : 1** (the better of the die's median body tone and its
+   mean, which counts glowing numerals and metal edges). This drove a
+   lighter or darker field under several sets (Arcane brass field,
+   Frostbound slate, Gemcutter grey velvet, Fate Engine bright steel,
+   Voltline lightbox, Hearthside tea-stained vellum, Old Road dark map).
+5. **Top-down lighting rules** (the round-1 failures were mostly these):
+   - Never put a small, bright light near the camera axis: its reflection
+     lands on the top faces as a hotspot over the numeral.
+   - Place side keys so their mirror image in a glossy floor lands
+     *off* the tray (for a camera at height h and a light at (x, z), the
+     reflection sits at x·h/(z+h)).
+   - Straight down, a metal numeral or frame mirrors the ceiling. Every
+     metal-numeral set gets a big, soft overhead source (`E.overhead`);
+     in real time that is the zenith of the IBL.
+   - Glass dice print their numerals on the outside only (back-facing
+     glyphs are masked), or the far face reads mirrored through the body.
+
+**The check** (`tool/dice_lookdev/readability_check.py`) runs on every
+top-down render (`render_set.py --check`, always on in `render.sh`):
+
+- The beauty frame is kept as a lossless PNG. A second, exact **mask
+  pass** re-renders the same camera with each die's material swapped for
+  an emission-only mask (R = numeral from the atlas, G = "top face": true
+  normal within 14° of up, B = die id), everything else hidden, 1 sample,
+  no pixel filter, EXR.
+- Per die: numeral luminance = median over the numeral (eroded 1 px);
+  surround = median over the top face in a ring 1…1+r px around the
+  numeral (r = 8% of the numeral's pixel height). Also a "plain body"
+  ratio over the rest of the face (where the keyline doesn't reach) for
+  reference, and die vs a 3–12 px ring of tray.
+- Results merge into `readability.json`; `readability_check.py --table`
+  prints the table below. `readability-crops.jpg` shows exactly the
+  pixels that were measured.
+
+Quick loop while iterating a set (≈1 min):
+
+```
+Blender --background --python dart3d/example/tool/dice_lookdev/readability_check.py -- \
+    --theme arcane --samples 16 --pct 50 --out /tmp/rd
+```
+
+**Results** (full renders, 96 samples, 1179×2556):
+
+| Set | Numeral treatment | Numeral contrast, worst die (gate 4.5) | vs plain body | Die vs tray, worst (gate 2.0) | Top numeral height | Numeral / face width (gate 0.40) | Result |
+|---|---|---|---|---|---|---|---|
+| Emberforged | glowing: white-hot emissive numerals in a soot keyline | 15.8:1 (d4) | 3.7:1 | 2.7:1 | 26 px | 0.41 | PASS |
+| Frostbound | glowing: emissive rime numerals on a deep-blue keyline | 14.6:1 (d8) | 3.1:1 | 2.4:1 | 25 px | 0.41 | PASS |
+| Arcane Study | glowing: warm spell-lit gilt numerals, midnight keyline | 9.2:1 (d4) | 6.0:1 | 2.1:1 | 26 px | 0.42 | PASS |
+| Northfield Relay | inked: near-black instrument print on warm-white ABS | 8.1:1 (d4) | 7.9:1 | 4.6:1 | 22 px | 0.41 | PASS |
+| Vermilion Court | bright metal + keyline: gold leaf in a black-lacquer keyline | 5.4:1 (d10u) | 2.0:1 | 2.1:1 | 27 px | 0.44 | PASS |
+
+"vs plain body" is the numeral against the face beyond the keyline; it
+shows which sets lean on the keyline (Vermilion, Frostbound, Celestial) and
+which read on the body alone.
+
+### 0.3 The d4 shard
+
+- A square prism along the die's long axis with pyramid caps: section
+  1.3 cm, 3.2 cm tip to tip (`SHARD_HALF`, `SHARD_CAP` in `build_dice.py`),
+  316 triangles. It rests on one of its four long faces, so the result is
+  the face pointing up, read like every other die.
+- Numbering: opposite long faces sum to 5 (4 up ↔ 1 down, 2 ↔ 3), asserted
+  at build time. One numeral per long face, reading along the crystal,
+  ~0.5 of the face width tall (the biggest numeral in the set). The eight
+  cap facets are blank (their own atlas cells; 78 of 81 cells used).
+- **Face map** (`dice_faces.lookdev.json`): the d4 lists only its four long
+  faces with `"shape": "shard"` and no `readout` override: the existing
+  "most aligned with up" readout works. The shard cannot come to rest on a
+  cap facet: the centre of mass projects outside every cap triangle (a cap
+  plane sits 0.78 × section from the centre, a long face 0.5), so it
+  topples onto a long face and ignoring the caps is safe.
+- Physics: use the convex hull (10 points) as the collider. It rolls along
+  its long axis much more readily than end over end, so a throw needs a
+  little extra spin about the long axis to look lively (DR2 tuning).
+
+### 0.4 Placement and contacts
+
+`env_common.place_layout()` orients each die (value up, numeral facing the
+viewer) and `settle()` drops it straight down: for every vertex in the
+die's lower third it ray-casts the surface below and lifts the die until
+none is below it, plus a 0.004 cm gap. This handles bowed pages, rim lips
+and trays at any height. `contact_report()` then records, per die and per
+shot, the gap at the contact point and any interpenetration (BVH overlap)
+with other dice or with environment meshes near the die; render_set prints
+`CONTACT PROBLEMS` if any die has a gap outside 0…0.01 cm or overlaps
+anything. The final renders have none (all gaps 0.004 cm, no overlaps).
+There are no mid-roll shots in round 2.
 
 ---
 
@@ -47,12 +191,14 @@ vendored in `tool/dice_lookdev/fonts/` with its licence).
 ```
 dart3d/example/tool/dice_lookdev/
   build_dice.py        geometry, numbering, glyph atlas, all dice materials, face map, glb export
-  env_common.py        scene/render helpers, tray + rim builder, scatter, camera, palette-PNG writer
+  env_common.py        scene/render helpers, tray + rim builder, scatter, camera, settle + contact
+                       report, overhead light, JPEG writer
   env_props.py         procedural props (candles, tomes, armillary, hourglass, gears, ...) + mask renderer
   build_env_<theme>.py one environment per theme (11)
-  render_set.py        builds dice + environment, renders the shots
-  contact_sheet.py     all-sets.png
-  render.sh            everything (./render.sh 1 | 2 | all; PCT/SAMPLES env for previews)
+  render_set.py        builds dice + environment, renders topdown / hero / d4 (+ --check)
+  readability_check.py the readability gate (mask pass + measurements, --table)
+  contact_sheet.py     all-sets-topdown.jpg, all-sets-hero.jpg, readability-crops.jpg
+  render.sh            everything (./render.sh [themes...]; PCT/SAMPLES/SHOTS env for previews)
   fonts/               EB Garamond + OFL
   dice_faces.lookdev.json  face map for this geometry
 ```
@@ -60,26 +206,30 @@ dart3d/example/tool/dice_lookdev/
 Everything is procedural (no downloaded assets), so a render is a pure
 function of the scripts and Blender 5.2.
 
-Render settings: Cycles on Metal, 128–160 samples with OpenImageDenoise,
-**Khronos PBR Neutral** view transform. AgX bleached the fire to white;
-PBR Neutral keeps emissive hues and is also a tone mapper the real-time
-path can match. Output is written as 8-bit palette PNG (k-means palette +
-light ordered dither, `env_common.quantize_png`) to keep the committed
-renders under the 12 MB budget.
+Render settings: Cycles on Metal, 96 samples (`SAMPLES=96`; each
+environment's default is 128–160) with OpenImageDenoise, **Khronos PBR
+Neutral** view transform. AgX bleached the fire to white; PBR Neutral keeps
+emissive hues and is also a tone mapper the real-time path can match.
+Output: full-colour JPEG q90 (`env_common.save_jpeg`); the lossless PNG is
+kept only in the temp dir for the readability check. About 1 h for all
+eleven sets on an M4. Do not run two renders at once: Cycles runs out of
+GPU memory.
 
-Scale: 1 Blender unit = 1 cm, real dice sizes (d20 ≈ 2.2 cm across).
+Scale: 1 Blender unit = 1 cm. Dice are a standard set × `SIZE_SCALE` 1.3
+(d20 ≈ 2.9 cm across), the in-app size; the tray's play area stays
+15 × 31 cm.
 
 ### 1.1 Dice geometry and numbering (shared by every set)
 
 | Die | Shape | Size | Bevel | Tris | Numbering (asserted at build time) |
 |---|---|---|---|---|---|
-| d4 | tetrahedron, **vertex-read** (3 numerals per face, the top vertex's numeral reads upright on all three visible faces) | edge 2.05 cm | 0.085, 4 segs | 148 | 1–4 |
-| d6 | cube | 1.6 cm | 0.13, 4 segs | 300 | opposite faces sum to 7; 1-2-3 counter-clockwise |
-| d8 | octahedron | 2.1 cm tip-to-tip | 0.07, 3 segs | 188 | sum 9 |
-| d10 units | pentagonal trapezohedron (planar kites, exact) | 2.2 cm tall | 0.06, 3 segs | 316 | 0–9, sum 9, odd numbers around one pole |
+| d4 | **shard**: square prism + pyramid caps, rests on a long face, read from the top face (§0.3) | 1.3 cm section, 3.2 cm long | 0.09, 3 segs | 316 | 1–4, opposite long faces sum to 5 |
+| d6 | cube | 2.1 cm | 0.17, 4 segs | 300 | opposite faces sum to 7; 1-2-3 counter-clockwise |
+| d8 | octahedron | 2.7 cm tip-to-tip | 0.09, 3 segs | 188 | sum 9 |
+| d10 units | pentagonal trapezohedron (planar kites, exact) | 2.9 cm tall | 0.08, 3 segs | 316 | 0–9, sum 9, odd numbers around one pole |
 | d10 tens (d%) | same | same | same | 316 | 00–90, sum 90 |
-| d12 | dodecahedron | 2.2 cm | 0.07, 3 segs | 476 | sum 13 |
-| d20 | icosahedron | 2.2 cm | 0.055, 3 segs | 476 | sum 21 |
+| d12 | dodecahedron | 2.9 cm | 0.09, 3 segs | 476 | sum 13 |
+| d20 | icosahedron | 2.9 cm | 0.07, 3 segs | 476 | sum 21 |
 
 - 6 and 9 carry a dot ("6." / "9.") on the d10, d12 and d20.
 - All dice are modelled resting on a face (face up = +Z), so they sit flat
@@ -89,14 +239,13 @@ Scale: 1 Blender unit = 1 cm, real dice sizes (d20 ≈ 2.2 cm across).
   hulls of the two glowing sets are 4–36 triangles.
 - **Face map.** `dice_faces.lookdev.json` has the same schema as
   `assets/dice/dice_faces.json`: glTF Y-up normals, `"resultSide": "up"`.
-  For the d4, `n` is the direction of the vertex that carries the numeral
-  (`"readout": "vertex"`). The existing "most aligned with up" readout
-  works unchanged. Note that our d4 is a true tetrahedron; the existing
-  Retro Classic and overlay d4s are the elongated "crystal" kind.
+  The d4 lists its four long faces (`"shape": "shard"`), like the existing
+  Retro Classic and overlay crystal d4s; the "most aligned with up"
+  readout works unchanged for every die.
 
 ### 1.2 One RGBA atlas per set
 
-Every face is planar-projected into one cell of a 9×9 atlas (70 of 81 cells
+Every face is planar-projected into one cell of a 9×9 atlas (78 of 81 cells
 used), so **all seven dice of a set share one texture**. The bevel strips
 project into a band just inside each face outline. The atlas is rendered
 with Workbench from real text and stroke curves:
@@ -107,6 +256,8 @@ with Workbench from real text and stroke curves:
 | G | theme decor (runes, frost dendrites, circuit pads, calibration ticks, stars, sigil rings, lacquer borders) | decor colour / emissive mask |
 | B | engrave height (R∪G, blurred) | bake into a tangent-space **normal map** |
 | A | **metal-edge frame**: bevel strip + a lip onto the face | metallic/roughness mask for the gold/brass/silver-framed sets |
+| halo R | **keyline**: the numeral dilated by ~0.2 face inradius (round 2) | bake into baseColor (dark ring) and zero the emissive there |
+| halo G | soft outer glow (numeral blurred) | optional emissive halo; unused in the stills (it lowers contrast) |
 
 Look-dev renders use 4096²; 2048² is enough in real time. glTF wants
 separate slots, so the shipping form per set is **baseColor(+alpha) +
@@ -211,17 +362,25 @@ Real-time notes use the capability table in demo-program §3.5. In short:
   real time (and was too slow even for these stills), so fake it with
   camera-facing gradient cards and fog, if dart3d exposes fog (verify).
 
-**Readability rule (all sets):** the play area is darker and lower in
-detail than the dice. The engraving is a low-contrast normal detail with a
-thin emissive line, not a busy texture. The **long walls sit on the screen
-edges** in the portrait view. The play area is 15 × 31 cm, so a 2.2 cm die
-is ~15% of the screen width, close to upstream's 70 px die on a ~400 px
-phone. Props frame the top and bottom edges, where the camera's slight
-tilt lets them peek in.
+**Readability (all sets):** see §0.2. The play area is lower in detail
+than the dice and separated from them in luminance (lighter *or* darker,
+per set). The **long walls sit on the screen edges** in the top-down view
+(frame width = tray + rims + ~1 cm), so a d20 is ~14% of the screen width.
+Low props frame the top and bottom edges.
 
 ### 3.1 Emberforged: "a banked fire you can hold"
 
-![hero](dice-lookdev/emberforged-hero.png)
+![top-down, in-app](dice-lookdev/emberforged-topdown.jpg)
+
+![hero](dice-lookdev/emberforged-hero.jpg)
+
+**Round 2.** Treatment: *glowing* — white-hot numerals (emissive 9, pale
+gold) inside a soot keyline, so the fire behind the glass never touches
+the digit. Less smoke in the glass (absorption 1.6 → 1.1) and a slightly
+bigger core, so the dice glow amber rather than smoulder. The molten
+channel is a deep-orange melt with dark crust rafts whose edges burn
+yellow (round 1 read pale salmon). The forge floor stays dark: the dice's
+own glow separates them.
 
 **Dice**:
 
@@ -276,7 +435,15 @@ tilt lets them peek in.
 
 ### 3.2 Frostbound: "glacial ice with a cold heart"
 
-![hero](dice-lookdev/frostbound-hero.png)
+![top-down, in-app](dice-lookdev/frostbound-topdown.jpg)
+
+![hero](dice-lookdev/frostbound-hero.jpg)
+
+**Round 2.** Treatment: *glowing* — rime numerals with a cold emissive
+(5) on a deep-blue keyline, like ink frozen under the frost. The altar's
+play field is now blue-black slate (round 1's pale frosted granite was the
+same luminance as the ice). No snow falls between the camera and the tray;
+low ice shards sit in the strips.
 
 **Dice**:
 
@@ -324,7 +491,18 @@ tilt lets them peek in.
 
 ### 3.3 Arcane Study: "gold-framed midnight"
 
-![hero](dice-lookdev/arcane-hero.png)
+![top-down, in-app](dice-lookdev/arcane-topdown.jpg)
+
+![hero](dice-lookdev/arcane-hero.jpg)
+
+**Round 2.** Treatment: *glowing* — gilt numerals with a soft warm
+emissive (spell-lit), a midnight keyline, gold frames. The dice body is a
+little lighter blue and no longer shows its far-side numerals through the
+body. The tray bed is a brushed-brass field with the sigil engraved dark
+(the operator's "lighter brass circle field"), bordered by oak; a warm
+candle key pools on it from the candle cluster; a big soft overhead gives
+the gilt something to mirror. Strips: a map, coins, a sealed letter, a
+quill, velvet, a bowl of glowing runestones.
 
 **Dice**:
 
@@ -374,7 +552,16 @@ tilt lets them peek in.
 
 ### 3.4 Fate Engine: "the machine is the environment"
 
-![hero](dice-lookdev/fateengine-hero.png)
+![top-down, in-app](dice-lookdev/fateengine-topdown.jpg)
+
+![hero](dice-lookdev/fateengine-hero.jpg)
+
+**Round 2.** Treatment: *glowing* — aqua-charged numerals in a dark
+keyline; everything else on the dice is gunmetal and brass (the sigil
+marks are brass now). The output plate is bright brushed steel with the
+gear-and-orbit pattern inlaid in brass; the teal survives only as a
+whisper in the grooves, the machine's core and tubes (all dimmed), so the
+set reads brass-first. Strips: loose gears, screws and a schematic.
 
 **Dice**:
 
@@ -413,7 +600,14 @@ tilt lets them peek in.
 
 ### 3.5 Celestial Observatory: "a night sky caught in resin"
 
-![hero](dice-lookdev/celestial-hero.png)
+![top-down, in-app](dice-lookdev/celestial-topdown.jpg)
+
+![hero](dice-lookdev/celestial-hero.jpg)
+
+**Round 2.** Treatment: *glowing* — starlight-silver numerals in an
+indigo keyline. The nebula is saturated indigo → violet → magenta with
+cyan wisps and stronger glow (round 1 read grey-violet). Strips: a star
+chart, a silver compass, loose amethyst.
 
 **Dice**:
 
@@ -442,7 +636,15 @@ tilt lets them peek in.
 
 ### 3.6 Hearthside Tome: "old bone, firelit"
 
-![hero](dice-lookdev/hearthside-hero.png)
+![top-down, in-app](dice-lookdev/hearthside-topdown.jpg)
+
+![hero](dice-lookdev/hearthside-hero.jpg)
+
+**Round 2.** Treatment: *inked* — engraved and filled with sepia-black
+ink. The pages are tea-stained vellum a few steps darker than the bone, so
+the dice separate. The top-down layout keeps dice off the gutter's slope
+(the physics floor will be flat). The mug and the velvet pouch sit at the
+top corners of the phone frame, wax seals at the bottom.
 
 **Dice**:
 
@@ -471,7 +673,15 @@ tilt lets them peek in.
 
 ### 3.7 Old Road: "wayfarer's gold"
 
-![hero](dice-lookdev/oldroad-hero.png)
+![top-down, in-app](dice-lookdev/oldroad-topdown.jpg)
+
+![hero](dice-lookdev/oldroad-hero.jpg)
+
+**Round 2.** Treatment: *enamel fill* — numerals cut deep and filled
+with black niello in bright worn gold. The gold needed a strong soft
+overhead to read straight down (a top-down metal face mirrors the ceiling)
+and a side key; the map is now dark tobacco vellum so the gold dice stand
+out. Strips: the clay pipe, coins and a sheathed knife.
 
 **Dice**:
 
@@ -498,7 +708,21 @@ tilt lets them peek in.
 
 ### 3.8 Northfield Relay: "1986 lab hardware" (loop-era, original)
 
-![hero](dice-lookdev/northfield-hero.png)
+![top-down, in-app](dice-lookdev/northfield-topdown.jpg)
+
+![hero](dice-lookdev/northfield-hero.jpg)
+
+**Round 2.** Treatment: *inked* — near-black instrument print on the
+warm-white ABS (round 1's orange print was 1.9 : 1); orange survives in
+the calibration ticks. The environment is an actual 1986 kitchen table
+seen from above: wood-grain laminate with an aluminium edge band, the CRT
+terminal's keyboard at the head of the table, a stoneware mug of coffee on
+a cork coaster, a plate with a toast crust and crumbs, the morning paper
+(abstract columns and a photo block), a spiral notebook with pencilled
+tallies and a yellow pencil, a pocket radio and a salt shaker, the teal
+field instrument and a coiled cable. The pendant lamp now hangs behind the
+top-down camera (round 1's shade blocked the view). The calibration mat is
+dark green, so the white dice separate.
 
 **Dice**:
 
@@ -525,7 +749,15 @@ tilt lets them peek in.
 
 ### 3.9 Voltline: "black mirror chrome, neon-lit"
 
-![hero](dice-lookdev/voltline-hero.png)
+![top-down, in-app](dice-lookdev/voltline-topdown.jpg)
+
+![hero](dice-lookdev/voltline-hero.jpg)
+
+**Round 2.** Treatment: *glowing* — magenta neon numerals in a black
+keyline. The holo tray is a lightbox under smoked glass (a soft indigo
+glow everywhere), so the black-chrome dice read as crisp silhouettes;
+their clearcoat is lower so the slanted faces don't mirror the glow back.
+Strips: a phone with a lit screen, a receipt, a straw.
 
 **Dice**:
 
@@ -555,7 +787,18 @@ tilt lets them peek in.
 
 ### 3.10 Vermilion Court: "urushi and gold"
 
-![hero](dice-lookdev/vermilion-hero.png)
+![top-down, in-app](dice-lookdev/vermilion-topdown.jpg)
+
+![hero](dice-lookdev/vermilion-hero.jpg)
+
+**Round 2.** Treatment: *bright metal + keyline* — gold-leaf numerals
+(part diffuse, so they read straight down) inside a black-lacquer keyline;
+the red alone was ~2.5 : 1 against gold. The lacquer is a brighter
+vermilion. The tray's black lacquer is satin rather than mirror (round 1
+mirrored the lanterns as white discs), the moon no longer shadows half the
+tray through the folding screen, the key comes from the side so its mirror
+image misses the tray, and a paper-ceiling overhead lights the gold.
+Strips: a folding fan, a celadon cup on a saucer, fallen petals.
 
 **Dice**:
 
@@ -582,7 +825,15 @@ tilt lets them peek in.
 
 ### 3.11 Gemcutter: "classic swirled gems"
 
-![hero](dice-lookdev/gemcutter-hero.png)
+![top-down, in-app](dice-lookdev/gemcutter-topdown.jpg)
+
+![hero](dice-lookdev/gemcutter-hero.jpg)
+
+**Round 2.** Treatment: *bright enamel + keyline* — warm-gold enamel
+numerals in a deep-green keyline. The swirl is a domain-warped noise
+(deep emerald, jade ribbons, thin pearl wisps) instead of regular bands.
+The tray velvet is jeweler's dove-grey (round 1's teal matched the
+emerald). Strips: gem paper with loose stones, tweezers, the loupe.
 
 **Dice**:
 
@@ -641,17 +892,66 @@ tilt lets them peek in.
 
 ---
 
-## 5. Open points for the operator
+## 5. Readability in real time: remaining risks
+
+The gate is measured on offline renders. What can break it in the app:
+
+1. **Glowing numerals = emissive mask + bloom.** The numeral colour and
+   the emissive map come from atlas R (per-set colour, strength 3–9 in the
+   stills). Bloom spreads that light *into the keyline*, which is exactly
+   the ring the gate measures, so the contrast drops as bloom rises. Keep
+   the bloom threshold above the dice's emissive level (bloom the
+   environment, not the numerals), or cap bloom radius below ~0.1 face
+   inradius at phone scale; re-measure on device screenshots (below).
+2. **Keyline via texture.** Bake halo R into baseColor (dark ring) and
+   zero the emissive there. At 2048² the keyline is ~12 texels wide on a d20
+   face; ETC1S can smear it into the numeral. Use UASTC for the colour map
+   of keyline sets, or keep the keyline in its own channel (e.g. roughness
+   texture alpha) and darken in the shader once E6 lands.
+3. **Top-down metal needs something to mirror.** Old Road, Vermilion,
+   Gemcutter, Arcane and Celestial rely on a soft overhead source. In real
+   time that is the zenith of the environment map (E3) or a large
+   unshadowed directional fill; with a dark IBL the gold goes dark again.
+   Part-diffuse numerals (Vermilion, Gemcutter) are the fallback that does
+   not depend on it.
+4. **Specular hotspots.** A key light near the camera axis puts its
+   highlight on the top faces. The in-app sun preset (el 46.8°) is fine;
+   a "lamp mode" light dragged over the tray (E5/V3) is not. Clamp the
+   lamp's elevation or lower clearcoat on keyline sets.
+5. **Glass dice (Emberforged, Frostbound).** The stills mask back-facing
+   glyphs. In real time back faces are culled (fine), but Filament's
+   refraction samples the scene behind the die, and the iOS alpha fallback
+   blends it: a bright floor under clear ice lowers contrast again. The
+   keylines carry the gate there (the plain-body ratio for Frostbound is
+   the honest worst case).
+6. **Tone mapper parity.** The numbers are for Khronos PBR Neutral. If
+   dart3d ships ACES or plain clamp, emissive numerals and pale gold clip
+   differently; pick PBR Neutral for the dice scenes or re-tune.
+7. **Screen size.** Measured on a 1179 px wide frame: the smallest numeral
+   is ~22–27 px (the d20's two-digit numbers, ~1.4 mm on a 460 ppi
+   phone). A smaller phone or a zoomed-out camera goes below that; don't
+   let the camera fit show more than tray + ~1 cm.
+8. **Verify on device.** The check reads any PNG plus the mask pass. The
+   next step is to run the same measurement on simulator/device
+   screenshots of the real app (the mask pass can come from a debug
+   material override), so the gate covers the real renderer too.
+
+
+---
+
+## 6. Open points for the operator
 
 - **Pick** which environments go to production first. Suggested:
   Emberforged → Frostbound → Arcane Study → Fate Engine, matching the
   batches.
-- **d4 style**: true tetrahedron with vertex-read numerals (this look-dev)
-  or the elongated crystal d4 of the existing sets. Physics readout
-  differs (vertex vs face); both are supported by the face-map schema.
-- **Die size vs screen**: the 15 × 31 cm play area gives upstream-like
-  die size on phones. A tablet shows more of the environment around the
-  walls (the props are modelled for that).
+- **Keyline weight**: the keylines are generous (~0.2 face inradius) so
+  the gate holds with margin. On Vermilion and Gemcutter they read as a
+  bold outline in close-ups; a thinner keyline still passes on most sets
+  if the operator prefers a finer look (it's one number,
+  `build_atlas` → halo).
+- **Die size vs screen**: dice are 1.3× the round-1 size (in-app size).
+  A tablet shows more of the environment around the walls (the props are
+  modelled for that).
 - The *final* dice for the app come from this script (`--export-glb`),
   then the fsceneb conversion. Baking of procedural textures (nebula,
   swirl, fire) into the atlas is the next tool step (a `--bake` mode), not

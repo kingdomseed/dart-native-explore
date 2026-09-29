@@ -99,7 +99,7 @@ def build(scene):
     silver = k.bsdf(Base_Color=(0.85, 0.87, 0.92, 1), Metallic=1.0, Roughness=0.2,
                     Normal=k.bump(tex.outputs["Color"], 0.4, 0.05))
     k.surface(k.mix_shader(tex.outputs["Color"], field, silver))
-    E.plane("disc_field", W + 2 * RIM_T, D + 2 * RIM_T, (0, 0, 0.3), lapis)
+    E.plane("disc_field", W + 2 * RIM_T, D + 2 * RIM_T, (0, 0, 0.31), lapis)
     E.cube("slab", (W + 2 * RIM_T + 1, D + 2 * RIM_T + 1, 0.6), (0, 0, 0), marble("Slab marble"), bevel=0.2)
     E.rim("rim", W + RIM_T, D + RIM_T, 3.0, RIM_H, RIM_T, marble("Rim marble"), z0=0.3)
     E.rim("rim_cap", W + RIM_T, D + RIM_T, 3.0, 0.4, 0.6, E.simple("Silver", (0.9, 0.9, 0.95), 0.2, 1.0),
@@ -136,11 +136,22 @@ def build(scene):
     E.light(scene, "AREA", "violet_rim", (40, 60, 20), 3500, color=(0.6, 0.35, 1.0), size=30, target=(0, 0, 3))
     E.light(scene, "AREA", "soft_front", (0, -60, 40), 1500, color=(0.85, 0.85, 1.0), size=40, target=(0, 0, 0))
     E.scatter("stardust", 160, ((-40, -30, 3), (40, 60, 40)), 0.04, E.emissive("Stardust", (0.8, 0.75, 1.0), 6.0),
-              seed=31, scale_range=(0.3, 1.0))
+              seed=31, scale_range=(0.3, 1.0), avoid=lambda p: abs(p.x) < W / 2 + 6 and abs(p.y) < D / 2 + 10)
+    E.overhead(scene, 2500, color=(0.85, 0.85, 1.0), size=90, height=110)  # silver frames read top-down
+    # Top-down framing: a star chart, a silver compass and loose amethyst.
+    bot = -D / 2 - RIM_T
+    chart_m, k = E.material("Star chart")
+    o2 = k.coords().outputs["Object"]
+    st2 = k.math("LESS_THAN", k.voronoi(o2, 0.9).outputs["Distance"], 0.05)
+    k.surface(k.bsdf(Base_Color=k.mix(st2, (0.05, 0.07, 0.2, 1), (0.9, 0.85, 0.6, 1)), Roughness=0.8))
+    P.paper(-2.0, top + 4.0, 0.0, 17, 8, rot=-0.05, mat=chart_m, curl=0.25, seed=41)
+    silver = E.simple("Compass silver", (0.88, 0.9, 0.95), 0.2, 1.0)
+    P.torus("compass_ring", 2.6, 0.25, (W / 2 - 1.5, bot - 3.3, 0.25), silver)
+    E.cylinder("compass_face", 2.4, 0.2, (W / 2 - 1.5, bot - 3.3, 0.15), E.simple("Compass face", (0.05, 0.06, 0.18),
+                                                                                  0.3), segs=48)
+    ndl = E.cube("compass_needle", (0.3, 4.0, 0.1), (W / 2 - 1.5, bot - 3.3, 0.35), silver)
+    ndl.rotation_euler = (0, 0, 0.5)
+    crystal_cluster(-W / 2 + 2.0, bot - 3.0, 0, 3, 17, am, 0.3)
     return dict(
-        samples=128, exposure=0.3, hero=dict(dist=32, elev=30, az=8, lens=65, fstop=2.8),
-        roll=dict(settled={"d12": ((-4.5, -7.0), 12, 20), "d6": ((5.5, -3.0), 6, -10), "d10t": ((-2.0, 4.0), 0, 30),
-                           "d4": ((6.0, 9.0), 4, 0)},
-                  airborne={"d20": ((0.5, -2.5, 3.0), (1.2, 2.5, 0.2)), "d8": ((-5.5, 7.0, 5.0), (2.0, -1.0, -0.5)),
-                            "d10u": ((4.0, 14.0, 2.2), (-1.5, -2.0, 0.3))}),
+        samples=128, exposure=0.3, topdown=dict(width=W + 2 * RIM_T + 1.0), hero=dict(dist=32, elev=30, az=8, lens=65, fstop=2.8),
     )

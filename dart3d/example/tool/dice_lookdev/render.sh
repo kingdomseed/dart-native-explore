@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
-# Dice look-dev (plan P3): renders every themed set in its environment and
-# builds the contact sheet. Output: docs/design/dice-lookdev/*.png
+# Dice look-dev (plan P3): renders every themed set in its environment,
+# measures readability on the in-app top-down view, and builds the contact
+# sheets. Output: docs/design/dice-lookdev/ (JPEG q90, full colour).
 #
-#   dart3d/example/tool/dice_lookdev/render.sh            # both batches
-#   dart3d/example/tool/dice_lookdev/render.sh 1          # batch 1 only
-#   PCT=40 SAMPLES=24 dart3d/example/tool/dice_lookdev/render.sh   # quick preview
+#   dart3d/example/tool/dice_lookdev/render.sh                  # every set
+#   dart3d/example/tool/dice_lookdev/render.sh arcane northfield
+#   PCT=50 SAMPLES=16 dart3d/example/tool/dice_lookdev/render.sh arcane   # quick preview
+#   SHOTS=topdown dart3d/example/tool/dice_lookdev/render.sh              # the gate only
 #
-# Batch 1 (full: hero, d20 close-up, environment mid-roll, phone in-app view):
-#   emberforged frostbound arcane fateengine
-# Batch 2 (hero + phone): celestial hearthside oldroad northfield voltline
-#   vermilion gemcutter
-#
-# Needs Blender 5.2 (Cycles on Metal). ~1.5 h for everything on an M4.
+# Per set: <theme>-topdown.jpg (PRIMARY, 1179x2556, straight down like the
+# app), <theme>-hero.jpg (3/4 view), <theme>-d4.jpg (d4 shard close-up) and
+# its entry in readability.json. Then all-sets-topdown.jpg, all-sets-hero.jpg,
+# readability-crops.jpg (the seven dice of every set at phone pixels, from
+# out/crops/) and the face map. Needs Blender 5.2 (Cycles on Metal).
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -20,23 +21,17 @@ OUT="${OUT:-$REPO/docs/design/dice-lookdev}"
 BLENDER="${BLENDER:-/Applications/Blender.app/Contents/MacOS/Blender}"
 PCT="${PCT:-100}"
 SAMPLES="${SAMPLES:-0}"   # 0 = each environment's default
+SHOTS="${SHOTS:-topdown,hero,d4}"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
-BATCH1=(emberforged frostbound arcane fateengine)
-BATCH2=(celestial hearthside oldroad northfield voltline vermilion gemcutter)
-case "${1:-all}" in
-  1) SETS=("${BATCH1[@]}") ;;
-  2) SETS=("${BATCH2[@]}") ;;
-  *) SETS=("${BATCH1[@]}" "${BATCH2[@]}") ;;
-esac
+ALL=(emberforged frostbound arcane fateengine celestial hearthside oldroad northfield voltline vermilion gemcutter)
+if [[ $# -gt 0 ]]; then SETS=("$@"); else SETS=("${ALL[@]}"); fi
 
 mkdir -p "$OUT"
 for t in "${SETS[@]}"; do
-  shots="hero,phone"
-  [[ " ${BATCH1[*]} " == *" $t "* ]] && shots="hero,d20,env,phone"
   "$BLENDER" --background --python "$HERE/render_set.py" -- \
-    --theme "$t" --shots "$shots" --pct "$PCT" --samples "$SAMPLES" \
+    --theme "$t" --shots "$SHOTS" --check --pct "$PCT" --samples "$SAMPLES" \
     --out "$OUT" --tmp "$TMP/$t" 2>&1 | grep -E '^dice_lookdev|Error|Traceback'
 done
 
@@ -44,7 +39,8 @@ done
 "$BLENDER" --background --python "$HERE/build_dice.py" -- \
   --faces-json "$HERE/dice_faces.lookdev.json" 2>&1 | grep -E '^dice_lookdev|Error|Traceback'
 
-ALL="$(IFS=,; echo "${BATCH1[*]},${BATCH2[*]}")"
-"$BLENDER" --background --python "$HERE/contact_sheet.py" -- --dir "$OUT" --themes "$ALL" 2>&1 \
+"$BLENDER" --background --python "$HERE/contact_sheet.py" -- --dir "$OUT" --themes "$(IFS=,; echo "${ALL[*]}")" 2>&1 \
   | grep -E '^dice_lookdev|Error|Traceback'
-du -ch "$OUT"/*.png | tail -1
+"$BLENDER" --background --python "$HERE/readability_check.py" -- --table "$OUT/readability.json" 2>/dev/null \
+  | grep -E '^\|'
+du -ch "$OUT"/*.jpg "$OUT"/*.png 2>/dev/null | tail -1
