@@ -317,6 +317,7 @@ including T2/T4 evidence.
 | **M15** | **Decals & Ortho** (0.24): scorch decals on M3 impacts, an ortho isometric diorama | smoke_render decal / ortho fixtures (no app example upstream) | **V4**, V2, V3 | Track V | Shows 0.24-only features; fold into M3/M4 if small | S–M |
 | **M16** | **Pirate Ship on Water**: a stylized ship riding Gerstner-style waves, foam/spray particles, sky + sun, gulls | Water/buoyancy (Gameplay Kit), ocean `.fmat` | **E6** water shader (interim: X4 vertex-animated mesh), E3 sky, W18 particles; buoyancy via Jolt/SceneKit forces or scripted bob | after E6 (interim v1 after X4) | Instantly shareable "wow" scene; shows shaders + physics + particles together | L |
 | **M17** | **Frankfurt Street Corner**: a stylized diorama of a Frankfurt Ostend corner with a streetcar looping through, day–night, windows lighting up, instanced people/cars | none upstream (inspired by Japanese-town dioramas on X) | E1 GPU instancing, E3 day–night, W16 curves/trails for rails, OSM footprints (ODbL) + Blender + Kenney CC0 props; **never commit the private address** | now (v1 static diorama + tram loop), E1/E3 upgrades | Personal, local and charming — the kind of scene people repost | L |
+| **M18** | **Steampunk Feudal Japan**: a moody isometric/ortho diorama — a pagoda-roofed street or shrine courtyard with torii and stone lanterns, brass gears and pipes woven into the architecture, steam venting, falling cherry-blossom petals, glowing paper lanterns, mist, a slow day→dusk light change; camera drifts or orbits | none upstream (inspired by Owlcat Games' feudal-Japan + magic + steampunk trailer on X, 2026-04-11) | V2 ortho (ortho already realized), W18 particles (petals, steam, sparks), emissive lanterns + bloom, fog/stage effects (W25), E1 instancing (petals/props), E3 day–dusk; animated gears via clips | now (v1 static diorama + particles + ortho camera); E1/E3 upgrades | Atmospheric "art piece" that shows lighting, particles and mood rather than raw tech | L |
 
 **Not planned as demos:** Multiplayer (decision D7), editor/MCP (decision D7), Widget
 Texture / Widget Input / clock die (decision D6, blocked on DartNative), External
@@ -339,6 +340,7 @@ M5 Campfire v1 → M6 Explosions ─── (E6/V3/E1 upgrades)
                           after E6: M9 Shader Lab (+V5) → M10 Mirror Hall (+E8)
                           after E12: M11 Splats   after E11: M14 Sound Stage
                           after X3/X4 approval: M12 Car Physics, M13 Cloth
+M18 Steampunk Feudal Japan v1 (ortho diorama + petals/steam/lanterns)
 M17 Street Corner v1 (static diorama + tram loop) ── (E1 instancing, E3 day–night upgrades)
                           after E6: M16 Pirate Ship (interim v1 after X4)
                           Track V: M15 Decals & Ortho, then V8 side-by-side sweep over all demos
@@ -568,6 +570,11 @@ demo lane does.
      **Privacy:** the exact address is the operator's own and this repo is
      public — never commit it; reference details are shared privately at
      build time.
+   - **M18 Steampunk feudal Japan** — inspired by Owlcat Games' trailer
+     (feudal Japan + magic + steampunk). **Inspiration only**: original
+     composition and models; no Owlcat names, characters, logos or art.
+     Models built in Blender and/or CC0 sources; check Kenney's pack for
+     suitable pieces (roofs, lanterns, props).
 5. **Upstream dice sounds:** not reusable (no license) — we make our own.
 6. **Asset source:** the operator owns Kenney's complete asset collection
    (itch.io "All-in-1"); Kenney assets are CC0, so they're the default
