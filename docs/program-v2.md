@@ -171,7 +171,8 @@ scaffolding, not the demo.
       engine-gated demos follow their units. New flagships: **M16 pirate
       ship on water** (E6) and **M17 Frankfurt street-corner diorama with a
       streetcar** (OSM footprints + Blender + Kenney; never commit the
-      private address).
+      private address), and **M18 steampunk feudal-Japan
+      diorama** (inspired by Owlcat's trailer; original art only).
 - [ ] P6 License-clean replacements for Dash and fcar before any public
       demo build (Kenney CC0 / Khronos samples / own Blender models).
 - [ ] P7 Full UI design pass with Claude Design — at the END of the demo
