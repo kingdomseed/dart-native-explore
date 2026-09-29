@@ -355,7 +355,7 @@ follow-up #8).
 
 
 Unit numbering: see Track P in `docs/program-v2.md` (P3 dice experience, P5 all
-demos M2–M17, P6 asset replacements, P7 design pass).
+demos M2–M18, P6 asset replacements, P7 design pass).
 
 ### 4.4 Home screen
 

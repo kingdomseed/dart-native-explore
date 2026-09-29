@@ -166,7 +166,7 @@ scaffolding, not the demo.
       iPad white screen).
 - [ ] P4 Hero launch scene + 3D DartNative logo. Logo landed (#26);
       hero scene in progress (`docs/design/hero-scene-brief.md`).
-- [ ] P5 Demo program M2–M17 (demo-program §4 + §8): showroom, physics
+- [ ] P5 Demo program M2–M18 (demo-program §4 + §8): showroom, physics
       playground, road trip, campfire, explosions, material gallery, …;
       engine-gated demos follow their units. New flagships: **M16 pirate
       ship on water** (E6) and **M17 Frankfurt street-corner diorama with a
