@@ -625,12 +625,15 @@ class Dart3dView(context: Context) : FrameLayout(context) {
 
             uiHelper.renderCallback = object : UiHelper.RendererCallback {
                 override fun onNativeWindowChanged(surface: Surface) {
-                    swapChain?.let { engine.destroySwapChain(it) }
+                    // A still-queued destroy of the old swapchain would
+                    // leave its VkSurfaceKHR on the window when the new
+                    // one is created (NATIVE_WINDOW_IN_USE) — drain it.
+                    destroySwapChainAndWait("native window changed")
                     swapChain = engine.createSwapChain(surface, uiHelper.swapChainFlags)
+                    Log.i(TAG, "dart3d view $viewId swapchain created")
                 }
                 override fun onDetachedFromSurface() {
-                    swapChain?.let { engine.destroySwapChain(it) }
-                    swapChain = null
+                    destroySwapChainAndWait("surface destroyed")
                 }
                 override fun onResized(width: Int, height: Int) {
                     viewportW = width; viewportH = height
@@ -659,6 +662,27 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             releasePartial()
             throw t
         }
+    }
+
+    /**
+     * Destroys the swapchain and blocks until the driver thread has run
+     * the destroy. `engine.destroySwapChain` only enqueues; returning
+     * from `surfaceDestroyed` with it still queued lets Android tear the
+     * ANativeWindow down while the Vulkan driver still owns a swapchain
+     * and VkSurfaceKHR on it. The next flush (the first `beginFrame`
+     * after a warm relaunch) then destroys those against a dead window
+     * and creates the new swapchain beside them — SURFACE_LOST,
+     * "enumerate size error", or NATIVE_WINDOW_IN_USE (#18). Filament's
+     * UiHelper contract: flushAndWait before returning. Main thread only.
+     */
+    private fun destroySwapChainAndWait(why: String) {
+        val sc = swapChain ?: return
+        swapChain = null
+        engine.destroySwapChain(sc)
+        val t0 = android.os.SystemClock.uptimeMillis()
+        engine.flushAndWait()
+        Log.i(TAG, "dart3d view $viewId swapchain destroyed ($why); " +
+            "driver drained in ${android.os.SystemClock.uptimeMillis() - t0}ms")
     }
 
     private fun releasePartial() {
@@ -1637,10 +1661,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             Log.i(TAG, "dart3d view $viewId released ($reason)")
             Choreographer.getInstance().removeFrameCallback(frameCallback)
             // detach() fires onDetachedFromSurface → destroys the swap
-            // chain while the engine is still alive.
+            // chain (and drains the driver) while the engine is alive.
             uiHelper.detach()
-            swapChain?.let { engine.destroySwapChain(it) }
-            swapChain = null
+            destroySwapChainAndWait("release")
             // W7 env objects — unbind from the scene first, then
             // destroy; the prefilter helpers die last.
             scene.setIndirectLight(null)
@@ -4836,6 +4859,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             inv[2] * d[0] + inv[6] * d[1] + inv[10] * d[2])
 
     private fun render(tNanos: Long) {
+        // No surface, no frame: UiHelper clears readiness in
+        // onDetachedFromSurface, before Android destroys the window.
+        if (!uiHelper.isReadyToRender) return
         val sc = swapChain ?: return
         if (renderer.beginFrame(sc, tNanos)) {
             // W14: due offscreen passes first — a material sampling an
