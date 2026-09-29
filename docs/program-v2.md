@@ -126,16 +126,10 @@ Rules:
       packages to disk across launches; a tasteful loading state on the
       hero (e.g. the logo fades in on its first rendered frame) until
       the first frame lands. (M)
-- [ ] S0i Reduced motion: DartNative exposes no reduced-motion signal
-      (`MediaQueryData` has size/padding/insets/dpr/brightness/
-      orientation/textScaleFactor/textDirection — no
-      `disableAnimations`/`accessibleNavigation`; nothing in
-      `dartnative/docs`). The P4 hero therefore always orbits, breathes
-      and rises in. Options: ask upstream for `disableAnimations`, or a
-      small `dart3d`/app channel reading `UIAccessibility
-      .isReduceMotionEnabled` / `Settings.Global.ANIMATOR_DURATION_SCALE
-      == 0`; then use the brief §3.6 static pose (yaw −12°, pitch +8°,
-      emissive 0.45, no rise-ins). (S)
+- [x] ~~S0i Reduced motion~~ — **not planned** (operator, 2026-09-29):
+      reduced motion is an app-level concern, not the dart3d package's, and the
+      example is a motion showcase. DartNative exposes no reduced-motion signal
+      anyway; apps built on dart3d can add their own if they need it.
 - [ ] S1 **Renderer spike** (≤ 3 days): Filament 1.77 on iOS Metal
       rendering the dice table + one showcase asset; measure binary size,
       frame time, integration cost. Output: go/no-go on D2.

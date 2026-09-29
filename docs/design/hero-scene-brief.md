@@ -357,7 +357,9 @@ expo-out). `CurvedAnimation` with a custom `Cubic` is supported
 | 400 / 520 / 640 / 740 | Eyebrow, headline, value props, and CTA rows each rise 26px and fade in over 850ms (their `hero-rise` stagger, shifted by +340ms to follow the logo). Use `SlideTransition` + `FadeTransition`. |
 | 1800+ | Ambient only: drift and breath. |
 
-Reduced motion. Check the platform setting. `MediaQuery.disableAnimations`
+*Not planned (operator, 2026-09-29): reduced motion is app-level, not the
+package's concern, and the example is a motion showcase — see program-v2
+S0i. Original note kept for reference:* Reduced motion. Check the platform setting. `MediaQuery.disableAnimations`
 support in DartNative is **unverified**; look for it in `widgets.md`
 before use, or add a small plugin/`dartnative_system` probe. If reduced
 motion is on: no rise-ins, logo at rest scale, **camera parked at yaw
