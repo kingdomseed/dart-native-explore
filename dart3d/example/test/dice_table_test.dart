@@ -168,12 +168,58 @@ void main() {
       }
     });
 
-    test('logo: texture + animation', () {
-      final doc = load('logo').document;
+    test('dartnative_logo: one mesh, one 1024² texture, the Spin clip', () {
+      // Leads the roster — the Showcase opens on it.
+      expect(showcaseItems.first.label, 'dartnative_logo');
+      final scene = load('dartnative_logo');
+      final doc = scene.document;
+      final meshNodes = doc.nodes.values.where(
+        (n) =>
+            n.name != 'showcase.slab' &&
+            n.components.any((c) => c.type == 'mesh'),
+      );
+      expect(meshNodes, hasLength(1));
+      expect(meshNodes.single.name, 'DartNativeLogo');
       expect(doc.animations, hasLength(1));
+      expect(doc.animations.values.single.name, 'Spin');
       expect(
         doc.resources.values.whereType<TextureResource>(),
         hasLength(1),
+      );
+      final image = doc.payloads.values.singleWhere(
+        (p) => p.encoding == PayloadEncoding.image,
+      );
+      expect(image.format, 'rgba8');
+      expect(image.bytes!.length, 1024 * 1024 * 4);
+      // Triangle budget (< 20k) from the uint16/uint32 index payloads.
+      var indices = 0;
+      for (final p in doc.payloads.values) {
+        if (p.encoding != PayloadEncoding.indexBuffer) continue;
+        indices += p.bytes!.length ~/ (p.format == 'uint32' ? 4 : 2);
+      }
+      expect(indices ~/ 3, inInclusiveRange(1, 20000));
+      // Glossy clear-coated material; the stage reuses the base-color
+      // texture as a faint emissive (no second image payload).
+      final mat = doc.resources.values.whereType<MaterialResource>().firstWhere(
+        (m) => m.name == 'DartNativeLogo',
+      );
+      expect(mat.properties['clearcoat'], isA<DoubleValue>());
+      expect(
+        mat.properties['emissiveTexture'],
+        mat.properties['baseColorTexture'],
+      );
+      // Authored face-on framing from the reading (−Z) side, with
+      // breathing room over the bounds radius.
+      expect(scene.cameraDir.z, lessThan(-0.9));
+      expect(scene.frameRadius, greaterThan(1.3));
+      // Dramatic stage: bloom on, dark gradient sky, pink + cyan rims.
+      final env =
+          doc.resources[doc.stage.environmentRef]! as EnvironmentResource;
+      expect(env.effects.bloomEnabled, isTrue);
+      expect(env.skybox?.source, isA<GradientSkySpec>());
+      expect(
+        doc.nodes.values.where((n) => n.name.startsWith('showcase.rim.')),
+        hasLength(2),
       );
     });
 

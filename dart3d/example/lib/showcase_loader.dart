@@ -20,21 +20,55 @@ import 'package:dart3d/src/vertex_pack.dart';
 import 'package:dart3d/src/world_bounds.dart';
 import 'package:vector_math/vector_math.dart';
 
+import 'dn_logo_stage.dart';
 import 'light_aim.dart';
 
 /// One showcase entry: the cycler label, its bundle key, and the
 /// capability line shown under it.
 final class ShowcaseItem {
-  const ShowcaseItem(this.label, this.assetKey, this.note);
+  const ShowcaseItem(
+    this.label,
+    this.assetKey,
+    this.note, {
+    this.cameraDir,
+    this.stage,
+    this.frameMargin = 1.0,
+  });
 
   final String label;
   final String assetKey;
   final String note;
+
+  /// Direction from the framed center toward the camera (normalized on
+  /// use). Null keeps the loader's 3/4 model-viewer angle.
+  final (double, double, double)? cameraDir;
+
+  /// The DartNative logo's dramatic stage (dark backdrop, key + pink/
+  /// cyan rims, bloom, self-glow — see `dn_logo_stage.dart`). Null
+  /// keeps the neutral studio: grey sky, warm key + cool fill.
+  final DnLogoStage? stage;
+
+  /// Scales the framed radius — >1 pulls the camera back for breathing
+  /// room (e.g. around an animated subject).
+  final double frameMargin;
 }
 
 /// The upstream corpus bundled under `assets/showcase/` plus the dice
-/// set (which keep their physics-ground load path — they roll).
+/// set (which keep their physics-ground load path — they roll). The
+/// DartNative logo leads: it's the demo centerpiece (P4; built by
+/// `tool/dn_logo/build.sh` from the logo SVG).
 const showcaseItems = [
+  ShowcaseItem(
+    'dartnative_logo',
+    'assets/showcase/dn_logo.fsceneb',
+    'swept brush stroke · baked gradient + AO · 1 animation',
+    // The importer's handedness puts the glyph's reading side at −Z:
+    // face-on from there, a touch above and to the right.
+    cameraDir: (-0.24, 0.2, -1.0),
+    stage: DnLogoStage.showcase,
+    // Whole glyph plus margin through the spin and bob.
+    frameMargin: 1.1,
+  ),
   ShowcaseItem(
     'dash',
     'assets/showcase/dash.fsceneb',
@@ -44,11 +78,6 @@ const showcaseItems = [
     'fcar',
     'assets/showcase/fcar.fsceneb',
     '17 meshes · 39 geometries · 11 materials',
-  ),
-  ShowcaseItem(
-    'logo',
-    'assets/showcase/flutter_logo_baked.fsceneb',
-    'textured · 1 animation',
   ),
   ShowcaseItem(
     'triangles',
@@ -193,6 +222,9 @@ ShowcaseScene? loadShowcaseScene(
     return null;
   }
 
+  final stage = item.stage;
+  if (stage != null) applyEmissiveGlow(doc, stage.emissiveGlow);
+
   // Frame from the union of authored mesh bounds in world space —
   // geometry resources are local-space, so the node's world transform
   // applies before the union (imported hierarchies place meshes far
@@ -204,25 +236,34 @@ ShowcaseScene? loadShowcaseScene(
   final hasBounds = bounds != null;
   final center = hasBounds ? (bmin + bmax) * 0.5 : Vector3.zero();
   final radius = hasBounds ? max((bmax - bmin).length * 0.5, 0.5) : 10.0;
+  // The framed radius: bounds plus the item's breathing room (the
+  // camera boom and the screen's aspect fit both scale off it).
+  final frameRadius = radius * item.frameMargin;
 
   // A slab under the lowest bound gives the key light something to
   // throw shadows onto; visual only, no physics in the gallery.
   final slabMat = doc.addResource(
-    MaterialResource(
-      doc.newId(),
-      type: 'physicallyBased',
-      properties: {
-        'baseColor': ColorValue(0.13, 0.14, 0.17, 1),
-        'roughness': DoubleValue(0.92),
-        'metallic': DoubleValue(0.0),
-      },
-    ),
+    stage != null
+        ? dnLogoSlabMaterial(doc)
+        : MaterialResource(
+            doc.newId(),
+            type: 'physicallyBased',
+            properties: {
+              'baseColor': ColorValue(0.13, 0.14, 0.17, 1),
+              'roughness': DoubleValue(0.92),
+              'metallic': DoubleValue(0.0),
+            },
+          ),
   );
   final slabGeo = doc.addResource(
     GeometryResource(
       doc.newId(),
       procedural: CuboidGeometrySpec(
-        extents: Vector3(radius * 8, radius * 0.04, radius * 8),
+        extents: Vector3(
+          frameRadius * 8,
+          radius * 0.04,
+          frameRadius * 8,
+        ),
       ),
     ),
   );
@@ -247,17 +288,23 @@ ShowcaseScene? loadShowcaseScene(
     root: true,
   );
 
-  // The 3/4 model-viewer camera: up and south-west of center. With the
+  // The 3/4 model-viewer camera: up and south-west of center (unless
+  // the item authors its own direction). With the
   // +Z forward convention the pose decomposes as Ry(yaw)·Rx(pitch)
   // over forward = −cameraDir.
-  final cameraDir = Vector3(-0.52, 0.36, -0.77)..normalize();
+  final authoredDir = item.cameraDir;
+  final cameraDir =
+      (authoredDir == null
+            ? Vector3(-0.52, 0.36, -0.77)
+            : Vector3(authoredDir.$1, authoredDir.$2, authoredDir.$3))
+        ..normalize();
   final fwd = -cameraDir;
   final pitch = -asin(fwd.y.clamp(-1.0, 1.0));
   final yaw = atan2(fwd.x, fwd.z);
   final camera = doc.createNode(
     name: 'showcase.camera',
     transform: TrsTransform(
-      translation: center + cameraDir * radius * 2.8,
+      translation: center + cameraDir * frameRadius * 2.8,
       rotation:
           Quaternion.axisAngle(Vector3(0, 1, 0), yaw) *
           Quaternion.axisAngle(Vector3(1, 0, 0), pitch),
@@ -275,53 +322,65 @@ ShowcaseScene? loadShowcaseScene(
     ],
     root: true,
   );
-  doc.createNode(
-    name: 'showcase.key',
-    transform: TrsTransform(
-      // Travels down and away from the camera (upstream +Z travel).
-      rotation: aimAlong(Vector3(0.3, -0.8, 0.5)),
-    ),
-    components: [
-      ComponentSpec(
-        'directionalLight',
-        properties: {
-          'color': ColorValue(1.0, 0.95, 0.88, 1),
-          'intensity': DoubleValue(keyLightIntensity(1300)),
-          'castsShadow': BoolValue(true),
-          'shadowRadius': DoubleValue(3.0),
-          'shadowDepthBias': DoubleValue(0.01),
-        },
+  if (stage != null) {
+    addDnLogoLights(
+      doc,
+      center: center,
+      radius: radius,
+      cameraDir: cameraDir,
+      stage: stage,
+    );
+  } else {
+    doc.createNode(
+      name: 'showcase.key',
+      transform: TrsTransform(
+        // Travels down and away from the camera (upstream +Z travel).
+        rotation: aimAlong(Vector3(0.3, -0.8, 0.5)),
       ),
-    ],
-    root: true,
-  );
-  doc.createNode(
-    name: 'showcase.fill',
-    transform: TrsTransform(
-      translation: center + Vector3(-radius * 2, radius * 1.6, -radius),
-    ),
-    components: [
-      ComponentSpec(
-        'pointLight',
-        properties: {
-          'color': ColorValue(0.62, 0.72, 1.0, 1),
-          'intensity': DoubleValue(keyLightIntensity(700 * radius)),
-          'range': DoubleValue(radius * 24),
-        },
+      components: [
+        ComponentSpec(
+          'directionalLight',
+          properties: {
+            'color': ColorValue(1.0, 0.95, 0.88, 1),
+            'intensity': DoubleValue(keyLightIntensity(1300)),
+            'castsShadow': BoolValue(true),
+            'shadowRadius': DoubleValue(3.0),
+            'shadowDepthBias': DoubleValue(0.01),
+          },
+        ),
+      ],
+      root: true,
+    );
+    doc.createNode(
+      name: 'showcase.fill',
+      transform: TrsTransform(
+        translation: center + Vector3(-radius * 2, radius * 1.6, -radius),
       ),
-    ],
-    root: true,
-  );
+      components: [
+        ComponentSpec(
+          'pointLight',
+          properties: {
+            'color': ColorValue(0.62, 0.72, 1.0, 1),
+            'intensity': DoubleValue(keyLightIntensity(700 * radius)),
+            'range': DoubleValue(radius * 24),
+          },
+        ),
+      ],
+      root: true,
+    );
+  }
   doc.stage.environmentRef ??= doc
       .addResource(
-        EnvironmentResource(
-          doc.newId(),
-          environment: const StudioEnvironment(),
-          environmentIntensity: 1.0,
-          exposure: 1.0,
-          toneMapping: 'pbrNeutral',
-          skybox: SkyboxSpec(EnvironmentSkySpec()),
-        ),
+        stage != null
+            ? dnLogoEnvironment(doc, stage: stage)
+            : EnvironmentResource(
+                doc.newId(),
+                environment: const StudioEnvironment(),
+                environmentIntensity: 1.0,
+                exposure: 1.0,
+                toneMapping: 'pbrNeutral',
+                skybox: SkyboxSpec(EnvironmentSkySpec()),
+              ),
       )
       .id;
 
@@ -342,7 +401,7 @@ ShowcaseScene? loadShowcaseScene(
     cameraNode: camera.id,
     cameraTarget: center,
     cameraDir: cameraDir,
-    frameRadius: radius,
+    frameRadius: frameRadius,
     summary: summary,
   );
 }
