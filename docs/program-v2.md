@@ -79,6 +79,7 @@ Rules:
 | V4 decals | the upstream 0.24 decal example renders with correct projection and fade; the E7 `d3:decal` fixture still renders with its original projection box and fade (screenshot matches its E7 evidence) on every backend |
 | V5 `.fmat` | an additive-blended material, a depth-write-off material, a depth-test-off material (draws over an occluder) and an unlit engine-input material each render as in the upstream example; a material without a precision qualifier compiles at mediump on both platforms (compiled-shader dump or diagnostic) and a highp-requiring case still renders correctly; a malformed `.fmat` surfaces its diagnostics |
 | V6 runtime | light scaling: frame time at 64 point lights ≤ 1.5× the 8-light frame time on A142 Vulkan and iOS; progressive prefilter: during a sun sweep no frame exceeds 33 ms on A142, and captures at 3 intermediate steps show reflections updating and converging to the full-prefilter reference (diff within tolerance recorded); spatial audio pans with the camera; character yaw follows movement; every 0.24 debug-view mode dart3d supports renders its channel on both platforms (one screenshot per mode) |
+| V5b DICOM (port outcome only) | a float data texture uploads exactly (test pattern of known r32Float values read back through a debug unlit material, matched per texel) on A142 Vulkan, A142 GL and iOS; upstream's DICOM example renders MPR, MIP and DVR matching the upstream render (screenshot per mode per platform) with window/level and transfer-function changes visible |
 | V6b screen distortion | the upstream 0.24 screen-distortion fixture pulses visibly on A142 Vulkan, A142 GL and iOS, matching the upstream render (screenshot pair per platform) |
 | V7 breaking changes | a written map of each upstream breaking change to the dart3d behavior (changed / not applicable), with one test per changed behavior |
 | V8 conformance | every example in the published 0.24 corpus screenshotted on A142 Vulkan, A142 GL and iOS sim next to the upstream render, pass/fail per example in `verification-matrix.md`; V8 closes only when every example passes, or a failure is re-classified as an explicit, operator-approved exclusion — any other failure keeps V8 open |
@@ -207,13 +208,16 @@ re-cut this list; items below are from the 2026-09-27 master preview.
       follow-up), spatial audio following the view camera
       (`dart3d_audio`), character `rotatesToMovement`/`yaw` (W19
       follow-up), debug views (W34 follow-up).
-- [ ] V5b **DICOM volume example — deferred** (operator, 2026-09-29):
-      excluded from V8 until E6 lands, then revisited. Upstream's example is a
-      capability showcase using private Flutter GPU internals (r32Float slice
-      atlas + raymarch `.fmat`), not scene-contract behavior. At revisit:
-      if upstream exposes data/float/3D textures publicly, add float
-      data-texture upload (S–M) and port; otherwise decide on a dart3d-own
-      showpiece.
+- [ ] V5b **DICOM volume example — decision checkpoint** (operator,
+      2026-09-29): excluded until E6 lands; **decided when E6 closes, before
+      V5 starts.** Upstream's example is a capability showcase (private
+      Flutter GPU internals, r32Float slice atlas + raymarch `.fmat`), not
+      scene-contract behavior. Exactly one outcome, recorded here:
+      - **Port:** V5b owns float data-texture upload (S–M) + the port, with
+        its T3 row below; it lands before V8.
+      - **No port:** the operator records a **renewed explicit exclusion**
+        for V8 (a dart3d-own showpiece may still be built as a demo, but it
+        does not resolve DICOM for V8).
 - [ ] V6b `Scene.screenDistortion` (radial refraction post pass, 0.24):
       realize on both platforms or record an operator-approved exclusion
       before V8.

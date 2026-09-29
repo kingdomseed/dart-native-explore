@@ -104,7 +104,8 @@ applies a tuned post-FX preset to each example.
 least until E6 lands, then revisited.** It is upstream's capability showcase
 (slice-atlas raymarch MPR/MIP/DVR via private GPU-shim internals, not the
 scene contract). At revisit, check whether upstream promoted data/float/3D
-textures to public API; if so, add float data-texture upload to V5 and port. |
+textures to public API; decided at the V5b checkpoint when E6 closes — port (V5b owns the float
+data-texture upload) or a renewed explicit exclusion for V8. |
 | 27 | Custom Skybox (631) | W | `.fmat` gradient and Menger skies re-baked to IBL | **Blocked [E6 + E3]** (sky `.fmat` → IBL bake). |
 | 28 | Audio (272) | F | Spatial music, tap plucks, buses | **Blocked [E11]**, spatial panning [V6]. |
 | 29 | Widget Texture (546), Widget Input inset (258) | W / F | Live widgets on a CRT mesh | **Blocked (decision D6)**. DartNative has no offscreen widget capture. |
