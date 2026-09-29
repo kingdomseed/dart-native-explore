@@ -2059,8 +2059,32 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         val json = try { JSONObject(String(data, Charsets.UTF_8)) }
             catch (e: Exception) {
                 Log.w(TAG, "command parse failed: ${data.size}B"); return }
-        journalTopLevel(json)
-        applyCommandJson(json)
+        applyTopLevelCommand(json)
+    }
+
+    /**
+     * One top-level command. `{"op":"batch","ops":[…]}` — a whole
+     * `applyCommands` call in one mutation — unwraps here, so each
+     * nested op takes exactly the path it would as its own mutation
+     * (journaled, then dispatched) while all of them apply inside this
+     * one drain item: nothing between two ops of a batch is ever
+     * sampled or rendered.
+     */
+    private fun applyTopLevelCommand(json: JSONObject) {
+        if (json.optString("op") != "batch") {
+            journalTopLevel(json)
+            applyCommandJson(json)
+            return
+        }
+        val ops = json.optJSONArray("ops") ?: run {
+            logCommandOnce("batch.malformed", "batch: missing ops")
+            return
+        }
+        logCommandOnce("batch.first",
+            "command batch: ${ops.length()} ops applied in one drain")
+        for (i in 0 until ops.length()) {
+            ops.optJSONObject(i)?.let { applyTopLevelCommand(it) }
+        }
     }
 
     /**

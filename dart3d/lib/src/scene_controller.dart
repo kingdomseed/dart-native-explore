@@ -252,6 +252,12 @@ final class SceneController {
   /// what [serializeScene] reads back. A scene built entirely from ops
   /// gets a fresh document to fold into; a fold that can't decode an
   /// op logs and drops just that mirror update, never the send.
+  ///
+  /// The whole call reaches the native side as ONE mutation (a `batch`
+  /// envelope when [ops] has more than one entry — see
+  /// [D3Protocol.commandBatchBytes]), so every op applies within the
+  /// same frame: no intermediate state between two ops of one call is
+  /// ever rendered.
   void applyCommands(List<Map<String, Object?>> ops) {
     if (ops.isEmpty) return;
     for (final op in ops) {
@@ -262,8 +268,8 @@ final class SceneController {
           dnLog('dart3d: document mirror dropped op ${op['op']} ($e)');
         }
       }
-      _sendOrQueue(D3Protocol.command, D3Protocol.commandBytes(op));
     }
+    _sendOrQueue(D3Protocol.command, D3Protocol.commandBatchBytes(ops));
   }
 
   /// Applies [diff] — the `diffScene` result from the controller's
@@ -297,9 +303,10 @@ final class SceneController {
     }
     _document = newDoc;
     _warnUnrealizedFeatures(newDoc);
-    // No document fold — newDoc is already the post-op state.
-    for (final op in ops) {
-      _sendOrQueue(D3Protocol.command, D3Protocol.commandBytes(op));
+    // No document fold — newDoc is already the post-op state. One
+    // mutation for the whole diff, so it lands within a single frame.
+    if (ops.isNotEmpty) {
+      _sendOrQueue(D3Protocol.command, D3Protocol.commandBatchBytes(ops));
     }
     return ops;
   }

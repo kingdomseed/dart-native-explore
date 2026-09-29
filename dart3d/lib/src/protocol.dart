@@ -185,6 +185,18 @@ import 'scene_model.dart';
 /// Repeating either op is safe by the same idempotency rules as the
 /// ops it carries.
 ///
+/// `SceneController.applyCommands` ships a multi-op call as ONE
+/// mutation, so the whole call applies inside a single drain:
+///
+/// - `{"op":"batch","ops":[<op>,…]}` — each nested op is applied in
+///    order exactly as if it had arrived as its own top-level command
+///    (same dispatch, same surgical-replay journaling), but all of them
+///    between the same two frames. Without it, consecutive commands are
+///    separate queue entries and a render-thread drain can land between
+///    them — e.g. a clip switch's outgoing weight-0 applied a frame
+///    before the incoming play shows one bind-pose frame (#33 review).
+///    A single-op call is sent bare (no envelope).
+///
 /// Physics ops act on nodes' rigid bodies and carry `.fscene`-space
 /// vectors (the native side applies the same LH→RH z-mirror as for
 /// transforms; torque/angular axes are pseudovectors and mirror like
@@ -374,6 +386,13 @@ abstract final class D3Protocol {
   static Uint8List commandBytes(Map<String, Object?> op) =>
       Uint8List.fromList(utf8.encode(jsonEncode(op)));
 
+  /// A whole [SceneController.applyCommands] call as ONE command
+  /// mutation: the bare op when [ops] has one entry, otherwise the
+  /// `{"op":"batch","ops":[…]}` envelope ([encodeCommandBatch]) so the
+  /// native drain applies every op within the same frame.
+  static Uint8List commandBatchBytes(List<Map<String, Object?>> ops) =>
+      commandBytes(ops.length == 1 ? ops.single : encodeCommandBatch(ops));
+
   /// View configuration as utf8 JSON.
   static Uint8List viewConfigBytes(Map<String, Object?> config) =>
       Uint8List.fromList(utf8.encode(jsonEncode(config)));
@@ -384,3 +403,10 @@ abstract final class D3Protocol {
     out.setUint32(offset + 4, id.index, Endian.little);
   }
 }
+
+/// `{"op":"batch","ops":[…]}` — [ops] applied natively in order within
+/// one drain, each through the top-level command path.
+Map<String, Object?> encodeCommandBatch(List<Map<String, Object?>> ops) => {
+  'op': 'batch',
+  'ops': ops,
+};

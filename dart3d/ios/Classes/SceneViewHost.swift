@@ -1120,7 +1120,29 @@ final class SceneViewHost: SCNView {
     func applyCommand(_ data: Data) {
         guard let json = try? JSONSerialization.jsonObject(with: data)
                 as? [String: Any] else { return }
-        applyCommandJson(json)
+        applyTopLevelCommand(json)
+    }
+
+    /// One top-level command. `{"op":"batch","ops":[…]}` — a whole
+    /// `applyCommands` call in one mutation — unwraps here, so each
+    /// nested op takes exactly the path it would as its own mutation
+    /// (depth-1 dispatch, journaling) while all of them apply inside
+    /// this one drain item: nothing between two ops of a batch is ever
+    /// sampled or rendered.
+    private func applyTopLevelCommand(_ json: [String: Any]) {
+        guard (json["op"] as? String) == "batch" else {
+            applyCommandJson(json)
+            return
+        }
+        guard let ops = json["ops"] as? [Any] else {
+            logOnce("batch.malformed", "batch: missing ops")
+            return
+        }
+        logOnce("batch.first",
+            "command batch: \(ops.count) ops applied in one drain")
+        for case let op as [String: Any] in ops {
+            applyTopLevelCommand(op)
+        }
     }
 
     /// The decoded-op dispatch — also the recursion point for the W15

@@ -12,6 +12,7 @@
 // ignore_for_file: implementation_imports
 
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dart3d/src/animation.dart';
@@ -377,6 +378,56 @@ void main() {
         LocalId.parse((skinOp['id'] as String).split(':').last),
         skinId,
       );
+    });
+  });
+
+  group('command batching (#33 review: one mutation per call)', () {
+    test('a multi-op call is one batch envelope, ops in order', () {
+      final ops = encodeSwitchAnimCommands(from: waveId, to: pulseId);
+      final bytes = D3Protocol.commandBatchBytes(ops);
+      expect(jsonDecode(utf8.decode(bytes)), {
+        'op': 'batch',
+        'ops': jsonDecode(jsonEncode(ops)),
+      });
+    });
+
+    test('a single-op call goes out bare', () {
+      final op = encodeAnimCommand(waveId, play: true);
+      expect(
+        jsonDecode(utf8.decode(D3Protocol.commandBatchBytes([op]))),
+        jsonDecode(jsonEncode(op)),
+      );
+    });
+
+    // The controller itself is out of reach under `dart test` (it
+    // imports package:dartnative), so pin its send shape at the
+    // source: applyCommands and applyDiff each make exactly one
+    // command send, built by commandBatchBytes — never a per-op loop.
+    test('SceneController sends each command call as one mutation', () {
+      final src = File('lib/src/scene_controller.dart').readAsStringSync();
+      String body(String signature) {
+        final start = src.indexOf(signature);
+        expect(start, isNonNegative, reason: signature);
+        final end = src.indexOf('\n  }\n', start);
+        return src.substring(start, end);
+      }
+
+      for (final sig in [
+        'void applyCommands(List<Map<String, Object?>> ops)',
+        'List<Map<String, Object?>> applyDiff(',
+      ]) {
+        final b = body(sig);
+        expect('_sendOrQueue('.allMatches(b), hasLength(1), reason: sig);
+        expect(
+          b,
+          contains(
+            '_sendOrQueue(D3Protocol.command, '
+            'D3Protocol.commandBatchBytes(ops))',
+          ),
+          reason: sig,
+        );
+      }
+      expect(src, isNot(contains('D3Protocol.commandBytes(op)')));
     });
   });
 
