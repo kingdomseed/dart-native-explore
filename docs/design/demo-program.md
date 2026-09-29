@@ -100,7 +100,8 @@ applies a tuned post-FX preset to each example.
 | 23 | Toon (.fmat) (281) | F | `.fmat` typed params, hot reload | **Blocked [E6]** (hot reload in W28). |
 | 24 | Custom vertices (.fmat) (357) | W | Gerstner ocean and curved endless-runner road | **Blocked [E6]** (vertex stage). |
 | 25 | Materialize (.fmat) (445) | W | DamagedHelmet: wireframe, then glass shards, then PBR | **Blocked [E6 + V5]** (additive blending, barycentrics). |
-| 26 | DICOM Volume (683 + 826) | W/F | MRI raymarch MPR/MIP/DVR | **Blocked [E6]**, plus r32Float texture upload (no unit; low priority). |
+| 26 | DICOM Volume (683 + 826) | W/F | MRI raymarch MPR/MIP/DVR | **Blocked [E6]** + r32Float upload. **Proposed exclusion** (niche medical
+viewer) — needs operator approval before V8; otherwise assign r32Float upload to V5. |
 | 27 | Custom Skybox (631) | W | `.fmat` gradient and Menger skies re-baked to IBL | **Blocked [E6 + E3]** (sky `.fmat` → IBL bake). |
 | 28 | Audio (272) | F | Spatial music, tap plucks, buses | **Blocked [E11]**, spatial panning [V6]. |
 | 29 | Widget Texture (546), Widget Input inset (258) | W / F | Live widgets on a CRT mesh | **Blocked (decision D6)**. DartNative has no offscreen widget capture. |
@@ -245,7 +246,7 @@ reveal, a wind-up slam), and rare rolls pay out much bigger.
 |---|---|---|---|
 | Rigid bodies, CCD, box colliders, 60 Hz fixed step | OK (Jolt) | OK (SCNPhysics) | — |
 | Toggle a wall between trigger and solid mid-roll | `isTrigger` in the collider vocab; runtime toggle needs a check | same | P-side check; fallback is to spawn inside |
-| Impact strength for audio | **Better than upstream:** W23 contact events carry impulse. Android reports one point per manifold, which is enough for audio. | contact events OK | use events, not velocity deltas |
+| Impact strength for audio | **iOS:** W23 contact events carry impulse — use it. **Android:** jolt-jni exposes no impulse (`JoltWorld.kt`; contacts serialize `"imp":0`), so derive strength from the bodies' relative normal velocity at contact (velocity delta across the contact-added event); one point per manifold is enough for audio. | iOS impulse / Android velocity-delta | same loudness curve fed by either source |
 | Settle detection | settle events exist (W23/W25). W25's settle lane is still open (S0g). | same | S0g |
 | Face readout | **bug**: inverse quaternion plus mirrored face normals (`triage/integration.md`) | same | **S0g**, fix first |
 | Cascaded directional shadows | fixed in #16; verify on the dice lane | OK (iOS skips cascades) | S0c T3 |
@@ -313,7 +314,7 @@ including T2/T4 evidence.
 | **M11** | **Splats**: strawberry macro and a room capture with a PBR sphere | Gaussian Splats | **E12** (after E1) | after E12 | Cutting-edge; README gallery shot | M |
 | **M12** | **Car Physics**: drivable car through crates, on-screen joystick | Car Physics | **X3** native vehicle (or E4-era perf proof of Dart raycasts) | after X3 | Driving the showroom car is the second "game" moment | M |
 | **M13** | **Cloth**: flag in wind, curtain parted by a sweeping capsule | Cloth | **X4** per-frame vertex stream; V1 doubleSided shadows | after X4 perf proof | Soft bodies on a phone; ports the example-local Dart solver unchanged | M |
-| **M14** | **Sound Stage**: spatial music orbiting the listener, tap-to-pluck | Audio | **E11**, V6 spatial | after E11 | Small, but completes the "everything upstream does" list | S |
+| **M14** | **Sound Stage**: spatial music orbiting the listener, tap-to-pluck | Audio | **E11** (v1: non-spatial playback) → **V6** (spatial panning with the listener) | v1 after E11; spatial after V6 | Small, but completes the "everything upstream does" list | S |
 | **M15** | **Decals & Ortho** (0.24): scorch decals on M3 impacts, an ortho isometric diorama | smoke_render decal / ortho fixtures (no app example upstream) | **V4**, V2, V3 | Track V | Shows 0.24-only features; fold into M3/M4 if small | S–M |
 | **M16** | **Pirate Ship on Water**: a stylized ship riding Gerstner-style waves, foam/spray particles, sky + sun, gulls | Water/buoyancy (Gameplay Kit), ocean `.fmat` | **E6** water shader (interim: X4 vertex-animated mesh), E3 sky, W18 particles; buoyancy via Jolt/SceneKit forces or scripted bob | after E6 (interim v1 after X4) | Instantly shareable "wow" scene; shows shaders + physics + particles together | L |
 | **M17** | **Frankfurt Street Corner**: a stylized diorama of a Frankfurt Ostend corner with a streetcar looping through, day–night, windows lighting up, instanced people/cars | none upstream (inspired by Japanese-town dioramas on X) | E1 GPU instancing, E3 day–night, W16 curves/trails for rails, OSM footprints (ODbL) + Blender + Kenney CC0 props; **never commit the private address** | now (v1 static diorama + tram loop), E1/E3 upgrades | Personal, local and charming — the kind of scene people repost | L |
@@ -348,7 +349,8 @@ M17 Street Corner v1 (static diorama + tram loop) ── (E1 instancing, E3 day�
 
 Parallelism: M1 needs one lane throughout. M2–M5 and M7 are independent
 screens under `dart3d/example/lib/demos/<name>/`, each on its own
-`p<N>-<slug>` branch. They share one `DemoStage` scaffold (clear colour,
+`p5-m<N>-<slug>` branch — **one PR per demo**, all under unit P5 (e.g.
+`p5-m3-physics-playground`); M1 dice work uses `p3-dr<N>-<slug>`. They share one `DemoStage` scaffold (clear colour,
 IBL, key/rim rig, camera boom that swaps to E2's orbit, "ⓘ limits"
 sheet, loading state — this also fixes the black Showcase-while-loading
 follow-up #8).
@@ -360,7 +362,9 @@ demos M2–M18, P6 asset replacements, P7 design pass).
 ### 4.4 Home screen
 
 After M0's hero, a grid of demo cards (a 3D thumbnail rendered once
-through `renderTexture` → PNG). "Dice" is the first card. The existing
+as **pre-generated PNG assets** captured with a device screenshot per demo
+(`renderTexture` has no pixel readback; a readback API would be a new engine
+ask). "Dice" is the first card. The existing
 Harness moves under a "Developer" section so the curated demos and the
 test lanes stop mixing (09-17 feedback).
 

@@ -257,6 +257,15 @@ glow, native controls, expo-out entrances, and very little ambient motion.
 
 ### 3.3 Logo model and material (Blender)
 
+> **Superseded by the landed asset (#26).** The logo is built by
+> `dart3d/example/tool/dn_logo/build_dn_logo.py`: variable-radius
+> elliptical **rounded tubes** swept along the stroke (`DEPTH_RATIO = 0.85`),
+> one glossy clear-coated material, the gradient baked into a 1024²
+> texture reused as the emissive map. That rounded form is what makes the
+> full-orbit decision work. The flat-extrusion recipe below is kept as
+> history only — do not rebuild the logo from it.
+
+
 - Geometry: trace the SVG path, extrude to ~12% of glyph width, and add a
   small rounded bevel (2–3 segments). Export `.glb`, then convert to
   `.fsceneb` with the upstream importer, as the other showcase assets were.
@@ -329,7 +338,7 @@ subliminal.
 | channel | spec | notes |
 |---|---|---|
 | **Primary: emissive breath** | `emissiveStrength` 0.35 → **0.65** → 0.35, raised-cosine (`0.5 − 0.5·cos`), **period 4.8s** | Needs a material update at runtime: `upsertResource` on the face material. **Unmeasured cost.** Rate-limit to ≤ 20 Hz. The change is smooth enough that 20 Hz isn't visible. If `upsertResource` re-realizes the material, use the fallback. |
-| ~~Fallback / companion: halo breath~~ | **Discarded** with the glow card (operator, §3.5). If the emissive breath hitches, fall back to breathing **bloom intensity** (measure its cost) or to a static glow. | — |
+| ~~Fallback / companion: halo breath~~ | **Discarded** with the glow card (operator, §3.5). If the emissive breath hitches, fall back to a **static glow** (bloom must not be animated: every bloom change rebuilds the environment, ~10–70 ms). | — |
 | Bloom (static) | `effects.bloom`: enabled, threshold ~**0.85**, intensity ~**0.3**, scatter/blur ~**0.6** | iOS: applied (threshold/intensity/blurRadius). Android: approximate (`strength/highlight/levels ← scatter`). **Tune separately per platform.** **Never animate bloom**: effects live on the environment resource, and any change there re-runs the env build, which is fingerprint-gated and costs ~10–70ms (`environment-ibl-spec.md`). |
 | Vignette (static) | subtle, ~0.25 | iOS applied, Android approximate |
 | Don't use | lens flare (iOS approximate; on Android flare is ignored when bloom is on, per the audit), chromatic aberration (Android platform limit), god rays (limit on both), DoF (unnecessary with a single subject) |
