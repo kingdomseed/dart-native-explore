@@ -95,8 +95,9 @@ Rules:
       #16 (Android); 7 Codex review rounds, every thread verified and
       answered; triage tables in `docs/triage/`; every deferred finding
       is tracked in an issue (#18, #20–#23)
-- [ ] S0c **Verification backfill** — *partial.* Done: T2 on the merged tree
-      `e19e031` (equivalence recorded in §Final T2) for A142 Vulkan + GL (`docs/triage/integration.md`
+- [ ] S0c **Verification backfill** — *partial.* Done: Android T2 (A142 Vulkan + GL) on the rewritten
+      lineage — PR #25's smoke (harness, ROLL, Showcase) on a branch cut from
+      main `4e12ef3`, merged as `ab861c7` (`docs/artifacts/s0g-vulkan-relaunch/`) (`docs/triage/integration.md`
       §Final T2). iOS T2 closed on main `4e12ef3` (ROLL-button roll +
       settle and a Dice/Showcase/Harness tab storm, 0 error lines —
       `docs/artifacts/integration/final/ios-main/`). Still open: the key T3 lanes for W15, W16, W18, W22, W23, W24,

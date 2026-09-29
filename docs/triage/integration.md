@@ -287,12 +287,12 @@ from pre-rewrite heads:
    (A Harness tap in this session did not register — no log evidence — so
    the tab storm was re-run separately, below.)
 
-**Error scan over the complete capture** (`ios-main/ios-harness-roll-tabs-full.log`, 666 lines, launch → end):
+**Error scan over the complete capture** (`ios-main/ios-harness-roll-tabs-full.log`, 672 lines, launch → end):
 `grep -ciE 'fatal|crash|exception|error|sigabrt|sigsegv|lost connection'` → **0**.
 Crash reports: `find ~/Library/Logs/DiagnosticReports -newermt @<run start> -iname '*Runner*'` → **0**.
 
 **Tab storm, separate session** on main `4e12ef3` (default mode;
-`ios-main/ios-tab-storm-full.log`, 489 lines). Each switch is confirmed by a
+`ios-main/ios-tab-storm-full.log`, 490 lines). Each switch is confirmed by a
 log line and/or screenshot: Dice (line 15) → **Harness**
 (`storm-1-harness.png`, 60 fps, rolling) → **Showcase** (line 328,
 `storm-2-showcase.png`) → **Harness revisit** (`storm-3-harness-revisit.png`,
