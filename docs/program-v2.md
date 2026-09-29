@@ -79,6 +79,7 @@ Rules:
 | V4 decals | the upstream 0.24 decal example renders with correct projection and fade; the E7 `d3:decal` fixture still renders with its original projection box and fade (screenshot matches its E7 evidence) on every backend |
 | V5 `.fmat` | an additive-blended material, a depth-write-off material, a depth-test-off material (draws over an occluder) and an unlit engine-input material each render as in the upstream example; a material without a precision qualifier compiles at mediump on both platforms (compiled-shader dump or diagnostic) and a highp-requiring case still renders correctly; a malformed `.fmat` surfaces its diagnostics |
 | V6 runtime | light scaling: frame time at 64 point lights ≤ 1.5× the 8-light frame time on A142 Vulkan and iOS; progressive prefilter: during a sun sweep no frame exceeds 33 ms on A142, and captures at 3 intermediate steps show reflections updating and converging to the full-prefilter reference (diff within tolerance recorded); spatial audio pans with the camera; character yaw follows movement; every 0.24 debug-view mode dart3d supports renders its channel on both platforms (one screenshot per mode) |
+| V6b screen distortion | the upstream 0.24 screen-distortion fixture pulses visibly on A142 Vulkan, A142 GL and iOS, matching the upstream render (screenshot pair per platform) |
 | V7 breaking changes | a written map of each upstream breaking change to the dart3d behavior (changed / not applicable), with one test per changed behavior |
 | V8 conformance | every example in the published 0.24 corpus screenshotted on A142 Vulkan, A142 GL and iOS sim next to the upstream render, pass/fail per example in `verification-matrix.md`; V8 closes only when every example passes, or a failure is re-classified as an explicit, operator-approved exclusion — any other failure keeps V8 open |
 
@@ -141,22 +142,41 @@ Rules:
 
 ### Track P — product (parallel with E if O1 = lift)
 
-- [ ] P1 Define the parser → scene contract (`parse → RollSpec → outcome`)
-      in `mythic_dice_parser`; decide physics-outcome vs parser-outcome
-      reconciliation (recommended: physics picks faces, parser evaluates
-      the expression over the rolled faces).
-- [ ] P2 DartNative dice app shell (`dn create`), wired to the parser and
-      dart3d. Replaces the example's dice tab as the dice product.
-- [ ] P3 Dice feel, from the 09-17 feedback: pick-up-and-toss roll,
-      labeled Reset, table follows screen aspect (edges = glass walls,
-      survives pan), in-app quality picker (auto by device + override),
-      iPad white screen root cause.
-- [ ] P4 Demo app (**depends on E2** for the orbit controller): curated showcase (not test lanes) with a stage,
-      orbit camera, side-by-side reference against flutter_scene demos;
-      3D animated DartNative logo centerpiece (Blender).
-      - Logo asset + Showcase entry landed on `p4-dn-logo-3d`
-        (`tool/dn_logo/build.sh`, `lib/dn_logo_stage.dart`; evidence
-        `docs/artifacts/p4-dn-logo/`). Hero launch scene is a follow-up.
+Demo plan and upstream mapping: `docs/design/demo-program.md` (operator
+decisions in §8). Principle: today's harness lanes and dice table are
+scaffolding, not the demo.
+
+- [ ] P1 Parser → scene contract (`parse → RollSpec → outcome`): physics
+      picks faces, `mythic_dice_parser` evaluates over them
+      (`PreRolledDiceRoller`) for rolls whose dice are known up front.
+      **Exploding/reroll expressions** (e.g. `4d6!`) need an extra physical
+      throw mid-evaluation, which requires `CallbackDiceRoller` to become
+      async in `mythic_dice_parser` — an explicit P1 dependency; until it
+      lands, P3 scopes explode/reroll to the pre-rolled fallback (extra dice
+      rolled virtually, shown after). No extraction/package split planned.
+- [ ] P2 **Standalone dice-roller app** — dice rolling only, mobile only,
+      built on dart3d, operator's portfolio (possibly published free or
+      paid). Separate project; starts after the example's dice experience
+      reaches DR3.
+- [ ] P3 **Dice experience in the example** — far nicer than today's
+      table; beat upstream's "Dice Shadows" (demo-program §5 phases DR1–DR5:
+      readout fix + screen-fitted walls + labeled Reset → aim/toss/sweep →
+      notation + count-up + audio → juice → polish). Includes the 09-17
+      feedback (pick-up-and-toss, walls = screen edges, quality picker,
+      iPad white screen).
+- [ ] P4 Hero launch scene + 3D DartNative logo. Logo landed (#26);
+      hero scene in progress (`docs/design/hero-scene-brief.md`).
+- [ ] P5 Demo program M2–M18 (demo-program §4 + §8): showroom, physics
+      playground, road trip, campfire, explosions, material gallery, …;
+      engine-gated demos follow their units. New flagships: **M16 pirate
+      ship on water** (E6) and **M17 Frankfurt street-corner diorama with a
+      streetcar** (OSM footprints + Blender + Kenney; never commit the
+      private address), and **M18 steampunk feudal-Japan
+      diorama** (inspired by Owlcat's trailer; original art only).
+- [ ] P6 License-clean replacements for Dash and fcar before any public
+      demo build (Kenney CC0 / Khronos samples / own Blender models).
+- [ ] P7 Full UI design pass with Claude Design — at the END of the demo
+      work.
 
 ### Track V — 0.24 parity (final goal; after Track E closes on 0.23.0)
 
@@ -187,6 +207,9 @@ re-cut this list; items below are from the 2026-09-27 master preview.
       follow-up), spatial audio following the view camera
       (`dart3d_audio`), character `rotatesToMovement`/`yaw` (W19
       follow-up), debug views (W34 follow-up).
+- [ ] V6b `Scene.screenDistortion` (radial refraction post pass, 0.24):
+      realize on both platforms or record an operator-approved exclusion
+      before V8.
 - [ ] V7 Breaking-change audit: `Lighting` projection scale/offset
       (replaces `tanHalfFov`), `initializeStaticResources()` throwing —
       map to dart3d equivalents or record as not applicable.
@@ -203,7 +226,8 @@ re-cut this list; items below are from the 2026-09-27 master preview.
 - [ ] R4 Consumer build test: a fresh `dn create` app depending on dart3d
       by path, then by git, resolves Filament/jolt-jni and builds both
       platforms.
-- [ ] R5 Publish to dartpub.dev (operator signs in; GitHub-backed).
+- [ ] R5 Publish to dartpub.dev (**requires P6**: the Dash/fcar showcase
+      assets must be replaced or excluded via `.pubignore` before any publish) — operator signs in; GitHub-backed.
 
 ## Operating rules
 
