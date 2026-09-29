@@ -75,9 +75,9 @@ applies a tuned post-FX preset to each example.
 
 | # | Upstream example (file, lines) | W/F | What it shows | dart3d mapping |
 |---|---|---|---|---|
-| 1 | **Dice Shadows** (`example_dice_shadows.dart` 3567 + `lib/dice/` 3182) | W | Upstream's dice roller. §3 covers it in depth. | **Partial / partly blocked.** Physics, shadows, PBR, particles, trails and bloom are OK. Overlay-on-widgets is blocked (§7 X1). Glass refracting widgets is blocked (M6). Sound needs E11, or dartnative_audio in the interim. Outline highlight needs E5b. Screen distortion is an ask (X2). |
+| 1 | **Dice Shadows** (`example_dice_shadows.dart` 3567 + `lib/dice/` 3182) | W | Upstream's dice roller. §3 covers it in depth. | **Partial / partly blocked.** Physics, shadows, PBR, particles, trails and bloom are OK. Overlay-on-widgets is blocked (§7 X1). Glass refracting widgets is blocked (decision D6). Sound needs E11, or dartnative_audio in the interim. Outline highlight needs E5b. Screen distortion is an ask (X2). |
 | 2 | Car (`example_car` 249) | W | Showroom car with doors/hood/trunk, steering wheels, blurred env background | **OK (approx.)**. `fcar.fsceneb` is already in the Showcase, and door poses go through `setNodeTransforms`. Equirect IBL is OK (W7). Env blur on the background is unverified. Lens flare is approximate on iOS and ignored with bloom on Android. Contact shadows are skipped on iOS. Orbit camera needs [E2]; the Showcase boom is the interim. |
-| 3 | Animation (127) | F | Skeletal clip blending | **Partial.** Clips play (W8/W30). Weighted cross-blend through `anim` ops needs checking. The declarative `SceneModel` API is N/A (M9). |
+| 3 | Animation (127) | F | Skeletal clip blending | **Partial.** Clips play (W8/W30). Weighted cross-blend through `anim` ops needs checking. The declarative `SceneModel` API is N/A (decision D9). |
 | 4 | Flutter Logo (91) | F | Baked logo over a grid | **Done, differently.** Replaced by the 3D DartNative logo (P4, `dn_logo.fsceneb`). |
 | 5 | Multiplayer (600+245) | W/F | Server-authoritative Rapier arena | **N/A** (decision D7, networking). |
 | 6 | Configurator (439) | W | Shoe on a turntable, KHR_materials_variants swatches, spot key, rim points | **OK except spot shadow [E5/U2].** Variants are realized (`selectMaterialVariant`). The asset is Khronos, CC BY 4.0 (§6). |
@@ -105,7 +105,7 @@ applies a tuned post-FX preset to each example.
 | 28 | Audio (272) | F | Spatial music, tap plucks, buses | **Blocked [E11]**, spatial panning [V6]. |
 | 29 | Widget Texture (546), Widget Input inset (258) | W / F | Live widgets on a CRT mesh | **Blocked (decision D6)**. DartNative has no offscreen widget capture. |
 | 30 | External Texture (492) | F | Video/camera as material | **Blocked [E10/W33a].** |
-| 31 | Accessibility (586) | F | Pickable labelled car parts, outline, semantics | **Partial.** Picking needs [E2], outline [E5b/U3], semantics [E10/W33b]. The widget panel part is blocked (M6). |
+| 31 | Accessibility (586) | F | Pickable labelled car parts, outline, semantics | **Partial.** Picking needs [E2], outline [E5b/U3], semantics [E10/W33b]. The widget panel part is blocked (decision D6). |
 | 32 | Render Targets (316) | F | Minimap RT, per-view AA | **OK** (`renderTexture`, W13/W24). |
 | 33 | Physics: Dash (1137 + `character/` 831) | W/F | Third-person character, stairs, platforms, plank bridge, seesaw, cloth corridor | **Blocked on [E4]** for the character. Joints are OK (W23). The cloth corridor needs X4. |
 | 34 | Physics (box3d) (384) | F | Box stack, pendulum rope, kinematic spinner, tap to drop | **OK.** Backend-neutral: joints, raycast and kinematic bodies are realized (W23). |
@@ -259,14 +259,14 @@ reveal, a wind-up slam), and rare rolls pay out much bigger.
 | DOF tilt-shift | OK (W13/W25) | OK | tune per platform |
 | Lens flare | ignored when bloom is on | approx | limit |
 | Chromatic aberration (slow-mo) | platform limit | OK | limit |
-| `screenDistortion` shockwave | **none** | **none** | **ask X2** (0.24; not in V1–V6) |
+| `screenDistortion` shockwave | **none** | **none** | **V6b** (0.24; see program-v2) |
 | Outline highlight | [E5b/U3] | [E5b/U3] | E5b |
 | Particles: bursts, stretched sparks, glitter | OK (CPU sim) | bursts/turbulence ignored (W18 delta) | limit; use one-shot emitters on iOS |
 | Trails | OK (W16) | OK | — |
 | Instanced confetti (110 cuboids with per-instance colour and shadows) | CPU-baked until [E1] | CPU-baked | E1, or a 110-node pool (fine at this count) |
 | Runtime IBL from an image | equirect via payload (W7) | same | — |
 | **Transparent SceneView over native widgets** | **no**: `SurfaceView` is opaque and would need `setZOrderOnTop` or `TextureView` | host `SCNView` is opaque (`backgroundColor = .black`) | **ask X1** |
-| `WidgetTexture` backdrop (glass refracting UI) and `WidgetComponent` clock | **blocked** | **blocked** | M6 (W33c) |
+| `WidgetTexture` backdrop (glass refracting UI) and `WidgetComponent` clock | **blocked** | **blocked** | decision D6 (W33c) |
 | Screen-space shake of the whole UI | DartNative `Transform` on the stack | same | P-side |
 | Low-latency pitched one-shots | [E11 `dart3d_audio`, Oboe]. Interim: `dartnative_audio` (media3 AudioPlayer; pitch control unverified) or a Dart mixer into `PcmStreamPlayer` | [E11, AVAudioEngine]; same interim | E11 / interim |
 | Haptics (upstream has none) | not verified in `dartnative_system` | same | P-side; a plugin probe |
@@ -315,6 +315,8 @@ including T2/T4 evidence.
 | **M13** | **Cloth**: flag in wind, curtain parted by a sweeping capsule | Cloth | **X4** per-frame vertex stream; V1 doubleSided shadows | after X4 perf proof | Soft bodies on a phone; ports the example-local Dart solver unchanged | M |
 | **M14** | **Sound Stage**: spatial music orbiting the listener, tap-to-pluck | Audio | **E11**, V6 spatial | after E11 | Small, but completes the "everything upstream does" list | S |
 | **M15** | **Decals & Ortho** (0.24): scorch decals on M3 impacts, an ortho isometric diorama | smoke_render decal / ortho fixtures (no app example upstream) | **V4**, V2, V3 | Track V | Shows 0.24-only features; fold into M3/M4 if small | S–M |
+| **M16** | **Pirate Ship on Water**: a stylized ship riding Gerstner-style waves, foam/spray particles, sky + sun, gulls | Water/buoyancy (Gameplay Kit), ocean `.fmat` | **E6** water shader (interim: X4 vertex-animated mesh), E3 sky, W18 particles; buoyancy via Jolt/SceneKit forces or scripted bob | after E6 (interim v1 after X4) | Instantly shareable "wow" scene; shows shaders + physics + particles together | L |
+| **M17** | **Frankfurt Street Corner**: a stylized diorama of a Frankfurt Ostend corner with a streetcar looping through, day–night, windows lighting up, instanced people/cars | none upstream (inspired by Japanese-town dioramas on X) | E1 GPU instancing, E3 day–night, W16 curves/trails for rails, OSM footprints (ODbL) + Blender + Kenney CC0 props; **never commit the private address** | now (v1 static diorama + tram loop), E1/E3 upgrades | Personal, local and charming — the kind of scene people repost | L |
 
 **Not planned as demos:** Multiplayer (decision D7), editor/MCP (decision D7), Widget
 Texture / Widget Input / clock die (decision D6, blocked on DartNative), External
@@ -337,6 +339,8 @@ M5 Campfire v1 → M6 Explosions ─── (E6/V3/E1 upgrades)
                           after E6: M9 Shader Lab (+V5) → M10 Mirror Hall (+E8)
                           after E12: M11 Splats   after E11: M14 Sound Stage
                           after X3/X4 approval: M12 Car Physics, M13 Cloth
+M17 Street Corner v1 (static diorama + tram loop) ── (E1 instancing, E3 day–night upgrades)
+                          after E6: M16 Pirate Ship (interim v1 after X4)
                           Track V: M15 Decals & Ortho, then V8 side-by-side sweep over all demos
 ```
 
@@ -524,7 +528,7 @@ demo lane does.
 | Ask | Needed by | What | Notes |
 |---|---|---|---|
 | **X1: transparent SceneView** | M1 look (b); any AR-style overlay | Clear-to-alpha host view composited over DartNative widgets. Android: `TextureView` or `SurfaceView.setZOrderOnTop` + `PixelFormat.TRANSLUCENT` with a Filament clear alpha. iOS: `SCNView.backgroundColor = .clear`, `isOpaque = false`. | This is upstream's signature dice trick ("shadows on your UI"). It also needs input pass-through to the widgets underneath. Size M. Candidate for U3/E5b scope. |
-| **X2: screen distortion** | M1 DR4, M6 | 0.24 `Scene.screenDistortion` pulses (a radial refraction post pass) | 0.24 surface but **missing from V1–V6**. Add to V (V5 `.fmat` post, or a new V-item). |
+| **X2: screen distortion** | M1 DR4, M6 | 0.24 `Scene.screenDistortion` pulses (a radial refraction post pass) | 0.24 surface, now tracked as **V6b** in program-v2 (realize or record an operator-approved exclusion before V8). |
 | **X3: native vehicle** | M12 | `d3:vehicle` modelled on upstream's example-local raycast vehicle: Jolt `VehicleConstraint`, `SCNPhysicsVehicle` | decision D4 allows `d3:` only where upstream has no wire form; upstream's vehicle is app code, so this is an extension. Operator call. |
 | **X4: streamed dynamic vertices** | M13 cloth, M8 water (CPU path) | A per-frame vertex update path (position/normal buffer replace) with a perf number on the A142 | Might already be fine through `upsertPayload`; measure first (S-sized spike). |
 | **X5: physics time scale** | M1 slow-mo, M6 | Scale the physics step (Jolt substep dt, `SCNPhysicsWorld.speed`) | Small. Both natives have the knob. |

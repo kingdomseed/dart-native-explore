@@ -231,11 +231,11 @@ glow, native controls, expo-out entrances, and very little ambient motion.
 | layer | recommendation | realized? |
 |---|---|---|
 | Clear colour | `SceneView(backgroundColor: 0xFF090E12)` (site `--bg`) | wire field exists (`lib/src/scene_view.dart:52`) |
-| Soft glow behind the logo | A large **unlit** quad (or `d3:procMesh` billboard) behind and slightly above the logo, with a baked radial-gradient texture: centre lime `#A1EA5A` at ~12% over `#090E12`, fading to fully transparent by 70% radius. Add a second, smaller cool lobe of `#79C0F1` at ~8%, offset lower-left. Alpha-blended, not additive. | unlit + textures verified both (W4/W6) |
+| ~~Soft glow behind the logo~~ | **Discarded (operator, §3.4/§3.5): no separate glow card, quad or halo — the logo's own gradient emission + bloom is the glow.** Original recipe (unlit radial-gradient quad) kept only as history. |
 | IBL | `environment: {type: studio}` for reflections and specular on the logo. **No skybox**, so the clear colour shows. | studio IBL verified both (W7 matrix rows 159–163) |
 | Env intensity | Tune per platform. The W-HDR lane needed `1.0` on iOS but `0.08` on Android (`verification-matrix.md:447`). Expect the same kind of split here. | known quirk |
-| Option: gradient sky | `skybox.source.type: gradient` (zenith `#0E1318`, horizon `#13191F`, ground `#090E12`, no sun). It's in code on both platforms (`FsceneRealizer.swift:~6394`, `EnvironmentFactory.kt:~143`), but I found **no verification row** for it. Use only after a T1 check. | code only |
-| Floor or shadows | **None.** The logo floats. Android directional shadows are currently inert (`program-audit-2026-09-28.md` §3), so a shadowed floor would look different on the two platforms. | avoids known defect |
+| Option: gradient sky | `skybox.source.type: gradient` (zenith `#0E1318`, horizon `#13191F`, ground `#090E12`, no sun). It's in code on both platforms (`FsceneRealizer.swift:~6394`, `EnvironmentFactory.kt:~143`), but I found **no verification row** for it. Use only after a T1 check. | code only **If chosen, it needs a T3 live check on the A142 (Vulkan + GL) and the iOS sim before merge — a T1 run can't show it renders.** |
+| Floor or shadows | **None, as an aesthetic choice** — the logo floats. (Android directional shadows work since #16; a soft floor shadow remains an option if it looks better.) |
 
 ### 3.2 Lighting
 
@@ -296,7 +296,7 @@ every angle.
 |---|---|
 | FOV (vertical) | 30–35° (long lens, flat perspective, "product shot") |
 | Target | logo centroid, raised +0.05 × glyph height |
-| Radius | framing-driven: logo width ≈ **62% of the view width** in portrait. With a 2.0-unit-wide logo at 32° FOV on a ~9:19.5 screen, that is r ≈ 9–10 units. Derive it from the bounds (`world_bounds.dart`) rather than hard-coding. |
+| Radius | framing-driven: logo width ≈ **62% of the view width** in portrait. With a 2.0-unit-wide logo at 32° FOV on a ~9:19.5 screen, that is r = 2 / (0.62 · 2 · tan(FOV/2) · aspect) ≈ **11–13 units** (aspect 9/19.5, FOV 30–35°). Derive it from the bounds (`world_bounds.dart`) rather than hard-coding. |
 | Yaw | **full 360° orbit, ~30 s per revolution, constant speed** (operator decision). *Superseded suggestion: sine pendulum ±24°, period 18 s.* |
 | Pitch | base elevation **+8°**, sine **±3°**, **period 13s** (not a multiple of 18s, so the path doesn't visibly repeat) |
 | Roll | 0 |
@@ -329,7 +329,7 @@ subliminal.
 | channel | spec | notes |
 |---|---|---|
 | **Primary: emissive breath** | `emissiveStrength` 0.35 → **0.65** → 0.35, raised-cosine (`0.5 − 0.5·cos`), **period 4.8s** | Needs a material update at runtime: `upsertResource` on the face material. **Unmeasured cost.** Rate-limit to ≤ 20 Hz. The change is smooth enough that 20 Hz isn't visible. If `upsertResource` re-realizes the material, use the fallback. |
-| **Fallback / companion: halo breath** | the backdrop glow quad's scale 1.00 → **1.06**, same phase and period | `setNodeTransforms` only, the same proven path as the camera. Cheap. |
+| ~~Fallback / companion: halo breath~~ | **Discarded** with the glow card (operator, §3.5). If the emissive breath hitches, fall back to breathing **bloom intensity** (measure its cost) or to a static glow. | — |
 | Bloom (static) | `effects.bloom`: enabled, threshold ~**0.85**, intensity ~**0.3**, scatter/blur ~**0.6** | iOS: applied (threshold/intensity/blurRadius). Android: approximate (`strength/highlight/levels ← scatter`). **Tune separately per platform.** **Never animate bloom**: effects live on the environment resource, and any change there re-runs the env build, which is fingerprint-gated and costs ~10–70ms (`environment-ibl-spec.md`). |
 | Vignette (static) | subtle, ~0.25 | iOS applied, Android approximate |
 | Don't use | lens flare (iOS approximate; on Android flare is ignored when bloom is on, per the audit), chromatic aberration (Android platform limit), god rays (limit on both), DoF (unnecessary with a single subject) |
@@ -402,7 +402,7 @@ Portrait phone layout sketch (iPhone 17 Pro, 402×874pt):
 │         ╭───────────────────╮        │
 │         │                   │        │
 │         │   3D DN logo      │        │  ← logo ≈ 62% width, centred ~38% from top
-│         │  (drifting arc,   │        │    backdrop glow quad behind (lime/blue lobes)
+│         │  (drifting arc,   │        │    (no glow quad — the logo glows its own colours)
 │         │   breathing glow) │        │
 │         ╰───────────────────╯        │
 │                                      │
@@ -531,7 +531,7 @@ Rules for the hero:
 
 ## 5. Open questions and checks before implementation
 
-- T1: does the `gradient` skybox render on both platforms? (Only if we
+- T3 (live, both platforms): does the `gradient` skybox render on both platforms? (Only if we
   use the optional sky.)
 - Measure: cost of `upsertResource` on a material at 20 Hz (emissive
   breath). Is it a property write or a re-realize? Is per-frame
