@@ -368,9 +368,9 @@ demos M2–M18, P6 asset replacements, P7 design pass).
 After M0's hero, a grid of demo cards (a 3D thumbnail rendered once
 as **pre-generated PNG assets** captured with a device screenshot per demo
 (`renderTexture` has no pixel readback; a readback API would be a new engine
-ask). "Dice" is the first card. The existing
-Harness moves under a "Developer" section so the curated demos and the
-test lanes stop mixing (09-17 feedback).
+ask). "Dice" is the first card. The harness stays out of the UI (09-17
+feedback; operator, 09-29): it boots only with
+`--dart-define=DART3D_SCENE=harness`.
 
 ---
 

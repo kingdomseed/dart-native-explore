@@ -223,14 +223,15 @@ wire never blocks them, and each can be pulled back into a workstream:
 
 ## Development
 
-Run the example harness and tests through the DartNative toolchain
-(`dn`), which supplies the `dartnative_*` package resolution:
+Run the example and tests through the DartNative toolchain (`dn`),
+which supplies the `dartnative_*` package resolution:
 
 ```bash
 dn test          # package tests (test/): codecs, geometry, physics, …
 cd example
 dn test          # harness-level tests (assets, tool/, example lib)
-dn run           # live harness on a connected device/simulator
+dn run           # the example app (hero → Dice / Showcase)
+dn run --dart-define=DART3D_SCENE=harness   # the verification harness
 ```
 
 Program docs live in `../docs/` — `dart3d-completion-program.md` for

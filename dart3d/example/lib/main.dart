@@ -7,11 +7,14 @@ import 'package:dart3d/dart3d.dart';
 import 'package:dartnative/dartnative.dart';
 import 'package:vector_math/vector_math.dart';
 
+import 'app_route.dart';
 import 'dartnative_plugin_registrant.dart';
 import 'dice_table.dart';
 import 'feature_scene.dart';
+import 'hero_screen.dart';
 import 'phase_timers.dart';
 import 'imported_scene.dart';
+import 'reel_scene.dart';
 import 'showcase_scene.dart';
 
 void main() {
@@ -39,30 +42,35 @@ void _applyBackendDefine() {
       )(pref);
 }
 
-/// The example app's shell — three screens switched by a segmented
-/// control:
+/// The example app's shell. It launches into the **hero**
+/// (`hero_screen.dart`) — the 3D DartNative logo on a dark stage — which
+/// leads to two screens:
 ///
-/// - **Dice** — the user-facing table: seven upstream-imported dice on
-///   a felt tray, tap to select, Roll throws the selection (or all).
+/// - **Dice** ("Roll the dice") — seven upstream-imported dice on a
+///   felt tray, tap to select, Roll throws the selection (or all).
 /// - **Showcase** — the broader `flutter_scene` corpus (dash, fcar,
-///   the Flutter logo, skinning/animation/texture coverage) plus the
-///   single-die physics lane.
-/// - **Harness** — the deterministic verification scene whose timed
-///   phases exercise the feature matrix (W0–W16, wloose, W18, W24, W25).
+///   skinning/animation/texture coverage) plus the single-die physics
+///   lane.
 ///
-/// Boot overrides: `--dart-define=DART3D_SCENE=dice|showcase|harness`
-/// picks the screen; `--dart-define=DART3D_MODEL=<label>` boots the
-/// showcase with that item selected (the old single-model lane);
-/// `--dart-define=DART3D_QUALITY=low|medium|high` pins the view tier.
-/// `--dart-define=DART3D_BACKEND=auto|opengl|vulkan` picks the Filament
-/// backend (Android only); `--dart-define=DART3D_STATS=1` turns the
-/// showcase view's stats HUD on (and its ~4 Hz `stats:` logcat line).
+/// Each has a back chevron at the top-left, and Android's system back
+/// returns to the hero as well. Routing lives in `app_route.dart`.
+///
+/// Boot overrides: `--dart-define=DART3D_SCENE=hero|dice|showcase` picks
+/// the screen. Two screens exist only behind that define:
+/// `DART3D_SCENE=harness` boots the deterministic verification scene
+/// ([FeatureMatrixScreen]) and `DART3D_SCENE=reel` the chrome-free logo
+/// capture view (`reel_scene.dart`). `--dart-define=DART3D_MODEL=<label>`
+/// boots the showcase with that item selected (the old single-model
+/// lane); `--dart-define=DART3D_QUALITY=low|medium|high` pins the view
+/// tier. `--dart-define=DART3D_BACKEND=auto|opengl|vulkan` picks the
+/// Filament backend (Android only); `--dart-define=DART3D_STATS=1` turns
+/// the showcase view's stats HUD on (and its ~4 Hz `stats:` logcat line).
 class Dart3dExampleApp extends StatefulWidget {
   const Dart3dExampleApp({super.key});
 
   static const _bootScene = String.fromEnvironment(
     'DART3D_SCENE',
-    defaultValue: 'dice',
+    defaultValue: 'hero',
   );
   static const _bootModel = String.fromEnvironment('DART3D_MODEL');
   static const _bootQuality = String.fromEnvironment('DART3D_QUALITY');
@@ -80,38 +88,45 @@ class Dart3dExampleApp extends StatefulWidget {
 }
 
 class _Dart3dExampleAppState extends State<Dart3dExampleApp> {
-  late int _screen = _bootIndex();
+  final _route = AppRoute.boot(
+    scene: Dart3dExampleApp._bootScene,
+    model: Dart3dExampleApp._bootModel,
+  );
 
-  int _bootIndex() {
-    if (Dart3dExampleApp._bootModel.isNotEmpty) return 1;
-    return switch (Dart3dExampleApp._bootScene) {
-      'harness' => 2,
-      'showcase' || 'gallery' => 1,
-      _ => 0,
-    };
-  }
+  void _open(AppScreen next) => setState(() => _route.open(next));
+
+  void _back() => setState(() => _route.back());
 
   @override
   Widget build(BuildContext context) {
-    final nav = Center(
-      child: SegmentedControl(
-        segments: const ['Dice', 'Showcase', 'Harness'],
-        selectedIndex: _screen,
-        onValueChanged: (i) => setState(() => _screen = i),
+    final quality = Dart3dExampleApp.bootQuality;
+    return switch (_route.screen) {
+      AppScreen.hero => HeroScreen(quality: quality, onOpen: _open),
+      AppScreen.dice => _backable(
+        DiceTableScreen(onBack: _back, quality: quality),
       ),
-    );
-    return switch (_screen) {
-      1 => ShowcaseScreen(
-        nav: nav,
-        initialLabel: Dart3dExampleApp._bootModel.isEmpty
-            ? null
-            : Dart3dExampleApp._bootModel,
-        quality: Dart3dExampleApp.bootQuality,
+      AppScreen.showcase => _backable(
+        ShowcaseScreen(
+          onBack: _back,
+          initialLabel: Dart3dExampleApp._bootModel.isEmpty
+              ? null
+              : Dart3dExampleApp._bootModel,
+          quality: quality,
+        ),
       ),
-      2 => FeatureMatrixScreen(nav: nav, quality: Dart3dExampleApp.bootQuality),
-      _ => DiceTableScreen(nav: nav, quality: Dart3dExampleApp.bootQuality),
+      AppScreen.harness => FeatureMatrixScreen(quality: quality),
+      AppScreen.reel => ReelScreen(quality: quality),
     };
   }
+
+  /// Routes Android's system back to the hero instead of leaving the app.
+  Widget _backable(Widget screen) => PopScope(
+    canPop: false,
+    onPopInvokedWithResult: (didPop, _) {
+      if (!didPop) _back();
+    },
+    child: screen,
+  );
 }
 
 /// The W0 verification scene — a physically simulated die and ball on
@@ -121,10 +136,7 @@ class _Dart3dExampleAppState extends State<Dart3dExampleApp> {
 /// plus the ball's rest position from the poses. Toggles exercise the
 /// view-config and camera manifest fields.
 class FeatureMatrixScreen extends StatefulWidget {
-  const FeatureMatrixScreen({super.key, this.nav, this.quality});
-
-  /// The app shell's screen switcher, overlaid at the top edge.
-  final Widget? nav;
+  const FeatureMatrixScreen({super.key, this.quality});
 
   /// The `DART3D_QUALITY` boot tier — null runs the widget defaults.
   final SceneQuality? quality;
@@ -764,8 +776,6 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
               quality: widget.quality,
             ),
           ),
-          if (widget.nav != null)
-            Positioned(left: 0, right: 0, top: 56, child: widget.nav!),
           Positioned(
             left: 0,
             right: 0,

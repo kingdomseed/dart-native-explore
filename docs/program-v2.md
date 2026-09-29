@@ -46,7 +46,7 @@ stayed empty. The new gate is smaller and mandatory.
 | Tier | When | Required evidence |
 |---|---|---|
 | **T1 — CI** | every PR | `dn analyze` + `dn test` in **every Dart package the PR changes** (`dart3d/`, `dart3d/example/`, and each new package such as `dart3d_audio/` or the dice app gets its own CI step when it is created). Target (R3): add Android `compileReleaseKotlin` and iOS `swiftc -typecheck` jobs. |
-| **T2 — device smoke** | every PR touching `dart3d/android/**`, `dart3d/ios/**`, or the wire vocabulary | On A142 **Vulkan and GL** and on the iOS sim: app boots, harness runs to completion, dice roll and settle, zero FATAL/crash in logs. One screenshot per surface + log excerpt, committed under `docs/artifacts/<unit>/`. |
+| **T2 — device smoke** | every PR touching `dart3d/android/**`, `dart3d/ios/**`, or the wire vocabulary | On A142 **Vulkan and GL** and on the iOS sim: app boots, harness (booted with `--dart-define=DART3D_SCENE=harness`; it has no UI entry) runs to completion, dice roll and settle, zero FATAL/crash in logs. One screenshot per surface + log excerpt, committed under `docs/artifacts/<unit>/`. |
 | **T3 — feature lanes** | every unit | The unit's own live checks, same evidence rules: the subset of its old "Verify, live" block that exercises new behavior, or for units new in v2, the checks listed under **New-unit T3** below. |
 | **T4 — review** | units that change what users see | Operator reviews screenshots (video optional) in the PR before merge. |
 | **Perf** | only units that claim a perf number | The measured number, device, and method, committed. |
@@ -118,6 +118,19 @@ Rules:
       remaining Filament builder sites for the GC-reachability hazard;
       W25 settle lane never passes after wLoose; body poses/velocities
       across deferred re-realize (M)
+- [ ] S0h Android cold-start material compile: on a fresh install the
+      first scene waits ~14 s — Filament compiles the lit material
+      packages one after another (~3.5 s each: `lit|false|OPAQUE|e0`,
+      `MASKED`, `TRANSPARENT`, then `OPAQUE|e1`; A142 Vulkan logcat,
+      #31). The P4 hero shows its copy over an empty stage meanwhile.
+      Options: compile the packages in parallel; persist compiled
+      packages to disk across launches; a tasteful loading state on the
+      hero (e.g. the logo fades in on its first rendered frame) until
+      the first frame lands. (M)
+- [x] ~~S0i Reduced motion~~ — **not planned** (operator, 2026-09-29):
+      reduced motion is an app-level concern, not the dart3d package's, and the
+      example is a motion showcase. DartNative exposes no reduced-motion signal
+      anyway; apps built on dart3d can add their own if they need it.
 - [ ] S1 **Renderer spike** (≤ 3 days): Filament 1.77 on iOS Metal
       rendering the dice table + one showcase asset; measure binary size,
       frame time, integration cost. Output: go/no-go on D2.
@@ -165,8 +178,14 @@ scaffolding, not the demo.
       notation + count-up + audio → juice → polish). Includes the 09-17
       feedback (pick-up-and-toss, walls = screen edges, quality picker,
       iPad white screen).
-- [ ] P4 Hero launch scene + 3D DartNative logo. Logo landed (#26);
-      hero scene in progress (`docs/design/hero-scene-brief.md`).
+- [ ] P4 Hero launch scene + 3D DartNative logo. Logo landed (#26).
+      Hero (M0) landed on `p4-hero-scene` (#31; spec
+      `docs/design/hero-scene-brief.md`; `lib/hero_screen.dart`,
+      `hero_scene.dart`, `hero_motion.dart`; evidence
+      `docs/artifacts/p4-hero/`). Interim orbit is Dart-driven (one
+      pivot transform per frame) until E2's orbit controller lands.
+      Per-platform `DnLogoStage.heroIos`/`heroAndroid` values are a
+      stopgap for the light-unit / tone-mapper mismatch (S0g).
 - [ ] P5 Demo program M2–M18 (demo-program §4 + §8): showroom, physics
       playground, road trip, campfire, explosions, material gallery, …;
       engine-gated demos follow their units. New flagships: **M16 pirate

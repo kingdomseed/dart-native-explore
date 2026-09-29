@@ -16,6 +16,7 @@ import 'package:dart3d/dart3d.dart';
 import 'package:dartnative/dartnative.dart';
 import 'package:vector_math/vector_math.dart';
 
+import 'back_chevron.dart';
 import 'dice_table_scene.dart';
 
 /// The dice-table screen: a static top-down camera over the tray,
@@ -23,10 +24,10 @@ import 'dice_table_scene.dart';
 /// pinch zoom on the camera boom, and user-driven rolls. No timers —
 /// nothing moves unless the user throws it.
 class DiceTableScreen extends StatefulWidget {
-  const DiceTableScreen({super.key, this.nav, this.quality});
+  const DiceTableScreen({super.key, required this.onBack, this.quality});
 
-  /// The app shell's screen switcher, overlaid at the top edge.
-  final Widget? nav;
+  /// Returns to the hero — the top-left back chevron.
+  final VoidCallback onBack;
 
   /// The `DART3D_QUALITY` boot tier — null runs the widget defaults.
   final SceneQuality? quality;
@@ -498,6 +499,9 @@ class _DiceTableScreenState extends State<DiceTableScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final padding = MediaQuery.of(context).padding;
+    final screen = MediaQuery.of(context).size;
+    final landscape = screen.width >= screen.height;
     return Scaffold(
       brightness: Brightness.dark,
       body: Stack(
@@ -580,13 +584,7 @@ class _DiceTableScreenState extends State<DiceTableScreen> {
               },
             ),
           ),
-          if (widget.nav != null)
-            Positioned(
-              left: 0,
-              right: 0,
-              top: 56,
-              child: widget.nav!,
-            ),
+          backChevron(context, widget.onBack),
           // The reference demo's chrome: a labeled ROLL pill as the
           // primary action at bottom-center, the settle total above
           // it, re-rack and tune as floating circles in the corners.
@@ -606,10 +604,13 @@ class _DiceTableScreenState extends State<DiceTableScreen> {
                 ),
               ),
             ),
-          // ↻ re-racks every die to its spawn slot.
+          // ↻ re-racks every die to its spawn slot — centred on the
+          // back chevron's row (4 pt taller each side), mirrored into
+          // the right safe area.
           Positioned(
-            top: 108,
-            right: 20,
+            top: padding.top + 4,
+            right: 16 +
+                (landscape ? max(padding.right, padding.top) : padding.right),
             child: _roundButton(CupertinoIcons.arrow_clockwise, _reset),
           ),
           Positioned(

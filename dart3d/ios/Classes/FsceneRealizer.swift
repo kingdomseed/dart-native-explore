@@ -2522,25 +2522,41 @@ enum FsceneRealizer {
                     m.ambientOcclusion.intensity = CGFloat(v)
                 }
             case "emissiveTexture":
+                let strength = d3Double(props["emissiveStrength"])
                 if let tex {
                     // The emissive factor default is black — a lone
                     // emissiveTexture emits nothing (glTF semantics).
-                    bindTextureContents(
-                        m.emission, tex: tex,
-                        baked: bakeFactor(
-                            tex,
-                            color: d3ColorComponents(props["emissive"])
-                                ?? [0, 0, 0, 1],
-                            rgbOnly: true),
-                        logKey: "material.\(materialKey).emission.mips")
+                    let fc = d3ColorComponents(props["emissive"])
+                        ?? [0, 0, 0, 1]
+                    if fc[0] == fc[1] && fc[1] == fc[2] {
+                        // A grey factor is a scalar: bind the texture
+                        // unbaked and carry the factor in the
+                        // property's intensity (exact — SceneKit
+                        // multiplies contents by it). Skips a CPU
+                        // factor × texture bake per decode, which made
+                        // a live emissive re-send (the P4 hero's
+                        // breath) cost ~100s of ms per material.
+                        bindTextureContents(
+                            m.emission, tex: tex, baked: nil,
+                            logKey: "material.\(materialKey).emission.mips")
+                        m.emission.intensity = CGFloat(fc[0] * (strength ?? 1))
+                    } else {
+                        bindTextureContents(
+                            m.emission, tex: tex,
+                            baked: bakeFactor(tex, color: fc, rgbOnly: true),
+                            logKey: "material.\(materialKey).emission.mips")
+                        if let strength {
+                            m.emission.intensity = CGFloat(strength)
+                        }
+                    }
                     applyContentsTransform(
                         m.emission, transform, materialKey: materialKey,
                         slot: slot)
                 } else {
                     m.emission.contents = d3Color(props["emissive"])
-                }
-                if let v = d3Double(props["emissiveStrength"]) {
-                    m.emission.intensity = CGFloat(v)
+                    if let strength {
+                        m.emission.intensity = CGFloat(strength)
+                    }
                 }
             // W22-r4 extension slots. clearcoat is REAL — the textures
             // bind SceneKit's `clearCoat` inputs with the same
@@ -3214,6 +3230,12 @@ enum FsceneRealizer {
         func bakeFactor(_ tex: DecodedTexture, color fc: [Double]?,
                         rgbOnly: Bool) -> UIImage? {
             guard let fc else { return nil }
+            // An identity factor bakes to the texture itself — skip
+            // the per-pixel pass (a material re-send used to re-bake
+            // a white-factored 1024² base color every time).
+            if fc[0] == 1, fc[1] == 1, fc[2] == 1, rgbOnly || fc[3] == 1 {
+                return nil
+            }
             guard let src = sourcePixels(tex, wantAlpha: !rgbOnly)
             else {
                 host.logOnce("texture.\(tex.key).bake",

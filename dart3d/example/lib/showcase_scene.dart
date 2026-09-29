@@ -12,6 +12,7 @@ import 'package:dart3d/dart3d.dart';
 import 'package:dartnative/dartnative.dart';
 import 'package:vector_math/vector_math.dart';
 
+import 'back_chevron.dart';
 import 'showcase_loader.dart';
 
 /// The showcase screen: a scene cycler over [showcaseItems], an
@@ -20,13 +21,13 @@ import 'showcase_loader.dart';
 class ShowcaseScreen extends StatefulWidget {
   const ShowcaseScreen({
     super.key,
-    this.nav,
+    required this.onBack,
     this.initialLabel,
     this.quality,
   });
 
-  /// The app shell's screen switcher, overlaid at the top edge.
-  final Widget? nav;
+  /// Returns to the hero — the top-left back chevron.
+  final VoidCallback onBack;
 
   /// Boots a specific item — the `DART3D_MODEL` lane.
   final String? initialLabel;
@@ -362,13 +363,7 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
               },
             ),
           ),
-          if (widget.nav != null)
-            Positioned(
-              left: 0,
-              right: 0,
-              top: 56,
-              child: widget.nav!,
-            ),
+          backChevron(context, widget.onBack),
           // One dock: prev/next circles flanking a translucent card
           // that carries the item name, its stats, and the clip chip.
           // Nothing outside the card reflows when clips appear or the

@@ -17,6 +17,7 @@ import 'dart:typed_data';
 import 'package:dart3d/src/fsceneb_reader.dart';
 import 'package:dart3d/src/scene_model.dart';
 import 'package:dart3d_example/dice_table_scene.dart';
+import 'package:dart3d_example/dn_logo_stage.dart';
 import 'package:dart3d_example/showcase_loader.dart';
 import 'package:test/test.dart';
 import 'package:vector_math/vector_math.dart';
@@ -221,6 +222,38 @@ void main() {
         doc.nodes.values.where((n) => n.name.startsWith('showcase.rim.')),
         hasLength(2),
       );
+      expect(
+        doc.nodes.values.where((n) => n.name == 'showcase.slab'),
+        hasLength(1),
+      );
+      expect(env.effects.vignetteEnabled, isTrue);
+    });
+
+    test('dartnative_logo reel stage: no slab, no vignette, flat sky', () {
+      final item = showcaseItems.first;
+      final scene = loadShowcaseScene(
+        ShowcaseItem(
+          item.label,
+          item.assetKey,
+          'reel',
+          cameraDir: item.cameraDir,
+          stage: DnLogoStage.reel,
+        ),
+        bytesFor: bytesFromDisk,
+      )!;
+      final doc = scene.document;
+      expect(
+        doc.nodes.values.where((n) => n.name == 'showcase.slab'),
+        isEmpty,
+      );
+      final env =
+          doc.resources[doc.stage.environmentRef]! as EnvironmentResource;
+      expect(env.effects.vignetteEnabled, isFalse);
+      expect(env.effects.bloomEnabled, isTrue);
+      expect(env.exposure, DnLogoStage.reel.exposure);
+      final sky = env.skybox!.source as GradientSkySpec;
+      expect(sky.zenithColor, sky.horizonColor);
+      expect(sky.groundColor, sky.horizonColor);
     });
 
     test('two_triangles: minimal skin + 2 animations', () {
