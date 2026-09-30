@@ -1033,6 +1033,39 @@ per set (no renders yet):
 
 ---
 
+## 3b. Game rooms (round 4): the room around each tray
+
+Each themed tray now sits in a full room: the establishing shot
+(`<set>-room.jpg`, 1600x900) is the dice-roller app's intro opening, and
+the room's light also reaches the tray in the top-down play view
+(`<set>-topdown.jpg`), which render_set grades outside the tray (darker,
+desaturated, softly defocused, `env_common.play_view_grade`) so the dice
+stay the brightest, sharpest thing on screen. Visual targets:
+`dart-native-explore-media/room-concepts/<set>-room.png`.
+
+Rules for every room: never a single key. The tray and dice keep their
+own lighting (key, rim, fill from round 2), and the room adds at least
+three motivated sources from different sides (hearth, window, lamps).
+Everything is built from the shared kit in `tool/dice_lookdev/room_common.py`
+(shell with real wall openings, window, fireplace, hanging lantern,
+pendant, sconce, paper lantern, neon bar, work table, shelves, bookcase,
+cabinet, chair, barrel, beams); each `build_env_<set>.py` only composes it
+in a `room(scene)` that returns the room camera. Render one with
+`render_set.py --theme <set> --shots topdown,room --check`.
+
+Lighting recipes (the tray lights are unchanged unless noted):
+
+- **Emberforged — the smithy.** Forge mouth back-left (area light at the
+  mouth, 500 kW, 1.0/0.42/0.12, plus a shadowless inner glow): the warm
+  key on the room and a grazing back-light on the tray. Leaded window
+  back-right (area, 70 kW, 0.5/0.62/1.0): cool moonlight, the counter
+  colour. Three iron cage lanterns (40–50 kW, warm) wash the back wall and
+  the workbench on the right; a fourth hangs above-right of the table (9
+  kW) as a top light outside the phone frame. Stone walls, flagstones,
+  oak beams and table, floor anvil, tool rail, barrels. Camera: seated
+  eye height, 20 mm, f/4 on the tray. Gate: numeral 5.17 (d12), die vs
+  tray 2.38, stroke 0.121–0.130, PASS.
+
 ## 4. dart3d features to verify (before building these for real)
 
 1. **Emissive intensity > 1 + bloom threshold** on both platforms, and
