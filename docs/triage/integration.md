@@ -235,11 +235,11 @@ so that iOS evidence carries over.
    `setImage`/`setBufferAt` direct buffers. Two crashes and possibly the
    page fault come from this class of bug.
 5. **W25 close-out lane:** settle-event absence (Dart).
-6. **Dice readout:** the fix above (Dart).
+6. ~~**Dice readout:** the fix above (Dart).~~ — done in P3 DR1 (matrix read, z mirrored once on load; per-face unit tests; A142 10-roll check in `docs/artifacts/p3-dr1/`). iOS device check pending.
 7. ~~iOS T2 tab-switch soak and ROLL-button roll~~ — done on main `4e12ef3` (§iOS T2 close-out).
 8. **Showcase shows a black view with no loading indicator** while a large
    asset (Dash, ~9 MB) loads — about 3 s on the iOS sim. Add a loading state (example UX).
-9. **Dice can come to rest under the tab bar**: on iOS a die settled against the
+9. ~~**Dice can come to rest under the tab bar**~~ — fixed in P3 DR1 (walls fitted to the screen minus the chrome insets). Original note:: on iOS a die settled against the
    top wall beneath the segmented control (`ios-main/ios-harness-run-roll.png`) —
    the tray doesn't account for the overlay insets (part of the P3 "table follows
    screen aspect" item).

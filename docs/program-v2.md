@@ -184,6 +184,14 @@ scaffolding, not the demo.
       tetrahedron d4 (crystal-shard d4), and **the environment never
       distracts from the dice** (subdued/defocused surroundings; dice are
       the brightest, sharpest element).
+      Includes the 09-17 feedback (pick-up-and-toss, walls = screen
+      edges, quality picker, iPad white screen).
+      **DR1 (foundation)** on `p3-dr1-dice-foundation`: readout fix,
+      crystal-shard d4 (procedural, look-dev geometry), screen-fitted
+      walls + ceiling in the frustum planes (safe areas, rotation),
+      top-down 35° camera at 15% d20, labeled Reset, upstream physics
+      numbers; A142 evidence `docs/artifacts/p3-dr1/`; iOS device check
+      pending.
 - [ ] P4 Hero launch scene + 3D DartNative logo. Logo landed (#26).
       Hero (M0) landed on `p4-hero-scene` (#31; spec
       `docs/design/hero-scene-brief.md`; `lib/hero_screen.dart`,
