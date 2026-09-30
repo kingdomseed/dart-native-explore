@@ -14,6 +14,7 @@ from mathutils import Vector
 
 import env_common as E
 import env_props as P
+import room_common as RC
 
 W, D = E.TRAY_W, E.TRAY_D
 RIM_T, RIM_H = 2.4, 3.4
@@ -134,7 +135,6 @@ def build(scene):
     # Basalt forge slab and the room floor.
     slab_m = basalt_floor()
     E.cube("forge_slab", (W + 46, D + 36, 6), (0, 0, -3.0), slab_m, bevel=0.6)
-    E.plane("room_floor", 600, 600, (0, 0, -30), E.simple("Floor", (0.015, 0.012, 0.01), 0.9))
     # Tray: forged iron plate with an engraved forge sigil, ringed by a molten channel.
     sigil = P.mask_texture("forge_sigil", P.sigil_strokes(seed=5, points=5, runes=20,
                                                           rings=(0.47, 0.455, 0.37, 0.2), w=0.003),
@@ -185,7 +185,6 @@ def build(scene):
     # Props behind the back wall.
     brazier(scene, -13.0, D / 2 + 13, 0.0, r=5.8)
     brazier(scene, 17.0, D / 2 + 8, 0.0, r=3.6, seed=9, coals=12, flames=3)
-    E.cube("forge_wall", (140, 4, 90), (0, D / 2 + 42, 30), brick_wall())
     # anvil beside the tray
     ax, ay = W / 2 + 9, -6
     E.cube("anvil_foot", (5.5, 7, 3.5), (ax, ay, 1.75), im2 := iron("Anvil iron"), bevel=0.4)
@@ -217,6 +216,57 @@ def build(scene):
     E.light(scene, "AREA", "cold_rim", (26, 30, 18), 2200, color=(0.35, 0.5, 1.0), size=18, target=(0, 0, 0))
     E.light(scene, "AREA", "fill", (10, -40, 8), 250, color=(0.6, 0.55, 0.9), size=30, target=(0, 0, 2))
 
+    room(scene)
     return dict(
         samples=160, exposure=0.1, topdown=dict(width=W + 2 * RIM_T + 1.0), hero=dict(dist=32, elev=26, az=-8, lens=70, fstop=2.8),
+        play_view=True, tray_half=(W / 2 + RIM_T, D / 2 + RIM_T),
+        room_cam=dict(loc=(38, -62, 20), target=(-14, 70, 12), lens=22, fstop=8.0, focus=(0, 0, 2)),
     )
+
+
+def room(scene):
+    """The smithy around the forge slab (concept: room-concepts/emberforged-room).
+
+    Lights, four directions: the forge hearth (warm, strong, back-left),
+    moonlight through the leaded window (cool, back-right), a hanging
+    lantern over the workbench (warm, right, above), and the tray's own key
+    and cold rim from the front. Shadows fall across the tray from the
+    hearth and the window at once.
+    """
+    wall = RC.stone("Smithy stone", (0.035, 0.03, 0.027), (0.11, 0.09, 0.075), scale=0.035)
+    floor = RC.stone("Flagstones", (0.03, 0.027, 0.024), (0.08, 0.07, 0.06), scale=0.012, rough=0.8)
+    RC.shell(half_w=210, back=175, front=-170, height=280, wall=wall, floor=floor)
+    im = iron("Room iron")
+    RC.table_legs((W + 46) / 2, (D + 36) / 2, top_z=-6.0, mat=im, r=4.0)
+    # the forge hearth: a big brick arch full of fire
+    RC.fireplace(scene, -105, 170, w=150, h=170, depth=50, mat=brick_wall(), energy=160000)
+    E.cube("hood", (170, 60, 40), (-105, 150, RC.FLOOR_Z + 200), wall, bevel=2.0)
+    # tool rack: tongs and hammers hanging on a rail between hearth and window
+    E.cylinder("rail", 1.2, 150, (20, 168, 30), im, segs=12).rotation_euler = (0, math.radians(90), 0)
+    rng = random.Random(21)
+    for i in range(14):
+        x = -45 + i * 9.5
+        L = rng.uniform(35, 60)
+        E.cylinder("tool_handle", 0.9, L, (x, 166, 30 - L / 2), im, segs=8)
+        if i % 3 == 0:
+            E.cube("hammer_head", (8, 4, 4), (x, 166, 30 - L), im, bevel=0.5)
+        else:
+            E.cube("tong_jaw", (2.5, 2.5, 7), (x, 166, 30 - L - 3), im)
+    # leaded window with the moon and a sleeping town, cool light pouring in
+    night = RC.sky("Smithy night", (0.02, 0.03, 0.09), (0.08, 0.1, 0.2), stars=2.0)
+    RC.window(110, 175, 55, 80, 110, night, wall, mullions=(4, 5), depth=16, moon=(9, 20, 30))
+    E.light(scene, "AREA", "moon_window", (110, 150, 60), 30000, color=(0.55, 0.65, 1.0), size=60,
+            target=(0, 0, 0))
+    # workbench on the right with a fur throw and a strongbox; barrels on the left
+    wood = P.dark_wood("Bench wood", c1=(0.03, 0.015, 0.008), c2=(0.1, 0.05, 0.025))
+    E.cube("workbench", (70, 150, 6), (150, 70, -10), wood, bevel=0.5)
+    RC.table_legs(35, 75, top_z=-13, mat=wood, r=3)
+    fur = E.simple("Fur throw", (0.12, 0.09, 0.07), 0.95, Sheen_Weight=1.0)
+    E.rock("fur", 22, (150, 40, -4), fur, seed=3, squash=(1.4, 1.0, 0.35), strength=0.25)
+    E.cube("strongbox", (26, 20, 18), (150, 110, 2), im, bevel=1.0)
+    for i, (x, y) in enumerate(((-150, 60), (-170, 20), (-140, 100))):
+        E.cylinder("barrel", 20, 70, (x, y, RC.FLOOR_Z + 35), wood, segs=32, bevel=2.0)
+    # a hanging lantern over the workbench (warm, right, above: behind the phone camera)
+    E.cylinder("lantern_cage", 8, 22, (120, 40, 85), im, segs=8)
+    E.sphere("lantern_flame", 3, (120, 40, 85), E.emissive("Lantern flame", (1.0, 0.6, 0.25), 20.0))
+    E.light(scene, "POINT", "lantern", (120, 40, 80), 30000, color=(1.0, 0.62, 0.3), size=8)
