@@ -179,7 +179,7 @@ def render_masks(scene, cam, objs, atlas_img, tmp, halo_img=None):
 # Measurement
 # --------------------------------------------------------------------------
 
-def measure(scene, cam, objs, specs, beauty_png, theme, tmp, crops_dir=None):
+def measure(scene, cam, objs, specs, beauty_png, theme, tmp, crops_dir=None, name=None):
     atlas_img = next(im for im in bpy.data.images if im.name.startswith(f"{theme}_atlas"))
     halo_img = next((im for im in bpy.data.images if im.name.startswith(f"{theme}_halo")), None)
     masks = render_masks(scene, cam, objs, atlas_img, tmp, halo_img)
@@ -284,7 +284,7 @@ def measure(scene, cam, objs, specs, beauty_png, theme, tmp, crops_dir=None):
     out["pass"] = all(v.get("pass") for v in dice.values())
     if crops_dir:
         Path(crops_dir).mkdir(parents=True, exist_ok=True)
-        save_crops(crops, Path(crops_dir) / f"{theme}-crops.png")
+        save_crops(crops, Path(crops_dir) / f"{name or theme}-crops.png")
     return out
 
 
@@ -329,7 +329,7 @@ def print_row(theme, res):
 
 def table(json_path, order=None):
     data = json.loads(Path(json_path).read_text())
-    order = [t for t in (order or ORDER) if t in data]
+    order = [t for base in (order or ORDER) for t in sorted(data) if t == base or t.startswith(base + "-")]
     lines = ["| Set | Numeral treatment | Numeral stroke vs face, worst die (gate 4.5) | "
              "Keyline counted? | Die vs tray, worst (gate 2.0) | Top numeral height | "
              "Numeral / face width (gate 0.40) | Stroke / height (gate 0.10–0.14) | Result |",
@@ -338,7 +338,9 @@ def table(json_path, order=None):
         r = data[t]
         worst = min(r["dice"].items(), key=lambda kv: kv[1].get("contrast", 0))
         sr = r.get("stroke_ratio_range", [0, 0])
-        lines.append(f"| {build_dice.THEMES[t]['title']} | {build_dice.THEMES[t].get('treatment', '')} | "
+        base = t.split("-")[0]
+        title = build_dice.THEMES[base]["title"] + (f" ({t[len(base) + 1:]})" if t != base else "")
+        lines.append(f"| {title} | {build_dice.THEMES[base].get('treatment', '')} | "
                      f"{r['min_contrast']:.1f}:1 ({worst[0]}) | {'yes (glowing)' if r.get('keyline_counted') else 'no'} | "
                      f"{r['min_contrast_silhouette']:.1f}:1 | {r['min_numeral_px']} px | "
                      f"{r['min_numeral_ratio']:.2f} | {sr[0]:.2f}–{sr[1]:.2f} | "

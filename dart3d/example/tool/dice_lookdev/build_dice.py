@@ -38,7 +38,7 @@ from pathlib import Path
 import bmesh
 import bpy
 import numpy as np
-from mathutils import Matrix, Quaternion, Vector
+from mathutils import Euler, Matrix, Quaternion, Vector
 
 HERE = Path(__file__).resolve().parent
 PHI = (1.0 + 5.0 ** 0.5) / 2.0
@@ -880,9 +880,9 @@ THEMES = {
     "dartnative": dict(
         env="Launch Tray",
         title="DartNative",
-        concept="The example app's own set: #090E12 dice with brand-gradient glowing edges and a cyan inlay.",
+        concept="Frosted glass with the 3D DartNative logo suspended inside, glowing its own gradient.",
         font="sans", weight=0.0, decor="dartnative",
-        treatment="glowing: white numerals in a thin keyline, brand-gradient edges"),
+        treatment="enamel: near-black numerals on frosted glass, denser-frost band (not counted)"),
     "gemcutter": dict(
         env="The Jeweler's Bench",
         title="Gemcutter",
@@ -1264,34 +1264,116 @@ def _srgb(hexcode):
 DN_GRADIENT = [_srgb(c) for c in ("#FA60A6", "#EF388B", "#E99173", "#D7BA52", "#B5C75E")]
 
 
+VARIANT = "reference"  # "realtime": the engine-feasible approximation (set by render_set --variant)
+LOGO_GLB = HERE.parents[1] / "assets_src" / "dn_logo" / "dn_logo.glb"
+
+
 def material_dartnative(img):
-    """The app's own set: #090E12 body, brand-gradient glowing edges (like
-    the 3D logo), a cyan inlay line, white numerals (lime is the tray's one accent)."""
-    m = bpy.data.materials.new("DartNative")
+    """Frosted glass with the 3D DartNative logo suspended inside.
+
+    reference: rough transmission (frost), a touch of milky volume, clear
+    coat. realtime: what SceneKit can draw -- a milky alpha-blended shell
+    with a fresnel rim, no refraction (Filament can do the reference's
+    rough transmission). Numerals: near-black enamel on the outside,
+    opaque, with a thin band of denser frost around them.
+    """
+    m = bpy.data.materials.new(f"DartNative frost ({VARIANT})")
     k = NodeKit(m)
     num, dec, h = k.atlas(img)
-    edge = k.edge
-    obj = k.coords().outputs["Object"]
     nrm = _engrave(k, h, strength=0.5, dist=0.02)
-    body = k.bsdf(Base_Color=(*_srgb("#090E12"), 1), Roughness=0.28, Coat_Weight=1.0, Coat_Roughness=0.04,
-                  Normal=nrm)
-    # the gradient runs around the die (object-space angle, drifting with height)
-    ang = k.node("ShaderNodeTexGradient", gradient_type="RADIAL")
-    k.link(obj, ang.inputs["Vector"])
-    sep = k.node("ShaderNodeSeparateXYZ")
-    k.link(obj, sep.inputs[0])
-    fac = k.math("FRACT", k.math("ADD", ang.outputs["Fac"], k.math("MULTIPLY", sep.outputs["Z"], 0.12)))
-    stops = [(i / len(DN_GRADIENT), c) for i, c in enumerate(DN_GRADIENT)] + [(1.0, DN_GRADIENT[0])]
-    grad = k.emission(k.ramp(fac, stops), 2.4)
-    s = k.mix_shader(k.math("MULTIPLY", edge, 0.85), body, grad)
-    # decor atlas G: a thin cyan inlay line just inside each face edge
-    cyan = k.emission((*_srgb("#03C3F0"), 1), 3.0)
-    s = k.mix_shader(dec, s, cyan)
-    s = k.keyline(s, (0.002, 0.003, 0.004), rough=0.5, normal=nrm)
-    white = k.add_shader(k.bsdf(Base_Color=(0.9, 0.95, 1.0, 1), Roughness=0.3, Normal=nrm),
-                         k.emission((0.88, 0.96, 1.0, 1), 4.0))
-    k.surface(k.mix_shader(num, s, white))
+    obj = k.coords().outputs["Object"]
+    micro = k.bump(k.noise(obj, 40.0, 3).outputs["Fac"], 0.08, 0.01, normal=nrm)
+    lw = k.node("ShaderNodeLayerWeight")
+    lw.inputs["Blend"].default_value = 0.3
+    if VARIANT == "realtime":
+        shell = k.bsdf(Base_Color=(0.8, 0.86, 0.92, 1), Roughness=0.35, Alpha=0.62, Coat_Weight=0.5,
+                       Coat_Roughness=0.1, Normal=nrm)
+        rim = k.emission((0.85, 0.92, 1.0, 1), k.math("MULTIPLY", lw.outputs["Fresnel"], 0.35))
+        shell = k.add_shader(shell, rim)
+    else:
+        # partly diffuse: frosted glass reads milky-white under the room light
+        # (a dark numeral needs that), the transmitted part carries the logo's glow
+        shell = k.bsdf(Base_Color=(0.96, 0.98, 1.0, 1), Transmission_Weight=0.4, Roughness=0.1, IOR=1.45,
+                       Coat_Weight=0.5, Coat_Roughness=0.08, Normal=micro)
+        vol = k.node("ShaderNodeVolumePrincipled")
+        k.set(vol, Density=0.15, Color=(0.95, 0.97, 1.0, 1), Anisotropy=0.0)
+        k.volume(vol.outputs[0])
+    # a thin cyan inlay line just inside each face (decor), lit softly
+    s_ = k.mix_shader(dec, shell, k.emission((*_srgb("#03C3F0"), 1), 1.6))
+    # denser, opaque frost right around the numerals (the keyline band)
+    band = k.bsdf(Base_Color=(0.9, 0.93, 0.96, 1), Roughness=0.6, Subsurface_Weight=0.3, Normal=nrm)
+    s_ = k.mix_shader(k.key, s_, band)
+    enamel = k.bsdf(Base_Color=(0.012, 0.014, 0.018, 1), Roughness=0.3, Coat_Weight=0.6, Coat_Roughness=0.08,
+                    Normal=nrm)
+    k.surface(k.mix_shader(num, s_, enamel))
     return m
+
+
+def material_dn_logo(image, strength):
+    """The logo's own gradient texture as base colour AND emission (it glows
+    its own gradient), same in both variants."""
+    m = bpy.data.materials.new("DN logo core")
+    k = NodeKit(m)
+    tex = k.node("ShaderNodeTexImage", image=image, interpolation="Cubic")
+    b = k.bsdf(Base_Color=tex.outputs["Color"], Roughness=0.2, Emission_Color=tex.outputs["Color"],
+               Emission_Strength=strength)
+    k.surface(b)
+    return m
+
+
+LOGO_STRENGTH = 6.0
+LOGO_FILL = 0.78  # logo half-diagonal / die inradius: visible, never crowding the faces
+
+
+def logo_cores(objs, specs, coll):
+    """One DartNative logo inside each die (imported from the landed asset)."""
+    before = set(bpy.data.objects)
+    bpy.ops.import_scene.gltf(filepath=str(LOGO_GLB))
+    src = next(o for o in bpy.data.objects if o not in before and o.type == "MESH")
+    src.animation_data_clear()
+    img = next(n.image for n in src.data.materials[0].node_tree.nodes if n.bl_idname == "ShaderNodeTexImage")
+    me = src.data.copy()
+    me.transform(src.matrix_world)  # bake the importer's Y-up rotation into the mesh
+    # centre the mesh on its bounding box; logo front is -Y, up is +Z
+    xs = [v.co for v in me.vertices]
+    c = Vector([(min(v[a] for v in xs) + max(v[a] for v in xs)) / 2 for a in range(3)])
+    half_diag = max((Vector((v.x, 0, v.z)) - Vector((c.x, 0, c.z))).length for v in xs)
+    for v in me.vertices:
+        v.co -= c
+    me.materials.clear()
+    me.materials.append(material_dn_logo(img, LOGO_STRENGTH))
+    for o in [o for o in bpy.data.objects if o not in before]:
+        bpy.data.objects.remove(o)
+    logos = {}
+    for kind, ob in objs.items():
+        lo = bpy.data.objects.new(f"{ob.name}_logo", me)
+        coll.objects.link(lo)
+        lo.scale = [LOGO_FILL * specs[kind]["inradius"] / half_diag] * 3
+        lo.visible_shadow = False  # it glows; and settle()/contacts ignore it
+        lo["dn_logo_of"] = ob.name
+        logos[kind] = lo
+    return logos
+
+
+def align_logos(objs, logos, cam_loc, yaw=None):
+    """Hold each logo level and facing the viewer (a gimbal, not a fixed
+    inclusion): it reads the same whatever face is up. In the engine this is
+    a billboard/look-at constraint on the logo node (SCNBillboardConstraint
+    on iOS, a per-frame rotation on Android)."""
+    import random as _r
+    rng = _r.Random(3)
+    for kind, lo in logos.items():
+        p = objs[kind].matrix_world.translation.copy()
+        lo.location = p
+        f = (Vector(cam_loc) - p).normalized()  # the logo's front (-Y) looks at the viewer
+        u = Vector((0, 1, 0)) if abs(f.z) > 0.95 else Vector((0, 0, 1))
+        z_ax = (u - f * u.dot(f)).normalized()
+        y_ax = -f
+        x_ax = y_ax.cross(z_ax)
+        q = Matrix((x_ax, y_ax, z_ax)).transposed().to_quaternion()
+        tilt = math.radians(rng.uniform(-12, 12) if yaw is None else yaw)
+        lo.rotation_mode = "QUATERNION"
+        lo.rotation_quaternion = Quaternion(f, tilt) @ q
 
 
 SHELL_MATERIALS = {
@@ -1308,6 +1390,7 @@ SHELL_MATERIALS = {
     "vermilion": material_vermilion,
     "dartnative": material_dartnative,
 }
+LOGO_THEMES = {"dartnative"}
 CORE_MATERIALS = {"emberforged": material_ember_core, "frostbound": material_frost_core}
 
 
@@ -1346,6 +1429,10 @@ def make_set(theme, atlas_dir, collection=None, specs=None):
             core.parent = ob
             stats[kind + "_core"] = len(cm.polygons)
         objs[kind] = ob
+    if theme in LOGO_THEMES:
+        objs_logos = logo_cores(objs, specs, coll)
+        for kind, lo in objs_logos.items():
+            objs[kind]["logo"] = lo.name
     stats["numeral_ratio_min"] = {kind: round(specs[kind]["numeral_ratio_min"], 3) for kind in KINDS}
     stats["stroke_ratio"] = {kind: round(specs[kind]["stroke_ratio"], 3) for kind in KINDS}
     return objs, specs, stats, atlas

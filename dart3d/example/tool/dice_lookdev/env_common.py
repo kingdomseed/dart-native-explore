@@ -597,8 +597,29 @@ def save_jpeg(src_png, dst, quality=JPEG_QUALITY):
     return Path(dst).stat().st_size
 
 
-def render_to(scene, cam, path_tmp, path_out, quality=JPEG_QUALITY):
-    """Render `cam` to a lossless PNG at path_tmp, then a JPEG at path_out."""
+def bloom_png(path, threshold=0.8, strength=0.35, radius_frac=0.012):
+    """A plain screen-space bloom on the display-referred PNG (what a phone's
+    post pass does): bright pixels, blurred wide, added back."""
+    import numpy as np
+    from build_dice import _blur
+    img = bpy.data.images.load(str(path))
+    w, h = img.size
+    a = np.array(img.pixels[:], dtype=np.float32).reshape(h, w, 4)
+    rgb = a[..., :3]
+    bright = np.clip(rgb - threshold, 0, None) / (1 - threshold)
+    r = max(2, int(radius_frac * max(w, h)))
+    glow = np.stack([_blur(_blur(bright[..., c], r), r * 2) for c in range(3)], axis=-1)
+    a[..., :3] = np.clip(rgb + glow * strength, 0, 1)
+    img.pixels.foreach_set(a.ravel())
+    img.filepath_raw = str(path)
+    img.file_format = "PNG"
+    img.save()
+    bpy.data.images.remove(img)
+
+
+def render_to(scene, cam, path_tmp, path_out, quality=JPEG_QUALITY, bloom=False):
+    """Render `cam` to a lossless PNG at path_tmp (+ bloom for the real-time
+    variant), then a JPEG at path_out."""
     import time
     scene.camera = cam
     scene.render.filepath = str(path_tmp)
@@ -606,6 +627,8 @@ def render_to(scene, cam, path_tmp, path_out, quality=JPEG_QUALITY):
     t0 = time.time()
     bpy.ops.render.render(write_still=True)
     t1 = time.time()
+    if bloom:
+        bloom_png(path_tmp)
     size = save_jpeg(path_tmp, path_out, quality)
     print(f"dice_lookdev: {path_out} {size // 1024} KB render {t1 - t0:.0f}s", flush=True)
     return size

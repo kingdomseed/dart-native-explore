@@ -102,12 +102,43 @@ def grid(d, themes, suffix, cw, ch, cols, out_name, src=None):
         x, y = c * cw, r * (ch + LAB)
         sheet[y:y + ch, x:x + cw - 1] = resize(load((src or d) / f"{t}-{suffix}"), cw - 1, ch)
         pos.append((x + 10, y + ch))
-        th = build_dice.THEMES[t]
+        th = build_dice.THEMES[t.split("-")[0]]
         texts.append((th["title"], "" if cw < 450 else th.get("env", "")))
     lab = labels(texts, W, H, pos)
     sheet = sheet * (1 - lab[:, :, None]) + lab[:, :, None] * np.array([0.95, 0.9, 0.8])
     size = save_jpeg(sheet, d / out_name)
     print(f"dice_lookdev: {out_name} {size // 1024} KB ({len(themes)} themes)")
+
+
+def dartnative_sheets(d):
+    """DartNative: the three environment options, and Blender reference vs
+    the real-time approximation for every shot of the recommended option."""
+    def sheet_of(paths, titles, subs, height, out_name):
+        ims = [load(p) for p in paths]
+        ims = [resize(im, max(1, int(im.shape[1] * height / im.shape[0])), height) for im in ims]
+        W = sum(im.shape[1] for im in ims) + 8 * (len(ims) - 1)
+        H = height + LAB
+        sheet = np.full((H, W, 3), 0.035, dtype=np.float32)
+        x, pos = 0, []
+        for im in ims:
+            sheet[:height, x:x + im.shape[1]] = im
+            pos.append((x + 10, height))
+            x += im.shape[1] + 8
+        lab = labels(list(zip(titles, subs)), W, H, pos)
+        sheet = sheet * (1 - lab[:, :, None]) + lab[:, :, None] * np.array([0.95, 0.9, 0.8])
+        size = save_jpeg(sheet, d / out_name)
+        print(f"dice_lookdev: {out_name} {size // 1024} KB")
+
+    opts = [o for o in "abc" if (d / f"dartnative-{o}-topdown.jpg").exists()]
+    names = {"a": "a  Obsidian", "b": "b  Lightbox", "c": "c  Stage"}
+    if opts:
+        sheet_of([d / f"dartnative-{o}-topdown.jpg" for o in opts], [names[o] for o in opts], [""] * len(opts), 1100,
+                 "dartnative-env-options.jpg")
+    for shot in ("topdown", "hero", "d20", "d4"):
+        ref, rt = d / f"dartnative-a-{shot}.jpg", d / f"dartnative-a-rt-{shot}.jpg"
+        if ref.exists() and rt.exists():
+            sheet_of([ref, rt], ["Blender reference", "Real-time approximation"], ["", ""],
+                     1100 if shot == "topdown" else 560, f"dartnative-compare-{shot}.jpg")
 
 
 def main():
@@ -124,6 +155,7 @@ def main():
     heroes = [t for t in themes if (d / f"{t}-hero.jpg").exists()]
     if heroes:
         grid(d, heroes, "hero.jpg", 533, 300, 3, "all-sets-hero.jpg")
+    dartnative_sheets(d)
     cd = Path(a.crops)
     crops = [t for t in themes if (cd / f"{t}-crops.png").exists()]
     if crops:

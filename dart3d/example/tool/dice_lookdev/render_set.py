@@ -52,6 +52,9 @@ def args():
     ap.add_argument("--out", default=str(REPO / "docs" / "design" / "dice-lookdev"))
     ap.add_argument("--tmp", default=tempfile.mkdtemp(prefix="dice_lookdev_"))
     ap.add_argument("--save-blend")
+    ap.add_argument("--env-option", default="", help="environment variant, e.g. a|b|c (DartNative)")
+    ap.add_argument("--variant", default="reference", choices=("reference", "realtime"),
+                    help="realtime = the engine-feasible material approximation (+ bloom)")
     return ap.parse_args(argv)
 
 
@@ -75,22 +78,32 @@ def run(a):
     scene = E.reset()
     E.TMP = str(tmp)
     env = importlib.import_module(f"build_env_{a.theme}")
+    if a.env_option:
+        env.OPTION = a.env_option
     info = env.build(scene)
+    build_dice.VARIANT = a.variant
+    tag = (f"-{a.env_option}" if a.env_option else "") + ("-rt" if a.variant == "realtime" else "")
+    name = a.theme + tag
     E.setup_cycles(scene, samples=a.samples or info.get("samples", 256), look=info.get("look"),
                    exposure=info.get("exposure", 0.0), view=info.get("view", "Khronos PBR Neutral"))
     scene.render.resolution_percentage = a.pct
     objs, specs, stats, atlas = build_dice.make_set(a.theme, tmp / "atlas")
     print("dice_lookdev: triangles", json.dumps(stats))
+    logos = {k: bpy.data.objects[ob["logo"]] for k, ob in objs.items() if "logo" in ob}
     z = info.get("surface_z", 0.0)
     shots = a.shots.split(",")
     sizes = {}
     report = {}
 
-    def shot(name, cam, res):
+    def shot(shot_name, cam, res):
         scene.render.resolution_x, scene.render.resolution_y = res
         scene.render.use_motion_blur = False
-        sizes[name] = E.render_to(scene, cam, tmp / f"{a.theme}_{name}.png", out / f"{a.theme}-{name}.jpg")
-        return tmp / f"{a.theme}_{name}.png"
+        if logos:
+            build_dice.align_logos(objs, logos, cam.matrix_world.translation)
+        png = tmp / f"{name}_{shot_name}.png"
+        sizes[shot_name] = E.render_to(scene, cam, png, out / f"{name}-{shot_name}.jpg",
+                                       bloom=a.variant == "realtime")
+        return png
 
     if "topdown" in shots:
         E.place_layout(objs, specs, info.get("topdown_layout", E.TOPDOWN_LAYOUT))
@@ -99,11 +112,12 @@ def run(a):
         png = shot("topdown", cam, PHONE)
         if a.check:
             import readability_check as R
-            res = R.measure(scene, cam, objs, specs, png, a.theme, tmp, crops_dir=HERE / "out" / "crops")
+            res = R.measure(scene, cam, objs, specs, png, a.theme, tmp, crops_dir=HERE / "out" / "crops",
+                            name=name)
             res["contacts"] = report["contacts_topdown"]
             res["numeral_ratio_min"] = stats["numeral_ratio_min"]
-            R.merge(out / "readability.json", a.theme, res)
-            R.print_row(a.theme, res)
+            R.merge(out / "readability.json", name, res)
+            R.print_row(name, res)
     centre = Vector(info.get("centre", (0.0, 2.0, z + 1.0)))
     if "hero" in shots or "d4" in shots or "d20" in shots:
         h = info.get("hero", {})

@@ -7,8 +7,8 @@ is app code. Source of truth for the renders:
 `docs/design/dice-lookdev/`. Context: `docs/design/demo-program.md` §3
 (upstream's roller) and §5 (our Dice Roller plan).
 
-Twelve sets. **DartNative** (§3.12) is the dart3d example app's own dice
-set; the eleven themed sets move to a separate dice-roller app. Each is a
+Twelve sets. **DartNative** (§3.12: the 3D logo suspended in frosted
+glass) is the dart3d example app's own dice set; the eleven themed sets move to a separate dice-roller app. Each is a
 **dice set plus the environment it is rolled in**:
 an engraved rolling surface as a hero object, framing props, a lighting
 mood and atmosphere. The two signature sets are Emberforged (fire) and
@@ -21,7 +21,7 @@ render, and every set has to pass a measured readability gate on that view
 
 | # | Set | Environment | Top-down (primary) | Hero | d4 close-up |
 |---|---|---|---|---|---|
-| 0 | **DartNative** (example app) | Launch Tray | [topdown](dice-lookdev/dartnative-topdown.jpg) | [hero](dice-lookdev/dartnative-hero.jpg) | [d20](dice-lookdev/dartnative-d20.jpg), [d4](dice-lookdev/dartnative-d4.jpg) |
+| 0 | **DartNative** (example app) | Obsidian tray (recommended of 3) | [topdown](dice-lookdev/dartnative-a-topdown.jpg) · [real-time](dice-lookdev/dartnative-a-rt-topdown.jpg) | [hero](dice-lookdev/dartnative-a-hero.jpg) | [d20](dice-lookdev/dartnative-a-d20.jpg), [d4](dice-lookdev/dartnative-a-d4.jpg) |
 | 1 | **Emberforged** | The Forge Hearth | [topdown](dice-lookdev/emberforged-topdown.jpg) | [hero](dice-lookdev/emberforged-hero.jpg) | [d4](dice-lookdev/emberforged-d4.jpg) |
 | 2 | **Frostbound** | The Frozen Altar | [topdown](dice-lookdev/frostbound-topdown.jpg) | [hero](dice-lookdev/frostbound-hero.jpg) | [d4](dice-lookdev/frostbound-d4.jpg) |
 | 3 | **Arcane Study** | The Night Study | [topdown](dice-lookdev/arcane-topdown.jpg) | [hero](dice-lookdev/arcane-hero.jpg) | [d4](dice-lookdev/arcane-d4.jpg) |
@@ -39,8 +39,9 @@ Sheets: `all-sets-topdown.jpg` (every set as the phone shows it),
 every set at phone pixels, 1:1). Per set: `<theme>-topdown.jpg`
 (1179×2556, iPhone portrait, straight down with the app's fov),
 `<theme>-hero.jpg` (1600×900, 3/4 view), `<theme>-d4.jpg` (1000×625), and
-`<theme>-d20.jpg` (1000×625) for DartNative, Emberforged, Old Road, Vermilion
-and Gemcutter. §3a has the in-app play-view rules (keep the surroundings
+`<theme>-d20.jpg` (1000×625) for Emberforged, Old Road, Vermilion and
+Gemcutter. DartNative has three environment options and a Blender-reference
+vs real-time pair for every shot (§3.12). §3a has the in-app play-view rules (keep the surroundings
 from competing with the dice) and an intro shot per set for the dice-roller
 app.
 All renders are full-colour JPEG q90 (round 1's 128-colour palette PNGs
@@ -159,7 +160,10 @@ Blender --background --python dart3d/example/tool/dice_lookdev/readability_check
 
 | Set | Numeral treatment | Numeral stroke vs face, worst die (gate 4.5) | Keyline counted? | Die vs tray, worst (gate 2.0) | Top numeral height | Numeral / face width (gate 0.40) | Stroke / height (gate 0.10–0.14) | Result |
 |---|---|---|---|---|---|---|---|---|
-| DartNative | glowing: white numerals in a thin keyline, brand-gradient edges | 18.8:1 (d10t) | yes (glowing) | 6.5:1 | 28 px | 0.41 | 0.12–0.13 | PASS |
+| DartNative (a) | enamel: near-black numerals on frosted glass, denser-frost band (not counted) | 6.9:1 (d4) | no | 7.3:1 | 28 px | 0.41 | 0.12–0.13 | PASS |
+| DartNative (a-rt) | enamel: near-black numerals on frosted glass, denser-frost band (not counted) | 7.8:1 (d10u) | no | 11.2:1 | 28 px | 0.41 | 0.12–0.13 | PASS |
+| DartNative (b) | enamel: near-black numerals on frosted glass, denser-frost band (not counted) | 5.9:1 (d4) | no | 2.9:1 | 28 px | 0.41 | 0.12–0.13 | PASS |
+| DartNative (c) | enamel: near-black numerals on frosted glass, denser-frost band (not counted) | 8.2:1 (d4) | no | 8.3:1 | 28 px | 0.41 | 0.12–0.13 | PASS |
 | Emberforged | glowing: white-hot emissive numerals in a soot keyline | 5.1:1 (d12) | yes (glowing) | 2.4:1 | 26 px | 0.41 | 0.12–0.13 | PASS |
 | Frostbound | glowing: emissive rime numerals on a deep-blue keyline | 5.8:1 (d4) | yes (glowing) | 2.1:1 | 25 px | 0.41 | 0.12–0.13 | PASS |
 | Arcane Study | glowing: warm spell-lit gilt numerals, thin midnight keyline | 6.2:1 (d4) | yes (glowing) | 2.2:1 | 27 px | 0.43 | 0.12–0.13 | PASS |
@@ -910,43 +914,84 @@ the operator may want a step darker — the gate allows down to ~0.3 grey). Stri
 
 ---
 
-### 3.12 DartNative: "the app's own set" (12th set, example-app default)
+### 3.12 DartNative: "the logo in frosted glass" (example-app default)
 
-![top-down, in-app](dice-lookdev/dartnative-topdown.jpg)
+![environment options, top-down](dice-lookdev/dartnative-env-options.jpg)
 
-![hero](dice-lookdev/dartnative-hero.jpg)
+![top-down: Blender reference vs real-time approximation](dice-lookdev/dartnative-compare-topdown.jpg)
 
-![d20](dice-lookdev/dartnative-d20.jpg)
+![d20: Blender reference vs real-time approximation](dice-lookdev/dartnative-compare-d20.jpg)
 
-The dart3d example app's main dice experience; the eleven themed sets move
-to the separate dice-roller app.
+The dart3d example app's main dice experience (the eleven themed sets move
+to the separate dice-roller app). Operator brief: the 3D DartNative logo
+inside a frosted-glass set, so it appears suspended in the dice, and a nice
+environment for it.
 
 **Dice**:
 
-- Body #090E12 with a clear coat (reads as black glass under the soft
-  overhead).
-- Every edge glows the **brand gradient** (#FA60A6 → #EF388B → #E99173 →
-  #D7BA52 → #B5C75E), running around the die like the 3D logo glows its
-  own gradient (atlas A = the edge mask, emissive 2.4; higher values wash
-  the hues toward pastel under PBR Neutral).
-- A thin **cyan** (#03C3F0) inlay line just inside each face (atlas G).
-- Numerals: Inter at its regular weight, near-white with a soft emissive,
-  inside a thin #090E12 keyline. Treatment: *glowing*.
+- **Shell:** frosted glass, milky white. Reference: 40% rough transmission
+  (roughness 0.1) + 60% diffuse white, a thin milky volume, clear coat.
+  Real frosted glass reads milky-white under room light; the diffuse part
+  is what gives the dark numerals a light ground, the transmitted part
+  carries the logo's glow.
+- **Logo:** the landed asset (`assets_src/dn_logo/dn_logo.glb`, the
+  rounded-tube "n" with its gradient texture), imported as-is; its texture
+  drives base colour *and* emission, so it glows its own brand gradient,
+  softened by the frost. One per die at the centre, scaled to 0.78 × the
+  die's inradius (half-diagonal), so it fills the core without touching the
+  faces; the d4 shard gets the smallest one (its inradius is 0.65 cm).
+- **Logo orientation — held level, facing the viewer.** A fixed inclusion
+  would sit at whatever angle the roll leaves it, and a tube logo seen
+  edge-on is a line. Held like a gimbal it always reads, the same on every
+  result, and it is a small magic trick (it stays level while the die
+  tumbles). Engine: a billboard/look-at constraint on the logo node
+  (`SCNBillboardConstraint` on iOS; a per-frame rotation on Android). Each
+  logo keeps a small random roll (±12°) so a set doesn't look stamped.
+- **Numerals:** near-black enamel on the *outside*, opaque, Inter at its
+  regular weight, with a thin band of denser (opaque) frost around each
+  numeral. The gate does **not** count that band: the numerals pass on the
+  plain frost around it, with the logo glowing behind. A thin cyan
+  (#03C3F0) inlay line runs just inside each face.
 
-**Environment: Launch Tray.** Deliberately empty: a dark slate floor a
-step lighter than the dice, a rounded anodized rim with one thin line of
-gradient light along its top, a near-black table, and the set's one
-**lime** (#A1EA5A) accent, a small "ready" light in the rim. No props, no
-haze: the dice are the only bright, saturated things on screen.
+**Environment options** (all #090E12-based; the brand gradient and cyan as
+*light*, lime #A1EA5A once as a small "ready" light in the rim):
 
-**Real time:** the cheapest set to ship. Edges and inlay are an emissive
-texture (edge mask × a 1D gradient lookup by object-space angle, or baked
-per die); numerals are an emissive mask with a baked keyline; the rim line
-is an emissive tube with the same gradient. One key, one fill, a dim IBL.
-**Juice**: the gradient can *flow* around the edges while a die tumbles
-(scroll the gradient lookup, E5c/E6) and flash white on land; the rim line
-pulses once on the total. Bloom only on the edges and rim, not the
-numerals (§5.1).
+| Option | What it is | Verdict |
+|---|---|---|
+| **a · Obsidian** (recommended) | glossy obsidian tray, one thin brand-gradient light line along the rim | Calmest and most premium; the dice are the only bright objects; the rim line echoes the logo's gradient; cheapest in real time (one emissive tube, one key, a dim IBL). |
+| b · Lightbox | frosted floor with the brand gradient glowing softly up through it | Striking, but the floor competes with the dice (it is the second-brightest thing on screen) and makes the white dice sit on colour. |
+| c · Stage | dark matte stage, soft pink and gold pools from two spots, cyan rim | Moody and good for a hero or intro shot; at top-down the coloured pools tint the dice and pull the eye off-centre. |
+
+**Real-time honesty.** Filament (Android) has rough transmission, so the
+reference look is reachable there (thickness-based, no volume). SceneKit
+(iOS) has no refraction: the approximation is a milky alpha-blended shell
+(alpha 0.62, roughness 0.35) with a fresnel rim brightening, the logo as an
+emissive core drawn *through* the alpha (sharper than the frost blur), and
+a screen-space bloom (threshold 0.8). The `-rt` renders are exactly that
+(`render_set.py --variant realtime`), measured by the same gate:
+`dartnative-compare-{topdown,hero,d20,d4}.jpg` put them side by side. What
+the phone loses: the frost's blur of the logo (it reads sharper and more
+"inside a lens"), light scattered through the body, and the milky
+self-shadowing; what it keeps: the milky shell, the glowing gradient logo,
+crisp numerals.
+
+**Readability** (full renders, 96 samples; the logo glows behind every
+top-face numeral; frost band not counted):
+
+| Render | Numeral vs plain frost, worst die (gate 4.5) | Die vs tray (gate 2.0) | Stroke / height | Result |
+|---|---|---|---|---|
+| a · Obsidian, Blender reference | 6.9:1 (d4) | 7.3:1 | 0.12–0.13 | PASS |
+| a · Obsidian, real-time approximation (+ bloom) | 7.8:1 (d10u) | 11.2:1 | 0.12–0.13 | PASS |
+| b · Lightbox | 5.9:1 (d4) | 2.9:1 | 0.12–0.13 | PASS |
+| c · Stage | 8.2:1 (d4) | 8.3:1 | 0.12–0.13 | PASS |
+
+Renders: `dartnative-a-{topdown,hero,d20,d4}.jpg` (reference),
+`dartnative-a-rt-{topdown,hero,d20,d4}.jpg` (real-time approximation),
+`dartnative-{b,c}-{topdown,hero}.jpg`, and the sheets
+`dartnative-env-options.jpg` and `dartnative-compare-{topdown,hero,d20,d4}.jpg`.
+
+**Juice**: the logo's emission pulses once on land and swells on a nat 20;
+the rim line runs the gradient around the tray on the total.
 
 ---
 
