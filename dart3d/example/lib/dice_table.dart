@@ -88,9 +88,6 @@ class _DiceTableScreenState extends State<DiceTableScreen>
   StreamSubscription<ScenePhysicsEvent>? _events;
   Timer? _settleTimer;
 
-  /// Moves the bead of light round the rim.
-  Timer? _rimTimer;
-
   /// Bumped by every roll and reset, so a pose read or settle event that
   /// belongs to an earlier throw (or to the rack drop) is never shown as
   /// this roll's result.
@@ -215,22 +212,12 @@ class _DiceTableScreenState extends State<DiceTableScreen>
     );
     _events = _controller.physicsEvents.listen(_onPhysicsEvent);
     setState(() => _status = _hint);
-    // The bead of light round the rim: one transform write per frame
-    // (a 10 Hz material upsert here stalled the renderer).
-    _rimTimer = Timer.periodic(const Duration(milliseconds: 33), (_) {
-      final s = _scene;
-      if (s == null) return;
-      _controller.setNodeTransforms([
-        NodeTransform(s.rimBead, translation: rimBeadAt(_layout, _now)),
-      ]);
-    });
   }
 
   @override
   void dispose() {
     _ticker.dispose();
     _settleTimer?.cancel();
-    _rimTimer?.cancel();
     _events?.cancel();
     super.dispose();
   }

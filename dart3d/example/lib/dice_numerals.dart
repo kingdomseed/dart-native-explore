@@ -223,37 +223,19 @@ void _paintFace(
   final texel = span / cellPx; // world units per texel
   final rin = face.inradius;
   final glyphs = layoutLabel(face.label(geo.kind)!);
-  // The face outline, face-local.
-  final poly = [for (final p in face.points) face.local(p)];
-  final edges = _edgeTable(poly);
-  // Glyph outline in face-local world units, at the look-dev's em — or
-  // smaller where a wide label ("90" on a d10 kite) would cross the
-  // face's edge: its ink and keyline must clear the outline and bevel.
-  final clearance = look.keylineWidth * rin + geo.bevel;
-  List<Float64List> place(double em) => [
+  // Glyph outline in face-local world units.
+  final contours = [
     for (final s in glyphs)
       Float64List.fromList([
         for (var i = 0; i < s.length; i += 2) ...[
-          face.anchor.x + s[i] * em,
-          face.anchor.y + s[i + 1] * em,
+          face.anchor.x + s[i] * face.em,
+          face.anchor.y + s[i + 1] * face.em,
         ],
       ]),
   ];
-  var em = face.em;
-  var contours = place(em);
-  bool fits(List<Float64List> c) {
-    for (final s in c) {
-      for (var i = 0; i < s.length; i += 2) {
-        if (_insideDistance(edges, s[i], s[i + 1]) < clearance) return false;
-      }
-    }
-    return true;
-  }
-
-  while (!fits(contours) && em > face.em * 0.6) {
-    em *= 0.96;
-    contours = place(em);
-  }
+  // The face outline (for the inlay), face-local.
+  final poly = [for (final p in face.points) face.local(p)];
+  final edges = _edgeTable(poly);
   // The outline's centroid-based inradius sets the inlay.
   var polyRin = double.infinity;
   for (var i = 0; i < poly.length; i++) {

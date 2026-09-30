@@ -52,19 +52,14 @@ void main() {
         final body = node.components.firstWhere((c) => c.type == 'rigidBody');
         expect((body.properties['ccdEnabled'] as BoolValue).value, isTrue);
       }
-      // 7 dice × (vertices, indices, atlas) + the stone + the rim's
-      // gradient and 8 pieces × 2 + the bead (texture, 2 buffers) + the
-      // logo's payloads, once.
+      // 7 dice × (vertices, indices, atlas) + the rim's gradient and 8
+      // pieces × 2 + the logo's payloads, once.
       final logo = readFsceneb(bytesFromDisk(kLogoAsset)!);
-      expect(
-        doc.payloads,
-        hasLength(7 * 3 + 1 + 1 + 8 * 2 + 3 + logo.payloads.length),
-      );
-      // Tray: stone slab + 8 rim pieces + the bead + 4 walls + ceiling
-      // + world.
+      expect(doc.payloads, hasLength(7 * 3 + 1 + 8 * 2 + logo.payloads.length));
+      // Tray: felt slab + 8 rim pieces + 4 walls + ceiling + world.
       expect(
         doc.nodes.values.where((n) => n.name.startsWith('tray.')),
-        hasLength(16),
+        hasLength(15),
       );
       expect(scene.rimNodes, hasLength(8));
       // A logo inside every die, all sharing one mesh.

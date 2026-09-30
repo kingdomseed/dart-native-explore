@@ -115,7 +115,6 @@ final class DiceTableScene {
     required this.wallNodes,
     required this.ceilingNode,
     required this.rimNodes,
-    required this.rimBead,
     required this.layout,
   });
 
@@ -131,9 +130,6 @@ final class DiceTableScene {
 
   /// The rim pieces, in [kRimPieces] order ([rimPoses]).
   final List<LocalId> rimNodes;
-
-  /// The bead of light that travels round the rim (`rimBeadAt`).
-  final LocalId rimBead;
 
   /// The layout the document was built with; the screen refits it to
   /// the real view and writes the new poses.
@@ -496,7 +492,6 @@ DiceTableScene? buildDiceTable({
     wallNodes: wallNodes,
     ceilingNode: ceilingNode,
     rimNodes: tray.rim,
-    rimBead: tray.bead,
     layout: fit,
   );
 }

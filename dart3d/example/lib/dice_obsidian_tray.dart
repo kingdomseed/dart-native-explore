@@ -1,5 +1,5 @@
 /// The Obsidian tray (docs/design/dice-lookdev.md §3.12, option a): a
-/// glossy near-black floor and one thin line of light in the DartNative
+/// deep indigo felt floor and one thin line of light in the DartNative
 /// gradient running round the play area — lime-gold along the top,
 /// pink along the bottom, blending down the sides. The dice stay the
 /// brightest, sharpest thing on screen.
@@ -19,7 +19,6 @@ import 'package:dart3d/src/scene_model.dart';
 import 'package:dart3d/src/vertex_pack.dart';
 import 'package:vector_math/vector_math.dart';
 
-import 'dice_numerals.dart' show encodePng;
 import 'dice_tray_layout.dart';
 
 /// The logo's gradient, pink → lime (look-dev `DN_GRADIENT`), sRGB.
@@ -76,142 +75,10 @@ List<({Vector3 translation, Vector3 scale})> rimPoses(TrayLayout layout) {
   ];
 }
 
-/// The rim nodes' ids, in [kRimPieces] order, and the bead of light
-/// that travels round it ([rimBeadAt]).
+/// The rim nodes' ids, in [kRimPieces] order.
 final class ObsidianTray {
-  const ObsidianTray({required this.rim, required this.bead});
+  const ObsidianTray({required this.rim});
   final List<LocalId> rim;
-  final LocalId bead;
-}
-
-/// Floor texture edge (texels) — the stone covers the whole 640-unit
-/// slab; the phone sees its middle ~⅓.
-const int kStoneSize = 512;
-
-/// Seconds for the bead of light to go once round the rim: slow enough
-/// to read as ambience, never as a signal.
-const double kBeadLap = 11;
-
-/// The bead's radius (it is unlit: a soft warm-white disc).
-const double kBeadRadius = 3.2;
-
-/// Where the bead is at time [t] (s): a point on the rim's centre line
-/// (the rounded rectangle [rimPoses] draws), clockwise from the top.
-Vector3 rimBeadAt(TrayLayout layout, double t) =>
-    rimPathPoint(layout, (t / kBeadLap) % 1.0);
-
-/// The point a fraction [s] (0…1) along the rim, clockwise from the
-/// middle of the top edge, at the rim's height.
-Vector3 rimPathPoint(TrayLayout layout, double s) {
-  final p = layout.play;
-  const o = kRimOffset, r = kRimCorner, y = 0.7;
-  final x0 = p.xMin - o, x1 = p.xMax + o, z0 = p.zMin - o, z1 = p.zMax + o;
-  final w = max(x1 - x0 - 2 * r, 0.0), h = max(z1 - z0 - 2 * r, 0.0);
-  final arc = pi / 2 * r;
-  // Segments: half top, TR corner, right, BR, bottom, BL, left, TL,
-  // half top.
-  final lens = [w / 2, arc, h, arc, w, arc, h, arc, w / 2];
-  final total = lens.fold(0.0, (a, b) => a + b);
-  var d = (s % 1.0) * total;
-  Vector3 corner(double cx, double cz, double a0, double f) {
-    final a = a0 - f * pi / 2;
-    return Vector3(cx + r * cos(a), y, cz + r * sin(a));
-  }
-
-  for (var i = 0; i < lens.length; i++) {
-    if (d > lens[i] && i < lens.length - 1) {
-      d -= lens[i];
-      continue;
-    }
-    final f = lens[i] == 0 ? 0.0 : d / lens[i];
-    return switch (i) {
-      0 => Vector3((x0 + x1) / 2 + f * w / 2, y, z1),
-      1 => corner(x1 - r, z1 - r, pi / 2, f),
-      2 => Vector3(x1, y, z1 - r - f * h),
-      3 => corner(x1 - r, z0 + r, 0, f),
-      4 => Vector3(x1 - r - f * w, y, z0),
-      5 => corner(x0 + r, z0 + r, -pi / 2, f),
-      6 => Vector3(x0, y, z0 + r + f * h),
-      7 => corner(x0 + r, z1 - r, -pi, f),
-      _ => Vector3(x0 + r + f * w / 2, y, z1),
-    };
-  }
-  return Vector3((x0 + x1) / 2, y, z1);
-}
-
-/// Polished near-black stone, [n]² RGBA, covering a slab of half-extent
-/// [half] world units: #090E12 with faint smoky veins (domain-warped
-/// fractal noise folded into thin lines) and a soft falloff toward the
-/// screen edges, baked — the table has depth and grain but stays far
-/// below the dice's brightness.
-Uint8List obsidianStone(int n, double half) {
-  final px = Uint8List(n * n * 4);
-  for (var y = 0; y < n; y++) {
-    for (var x = 0; x < n; x++) {
-      // World position on the slab.
-      final wx = (x + 0.5) / n * 2 * half - half;
-      final wz = (y + 0.5) / n * 2 * half - half;
-      // Veins: thin folds of warped noise, two scales.
-      final warp = _fbm(wx * 0.018, wz * 0.018, 3) * 3.2;
-      final v1 = 1 - (sin(wx * 0.045 + wz * 0.021 + warp)).abs();
-      final v2 = 1 - (sin(wx * -0.02 + wz * 0.07 + warp * 1.7 + 1.3)).abs();
-      final vein = pow(v1, 14) * 0.9 + pow(v2, 22) * 0.55;
-      // Cloudy depth in the stone.
-      final cloud = _fbm(wx * 0.01 + 7.1, wz * 0.01 - 3.3, 4);
-      // Soft falloff: the middle of the table a touch lighter.
-      final r = sqrt(wx * wx / (80 * 80) + wz * wz / (130 * 130));
-      final fall = 1.0 - 0.45 * _smoothstep(0.35, 1.25, r);
-      final l = (0.9 + 0.4 * cloud + 1.9 * vein) * fall;
-      // Two soft pools of the logo's colours from opposite corners
-      // (pink low-left, cyan high-right), baked: light pools without
-      // lights (two point lights here hung the A142's GPU).
-      final pink = 11 * _pool(wx + 38, wz + 70, 62);
-      final cyan = 10 * _pool(wx - 38, wz - 72, 62);
-      final i = (y * n + x) * 4;
-      px[i] = (9 * l + pink + 0.2 * cyan).round().clamp(0, 255);
-      px[i + 1] = (14 * l + 0.25 * pink + 0.75 * cyan).round().clamp(0, 255);
-      px[i + 2] = (18 * l + 2 * vein + 0.55 * pink + cyan).round().clamp(
-        0,
-        255,
-      );
-      px[i + 3] = 255;
-    }
-  }
-  return px;
-}
-
-/// A soft round pool of light at offset (dx, dz) with [radius]: 1 at
-/// its centre, fading to 0.
-double _pool(double dx, double dz, double radius) {
-  final t = 1 - (dx * dx + dz * dz) / (radius * radius);
-  return t <= 0 ? 0 : t * t;
-}
-
-double _smoothstep(double a, double b, double x) {
-  final t = ((x - a) / (b - a)).clamp(0.0, 1.0);
-  return t * t * (3 - 2 * t);
-}
-
-/// Value-noise fBm in 0…1.
-double _fbm(double x, double y, int octaves) {
-  var sum = 0.0, amp = 0.5, norm = 0.0;
-  for (var o = 0; o < octaves; o++) {
-    sum += _noise(x, y) * amp;
-    norm += amp;
-    x = x * 2.03 + 17.1;
-    y = y * 2.03 - 9.7;
-    amp *= 0.5;
-  }
-  return sum / norm;
-}
-
-double _noise(double x, double y) {
-  final xi = x.floor(), yi = y.floor();
-  final fx = x - xi, fy = y - yi;
-  final ux = fx * fx * (3 - 2 * fx), uy = fy * fy * (3 - 2 * fy);
-  final a = _hash(xi, yi), b = _hash(xi + 1, yi);
-  final c = _hash(xi, yi + 1), d = _hash(xi + 1, yi + 1);
-  return a + (b - a) * ux + (c - a) * uy + (a - b - c + d) * ux * uy;
 }
 
 /// Adds the floor slab, its collider, and the rim to [doc], fitted to
@@ -232,30 +99,15 @@ ObsidianTray addObsidianTray(
       ),
     ),
   );
-  final stone = obsidianStone(kStoneSize, half);
-  final stoneImg = doc.addPayload(
-    PayloadSpec(
-      doc.newId(),
-      encoding: PayloadEncoding.image,
-      format: 'png',
-      width: kStoneSize,
-      height: kStoneSize,
-      bytes: encodePng(stone, kStoneSize, kStoneSize),
-    ),
-  );
-  final stoneTex = doc.addResource(
-    TextureResource(doc.newId(), payload: stoneImg.id),
-  );
   final obsidian = doc.addResource(
     MaterialResource(
       doc.newId(),
       type: 'physicallyBased',
       properties: {
-        // Polished stone, satin: a mirror finish would show the studio
-        // IBL's softbox as a bright oval straight down.
-        'baseColor': ColorValue(1, 1, 1, 1),
-        'baseColorTexture': ResourceRefValue(stoneTex.id),
-        'roughness': DoubleValue(0.5),
+        // Deep indigo felt (#23264A): visibly not black, mid-dark, so
+        // the frosted dice and their white numerals still pop.
+        'baseColor': ColorValue(0.0168, 0.0194, 0.0685, 1),
+        'roughness': DoubleValue(0.92),
         'metallic': DoubleValue(0.0),
       },
     ),
@@ -354,72 +206,7 @@ ObsidianTray addObsidianTray(
           .id,
     );
   }
-  // The bead: a soft disc of warm-white light (colour and alpha fall off
-  // together), blended over the rim, moved by transform writes only.
-  const bn = 64;
-  final beadPx = Uint8List(bn * bn * 4);
-  for (var y = 0; y < bn; y++) {
-    for (var x = 0; x < bn; x++) {
-      final dx = (x + 0.5) / bn * 2 - 1, dy = (y + 0.5) / bn * 2 - 1;
-      final f = pow((1 - sqrt(dx * dx + dy * dy)).clamp(0.0, 1.0), 2.2);
-      final i = (y * bn + x) * 4;
-      beadPx[i] = (255 * f).round();
-      beadPx[i + 1] = (246 * f).round();
-      beadPx[i + 2] = (232 * f).round();
-      beadPx[i + 3] = (255 * f).round();
-    }
-  }
-  final beadImg = doc.addPayload(
-    PayloadSpec(
-      doc.newId(),
-      encoding: PayloadEncoding.image,
-      format: 'rgba8',
-      width: bn,
-      height: bn,
-      length: beadPx.length,
-      bytes: beadPx,
-    ),
-  );
-  final beadTex = doc.addResource(
-    TextureResource(doc.newId(), payload: beadImg.id),
-  );
-  final beadMat = doc.addResource(
-    MaterialResource(
-      doc.newId(),
-      type: 'unlit',
-      properties: {
-        'baseColor': ColorValue(1, 1, 1, 1),
-        'baseColorTexture': ResourceRefValue(beadTex.id),
-        'alphaMode': StringValue('blend'),
-      },
-    ),
-  );
-  const br = kBeadRadius;
-  final beadGeo = _addMesh(doc, (
-    p: [
-      Vector3(-br, 0, -br),
-      Vector3(br, 0, -br),
-      Vector3(br, 0, br),
-      Vector3(-br, 0, br),
-    ],
-    uv: [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(0, 1)],
-    idx: [0, 1, 2, 0, 2, 3],
-  ));
-  final bead = doc.createNode(
-    name: 'tray.rim.bead',
-    transform: TrsTransform(translation: rimBeadAt(layout, 0)),
-    components: [
-      ComponentSpec(
-        'mesh',
-        properties: {
-          'geometry': ResourceRefValue(beadGeo),
-          'material': ResourceRefValue(beadMat.id),
-        },
-      ),
-    ],
-    root: true,
-  );
-  return ObsidianTray(rim: ids, bead: bead.id);
+  return ObsidianTray(rim: ids);
 }
 
 typedef _Mesh = ({List<Vector3> p, List<Vector2> uv, List<int> idx});
@@ -516,10 +303,4 @@ LocalId _addMesh(SceneDocument doc, _Mesh m) {
         ),
       )
       .id;
-}
-
-double _hash(int a, int b) {
-  var k = (a * 374761393 + b * 668265263) & 0x7fffffff;
-  k = ((k ^ (k >> 13)) * 1274126177) & 0x7fffffff;
-  return (k & 0xffff) / 0xffff;
 }
