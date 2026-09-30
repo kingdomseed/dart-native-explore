@@ -25,8 +25,8 @@ import 'dice_table_scene.dart' show DieFace, DieFaceMap, faceUpRotation;
 
 /// The shell's material knobs. Both natives draw the shell the same
 /// way: alpha-blended smoke over the logo (SceneKit has no refraction,
-/// and one path keeps the platforms alike), clear-coated, the atlas as
-/// base colour and as emissive map.
+/// and one path keeps the platforms alike), a rough frosted finish (no
+/// clear coat by default), the atlas as base colour and as emissive map.
 final class DiceShellLook {
   const DiceShellLook({
     this.roughness = 0.58,
@@ -330,4 +330,7 @@ Map<String, PropertyValue> shellMaterialProperties(
     'clearcoatRoughness': DoubleValue(look.clearcoatRoughness),
   },
   'alphaMode': StringValue('blend'),
+  // Cull the far side: blended surfaces don't write depth, so a
+  // double-sided shell would lay its back faces over the top numerals.
+  'doubleSided': BoolValue(false),
 };
