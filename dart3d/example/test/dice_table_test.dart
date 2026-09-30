@@ -78,6 +78,12 @@ void main() {
             t.toMatrix4() * doc.nodes[die.logo]!.transform.toMatrix4();
         final front = world.rotated3(Vector3(0, 0, -1))..normalize();
         expect(front.y, closeTo(1, 1e-4), reason: die.label);
+        // Centred in the die (the prefab root's lift must not leak in).
+        expect(
+          doc.nodes[die.logo]!.transform.toMatrix4().getTranslation().length,
+          closeTo(0, 1e-6),
+          reason: die.label,
+        );
       }
       expect(meshes, hasLength(1));
       expect(scene.wallNodes, hasLength(4));

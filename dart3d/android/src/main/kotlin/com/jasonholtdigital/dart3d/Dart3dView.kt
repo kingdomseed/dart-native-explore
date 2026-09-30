@@ -930,8 +930,12 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         trailMaterial = loaded[6]
         // The materials are compiled double-sided-capable; keep the
         // default single-sided unless a resource's doubleSided says so.
+        // Packages compiled doubleSided bake culling to NONE, so cull back
+        // faces explicitly (the material-less fallbacks use these).
         for (m in loaded.subList(0, 6)) {
             m.defaultInstance.setDoubleSided(false)
+            m.defaultInstance.setCullingMode(
+                com.google.android.filament.Material.CullingMode.BACK)
         }
         // W16: the trail ribbon's own material — upstream's default is
         // translucent unlit driven fully by vertex color (incl. alpha),

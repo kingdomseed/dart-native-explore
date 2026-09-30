@@ -319,6 +319,7 @@ DiceTableScene? buildDiceTable({
   final rng = Random(0xD1CE);
   final dieNodes = <NodeSpec>[];
   final logoNodes = <LocalId?>[];
+  TransformSpec? firstLogoTransform;
   final facings = <Quaternion>[];
   for (final (i, d) in built.indexed) {
     final (x, z) = slots[i];
@@ -353,6 +354,7 @@ DiceTableScene? buildDiceTable({
       ),
     );
     node.children.add(logo.id);
+    firstLogoTransform ??= logo.transform;
     if (i == 0) {
       logo.instance = PrefabInstanceSpec(source: AssetRef(kLogoAsset));
     }
@@ -370,6 +372,9 @@ DiceTableScene? buildDiceTable({
   // Share the first logo's mesh with the others, and make it glow.
   final firstLogo = logoNodes.firstOrNull;
   if (firstLogo != null) {
+    // Composing the prefab bakes the asset root's lift into this node's
+    // matrix; put back the centred transform the other logos have.
+    composed.nodes[firstLogo]!.transform = firstLogoTransform!;
     final mesh = composed.nodes[firstLogo]!.components.firstWhere(
       (c) => c.type == 'mesh',
     );

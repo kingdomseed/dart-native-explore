@@ -33,7 +33,10 @@ const kDnGradient = [
 /// Rim line width, and its offset from the play area's edge (world
 /// units; negative = inside): just inside the walls, clear of the
 /// chrome above and below the tray.
-const double kRimWidth = 0.9, kRimOffset = -1.2;
+// The rim's inner edge sits on the wall line: a die resting against a
+// wall projects onto that line (the walls are frustum planes), so no die
+// ever covers the rim.
+const double kRimWidth = 0.9, kRimOffset = kRimWidth / 2;
 
 /// Corner radius of the rim.
 const double kRimCorner = 9.0;
@@ -290,9 +293,11 @@ LocalId _addMesh(SceneDocument doc, _Mesh m) {
   );
   var lo = Vector3.all(double.infinity), hi = Vector3.all(-double.infinity);
   for (final q in m.p) {
-    lo = Vector3(min(lo.x, q.x), min(lo.y, q.y) - 0.1, min(lo.z, q.z));
-    hi = Vector3(max(hi.x, q.x), max(hi.y, q.y) + 0.1, max(hi.z, q.z));
+    lo = Vector3(min(lo.x, q.x), min(lo.y, q.y), min(lo.z, q.z));
+    hi = Vector3(max(hi.x, q.x), max(hi.y, q.y), max(hi.z, q.z));
   }
+  lo.y -= 0.1;
+  hi.y += 0.1;
   return doc
       .addResource(
         GeometryResource(

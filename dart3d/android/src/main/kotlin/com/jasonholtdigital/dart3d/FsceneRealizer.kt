@@ -5416,9 +5416,10 @@ object FsceneRealizer {
 
         val doubleSided = props.tag("doubleSided").d3Bool() ?: false
         mi.setDoubleSided(doubleSided)
-        // setDoubleSided(false) alone left the blended variants unculled on
-        // the A142: a translucent die's far side showed through its top
-        // face (P3 DartNative set). Restore back-face culling explicitly.
+        // The packages are compiled doubleSided, which bakes culling to
+        // NONE: setDoubleSided(false) alone leaves every single-sided
+        // material unculled (a translucent die's far side showed through
+        // its top face on the A142). Restore back-face culling explicitly.
         if (!doubleSided) {
             mi.setCullingMode(
                 com.google.android.filament.Material.CullingMode.BACK)
