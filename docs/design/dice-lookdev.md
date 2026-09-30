@@ -1134,6 +1134,19 @@ Lighting recipes (the tray lights are unchanged unless noted):
   to take in the hearth. Gate: numeral 4.60 (d4), die vs tray 2.95,
   stroke 0.123–0.128, PASS.
 
+- **Northfield — the 1986 countryside kitchen.** Striped wallpaper, a
+  checkered lino floor, cream kitchen units along the left wall (worktop,
+  orange tile splashback, wall cupboards, cooker with an enamel kettle, a
+  tall fridge), a radiator under the window with floral curtains, and
+  outside the grey field, a tree line and the tall three-legged machine
+  (flat silhouettes against the sky). Lights: the orange pendant over the
+  table, now on a cord (warm key, above), the window (area, 30 kW,
+  grey-blue daylight, back), the CRT's shadowless green spill (2.5 kW,
+  left, the accent) and a warm strip under the wall cupboards (6 kW,
+  back-left). Camera: 20 mm, looking across the table toward the window
+  and the units. Gate: numeral 7.46 (d10t), die vs tray 5.49, stroke
+  0.124–0.132, PASS.
+
 ## 4. dart3d features to verify (before building these for real)
 
 1. **Emissive intensity > 1 + bloom threshold** on both platforms, and

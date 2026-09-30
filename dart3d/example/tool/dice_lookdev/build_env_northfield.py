@@ -332,4 +332,4 @@ def room(scene, table, top):
                0.5), segs=6)
     E.light(scene, "AREA", "crt_spill", (-3.0, top + 10, 14), 2500, color=(0.3, 1.0, 0.45), size=20,
             target=(-60, -20, 0), shadow=False)
-    return dict(loc=(26, -66, 36), target=(-10, 90, 6), lens=20, fstop=4.0, focus=(0, 0, 2))
+    return dict(loc=(30, -80, 44), target=(-26, 90, 4), lens=20, fstop=4.0, focus=(0, 0, 2))
