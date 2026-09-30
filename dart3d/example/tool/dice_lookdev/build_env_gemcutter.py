@@ -123,6 +123,7 @@ def room(scene, top):
     now on a proper arm), the sunset window (warm orange, back-right), an
     emerald-glass lamp on the gem chest (green accent, right) and a brass
     wall lamp on the left (warm); plus the tray's fill, overhead and rim.
+    (The bench's own balance comes from the tray environment.)
     """
     panel = P.dark_wood("Atelier panel", c1=(0.025, 0.014, 0.01), c2=(0.07, 0.04, 0.025), varnish=0.5)
     walnut = P.dark_wood("Atelier walnut", c1=(0.05, 0.025, 0.012), c2=(0.16, 0.08, 0.04), varnish=0.7)
@@ -168,15 +169,4 @@ def room(scene, top):
             E.sphere("display_gem", 2.8, p, P.glass(f"Gem {j} {i}", color=gem_cols[(i + j) % 5], ior=1.7),
                      subdiv=1, scale=(1, 1, 0.8))
     RC.sconce(scene, "left", -60, 90, energy=12000, mat=brass)
-    # a brass balance on the bench, behind-left of the tray
-    bx, by = -45, 70
-    E.cylinder("balance_base", 7, 2, (bx, by, 1), brass, segs=32)
-    E.cylinder("balance_post", 0.8, 34, (bx, by, 18), brass, segs=12)
-    E.cube("balance_beam", (36, 1, 1), (bx, by, 35), brass)
-    for sx in (-1, 1):
-        for a in range(3):
-            ang = a * 2.09
-            ch = E.cylinder("balance_chain", 0.15, 16, (bx + sx * 17 + math.cos(ang) * 2.5, by + math.sin(ang) * 2.5,
-                                                        27), brass, segs=4)
-        E.cylinder("balance_pan", 6, 1, (bx + sx * 17, by, 19), brass, segs=32, r2=4)
     return dict(loc=(-20, -72, 42), target=(18, 100, 6), lens=20, fstop=4.0, focus=(0, 0, 2))

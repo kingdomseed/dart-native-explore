@@ -1172,6 +1172,16 @@ Lighting recipes (the tray lights are unchanged unless noted):
   small table lanterns. Camera: 20 mm, f/4. Gate: numeral 5.26 (d10u),
   die vs tray 2.28, stroke 0.123–0.128, PASS.
 
+- **Gemcutter — the jeweler's atelier.** Dark panelled walls, a tall
+  mullioned window at the back-right onto a spired city at sunset (area,
+  35 kW, 1.0/0.62/0.35: the warm counter-light), a many-drawered gem chest
+  on the right with an emerald-glass lamp on it (shadowless 12 kW green,
+  the accent), a tool rack of gravers above it, glass display shelves of
+  cut stones and a brass sconce (12 kW, warm) on the left wall. The bench
+  lamp keeps its cool-white key and now stands on a brass arm. Camera:
+  20 mm, f/4. Gate: numeral 5.15 (d20), die vs tray 2.74, stroke
+  0.121–0.130, PASS.
+
 ## 4. dart3d features to verify (before building these for real)
 
 1. **Emissive intensity > 1 + bloom threshold** on both platforms, and
