@@ -107,7 +107,7 @@ def build(scene):
     E.light(scene, "AREA", "key", (-46, -12, 36), 16000, color=(1.0, 0.75, 0.55), size=25, target=(0, 0, 0))
     # Round 2: soft warm overhead (a paper ceiling lamp) for the gold leaf,
     # which mirrors the ceiling when seen straight down.
-    E.overhead(scene, 5000, color=(1.0, 0.82, 0.62), size=90, height=110)
+    E.overhead(scene, 1500, color=(1.0, 0.82, 0.62), size=90, height=110)
     # Top-down framing: a folding fan, a tea cup on its saucer and fallen
     # petals in the strips above and below the tray.
     bot = -D / 2 - RIM_T
@@ -133,6 +133,6 @@ def build(scene):
         pt = E.sphere("fallen_petal", 1.0, (x, y, 0.08), petal, subdiv=2, scale=(0.5, 0.32, 0.04))
         pt.rotation_euler = (0, 0, rng.uniform(0, 6.28))
     return dict(
-        samples=128, exposure=0.8, topdown=dict(width=W + 2 * RIM_T + 1.0), surface_z=1.2, centre=(0, 2.0, 2.2),
+        samples=128, exposure=1.3, topdown=dict(width=W + 2 * RIM_T + 1.0), surface_z=1.2, centre=(0, 2.0, 2.2),
         hero=dict(dist=32, elev=30, az=8, lens=65, fstop=2.8),
     )

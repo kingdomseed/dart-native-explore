@@ -1,12 +1,15 @@
 # Dice look-dev: themed sets and their rolling environments (plan P3)
 
-Status: look-dev **round 2** for operator review, 2026-09-29. Nothing here
+Status: look-dev **round 2.1** for operator review, 2026-09-30 (round 2 +
+refined numerals and a stricter readability gate, §0.5). Nothing here
 is app code. Source of truth for the renders:
 `dart3d/example/tool/dice_lookdev/` (Blender 5.2.2, Cycles). Renders:
 `docs/design/dice-lookdev/`. Context: `docs/design/demo-program.md` §3
 (upstream's roller) and §5 (our Dice Roller plan).
 
-Eleven themes. Each is a **dice set plus the environment it is rolled in**:
+Twelve sets. **DartNative** (§3.12) is the dart3d example app's own dice
+set; the eleven themed sets move to a separate dice-roller app. Each is a
+**dice set plus the environment it is rolled in**:
 an engraved rolling surface as a hero object, framing props, a lighting
 mood and atmosphere. The two signature sets are Emberforged (fire) and
 Frostbound (ice).
@@ -18,6 +21,7 @@ render, and every set has to pass a measured readability gate on that view
 
 | # | Set | Environment | Top-down (primary) | Hero | d4 close-up |
 |---|---|---|---|---|---|
+| 0 | **DartNative** (example app) | Launch Tray | [topdown](dice-lookdev/dartnative-topdown.jpg) | [hero](dice-lookdev/dartnative-hero.jpg) | [d20](dice-lookdev/dartnative-d20.jpg), [d4](dice-lookdev/dartnative-d4.jpg) |
 | 1 | **Emberforged** | The Forge Hearth | [topdown](dice-lookdev/emberforged-topdown.jpg) | [hero](dice-lookdev/emberforged-hero.jpg) | [d4](dice-lookdev/emberforged-d4.jpg) |
 | 2 | **Frostbound** | The Frozen Altar | [topdown](dice-lookdev/frostbound-topdown.jpg) | [hero](dice-lookdev/frostbound-hero.jpg) | [d4](dice-lookdev/frostbound-d4.jpg) |
 | 3 | **Arcane Study** | The Night Study | [topdown](dice-lookdev/arcane-topdown.jpg) | [hero](dice-lookdev/arcane-hero.jpg) | [d4](dice-lookdev/arcane-d4.jpg) |
@@ -34,7 +38,11 @@ Sheets: `all-sets-topdown.jpg` (every set as the phone shows it),
 `all-sets-hero.jpg` (heroes), `readability-crops.jpg` (the seven dice of
 every set at phone pixels, 1:1). Per set: `<theme>-topdown.jpg`
 (1179×2556, iPhone portrait, straight down with the app's fov),
-`<theme>-hero.jpg` (1600×900, 3/4 view) and `<theme>-d4.jpg` (1000×625).
+`<theme>-hero.jpg` (1600×900, 3/4 view), `<theme>-d4.jpg` (1000×625), and
+`<theme>-d20.jpg` (1000×625) for DartNative, Emberforged, Old Road, Vermilion
+and Gemcutter. §3a has the in-app play-view rules (keep the surroundings
+from competing with the dice) and an intro shot per set for the dice-roller
+app.
 All renders are full-colour JPEG q90 (round 1's 128-colour palette PNGs
 are gone). `readability.json` holds every measurement.
 
@@ -79,17 +87,27 @@ papers, a fan, loose gears, a phone, a compass...).
 **Rules (every set):**
 
 1. **Numeral contrast** on the top face, as rendered (display sRGB after
-   tone mapping, not albedo): WCAG relative luminance, numeral vs the face
-   immediately around it, **≥ 4.5 : 1** on every die.
+   tone mapping, not albedo): WCAG relative luminance of the numeral's
+   **stroke core** against the **plain face** right around it, **≥ 4.5 : 1**
+   on every die, taken worst-quartile (the numeral's weakest quarter vs the
+   face's closest quarter, so wear, AO, flakes and texture count). The
+   keyline is *not* counted for non-glowing sets: their numerals must read
+   on the face itself. Glowing sets may count their keyline/glow ring.
+   (Round 2 measured medians against the ring including the keyline;
+   round 2's Old Road passed that at 6.2 : 1 and was unreadable by eye.
+   Re-measured with this rule it fails at 3.8 : 1, plus the stroke gate.)
 2. **Numeral size**: the top-face numeral's height is **≥ 40% of the
    face's inscribed width** (worst face of each die, measured from the
    atlas). All dice are also 1.3× the round-1 size, so a d20 numeral is
    ~26 px tall on a 1179 px wide phone render and the d6's ~56 px.
+   **Stroke weight**: mean stroke width / numeral height **0.10–0.14**
+   (a medium weight with open counters; 2 × area / boundary length, from
+   the atlas). Round 2's emboldened glyphs were 0.22–0.28.
 3. **A numeral treatment chosen per theme** (table below): glowing
    (emissive numerals, usually inside a dark keyline), inked/filled, bright
    metal or enamel with a dark keyline. The keyline is a second texture in
-   the atlas layout (`<theme>_halo.png`: R = numeral dilated by ~0.2 face
-   inradius, G = soft glow), so it is exact per glyph.
+   the atlas layout (`<theme>_halo.png`: R = numeral dilated by ~0.1 face
+   inradius, G = soft glow), so it is exact per glyph. Round 2.1 halved it.
 4. **Die vs tray**: the die's silhouette must separate from the tray around
    it by **≥ 2 : 1**, taking the best of three readings: the die's median
    body tone, its mean (which counts glowing numerals and metal edges),
@@ -118,12 +136,14 @@ top-down render (`render_set.py --check`, always on in `render.sh`):
   an emission-only mask (R = numeral from the atlas, G = "top face": true
   normal within 14° of up, B = die id), everything else hidden, 1 sample,
   no pixel filter, EXR.
-- Per die: numeral luminance = median over the numeral (eroded 1 px);
-  surround = median over the top face in a ring 1…1+r px around the
-  numeral (r = 8% of the numeral's pixel height). Also a "plain body"
-  ratio over the rest of the face (where the keyline doesn't reach) for
-  reference, and die vs a 3–12 px ring of tray (other dice excluded,
-  contact shadow included).
+- The mask pass also marks the keyline ring (G = 0.5), so the check knows
+  numeral, keyline and plain face per pixel.
+- Per die: stroke core = the numeral eroded by ~¼ of its stroke width;
+  face ring = plain face in a ring 1…1+r px outside numeral + keyline
+  (r = 8% of the numeral's pixel height); "adjacent" ring = right outside
+  the numeral, keyline included (counted only for glowing sets).
+  Worst-quartile contrast as in rule 1. Die vs a 3–12 px ring of tray
+  (other dice excluded, contact shadow included).
 - Results merge into `readability.json`; `readability_check.py --table`
   prints the table below. `readability-crops.jpg` shows exactly the
   pixels that were measured.
@@ -137,23 +157,23 @@ Blender --background --python dart3d/example/tool/dice_lookdev/readability_check
 
 **Results** (full renders, 96 samples, 1179×2556):
 
-| Set | Numeral treatment | Numeral contrast, worst die (gate 4.5) | vs plain body | Die vs tray, worst (gate 2.0) | Top numeral height | Numeral / face width (gate 0.40) | Result |
-|---|---|---|---|---|---|---|---|
-| Emberforged | glowing: white-hot emissive numerals in a soot keyline | 15.8:1 (d4) | 3.7:1 | 2.7:1 | 26 px | 0.41 | PASS |
-| Frostbound | glowing: emissive rime numerals on a deep-blue keyline | 14.6:1 (d8) | 3.1:1 | 2.4:1 | 25 px | 0.41 | PASS |
-| Arcane Study | glowing: warm spell-lit gilt numerals, midnight keyline | 9.2:1 (d4) | 6.0:1 | 2.1:1 | 26 px | 0.42 | PASS |
-| Fate Engine | glowing: aqua-charged numerals in a dark keyline | 16.6:1 (d8) | 14.2:1 | 2.2:1 | 26 px | 0.42 | PASS |
-| Celestial Observatory | glowing: starlight-silver numerals in an indigo keyline | 18.7:1 (d10u) | 9.8:1 | 2.7:1 | 26 px | 0.41 | PASS |
-| Hearthside Tome | inked: engraved, filled with sepia-black ink | 5.1:1 (d10t) | 5.4:1 | 2.1:1 | 23 px | 0.43 | PASS |
-| Old Road | enamel fill: black niello in bright worn gold | 6.2:1 (d10t) | 5.9:1 | 2.1:1 | 28 px | 0.46 | PASS |
-| Northfield Relay | inked: near-black instrument print on warm-white ABS | 8.1:1 (d4) | 7.9:1 | 4.6:1 | 22 px | 0.41 | PASS |
-| Voltline | glowing: magenta neon numerals in a black keyline | 14.3:1 (d4) | 14.3:1 | 4.6:1 | 29 px | 0.41 | PASS |
-| Vermilion Court | bright metal + keyline: gold leaf in a black-lacquer keyline | 5.4:1 (d10u) | 2.0:1 | 2.1:1 | 27 px | 0.44 | PASS |
-| Gemcutter | bright enamel + keyline: warm-gold enamel in a deep-green keyline | 8.2:1 (d4) | 3.8:1 | 2.1:1 | 24 px | 0.41 | PASS |
+| Set | Numeral treatment | Numeral stroke vs face, worst die (gate 4.5) | Keyline counted? | Die vs tray, worst (gate 2.0) | Top numeral height | Numeral / face width (gate 0.40) | Stroke / height (gate 0.10–0.14) | Result |
+|---|---|---|---|---|---|---|---|---|
+| DartNative | glowing: white numerals in a thin keyline, brand-gradient edges | 18.8:1 (d10t) | yes (glowing) | 6.5:1 | 28 px | 0.41 | 0.12–0.13 | PASS |
+| Emberforged | glowing: white-hot emissive numerals in a soot keyline | 5.1:1 (d12) | yes (glowing) | 2.4:1 | 26 px | 0.41 | 0.12–0.13 | PASS |
+| Frostbound | glowing: emissive rime numerals on a deep-blue keyline | 5.8:1 (d4) | yes (glowing) | 2.1:1 | 25 px | 0.41 | 0.12–0.13 | PASS |
+| Arcane Study | glowing: warm spell-lit gilt numerals, thin midnight keyline | 6.2:1 (d4) | yes (glowing) | 2.2:1 | 27 px | 0.43 | 0.12–0.13 | PASS |
+| Fate Engine | glowing: aqua-charged numerals in a dark keyline | 13.8:1 (d10t) | yes (glowing) | 2.1:1 | 27 px | 0.43 | 0.12–0.13 | PASS |
+| Celestial Observatory | glowing: starlight-silver numerals in an indigo keyline | 11.9:1 (d12) | yes (glowing) | 2.4:1 | 26 px | 0.41 | 0.12–0.13 | PASS |
+| Hearthside Tome | inked: engraved, filled with sepia-black ink | 4.8:1 (d4) | no | 2.1:1 | 24 px | 0.43 | 0.12–0.13 | PASS |
+| Old Road | enamel fill: oxblood-black enamel in bright polished gold | 4.8:1 (d4) | no | 3.0:1 | 27 px | 0.45 | 0.12–0.13 | PASS |
+| Northfield Relay | inked: near-black instrument print on warm-white ABS | 7.3:1 (d10u) | no | 4.9:1 | 22 px | 0.42 | 0.12–0.13 | PASS |
+| Voltline | glowing: magenta neon numerals in a black keyline | 14.3:1 (d10u) | yes (glowing) | 4.6:1 | 28 px | 0.42 | 0.12–0.13 | PASS |
+| Vermilion Court | bright metal: pale gold leaf on deep urushi red, gilt edges (thin keyline) | 5.0:1 (d10u) | no | 2.1:1 | 29 px | 0.45 | 0.12–0.13 | PASS |
+| Gemcutter | bright enamel: ivory-gold enamel on emerald (thin keyline) | 5.1:1 (d20) | no | 2.7:1 | 24 px | 0.41 | 0.12–0.13 | PASS |
 
-"vs plain body" is the numeral against the face beyond the keyline; it
-shows which sets lean on the keyline (Vermilion, Frostbound, Celestial) and
-which read on the body alone.
+"Keyline counted?" is yes only for the glowing sets; every other set
+reads on the plain face.
 
 ### 0.3 The d4 shard
 
@@ -187,6 +207,21 @@ with other dice or with environment meshes near the die; render_set prints
 `CONTACT PROBLEMS` if any die has a gap outside 0…0.01 cm or overlaps
 anything. The final renders have none (all gaps 0.004 cm, no overlaps).
 There are no mid-roll shots in round 2.
+
+### 0.5 Round 2.1: refined numerals, a stricter gate
+
+Operator feedback on the round-2 contact sheet → change:
+
+| Feedback | Change |
+|---|---|
+| "The numbers are too thick (like the number three)", Vermilion especially | The fonts are no longer emboldened (round 2 thickened every glyph outline by 3.5–4.5% of the em): stroke/height went from 0.22–0.28 to 0.12–0.13 (Inter and DejaVu at their regular weight, EB Garamond +0.6%), with open counters on 3/6/8/9. The em went up 13% so the numeral **height** is unchanged. Keylines are half as wide (~0.1 face inradius). |
+| Old Road still unreadable (bottom-left) | Bright, clean polished gold (wear and AO only in the recesses), numerals filled with deep oxblood-black enamel with a crisp edge, the runes reduced to a shallow engraving (no enamel) so they never compete, the rune border moved out; the map is darker and quieter (low-contrast mottling, faint pale lines). |
+| Tighten the gate | Stroke core vs plain face, worst quartile, keyline only for glowing sets, stroke-weight gate 0.10–0.14 (rules 1–2 above). Round 2's Old Road (re-rendered from commit 446d716, measured with the new check) fails: 3.8 : 1 on the d10t and stroke 0.24–0.28. |
+| — (consequences of the stricter gate) | Vermilion: deep urushi red, pale gold-leaf numerals and gilt edges (maki-e), less coat sheen; the red is darker so the gold reads on the face itself. Gemcutter: brighter ivory-gold enamel, pale-jade wisps instead of pearl-white. Hearthside: denser ink. |
+
+d20 close-ups of the refined numerals: [Emberforged](dice-lookdev/emberforged-d20.jpg),
+[Old Road](dice-lookdev/oldroad-d20.jpg), [Vermilion](dice-lookdev/vermilion-d20.jpg),
+[Gemcutter](dice-lookdev/gemcutter-d20.jpg).
 
 ---
 
@@ -682,8 +717,10 @@ top corners of the phone frame, wax seals at the bottom.
 
 ![hero](dice-lookdev/oldroad-hero.jpg)
 
-**Round 2.** Treatment: *enamel fill* — numerals cut deep and filled
-with black niello in bright worn gold. The gold needed a strong soft
+**Round 2.1.** Treatment: *enamel fill* — numerals cut crisp and filled
+with oxblood-black enamel in bright, clean polished gold; the runes are a
+shallow engraving only, and the map is darker and quieter (§0.5).
+**Round 2.** Numerals were filled with black niello in bright worn gold. The gold needed a strong soft
 overhead to read straight down (a top-down metal face mirrors the ceiling)
 and a side key, and a warm dim room instead of black (most faces of a die
 seen straight down mirror the room, not the ceiling); the map is now dark
@@ -802,10 +839,11 @@ Strips: a phone with a lit screen, a receipt, a straw.
 
 ![hero](dice-lookdev/vermilion-hero.jpg)
 
-**Round 2.** Treatment: *bright metal + keyline* — gold-leaf numerals
-(part diffuse, so they read straight down) inside a black-lacquer keyline;
-the red alone was ~2.5 : 1 against gold. The lacquer is a brighter
-vermilion. The tray's black lacquer is satin rather than mirror (round 1
+**Round 2.1.** Treatment: *bright metal* — pale gold-leaf numerals at a
+medium weight on a deep urushi red, gilt edges (maki-e), a thin keyline
+that the gate does not count (§0.5).
+**Round 2.** Gold-leaf numerals (part diffuse, so they read straight down)
+sat inside a heavy black-lacquer keyline on a brighter vermilion. The tray's black lacquer is satin rather than mirror (round 1
 mirrored the lanterns as white discs), the moon no longer shadows half the
 tray through the folding screen, the key comes from the side so its mirror
 image misses the tray, and a paper-ceiling overhead lights the gold.
@@ -840,8 +878,9 @@ Strips: a folding fan, a celadon cup on a saucer, fallen petals.
 
 ![hero](dice-lookdev/gemcutter-hero.jpg)
 
-**Round 2.** Treatment: *bright enamel + keyline* — warm-gold enamel
-numerals in a deep-green keyline. The swirl is a domain-warped noise
+**Round 2.1.** Treatment: *bright enamel* — ivory-gold enamel numerals
+at a medium weight; pale-jade wisps instead of pearl-white (§0.5).
+**Round 2.** Warm-gold enamel numerals sat in a deep-green keyline. The swirl is a domain-warped noise
 (deep emerald, jade ribbons, thin pearl wisps) instead of regular bands.
 The tray velvet is a light jeweler's grey (round 1's teal matched the
 emerald; at top-down under the daylight lamp it reads almost white, which
@@ -868,6 +907,84 @@ the operator may want a step darker — the gate allows down to ~0.3 grey). Stri
   uses alpha.
 - Loose gems are low-poly glass with a high-contrast IBL.
 - **Juice**: a loupe zoom on the result (camera dolly to the d20).
+
+---
+
+### 3.12 DartNative: "the app's own set" (12th set, example-app default)
+
+![top-down, in-app](dice-lookdev/dartnative-topdown.jpg)
+
+![hero](dice-lookdev/dartnative-hero.jpg)
+
+![d20](dice-lookdev/dartnative-d20.jpg)
+
+The dart3d example app's main dice experience; the eleven themed sets move
+to the separate dice-roller app.
+
+**Dice**:
+
+- Body #090E12 with a clear coat (reads as black glass under the soft
+  overhead).
+- Every edge glows the **brand gradient** (#FA60A6 → #EF388B → #E99173 →
+  #D7BA52 → #B5C75E), running around the die like the 3D logo glows its
+  own gradient (atlas A = the edge mask, emissive 2.4; higher values wash
+  the hues toward pastel under PBR Neutral).
+- A thin **cyan** (#03C3F0) inlay line just inside each face (atlas G).
+- Numerals: Inter at its regular weight, near-white with a soft emissive,
+  inside a thin #090E12 keyline. Treatment: *glowing*.
+
+**Environment: Launch Tray.** Deliberately empty: a dark slate floor a
+step lighter than the dice, a rounded anodized rim with one thin line of
+gradient light along its top, a near-black table, and the set's one
+**lime** (#A1EA5A) accent, a small "ready" light in the rim. No props, no
+haze: the dice are the only bright, saturated things on screen.
+
+**Real time:** the cheapest set to ship. Edges and inlay are an emissive
+texture (edge mask × a 1D gradient lookup by object-space angle, or baked
+per die); numerals are an emissive mask with a baked keyline; the rim line
+is an emissive tube with the same gradient. One key, one fill, a dim IBL.
+**Juice**: the gradient can *flow* around the edges while a die tumbles
+(scroll the gradient lookup, E5c/E6) and flash white on land; the rim line
+pulses once on the total. Bloom only on the edges and rim, not the
+numerals (§5.1).
+
+---
+
+## 3a. In the app: a play view that doesn't compete, and an intro per set
+
+**Play view (all sets).** At top-down the dice must be the brightest,
+sharpest, most saturated thing on screen. The stills already keep the
+trays calmer than the dice; in the app add, outside the tray:
+
+- a **vignette** (a screen-space darkening that starts at the rim, ~25–35%
+  at the screen edges);
+- **defocus** of the strips beyond the rim (DOF focused on the tray floor;
+  props there sit 0–15 cm away from it, enough for a soft blur at the
+  app's fov), or a baked blur in the prop atlas where DOF is too costly;
+- **lower contrast and saturation** outside the tray (−20–30% in the prop
+  atlas bake, or a post grade masked by the tray's screen rect);
+- keep emissive props (candles, braziers, tubes, lanterns, neon, the CRT)
+  below the dice's emissive level, and dim them further while dice are
+  rolling.
+
+**Cinematic intro (dice-roller app).** Side view exploring the environment
+→ the camera flies to the table → top-down rolling. Good opening angles
+per set (no renders yet):
+
+| Set | Opening shot | What the camera passes on the way down |
+|---|---|---|
+| DartNative | low and close along the rim, the gradient line running toward camera in the dark | rises straight up over the tray as the rim line completes the loop |
+| Emberforged | low behind the braziers, flames and sparks in the foreground, brick wall behind | over the anvil, down onto the molten channel ring |
+| Frostbound | through the ice-crystal clusters, cave glow behind | across the snow-capped rim, down onto the ward circle |
+| Arcane Study | candle flames in the foreground, the moonlit window behind, tomes and the armillary | over the runestone bowl and the letter, down onto the brass sigil |
+| Fate Engine | in front of the engine: tubes, gears and the core at eye level | down the output chute into the tray |
+| Celestial | on the balcony, star sky and amethysts, the armillary in silhouette | over the balustrade rail, down onto the astrolabe |
+| Hearthside | from the hearth side, fire glow behind the open tome | across the mug and the pouch, down onto the pages |
+| Old Road | from the window's blue hour toward the lantern | over the satchel and pipe, down onto the map |
+| Northfield | at the CRT, green text scrolling, the pendant lamp above | across the keyboard and the mug, down onto the calibration mat |
+| Voltline | through the rain-streaked window, neon signs outside | across the counter, down onto the lightbox |
+| Vermilion | past a paper lantern toward the gold-leaf screen | over the fan and the tea cup, down onto the lacquer tray |
+| Gemcutter | under the bench lamp, loupe and gem cases in the foreground | past the balance, down onto the grey velvet |
 
 ---
 

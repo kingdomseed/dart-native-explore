@@ -164,7 +164,7 @@ def build(scene):
 
     # Light: warm workshop key, teal machine glow, cool rim.
     # side key: its mirror image in the steel plate lands off the tray
-    E.light(scene, "AREA", "key", (-48, -18, 40), 22000, color=(1.0, 0.72, 0.46), size=25, target=(0, 0, 0))
+    E.light(scene, "AREA", "key", (-48, -18, 40), 26000, color=(1.0, 0.72, 0.46), size=25, target=(0, 0, 0))
     E.overhead(scene, 9000, color=(1.0, 0.82, 0.6), size=90, height=110)
     # Top-down framing: loose gears, screws and a schematic in the strips.
     bot = -D / 2 - RIM_T

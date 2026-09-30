@@ -62,18 +62,20 @@ KINDS = ("d4", "d6", "d8", "d10u", "d10t", "d12", "d20")
 # ~23-33 mm across in a 132 mm wide tray; here a d20 is ~2.9 cm across in
 # the 15 cm tray).
 SIZE_SCALE = 1.3
-# em: glyph font size as a multiple of the face inradius. Round 2 raised
-# these so every top-face numeral is >= 40% of the face's inscribed width
-# (measured from the rendered atlas, see numeral_stats()).
+# em: glyph font size as a multiple of the face inradius. Every top-face
+# numeral is >= 40% of the face's inscribed width and its strokes are a
+# medium weight, ~10-14% of the numeral height (round 2.1: the fonts are no
+# longer emboldened; em went up 13% to keep the height), measured from the
+# rendered atlas, see numeral_stats().
 DIE_PARAMS = {
     #        size     bevel  segs  glyph em (x face inradius)
-    "d4": dict(size=1.00, bevel=0.07, segs=3, em=1.75),  # shard: size = square section
-    "d6": dict(size=1.60, bevel=0.13, segs=4, em=1.48),
-    "d8": dict(size=1.05, bevel=0.07, segs=3, em=1.56),
-    "d10u": dict(size=1.00, bevel=0.06, segs=3, em=1.46),
-    "d10t": dict(size=1.00, bevel=0.06, segs=3, em=1.36),
-    "d12": dict(size=0.66, bevel=0.07, segs=3, em=1.48),
-    "d20": dict(size=1.18, bevel=0.055, segs=3, em=1.42),
+    "d4": dict(size=1.00, bevel=0.07, segs=3, em=1.78),  # shard: size = square section
+    "d6": dict(size=1.60, bevel=0.13, segs=4, em=1.67),
+    "d8": dict(size=1.05, bevel=0.07, segs=3, em=1.76),
+    "d10u": dict(size=1.00, bevel=0.06, segs=3, em=1.65),
+    "d10t": dict(size=1.00, bevel=0.06, segs=3, em=1.54),
+    "d12": dict(size=0.66, bevel=0.07, segs=3, em=1.67),
+    "d20": dict(size=1.18, bevel=0.055, segs=3, em=1.60),
 }
 # d4 shard proportions (x square section): prism half-length, cap length.
 SHARD_HALF, SHARD_CAP = 0.62, 0.62
@@ -419,7 +421,7 @@ def decor_strokes(theme, kind, f, rng):
     if style == "none" or f.get("cap"):
         return out
     if style in ("runes", "lacquer", "circuit", "ticks"):
-        k = {"runes": 0.86, "lacquer": 0.84, "circuit": 0.9, "ticks": 0.0}[style]
+        k = {"runes": 0.9, "lacquer": 0.84, "circuit": 0.9, "ticks": 0.0}[style]
         if k:
             out.append(([_inset(p2, k)], rin * (0.035 if style != "circuit" else 0.05), True))
     if style == "lacquer":
@@ -461,6 +463,8 @@ def decor_strokes(theme, kind, f, rng):
             d = q * 0.62
             out.append(([_circle(d.x, d.y, rin * 0.07, 12)], rin * 0.025, True))
             out.append(([[tuple(q * 0.8), tuple(q * 0.69)]], rin * 0.025, False))
+    if style == "dartnative":
+        out.append(([_inset(p2, 0.8)], rin * 0.03, True))
     if style == "frost":
         for q in p2:
             base = q * 0.92
@@ -567,7 +571,7 @@ def build_atlas(theme, specs, out_dir, res=4096):
     # by ~0.15 face inradius, hard edge), G = soft outer glow (wider falloff).
     # Real time: bake the keyline into baseColor, the glow into emissive.
     num = layers["num"]
-    key = np.clip(_blur(num, max(2, int(res * 0.0055))) * 6.0, 0, 1)
+    key = np.clip(_blur(num, max(2, int(res * 0.0028))) * 6.0, 0, 1)
     glow = np.clip(_blur(num, max(3, int(res * 0.006))) * 2.5, 0, 1)
     _save_rgba(np.stack([key, glow, np.zeros_like(num), np.ones_like(num)], axis=-1),
                out_dir / f"{theme}_halo.png")
@@ -580,16 +584,19 @@ def build_atlas(theme, specs, out_dir, res=4096):
 
 
 def numeral_stats(specs, num, res):
-    """Numeral height / face inscribed width, per numbered face (from the atlas).
+    """Numeral size and stroke weight, per numbered face (from the atlas).
 
-    Stored on each face as f["numeral_ratio"]; spec["numeral_ratio_min"] is the
-    die's worst face. The readability rule is >= 0.40.
+    f["numeral_ratio"]: numeral height / face inscribed width (rule >= 0.40);
+    spec["numeral_ratio_min"] is the die's worst face.
+    f["stroke_ratio"]: mean stroke width / numeral height (rule ~0.10-0.14,
+    a medium weight with open counters). Stroke width = 2 * area / boundary
+    length, exact for thin strokes; spec["stroke_ratio"] is the die's median.
     """
     bases = cell_bases()
     cpx = res / ATLAS_GRID
     for kind in KINDS:
         spec = specs[kind]
-        ratios = []
+        ratios, strokes = [], []
         for i, f in enumerate(spec["faces"]):
             if f.get("cap"):
                 continue
@@ -602,7 +609,16 @@ def numeral_stats(specs, num, res):
             h = (ys[-1] - ys[0] + 1) if len(ys) else 0
             f["numeral_ratio"] = (h / cpx * spec["cell_span"]) / (2 * f["rin"])
             ratios.append(f["numeral_ratio"])
+            inner = cell.copy()
+            inner[1:, :] &= cell[:-1, :]
+            inner[:-1, :] &= cell[1:, :]
+            inner[:, 1:] &= cell[:, :-1]
+            inner[:, :-1] &= cell[:, 1:]
+            boundary = max(1, int((cell & ~inner).sum()))
+            f["stroke_ratio"] = (2.0 * cell.sum() / boundary) / max(1, h)
+            strokes.append(f["stroke_ratio"])
         spec["numeral_ratio_min"] = min(ratios)
+        spec["stroke_ratio"] = float(np.median(strokes))
 
 
 def _blur(a, r):
@@ -805,68 +821,74 @@ THEMES = {
         env="The Forge Hearth",
         title="Emberforged",
         concept="Smoked amber glass around a live coal: a banked fire you can hold.",
-        font="sans", weight=0.035, decor="none", core=True,
+        font="sans", weight=0.0, decor="none", core=True,
         treatment="glowing: white-hot emissive numerals in a soot keyline"),
     "frostbound": dict(
         env="The Frozen Altar",
         title="Frostbound",
         concept="Clear glacial ice, fractured inside, with a cold blue heart and rime-frosted numerals.",
-        font="sans", weight=0.035, decor="frost", core=True,
+        font="sans", weight=0.0, decor="frost", core=True,
         treatment="glowing: emissive rime numerals on a deep-blue keyline"),
     "oldroad": dict(
         env="The Wayfarer's Table",
         title="Old Road",
         concept="Worn wayfarer's gold, numerals and flowing runes cut and filled with black niello.",
-        font="serif", weight=0.045, em_scale=1.15, decor="runes",
-        treatment="enamel fill: black niello in bright worn gold"),
+        font="serif", weight=0.006, em_scale=1.15, decor="runes",
+        treatment="enamel fill: oxblood-black enamel in bright polished gold"),
     "northfield": dict(
         env="Kitchen Table, 1986",
         title="Northfield Relay",
         concept="80s Nordic lab hardware: warm-white ABS, instrument numerals, calibration ticks.",
-        font="mono", weight=0.035, decor="ticks",
+        font="mono", weight=0.0, decor="ticks",
         treatment="inked: near-black instrument print on warm-white ABS"),
     "voltline": dict(
         env="Rain Counter",
         title="Voltline",
         concept="Black mirror chrome with neon-lit numerals and glowing circuit rims.",
-        font="mono", weight=0.035, decor="circuit",
+        font="mono", weight=0.0, decor="circuit",
         treatment="glowing: magenta neon numerals in a black keyline"),
     "vermilion": dict(
         env="Lantern Pavilion",
         title="Vermilion Court",
         concept="Deep urushi-red lacquer, gold-leaf numerals and fine gold inlay borders.",
-        font="serif", weight=0.035, em_scale=1.15, decor="lacquer",
-        treatment="bright metal + keyline: gold leaf in a black-lacquer keyline"),
+        font="serif", weight=0.006, em_scale=1.15, decor="lacquer",
+        treatment="bright metal: pale gold leaf on deep urushi red, gilt edges (thin keyline)"),
     "arcane": dict(
         env="The Night Study",
         title="Arcane Study",
         concept="Gold-framed midnight dice: deep-blue star-glitter inlay under raised gilt edges and numerals.",
-        font="serif", weight=0.035, em_scale=1.1, decor="stars",
-        treatment="glowing: warm spell-lit gilt numerals, midnight keyline"),
+        font="serif", weight=0.006, em_scale=1.1, decor="stars",
+        treatment="glowing: warm spell-lit gilt numerals, thin midnight keyline"),
     "fateengine": dict(
         env="The Fate Engine",
         title="Fate Engine",
         concept="Machined gunmetal in brass frames; numerals and sigils lit teal by the engine's charge.",
-        font="serif", weight=0.035, em_scale=1.1, decor="sigil",
+        font="serif", weight=0.006, em_scale=1.1, decor="sigil",
         treatment="glowing: aqua-charged numerals in a dark keyline"),
     "celestial": dict(
         env="The Star Balcony",
         title="Celestial Observatory",
         concept="A night sky caught in resin: violet nebula, pin-point stars, silver-rimmed edges.",
-        font="sans", weight=0.035, decor="stars",
+        font="sans", weight=0.0, decor="stars",
         treatment="glowing: starlight-silver numerals in an indigo keyline"),
     "hearthside": dict(
         env="Fireside Reading",
         title="Hearthside Tome",
         concept="Old bone and ivory, sepia-inked numerals worn soft by years of firelit play.",
-        font="serif", weight=0.035, em_scale=1.12, decor="none",
+        font="serif", weight=0.006, em_scale=1.12, decor="none",
         treatment="inked: engraved, filled with sepia-black ink"),
+    "dartnative": dict(
+        env="Launch Tray",
+        title="DartNative",
+        concept="The example app's own set: #090E12 dice with brand-gradient glowing edges and a cyan inlay.",
+        font="sans", weight=0.0, decor="dartnative",
+        treatment="glowing: white numerals in a thin keyline, brand-gradient edges"),
     "gemcutter": dict(
         env="The Jeweler's Bench",
         title="Gemcutter",
         concept="Classic swirled-gem polyhedrals: emerald and pearl ribbons under a glassy polish.",
-        font="sans", weight=0.035, decor="none",
-        treatment="bright enamel + keyline: warm-gold enamel in a deep-green keyline"),
+        font="sans", weight=0.0, decor="none",
+        treatment="bright enamel: ivory-gold enamel on emerald (thin keyline)"),
 }
 
 
@@ -948,12 +970,12 @@ def material_frostbound(img):
     # frozen under the frost), so clear ice over a bright floor can't wash
     # them out.
     rime = k.bsdf(Base_Color=(0.93, 0.97, 1.0, 1), Roughness=0.7, Subsurface_Weight=0.4,
-                  Normal=nrm, Emission_Color=(0.7, 0.9, 1.0, 1), Emission_Strength=5.0)
+                  Normal=nrm, Emission_Color=(0.7, 0.9, 1.0, 1), Emission_Strength=7.0)
     body = k.keyline(k.add_shader(ice, glint), (0.008, 0.03, 0.09), rough=0.45, normal=nrm)
     surf = k.mix_shader(num, body, rime)
     k.surface(surf)
     vol = k.node("ShaderNodeVolumeAbsorption")
-    k.set(vol, Color=(0.72, 0.9, 1.0, 1), Density=0.35)
+    k.set(vol, Color=(0.72, 0.9, 1.0, 1), Density=0.55)
     k.volume(vol.outputs[0])
     return m
 
@@ -978,7 +1000,7 @@ def material_frost_core():
     vol = k.node("ShaderNodeVolumePrincipled")
     k.set(vol, Color=(0.92, 0.97, 1.0, 1), Anisotropy=0.3, Emission_Color=(0.18, 0.55, 1.0, 1))
     k.link(density, vol.inputs["Density"])
-    k.link(k.math("MULTIPLY", k.math("POWER", heart, 1.6), 9.0), vol.inputs["Emission Strength"])
+    k.link(k.math("MULTIPLY", k.math("POWER", heart, 1.6), 6.0), vol.inputs["Emission Strength"])
     k.volume(vol.outputs[0])
     return m
 
@@ -995,17 +1017,23 @@ def material_oldroad(img):
     scratches = k.noise(stretch.outputs[0], 30.0, 2, 0.5).outputs["Fac"]
     ao = k.node("ShaderNodeAmbientOcclusion", samples=8)
     ao.inputs["Distance"].default_value = 0.25
-    col = k.mix(k.math("SUBTRACT", 1.0, ao.outputs["AO"]), (1.0, 0.72, 0.32, 1), (0.36, 0.2, 0.07, 1))
-    col = k.mix(k.math("MULTIPLY", wear, 0.35), col, (0.55, 0.42, 0.25, 1))
-    rough = k.math("ADD", k.math("MULTIPLY", wear, 0.35), 0.16)
-    nrm = k.bump(scratches, 0.12, 0.01)
+    # Round 2.1: bright, clean polished gold on the faces (round 2's wear and
+    # AO read as gold-on-gold at phone size); the grime stays in the recesses.
+    col = k.mix(k.math("MULTIPLY", k.math("SUBTRACT", 1.0, ao.outputs["AO"]), 0.6), (1.0, 0.8, 0.42, 1),
+                (0.45, 0.28, 0.1, 1))
+    col = k.mix(k.math("MULTIPLY", wear, 0.12), col, (0.8, 0.64, 0.36, 1))
+    rough = k.math("ADD", k.math("MULTIPLY", wear, 0.12), 0.14)
+    nrm = k.bump(scratches, 0.05, 0.01)
     nrm = _engrave(k, h, normal=nrm, strength=1.0, dist=0.05)
     gold = k.bsdf(Base_Color=col, Metallic=1.0, Roughness=rough, Normal=nrm)
-    # Readability: numerals cut deep and filled with black niello (enamel
-    # fill) on bright worn gold.
-    niello = k.bsdf(Base_Color=(0.008, 0.007, 0.006, 1), Roughness=0.5, Normal=nrm)
-    fill = k.math("MAXIMUM", num, dec)
-    k.surface(k.mix_shader(fill, gold, niello))
+    # Readability: numerals cut crisp and filled with deep oxblood-black
+    # enamel on the bright gold; the runes are a shallow engraving now (no
+    # enamel), so they stay ornament and never compete with the numeral.
+    enamel = k.bsdf(Base_Color=(0.012, 0.003, 0.003, 1), Roughness=0.3, Coat_Weight=0.6, Coat_Roughness=0.1,
+                    Normal=nrm)
+    etched = k.bsdf(Base_Color=k.mix(0.12, col, (0.3, 0.2, 0.08, 1)), Metallic=1.0, Roughness=0.3, Normal=nrm)
+    s = k.mix_shader(k.math("MULTIPLY", dec, 0.8), gold, etched)
+    k.surface(k.mix_shader(num, s, enamel))
     return m
 
 
@@ -1055,12 +1083,14 @@ def material_vermilion(img):
     num, dec, h = k.atlas(img)
     obj = k.coords().outputs["Object"]
     depth = k.noise(obj, 2.5, 5, 0.55).outputs["Fac"]
-    col = k.ramp(depth, [(0.3, (0.52, 0.035, 0.014)), (0.7, (0.8, 0.09, 0.03))])
+    # Round 2.1: a deep urushi red, so the gold numerals read on the plain
+    # face (the gate no longer counts the keyline for non-glowing sets)
+    col = k.ramp(depth, [(0.3, (0.14, 0.008, 0.004)), (0.7, (0.26, 0.022, 0.009))])
     flake = k.voronoi(obj, 55.0)
-    flakes = k.math("MULTIPLY", k.math("LESS_THAN", flake.outputs["Distance"], 0.06),
+    flakes = k.math("MULTIPLY", k.math("LESS_THAN", flake.outputs["Distance"], 0.03),
                     k.math("GREATER_THAN", k.noise(obj, 4.0, 1).outputs["Fac"], 0.58))
     nrm = _engrave(k, h, strength=0.5, dist=0.02)
-    lac = k.bsdf(Base_Color=col, Roughness=0.35, Coat_Weight=1.0, Coat_Roughness=0.015, Coat_IOR=1.55,
+    lac = k.bsdf(Base_Color=col, Roughness=0.35, Coat_Weight=1.0, Coat_Roughness=0.05, Coat_IOR=1.55,
                  Normal=nrm)
     gold = k.bsdf(Base_Color=(1.0, 0.74, 0.3, 1), Metallic=1.0, Roughness=0.22, Normal=nrm,
                   Coat_Weight=0.6, Coat_Roughness=0.02)
@@ -1068,9 +1098,12 @@ def material_vermilion(img):
     # Readability: gold-leaf numerals (part diffuse, so they catch the key
     # light even when the camera looks straight down) inside a black-lacquer
     # keyline; the red alone was only ~2.5:1 against gold.
-    leaf = k.bsdf(Base_Color=(1.0, 0.76, 0.34, 1), Metallic=0.5, Roughness=0.35, Normal=nrm,
+    leaf = k.bsdf(Base_Color=(1.0, 0.93, 0.72, 1), Metallic=0.1, Roughness=0.32, Normal=nrm,
                   Coat_Weight=0.4, Coat_Roughness=0.05)
     s = k.mix_shader(dec, s, gold)
+    # round 2.1: gilt edges (maki-e style), so the deep-red dice keep a lit
+    # outline on the black-lacquer tray
+    s = k.mix_shader(k.edge, s, gold)
     s = k.keyline(s, (0.006, 0.003, 0.002), rough=0.3, normal=nrm)
     k.surface(k.mix_shader(num, s, leaf))
     return m
@@ -1192,7 +1225,7 @@ def material_hearthside(img):
     bone = k.bsdf(Base_Color=col, Roughness=0.38, Subsurface_Weight=0.35, Subsurface_Radius=(0.5, 0.35, 0.2),
                   Normal=nrm, Coat_Weight=0.25, Coat_Roughness=0.2)
     # Readability: engraved and inked with dense sepia-black.
-    ink = k.bsdf(Base_Color=(0.03, 0.012, 0.006, 1), Roughness=0.6, Normal=nrm)
+    ink = k.bsdf(Base_Color=(0.012, 0.005, 0.003, 1), Roughness=0.6, Normal=nrm)
     k.surface(k.mix_shader(num, bone, ink))
     return m
 
@@ -1208,15 +1241,56 @@ def material_gemcutter(img):
     warp = k.noise(obj, 0.9, 3, 0.5).outputs["Color"]
     vec = k.mix(0.7, obj, warp, "LINEAR_LIGHT")
     sw = k.noise(vec, 1.3, 6, 0.55, dist=2.5).outputs["Fac"]
-    col = k.ramp(sw, [(0.28, (0.0, 0.07, 0.035)), (0.46, (0.01, 0.3, 0.14)), (0.58, (0.05, 0.55, 0.3)),
-                      (0.63, (0.75, 0.9, 0.82)), (0.67, (0.03, 0.4, 0.2)), (0.8, (0.0, 0.12, 0.06))])
+    # round 2.1: pale-jade wisps instead of pearl-white, so the bright
+    # numerals keep their contrast wherever a wisp passes behind them
+    col = k.ramp(sw, [(0.28, (0.0, 0.045, 0.022)), (0.46, (0.01, 0.16, 0.08)), (0.58, (0.02, 0.26, 0.14)),
+                      (0.63, (0.12, 0.34, 0.24)), (0.67, (0.015, 0.2, 0.1)), (0.8, (0.0, 0.08, 0.04))])
     nrm = _engrave(k, h, strength=0.8, dist=0.05)
     body = k.bsdf(Base_Color=col, Roughness=0.04, Transmission_Weight=0.55, IOR=1.55, Subsurface_Weight=0.3,
                   Coat_Weight=1.0, Coat_Roughness=0.01, Normal=nrm)
     body = k.keyline(body, (0.0, 0.025, 0.012), rough=0.35, normal=nrm)
     # Readability: warm-gold enamel numerals (part diffuse) in a deep-green keyline.
-    paint = k.bsdf(Base_Color=(1.0, 0.86, 0.5, 1), Metallic=0.45, Roughness=0.32, Normal=nrm)
+    paint = k.bsdf(Base_Color=(1.0, 0.95, 0.8, 1), Metallic=0.15, Roughness=0.3, Normal=nrm)
     k.surface(k.mix_shader(num, body, paint))
+    return m
+
+
+def _srgb(hexcode):
+    h = hexcode.lstrip("#")
+    c = [int(h[i:i + 2], 16) / 255.0 for i in (0, 2, 4)]
+    return tuple(x / 12.92 if x <= 0.04045 else ((x + 0.055) / 1.055) ** 2.4 for x in c)
+
+
+DN_GRADIENT = [_srgb(c) for c in ("#FA60A6", "#EF388B", "#E99173", "#D7BA52", "#B5C75E")]
+
+
+def material_dartnative(img):
+    """The app's own set: #090E12 body, brand-gradient glowing edges (like
+    the 3D logo), a cyan inlay line, white numerals (lime is the tray's one accent)."""
+    m = bpy.data.materials.new("DartNative")
+    k = NodeKit(m)
+    num, dec, h = k.atlas(img)
+    edge = k.edge
+    obj = k.coords().outputs["Object"]
+    nrm = _engrave(k, h, strength=0.5, dist=0.02)
+    body = k.bsdf(Base_Color=(*_srgb("#090E12"), 1), Roughness=0.28, Coat_Weight=1.0, Coat_Roughness=0.04,
+                  Normal=nrm)
+    # the gradient runs around the die (object-space angle, drifting with height)
+    ang = k.node("ShaderNodeTexGradient", gradient_type="RADIAL")
+    k.link(obj, ang.inputs["Vector"])
+    sep = k.node("ShaderNodeSeparateXYZ")
+    k.link(obj, sep.inputs[0])
+    fac = k.math("FRACT", k.math("ADD", ang.outputs["Fac"], k.math("MULTIPLY", sep.outputs["Z"], 0.12)))
+    stops = [(i / len(DN_GRADIENT), c) for i, c in enumerate(DN_GRADIENT)] + [(1.0, DN_GRADIENT[0])]
+    grad = k.emission(k.ramp(fac, stops), 2.4)
+    s = k.mix_shader(k.math("MULTIPLY", edge, 0.85), body, grad)
+    # decor atlas G: a thin cyan inlay line just inside each face edge
+    cyan = k.emission((*_srgb("#03C3F0"), 1), 3.0)
+    s = k.mix_shader(dec, s, cyan)
+    s = k.keyline(s, (0.002, 0.003, 0.004), rough=0.5, normal=nrm)
+    white = k.add_shader(k.bsdf(Base_Color=(0.9, 0.95, 1.0, 1), Roughness=0.3, Normal=nrm),
+                         k.emission((0.88, 0.96, 1.0, 1), 4.0))
+    k.surface(k.mix_shader(num, s, white))
     return m
 
 
@@ -1232,6 +1306,7 @@ SHELL_MATERIALS = {
     "northfield": material_northfield,
     "voltline": material_voltline,
     "vermilion": material_vermilion,
+    "dartnative": material_dartnative,
 }
 CORE_MATERIALS = {"emberforged": material_ember_core, "frostbound": material_frost_core}
 
@@ -1272,6 +1347,7 @@ def make_set(theme, atlas_dir, collection=None, specs=None):
             stats[kind + "_core"] = len(cm.polygons)
         objs[kind] = ob
     stats["numeral_ratio_min"] = {kind: round(specs[kind]["numeral_ratio_min"], 3) for kind in KINDS}
+    stats["stroke_ratio"] = {kind: round(specs[kind]["stroke_ratio"], 3) for kind in KINDS}
     return objs, specs, stats, atlas
 
 

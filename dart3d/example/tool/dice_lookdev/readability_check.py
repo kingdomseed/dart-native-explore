@@ -45,11 +45,12 @@ import numpy as np  # noqa: E402
 
 import build_dice  # noqa: E402
 
-ORDER = ("emberforged", "frostbound", "arcane", "fateengine", "celestial", "hearthside", "oldroad", "northfield",
+ORDER = ("dartnative", "emberforged", "frostbound", "arcane", "fateengine", "celestial", "hearthside", "oldroad", "northfield",
          "voltline", "vermilion", "gemcutter")
 GATE_NUMERAL = 4.5
 GATE_SILHOUETTE = 2.0
 GATE_SIZE = 0.40
+GATE_STROKE = (0.10, 0.14)  # stroke width / numeral height: medium weight, open counters
 TOP_COS = 0.97  # true normal . +Z
 
 
@@ -97,7 +98,7 @@ def ratio(a, b):
 # Mask pass
 # --------------------------------------------------------------------------
 
-def mask_material(atlas_img, die_id):
+def mask_material(atlas_img, halo_img, die_id):
     m = bpy.data.materials.new(f"readability_mask_{die_id}")
     k = build_dice.NodeKit(m)
     tex = k.node("ShaderNodeTexImage", image=atlas_img, interpolation="Closest")
@@ -108,15 +109,24 @@ def mask_material(atlas_img, die_id):
     k.link(geo.outputs["True Normal"], nz.inputs[0])
     top = k.math("GREATER_THAN", nz.outputs["Z"], TOP_COS)
     num = k.math("MULTIPLY", k.math("GREATER_THAN", sep.outputs["Red"], 0.5), top)
+    # G: 1 = plain face, 0.5 = keyline ring, 0 = not the top face
+    face = top
+    if halo_img is not None:
+        ht = k.node("ShaderNodeTexImage", image=halo_img, interpolation="Closest")
+        hs = k.node("ShaderNodeSeparateColor")
+        k.link(ht.outputs["Color"], hs.inputs["Color"])
+        key = k.math("MULTIPLY", k.math("GREATER_THAN", hs.outputs["Red"], 0.3),
+                     k.math("LESS_THAN", sep.outputs["Red"], 0.5))
+        face = k.math("MULTIPLY", top, k.math("SUBTRACT", 1.0, k.math("MULTIPLY", key, 0.5)))
     comb = k.node("ShaderNodeCombineColor")
     k.link(num, comb.inputs[0])
-    k.link(top, comb.inputs[1])
+    k.link(face, comb.inputs[1])
     comb.inputs[2].default_value = (die_id + 1) / 10.0
     k.surface(k.emission(comb.outputs[0], 1.0))
     return m
 
 
-def render_masks(scene, cam, objs, atlas_img, tmp):
+def render_masks(scene, cam, objs, atlas_img, tmp, halo_img=None):
     """Exact per-pixel masks (numeral, top face, die id) for the current camera."""
     saved_hide = {ob.name: ob.hide_render for ob in scene.objects}
     saved_mats = {kind: list(ob.data.materials) for kind, ob in objs.items()}
@@ -131,7 +141,7 @@ def render_masks(scene, cam, objs, atlas_img, tmp):
             ob.hide_render = True
     for i, (kind, ob) in enumerate(objs.items()):
         ob.data.materials.clear()
-        ob.data.materials.append(mask_material(atlas_img, build_dice.KINDS.index(kind)))
+        ob.data.materials.append(mask_material(atlas_img, halo_img, build_dice.KINDS.index(kind)))
     w = bpy.data.worlds.new("mask_world")
     w.color = (0, 0, 0)
     scene.world = w
@@ -171,7 +181,9 @@ def render_masks(scene, cam, objs, atlas_img, tmp):
 
 def measure(scene, cam, objs, specs, beauty_png, theme, tmp, crops_dir=None):
     atlas_img = next(im for im in bpy.data.images if im.name.startswith(f"{theme}_atlas"))
-    masks = render_masks(scene, cam, objs, atlas_img, tmp)
+    halo_img = next((im for im in bpy.data.images if im.name.startswith(f"{theme}_halo")), None)
+    masks = render_masks(scene, cam, objs, atlas_img, tmp, halo_img)
+    glowing = build_dice.THEMES[theme].get("treatment", "").startswith("glowing")
     beauty, _ = load_rgb(beauty_png)
     if beauty.shape[:2] != masks.shape[:2]:
         raise RuntimeError(f"beauty {beauty.shape} vs mask {masks.shape}: render both at the same size")
@@ -191,27 +203,49 @@ def measure(scene, cam, objs, specs, beauty_png, theme, tmp, crops_dir=None):
         x0, x1 = max(0, xs.min() - 16), min(die.shape[1], xs.max() + 17)
         sl = (slice(y0, y1), slice(x0, x1))
         d, Lc = die[sl], L[sl]
-        top = d & (masks[sl][..., 1] > 0.5)
+        g = masks[sl][..., 1]
+        top = d & (g > 0.25)
         num = top & (masks[sl][..., 0] > 0.5)
+        keyline = top & (g < 0.75) & ~num
+        face = top & (g >= 0.75) & ~num
         res = {"visible": True}
         if num.any():
             nys = np.nonzero(num)[0]
             h_px = int(nys.max() - nys.min() + 1)
             ring_r = max(2, int(round(0.08 * h_px)))
-            core = erode(num, 1)
+            # stroke core: the numeral eroded by ~1/4 of its stroke width
+            stroke_px = specs[kind]["stroke_ratio"] * h_px
+            core = erode(num, max(1, int(round(stroke_px / 4))))
             if core.sum() < 6:
-                core = num
-            near = dilate(num, 1)
-            surround = top & ~near & dilate(num, 1 + ring_r)
-            body = top & ~dilate(num, 1 + ring_r)
-            ln = float(np.median(Lc[core]))
-            ls = float(np.median(Lc[surround])) if surround.any() else float("nan")
-            lb = float(np.median(Lc[body])) if body.any() else float("nan")
-            res.update(numeral_px=h_px, L_numeral=round(ln, 4), L_surround=round(ls, 4), L_body=round(lb, 4),
-                       contrast=round(ratio(ln, ls), 2), contrast_body=round(ratio(ln, lb), 2),
-                       numeral_brighter=ln > ls)
+                core = erode(num, 1) if erode(num, 1).sum() >= 6 else num
+            # "adjacent": the ring right outside the numeral (the keyline, if any)
+            adjacent = top & ~dilate(num, 1) & dilate(num, 1 + ring_r)
+            # "face": the plain face right outside numeral + keyline
+            inked = num | keyline
+            facering = face & ~dilate(inked, 1) & dilate(inked, 1 + ring_r)
+            if not facering.any():
+                facering = face
+            # Worst-quartile contrast: the numeral's weakest quarter against the
+            # face's closest quarter (catches AO, wear and texture noise that a
+            # median hides; round 2's Old Road passed on medians).
+            dark = np.median(Lc[core]) < np.median(Lc[facering])
+
+            def pair(ring_mask):
+                if dark:
+                    return float(np.percentile(Lc[core], 75)), float(np.percentile(Lc[ring_mask], 25))
+                return float(np.percentile(Lc[core], 25)), float(np.percentile(Lc[ring_mask], 75))
+            ln, lf = pair(facering)
+            _, la = pair(adjacent) if adjacent.any() else (ln, lf)
+            c_face, c_adj = ratio(ln, lf), ratio(ln, la)
+            # glowing sets may count their keyline/glow; the others must read
+            # on the plain face
+            gated = max(c_face, c_adj) if glowing else c_face
+            res.update(numeral_px=h_px, L_numeral=round(ln, 4), L_face=round(lf, 4), L_adjacent=round(la, 4),
+                       contrast=round(gated, 2), contrast_face=round(c_face, 2), contrast_adjacent=round(c_adj, 2),
+                       numeral_brighter=not dark, keyline_counted=glowing)
         else:
-            res.update(numeral_px=0, contrast=0.0, contrast_body=0.0)
+            res.update(numeral_px=0, contrast=0.0, contrast_face=0.0, contrast_adjacent=0.0)
+        res["stroke_ratio"] = round(specs[kind]["stroke_ratio"], 3)
         sil = erode(d, 2)
         ring = dilate(d, 12) & ~dilate(d, 3) & ~dilate(any_die[sl], 3)
         if sil.any() and ring.any():
@@ -235,14 +269,18 @@ def measure(scene, cam, objs, specs, beauty_png, theme, tmp, crops_dir=None):
         else:
             res["contrast_silhouette"] = float("nan")
         res["pass"] = bool(res["contrast"] >= GATE_NUMERAL and res["contrast_silhouette"] >= GATE_SILHOUETTE
-                           and specs[kind]["numeral_ratio_min"] >= GATE_SIZE)
+                           and specs[kind]["numeral_ratio_min"] >= GATE_SIZE
+                           and GATE_STROKE[0] <= specs[kind]["stroke_ratio"] <= GATE_STROKE[1])
         dice[kind] = res
         crops.append((kind, beauty[sl]))
     out = {"dice": dice,
            "min_contrast": min(v.get("contrast", 0) for v in dice.values()),
            "min_contrast_silhouette": min(v.get("contrast_silhouette", 0) for v in dice.values()),
            "min_numeral_px": min(v.get("numeral_px", 0) for v in dice.values()),
-           "min_numeral_ratio": round(min(specs[k]["numeral_ratio_min"] for k in objs), 3)}
+           "min_numeral_ratio": round(min(specs[k]["numeral_ratio_min"] for k in objs), 3),
+           "stroke_ratio_range": [round(min(specs[k]["stroke_ratio"] for k in objs), 3),
+                                  round(max(specs[k]["stroke_ratio"] for k in objs), 3)],
+           "keyline_counted": glowing}
     out["pass"] = all(v.get("pass") for v in dice.values())
     if crops_dir:
         Path(crops_dir).mkdir(parents=True, exist_ok=True)
@@ -278,28 +316,33 @@ def merge(json_path, theme, res):
 
 def print_row(theme, res):
     worst = min(res["dice"].items(), key=lambda kv: kv[1].get("contrast", 0))
+    sr = res.get("stroke_ratio_range", [0, 0])
     print(f"dice_lookdev: readability {theme}: numeral min {res['min_contrast']:.2f} ({worst[0]}), "
           f"silhouette min {res['min_contrast_silhouette']:.2f}, numeral >= {res['min_numeral_px']} px, "
-          f"size {res['min_numeral_ratio']:.2f} -> {'PASS' if res['pass'] else 'FAIL'}", flush=True)
+          f"size {res['min_numeral_ratio']:.2f}, stroke {sr[0]:.3f}-{sr[1]:.3f} "
+          f"-> {'PASS' if res['pass'] else 'FAIL'}", flush=True)
     for k, v in res["dice"].items():
-        print(f"dice_lookdev:   {k:5s} numeral {v.get('contrast', 0):5.2f} (body {v.get('contrast_body', 0):5.2f})"
-              f" sil {v.get('contrast_silhouette', 0):5.2f} {v.get('numeral_px', 0):3d}px", flush=True)
+        print(f"dice_lookdev:   {k:5s} numeral {v.get('contrast', 0):5.2f} (face {v.get('contrast_face', 0):5.2f},"
+              f" adjacent {v.get('contrast_adjacent', 0):5.2f}) sil {v.get('contrast_silhouette', 0):5.2f}"
+              f" {v.get('numeral_px', 0):3d}px", flush=True)
 
 
 def table(json_path, order=None):
     data = json.loads(Path(json_path).read_text())
     order = [t for t in (order or ORDER) if t in data]
-    lines = ["| Set | Numeral treatment | Numeral contrast, worst die (gate 4.5) | vs plain body | "
-             "Die vs tray, worst (gate 2.0) | Top numeral height | Numeral / face width (gate 0.40) | Result |",
-             "|---|---|---|---|---|---|---|---|"]
+    lines = ["| Set | Numeral treatment | Numeral stroke vs face, worst die (gate 4.5) | "
+             "Keyline counted? | Die vs tray, worst (gate 2.0) | Top numeral height | "
+             "Numeral / face width (gate 0.40) | Stroke / height (gate 0.10–0.14) | Result |",
+             "|---|---|---|---|---|---|---|---|---|"]
     for t in order:
         r = data[t]
         worst = min(r["dice"].items(), key=lambda kv: kv[1].get("contrast", 0))
-        body = min(v.get("contrast_body", 0) for v in r["dice"].values())
+        sr = r.get("stroke_ratio_range", [0, 0])
         lines.append(f"| {build_dice.THEMES[t]['title']} | {build_dice.THEMES[t].get('treatment', '')} | "
-                     f"{r['min_contrast']:.1f}:1 ({worst[0]}) | {body:.1f}:1 | "
+                     f"{r['min_contrast']:.1f}:1 ({worst[0]}) | {'yes (glowing)' if r.get('keyline_counted') else 'no'} | "
                      f"{r['min_contrast_silhouette']:.1f}:1 | {r['min_numeral_px']} px | "
-                     f"{r['min_numeral_ratio']:.2f} | {'PASS' if r['pass'] else 'FAIL'} |")
+                     f"{r['min_numeral_ratio']:.2f} | {sr[0]:.2f}–{sr[1]:.2f} | "
+                     f"{'PASS' if r['pass'] else 'FAIL'} |")
     return "\n".join(lines)
 
 

@@ -150,7 +150,7 @@ def build(scene):
     # overhead for the gilt, and a weaker moon than round 1.
     E.light(scene, "AREA", "moon", (8, top + 70, 60), 6000, color=(0.55, 0.65, 1.0), size=40, target=(0, 0, 0),
             shadow=False)
-    E.light(scene, "AREA", "candle_key", (-8, top + 2, 34), 11000, color=(1.0, 0.74, 0.48), size=14,
+    E.light(scene, "AREA", "candle_key", (-8, top + 2, 34), 13000, color=(1.0, 0.74, 0.48), size=14,
             target=(0, -5, 0))
     E.light(scene, "AREA", "warm_fill", (-30, -30, 30), 900, color=(1.0, 0.7, 0.45), size=25, target=(0, 0, 0))
     E.overhead(scene, 3500, color=(1.0, 0.85, 0.65), size=90, height=110)

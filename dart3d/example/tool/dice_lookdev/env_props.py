@@ -137,20 +137,22 @@ def dark_wood(name="Dark wood", scale=0.05, c1=(0.05, 0.025, 0.012), c2=(0.12, 0
     return m
 
 
-def parchment(name="Parchment", ink=True, tone=None):
-    """tone: optional 3 colour stops (dark, mid, light) replacing the default cream."""
+def parchment(name="Parchment", ink=True, tone=None, ink_color=(0.08, 0.05, 0.03), ink_amount=0.3, grain=1.0):
+    """tone: optional 3 colour stops (dark, mid, light) replacing the default cream.
+    ink_color / ink_amount: the map lines; grain scales the mottling (1 = default)."""
     m, k = E.material(name)
     obj = k.coords().outputs["Object"]
     n = k.noise(obj, 0.25, 10, 0.65).outputs["Fac"]
     t = tone or ((0.42, 0.3, 0.16), (0.78, 0.66, 0.46), (0.85, 0.75, 0.55))
+    n = k.math("ADD", 0.5, k.math("MULTIPLY", k.math("SUBTRACT", n, 0.5), grain))
     col = k.ramp(n, [(0.25, t[0]), (0.65, t[1]), (0.85, t[2])])
     if ink:
         # contour-like inked coastlines (an invented map, no real places)
         c = k.noise(obj, 0.35, 3, 0.5).outputs["Fac"]
         f = k.math("FRACT", k.math("MULTIPLY", c, 7.0))
         line = k.math("LESS_THAN", k.math("ABSOLUTE", k.math("SUBTRACT", f, 0.5)), 0.035)
-        ink_m = k.math("MULTIPLY", line, 0.3)
-        col = k.mix(ink_m, col, (0.08, 0.05, 0.03, 1))
+        ink_m = k.math("MULTIPLY", line, ink_amount)
+        col = k.mix(ink_m, col, (*ink_color, 1))
     k.surface(k.bsdf(Base_Color=col, Roughness=0.85, Subsurface_Weight=0.1,
                      Normal=k.bump(k.noise(obj, 3.0, 6).outputs["Fac"], 0.15, 0.05)))
     return m

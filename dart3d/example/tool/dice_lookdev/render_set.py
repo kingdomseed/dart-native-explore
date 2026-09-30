@@ -11,6 +11,7 @@ Shots (every die is settled on the surface; see env_common.settle)
             dice showing a result. Judge everything from this first.
   hero    - the full set in the tray, 3/4 view, shallow depth of field
   d4      - close-up of the d4 shard with its result on the top face
+  d20     - close-up of the d20 (numeral detail: stroke weight, keyline, enamel)
 
 --check runs readability_check.measure() on the top-down render (numeral vs
 face contrast, numeral size, die vs tray contrast, contacts) and merges the
@@ -104,7 +105,7 @@ def run(a):
             R.merge(out / "readability.json", a.theme, res)
             R.print_row(a.theme, res)
     centre = Vector(info.get("centre", (0.0, 2.0, z + 1.0)))
-    if "hero" in shots or "d4" in shots:
+    if "hero" in shots or "d4" in shots or "d20" in shots:
         h = info.get("hero", {})
         loc = E.orbit(centre, h.get("dist", 34) * 1.12, h.get("elev", 27), h.get("az", 0))
         E.place_layout(objs, specs, info.get("hero_layout", E.HERO_LAYOUT), centre=centre.to_2d(), facing_from=loc)
@@ -119,6 +120,11 @@ def run(a):
             cam_loc = E.orbit(t, 13, 48, az)
             cam = E.camera(scene, "d4", cam_loc, t, lens=100, fstop_real=5.6)
             shot("d4", cam, (1000, 625))
+        if "d20" in shots:
+            t = objs["d20"].location.copy()
+            cam_loc = E.orbit(t, 12, 52, h.get("az", 0) - 10)
+            cam = E.camera(scene, "d20", cam_loc, t, lens=100, fstop_real=5.6)
+            shot("d20", cam, (1000, 625))
     print("dice_lookdev: contacts", json.dumps(report))
     bad = [(s, k, v) for s, r in report.items() for k, v in r.items()
            if v["overlaps"] or not (0 <= v["gap_cm"] < 0.01)]

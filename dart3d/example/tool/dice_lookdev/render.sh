@@ -9,7 +9,8 @@
 #   SHOTS=topdown dart3d/example/tool/dice_lookdev/render.sh              # the gate only
 #
 # Per set: <theme>-topdown.jpg (PRIMARY, 1179x2556, straight down like the
-# app), <theme>-hero.jpg (3/4 view), <theme>-d4.jpg (d4 shard close-up) and
+# app), <theme>-hero.jpg (3/4 view), <theme>-d4.jpg (d4 shard close-up),
+# <theme>-d20.jpg for the sets in D20_SETS, and
 # its entry in readability.json. Then all-sets-topdown.jpg, all-sets-hero.jpg,
 # readability-crops.jpg (the seven dice of every set at phone pixels, from
 # out/crops/) and the face map. Needs Blender 5.2 (Cycles on Metal).
@@ -22,16 +23,17 @@ BLENDER="${BLENDER:-/Applications/Blender.app/Contents/MacOS/Blender}"
 PCT="${PCT:-100}"
 SAMPLES="${SAMPLES:-0}"   # 0 = each environment's default
 SHOTS="${SHOTS:-topdown,hero,d4}"
+D20_SETS=" dartnative emberforged oldroad vermilion gemcutter "  # these also get a d20 close-up
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
-ALL=(emberforged frostbound arcane fateengine celestial hearthside oldroad northfield voltline vermilion gemcutter)
+ALL=(dartnative emberforged frostbound arcane fateengine celestial hearthside oldroad northfield voltline vermilion gemcutter)
 if [[ $# -gt 0 ]]; then SETS=("$@"); else SETS=("${ALL[@]}"); fi
 
 mkdir -p "$OUT"
 for t in "${SETS[@]}"; do
   "$BLENDER" --background --python "$HERE/render_set.py" -- \
-    --theme "$t" --shots "$SHOTS" --check --pct "$PCT" --samples "$SAMPLES" \
+    --theme "$t" --shots "$SHOTS$([[ "$SHOTS" == *hero* && "$D20_SETS" == *" $t "* ]] && echo ,d20)" --check --pct "$PCT" --samples "$SAMPLES" \
     --out "$OUT" --tmp "$TMP/$t" 2>&1 | grep -E '^dice_lookdev|Error|Traceback'
 done
 

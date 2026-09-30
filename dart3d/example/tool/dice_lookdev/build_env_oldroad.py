@@ -33,7 +33,8 @@ def build(scene):
     E.world(scene, color=(0.1, 0.075, 0.05), strength=1.0)
     table = P.dark_wood("Inn table", c1=(0.05, 0.03, 0.015), c2=(0.18, 0.1, 0.05), rough=0.75, varnish=0.0)
     E.cube("table", (200, 150, 6), (0, 20, -3.0), table, bevel=0.5)
-    E.plane("map", W + 2 * RIM_T, D + 2 * RIM_T, (0, 0, 0.36), P.parchment("Travel map", tone=((0.08, 0.05, 0.022), (0.16, 0.1, 0.05), (0.2, 0.14, 0.07))), subdiv=1)
+    E.plane("map", W + 2 * RIM_T, D + 2 * RIM_T, (0, 0, 0.36), P.parchment("Travel map", tone=((0.05, 0.034, 0.018), (0.075, 0.05, 0.027), (0.09, 0.062, 0.034)),
+                                                             ink_color=(0.3, 0.22, 0.12), ink_amount=0.18, grain=0.5), subdiv=1)
     E.cube("map_board", (W + 2 * RIM_T + 1, D + 2 * RIM_T + 1, 0.7), (0, 0, 0), leather("Board leather",
                                                                                     (0.1, 0.04, 0.02)), bevel=0.3)
     E.rim("rim", W + RIM_T, D + RIM_T, 3.0, RIM_H, RIM_T, leather(), z0=0.35)
@@ -80,5 +81,5 @@ def build(scene):
            bevel=0.3).rotation_euler = (0, 0, math.radians(84))
     E.haze_box("haze", (160, 180, 70), (0, 20, 34), 0.003, color=(1.0, 0.9, 0.8), noise_scale=0.03)
     return dict(
-        samples=128, exposure=0.6, topdown=dict(width=W + 2 * RIM_T + 1.0), hero=dict(dist=32, elev=30, az=-6, lens=65, fstop=2.8),
+        samples=128, exposure=0.9, topdown=dict(width=W + 2 * RIM_T + 1.0), hero=dict(dist=32, elev=30, az=-6, lens=65, fstop=2.8),
     )
