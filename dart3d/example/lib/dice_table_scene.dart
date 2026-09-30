@@ -3,10 +3,14 @@
 /// screen lives in `dice_table.dart`, which passes `loadAssetBytes`
 /// and `dnLog` in through the parameters. Pulls the pure-Dart dart3d
 /// libraries directly — the barrel needs DartNative's patched SDK.
+///
+/// The table is the DartNative set (`dice_set.dart`: black frosted
+/// dice, the 3D logo glowing inside each) on the Obsidian tray
+/// (`dice_obsidian_tray.dart`), top-down, the walls fitted to the
+/// screen (`dice_tray_layout.dart`).
 // ignore_for_file: implementation_imports
 library;
 
-import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -15,7 +19,9 @@ import 'package:dart3d/src/physics.dart';
 import 'package:dart3d/src/scene_model.dart';
 import 'package:vector_math/vector_math.dart';
 
-import 'dice_shard_d4.dart';
+import 'dice_obsidian_tray.dart';
+import 'dice_polyhedra.dart';
+import 'dice_set.dart';
 import 'dice_tray_layout.dart';
 import 'light_aim.dart';
 
@@ -60,9 +66,8 @@ final class DieFaceMap {
   int read(Quaternion worldRotation) => top(worldRotation).$1.value;
 }
 
-/// One die on the table: its composed node id (the instance id — a
-/// single-root prefab merges its root into the instance node), its
-/// display label, its face map, and its size.
+/// One die on the table: its node, display label, face map and size,
+/// and the logo inside it.
 final class TableDie {
   const TableDie({
     required this.node,
@@ -71,21 +76,34 @@ final class TableDie {
     required this.restY,
     required this.restRotation,
     required this.radius,
+    this.logo,
+    this.logoFacing,
   });
 
   final LocalId node;
   final String label;
   final DieFaceMap faceMap;
 
-  /// The rack pose: [restRotation] puts a face squarely up, and
-  /// [restY] is the node-origin height at which the die then rests on
-  /// the table — racking puts it there so a reset doesn't tip or drop
-  /// the dice into an unrequested roll.
+  /// The rack pose: [restRotation] puts the highest face squarely up,
+  /// reading upright, and [restY] is the node-origin height at which the
+  /// die then rests on the table.
   final double restY;
   final Quaternion restRotation;
 
   /// Bounding-sphere radius — keeps racked dice clear of the walls.
   final double radius;
+
+  /// The logo node inside the die (a child), and the world rotation it
+  /// is held at whatever the die does: level, reading side up, with a
+  /// small per-die roll ([logoLocalRotation]).
+  final LocalId? logo;
+  final Quaternion? logoFacing;
+
+  /// The logo's local rotation for the die at world [dieRotation].
+  Quaternion? logoLocalRotation(Quaternion dieRotation) {
+    final f = logoFacing;
+    return f == null ? null : dieRotation.conjugated() * f;
+  }
 }
 
 /// Everything the screen needs from [buildDiceTable].
@@ -96,6 +114,8 @@ final class DiceTableScene {
     required this.cameraNode,
     required this.wallNodes,
     required this.ceilingNode,
+    required this.rimNodes,
+    required this.rimBead,
     required this.layout,
   });
 
@@ -109,31 +129,26 @@ final class DiceTableScene {
   final List<LocalId> wallNodes;
   final LocalId ceilingNode;
 
+  /// The rim pieces, in [kRimPieces] order ([rimPoses]).
+  final List<LocalId> rimNodes;
+
+  /// The bead of light that travels round the rim (`rimBeadAt`).
+  final LocalId rimBead;
+
   /// The layout the document was built with; the screen refits it to
   /// the real view and writes the new poses.
   final TrayLayout layout;
 }
 
-/// The bundled imported dice — label → `.fsceneb` asset key. The d4 is
-/// the procedural crystal shard ([addShardD4]), not an asset.
-const _diceAssets = {
-  'd6': 'assets/dice/scene.d6.dbe505b8.fsceneb',
-  'd8': 'assets/dice/scene.d8.dbe51f72.fsceneb',
-  'd10t': 'assets/dice/scene.d10t.862039c2.fsceneb',
-  'd10u': 'assets/dice/scene.d10u.86203b0d.fsceneb',
-  'd12': 'assets/dice/scene.d12.a5cbecd0.fsceneb',
-  'd20': 'assets/dice/scene.d20.a5fdb0b1.fsceneb',
-};
-
 /// Rack order.
-const kDiceOrder = ['d4', 'd6', 'd8', 'd10t', 'd10u', 'd12', 'd20'];
+const kDiceOrder = kDieKinds;
 
-/// Diameter of the d20 in world units (its bounds span ±9.63).
-const double kD20Diameter = 19.26;
+/// Diameter of the d20 in world units.
+const double kD20Diameter = kD20Span;
 
 /// Rendered d20 size as a fraction of the screen's short side — about
 /// upstream's (its d6 is ~70 px on a ~400 px-wide phone).
-const double kD20ScreenFraction = 0.15;
+const double kD20ScreenFraction = 0.21;
 
 /// Logical px per world unit on the table for a view whose short side
 /// is [shortestSide] — constant across rotation, so dice keep their
@@ -141,109 +156,19 @@ const double kD20ScreenFraction = 0.15;
 double trayPxPerUnit(double shortestSide) =>
     kD20ScreenFraction * shortestSide / kD20Diameter;
 
-/// Half-extent of the (square) tabletop — wider than the visible area
-/// of any phone or tablet at [trayPxPerUnit], so the view is always
-/// wood.
-const double kTableHalf = 320.0;
+/// The logo asset (P4, `tool/dn_logo/build.sh`).
+const kLogoAsset = 'assets/showcase/dn_logo.fsceneb';
 
-/// Edge of the synthesized wood texture, in pixels.
-const int kWoodTextureSize = 512;
+/// The logo's half-diagonal in its own units (bounds ±1.0 × ±0.69).
+const double kLogoHalfDiagonal = 1.21;
 
-/// A [kWoodTextureSize]² RGBA wood texture, synthesized at build time —
-/// no asset file, so the document carries it as an `rgba8` payload that
-/// both backends upload verbatim.
-///
-/// The grain is elongated turbulence-driven banding (walnut tones);
-/// the vignette is *baked*: Filament measures point/spot intensity in
-/// candela while SceneKit uses a unitless multiplier, so a real lamp
-/// would fall off differently per platform. Darkening the texture
-/// toward the edges gives the pool-table lamp look identically
-/// everywhere — the wood is still lit, so dice shadows and speculars
-/// land on it normally.
-Uint8List _woodTexture() {
-  const n = kWoodTextureSize;
-  final px = Uint8List(n * n * 4);
-  for (var y = 0; y < n; y++) {
-    for (var x = 0; x < n; x++) {
-      final nx = x / (n / 2) - 1, ny = y / (n / 2) - 1;
-      // Grain: rings stretched along v → long wavy lines running
-      // down the table, like boards.
-      final gx = nx * 5.0, gy = ny * 0.9;
-      final d = sqrt(gx * gx + gy * gy);
-      final turb =
-          0.55 * sin(gx * 4.2 + gy * 9.1) +
-          0.3 * sin(gx * 11.7 - gy * 3.3) +
-          0.18 * sin(gx * 23.1 + gy * 6.7);
-      final band = d * 5.5 + turb - (d * 5.5 + turb).floorToDouble();
-      // Sharp dark pore lines where the band wraps.
-      final line = (band - 0.5).abs() * 2;
-      // Broad tonal bands across the grain.
-      final tone = 0.5 + 0.5 * sin(d * 2.2 + turb * 0.9);
-      // Fine per-pixel hash noise — keeps the wood from airbrushing.
-      final h = (x * 1973 + y * 9277) ^ (x * y * 2699);
-      final noise = ((h & 0xffff) / 0xffff - 0.5) * 0.14;
-      final t = (line * 0.55 + tone * 0.45 + noise).clamp(0.0, 1.0);
-      // Walnut: light ↔ dark.
-      var r = 0.32 + 0.30 * t, g = 0.20 + 0.185 * t, b = 0.10 + 0.10 * t;
-      // Baked vignette — bright centre, darker toward a phone's long
-      // edges (world radius ~150).
-      final rw = sqrt(nx * nx + ny * ny) * kTableHalf;
-      final edge = ((rw - 70) / 150).clamp(0.0, 1.0);
-      final vig = 1.0 - 0.45 * edge * edge * (3 - 2 * edge);
-      r *= vig;
-      g *= vig;
-      b *= vig;
-      final i = (y * n + x) * 4;
-      px[i] = (r * 255).round().clamp(0, 255);
-      px[i + 1] = (g * 255).round().clamp(0, 255);
-      px[i + 2] = (b * 255).round().clamp(0, 255);
-      px[i + 3] = 255;
-    }
-  }
-  return px;
-}
+/// Logo size inside a die: its half-diagonal over the die's inradius
+/// (look-dev `LOGO_FILL`) — visible, never crowding the faces.
+const double kLogoFill = 0.72;
 
-/// Parses `assets/dice/dice_faces.json` (extracted host-side from each
-/// glb's `extras.face_map_json`). The JSON normals are glTF (right-
-/// handed, Y-up); the `.fsceneb` meshes and the settle poses are in the
-/// document's left-handed frame, so z is mirrored here, once, on load.
-/// [bytesFor] overrides the bundle lookup for tests.
-Map<String, DieFaceMap> loadDiceFaceMaps({
-  Uint8List? Function(String key)? bytesFor,
-}) {
-  final bytes = bytesFor?.call('assets/dice/dice_faces.json');
-  if (bytes == null) return {};
-  final Object? decoded = jsonDecode(utf8.decode(bytes));
-  if (decoded is! Map<String, dynamic>) return {};
-  final out = <String, DieFaceMap>{};
-  decoded.forEach((die, raw) {
-    if (raw is! Map<String, dynamic>) return;
-    final faces = <DieFace>[];
-    for (final f in (raw['faces'] as List? ?? const [])) {
-      if (f is! Map<String, dynamic>) continue;
-      final n = f['n'] as List?;
-      final v = f['v'];
-      if (n == null || n.length != 3 || v is! num) continue;
-      faces.add(
-        DieFace(
-          Vector3(
-            (n[0] as num).toDouble(),
-            (n[1] as num).toDouble(),
-            -(n[2] as num).toDouble(),
-          ),
-          v.toInt(),
-        ),
-      );
-    }
-    out[die] = DieFaceMap(faces: faces);
-  });
-  return out;
-}
-
-/// The shard d4's face map (document space, from [kShardFaces]).
-final DieFaceMap shardFaceMap = DieFaceMap(
-  faces: [for (final (n, v) in kShardFaces) DieFace(n, v)],
-);
+/// The logo's self-glow (its gradient texture as emissive), strong
+/// enough to shine through the smoky shell.
+const double kLogoGlow = 1.5;
 
 /// Table physics, ported from upstream "Dice Shadows"
 /// (docs/design/demo-program.md §3.2) and scaled by [kUpstreamUnit]:
@@ -262,6 +187,7 @@ final class DiceTableSpec {
     this.angularDamping = 0.3,
     this.throwScale = 1.0,
     this.spinScale = 1.0,
+    this.shell = const DiceShellLook(),
   });
 
   /// Gravity magnitude (the world's gravity vector is −Y).
@@ -278,20 +204,24 @@ final class DiceTableSpec {
 
   /// Multipliers on the throw's launch speed and tumble rate.
   final double throwScale, spinScale;
+
+  /// The dice's shell material.
+  final DiceShellLook shell;
 }
 
-/// Builds the composed dice-table document: table, walls and ceiling
-/// fitted to [layout], the seven dice, camera, lights, environment.
-/// [bytesFor] overrides the bundle lookup for tests; [spec] tunes the
-/// physics. The screen refits the layout to its real size.
+/// Builds the table document: the Obsidian tray, walls and ceiling
+/// fitted to [layout], the seven DartNative dice with a logo inside
+/// each, camera, lights, environment. [bytesFor] supplies the logo
+/// asset (the dice are procedural; without it they're built logo-less);
+/// [spec] tunes the physics. The screen refits the layout to its real
+/// size.
 DiceTableScene? buildDiceTable({
   Uint8List? Function(String key)? bytesFor,
   void Function(String message)? log,
   DiceTableSpec spec = const DiceTableSpec(),
   TrayLayout? layout,
 }) {
-  final bytesOf = bytesFor ?? (_) => null;
-  final faceMaps = loadDiceFaceMaps(bytesFor: bytesFor);
+  final sw = Stopwatch()..start();
   final host = SceneDocument();
   // Until the screen measures itself: a typical portrait phone.
   final fit =
@@ -313,58 +243,11 @@ DiceTableScene? buildDiceTable({
     restitutionCombine: 'average',
   );
 
-  // Wood tabletop: a deep slab (a die at full throw speed moves ~5
-  // units per substep; 40 is unpassable), its top face at y = 0.
-  const slabThick = 40.0;
-  final woodPixels = _woodTexture();
-  final woodPayload = host.addPayload(
-    PayloadSpec(
-      host.newId(),
-      encoding: PayloadEncoding.image,
-      format: 'rgba8',
-      width: kWoodTextureSize,
-      height: kWoodTextureSize,
-      length: woodPixels.length,
-      bytes: woodPixels,
-    ),
-  );
-  final woodTex = host.addResource(
-    TextureResource(host.newId(), payload: woodPayload.id),
-  );
-  final wood = host.addResource(
-    MaterialResource(
-      host.newId(),
-      type: 'physicallyBased',
-      properties: {
-        'baseColor': ColorValue(1, 1, 1, 1),
-        'baseColorTexture': ResourceRefValue(woodTex.id),
-        'roughness': DoubleValue(0.55),
-        'metallic': DoubleValue(0.0),
-      },
-    ),
-  );
-  final topExtents = Vector3(kTableHalf * 2, slabThick, kTableHalf * 2);
-  final topGeo = host.addResource(
-    GeometryResource(
-      host.newId(),
-      procedural: CuboidGeometrySpec(extents: topExtents),
-    ),
-  );
-  host.createNode(
-    name: 'tray.top',
-    transform: TrsTransform(translation: Vector3(0, -slabThick / 2, 0)),
-    components: [
-      ComponentSpec(
-        'mesh',
-        properties: {
-          'geometry': ResourceRefValue(topGeo.id),
-          'material': ResourceRefValue(wood.id),
-        },
-      ),
-      boundsCollider(topExtents),
-      rigidBodyComponent(type: 'fixed'),
-    ],
-    root: true,
+  final tray = addObsidianTray(
+    host,
+    fit,
+    collider: boundsCollider,
+    body: rigidBodyComponent(type: 'fixed'),
   );
 
   // Invisible walls in the camera frustum's side planes, plus a
@@ -423,93 +306,113 @@ DiceTableScene? buildDiceTable({
     ccdEnabled: true,
   );
 
-  // Pre-decode each imported die once: `resolve` reuses the cached
-  // document, and the mesh gives each die's rack pose (its highest
-  // face turned squarely up, resting on the table) and radius.
-  final prefabDocs = <String, SceneDocument>{};
-  final restPoses = <String, (double, Quaternion)>{};
-  final radii = <String, double>{};
-  for (final e in _diceAssets.entries) {
-    final bytes = bytesOf(e.value);
-    if (bytes == null) continue;
-    final doc = readFsceneb(bytes);
-    prefabDocs[e.value] = doc;
-    final faces = faceMaps[e.key]?.faces ?? const <DieFace>[];
-    final rotation = faces.isEmpty
-        ? Quaternion.identity()
-        : faceUpRotation(
-            faces.reduce((a, b) => a.normal.y >= b.normal.y ? a : b).normal,
-          );
-    final m = rotation.asRotationMatrix();
-    var minY = double.infinity;
-    var radius = 0.0;
-    for (final res in doc.resources.values.whereType<GeometryResource>()) {
-      for (final p in _positions(doc, res)) {
-        minY = min(minY, (m * p).y);
-        radius = max(radius, p.length);
-      }
-    }
-    if (minY.isFinite) restPoses[e.key] = (-minY + 0.2, rotation);
-    radii[e.key] = radius;
-  }
+  final built = [
+    for (final kind in kDiceOrder)
+      addDartNativeDie(host, kind, look: spec.shell),
+  ];
+  final diceMs = sw.elapsedMilliseconds;
+  final slots = fit.rack(
+    built.length,
+    _rackSpacing(built.map((d) => d.radius)),
+  );
 
-  final slots = fit.rack(kDiceOrder.length, _rackSpacing(radii.values));
-  final dice = <TableDie>[];
-  for (final (i, label) in kDiceOrder.indexed) {
+  // The logo: one prefab instance inside the first die, then the same
+  // geometry and material shared by every other die's logo node.
+  final logoBytes = bytesFor?.call(kLogoAsset);
+  final logoDoc = logoBytes == null ? null : readFsceneb(logoBytes);
+  final rng = Random(0xD1CE);
+  final dieNodes = <NodeSpec>[];
+  final logoNodes = <LocalId?>[];
+  final facings = <Quaternion>[];
+  for (final (i, d) in built.indexed) {
     final (x, z) = slots[i];
-    if (label == 'd4') {
-      final shard = addShardD4(host);
-      final node = host.createNode(
-        name: 'die.d4',
-        transform: TrsTransform(translation: Vector3(x, shard.restY, z)),
-        components: [shard.mesh, dieCollider(), dieBody()],
-        root: true,
-      );
-      dice.add(
-        TableDie(
-          node: node.id,
-          label: label,
-          faceMap: shardFaceMap,
-          restY: shard.restY,
-          restRotation: Quaternion.identity(),
-          radius: shard.radius,
-        ),
-      );
-      continue;
-    }
-    final asset = _diceAssets[label]!;
-    if (!prefabDocs.containsKey(asset)) continue;
-    final (restY, restRotation) =
-        restPoses[label] ?? (12.0, Quaternion.identity());
     final node = host.createNode(
-      name: 'die.$label',
+      name: 'die.${d.kind}',
       transform: TrsTransform(
-        translation: Vector3(x, restY, z),
-        rotation: restRotation,
+        translation: Vector3(x, d.restY, z),
+        rotation: d.restRotation,
       ),
+      components: [d.mesh, dieCollider(), dieBody()],
       root: true,
     );
-    node.instance = PrefabInstanceSpec(
-      source: AssetRef(asset),
-      addedComponents: [dieCollider(), dieBody()],
-    );
-    dice.add(
-      TableDie(
-        node: node.id,
-        label: label,
-        faceMap: faceMaps[label] ?? const DieFaceMap(faces: []),
-        restY: restY,
-        restRotation: restRotation,
-        radius: radii[label] ?? 12.0,
+    dieNodes.add(node);
+    // Held level with its reading side (−Z) to the camera, screen-up
+    // (+Z) its up, turned a little per die so the set doesn't look
+    // stamped.
+    final roll = (rng.nextDouble() - 0.5) * 2 * 12 * pi / 180;
+    final facing =
+        Quaternion.axisAngle(Vector3(1, 0, 0), pi / 2) *
+        Quaternion.axisAngle(Vector3(0, 0, 1), roll);
+    facings.add(facing);
+    if (logoDoc == null) {
+      logoNodes.add(null);
+      continue;
+    }
+    final scale = kLogoFill * d.inradius / kLogoHalfDiagonal;
+    final logo = host.createNode(
+      name: 'die.${d.kind}.logo',
+      transform: TrsTransform(
+        rotation: d.restRotation.conjugated() * facing,
+        scale: Vector3.all(scale),
       ),
     );
+    node.children.add(logo.id);
+    if (i == 0) {
+      logo.instance = PrefabInstanceSpec(source: AssetRef(kLogoAsset));
+    }
+    logoNodes.add(logo.id);
   }
 
-  SceneDocument resolve(AssetRef ref) =>
-      prefabDocs[ref.key] ??
-      (throw StateError('missing bundled asset ${ref.key}'));
+  final composeStart = sw.elapsedMilliseconds;
+  final composed = composeScene(
+    host,
+    resolve: (ref) => ref.key == kLogoAsset && logoDoc != null
+        ? logoDoc
+        : (throw StateError('missing bundled asset ${ref.key}')),
+  );
 
-  final composed = composeScene(host, resolve: resolve);
+  // Share the first logo's mesh with the others, and make it glow.
+  final firstLogo = logoNodes.firstOrNull;
+  if (firstLogo != null) {
+    final mesh = composed.nodes[firstLogo]!.components.firstWhere(
+      (c) => c.type == 'mesh',
+    );
+    final matRef = mesh.properties['material'];
+    if (matRef is ResourceRefValue) {
+      final mat = composed.resources[matRef.id];
+      if (mat is MaterialResource) {
+        final base = mat.properties['baseColorTexture'];
+        if (base != null) mat.properties['emissiveTexture'] = base;
+        mat.properties['emissive'] = ColorValue(1, 1, 1, 1);
+        mat.properties['emissiveStrength'] = DoubleValue(kLogoGlow);
+        // Opaque: the asset's blended material is depth-sorted against
+        // the shell around it (same centre, so either order), and drawn
+        // last it covered the numerals. In the opaque pass it writes
+        // depth and the shell always composites over it.
+        mat.properties['alphaMode'] = StringValue('opaque');
+      }
+    }
+    for (final id in logoNodes.skip(1)) {
+      if (id == null) continue;
+      composed.nodes[id]!.components.add(
+        ComponentSpec('mesh', properties: Map.of(mesh.properties)),
+      );
+    }
+  }
+
+  final dice = [
+    for (final (i, d) in built.indexed)
+      TableDie(
+        node: dieNodes[i].id,
+        label: d.kind,
+        faceMap: d.faceMap,
+        restY: d.restY,
+        restRotation: d.restRotation,
+        radius: d.radius,
+        logo: logoNodes[i],
+        logoFacing: logoNodes[i] == null ? null : facings[i],
+      ),
+  ];
 
   final cam = fit.camera;
   final camera = composed.createNode(
@@ -529,38 +432,22 @@ DiceTableScene? buildDiceTable({
     root: true,
   );
 
-  // Warm key steeply overhead — shadows sit mostly under the dice
-  // like the lamp-over-table reference — plus a cool fill; studio env
-  // dimmed so the key's shadows stay visible. Lights travel along +Z
-  // (upstream DirectionalLightComponent.worldDirection = rotation ×
-  // (0,0,1)); `aimAlong` points +Z along the travel direction.
+  // One key from screen upper-left at ~50° — low enough that its mirror
+  // image never lands on the glossy floor or the top faces (look-dev
+  // §0.2 rule 5) — casting the dice's shadows; a dim studio IBL for the
+  // clear coats and bevels to catch.
   composed.createNode(
     name: 'table.key',
-    transform: TrsTransform(rotation: aimAlong(Vector3(-0.28, -1.0, -0.22))),
+    transform: TrsTransform(rotation: aimAlong(Vector3(0.55, -1.0, -0.62))),
     components: [
       ComponentSpec(
         'directionalLight',
         properties: {
-          'color': ColorValue(1.0, 0.93, 0.82, 1),
-          'intensity': DoubleValue(keyLightIntensity(2400)),
+          'color': ColorValue(1.0, 0.96, 0.9, 1),
+          'intensity': DoubleValue(keyLightIntensity(2200)),
           'castsShadow': BoolValue(true),
           'shadowRadius': DoubleValue(2.5),
           'shadowDepthBias': DoubleValue(0.01),
-        },
-      ),
-    ],
-    root: true,
-  );
-  composed.createNode(
-    name: 'table.fill',
-    transform: TrsTransform(translation: Vector3(-70, 90, 220)),
-    components: [
-      ComponentSpec(
-        'pointLight',
-        properties: {
-          'color': ColorValue(0.55, 0.68, 1.0, 1),
-          'intensity': DoubleValue(1500),
-          'range': DoubleValue(600),
         },
       ),
     ],
@@ -571,17 +458,36 @@ DiceTableScene? buildDiceTable({
         EnvironmentResource(
           composed.newId(),
           environment: const StudioEnvironment(),
-          environmentIntensity: 0.5,
+          environmentIntensity: 0.25,
           exposure: 1.0,
           toneMapping: 'pbrNeutral',
-          skybox: SkyboxSpec(EnvironmentSkySpec()),
+          skybox: SkyboxSpec(
+            GradientSkySpec(
+              zenithColor: Vector3(0.0027, 0.0044, 0.006),
+              horizonColor: Vector3(0.0027, 0.0044, 0.006),
+              groundColor: Vector3(0.0027, 0.0044, 0.006),
+              sunColor: Vector3.zero(),
+            ),
+          ),
+          effects: EnvironmentEffectsSpec(
+            // Bloom only well above the numerals' level (look-dev §5
+            // risk 1): the rim and the logos' hottest parts glow, the
+            // numerals' keylines stay crisp.
+            bloomEnabled: true,
+            bloomThreshold: 1.1,
+            bloomIntensity: 0.35,
+            bloomScatter: 0.6,
+          ),
         ),
       )
       .id;
 
   log?.call(
-    'dart3d: dice table — ${dice.length} dice, '
-    '${composed.nodes.length} nodes, ${composed.payloads.length} payloads',
+    'dart3d: dice table — ${dice.length} DartNative dice '
+    '(logo ${logoDoc == null ? 'missing' : 'inside'}), '
+    '${composed.nodes.length} nodes, ${composed.payloads.length} payloads, '
+    'built in ${sw.elapsedMilliseconds} ms (dice $diceMs, compose from '
+    '$composeStart)',
   );
   return DiceTableScene(
     document: composed,
@@ -589,13 +495,14 @@ DiceTableScene? buildDiceTable({
     cameraNode: camera.id,
     wallNodes: wallNodes,
     ceilingNode: ceilingNode,
+    rimNodes: tray.rim,
+    rimBead: tray.bead,
     layout: fit,
   );
 }
 
 /// Rack spacing: the widest die plus a little air.
-double _rackSpacing(Iterable<double> radii) =>
-    radii.fold(kShardSection * (kShardHalfRatio + kShardCapRatio), max) * 2.3;
+double _rackSpacing(Iterable<double> radii) => radii.reduce(max) * 2.3;
 
 /// Rack spacing for [dice] — the screen's reset uses the same grid.
 double rackSpacingFor(List<TableDie> dice) =>
@@ -615,29 +522,4 @@ Quaternion faceUpRotation(Vector3 n) {
     axis.normalized(),
     acos(u.dot(up).clamp(-1.0, 1.0)),
   );
-}
-
-/// Vertex positions of an imported geometry's payload (the importer's
-/// SoA layout, or an interleaved one).
-Iterable<Vector3> _positions(SceneDocument doc, GeometryResource geo) sync* {
-  final payload = doc.payloads[geo.vertices];
-  final bytes = payload?.bytes;
-  if (payload == null || bytes == null) return;
-  final soa = payload.layout?.contains('soa') ?? false;
-  final stride = switch (payload.layout) {
-    'unskinned_soa_uv1_tangent' || 'unskinned_uv1_tangent' => 72,
-    'unskinned_soa' || 'unskinned' || null => 48,
-    _ => 0,
-  };
-  if (stride == 0) return;
-  final data = ByteData.sublistView(bytes);
-  final count = bytes.length ~/ stride;
-  for (var i = 0; i < count; i++) {
-    final o = soa ? i * 12 : i * stride;
-    yield Vector3(
-      data.getFloat32(o, Endian.little),
-      data.getFloat32(o + 4, Endian.little),
-      data.getFloat32(o + 8, Endian.little),
-    );
-  }
 }

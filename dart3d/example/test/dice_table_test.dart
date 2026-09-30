@@ -52,14 +52,39 @@ void main() {
         final body = node.components.firstWhere((c) => c.type == 'rigidBody');
         expect((body.properties['ccdEnabled'] as BoolValue).value, isTrue);
       }
-      // 6 imported dice × 4 payloads + shard (vertices, indices, atlas)
-      // + wood texture.
-      expect(doc.payloads, hasLength(28));
-      // Tray: wood slab + 4 walls + ceiling + physics world.
+      // 7 dice × (vertices, indices, atlas) + the stone + the rim's
+      // gradient and 8 pieces × 2 + the bead (texture, 2 buffers) + the
+      // logo's payloads, once.
+      final logo = readFsceneb(bytesFromDisk(kLogoAsset)!);
+      expect(
+        doc.payloads,
+        hasLength(7 * 3 + 1 + 1 + 8 * 2 + 3 + logo.payloads.length),
+      );
+      // Tray: stone slab + 8 rim pieces + the bead + 4 walls + ceiling
+      // + world.
       expect(
         doc.nodes.values.where((n) => n.name.startsWith('tray.')),
-        hasLength(7),
+        hasLength(16),
       );
+      expect(scene.rimNodes, hasLength(8));
+      // A logo inside every die, all sharing one mesh.
+      final meshes = <String>{};
+      for (final die in scene.dice) {
+        expect(die.logo, isNotNull, reason: die.label);
+        expect(doc.nodes[die.node]!.children, contains(die.logo));
+        final mesh = doc.nodes[die.logo]!.components.firstWhere(
+          (c) => c.type == 'mesh',
+        );
+        meshes.add('${(mesh.properties['geometry'] as ResourceRefValue).id}');
+        // Held level, reading side up, at rest.
+        final t = doc.nodes[die.node]!.transform as TrsTransform;
+        // (The instanced logo's transform composes to a matrix.)
+        final world =
+            t.toMatrix4() * doc.nodes[die.logo]!.transform.toMatrix4();
+        final front = world.rotated3(Vector3(0, 0, -1))..normalize();
+        expect(front.y, closeTo(1, 1e-4), reason: die.label);
+      }
+      expect(meshes, hasLength(1));
       expect(scene.wallNodes, hasLength(4));
       expect(doc.stage.environmentRef, isNotNull);
       expect(doc.nodes[scene.cameraNode], isNotNull);
@@ -80,6 +105,11 @@ void main() {
           reason: die.label,
         );
         expect(die.restY, inInclusiveRange(4.0, 12.0), reason: die.label);
+        // Racked highest number up.
+        expect(
+          die.faceMap.read(t.rotation),
+          die.faceMap.faces.map((f) => f.value).reduce(max),
+        );
       }
     });
   });

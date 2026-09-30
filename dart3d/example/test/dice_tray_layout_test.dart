@@ -49,9 +49,12 @@ void main() {
       final layout = fitOf(screen);
       final eye = layout.camera.position;
 
-      test('d20 renders at 15% of the short side', () {
+      test('d20 renders at kD20ScreenFraction (21%) of the short side', () {
         final d20Px = kD20Diameter * layout.pxPerUnit;
-        expect(d20Px / min(screen.w, screen.h), closeTo(0.15, 1e-3));
+        expect(
+          d20Px / min(screen.w, screen.h),
+          closeTo(kD20ScreenFraction, 1e-3),
+        );
       });
 
       test('the play area projects exactly onto the inset screen rect', () {
@@ -148,12 +151,13 @@ void main() {
       });
 
       test('seven dice rack inside the play area without touching', () {
-        const spacing = 38.0;
+        // The DartNative set: largest radius ≈ 10.6 (the d4), rack at 2.3×.
+        const spacing = 24.5;
         final slots = layout.rack(7, spacing);
         expect(slots, hasLength(7));
         for (final (x, z) in slots) {
           expect(
-            layout.contains(Vector3(x, 0, z), slack: -16),
+            layout.contains(Vector3(x, 0, z), slack: -10.6),
             isTrue,
             reason: '($x, $z)',
           );
@@ -162,7 +166,7 @@ void main() {
           for (var j = i + 1; j < slots.length; j++) {
             final dx = slots[i].$1 - slots[j].$1,
                 dz = slots[i].$2 - slots[j].$2;
-            expect(sqrt(dx * dx + dz * dz), greaterThan(33));
+            expect(sqrt(dx * dx + dz * dz), greaterThan(21.2));
           }
         }
       });
