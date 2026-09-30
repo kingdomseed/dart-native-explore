@@ -170,14 +170,20 @@ scaffolding, not the demo.
       rolled virtually, shown after). No extraction/package split planned.
 - [ ] P2 **Standalone dice-roller app** — dice rolling only, mobile only,
       built on dart3d, operator's portfolio (possibly published free or
-      paid). Separate project; starts after the example's dice experience
-      reaches DR3.
-- [ ] P3 **Dice experience in the example** — far nicer than today's
-      table; beat upstream's "Dice Shadows" (demo-program §5 phases DR1–DR5:
-      readout fix + screen-fitted walls + labeled Reset → aim/toss/sweep →
-      notation + count-up + audio → juice → polish). Includes the 09-17
-      feedback (pick-up-and-toss, walls = screen edges, quality picker,
-      iPad white screen).
+      paid). Separate project. Carries the **11 themed sets + environments**
+      from look-dev (`docs/design/dice-lookdev.md`, branch
+      `p3-dice-lookdev`) and a **cinematic intro**: start in a side camera
+      view exploring the themed environment, fly to the table, then roll
+      top-down. Starts after the example's dice experience reaches DR3.
+- [ ] P3 **Dice experience in the example** — the demo's main experience:
+      a **DartNative-themed dice set** with really fluid rolls (operator,
+      2026-09-30). Phases DR1–DR5 (demo-program §5): readout fix +
+      screen-fitted walls + labeled Reset → aim/toss/sweep → notation +
+      count-up + audio → juice → polish. Rules for every set: numbers
+      always super readable (contrast gate), top-down play camera, no
+      tetrahedron d4 (crystal-shard d4), and **the environment never
+      distracts from the dice** (subdued/defocused surroundings; dice are
+      the brightest, sharpest element).
 - [ ] P4 Hero launch scene + 3D DartNative logo. Logo landed (#26).
       Hero (M0) landed on `p4-hero-scene` (#31; spec
       `docs/design/hero-scene-brief.md`; `lib/hero_screen.dart`,
