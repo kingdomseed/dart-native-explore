@@ -91,6 +91,7 @@ class _DiceTableScreenState extends State<DiceTableScreen>
   /// this roll's result.
   int _rollId = 0;
   double _rollStart = 0;
+  int _turnedRoll = -1;
 
   /// A real throw can't settle faster than this; a settle event inside the
   /// window was already in flight from native before the roll (the racked
@@ -233,12 +234,16 @@ class _DiceTableScreenState extends State<DiceTableScreen>
     _poseInFlight = true;
     final id = _rollId;
     try {
-      final poses = await _controller.poses();
-      if (!mounted) return;
+      final List<ScenePose> poses;
+      try {
+        poses = await _controller.poses();
+      } on StateError {
+        return; // the view detached mid-roll (Back)
+      }
+      if (!mounted || id != _rollId) return;
       for (final p in poses) {
         _poses[p.node] = p;
       }
-      if (id != _rollId) return;
       if (_gates.isNotEmpty) _checkGates();
       if (_turning != null) _stepTurn();
     } finally {
@@ -648,6 +653,9 @@ class _DiceTableScreenState extends State<DiceTableScreen>
       _sweepRolled = true;
       _beginRoll();
       dnLog('dart3d: dice sweep');
+    } else if (!_rolling) {
+      // The dice settled mid-sweep and were read; this hit is a new roll.
+      _beginRoll();
     } else {
       // Keep the roll open while the sweep goes on.
       _rollStart = t;
@@ -753,7 +761,11 @@ class _DiceTableScreenState extends State<DiceTableScreen>
           'at ${p.x.toStringAsFixed(1)},${p.y.toStringAsFixed(1)},'
           '${p.z.toStringAsFixed(1)}${flags.isEmpty ? '' : ' ${flags.join(' ')}'})',
         );
-        if (die.label == 'd4') _startTurn(die, pose, face.normal);
+        if (die.label == 'd4' &&
+            source == 'settled' &&
+            dot >= flatDotFor(die.faceMap)) {
+          _startTurn(die, pose, face.normal);
+        }
       }
     }
     if (_values.isEmpty) return;
@@ -802,7 +814,12 @@ class _DiceTableScreenState extends State<DiceTableScreen>
   /// No settle event within the timeout: read the poses as they are.
   Future<void> _settleFallback() async {
     final id = _rollId;
-    final poses = await _controller.poses();
+    final List<ScenePose> poses;
+    try {
+      poses = await _controller.poses();
+    } on StateError {
+      return; // the view detached
+    }
     if (!mounted || id != _rollId) return;
     _read(poses, source: 'timeout');
   }
@@ -810,8 +827,11 @@ class _DiceTableScreenState extends State<DiceTableScreen>
   // MARK: - The d4 turns to read upright
 
   void _startTurn(TableDie die, ScenePose pose, Vector3 faceNormal) {
+    // One turn per roll: the re-read after it must not start another.
+    if (_turnedRoll == _rollId) return;
     final yaw = shardUprightYaw(pose.rotation, faceNormal);
     if (yaw.abs() < 2 * kUprightTolerance) return;
+    _turnedRoll = _rollId;
     _turning = die;
     _turnUntil = _now + 1.8;
     dnLog(
@@ -831,11 +851,16 @@ class _DiceTableScreenState extends State<DiceTableScreen>
     final rate = uprightTurnRate(shardUprightYaw(pose.rotation, face.normal));
     if (rate == 0 || _now > _turnUntil) {
       _stopTurn();
+      // The turn can nudge a neighbour or the d4 itself onto another
+      // face: read every die again at the next settle.
+      _rollStart = _now;
+      _settleTimer?.cancel();
+      _settleTimer = Timer(_nudgeTimeout, _settleFallback);
+      _wake();
       return;
     }
     _controller.setBodyVelocity(
       die.node,
-      linear: Vector3.zero(),
       angularAxis: Vector3(0, 1, 0),
       angularRate: rate,
     );
@@ -847,7 +872,6 @@ class _DiceTableScreenState extends State<DiceTableScreen>
     _turning = null;
     _controller.setBodyVelocity(
       die.node,
-      linear: Vector3.zero(),
       angularAxis: Vector3(0, 1, 0),
       angularRate: 0,
     );
