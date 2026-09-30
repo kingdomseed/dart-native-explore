@@ -172,7 +172,6 @@ def room(scene, lac):
         E.cylinder("pagoda_roof", wd * 0.75, 7, (px, py, z + 12), far, segs=4, r2=wd * 0.25).rotation_euler = \
             (0, 0, math.radians(45))
     E.cylinder("pagoda_spire", 0.8, 25, (px, py, 210), far, segs=6)
-    E.cube("pagoda_hill", (160, 8, 110), (px + 10, py + 2, 50), far)
     bark = E.simple("Cherry bark", (0.03, 0.02, 0.02), 0.8)
     blossom = E.simple("Blossom", (0.95, 0.6, 0.7), 0.6, Subsurface_Weight=0.4, Emission_Color=(1.0, 0.6, 0.7, 1),
                        Emission_Strength=0.15)
@@ -191,16 +190,16 @@ def room(scene, lac):
         RC.shoji("left", u, 78, 190, wood, glow=0.35)
     # a tansu chest on the right wall, cushions on the mats
     RC.cabinet("right", 60, w=110, h=70, depth=45, mat=wood, top_mat=red, doors=3)
-    cush = E.simple("Zabuton", (0.05, 0.05, 0.14), 0.8, Sheen_Weight=0.8)
+    cush = E.simple("Zabuton", (0.12, 0.02, 0.03), 0.6)
     for x, y in ((-70, -10), (70, -30)):
-        E.cube("zabuton", (55, 55, 9), (x, y, 4.5), cush, bevel=3.5)
+        E.cube("zabuton", (50, 50, 7), (x, y, 3.5), cush, bevel=3.0)
     # the andon: a paper floor lantern on the left (warm)
     ax, ay = -110, 70
     for sx in (-1, 1):
         for sy in (-1, 1):
             E.cube("andon_leg", (2.5, 2.5, 70), (ax + sx * 12, ay + sy * 12, 35), wood)
     E.cube("andon_paper", (23, 23, 45), (ax, ay, 45), E.simple("Andon paper", (0.9, 0.8, 0.6), 0.9,
-           Emission_Color=(1.0, 0.72, 0.4, 1), Emission_Strength=2.0)).visible_shadow = False
+           Emission_Color=(1.0, 0.72, 0.4, 1), Emission_Strength=0.7)).visible_shadow = False
     E.light(scene, "POINT", "andon_light", (ax, ay, 45), 9000, color=(1.0, 0.7, 0.4), size=10)
     # a big vermilion paper lantern hung on the right (the red accent)
     RC.paper_lantern(scene, 120, 40, 130, r=26, color=(1.0, 0.18, 0.06), energy=14000,

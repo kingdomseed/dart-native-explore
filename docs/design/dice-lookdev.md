@@ -1159,6 +1159,19 @@ Lighting recipes (the tray lights are unchanged unless noted):
   counter. Gate: numeral 12.35 (d4), die vs tray 4.66, stroke
   0.124–0.132, PASS.
 
+- **Vermilion Court — the lantern pavilion.** A tatami room (the tray
+  sits on the mats; room floor z = 0, camera at seated-on-the-floor
+  height): shoji along the left wall glowing faintly, lacquered posts, the
+  gold-leaf folding screen behind the tray, a tansu chest with a
+  vermilion top on the right, cushions, and the back open onto a
+  vermilion veranda railing over dusk mountains, a pagoda silhouette and
+  a cherry tree in blossom. Lights: a paper andon floor lantern (9 kW,
+  warm, left), a big vermilion paper lantern hung on the right (14 kW,
+  red accent), the dusk sky through the opening (area, 30 kW, cool
+  violet, back), over the tray's warm key, moon and overhead and the
+  small table lanterns. Camera: 20 mm, f/4. Gate: numeral 5.26 (d10u),
+  die vs tray 2.28, stroke 0.123–0.128, PASS.
+
 ## 4. dart3d features to verify (before building these for real)
 
 1. **Emissive intensity > 1 + bloom threshold** on both platforms, and
