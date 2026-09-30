@@ -149,6 +149,86 @@ final class TrayLayout {
     return (width / 2 + p.x * s * pxPerUnit, height / 2 - p.z * s * pxPerUnit);
   }
 
+  /// The point at height [y] under the screen position ([sx], [sy])
+  /// (logical px from the view's top-left) — [project]'s inverse.
+  Vector3 unproject(
+    double sx,
+    double sy, {
+    required double width,
+    required double height,
+    double y = 0,
+  }) {
+    final k = _scaleAt(y) * pxPerUnit;
+    return Vector3((sx - width / 2) / k, y, (height / 2 - sy) / k);
+  }
+
+  /// A screen velocity ([vx], [vy] in px/s, y down) as a world velocity
+  /// on the plane at height [y].
+  Vector3 screenVelocityToWorld(double vx, double vy, {double y = 0}) {
+    final k = _scaleAt(y) * pxPerUnit;
+    return Vector3(vx / k, 0, -vy / k);
+  }
+
+  /// Screen magnification of the plane at height [y] vs the table.
+  double _scaleAt(double y) => cameraHeight / (cameraHeight - y);
+
+  /// Outward normals of [walls], in the same order.
+  static final List<Vector3> wallNormals = [
+    Vector3(1, 0, 0),
+    Vector3(-1, 0, 0),
+    Vector3(0, 0, 1),
+    Vector3(0, 0, -1),
+  ];
+
+  /// Wall [i]'s inner face, as a horizontal offset from the tray's
+  /// centre line along its outward normal, at height [y]. The faces lean
+  /// in toward the camera's eye.
+  double wallOffsetAt(int i, double y) {
+    final base = switch (i) {
+      0 => play.xMax,
+      1 => -play.xMin,
+      2 => play.zMax,
+      _ => -play.zMin,
+    };
+    return base * (cameraHeight - y) / cameraHeight;
+  }
+
+  /// How far [p] lies beyond wall [i]'s inner face, horizontally
+  /// (negative inside). A point beyond any wall is off-screen.
+  double outside(int i, Vector3 p) =>
+      p.dot(wallNormals[i]) - wallOffsetAt(i, p.y);
+
+  /// Whether a body of [radius] at [p] is fully inside every wall.
+  bool holds(Vector3 p, double radius) {
+    for (var i = 0; i < 4; i++) {
+      if (outside(i, p) > -radius) return false;
+    }
+    return true;
+  }
+
+  /// Wall [i]'s pose moved [by] units outward — an open entry gate.
+  TrayPose wallOpened(int i, double by) => (
+    position: walls[i].position + wallNormals[i] * by,
+    rotation: walls[i].rotation,
+  );
+
+  /// [p] pulled inside every wall by [margin] at its own height.
+  Vector3 clampInside(Vector3 p, double margin) {
+    final out = p.clone();
+    for (final (axis, hi, lo) in const [(0, 0, 1), (2, 2, 3)]) {
+      final top = wallOffsetAt(hi, p.y) - margin;
+      final bottom = -wallOffsetAt(lo, p.y) + margin;
+      final v = axis == 0 ? out.x : out.z;
+      final c = bottom > top ? (top + bottom) / 2 : v.clamp(bottom, top);
+      if (axis == 0) {
+        out.x = c;
+      } else {
+        out.z = c;
+      }
+    }
+    return out;
+  }
+
   /// [p] pulled inside the play area by [margin] on each side (y kept).
   Vector3 clampToPlay(Vector3 p, double margin) {
     double c(double v, double lo, double hi) =>

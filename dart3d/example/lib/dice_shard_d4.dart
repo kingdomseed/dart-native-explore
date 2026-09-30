@@ -4,7 +4,9 @@
 ///
 /// Geometry follows the look-dev spec (`tool/dice_lookdev/build_dice.py`
 /// on the `p3-dice-lookdev` branch: section `s`, prism half-length and
-/// cap length both `0.62·s`, faces 4/1/2/3 on +up/−up/±side). The body
+/// cap length both `0.62·s`, faces 4/1/2/3 on +up/−up/±side). Numerals
+/// read *along* the crystal — the baseline runs down the long axis, so a
+/// shard lying across the screen reads upright ([shardGlyphUp]). The body
 /// is built here in Dart as a flat-shaded payload mesh with a
 /// synthesized numeral texture, so it needs no asset file; the themed
 /// look-dev materials replace the texture later without touching the
@@ -39,6 +41,28 @@ final List<(Vector3, int)> kShardFaces = [
   (Vector3(0, 0, 1), 2),
   (Vector3(0, 0, -1), 3),
 ];
+
+/// The long axis (mesh space): the tips sit at ±X.
+final Vector3 kShardAxis = Vector3(1, 0, 0);
+
+/// The "up" of the numeral printed on the long face with outward normal
+/// [n] (mesh space): across the crystal, `axis × n`. The numeral's
+/// right runs toward the +X tip (`n × up`, the document's screen-right —
+/// see [addShardD4]). Rolling about the long axis maps each face's
+/// frame onto the next, so while the +X tip points screen-right every
+/// face reads upright from the top-down camera.
+Vector3 shardGlyphUp(Vector3 n) => kShardAxis.cross(n)..normalize();
+
+/// How far the up face's numeral is turned from upright on screen, for
+/// a shard at world [rotation] with face [faceNormal] (mesh space) up:
+/// the signed yaw (radians, −π..π) about world +Y from screen-up (+Z)
+/// to the numeral's up. Turning the die by `−shardUprightYaw(...)`
+/// about +Y makes it read upright.
+double shardUprightYaw(Quaternion rotation, Vector3 faceNormal) {
+  final up = rotation.asRotationMatrix() * shardGlyphUp(faceNormal);
+  if (up.x * up.x + up.z * up.z < 1e-12) return 0;
+  return atan2(up.x, up.z);
+}
 
 /// What [addShardD4] adds to a document: the mesh component for the die
 /// node and the node-origin height at which a long face rests on the
@@ -79,25 +103,28 @@ ShardD4 addShardD4(SceneDocument doc) {
     4: (0.5, 0.5),
   };
   for (final (n, value) in kShardFaces) {
-    final up = Vector3(1, 0, 0);
+    final up = shardGlyphUp(n);
     // Document space is left-handed (the natives z-mirror it), so a
     // face's screen-right is n × up — the mirror turns it into the
-    // usual right-handed up × n on screen.
+    // usual right-handed up × n on screen. Here that is +X: numerals
+    // read along the crystal.
     final right = n.cross(up);
     final (cu, cv) = cellOf[value]!;
     final base = positions.length;
-    // Corners: (-half..half along X) × (-a..a along right).
-    for (final (sx, sr) in const [
+    // Corners: (-half..half along right = X) × (-a..a along up). The
+    // cell's width spans the face's length, its height the narrower
+    // section (centred, same texel scale).
+    for (final (sr, su) in const [
       (-1.0, -1.0),
       (1.0, -1.0),
       (1.0, 1.0),
       (-1.0, 1.0),
     ]) {
-      positions.add(n * a + up * (sx * half) + right * (sr * a));
+      positions.add(n * a + right * (sr * half) + up * (su * a));
       normals.add(n.clone());
-      // v runs down the image while the glyph's up is +X.
+      // v runs down the image; the glyph's up runs up it.
       uvs.add(
-        Vector2(cu + 0.25 + sr * 0.25 * (a / half), cv + 0.25 - sx * 0.25),
+        Vector2(cu + 0.25 + sr * 0.25, cv + 0.25 - su * 0.25 * (a / half)),
       );
       tangents.add(Vector4(right.x, right.y, right.z, 1));
     }
@@ -240,9 +267,11 @@ Uint8List shardNumeralAtlas() {
   const ink = (0.07, 0.05, 0.03);
   final glyphs = {1: _glyph1(), 2: _glyph2(), 3: _glyph3(), 4: _glyph4()};
   const origin = {1: (0, 0), 2: (1, 0), 3: (0, 1), 4: (1, 1)};
-  // Glyph box: 0.56 of the cell tall, centred; strokes 0.075 of the box.
-  const glyphH = cell * 0.56;
-  const stroke = glyphH * 0.085;
+  // Glyph box: 0.44 of the cell tall (≈0.55 of the section — the cell
+  // spans the face's length), centred; strokes 0.12 of the height, the
+  // look-dev weight (docs/design/dice-lookdev.md §0.2 rule 2).
+  const glyphH = cell * 0.44;
+  const stroke = glyphH * 0.12;
   for (var y = 0; y < n; y++) {
     for (var x = 0; x < n; x++) {
       final cx = x ~/ cell, cy = y ~/ cell;
