@@ -1088,6 +1088,16 @@ Lighting recipes (the tray lights are unchanged unless noted):
   plank floor, a burgundy-and-ink rug. Camera: 20 mm, seated, f/4. Gate:
   numeral 5.97 (d4), die vs tray 2.16, stroke 0.124–0.130, PASS.
 
+- **Fate Engine — the inventor's workshop.** Brick walls run with copper
+  pipes and big brass wall gears, a tall mullioned window onto a spired
+  city at night (area, 40 kW, cool, back-right), a side bench with bottle
+  shelves on the left, a glass tesla column with a teal coil on the right
+  (shadowless 25 kW teal, the accent), an industrial pendant above-left of
+  the table (spot, 60 kW, 1.0/0.72/0.42, the warm key) and a caged lamp on
+  the back wall (40 kW, warm, back-left); over the tray's own key and rim.
+  Camera: 20 mm, f/4. Gate: numeral 11.81 (d12), die vs tray 2.92, stroke
+  0.124–0.130, PASS.
+
 ## 4. dart3d features to verify (before building these for real)
 
 1. **Emissive intensity > 1 + bloom threshold** on both platforms, and

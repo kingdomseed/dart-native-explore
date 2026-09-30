@@ -224,7 +224,7 @@ def room(scene):
     RC.wall_shelf("left", 40, 85, w=150, seed=12, kind="mixed",
                   palette=[(0.2, 0.12, 0.06), (0.12, 0.1, 0.08), (0.3, 0.2, 0.1)])
     # the tesla column: a glass cylinder with a teal coil on a brass base (right)
-    tx, ty = 135, 70
+    tx, ty = 118, 105
     E.cylinder("tesla_base", 22, 20, (tx, ty, RC.FLOOR_Z + 10), brass, segs=32, bevel=1.0)
     E.cylinder("tesla_glass", 16, 150, (tx, ty, RC.FLOOR_Z + 95), P.glass("Tesla glass"), segs=32,
                cap=False).visible_shadow = False
@@ -234,7 +234,7 @@ def room(scene):
         z0, z1 = RC.FLOOR_Z + 30 + i * 7.5, RC.FLOOR_Z + 30 + (i + 1) * 7.5
         RC.neon_bar(scene, (tx + 9 * math.cos(a0), ty + 9 * math.sin(a0), z0),
                     (tx + 9 * math.cos(a1), ty + 9 * math.sin(a1), z1), TEAL, strength=12.0, energy=0, r=0.8)
-    E.light(scene, "POINT", "tesla_light", (tx, ty, RC.FLOOR_Z + 100), 45000, color=TEAL, size=12, shadow=False)
+    E.light(scene, "POINT", "tesla_light", (tx, ty, RC.FLOOR_Z + 100), 25000, color=TEAL, size=12, shadow=False)
     # cogs, rolled plans and tools on the big table around the tray (beyond the phone frame)
     for i, (x, y, r) in enumerate(((-55, -20, 6), (-70, 10, 4), (60, -30, 5), (75, 50, 7))):
         P.gear(f"table_cog{i}", r, 10 + i * 2, 1.2, (x, y, 0.0), brass, hole=0)
@@ -245,4 +245,4 @@ def room(scene):
     RC.pendant_lamp(scene, -45, -10, 80, energy=60000, color=(1.0, 0.72, 0.42), shade=(0.4, 0.28, 0.12), r=24,
                     spot_deg=95)
     RC.hanging_lantern(scene, -120, 130, 110, energy=40000, mat=iron)
-    return dict(loc=(20, -72, 44), target=(0, 90, 6), lens=20, fstop=4.0, focus=(0, 0, 2))
+    return dict(loc=(20, -82, 50), target=(4, 90, 0), lens=20, fstop=4.0, focus=(0, 0, 2))

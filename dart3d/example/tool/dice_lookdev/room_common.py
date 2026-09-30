@@ -214,7 +214,7 @@ def wall_plane(name, length, height, openings, mat, thickness=18.0):
 
 
 def shell(half_w=220, back=260, front=-160, height=300, wall=None, floor=None, ceiling=None, side_walls=True,
-          openings=None, side_mats=None, floor_z=-76.0):
+          openings=None, side_mats=None, floor_z=-76.0, back_wall=True):
     """Floor, back wall, side walls (optional) and ceiling (optional); the front is open.
 
     openings: {"back"|"left"|"right": [(u, z, w, h), ...]} holes in the walls
@@ -234,8 +234,9 @@ def shell(half_w=220, back=260, front=-160, height=300, wall=None, floor=None, c
     def local(ops, centre):
         return [(u - centre, z - FLOOR_Z, w, h) for (u, z, w, h) in ops]
 
-    bw = wall_plane("wall_back", 2 * half_w, height, local(openings.get("back", []), 0.0), wall)
-    _group("wall_back_g", [bw], Vector((0, back, FLOOR_Z)), 0.0)
+    if back_wall:  # False: an open loggia / balcony
+        bw = wall_plane("wall_back", 2 * half_w, height, local(openings.get("back", []), 0.0), wall)
+        _group("wall_back_g", [bw], Vector((0, back, FLOOR_Z)), 0.0)
     if side_walls:
         mid = (back + front) / 2
         for side, sx in (("left", -1), ("right", 1)):

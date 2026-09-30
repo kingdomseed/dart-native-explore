@@ -12,6 +12,7 @@ import random
 
 import env_common as E
 import env_props as P
+import room_common as RC
 from build_dice import _circle
 from build_env_frostbound import crystal_cluster
 
@@ -152,6 +153,53 @@ def build(scene):
     ndl = E.cube("compass_needle", (0.3, 4.0, 0.1), (W / 2 - 1.5, bot - 3.3, 0.35), silver)
     ndl.rotation_euler = (0, 0, 0.5)
     crystal_cluster(-W / 2 + 2.0, bot - 3.0, 0, 3, 17, am, 0.3)
+    rc = room(scene, am)
     return dict(
         samples=128, exposure=0.3, topdown=dict(width=W + 2 * RIM_T + 1.0), hero=dict(dist=32, elev=30, az=8, lens=65, fstop=2.8),
+        play_view=True, tray_half=(W / 2 + RIM_T, D / 2 + RIM_T), room_cam=rc,
     )
+
+
+def room(scene, am):
+    """The observatory loggia (concept: room-concepts/celestial-room).
+
+    An open marble arcade on the star balcony: columns and a lintel frame the
+    nebula sky over the balustrade, marble side walls with deep-violet
+    hangings, a brass telescope on its tripod, a great floor armillary and
+    an amethyst geode. Lights from four sides: the moon (cool, back-left),
+    a brass lantern hung on the left (warm), the amethyst glow (violet,
+    right) and two sconces on the side walls; plus the tray's soft front.
+    """
+    mar = marble("Loggia marble")
+    RC.shell(half_w=200, back=95, front=-200, height=320, wall=mar, floor=marble("Loggia floor"), floor_z=-60.0,
+             back_wall=False)
+    RC.work_table(180, 140, top_z=-6.0, thick=0.1, mat=mar, leg_r=7, y=20, top=False)
+    # the arcade: columns at the balustrade and a lintel under the open sky
+    for x in (-190, -95, 95, 190):
+        RC.column(x, 100, 320, 14, mar)
+    E.cube("arcade_lintel", (420, 30, 30), (0, 100, RC.FLOOR_Z + 305), mar, bevel=1.5)
+    # violet hangings on the side walls
+    for side, u in (("left", -20), ("right", -20), ("left", -130), ("right", -130)):
+        RC.banner(side, u, 230, w=55, h=180, color=(0.08, 0.02, 0.14), trim=(0.6, 0.48, 0.25), pattern=True)
+    brass = P.brass("Observatory brass", worn=0.35)
+    # a brass telescope on a tripod, back-left, aimed at the sky
+    tx, ty = -125, 55
+    for i in range(3):
+        a = math.radians(120 * i + 20)
+        leg = E.cylinder("tripod_leg", 1.4, 120, (tx + math.cos(a) * 18, ty + math.sin(a) * 18, RC.FLOOR_Z + 58),
+                         P.dark_wood("Tripod wood"), segs=10)
+        leg.rotation_euler = (-math.sin(a) * 0.3, math.cos(a) * 0.3, 0)
+    tube = E.cylinder("telescope", 6, 110, (tx + 12, ty + 25, RC.FLOOR_Z + 135), brass, segs=32, r2=4.5)
+    tube.rotation_euler = (math.radians(-60), 0, math.radians(-25))
+    # a great floor armillary on the right
+    P.armillary(125, 40, RC.FLOOR_Z, R=38.0, mat=brass)
+    # an amethyst geode with its violet glow (right, front of the armillary)
+    import build_env_frostbound as F
+    F.crystal_cluster(110, -30, RC.FLOOR_Z + 0.5, 11, 31, am, 3.2)
+    E.light(scene, "POINT", "geode_glow", (110, -30, RC.FLOOR_Z + 40), 30000, color=(0.65, 0.3, 1.0), size=15,
+            shadow=False)
+    # a warm lantern hung on the left and sconces on the side walls
+    RC.hanging_lantern(scene, -80, -20, 70, energy=35000, mat=brass, glass_color=(1.0, 0.75, 0.45))
+    for side in ("left", "right"):
+        RC.sconce(scene, side, 40, 120, energy=9000)
+    return dict(loc=(16, -80, 48), target=(0, 120, 20), lens=20, fstop=4.0, focus=(0, 0, 2))
