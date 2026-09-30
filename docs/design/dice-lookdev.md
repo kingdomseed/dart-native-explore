@@ -1098,6 +1098,19 @@ Lighting recipes (the tray lights are unchanged unless noted):
   Camera: 20 mm, f/4. Gate: numeral 11.81 (d12), die vs tray 2.92, stroke
   0.124–0.130, PASS.
 
+- **Celestial — the observatory loggia.** An open marble arcade on the star
+  balcony (no back wall): columns and a lintel frame the nebula with a
+  room-scale star layer, a pale moon and a small planet; violet hangings
+  with a gold lattice on the side walls, a brass telescope on a tripod
+  (back-left), a great floor armillary (right) and an amethyst geode.
+  Lights: the tray's moon (cool, back-left) and soft front, a brass
+  lantern hung on the left (35 kW, warm key), the geode's shadowless
+  violet glow (30 kW, right, the accent) and brass sconces on both side
+  walls (9 kW each). Room marble is a pale fine-veined variant (the tray's
+  bold marble reads as zebra stripes at room scale). Camera: 18 mm, low,
+  looking up into the sky. Gate: numeral 11.35 (d12), die vs tray 2.45,
+  stroke 0.121–0.130, PASS.
+
 ## 4. dart3d features to verify (before building these for real)
 
 1. **Emissive intensity > 1 + bloom threshold** on both platforms, and

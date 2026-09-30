@@ -248,6 +248,31 @@ def shell(half_w=220, back=260, front=-160, height=300, wall=None, floor=None, c
         E.plane("ceiling", 2 * half_w + 40, back - front + 40, (0, (back + front) / 2, FLOOR_Z + height), ceiling)
 
 
+def half_timber(wall, us, mat, rails=(), size=16, braces=True):
+    """Timber framing on a plaster wall: posts at the u positions in `us`,
+    horizontal rails at the (world) heights in `rails`, and diagonal braces."""
+    r = _ROOM
+    parts = []
+    L = 2 * r["half_w"] if wall == "back" else r["back"] - r["front"]
+    uc = 0.0 if wall == "back" else (r["back"] + r["front"]) / 2
+    sgn = -1 if wall == "right" else 1  # local x runs along -y on the right wall
+    h = r["height"]
+    for u in us:
+        parts.append(E.cube("timber_post", (size, 6, h), ((u - uc) * sgn, -3, h / 2), mat))
+    for z in rails:
+        parts.append(E.cube("timber_rail", (L, 6, size * 0.8), (0, -3, z - FLOOR_Z), mat))
+    if braces and len(us) > 1 and rails:
+        z0 = rails[0] - FLOOR_Z
+        for a, b in zip(us[:-1], us[1:]):
+            ln = math.hypot(b - a, h - z0)
+            br = E.cube("timber_brace", (size * 0.7, 5, ln * 0.5), (((a + b) / 2 - uc) * sgn - (b - a) * 0.25 * sgn,
+                                                                     -3, z0 + (h - z0) * 0.25), mat)
+            br.rotation_euler = (0, -math.atan2(b - a, h - z0) * sgn * 0.9, 0)
+            parts.append(br)
+    loc, rz = _wall_frame(wall, uc)
+    return _group("half_timber", parts, loc + Vector((0, 0, FLOOR_Z)), rz)
+
+
 def beams(mat, n=4, size=(22, 26), z=None, along="x"):
     """Heavy ceiling beams (timber frame)."""
     r = _ROOM
@@ -615,6 +640,32 @@ def chair(x, y, rot=0.0, mat=None, seat_h=46, back_h=50, w=44):
     parts.append(E.cube("chair_rail", (w, 3, 12), (0, w / 2 - 3, seat_h + back_h - 8), mat, bevel=0.5))
     parts.append(E.cube("chair_rail", (w, 3, 6), (0, w / 2 - 3, seat_h + back_h * 0.45), mat, bevel=0.5))
     return _group("chair", parts, Vector((x, y, FLOOR_Z)), rot)
+
+
+def leather(name="Leather", color=(0.12, 0.035, 0.02)):
+    m, k = E.material(name)
+    obj = k.coords().outputs["Object"]
+    n = k.noise(obj, 0.6, 6, 0.6).outputs["Fac"]
+    col = k.mix(k.math("MULTIPLY", n, 0.5), (*color, 1), tuple(c * 0.45 for c in color) + (1,))
+    k.surface(k.bsdf(Base_Color=col, Roughness=k.math("ADD", k.math("MULTIPLY", n, 0.3), 0.35), Coat_Weight=0.2,
+                     Normal=k.bump(k.noise(obj, 3.0, 4).outputs["Fac"], 0.2, 0.2)))
+    return m
+
+
+def armchair(x, y, rot=0.0, mat=None, w=90, throw=None):
+    """An overstuffed wing armchair (rounded blocks) facing -y before rotation;
+    throw = a material for a blanket draped over one arm."""
+    mat = mat or leather()
+    parts = [E.cube("chair_base", (w, 80, 38), (0, 0, 19), mat, bevel=6),
+             E.cube("chair_cushion", (w - 30, 70, 14), (0, -5, 44), mat, bevel=5),
+             E.cube("chair_back", (w, 20, 70), (0, 32, 68), mat, bevel=7)]
+    for sx in (-1, 1):
+        parts.append(E.cube("chair_arm", (16, 78, 26), (sx * (w / 2 - 8), 0, 50), mat, bevel=6))
+        parts.append(E.cube("chair_wing", (12, 24, 40), (sx * (w / 2 - 6), 26, 88), mat, bevel=5))
+    if throw:
+        t = E.rock("chair_throw", 26, (w / 2 - 12, -5, 60), throw, seed=5, squash=(0.5, 1.3, 0.7), strength=0.3)
+        parts.append(t)
+    return _group("armchair", parts, Vector((x, y, FLOOR_Z)), rot)
 
 
 def cabinet(wall, u, w=90, h=90, depth=55, z0=None, mat=None, top_mat=None, doors=2):

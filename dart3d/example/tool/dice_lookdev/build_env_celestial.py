@@ -170,8 +170,13 @@ def room(scene, am):
     a brass lantern hung on the left (warm), the amethyst glow (violet,
     right) and two sconces on the side walls; plus the tray's soft front.
     """
-    mar = marble("Loggia marble")
-    RC.shell(half_w=200, back=95, front=-200, height=320, wall=mar, floor=marble("Loggia floor"), floor_z=-60.0,
+    mar, k = E.material("Loggia marble")  # pale, fine-veined (the tray's marble is too bold at room scale)
+    obj = k.coords().outputs["Object"]
+    vein = k.noise(obj, 0.02, 8, 0.7, dist=2.0).outputs["Fac"]
+    v = k.math("LESS_THAN", k.math("ABSOLUTE", k.math("SUBTRACT", vein, 0.5)), 0.012)
+    k.surface(k.bsdf(Base_Color=k.mix(v, (0.62, 0.6, 0.66, 1), (0.3, 0.28, 0.36, 1)), Roughness=0.25,
+                     Coat_Weight=0.3))
+    RC.shell(half_w=200, back=95, front=-200, height=320, wall=mar, floor=RC.tiles("Loggia floor", (0.35, 0.33, 0.4), (0.06, 0.05, 0.08), scale=0.02), floor_z=-60.0,
              back_wall=False)
     RC.work_table(180, 140, top_z=-6.0, thick=0.1, mat=mar, leg_r=7, y=20, top=False)
     # the arcade: columns at the balustrade and a lintel under the open sky
@@ -202,4 +207,19 @@ def room(scene, am):
     RC.hanging_lantern(scene, -80, -20, 70, energy=35000, mat=brass, glass_color=(1.0, 0.75, 0.45))
     for side in ("left", "right"):
         RC.sconce(scene, side, 40, 120, energy=9000)
-    return dict(loc=(16, -80, 48), target=(0, 120, 20), lens=20, fstop=4.0, focus=(0, 0, 2))
+    # a star layer in front of the nebula, sized for the room shot
+    sm, k = E.material("Room stars")
+    tc = k.coords().outputs["Generated"]
+    v = k.voronoi(tc, 90.0)
+    st = k.math("LESS_THAN", v.outputs["Distance"], k.math("MULTIPLY", v.outputs["Color"], 0.07))
+    k.surface(k.mix_shader(st, k.node("ShaderNodeBsdfTransparent").outputs[0],
+                           k.emission((0.95, 0.9, 1.0, 1), 5.0)))
+    card = E.plane("room_stars", 1150, 480, (0, 420, 110), sm)
+    card.rotation_euler = (math.radians(90), 0, 0)
+    card.visible_shadow = False
+    # a ringed planet and a pale moon hanging in the nebula
+    moon = E.sphere("sky_moon", 45, (-170, 430, 190), E.emissive("Sky moon", (0.5, 0.48, 0.62), 0.9), subdiv=4)
+    moon.visible_shadow = False
+    pl = E.sphere("sky_planet", 22, (190, 430, 250), E.emissive("Sky planet", (0.4, 0.33, 0.55), 0.7), subdiv=4)
+    pl.visible_shadow = False
+    return dict(loc=(-10, -75, 22), target=(5, 100, 45), lens=18, fstop=4.0, focus=(0, 0, 2))
