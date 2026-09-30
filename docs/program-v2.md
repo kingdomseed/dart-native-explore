@@ -19,7 +19,7 @@ where this file re-scopes it. Why the reset: see
 
 | # | Decision | Why |
 |---|---|---|
-| D1 | **Two-stage parity pin.** Milestone: flutter_scene 0.23.0 / scene 0.3.0, commit `0dc6ee80` (bdero/flutter_scene), `.fscene` v5, `.fsceneb` v2 — finish the existing work (Tracks S, E) against this first. **Final goal: flutter_scene 0.24 / scene 0.4** (Track V), pinned to the published 0.24.0/0.4.0 tags when they ship; until then unreleased master (`b02c99989`, 2026-09-27) is the preview reference. | The old plan cited a `/tmp` monorepo that no longer exists; "parity" had no fixed target. |
+| D1 | **Two-stage parity pin.** Milestone: flutter_scene 0.23.0 / scene 0.3.0, commit `0dc6ee80` (bdero/flutter_scene), `.fscene` v5, `.fsceneb` v2 — finish the existing work (Tracks S, E) against this first. **Final goal: flutter_scene 0.24 / scene 0.4** (Track V), pinned to the published 0.24.0/0.4.0 tags when they ship; until then unreleased master is the preview reference — `b473543a`, 2026-09-30, per V0 (the tags are not published; release branch `bdero/release-0.24` @ `168fad28` is a stale candidate). | The old plan cited a `/tmp` monorepo that no longer exists; "parity" had no fixed target. |
 | D2 | **Keep SceneKit on iOS for now; run a time-boxed Filament-on-Metal spike (S1) before W28.** | SceneKit is soft-deprecated (WWDC25) but the iOS 27 SDK carries no deprecation annotations. A single Filament renderer would collapse the iOS halves of W28/W20/W31 into the Android implementation, but costs a rewrite of SceneKit-provided pieces (particles, floor mirror, physics via Jolt C++). Decide with data, not now. RealityKit is ruled out (weaker shader control, no decal/planar primitives). |
 | D3 | **Upgrade Filament 1.71.6 → 1.77.2+ in lockstep (filament-android, filament-utils-android, filamat-android, gltfio-android) once 1.77.2 is on Maven;** replace CPU-baked instancing with GPU instancing. | `RenderableManager.Builder.instances(n)` + `getInstanceIndex()` already works in the Java API; Java `InstanceBuffer` lands in 1.77.2. Unblocks W31 and mesh particles. Materials recompile automatically (runtime filamat). |
 | D4 | **Mirror upstream vocabulary; invent `d3:` extensions only where upstream has no wire form**, and model them on upstream's runtime API. | Keeps `.fscene` interchange. Applies to W19 (upstream `CharacterController` codec exists → use it, drop the invented `characterMove` op) and W27 (`DecalNode` is runtime-only upstream → `d3:decal` modeled on it). |
@@ -73,14 +73,14 @@ Rules:
 | U3 rendering extras | selection outline on a picked node; each iOS tone-mapper visibly distinct; sprite atlas frames advance |
 | U4 property resolver | a clip animating a material color and a light intensity plays on both platforms |
 | V0 re-pin | the published tags' `.fscene`/`.fsceneb` versions recorded; every 0.24 example `.fscene` loads in dart3d's Dart mirror with no unknown-component warnings except those assigned to V1–V6 |
-| V1 wire fields | a document using each new field round-trips through `serializeScene`; each `shadowCastingMode` value visibly differs on both platforms; each supported SMAA setting produces a visible edge difference (zoomed crop) or a renderer diagnostic confirming it applied, on A142 Vulkan, A142 GL and iOS — unsupported settings log a warn-once and are listed as limits |
-| V2 ortho | an upstream 0.24 ortho-camera example matches upstream framing (screenshot overlay); a perspective and an ortho scene with an off-center projection offset and non-unit scale light identically to upstream (screenshot overlay of lit surfaces, or a renderer diagnostic printing the applied scale/offset); splats sort correctly under ortho (after W31) |
+| V1 wire fields | a document using each new field round-trips through `serializeScene`; a stage with default TAA/SMAA fields realizes the scene 0.4 defaults natively (V7-4, logged values on both platforms); each `shadowCastingMode` value visibly differs on both platforms; each supported SMAA setting produces a visible edge difference (zoomed crop) or a renderer diagnostic confirming it applied, on A142 Vulkan, A142 GL and iOS — unsupported settings log a warn-once and are listed as limits |
+| V2 ortho | the upstream ortho smoke scene (`examples/smoke_render/lib/smoke_scenes.dart:1648`, the only upstream ortho fixture) matches upstream framing (screenshot overlay); each `orthographicSize` mode frames as upstream at two aspect ratios; a document using the legacy `orthoScale` still realizes; a perspective and an ortho scene with an off-center projection offset and non-unit scale light identically to upstream (screenshot overlay of lit surfaces, or a renderer diagnostic printing the applied scale/offset); splats sort correctly under ortho (after W31) |
 | V3 point shadows | a point light inside an open-front box of receivers with occluders on all six axes casts a shadow on every face (±X, ±Y, ±Z), on A142 Vulkan, A142 GL and iOS |
-| V4 decals | the upstream 0.24 decal example renders with correct projection and fade; the E7 `d3:decal` fixture still renders with its original projection box and fade (screenshot matches its E7 evidence) on every backend |
-| V5 `.fmat` | an additive-blended material, a depth-write-off material, a depth-test-off material (draws over an occluder) and an unlit engine-input material each render as in the upstream example; a material without a precision qualifier compiles at mediump on both platforms (compiled-shader dump or diagnostic) and a highp-requiring case still renders correctly; a malformed `.fmat` surfaces its diagnostics |
-| V6 runtime | light scaling: frame time at 64 point lights ≤ 1.5× the 8-light frame time on A142 Vulkan and iOS; progressive prefilter: during a sun sweep no frame exceeds 33 ms on A142, and captures at 3 intermediate steps show reflections updating and converging to the full-prefilter reference (diff within tolerance recorded); spatial audio pans with the camera; character yaw follows movement; every 0.24 debug-view mode dart3d supports renders its channel on both platforms (one screenshot per mode) |
+| V4 decals | the upstream decal smoke scene (`smoke_scenes.dart:1969`) renders with correct projection and fade; the E7 `d3:decal` fixture still renders with its original projection box and fade (screenshot matches its E7 evidence) on every backend |
+| V5 `.fmat` | an additive-blended material, a `depth_test: always` material (draws over an occluder) and an unlit engine-input material each render as in the upstream example; a material without a precision qualifier compiles at mediump on both platforms (compiled-shader dump or diagnostic) and a highp-requiring case still renders correctly; a malformed `.fmat` surfaces its diagnostics; `default_black`/`default_transparent` samplers read black/transparent while unset; each master-only key in the V5 table that ships in the published tag gets one fixture |
+| V6 runtime | light scaling: frame time at 64 point lights ≤ 1.5× the 8-light frame time on A142 Vulkan and iOS, and a large mesh reached by 64 lights shades all of them; spatial audio pans with the camera; a tick listener runs before every fixed step and fly-camera move intent drives the camera; every 0.24 debug-view mode dart3d supports renders its channel on both platforms (one screenshot per mode) |
 | V5b DICOM (port outcome only) | a float data texture uploads exactly — verified by **numeric readback** of a known r32Float test pattern (native test hook: Metal `getBytes` / Filament `Texture` readback into a float buffer, compared per texel within 0 ULP), not by rendered colour (shader precision, 8-bit output and colour conversion could mask corruption) on A142 Vulkan, A142 GL and iOS; upstream's DICOM example renders MPR, MIP and DVR matching the upstream render (screenshot per mode per platform) with window/level and transfer-function changes visible |
-| V6b screen distortion | the upstream 0.24 screen-distortion fixture pulses visibly on A142 Vulkan, A142 GL and iOS, matching the upstream render (screenshot pair per platform) |
+| V6b screen distortion | a shockwave pulse modeled on upstream's dice VFX (`examples/flutter_app/lib/dice/dice_vfx.dart:466-471`; no dedicated fixture exists) pulses visibly on A142 Vulkan, A142 GL and iOS, matching the upstream render (screenshot pair per platform) |
 | V7 breaking changes | a written map of each upstream breaking change to the dart3d behavior (changed / not applicable), with one test per changed behavior |
 | V8 conformance | every example in the published 0.24 corpus screenshotted on A142 Vulkan, A142 GL and iOS sim next to the upstream render, pass/fail per example in `verification-matrix.md`; V8 closes only when every example passes, or a failure is re-classified as an explicit, operator-approved exclusion — any other failure keeps V8 open |
 
@@ -141,7 +141,7 @@ Rules:
 |---|---|---|---|---|
 | E1 | **Filament upgrade + GPU instancing** (new) | D3. Re-run the full W26 + W18 lanes afterward. | L | 1.77.2 on Maven |
 | E2 | **U1 camera controllers + picking** (new) | Orbit/fly/follow controllers, `scene_pointer` hit tests (BVH or native hit test). | M | — |
-| E3 | **W17 sky / environment** | Generate the equirect natively, not in Dart (Dart per-pixel scatter won't hit the A142 budget). Rate-limit IBL re-prefilter on sun sweeps. | M–L | — |
+| E3 | **W17 sky / environment** | Generate the equirect natively, not in Dart (Dart per-pixel scatter won't hit the A142 budget). Rate-limit IBL re-prefilter on sun sweeps; also carries the progressive-prefilter check moved from V6 (upstream [#422](https://github.com/bdero/flutter_scene/pull/422) is the reference). Added T3: during a sun sweep no frame exceeds 33 ms on A142, and captures at 3 intermediate steps converge to the full-prefilter reference. | M–L | — |
 | E4 | **W19 character controller** | Upstream `CharacterController` codec (D4); Android `CharacterVirtual` + `CustomCharacterContactListener` in plain Kotlin (jolt-jni ≥ 6.0.0); iOS sweep-and-slide. | L | — |
 | E5 | **U2 geometry + shadow breadth** (new) | Wedge/Ring/Extrude; spot-light shadows (point shadows are the 0.24 delta, V3); shadow-catcher bake mode. | M | — |
 | E5b | **U3 rendering extras** (new) | Selection outline, iOS tone-mapper selection, sprites + texture atlas. | M | E2 |
@@ -214,51 +214,214 @@ scaffolding, not the demo.
 
 ### Track V — 0.24 parity (final goal; after Track E closes on 0.23.0)
 
-Scope = the upstream delta from `0dc6ee80` to the published
-flutter_scene 0.24.0 / scene 0.4.0 tags. Before starting, re-diff the
-published tags (master is 200+ commits ahead and still moving) and
-re-cut this list; items below are from the 2026-09-27 master preview.
+Scope = the upstream delta from `0dc6ee80` to flutter_scene 0.24.0 /
+scene 0.4.0. Re-cut by V0 on **2026-09-30** against the upstream state
+below; each item carries its upstream PR/commit, size, the dart3d files
+it touches, its Track E dependency, and whether it is in the release
+candidate (**RC✓**) or only on master (**master-only**).
 
-- [ ] V0 Re-pin to the published 0.24.0/0.4.0 tags; diff `packages/scene`
-      (wire) and `packages/flutter_scene` (runtime) changelogs; confirm
-      `.fscene` stays v5 or add the migration.
-- [ ] V1 Wire additions: `Node.shadowCastingMode`, SMAA fields, any new
-      codecs; both natives + Dart mirror.
-- [ ] V2 Orthographic reconciliation: `projection:"orthographic"` already
-      realizes on both platforms (W6; `verification-matrix.md` rows 21,
-      133). Scope is only what 0.24 changes — any new ortho camera
-      fields/API in scene 0.4, the `Lighting` projection scale/offset
-      semantics (shared with V7), and splat sorting under ortho once W31
-      lands.
-- [ ] V3 Point-light shadows — new in 0.24 (0.23.0 has spot shadows only, covered by U2); cube/omni shadow maps on Filament and SceneKit.
-- [ ] V4 Decals against the published `DecalNode` contract — reconcile
-      E7's `d3:decal` extension with upstream (migrate or alias).
-- [ ] V5 `.fmat` additions (W28 follow-up): `blending: additive`,
-      `depth_write`/`depth_test`, unlit `engine_inputs`, compile
-      diagnostics, mediump default.
-- [ ] V6 Lighting/runtime semantics: froxel-clustered lights (light-count
-      scaling on both platforms), progressive radiance prefilter (W20
-      follow-up), spatial audio following the view camera
-      (`dart3d_audio`), character `rotatesToMovement`/`yaw` (W19
-      follow-up), debug views (W34 follow-up).
-- [ ] V5b **DICOM volume example — decision checkpoint** (operator,
-      2026-09-29): excluded until E6 lands; **decided when E6 closes, before
-      V5 starts.** Upstream's example is a capability showcase (private
-      Flutter GPU internals, r32Float slice atlas + raymarch `.fmat`), not
-      scene-contract behavior. Exactly one outcome, recorded here:
+**V0 findings (2026-09-30):** checked with `gh api repos/bdero/flutter_scene/{tags,releases,branches}` and the pub.dev API.
+
+- **0.24.0 / 0.4.0 are not published.** Newest tags and releases:
+  `flutter_scene-0.23.0` and `scene-0.3.0`, both at
+  `0dc6ee8062a4aaaffb2d1f91e3aeb3005d5b54e4` (released 2026-08-25).
+  pub.dev latest is `flutter_scene 0.23.0` and `scene 0.3.0`.
+- **Release candidate:** branch `bdero/release-0.24` @
+  `168fad28f0d6ffb871f204da72d63d1a826ce8f1` (2026-09-14; version bumps
+  in `0806665e` "Prepare the 0.24 release train"). It forks master at
+  `160464d3` ([#404](https://github.com/bdero/flutter_scene/pull/404)) and is 3 commits ahead and 156 behind master. It is
+  stale: nothing merged after 2026-09-15 is in it (ortho cameras,
+  display-referred surfaces, progressive prefilter, spatial-audio
+  follow, the #437 `.fmat` hooks).
+- **Scope reference:** master HEAD
+  `b473543a654281ecb9e9882dd651e12202eee576` (2026-09-30, [#437](https://github.com/bdero/flutter_scene/pull/437)),
+  274 commits ahead of `0dc6ee80`. Its pubspecs still say 0.23.0/0.3.0,
+  and both CHANGELOGs have an open `## 0.24.0` / `## 0.4.0` section.
+  The old preview ref `b02c9998` (2026-09-27) is superseded.
+- **What was diffed:** `packages/scene` (18 files, +2088/−84);
+  the codecs in `packages/flutter_scene/lib/src/fscene/realize/`
+  (`builtin_codecs.dart`, `ui_codecs.dart`, `stage.dart`, `realize.dart`,
+  `resource_realizer.dart`; `physics_codecs.dart`, `audio_codecs.dart`,
+  `particle_emitter_codec.dart` and `render_extras_codecs.dart` are unchanged);
+  `packages/flutter_scene/lib/src/fmat/fmat_parser.dart`; both CHANGELOGs.
+- **`.fscene` stays v5 and `.fsceneb` stays v2, so no migration is needed.**
+  At `b473543a`: `currentFsceneVersion = 5`
+  (`packages/scene/lib/src/scene_document.dart:9`) and `kFscenebVersion = 2`
+  (`packages/scene/lib/src/binary/fsceneb.dart:44`). The migration
+  list (`_migrateV1ToV2` … `_migrateV4ToV5`) and `supportedFeatures`
+  (`skinning`, `prefabInstances`, `streaming`, `renderTextures`) are
+  unchanged. Every 0.4 addition is an optional key, and the writer omits
+  it when it holds its default. One default *value* changed: TAA (V7-4).
+- **Runtime-only in 0.24:** `DecalNode`, `Scene.screenDistortion`,
+  `Scene.debug`, `Node.renderOrder` and `shadowCasterChannelMask` on spot
+  and point lights. None of them has a codec on master, so the D4 rule
+  (`d3:` extension modeled on the runtime API) applies to each one dart3d realizes.
+- **Next step:** when the tags ship, diff `flutter_scene-0.24.0` against
+  `b473543a` and amend this list. V0 stays open until then.
+
+Sizes: S ≤ 1 day, M ≤ 1 week, L ≤ 3 weeks, XL > 3 weeks.
+"Natives" = `dart3d/ios/Classes/FsceneRealizer.swift` +
+`dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/FsceneRealizer.kt`
+unless the row names other files.
+
+**Plan corrections found by V0** (the list below already applies them):
+
+| Old item | Verdict | Evidence |
+|---|---|---|
+| V2 "ortho already realizes (W6)" | **Wrong key set.** dart3d realizes ortho from an invented `orthoScale`/`orthographicScale` (SceneKit half-height). Upstream 0.23 had no ortho: its camera codec offered `options: ['perspective']` only. 0.24 standardizes different keys. | `FsceneRealizer.swift:4841-4844`, `Dart3dView.kt:3095-3101`, `RenderTargets.kt:139-141`; upstream #411 |
+| V2 / V7 "Lighting projection scale/offset" | **Not in the RC** (master-only), and it is no dart3d concern: `Lighting` is flutter_scene's shader-uniform helper. `tanHalfFov` has no hits in `dart3d/`. | V7-1 |
+| V4 "migrate or alias to the published `DecalNode` contract" | **No wire contract exists.** `DecalNode` is runtime-only on master: no codec, and nothing in `packages/scene`. E7's `d3:decal` stays. V4 shrinks to an API-shape check and folds into E7 acceptance. | `lib/src/decal.dart` (master) |
+| V5 `depth_write` | **Already in 0.23.0.** `fmat_parser.dart:565` at `0dc6ee80` parses it, so it belongs to E6/W28. Only `depth_test` is new. | — |
+| V5b DICOM | **Not a 0.24 delta.** `examples/flutter_app/lib/example_dicom.dart` and `assets/dicom_volume.fmat` exist at `0dc6ee80`. It is a 0.23.0-corpus decision; the checkpoint text stands. | `git ls-tree 0dc6ee80` |
+| V6 progressive radiance prefilter | **Already covered by E3.** It fixes flutter_scene's own Impeller prefilter, and it is master-only. dart3d prefilters natively (Filament `libs/iblprefilter`, see `EnvironmentFactory.kt:34`; SceneKit on iOS), and E3 already scopes "rate-limit IBL re-prefilter on sun sweeps". The hitch check moves to E3's T3. | #422 |
+| V6 character `rotatesToMovement`/`yaw` | **Out of scope (D7).** It lives on `ThirdPersonControllerComponent` in `lib/src/kit/character/third_person_controller.dart`, and no codec carries it. It is kit, not the `KinematicCharacterControllerCodec` that W19 mirrors (that codec is unchanged in 0.24). Dropped. | #385 |
+| V6 spatial audio, V6b distortion | Master-only / RC✓ respectively; neither has a wire form (see rows). | — |
+| *missing* | Added: V1c TAA default change, V1d `displayReferred`, V1g unknown-data preservation, V1h `editor` block, V1i `-split<N>` hints, V3 point-shadow codec fields, V5 master-only `.fmat` keys, V6f tick listeners + fly move input, V6g runtime additions triage. | rows below |
+
+**Items:**
+
+- [x] **V0 Re-diff** (this section). Re-open to re-diff when the tags ship.
+- [ ] **V1 Wire additions** (scene 0.4 + codec keys; Dart mirror + both natives)
+
+  | # | Upstream delta | PR / commit | Size | dart3d files | Depends | RC |
+  |---|---|---|---|---|---|---|
+  | V1a | Bump `scene: ^0.3.0` → `^0.4.0` once published; round-trip every new key through `serializeScene` | — | S | `dart3d/pubspec.yaml`, `lib/src/diff_apply.dart` (`readFsceneWithExtensions` :484, `writeFsceneWithExtensions` :592), `test/scene_codec_fixture_test.dart` | — | — |
+  | V1b | Node `shadowCasting`: `off` / `on` / `doubleSided` / `shadowsOnly` (`NodeSpec.shadowCastingMode`, prefab override path `shadowCasting`) | [#372](https://github.com/bdero/flutter_scene/pull/372) [`7406d661`](https://github.com/bdero/flutter_scene/commit/7406d661) | M | natives: node decode + `updateNode` path; `lib/src/protocol.dart` (flag list) | E5 (spot receivers to check against) | RC✓ |
+  | V1c | Stage `effects.smaa` {`threshold`, `maxSearchSteps`, `maxDiagonalSearchSteps`, `cornerRounding`}; TAA and SMAA tuning now reach the scene, and the **TAA spec defaults changed** (V7-4) | [#372](https://github.com/bdero/flutter_scene/pull/372) [`0da324c5`](https://github.com/bdero/flutter_scene/commit/0da324c5) | S | `ios/Classes/StageEffects.swift` (:231-239 TAA defaults), `android/.../StageEffects.kt` (:277-293). Neither Filament nor SceneKit has SMAA: `RenderTargets.kt:326` already logs `smaa` as having no Filament knob, and iOS `RenderTargets.swift:677` maps only none/msaa. So: parse, warn once, list as a limit | — | RC✓ |
+  | V1d | Unlit material resource `displayReferred` (draws past the tone curve); `widget` component `displayReferred` (default true) | [#419](https://github.com/bdero/flutter_scene/pull/419) [`b5bc75cc`](https://github.com/bdero/flutter_scene/commit/b5bc75cc) | M | natives: unlit material decode (`android/.../MaterialPackages.kt`, `FsceneRealizer.swift` material path). The widget half is blocked with W33c (D6) | — | master-only |
+  | V1e | `PointLight` shadow keys: see V3 | #372 | — | — | — | RC✓ |
+  | V1f | Camera ortho keys: see V2 | #411 | — | — | — | master-only |
+  | V1g | Unknown-data preservation: `readFscene`/`writeFscene` keep unknown keys, unknown value objects, unknown `.fsceneb` chunks (`UnknownValue`, `UnknownChunk`) | [#423](https://github.com/bdero/flutter_scene/pull/423) [`7ef3b7c2`](https://github.com/bdero/flutter_scene/commit/7ef3b7c2), [`eaec5e26`](https://github.com/bdero/flutter_scene/commit/eaec5e26) | S | `lib/src/diff_apply.dart` and `lib/src/compose_extensions.dart` exist because 0.3 drops `d3` keys: re-test them, and simplify where 0.4 now keeps the keys. `lib/src/fsceneb_reader.dart:126` already skips unknown chunks | — | master-only |
+  | V1h | Document `editor` block (`EditorStateSpec`: camera pose, selection) | [#372](https://github.com/bdero/flutter_scene/pull/372) [`b3bd6f60`](https://github.com/bdero/flutter_scene/commit/b3bd6f60) | S | Editor is out of scope (D7). The natives read named top-level keys only (`FsceneRealizer.swift:42-80`, `.kt:448-476`), so the block is ignored. Needs a Dart round-trip test only | — | RC✓ |
+  | V1i | `-split<N>` node-name mesh split hints (`applyMeshSplitHints`, `splitTriangleMeshByGrid` in scene 0.4) | [#372](https://github.com/bdero/flutter_scene/pull/372) [`673a0bb2`](https://github.com/bdero/flutter_scene/commit/673a0bb2) | S | optional: `lib/src/glb_import.dart` / `lib/src/gltf/fscene_emitter.dart` call the scene 0.4 helper | — | RC✓ |
+
+- [ ] **V2 Orthographic cameras.** [#411](https://github.com/bdero/flutter_scene/pull/411)
+      ([`1fa830b2`](https://github.com/bdero/flutter_scene/commit/1fa830b2), [`1a3a8fce`](https://github.com/bdero/flutter_scene/commit/1a3a8fce)). **M. master-only.** Depends: — (E12 for splat sorting).
+      Upstream `camera` codec keys: `projection: "orthographic"` plus
+      `orthographicNear` (signed, default 0), `orthographicFar` (1000),
+      `orthographicSize` (`height`|`width`|`contain`|`cover`|`stretch`|`pixelsPerUnit`),
+      `orthographicWidth`/`orthographicHeight` (full extents, default 10),
+      `orthographicPixelsPerUnit` (32), `orthographicZoom` (1),
+      `orthographicOffset` (vec2 lens shift, world units).
+      dart3d work: map these onto `SCNCamera` and Filament
+      `Camera.setProjection(ORTHO…)`. `pixelsPerUnit` and the fit modes
+      need the view's logical size. Keep `orthoScale`/`orthographicScale`
+      as a deprecated alias (half-height = `orthographicHeight / 2`).
+      Files: `ios/Classes/FsceneRealizer.swift` (:4841-4844),
+      `android/.../Dart3dView.kt` (:3095-3101), `android/.../RenderTargets.kt`
+      (:139-141). Splats under ortho land after E12 (W31).
+      The only upstream ortho scene is a smoke scene
+      (`examples/smoke_render/lib/smoke_scenes.dart:1648`). No
+      `flutter_app` example uses ortho.
+- [ ] **V3 Point-light shadows.** [#372](https://github.com/bdero/flutter_scene/pull/372) ([`0da324c5`](https://github.com/bdero/flutter_scene/commit/0da324c5)). **M. RC✓.** Depends: E5.
+      Upstream `pointLight` codec gains `castsShadow` (false),
+      `shadowMapResolution` (512, power of two 64–4096), `shadowNear` (0.1),
+      `shadowDepthBias` (0), `shadowNormalBias` (0.1), `shadowSoftness` (1),
+      `shadowCasterFaces` (`front`). dart3d's light decode is shared across
+      types, so `castsShadow` already reaches the builders for point lights:
+      Filament `ShadowOptions` at `FsceneRealizer.kt:3496-3523`, SceneKit
+      `castsShadow` at `FsceneRealizer.swift:4879-4893`. That path has never
+      been device-verified for point lights. The other five keys are
+      unmapped; dart3d reads its own `shadowRadius`. Runtime-only:
+      `shadowCasterChannelMask` on spot and point lights, and the
+      `shadowCasterOverflowCount` diagnostics.
+- [ ] **V4 Decal contract check.** [#369](https://github.com/bdero/flutter_scene/pull/369) ([`6b45aeb0`](https://github.com/bdero/flutter_scene/commit/6b45aeb0)). **S. RC✓.** Depends: E6, E7.
+      There is no wire form to migrate to (see corrections). Diff E7's `d3:decal` against
+      `DecalNode`: its `.fmat` material, `fade`, `project()`,
+      `boxTransform()`, and the decal-inverse and fade parameters. Record
+      differences in E7's PR. Fold into E7 acceptance if they match.
+- [ ] **V5 `.fmat` additions** (W28 follow-up). **XL total. Depends: E6.**
+      dart3d has no `.fmat` translator yet: `FsceneRealizer.swift:6229` and
+      `FsceneRealizer.kt:5149` log `fmat` skies as unsupported. Every
+      row lands in E6's translator(s).
+
+  | Key / behavior | PR / commit | Size | RC |
+  |---|---|---|---|
+  | `blending: additive` | [#369](https://github.com/bdero/flutter_scene/pull/369) [`5d7be2ae`](https://github.com/bdero/flutter_scene/commit/5d7be2ae) | S | RC✓ |
+  | `depth_test: less_equal \| always` (translucent pass) | [#369](https://github.com/bdero/flutter_scene/pull/369) [`6b45aeb0`](https://github.com/bdero/flutter_scene/commit/6b45aeb0) | S | RC✓ |
+  | Unlit `engine_inputs`, `scene_color_reach`, `GetSceneWorldPosition` | [#369](https://github.com/bdero/flutter_scene/pull/369) [`d9ba0d92`](https://github.com/bdero/flutter_scene/commit/d9ba0d92) | M | RC✓ |
+  | mediump fragment default, explicit highp (`shaders/PRECISION.md`) | [#401](https://github.com/bdero/flutter_scene/pull/401) [`5cf64816`](https://github.com/bdero/flutter_scene/commit/5cf64816), [`05d96e17`](https://github.com/bdero/flutter_scene/commit/05d96e17) | M | RC✓ |
+  | Compile diagnostics with line numbers (`FmatCompileException.diagnostics`, `shaderSourceWindow`) | [#399](https://github.com/bdero/flutter_scene/pull/399) [`3cbb4f69`](https://github.com/bdero/flutter_scene/commit/3cbb4f69) | S | RC✓ |
+  | `#include <wireframe.glsl>` barycentric helpers; `MaterialGroup` (Dart helper) | [#369](https://github.com/bdero/flutter_scene/pull/369) [`5d7be2ae`](https://github.com/bdero/flutter_scene/commit/5d7be2ae) | S | RC✓ |
+  | `hint: default_black` / `default_transparent` sample black/transparent (were white) | [#441](https://github.com/bdero/flutter_scene/pull/441) [`85f47359`](https://github.com/bdero/flutter_scene/commit/85f47359) | S | master-only |
+  | `effects_depth` | [#437](https://github.com/bdero/flutter_scene/pull/437) [`e2dfcd52`](https://github.com/bdero/flutter_scene/commit/e2dfcd52) | S | master-only |
+  | `alpha_to_coverage` | [#437](https://github.com/bdero/flutter_scene/pull/437) [`838208c1`](https://github.com/bdero/flutter_scene/commit/838208c1) | S | master-only |
+  | `directional_light: false`, `environment_lighting: false` | [#437](https://github.com/bdero/flutter_scene/pull/437) [`9b10e750`](https://github.com/bdero/flutter_scene/commit/9b10e750), [`8107ea58`](https://github.com/bdero/flutter_scene/commit/8107ea58) | S | master-only |
+  | Lit `Light()` / `Ambient()` / `Composite()` hooks, per-light table row + shadow slot | [#437](https://github.com/bdero/flutter_scene/pull/437) [`c1aea187`](https://github.com/bdero/flutter_scene/commit/c1aea187), [`e2fff3e4`](https://github.com/bdero/flutter_scene/commit/e2fff3e4) | L | master-only |
+  | `Vertex()` model transform; attribute-driven vertex stage runs in depth/shadow passes | [#437](https://github.com/bdero/flutter_scene/pull/437) [`4f0ca831`](https://github.com/bdero/flutter_scene/commit/4f0ca831), [`fe6c6512`](https://github.com/bdero/flutter_scene/commit/fe6c6512) | M | master-only |
+
+- [ ] **V5b DICOM volume example: decision checkpoint** (operator,
+      2026-09-29). This is **a 0.23.0-corpus item, not a 0.24 delta**
+      (see corrections). It is excluded until E6 lands and **decided when E6 closes,
+      before V5 starts.** Upstream's example is a capability showcase
+      (private Flutter GPU internals, r32Float slice atlas + raymarch
+      `.fmat`), not scene-contract behavior. Exactly one outcome, recorded
+      here:
       - **Port:** V5b owns float data-texture upload (S–M) + the port, with
         its T3 row below; it lands before V8.
       - **No port:** the operator records a **renewed explicit exclusion**
-        for V8 (a dart3d-own showpiece may still be built as a demo, but it
-        does not resolve DICOM for V8).
-- [ ] V6b `Scene.screenDistortion` (radial refraction post pass, 0.24):
-      realize on both platforms or record an operator-approved exclusion
-      before V8.
-- [ ] V7 Breaking-change audit: `Lighting` projection scale/offset
-      (replaces `tanHalfFov`), `initializeStaticResources()` throwing —
-      map to dart3d equivalents or record as not applicable.
-- [ ] V8 Conformance: run the 0.24 example corpus through dart3d on both
-      platforms; T3 evidence per item.
+        for V8. A dart3d-own showpiece may still be built as a demo, but it
+        does not resolve DICOM for V8.
+- [ ] **V6 Lighting and runtime semantics**
+
+  | # | Upstream delta | PR / commit | Size | dart3d files | Depends | RC |
+  |---|---|---|---|---|---|---|
+  | V6a | Froxel-clustered punctual lights (no per-object light cap; 255 per froxel) | [#372](https://github.com/bdero/flutter_scene/pull/372) [`d08f6d7c`](https://github.com/bdero/flutter_scene/commit/d08f6d7c), [`8885bd28`](https://github.com/bdero/flutter_scene/commit/8885bd28) | S (Android) / L (iOS) | Filament already shades punctual lights through its own froxel grid, so Android is verify-only. SceneKit limits the lights per node, so the iOS scope depends on S1 (D2). `ios/Classes/SceneViewHost.swift`, `FsceneRealizer.swift` light decode | S1 | RC✓ |
+  | V6c | Spatial audio follows the `SceneView` camera when no scene camera / `AudioListener` is set | [#409](https://github.com/bdero/flutter_scene/pull/409) [`8518fcd7`](https://github.com/bdero/flutter_scene/commit/8518fcd7) | S | `dart3d_audio/` | E11 | master-only |
+  | V6e | Surface debug views (`Scene.debug.view`, `split`, `overlays`, `Node.debugView`); `splitView`/`splitOverlays`; `DebugDraw.colliders` | [#394](https://github.com/bdero/flutter_scene/pull/394) [`54cd2625`](https://github.com/bdero/flutter_scene/commit/54cd2625); [#437](https://github.com/bdero/flutter_scene/pull/437) [`d65a0c1d`](https://github.com/bdero/flutter_scene/commit/d65a0c1d), [`4513ca8b`](https://github.com/bdero/flutter_scene/commit/4513ca8b); [#402](https://github.com/bdero/flutter_scene/pull/402) [`0ad15113`](https://github.com/bdero/flutter_scene/commit/0ad15113) | M | runtime-only: a `command` op (`lib/src/protocol.dart`) + native debug material paths | E9 | #394, #402 RC✓; splitView master-only |
+  | V6f | `Scene.addTickListener` (`SceneTickListener`) + `FlyCameraController.setMoveInput` (analog move intent) | [#404](https://github.com/bdero/flutter_scene/pull/404) [`65a5b309`](https://github.com/bdero/flutter_scene/commit/65a5b309) | S | `lib/src/scene_controller.dart`, E2's fly controller | E2 | RC✓ |
+  | V6g | Runtime additions without wire; triage at V8, realize only if a corpus example needs one: `Node.renderOrder` ([`dafe761c`](https://github.com/bdero/flutter_scene/commit/dafe761c)), custom planar mirrors ([`81c7010a`](https://github.com/bdero/flutter_scene/commit/81c7010a)), linear-HDR `RenderTexture` ([`38b81d90`](https://github.com/bdero/flutter_scene/commit/38b81d90)), per-draw instance/index range ([`c2d72f87`](https://github.com/bdero/flutter_scene/commit/c2d72f87)), double-sided materials cast from both faces ([`450cd38d`](https://github.com/bdero/flutter_scene/commit/450cd38d)), sliced `Scene.warmUp` ([`0043b7ea`](https://github.com/bdero/flutter_scene/commit/0043b7ea), which S0h can learn from), `SceneView.maxFrameRate` ([`b4102ed3`](https://github.com/bdero/flutter_scene/commit/b4102ed3)) | [#437](https://github.com/bdero/flutter_scene/pull/437) | S each | per item | — | master-only |
+
+  Dropped from the old V6: the progressive radiance prefilter (moved to E3) and
+  the character `rotatesToMovement`/`yaw` (D7). See the corrections.
+- [ ] **V6b `Scene.screenDistortion`** (radial shockwave pulses: `radius`,
+      `thickness`, `strength`, `chromaticAberration`; a `CustomRenderPass`).
+      [#369](https://github.com/bdero/flutter_scene/pull/369) ([`656f6f2f`](https://github.com/bdero/flutter_scene/commit/656f6f2f)). **M. RC✓.** Depends: E6 (post-pass shader).
+      Runtime-only, so it needs a `d3:` stage extension or a command op (D4).
+      The only upstream consumer is the master-only dice VFX
+      (`examples/flutter_app/lib/dice/dice_vfx.dart:466-471`), which is relevant to P3
+      juice. Realize it on both platforms, or record an operator-approved
+      exclusion before V8.
+- [ ] **V7 Breaking changes:** map each one to dart3d behavior (T3 row: one
+      test per *affected* row).
+
+  | # | Upstream break | PR / commit | RC | dart3d affected? |
+  |---|---|---|---|---|
+  | V7-1 | `Lighting` takes `projectionScaleX/Y`, `projectionOffsetX/Y`, `orthographic` in place of `tanHalfFovX/Y` (deprecated getters) | [#411](https://github.com/bdero/flutter_scene/pull/411) [`1fa830b2`](https://github.com/bdero/flutter_scene/commit/1fa830b2) | master-only | **No.** `Lighting` is flutter_scene's shader-uniform struct, and dart3d has no equivalent (`tanHalfFov`: 0 hits). The semantic half (off-center ortho) is V2. |
+  | V7-2 | `Scene.initializeStaticResources()` completes with its error | [#372](https://github.com/bdero/flutter_scene/pull/372) [`fce6aa96`](https://github.com/bdero/flutter_scene/commit/fce6aa96) | RC✓ | **No.** dart3d has no Dart-side static-resource load; its natives compile materials (`MaterialPackages.kt`). |
+  | V7-3 | `Geometry.uploadVertexData` takes `TypedData`, not `ByteData` | [#420](https://github.com/bdero/flutter_scene/pull/420) [`9011b481`](https://github.com/bdero/flutter_scene/commit/9011b481) | master-only | **No.** dart3d does not depend on `flutter_scene` and has no `Geometry` class. |
+  | V7-4 | scene 0.4 TAA spec defaults now match the renderer's: `minimumCurrentWeight` 0.1→0.15, `varianceGamma` 1.0→1.2, `sharpness` 0→0.15, `jitterSequenceLength` 16→11, `jitterScale` 1.0→0.46, `objectMotion` true→false, `skinnedMotion` true→false. The writer omits defaults | [#372](https://github.com/bdero/flutter_scene/pull/372) [`0da324c5`](https://github.com/bdero/flutter_scene/commit/0da324c5) | RC✓ | **Yes.** Both natives hard-code the 0.3 defaults (`StageEffects.swift:231-239`, `StageEffects.kt:277-293`). After the V1a bump, a document holding 0.4 defaults omits those keys and the natives fill in 0.3 values. Fix in V1c together with the bump. |
+  | V7-5 | Implementer-facing (RC changelog `168fad28` only): `Geometry.emitsStandardVaryings`/`debugEdges`, `Material.depthCompare`/`participatesInDebugViews`, `Camera.projectToScreenUv`, `ComponentCodec.writeLiveProperty`, `IrradianceFieldBakeStepper` `pointShadowFrame` | [`168fad28`](https://github.com/bdero/flutter_scene/commit/168fad28) | RC✓ | **No.** These are flutter_scene class hierarchies, which dart3d neither implements nor imports. |
+  | V7-6 | `Node.castsShadows` deprecated in favor of `shadowCastingMode` | [#372](https://github.com/bdero/flutter_scene/pull/372) [`7406d661`](https://github.com/bdero/flutter_scene/commit/7406d661) | RC✓ | **No** (runtime API). The wire gains the new `shadowCasting` key (V1b) and nothing is removed. |
+  | V7-7 | `.fmat` `default_black`/`default_transparent` hints sample black/transparent (were white); fragment precision defaults to mediump | [#441](https://github.com/bdero/flutter_scene/pull/441), [#401](https://github.com/bdero/flutter_scene/pull/401) | master-only / RC✓ | **Not yet.** dart3d has no `.fmat` translator. E6 must implement the 0.24 semantics from the start (V5). |
+
+- [ ] **V8 Conformance:** run the 0.24 example corpus through dart3d on both
+      platforms, with T3 evidence per item. New in the corpus since `0dc6ee80`
+      (`examples/flutter_app/lib/main.dart`): **Debug views**
+      (`example_debug_views.dart`, [#394](https://github.com/bdero/flutter_scene/pull/394), RC✓) and **Dice Shadows**
+      (`example_dice_shadows.dart` + `lib/dice/*`, [#409](https://github.com/bdero/flutter_scene/pull/409)/[#427](https://github.com/bdero/flutter_scene/pull/427),
+      master-only). Its shadows onto Flutter widgets are W33c-blocked (D6).
+      The `flutter_scene_input` controls screen ([#404](https://github.com/bdero/flutter_scene/pull/404)) is app-level (D7).
+      The smoke-render scenes (`examples/smoke_render/lib/smoke_scenes.dart`:
+      ortho :1648, decal :1969) are the only upstream fixtures for V2 and V4.
+
+**0.24 upstream changes with no dart3d scope** (reason in brackets):
+web-only fixes #407, #408, #413, #420 [no web target]; per-platform
+shader bundles #410 and the Impeller/Vulkan/Metal crash fixes #425, #431,
+#438 [flutter_scene renderer internals]; GPU frame pacing #400, quality
+ladder #396, transient-buffer and render-target recycling #437 [host renderer;
+dart3d has its own `viewQuality`]; render stats, shader reflection and captures
+#399, memory-pressure release #373 [D9 profiling]; DFG asset, CPU mip build
+and mip-probe fix #422 [Impeller-side]; ETC1S transcode/encode #432, #433
+[runtime transcoder and cook tool, no wire change]; skin-weight normalization and
+unit normals #418, inverse-transpose normals `19adefd7`, unskinned morph
+binding #429 [renderer-internal: Filament and SceneKit skin and morph natively;
+V8 would catch a visual gap]; cascade caster culling #405 [perf];
+the cinematic kit (added and removed inside #437, net zero) [D7].
+Adjacent pre-existing dart3d gap, not a 0.24 item: upstream #430 applies
+glTF sampler wrap modes at runtime import. dart3d's importer parses
+`wrapS`/`wrapT` (`lib/src/gltf/parser.dart:545-546`), but
+`lib/src/gltf/fscene_emitter.dart` never emits a texture `wrap`.
 
 ### Track R — release (after S0; before first publish)
 
