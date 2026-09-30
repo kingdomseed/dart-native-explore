@@ -66,25 +66,7 @@ def coal():
 
 def flame_volume(strength=18.0):
     """Surface flame (emission + transparency): reads as fire at a fraction of a volume's cost."""
-    m, k = E.material("Flame")
-    obj = k.coords().outputs["Object"]
-    sep = k.node("ShaderNodeSeparateXYZ")
-    k.link(obj, sep.inputs[0])
-    warp = k.noise(obj, 1.2, 3, 0.5, dims="4D", w=0.3).outputs["Color"]
-    vec = k.mix(0.4, obj, warp, "LINEAR_LIGHT")
-    n = k.noise(vec, 2.2, 6, 0.6, dist=0.6).outputs["Fac"]
-    up = k.math("SUBTRACT", 1.0, k.math("MULTIPLY", k.math("ADD", sep.outputs["Z"], 1.0), 0.5), clamp=True)
-    lw = k.node("ShaderNodeLayerWeight")
-    lw.inputs["Blend"].default_value = 0.5
-    core = k.math("SUBTRACT", 1.0, lw.outputs["Fresnel"])
-    heat = k.math("MULTIPLY", k.math("MULTIPLY", k.math("POWER", n, 1.6), up), core)
-    heat = k.math("MULTIPLY", heat, 4.0, clamp=True)
-    col = k.ramp(heat, [(0.0, (0.3, 0.02, 0.0)), (0.4, (1.0, 0.25, 0.02)), (0.8, (1.0, 0.65, 0.2)),
-                        (1.0, (1.0, 0.95, 0.75))])
-    em = k.emission(col, k.math("MULTIPLY", heat, strength * 0.5))
-    tr = k.node("ShaderNodeBsdfTransparent").outputs[0]
-    k.surface(k.mix_shader(k.math("POWER", heat, 0.5), tr, em))
-    return m
+    return RC.fire_material(strength)
 
 
 def brick_wall():

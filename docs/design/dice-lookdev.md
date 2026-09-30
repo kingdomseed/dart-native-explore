@@ -1066,6 +1066,18 @@ Lighting recipes (the tray lights are unchanged unless noted):
   eye height, 20 mm, f/4 on the tray. Gate: numeral 5.17 (d12), die vs
   tray 2.38, stroke 0.121–0.130, PASS.
 
+- **Frostbound — the frozen altar hall.** Room floor is the snow ground
+  (z −14); frost-stone walls, eight granite pillars, glowing ice
+  formations along the side walls, icicles, deep-blue lattice banners.
+  Warm key: three bronze fire bowls on pedestals (front-left 45 kW, right
+  35 kW, back-left 30 kW), so shadows fall two ways. Cool fill: the tall
+  arch at the back onto a glacier valley at dusk (area, 90 kW,
+  0.55/0.72/1.0). Accent rim: shadowless blue ice glows from both sides
+  (9 kW each, 0.25/0.6/1.0), over the tray's moon key. The cave-ice
+  boulders now flank the arch. Camera: 16 mm from standing height (the
+  hall is tall), f/4. Gate: numeral 5.51 (d4), die vs tray 2.19, stroke
+  0.121–0.130, PASS.
+
 ## 4. dart3d features to verify (before building these for real)
 
 1. **Emissive intensity > 1 + bloom threshold** on both platforms, and

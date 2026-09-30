@@ -126,6 +126,29 @@ def wallpaper(name="Wallpaper", c1=(0.3, 0.22, 0.12), c2=(0.18, 0.12, 0.07), str
     return m
 
 
+def fire_material(strength=18.0, name="Flame"):
+    """Surface flame (emission + transparency): reads as fire at a fraction of a volume's cost."""
+    m, k = E.material(name)
+    obj = k.coords().outputs["Object"]
+    sep = k.node("ShaderNodeSeparateXYZ")
+    k.link(obj, sep.inputs[0])
+    warp = k.noise(obj, 1.2, 3, 0.5, dims="4D", w=0.3).outputs["Color"]
+    vec = k.mix(0.4, obj, warp, "LINEAR_LIGHT")
+    n = k.noise(vec, 2.2, 6, 0.6, dist=0.6).outputs["Fac"]
+    up = k.math("SUBTRACT", 1.0, k.math("MULTIPLY", k.math("ADD", sep.outputs["Z"], 1.0), 0.5), clamp=True)
+    lw = k.node("ShaderNodeLayerWeight")
+    lw.inputs["Blend"].default_value = 0.5
+    core = k.math("SUBTRACT", 1.0, lw.outputs["Fresnel"])
+    heat = k.math("MULTIPLY", k.math("MULTIPLY", k.math("POWER", n, 1.6), up), core)
+    heat = k.math("MULTIPLY", heat, 4.0, clamp=True)
+    col = k.ramp(heat, [(0.0, (0.3, 0.02, 0.0)), (0.4, (1.0, 0.25, 0.02)), (0.8, (1.0, 0.65, 0.2)),
+                        (1.0, (1.0, 0.95, 0.75))])
+    em = k.emission(col, k.math("MULTIPLY", heat, strength * 0.5))
+    tr = k.node("ShaderNodeBsdfTransparent").outputs[0]
+    k.surface(k.mix_shader(k.math("POWER", heat, 0.5), tr, em))
+    return m
+
+
 # --------------------------------------------------------------------------
 # Architecture
 # --------------------------------------------------------------------------
@@ -191,18 +214,22 @@ def wall_plane(name, length, height, openings, mat, thickness=18.0):
 
 
 def shell(half_w=220, back=260, front=-160, height=300, wall=None, floor=None, ceiling=None, side_walls=True,
-          openings=None, side_mats=None):
+          openings=None, side_mats=None, floor_z=-76.0):
     """Floor, back wall, side walls (optional) and ceiling (optional); the front is open.
 
     openings: {"back"|"left"|"right": [(u, z, w, h), ...]} holes in the walls
     (u along the wall as in `_wall_frame`, z in world cm). Put a `window` or
-    `arch_opening` in each."""
+    `arch_opening` in each. floor_z: the room floor (default -76, a table
+    room; an altar/ground environment passes its own ground height)."""
+    global FLOOR_Z
+    FLOOR_Z = floor_z  # every kit piece reads it at call time (default: table rooms)
     _ROOM.update(half_w=half_w, back=back, front=front, height=height)
     wall = wall or plaster()
-    floor = floor or planks()
     openings = openings or {}
     side_mats = side_mats or {}
-    E.plane("room_floor", 2 * half_w + 40, back - front + 40, (0, (back + front) / 2, FLOOR_Z), floor)
+    if floor is not False:  # False: the environment already has its own ground
+        E.plane("room_floor", 2 * half_w + 40, back - front + 40, (0, (back + front) / 2, FLOOR_Z),
+                floor or planks())
 
     def local(ops, centre):
         return [(u - centre, z - FLOOR_Z, w, h) for (u, z, w, h) in ops]
@@ -238,7 +265,8 @@ def beams(mat, n=4, size=(22, 26), z=None, along="x"):
 def sky(name, top, bottom, stars=0.0, moon=None, nebula=None, strength=1.0, skyline=None):
     """Emissive sky material for window/arch openings (a plane's Generated
     coords: y runs bottom to top). skyline=(colour, height 0..1) adds a dark
-    silhouette band of roofs/hills at the bottom."""
+    silhouette band of roofs/hills at the bottom; (colour, height, False)
+    leaves out the lit windows (mountains)."""
     m, k = E.material(name)
     tc = k.coords().outputs["Generated"]
     sep = k.node("ShaderNodeSeparateXYZ")
@@ -263,11 +291,19 @@ def sky(name, top, bottom, stars=0.0, moon=None, nebula=None, strength=1.0, skyl
         hn.noise_dimensions = "1D"
         k.link(step, hn.inputs["W"])
         hgt = k.math("ADD", k.math("MULTIPLY", hn.outputs["Value"], skyline[1] * 0.6), skyline[1] * 0.5)
+        if len(skyline) >= 3 and not skyline[2]:  # mountains: a smooth ridge line instead of roofs
+            rn = k.node("ShaderNodeTexNoise")
+            rn.noise_dimensions = "1D"
+            k.link(k.math("MULTIPLY", sx.outputs["X"], 3.0), rn.inputs["W"])
+            k.set(rn, Detail=6.0, Roughness=0.6)
+            hgt = k.math("MULTIPLY", k.math("POWER", rn.outputs["Fac"], 1.5), skyline[1] * 2.2)
         below = k.math("LESS_THAN", sep.outputs["Y"], hgt)
         # a few lit windows in the silhouette
         lit = k.math("LESS_THAN", k.voronoi(tc, 90.0).outputs["Distance"], 0.06)
         lit = k.math("MULTIPLY", lit, k.math("LESS_THAN", sep.outputs["Y"], k.math("SUBTRACT", hgt, 0.03)))
-        sil = k.add_shader(k.emission((*skyline[0], 1), 1.0), k.emission((1.0, 0.6, 0.25, 1), k.math("MULTIPLY", lit, 3.0)))
+        sil = k.emission((*skyline[0], 1), 1.0)
+        if len(skyline) < 3 or skyline[2]:
+            sil = k.add_shader(sil, k.emission((1.0, 0.6, 0.25, 1), k.math("MULTIPLY", lit, 3.0)))
         em = k.mix_shader(below, em, sil)
     k.surface(em)
     return m
@@ -362,7 +398,7 @@ def fireplace(scene, wall, u, w=120, h=110, depth=45, mat=None, energy=90000, ma
         top = _ROOM["height"]
         parts.append(E.cube("chimney_breast", (w * 0.8, depth * 0.8, top - h), (0, -depth * 0.4, h + (top - h) / 2),
                             mat))
-    fm = flame or P.flame_mat(strength=14.0, color=(1.0, 0.5, 0.15))
+    fm = flame or fire_material(8.0, "Hearth fire")
     rng = random.Random(seed + int(u))
     fz = 5 + 4
     for i in range(6):
@@ -466,6 +502,60 @@ def paper_lantern(scene, x, y, z, r=18, color=(1.0, 0.25, 0.08), energy=15000, l
     return E.light(scene, "POINT", "paper_lantern_light", (x, y, z), energy, color=light_color, size=r * 0.8)
 
 
+def fire_bowl(scene, x, y, z_top, r=18, energy=60000, mat=None, pedestal=None, color=(1.0, 0.5, 0.18),
+              seed=0, flame=None):
+    """A fire bowl (brazier) on a stone pedestal whose top is at z_top."""
+    mat = mat or P.brass("Fire bowl bronze", worn=0.6, color=(0.7, 0.45, 0.2))
+    rng = random.Random(seed)
+    if pedestal is not None:
+        E.cube("bowl_pedestal", (r * 1.6, r * 1.6, z_top - FLOOR_Z), (x, y, (z_top + FLOOR_Z) / 2), pedestal,
+               bevel=1.0)
+    b = E.cylinder("fire_bowl", r * 0.5, r * 0.6, (x, y, z_top + r * 0.3), mat, segs=40, r2=r)
+    b.modifiers.new("solid", "SOLIDIFY").thickness = 1.0
+    coal = E.emissive("Bowl coals", (1.0, 0.3, 0.05), 6.0)
+    for i in range(10):
+        a, rr = rng.uniform(0, 6.28), rng.uniform(0, r * 0.7)
+        E.rock(f"bowl_coal{i}", r * 0.12, (x + math.cos(a) * rr, y + math.sin(a) * rr, z_top + r * 0.55), coal,
+               seed=i + seed, subdiv=2)
+    fm = flame or fire_material(8.0, "Bowl fire")
+    for i in range(4):
+        a, rr = rng.uniform(0, 6.28), rng.uniform(0, r * 0.35)
+        h = r * rng.uniform(0.8, 1.3)
+        fl = E.sphere("bowl_flame", 1.0, (x + math.cos(a) * rr, y + math.sin(a) * rr, z_top + r * 0.6 + h * 0.5), fm,
+                      subdiv=3, scale=(r * 0.3, r * 0.3, h))
+        fl.visible_shadow = False
+    return E.light(scene, "POINT", "fire_bowl_light", (x, y, z_top + r * 1.3), energy, color=color, size=r * 0.5)
+
+
+def banner(wall, u, z_top, w=50, h=150, color=(0.03, 0.05, 0.2), trim=(0.6, 0.45, 0.2), pattern=None):
+    """A hanging cloth banner with a trimmed border, a pole and a swallowtail
+    hem (plain geometry: no emblem unless `pattern` = a mask image)."""
+    m, k = E.material(f"Banner {color}")
+    obj = k.coords().outputs["Object"]
+    sep = k.node("ShaderNodeSeparateXYZ")
+    k.link(obj, sep.inputs[0])
+    edge = k.math("GREATER_THAN", k.math("ABSOLUTE", sep.outputs["X"]), w / 2 - 3)
+    col = k.mix(edge, (*color, 1), (*trim, 1))
+    if pattern is not None:
+        # a gold diamond lattice on the field: sin(x+z) * sin(x-z)
+        d1 = k.math("SINE", k.math("MULTIPLY", k.math("ADD", sep.outputs["X"], sep.outputs["Z"]), 0.35))
+        d2 = k.math("SINE", k.math("MULTIPLY", k.math("SUBTRACT", sep.outputs["X"], sep.outputs["Z"]), 0.35))
+        lat = k.math("LESS_THAN", k.math("ABSOLUTE", k.math("MULTIPLY", d1, d2)), 0.04)
+        col = k.mix(lat, col, (*trim, 1))
+    k.surface(k.bsdf(Base_Color=col, Roughness=0.8, Sheen_Weight=0.8))
+    bm = bmesh.new()
+    pts = [(-w / 2, 0), (w / 2, 0), (w / 2, -h), (0, -h + w * 0.35), (-w / 2, -h)]
+    vs = [bm.verts.new((px, 0, pz)) for px, pz in pts]
+    bm.faces.new(vs)
+    cloth = E.mesh_object("banner", bm, m)
+    cloth.location = (0, -3, z_top - FLOOR_Z)
+    cloth.modifiers.new("solid", "SOLIDIFY").thickness = 0.4
+    pole = E.cylinder("banner_pole", 1.2, w + 10, (0, -3, z_top - FLOOR_Z + 1.5), P.brass("Banner brass"), segs=12)
+    pole.rotation_euler = (0, math.radians(90), 0)
+    loc, rz = _wall_frame(wall, u)
+    return _group("banner", [cloth, pole], loc + Vector((0, 0, FLOOR_Z)), rz)
+
+
 def neon_bar(scene, p0, p1, color, strength=25.0, energy=4000, r=0.9):
     """A straight neon tube from p0 to p1 with a soft area light along it."""
     p0, p1 = Vector(p0), Vector(p1)
@@ -484,11 +574,14 @@ def neon_bar(scene, p0, p1, color, strength=25.0, energy=4000, r=0.9):
 # Furniture
 # --------------------------------------------------------------------------
 
-def work_table(w, d, top_z=-6.0, thick=8.0, mat=None, leg_r=5.0, x=0.0, y=0.0, square_legs=True, apron=True):
+def work_table(w, d, top_z=-6.0, thick=8.0, mat=None, leg_r=5.0, x=0.0, y=0.0, square_legs=True, apron=True,
+               top=True):
     """A table centred at (x, y) whose top surface is at top_z (the env's base
-    slab / tray sits on it)."""
+    slab / tray sits on it). top=False: legs and apron only, under a table
+    top the environment already has (top_z is then its underside + thick)."""
     mat = mat or P.dark_wood("Table oak", c1=(0.035, 0.018, 0.009), c2=(0.11, 0.055, 0.028))
-    E.cube("table_top", (w, d, thick), (x, y, top_z - thick / 2), mat, bevel=1.0)
+    if top:
+        E.cube("table_top", (w, d, thick), (x, y, top_z - thick / 2), mat, bevel=1.0)
     h = top_z - thick - FLOOR_Z
     for sx in (-1, 1):
         for sy in (-1, 1):

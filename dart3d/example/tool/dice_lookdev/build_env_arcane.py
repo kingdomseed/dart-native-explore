@@ -12,6 +12,7 @@ import math
 
 import env_common as E
 import env_props as P
+import room_common as RC
 
 W, D = E.TRAY_W, E.TRAY_D
 RIM_T, RIM_H = 2.2, 2.6
@@ -159,6 +160,50 @@ def build(scene):
     E.scatter("motes", 160, ((-35, -25, 3), (35, 50, 35)), 0.05, E.emissive("Mote", (1.0, 0.85, 0.6), 4.0),
               seed=12, scale_range=(0.3, 1.0), avoid=lambda p: abs(p.x) < W / 2 + 6 and abs(p.y) < D / 2 + 10)
     E.haze_box("haze", (160, 180, 70), (0, 20, 34), 0.004, color=(0.9, 0.85, 1.0), noise_scale=0.03)
+    rc = room(scene, table, top)
     return dict(
         samples=128, exposure=0.6, topdown=dict(width=W + 2 * RIM_T + 1.0), hero=dict(dist=32, elev=30, az=6, lens=65, fstop=2.8),
+        play_view=True, tray_half=(W / 2 + RIM_T, D / 2 + RIM_T), room_cam=rc,
     )
+
+
+def room(scene, table, top):
+    """The night study (concept: room-concepts/arcane-room).
+
+    The desk stands against the window wall: a tall leaded window with a
+    moonlit skyline of spires behind the tray, floor-to-ceiling bookcases
+    either side of it and along the left wall, a fireplace on the right
+    wall, candle sconces, a rug. Lights from four sides: moonlight through
+    the window (cool, back), the fireplace (warm, right), sconces and the
+    desk candles (warm, back-left and back-right), the tray's candle key.
+    """
+    wy = top + 80  # the window plane (P.backdrop_window's mullions)
+    wall = RC.plaster("Study plaster", (0.12, 0.1, 0.09))
+    panel = P.dark_wood("Study panelling", c1=(0.025, 0.012, 0.007), c2=(0.07, 0.035, 0.016))
+    RC.shell(half_w=190, back=wy, front=-200, height=280, wall=wall, floor=RC.planks(),
+             openings={"back": [(0, 45, 70, 80)]}, side_mats={"left": panel})
+    spires = RC.sky("Study night", (0.015, 0.02, 0.06), (0.07, 0.09, 0.2), stars=2.0, strength=0.7,
+                    skyline=((0.01, 0.012, 0.025), 0.3))
+    RC.window("back", 0, 45, 70, 80, spires, panel, mullions=(1, 1), sill=False,
+              glow=(25000, (0.55, 0.65, 1.0)))
+    RC.work_table(220, 160, top_z=0.0, thick=6.0, mat=table, leg_r=6, y=20, top=False)
+    oak = P.dark_wood("Study oak", c1=(0.03, 0.015, 0.008), c2=(0.09, 0.045, 0.02))
+    for u, seed in ((-120, 1), (120, 2)):
+        RC.bookshelf("back", u, w=110, h=250, depth=32, rows=8, seed=seed, mat=oak)
+    for u, seed in ((-60, 3), (-170, 4)):
+        RC.bookshelf("left", u, w=110, h=250, depth=32, rows=8, seed=seed, mat=oak)
+    RC.fireplace(scene, "right", -60, w=130, h=115, depth=40, energy=160000, seed=5,
+                 mat=RC.stone("Study hearth", (0.1, 0.09, 0.08), (0.22, 0.2, 0.17), scale=0.03))
+    for u in (-58, 58):
+        RC.sconce(scene, "back", u, 80, energy=6000)
+    RC.rug(0, -60, 260, 200, (0.12, 0.02, 0.03), (0.03, 0.02, 0.08), name="Study rug")
+    RC.chair(-20, -95, rot=math.radians(180 - 10), mat=oak)
+    # a tall brass candelabrum on the floor by the left bookcase (warm, left)
+    brass = P.brass("Candelabrum brass", worn=0.4)
+    E.cylinder("candelabrum", 1.5, 150, (-150, 60, RC.FLOOR_Z + 75), brass, segs=16)
+    E.cylinder("candelabrum_foot", 16, 4, (-150, 60, RC.FLOOR_Z + 2), brass, segs=32, r2=6)
+    for dx in (-12, 0, 12):
+        P.candle(scene, -150 + dx, 60, RC.FLOOR_Z + 150, h=14, r=1.6, seed=int(dx) + 30, energy=0, light=False)
+    E.light(scene, "POINT", "candelabrum_light", (-150, 60, RC.FLOOR_Z + 170), 20000, color=(1.0, 0.65, 0.35),
+            size=8)
+    return dict(loc=(14, -58, 36), target=(-2, 90, 12), lens=20, fstop=4.0, focus=(0, 0, 2))

@@ -15,6 +15,7 @@ from mathutils import Euler, Matrix, Vector
 
 import env_common as E
 import env_props as P
+import room_common as RC
 
 W, D = E.TRAY_W, E.TRAY_D
 RIM_T, RIM_H = 2.6, 3.2
@@ -140,7 +141,7 @@ def build(scene):
     crystal_cluster(W / 2 - 1.0, -D / 2 - RIM_T - 3.2, 0.3, 5, 12, ice_m, 0.3)
     crystal_cluster(W / 2 + 1.5, D / 2 + RIM_T + 4.0, 0.3, 3, 13, ice_m, 0.22)
     # cave wall of ice behind
-    for i, (x, y, r) in enumerate(((-70, 190, 60), (40, 210, 70), (130, 160, 55), (-150, 150, 50))):
+    for i, (x, y, r) in enumerate(((-150, 215, 60), (150, 225, 70), (190, 120, 55), (-195, 110, 50))):  # flank the hall arch
         E.rock(f"ice_wall{i}", r, (x, y, 10), ice("Cave wall ice", glow=1.2), seed=99 + i, squash=(1.0, 0.7, 1.4),
                strength=0.45)
     E.light(scene, "AREA", "cave_glow", (0, 260, 40), 90000, color=(0.25, 0.55, 1.0), size=120,
@@ -159,7 +160,58 @@ def build(scene):
               avoid=lambda p: abs(p.x) < W / 2 + 4 and abs(p.y) < D / 2 + 6)  # none between camera and dice
     E.haze_box("mist", (170, 200, 12), (0, 20, -8), 0.02, color=(0.8, 0.9, 1.0), essential=True)
     E.haze_box("air", (160, 220, 80), (0, 30, 45), 0.0015, color=(0.7, 0.85, 1.0))
+    rc = room(scene, ice_m)
     return dict(
         samples=160, exposure=0.2, topdown=dict(width=W + 2 * RIM_T + 1.0), hero=dict(dist=32, elev=26, az=10, lens=70, fstop=2.8),
+        play_view=True, tray_half=(W / 2 + RIM_T, D / 2 + RIM_T), room_cam=rc,
     )
+
+
+def room(scene, ice_m):
+    """The frozen altar chamber (concept: room-concepts/frostbound-room).
+
+    A pillared hall of frost-rimed stone on the snow floor, a tall arch at the
+    back open onto a glacier valley at dusk, ice formations along the walls,
+    icicles, deep-blue banners. Lights from four sides: two fire bowls
+    (warm key, front-left and right), the arch (cool sky fill from the back),
+    blue ice glows at the sides (accent rim), plus the tray's moon key.
+    """
+    wall = RC.stone("Frost stone", (0.09, 0.11, 0.14), (0.28, 0.32, 0.38), scale=0.012)
+    RC.shell(half_w=230, back=260, front=-170, height=330, wall=wall, floor=False, floor_z=-14.0,
+             openings={"back": [(0, 96, 150, 220)]})
+    glacier = RC.sky("Glacier dusk", (0.12, 0.25, 0.55), (0.55, 0.72, 0.95), stars=1.5, strength=0.55,
+                     skyline=((0.16, 0.24, 0.38), 0.45, False))
+    RC.window("back", 0, 96, 150, 220, glacier, wall, mullions=(1, 1), sill=False,
+              glow=(90000, (0.55, 0.72, 1.0)))
+    col_m = granite("Pillar granite", snow=0.5)
+    for sx in (-1, 1):
+        for y in (20, 150):
+            RC.column(sx * 125, y, 330, 17, col_m)
+    # warm key: fire bowls on carved pedestals, front-left and back-right
+    ped = granite("Pedestal granite", snow=0.4)
+    RC.fire_bowl(scene, -75, -25, 45, r=16, energy=45000, pedestal=ped, seed=1)
+    RC.fire_bowl(scene, 85, 95, 50, r=16, energy=35000, pedestal=ped, seed=2)
+    RC.fire_bowl(scene, -110, 215, 60, r=14, energy=30000, pedestal=ped, seed=3)
+    # deep-blue banners with a gold lattice between the pillars
+    for u in (-150, 150):
+        RC.banner("back", u, 250, w=60, h=170, color=(0.02, 0.04, 0.16), trim=(0.55, 0.42, 0.2), pattern=True)
+    # ice formations along the side walls, glowing blue: the accent rim
+    wall_ice = ice("Hall ice", glow=0.5)
+    for i, (x, y, r) in enumerate(((-200, 60, 45), (-190, 170, 55), (200, 20, 50), (195, 140, 45),
+                                   (-205, -60, 35), (205, -80, 40))):
+        E.rock(f"hall_ice{i}", r, (x, y, -14 + r * 0.6), wall_ice, seed=200 + i, squash=(0.6, 1.0, 1.8),
+               strength=0.4)
+    for sx in (-1, 1):
+        E.light(scene, "AREA", "ice_glow", (sx * 175, 60, 60), 9000, color=(0.25, 0.6, 1.0), size=80,
+                target=(0, 0, 0), shadow=False)
+    # icicles along the arch lintel and the wall tops
+    rng = random.Random(9)
+    for i in range(40):
+        x = rng.uniform(-220, 220)
+        y = 250 if abs(x) > 80 else 252
+        z_top = 316 - 14 if abs(x) > 80 else 96 + 110 - 14 + 14
+        L = rng.uniform(10, 45)
+        E.cylinder("icicle", 0.05, L, (x, y - rng.uniform(0, 6), z_top - L / 2), ice_m, segs=6,
+                   r2=rng.uniform(1.0, 2.5))
+    return dict(loc=(16, -62, 50), target=(-4, 80, 4), lens=16, fstop=4.0, focus=(0, 0, 2))
 
