@@ -880,9 +880,9 @@ THEMES = {
     "dartnative": dict(
         env="Launch Tray",
         title="DartNative",
-        concept="Frosted glass with the 3D DartNative logo suspended inside, glowing its own gradient.",
+        concept="Black frosted glass with the 3D DartNative logo suspended inside, glowing its own gradient.",
         font="sans", weight=0.0, decor="dartnative",
-        treatment="enamel: near-black numerals on frosted glass, denser-frost band (not counted)"),
+        treatment="glowing: luminous cool-white enamel numerals in a thin dark keyline, on black frosted glass"),
     "gemcutter": dict(
         env="The Jeweler's Bench",
         title="Gemcutter",
@@ -1269,42 +1269,59 @@ LOGO_GLB = HERE.parents[1] / "assets_src" / "dn_logo" / "dn_logo.glb"
 
 
 def material_dartnative(img):
-    """Frosted glass with the 3D DartNative logo suspended inside.
+    """Smoky black frosted glass with the 3D DartNative logo glowing inside.
 
-    reference: rough transmission (frost), a touch of milky volume, clear
-    coat. realtime: what SceneKit can draw -- a milky alpha-blended shell
-    with a fresnel rim, no refraction (Filament can do the reference's
-    rough transmission). Numerals: near-black enamel on the outside,
-    opaque, with a thin band of denser frost around them.
+    reference: near-#090E12 glass -- rough transmission through a dark
+    absorbing volume, so the logo's glow diffuses softly through the frost;
+    the frost is lighter at the centre of each face (smoother), so the "n"
+    comes through; clear coat; a faint cool fresnel rim so the black die
+    separates from a dark tray.
+    realtime: what SceneKit can draw -- a dark alpha-blended shell with the
+    same fresnel rim, no refraction (Filament can do the reference's rough
+    transmission).
+    Numerals: pale cool-white enamel on the outside, opaque, in a thin dark
+    keyline.
     """
-    m = bpy.data.materials.new(f"DartNative frost ({VARIANT})")
+    m = bpy.data.materials.new(f"DartNative black frost ({VARIANT})")
     k = NodeKit(m)
     num, dec, h = k.atlas(img)
     nrm = _engrave(k, h, strength=0.5, dist=0.02)
     obj = k.coords().outputs["Object"]
-    micro = k.bump(k.noise(obj, 40.0, 3).outputs["Fac"], 0.08, 0.01, normal=nrm)
+    micro = k.bump(k.noise(obj, 40.0, 3).outputs["Fac"], 0.06, 0.01, normal=nrm)
     lw = k.node("ShaderNodeLayerWeight")
-    lw.inputs["Blend"].default_value = 0.3
+    lw.inputs["Blend"].default_value = 0.25
+    rim = k.emission((0.55, 0.75, 1.0, 1), k.math("MULTIPLY", k.math("POWER", lw.outputs["Fresnel"], 2.0), 0.6))
     if VARIANT == "realtime":
-        shell = k.bsdf(Base_Color=(0.8, 0.86, 0.92, 1), Roughness=0.35, Alpha=0.62, Coat_Weight=0.5,
-                       Coat_Roughness=0.1, Normal=nrm)
-        rim = k.emission((0.85, 0.92, 1.0, 1), k.math("MULTIPLY", lw.outputs["Fresnel"], 0.35))
-        shell = k.add_shader(shell, rim)
+        shell = k.bsdf(Base_Color=(0.012, 0.018, 0.024, 1), Roughness=0.3, Alpha=0.78, Coat_Weight=0.6,
+                       Coat_Roughness=0.06, Normal=nrm)
     else:
-        # partly diffuse: frosted glass reads milky-white under the room light
-        # (a dark numeral needs that), the transmitted part carries the logo's glow
-        shell = k.bsdf(Base_Color=(0.96, 0.98, 1.0, 1), Transmission_Weight=0.4, Roughness=0.1, IOR=1.45,
-                       Coat_Weight=0.5, Coat_Roughness=0.08, Normal=micro)
-        vol = k.node("ShaderNodeVolumePrincipled")
-        k.set(vol, Density=0.15, Color=(0.95, 0.97, 1.0, 1), Anisotropy=0.0)
+        # frost: smoother (clearer) at each face's centre, rougher toward its edges
+        uv = k.node("ShaderNodeUVMap")
+        cell = k.node("ShaderNodeVectorMath", operation="FRACTION")
+        sc = k.node("ShaderNodeVectorMath", operation="SCALE")
+        k.link(uv.outputs["UV"], sc.inputs[0])
+        sc.inputs["Scale"].default_value = float(ATLAS_GRID)
+        k.link(sc.outputs[0], cell.inputs[0])
+        off = k.node("ShaderNodeVectorMath", operation="SUBTRACT")
+        k.link(cell.outputs[0], off.inputs[0])
+        off.inputs[1].default_value = (0.5, 0.5, 0.0)
+        ln = k.node("ShaderNodeVectorMath", operation="LENGTH")
+        k.link(off.outputs[0], ln.inputs[0])
+        rough = k.math("ADD", 0.04, k.math("MULTIPLY", k.math("MINIMUM", ln.outputs["Value"], 0.5), 0.6))
+        shell = k.bsdf(Base_Color=(0.8, 0.84, 0.9, 1), Transmission_Weight=1.0, Roughness=rough, IOR=1.45,
+                       Coat_Weight=0.6, Coat_Roughness=0.06, Normal=micro)
+        vol = k.node("ShaderNodeVolumeAbsorption")
+        k.set(vol, Color=(0.16, 0.19, 0.22, 1), Density=1.6)
         k.volume(vol.outputs[0])
+    shell = k.add_shader(shell, rim)
     # a thin cyan inlay line just inside each face (decor), lit softly
     s_ = k.mix_shader(dec, shell, k.emission((*_srgb("#03C3F0"), 1), 1.6))
-    # denser, opaque frost right around the numerals (the keyline band)
-    band = k.bsdf(Base_Color=(0.9, 0.93, 0.96, 1), Roughness=0.6, Subsurface_Weight=0.3, Normal=nrm)
-    s_ = k.mix_shader(k.key, s_, band)
-    enamel = k.bsdf(Base_Color=(0.012, 0.014, 0.018, 1), Roughness=0.3, Coat_Weight=0.6, Coat_Roughness=0.08,
-                    Normal=nrm)
+    # thin dark keyline (opaque #090E12 enamel) around the numerals
+    s_ = k.keyline(s_, _srgb("#090E12"), rough=0.4, normal=nrm)
+    # luminous enamel: pale cool white with a soft self-glow, so a numeral stays
+    # white over a dark die in a dark room (unlit numerals in the engine)
+    enamel = k.bsdf(Base_Color=(0.93, 0.96, 1.0, 1), Roughness=0.32, Coat_Weight=0.5, Coat_Roughness=0.06,
+                    Normal=nrm, Emission_Color=(0.86, 0.92, 1.0, 1), Emission_Strength=1.1)
     k.surface(k.mix_shader(num, s_, enamel))
     return m
 
@@ -1321,8 +1338,8 @@ def material_dn_logo(image, strength):
     return m
 
 
-LOGO_STRENGTH = 6.0
-LOGO_FILL = 0.78  # logo half-diagonal / die inradius: visible, never crowding the faces
+LOGO_STRENGTH = 3.0
+LOGO_FILL = 0.72  # logo half-diagonal / die inradius: visible, never crowding the faces
 
 
 def logo_cores(objs, specs, coll):

@@ -617,7 +617,40 @@ def bloom_png(path, threshold=0.8, strength=0.35, radius_frac=0.012):
     bpy.data.images.remove(img)
 
 
-def render_to(scene, cam, path_tmp, path_out, quality=JPEG_QUALITY, bloom=False):
+def play_view_grade(path, scene, cam, half, z, darken=0.35, desat=0.4, blur_frac=0.004, feather_frac=0.02):
+    """The in-app play view: outside the tray (its rim included) the room is
+    darker, less saturated and softly defocused, so the dice stay the
+    brightest, sharpest thing on screen. In the app: a vignette/grade pass
+    masked by the tray's screen rect, or the same baked into the prop atlas."""
+    import numpy as np
+    from bpy_extras.object_utils import world_to_camera_view
+    from build_dice import _blur
+    img = bpy.data.images.load(str(path))
+    w, h = img.size
+    a = np.array(img.pixels[:], dtype=np.float32).reshape(h, w, 4)
+    pts = [world_to_camera_view(scene, cam, Vector((sx * half[0], sy * half[1], z)))
+           for sx in (-1, 1) for sy in (-1, 1)]
+    x0, x1 = min(p.x for p in pts) * w, max(p.x for p in pts) * w
+    y0, y1 = min(p.y for p in pts) * h, max(p.y for p in pts) * h
+    f = max(2.0, feather_frac * w)
+    xs, ys = np.arange(w)[None, :] + 0.5, np.arange(h)[:, None] + 0.5
+    dx = np.maximum(np.maximum(x0 - xs, xs - x1), 0)
+    dy = np.maximum(np.maximum(y0 - ys, ys - y1), 0)
+    out = np.clip(np.sqrt(dx ** 2 + dy ** 2) / f, 0, 1)[..., None]  # 0 inside the tray, 1 outside
+    rgb = a[..., :3]
+    r = max(2, int(blur_frac * w))
+    soft = np.stack([_blur(rgb[..., c], r) for c in range(3)], axis=-1)
+    gray = (0.2126 * soft[..., 0] + 0.7152 * soft[..., 1] + 0.0722 * soft[..., 2])[..., None]
+    graded = (soft * (1 - desat) + gray * desat) * (1 - darken)
+    a[..., :3] = rgb * (1 - out) + graded * out
+    img.pixels.foreach_set(a.ravel())
+    img.filepath_raw = str(path)
+    img.file_format = "PNG"
+    img.save()
+    bpy.data.images.remove(img)
+
+
+def render_to(scene, cam, path_tmp, path_out, quality=JPEG_QUALITY, bloom=False, grade=None):
     """Render `cam` to a lossless PNG at path_tmp (+ bloom for the real-time
     variant), then a JPEG at path_out."""
     import time
@@ -629,6 +662,8 @@ def render_to(scene, cam, path_tmp, path_out, quality=JPEG_QUALITY, bloom=False)
     t1 = time.time()
     if bloom:
         bloom_png(path_tmp)
+    if grade:
+        play_view_grade(path_tmp, scene, cam, *grade)
     size = save_jpeg(path_tmp, path_out, quality)
     print(f"dice_lookdev: {path_out} {size // 1024} KB render {t1 - t0:.0f}s", flush=True)
     return size

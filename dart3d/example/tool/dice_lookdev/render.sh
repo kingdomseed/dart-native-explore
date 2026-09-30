@@ -39,9 +39,9 @@ render() {  # render <theme> <shots> [extra render_set args...]
 }
 for t in "${SETS[@]}"; do
   if [[ "$t" == dartnative ]]; then
-    # three environment options (top-down + hero); the recommended one (a)
-    # also gets d20/d4 close-ups and the real-time approximation of every shot
-    for o in b c; do render dartnative "topdown,hero" --env-option "$o"; done
+    # the chosen environment (a, Obsidian): every shot, Blender reference and
+    # the real-time approximation (options b/c: DN_OPTIONS="b c" to re-render)
+    for o in ${DN_OPTIONS:-}; do render dartnative "topdown,hero" --env-option "$o"; done
     render dartnative "topdown,hero,d20,d4" --env-option a
     render dartnative "topdown,hero,d20,d4" --env-option a --variant realtime
     continue

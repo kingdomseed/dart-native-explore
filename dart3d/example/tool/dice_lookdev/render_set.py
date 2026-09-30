@@ -12,6 +12,7 @@ Shots (every die is settled on the surface; see env_common.settle)
   hero    - the full set in the tray, 3/4 view, shallow depth of field
   d4      - close-up of the d4 shard with its result on the top face
   d20     - close-up of the d20 (numeral detail: stroke weight, keyline, enamel)
+  room    - the room establishing shot (the dice-roller app's intro opening)
 
 --check runs readability_check.measure() on the top-down render (numeral vs
 face contrast, numeral size, die vs tray contrast, contacts) and merges the
@@ -95,21 +96,24 @@ def run(a):
     sizes = {}
     report = {}
 
-    def shot(shot_name, cam, res):
+    def shot(shot_name, cam, res, grade=None):
         scene.render.resolution_x, scene.render.resolution_y = res
         scene.render.use_motion_blur = False
         if logos:
-            build_dice.align_logos(objs, logos, cam.matrix_world.translation)
+            bpy.context.view_layer.update()  # a new camera has no matrix_world until the depsgraph runs
+            build_dice.align_logos(objs, logos, cam.matrix_world.translation.copy())
         png = tmp / f"{name}_{shot_name}.png"
         sizes[shot_name] = E.render_to(scene, cam, png, out / f"{name}-{shot_name}.jpg",
-                                       bloom=a.variant == "realtime")
+                                       bloom=a.variant == "realtime", grade=grade)
         return png
 
     if "topdown" in shots:
         E.place_layout(objs, specs, info.get("topdown_layout", E.TOPDOWN_LAYOUT))
         report["contacts_topdown"] = E.contact_report(objs)
         cam = topdown_camera(scene, info, z)
-        png = shot("topdown", cam, PHONE)
+        # rooms: grade everything outside the tray (the in-app play view)
+        grade = (info["tray_half"], z) if info.get("play_view") else None
+        png = shot("topdown", cam, PHONE, grade=grade)
         if a.check:
             import readability_check as R
             res = R.measure(scene, cam, objs, specs, png, a.theme, tmp, crops_dir=HERE / "out" / "crops",
@@ -139,6 +143,14 @@ def run(a):
             cam_loc = E.orbit(t, 12, 52, h.get("az", 0) - 10)
             cam = E.camera(scene, "d20", cam_loc, t, lens=100, fstop_real=5.6)
             shot("d20", cam, (1000, 625))
+    if "room" in shots and info.get("room_cam"):
+        rc = info["room_cam"]
+        E.place_layout(objs, specs, info.get("hero_layout", E.HERO_LAYOUT), centre=centre.to_2d(),
+                       facing_from=rc["loc"])
+        report["contacts_room"] = E.contact_report(objs)
+        cam = E.camera(scene, "room", rc["loc"], rc["target"], lens=rc.get("lens", 24),
+                       fstop_real=rc.get("fstop", 5.6), focus=rc.get("focus", centre))
+        shot("room", cam, (1600, 900))
     print("dice_lookdev: contacts", json.dumps(report))
     bad = [(s, k, v) for s, r in report.items() for k, v in r.items()
            if v["overlaps"] or not (0 <= v["gap_cm"] < 0.01)]
