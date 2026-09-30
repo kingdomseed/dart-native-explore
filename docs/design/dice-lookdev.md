@@ -1122,6 +1122,18 @@ Lighting recipes (the tray lights are unchanged unless noted):
   over the tray's reading key and cool fill. Camera: 20 mm, f/4. Gate:
   numeral 5.45 (d4), die vs tray 2.21, stroke 0.123–0.129, PASS.
 
+- **Old Road — the wayfarer's inn corner.** Timber-and-plaster walls, a
+  small window at the back onto the blue hour (area, 8 kW, cool), a raised
+  fieldstone hearth on the right wall (60 kW, warm side light) with a fur
+  stool, a travel pack on a chair, a walking staff, a barrel and a shelf of
+  jugs; a candle on a side table back-right (4 kW). The tin lantern on the
+  table stays the warm key from the left, with the tray's overhead and
+  warm key. No ceiling beams here: the polished-gold dice mirror what is
+  above them, and a dark beam over the table pulled the d4 below the gate
+  (4.18); without beams it is back to 4.60. Camera: 20 mm, turned right
+  to take in the hearth. Gate: numeral 4.60 (d4), die vs tray 2.95,
+  stroke 0.123–0.128, PASS.
+
 ## 4. dart3d features to verify (before building these for real)
 
 1. **Emissive intensity > 1 + bloom threshold** on both platforms, and

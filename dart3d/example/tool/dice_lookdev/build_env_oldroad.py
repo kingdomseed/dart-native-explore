@@ -100,25 +100,27 @@ def room(scene, table, top):
     (back-right); plus the tray's overhead and warm key.
     """
     wy = top + 75
-    wall = RC.plaster("Inn plaster", (0.3, 0.24, 0.17))
+    wall = RC.plaster("Inn plaster", (0.45, 0.36, 0.25))
     timber = P.dark_wood("Inn timber", c1=(0.03, 0.017, 0.008), c2=(0.09, 0.05, 0.022), rough=0.8, varnish=0.0)
     RC.shell(half_w=170, back=wy, front=-180, height=240, wall=wall, floor=RC.planks("Inn floor"),
              openings={"back": [(0, 45, 70, 80)]})
-    RC.half_timber("back", (-165, -60, 60, 165), timber, rails=(RC.FLOOR_Z + 95,))
+    RC.half_timber("back", (-165, -60), timber, rails=(RC.FLOOR_Z + 175,))
+    RC.half_timber("back", (60, 165), timber, rails=())
     RC.half_timber("left", (-150, -40, 70), timber, rails=(RC.FLOOR_Z + 95,))
-    RC.half_timber("right", (-150, 70), timber, rails=(RC.FLOOR_Z + 170,), braces=False)
-    RC.beams(timber, n=3, size=(18, 22))
+    RC.half_timber("right", (-150, 0, 120), timber, rails=(RC.FLOOR_Z + 170,), braces=False)
+    # no ceiling beams: the gold dice mirror what is above them, and a dark
+    # beam over the table dims the d4's faces below the readability gate
     dusk = RC.sky("Inn dusk", (0.03, 0.06, 0.18), (0.35, 0.22, 0.3), strength=0.8, skyline=((0.02, 0.025, 0.05), 0.3))
-    RC.window("back", 0, 45, 70, 80, dusk, timber, mullions=(1, 1), sill=True, glow=(18000, (0.55, 0.55, 1.0)))
+    RC.window("back", 0, 45, 70, 80, dusk, timber, mullions=(1, 1), sill=True, glow=(8000, (0.55, 0.55, 1.0)))
     RC.work_table(200, 150, top_z=0.0, thick=6.0, mat=table, leg_r=7, y=20, top=False)
-    RC.fireplace(scene, "right", -30, w=120, h=110, depth=45, energy=130000, seed=7,
+    RC.fireplace(scene, "right", 60, w=120, h=100, depth=45, energy=60000, seed=7, base=40,
                  mat=RC.stone("Inn fieldstone", (0.1, 0.085, 0.07), (0.26, 0.22, 0.17), scale=0.03))
     fur = E.simple("Stool fur", (0.25, 0.2, 0.15), 0.95, Sheen_Weight=1.0)
-    E.cube("stool_seat", (40, 34, 6), (105, -40, RC.FLOOR_Z + 40), timber, bevel=0.8)
+    E.cube("stool_seat", (40, 34, 6), (115, -70, RC.FLOOR_Z + 40), timber, bevel=0.8)
     for sx in (-1, 1):
         for sy in (-1, 1):
-            E.cube("stool_leg", (4, 4, 38), (105 + sx * 16, -40 + sy * 13, RC.FLOOR_Z + 19), timber)
-    E.rock("stool_fur", 22, (105, -40, RC.FLOOR_Z + 46), fur, seed=8, squash=(1.0, 0.85, 0.25), strength=0.25)
+            E.cube("stool_leg", (4, 4, 38), (115 + sx * 16, -70 + sy * 13, RC.FLOOR_Z + 19), timber)
+    E.rock("stool_fur", 22, (115, -70, RC.FLOOR_Z + 46), fur, seed=8, squash=(1.0, 0.85, 0.25), strength=0.25)
     # the travel pack on a chair behind the table, the staff leaning on the table edge
     RC.chair(60, 115, rot=math.radians(180), mat=timber)
     pack = leather("Pack canvas", (0.12, 0.1, 0.06))
@@ -138,4 +140,4 @@ def room(scene, table, top):
     P.candle(scene, 130, 120, RC.FLOOR_Z + 74, h=10, r=1.8, seed=9, light=False)
     E.light(scene, "POINT", "side_candle", (130, 120, RC.FLOOR_Z + 90), 4000, color=(1.0, 0.6, 0.3), size=2)
     RC.rug(0, -40, 240, 160, (0.3, 0.08, 0.05), (0.12, 0.05, 0.03), name="Inn rug")
-    return dict(loc=(18, -70, 40), target=(-2, 90, 4), lens=20, fstop=4.0, focus=(0, 0, 2))
+    return dict(loc=(10, -72, 40), target=(40, 90, 4), lens=20, fstop=4.0, focus=(0, 0, 2))

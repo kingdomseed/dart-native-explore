@@ -12,6 +12,7 @@ import random
 
 import env_common as E
 import env_props as P
+import room_common as RC
 
 W, D = E.TRAY_W, E.TRAY_D
 RIM_T, RIM_H = 2.2, 2.4
@@ -135,4 +136,73 @@ def build(scene):
     return dict(
         samples=128, exposure=1.3, topdown=dict(width=W + 2 * RIM_T + 1.0), surface_z=1.2, centre=(0, 2.0, 2.2),
         hero=dict(dist=32, elev=30, az=8, lens=65, fstop=2.8),
+        play_view=True, tray_half=(W / 2 + RIM_T, D / 2 + RIM_T), room_cam=room(scene, lac),
     )
+
+
+def room(scene, lac):
+    """The lantern pavilion (concept: room-concepts/vermilion-room).
+
+    A tatami room (the tray sits on the mats; floor z = 0) with lacquered
+    posts, shoji walls glowing on the left, the gold-leaf folding screen
+    behind the tray, and the back open onto a veranda railing over dusk
+    mountains, a pagoda silhouette and a cherry tree. Lights from four
+    sides: a paper andon floor lantern (warm, left), a big vermilion paper
+    lantern (red accent, right), the dusk sky through the opening (cool
+    violet, back) and the tray's warm key and overhead.
+    """
+    wood = P.dark_wood("Pavilion wood", c1=(0.03, 0.012, 0.008), c2=(0.1, 0.04, 0.02), varnish=0.7)
+    red = E.simple("Vermilion lacquer", (0.45, 0.04, 0.02), 0.25, Coat_Weight=1.0)
+    RC.shell(half_w=200, back=180, front=-200, height=230, wall=RC.plaster("Pavilion plaster", (0.35, 0.3, 0.24)),
+             floor=False, floor_z=0.0, openings={"back": [(0, 105, 300, 190)]},
+             ceiling=P.dark_wood("Pavilion ceiling", c1=(0.03, 0.015, 0.01), c2=(0.07, 0.035, 0.02)))
+    dusk = RC.sky("Pavilion dusk", (0.08, 0.07, 0.2), (0.5, 0.3, 0.4), stars=0.8, strength=0.8,
+                  skyline=((0.06, 0.05, 0.12), 0.35, False))
+    RC.window("back", 0, 105, 300, 190, dusk, wood, mullions=(1, 1), sill=False, glow=(30000, (0.6, 0.55, 1.0)))
+    # the veranda beyond: posts and a railing, a pagoda and a cherry tree against the sky
+    for x in (-150, -50, 50, 150):
+        E.cube("veranda_post", (12, 12, 230), (x, 230, 115), red, bevel=1.0)
+    E.cube("veranda_rail", (320, 6, 5), (0, 230, 55), red, bevel=0.5)
+    E.cube("veranda_rail_low", (320, 6, 4), (0, 230, 25), red, bevel=0.5)
+    E.plane("veranda_deck", 360, 100, (0, 230, -0.5), wood)
+    far = E.emissive("Pagoda silhouette", (0.05, 0.04, 0.09), 1.0)
+    px, py = 90, 262
+    for i, (wd, z) in enumerate(((46, 120), (38, 145), (30, 168), (22, 188))):
+        E.cube("pagoda_body", (wd * 0.6, 8, 20), (px, py, z), far)
+        E.cylinder("pagoda_roof", wd * 0.75, 7, (px, py, z + 12), far, segs=4, r2=wd * 0.25).rotation_euler = \
+            (0, 0, math.radians(45))
+    E.cylinder("pagoda_spire", 0.8, 25, (px, py, 210), far, segs=6)
+    E.cube("pagoda_hill", (160, 8, 110), (px + 10, py + 2, 50), far)
+    bark = E.simple("Cherry bark", (0.03, 0.02, 0.02), 0.8)
+    blossom = E.simple("Blossom", (0.95, 0.6, 0.7), 0.6, Subsurface_Weight=0.4, Emission_Color=(1.0, 0.6, 0.7, 1),
+                       Emission_Strength=0.15)
+    tr = E.cylinder("cherry_trunk", 6, 200, (-110, 250, 100), bark, segs=12, r2=3)
+    tr.rotation_euler = (0, math.radians(8), 0)
+    rng = random.Random(12)
+    for i in range(22):
+        E.rock(f"blossom{i}", rng.uniform(12, 22), (-110 + rng.uniform(-70, 60), 250 + rng.uniform(-10, 15),
+                                                    rng.uniform(150, 230)), blossom, seed=300 + i,
+               squash=(1.2, 0.8, 0.8), strength=0.4, subdiv=3)
+    # lacquered posts at the corners of the room, a lintel over the opening
+    for x in (-160, 160):
+        E.cube("post", (14, 14, 230), (x, 170, 115), wood, bevel=1.0)
+    # shoji along the left wall, glowing
+    for u in (-140, -60, 20, 100):
+        RC.shoji("left", u, 78, 190, wood, glow=0.35)
+    # a tansu chest on the right wall, cushions on the mats
+    RC.cabinet("right", 60, w=110, h=70, depth=45, mat=wood, top_mat=red, doors=3)
+    cush = E.simple("Zabuton", (0.05, 0.05, 0.14), 0.8, Sheen_Weight=0.8)
+    for x, y in ((-70, -10), (70, -30)):
+        E.cube("zabuton", (55, 55, 9), (x, y, 4.5), cush, bevel=3.5)
+    # the andon: a paper floor lantern on the left (warm)
+    ax, ay = -110, 70
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            E.cube("andon_leg", (2.5, 2.5, 70), (ax + sx * 12, ay + sy * 12, 35), wood)
+    E.cube("andon_paper", (23, 23, 45), (ax, ay, 45), E.simple("Andon paper", (0.9, 0.8, 0.6), 0.9,
+           Emission_Color=(1.0, 0.72, 0.4, 1), Emission_Strength=2.0)).visible_shadow = False
+    E.light(scene, "POINT", "andon_light", (ax, ay, 45), 9000, color=(1.0, 0.7, 0.4), size=10)
+    # a big vermilion paper lantern hung on the right (the red accent)
+    RC.paper_lantern(scene, 120, 40, 130, r=26, color=(1.0, 0.18, 0.06), energy=14000,
+                     light_color=(1.0, 0.35, 0.15))
+    return dict(loc=(-12, -78, 48), target=(8, 120, 8), lens=20, fstop=4.0, focus=(0, 0, 2))

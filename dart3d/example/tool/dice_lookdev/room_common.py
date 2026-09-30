@@ -389,6 +389,30 @@ def arch_opening(wall, u, z_bottom, w, h, mat, depth=24, sky_mat=None, columns=T
     return _group("arch", parts, loc + Vector((0, 0, FLOOR_Z)), rz)
 
 
+def shoji(wall, u, w, h, frame_mat, glow=0.6, glow_color=(1.0, 0.85, 0.6), grid=(4, 6), z0=None):
+    """A sliding paper screen against `wall`: a wooden lattice over washi
+    that glows faintly (lamplight beyond)."""
+    z0 = FLOOR_Z if z0 is None else z0
+    zl = z0 - FLOOR_Z
+    m, k = E.material(f"Washi {glow}")
+    obj = k.coords().outputs["Object"]
+    n = k.noise(obj, 0.4, 6).outputs["Fac"]
+    k.surface(k.add_shader(k.bsdf(Base_Color=(0.85, 0.8, 0.7, 1), Roughness=0.9, Transmission_Weight=0.3),
+                           k.emission((*glow_color, 1), k.math("MULTIPLY", k.math("ADD", n, 0.5), glow))))
+    paper = E.plane("shoji_paper", w, h, (0, -2, zl + h / 2), m)
+    paper.rotation_euler = (math.radians(90), 0, 0)
+    paper.visible_shadow = False
+    parts = [paper]
+    nx, nz = grid
+    for i in range(nx + 1):
+        parts.append(E.cube("shoji_stile", (2.2 if 0 < i < nx else 4, 3, h), (-w / 2 + i * w / nx, -3.5, zl + h / 2),
+                            frame_mat))
+    for j in range(nz + 1):
+        parts.append(E.cube("shoji_rail", (w, 3, 2.2 if 0 < j < nz else 4), (0, -3.5, zl + j * h / nz), frame_mat))
+    loc, rz = _wall_frame(wall, u)
+    return _group("shoji", parts, loc + Vector((0, 0, FLOOR_Z)), rz)
+
+
 def column(x, y, h, r, mat, base=True):
     E.cylinder("column", r, h, (x, y, FLOOR_Z + h / 2), mat, segs=24)
     if base:
