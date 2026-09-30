@@ -171,25 +171,25 @@ def room(scene, top, chrome):
     card.rotation_euler = (math.radians(90), math.radians(180), 0)
     # the bar on the left: counter, chrome edge, stools, back bar, pendants
     red = E.simple("Stool vinyl", (0.4, 0.02, 0.03), 0.3, Coat_Weight=0.6)
-    bar_top = E.simple("Bar top", (0.03, 0.03, 0.035), 0.1, Coat_Weight=1.0)
-    E.cube("bar", (60, 220, 100), (-150, -100, -55), panel, bevel=0.5)
-    E.cube("bar_top", (66, 224, 5), (-150, -100, -3), bar_top, bevel=0.8)
-    E.cube("bar_chrome", (2, 224, 6), (-117, -100, -8), chrome)
+    bar_top = E.simple("Bar top formica", (0.4, 0.5, 0.46), 0.35, Coat_Weight=0.6)
+    E.cube("bar", (60, 200, 100), (-125, -60, -55), panel, bevel=0.5)
+    E.cube("bar_top", (66, 204, 5), (-125, -60, -3), bar_top, bevel=0.8)
+    E.cube("bar_chrome", (2, 204, 6), (-92, -60, -8), chrome)
     for i in range(5):
-        y = -190 + i * 45
-        E.cylinder("stool_post", 2.5, 70, (-100, y, -70), chrome, segs=16)
-        E.cylinder("stool_seat", 17, 9, (-100, y, -32), red, segs=32, bevel=2.0)
-        E.cylinder("stool_foot", 16, 3, (-100, y, -103), chrome, segs=32)
+        y = -140 + i * 42
+        E.cylinder("stool_post", 2.5, 70, (-72, y, -70), chrome, segs=16)
+        E.cylinder("stool_seat", 17, 9, (-72, y, -32), red, segs=32, bevel=2.0)
+        E.cylinder("stool_foot", 16, 3, (-72, y, -103), chrome, segs=32)
     RC.wall_shelf("left", -100, -10 + 25, w=200, depth=18, seed=14, kind="bottles", mat=chrome,
                   palette=[(0.05, 0.2, 0.05), (0.3, 0.12, 0.02), (0.2, 0.2, 0.25), (0.25, 0.02, 0.05)])
     RC.wall_shelf("left", -100, 20 + 25, w=200, depth=18, seed=15, kind="bottles", mat=chrome,
                   palette=[(0.05, 0.2, 0.05), (0.3, 0.12, 0.02), (0.2, 0.2, 0.25), (0.25, 0.02, 0.05)])
-    for y in (-170, -100, -30):
-        RC.pendant_lamp(scene, -145, y, 55, energy=20000, color=(1.0, 0.72, 0.45), shade=(0.8, 0.8, 0.82), r=16,
+    for y in (-130, -60, 10):
+        RC.pendant_lamp(scene, -122, y, 55, energy=20000, color=(1.0, 0.72, 0.45), shade=(0.8, 0.8, 0.82), r=16,
                         spot_deg=100)
     RC.neon_bar(scene, (-190, -235, 100), (-190, wy - 5, 100), MAGENTA, strength=18.0, energy=15000)
     RC.neon_bar(scene, (-195, wy - 4, 96), (195, wy - 4, 96), CYAN, strength=14.0, energy=12000)
     # a booth bench behind the camera side on the right, with a table lamp glow
     E.cube("booth_seat", (60, 130, 45), (170, -130, -82), red, bevel=4)
     E.cube("booth_back", (15, 130, 70), (195, -130, -40), red, bevel=4)
-    return dict(loc=(22, -62, 34), target=(-24, 80, 4), lens=20, fstop=4.0, focus=(0, 0, 2))
+    return dict(loc=(45, -85, 62), target=(-45, 80, -12), lens=20, fstop=4.0, focus=(0, 0, 2))

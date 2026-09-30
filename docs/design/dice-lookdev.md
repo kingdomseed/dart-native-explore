@@ -1147,6 +1147,18 @@ Lighting recipes (the tray lights are unchanged unless noted):
   and the units. Gate: numeral 7.46 (d10t), die vs tray 5.49, stroke
   0.124–0.132, PASS.
 
+- **Voltline — the late-night diner.** The rain window is the whole back
+  wall (the existing street neon outside: magenta and cyan, the back
+  light); a lit block of windows across the street; to the left a long
+  bar with a mint formica top and chrome edge, red vinyl stools, a back
+  bar of bottles and three chrome pendants over it (spot, 20 kW each,
+  warm, left); a magenta neon strip along the left ceiling edge (15 kW)
+  and a cyan one over the window (12 kW); checker floor, dark panelling,
+  a red booth. The tray keeps its cool front key. Room floor at −105 (bar
+  height). Camera: 20 mm from standing height so the bar reads over the
+  counter. Gate: numeral 12.35 (d4), die vs tray 4.66, stroke
+  0.124–0.132, PASS.
+
 ## 4. dart3d features to verify (before building these for real)
 
 1. **Emissive intensity > 1 + bloom threshold** on both platforms, and
