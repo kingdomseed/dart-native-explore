@@ -13,6 +13,7 @@ import random
 
 import env_common as E
 import env_props as P
+import room_common as RC
 from build_dice import _circle
 
 W, D = E.TRAY_W, E.TRAY_D
@@ -181,6 +182,67 @@ def build(scene):
     E.scatter("motes", 120, ((-35, -25, 3), (35, 50, 40)), 0.05, E.emissive("Mote", (1.0, 0.9, 0.7), 3.0),
               seed=21, scale_range=(0.3, 1.0), avoid=lambda p: abs(p.x) < W / 2 + 6 and abs(p.y) < D / 2 + 10)
     E.haze_box("haze", (160, 180, 70), (0, 20, 34), 0.004, color=(0.85, 1.0, 0.95), noise_scale=0.03)
+    rc = room(scene)
     return dict(
         samples=128, exposure=0.1, topdown=dict(width=W + 2 * RIM_T + 1.0), hero=dict(dist=32, elev=28, az=-6, lens=65, fstop=2.8),
+        play_view=True, tray_half=(W / 2 + RIM_T, D / 2 + RIM_T), room_cam=rc,
     )
+
+
+def room(scene):
+    """The inventor's workshop (concept: room-concepts/fateengine-room).
+
+    Brick walls run with copper pipes, big wall gears, a tall arched-top
+    window onto a spired city at night, a workbench with bottle shelves on
+    the left, and a glass tesla column with a teal coil on the right.
+    Lights from four sides: an industrial pendant (warm key, above-left),
+    the window (cool, back-right), the tesla column (teal accent, right) and
+    a caged work lamp on the back wall (warm, back-left); plus the tray's key.
+    """
+    brick = RC.stone("Workshop brick", (0.09, 0.04, 0.025), (0.2, 0.1, 0.06), scale=0.05)
+    RC.shell(half_w=190, back=150, front=-190, height=290, wall=brick, floor=RC.planks(),
+             openings={"back": [(70, 70, 90, 170)]})
+    wood = P.dark_wood("Workshop table")
+    RC.work_table(220, 160, top_z=0.0, thick=6.0, mat=wood, leg_r=6, y=20, top=False)
+    copper = P.brass("Workshop copper", worn=0.7, color=(0.8, 0.42, 0.28))
+    brass = P.brass("Workshop brass", worn=0.5)
+    iron = E.simple("Workshop iron", (0.04, 0.04, 0.045), 0.4, 0.9)
+    city = RC.sky("Workshop city", (0.02, 0.03, 0.07), (0.1, 0.12, 0.2), stars=1.0, strength=0.7,
+                  skyline=((0.012, 0.014, 0.025), 0.4))
+    RC.window("back", 70, 70, 90, 170, city, iron, mullions=(3, 6), bar=1.2, glow=(40000, (0.55, 0.65, 1.0)))
+    RC.pipes("back", -190, 20, (120, 150), r=5, mat=copper, drops=(-150, -40))
+    RC.pipes("left", -190, 150, (160,), r=6, mat=copper, drops=(60,))
+    RC.wall_gear("back", -95, 95, 38, 24, brass, thick=5)
+    RC.wall_gear("back", -40, 140, 22, 16, copper, thick=4, off=12)
+    RC.wall_gear("left", 90, 110, 45, 28, brass, thick=5)
+    # workbench along the left wall with shelves of bottles and a vice
+    E.cube("side_bench", (60, 170, 6), (-160, 40, -12), wood, bevel=0.5)
+    for sy in (-1, 1):
+        E.cube("side_bench_leg", (50, 6, 58), (-160, 40 + sy * 78, RC.FLOOR_Z + 29), wood)
+    RC.wall_shelf("left", 40, 40, w=150, seed=11, kind="bottles",
+                  palette=[(0.05, 0.25, 0.2), (0.3, 0.15, 0.05), (0.1, 0.1, 0.2), (0.25, 0.22, 0.1)])
+    RC.wall_shelf("left", 40, 85, w=150, seed=12, kind="mixed",
+                  palette=[(0.2, 0.12, 0.06), (0.12, 0.1, 0.08), (0.3, 0.2, 0.1)])
+    # the tesla column: a glass cylinder with a teal coil on a brass base (right)
+    tx, ty = 135, 70
+    E.cylinder("tesla_base", 22, 20, (tx, ty, RC.FLOOR_Z + 10), brass, segs=32, bevel=1.0)
+    E.cylinder("tesla_glass", 16, 150, (tx, ty, RC.FLOOR_Z + 95), P.glass("Tesla glass"), segs=32,
+               cap=False).visible_shadow = False
+    E.cylinder("tesla_cap", 20, 12, (tx, ty, RC.FLOOR_Z + 176), brass, segs=32, bevel=1.0)
+    for i in range(18):  # coil turns: short tube segments around a helix
+        a0, a1 = i * 0.9, (i + 1) * 0.9
+        z0, z1 = RC.FLOOR_Z + 30 + i * 7.5, RC.FLOOR_Z + 30 + (i + 1) * 7.5
+        RC.neon_bar(scene, (tx + 9 * math.cos(a0), ty + 9 * math.sin(a0), z0),
+                    (tx + 9 * math.cos(a1), ty + 9 * math.sin(a1), z1), TEAL, strength=12.0, energy=0, r=0.8)
+    E.light(scene, "POINT", "tesla_light", (tx, ty, RC.FLOOR_Z + 100), 45000, color=TEAL, size=12, shadow=False)
+    # cogs, rolled plans and tools on the big table around the tray (beyond the phone frame)
+    for i, (x, y, r) in enumerate(((-55, -20, 6), (-70, 10, 4), (60, -30, 5), (75, 50, 7))):
+        P.gear(f"table_cog{i}", r, 10 + i * 2, 1.2, (x, y, 0.0), brass, hole=0)
+    for i, (x, y) in enumerate(((-75, 60), (-60, 75))):
+        E.cylinder("plan_roll", 3.0, 45, (x, y, 3.0), P.parchment(f"Plan roll {i}"), segs=24).rotation_euler = \
+            (0, math.radians(90), 0.3 * i)
+    # warm key: an industrial pendant above-left of the table, and a caged lamp on the back wall
+    RC.pendant_lamp(scene, -45, -10, 80, energy=60000, color=(1.0, 0.72, 0.42), shade=(0.4, 0.28, 0.12), r=24,
+                    spot_deg=95)
+    RC.hanging_lantern(scene, -120, 130, 110, energy=40000, mat=iron)
+    return dict(loc=(20, -72, 44), target=(0, 90, 6), lens=20, fstop=4.0, focus=(0, 0, 2))

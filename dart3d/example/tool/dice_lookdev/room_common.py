@@ -730,6 +730,42 @@ def rug(x, y, w, d, c1, c2, name="Rug"):
     return E.plane("rug", w, d, (x, y, FLOOR_Z + 0.3), m)
 
 
+def pipes(wall, u0, u1, zs, r=4.0, mat=None, drops=(), off=8.0):
+    """Horizontal pipe runs along `wall` from u0 to u1 at heights zs, with
+    flanges every ~60 cm and vertical drops at the u positions in `drops`
+    (from the top run to the floor)."""
+    mat = mat or P.brass("Pipe copper", worn=0.7, color=(0.8, 0.45, 0.3))
+    parts = []
+    L = abs(u1 - u0)
+    uc = (u0 + u1) / 2
+    for z in zs:
+        p_ = E.cylinder("pipe", r, L, (0, -off, z - FLOOR_Z), mat, segs=16)
+        p_.rotation_euler = (0, math.radians(90), 0)
+        parts.append(p_)
+        for i in range(int(L // 60) + 1):
+            fl = E.cylinder("pipe_flange", r * 1.35, 2.0, (-L / 2 + i * 60, -off, z - FLOOR_Z), mat, segs=16)
+            fl.rotation_euler = (0, math.radians(90), 0)
+            parts.append(fl)
+    top = max(zs) - FLOOR_Z
+    for du in drops:
+        parts.append(E.cylinder("pipe_drop", r, top, (du - uc, -off, top / 2), mat, segs=16))
+        parts.append(E.cylinder("pipe_valve", r * 2.2, 1.5, (du - uc, -off - r - 2, top * 0.45), mat, segs=24))
+        parts[-1].rotation_euler = (math.radians(90), 0, 0)
+    loc, rz = _wall_frame(wall, uc)
+    return _group("pipes", parts, loc + Vector((0, 0, FLOOR_Z)), rz)
+
+
+def wall_gear(wall, u, z, r, teeth, mat, thick=4.0, off=6.0):
+    """A big gear mounted flat on a wall (machinery / clockwork backdrop)."""
+    g = P.gear("wall_gear", r, teeth, thick, (0, 0, 0), mat, hole=0)
+    g.rotation_euler = (math.radians(90), 0, 0)
+    g.location = (0, -off, z - FLOOR_Z)
+    hub = E.cylinder("wall_gear_hub", r * 0.18, thick * 2.5, (0, -off - thick, z - FLOOR_Z), mat, segs=24)
+    hub.rotation_euler = (math.radians(90), 0, 0)
+    loc, rz = _wall_frame(wall, u)
+    return _group("wall_gear_g", [g, hub], loc + Vector((0, 0, FLOOR_Z)), rz)
+
+
 def barrel(x, y, r=20, h=70, mat=None, band=None):
     mat = mat or P.dark_wood("Barrel wood")
     band = band or E.simple("Barrel band", (0.03, 0.03, 0.03), 0.4, 0.9)

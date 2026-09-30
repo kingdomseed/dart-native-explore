@@ -1078,6 +1078,16 @@ Lighting recipes (the tray lights are unchanged unless noted):
   hall is tall), f/4. Gate: numeral 5.51 (d4), die vs tray 2.19, stroke
   0.121–0.130, PASS.
 
+- **Arcane Study — the night study.** The desk stands against the window
+  wall: a leaded window onto a moonlit skyline of spires (area, 25 kW,
+  0.55/0.65/1.0, cool from the back), floor-to-ceiling oak bookcases
+  either side of it and along the panelled left wall, a stone fireplace on
+  the right wall (160 kW, warm side light), two brass candle sconces
+  flanking the window (6 kW each) and a floor candelabrum by the left
+  bookcase (20 kW), over the tray's candle key and moon. Plaster walls,
+  plank floor, a burgundy-and-ink rug. Camera: 20 mm, seated, f/4. Gate:
+  numeral 5.97 (d4), die vs tray 2.16, stroke 0.124–0.130, PASS.
+
 ## 4. dart3d features to verify (before building these for real)
 
 1. **Emissive intensity > 1 + bloom threshold** on both platforms, and

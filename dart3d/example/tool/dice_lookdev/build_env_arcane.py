@@ -206,4 +206,4 @@ def room(scene, table, top):
         P.candle(scene, -150 + dx, 60, RC.FLOOR_Z + 150, h=14, r=1.6, seed=int(dx) + 30, energy=0, light=False)
     E.light(scene, "POINT", "candelabrum_light", (-150, 60, RC.FLOOR_Z + 170), 20000, color=(1.0, 0.65, 0.35),
             size=8)
-    return dict(loc=(14, -58, 36), target=(-2, 90, 12), lens=20, fstop=4.0, focus=(0, 0, 2))
+    return dict(loc=(16, -72, 44), target=(-2, 90, 2), lens=20, fstop=4.0, focus=(0, 0, 2))
