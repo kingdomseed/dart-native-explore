@@ -192,6 +192,16 @@ scaffolding, not the demo.
       top-down 35° camera at 15% d20, labeled Reset, upstream physics
       numbers; A142 evidence `docs/artifacts/p3-dr1/`; iOS device check
       pending.
+      **DR2 (the throw)** on `p3-dr2-dice-feel`: d4 numerals read along
+      the crystal and the d4 turns upright after settling; cocked-die
+      detection (per-die tolerance, catches d20 edge-rests) + physical
+      nudge, read at the next settle; aim arrow (420 px pull, colour/
+      width ramp, dissolve) → Poisson cluster spawned off-screen behind
+      the arrow through an opened gate wall, ballistic lift, end-over-end
+      spin, per-die spin retune; long-press pick-up to a hover plane +
+      fling toss; sweep from a die. Input is `GestureDetector` on the
+      scene view (`Listener` hides/doesn't reach it on Android). A142
+      evidence `docs/artifacts/p3-dr2/`; iOS device check pending.
 - [ ] P4 Hero launch scene + 3D DartNative logo. Logo landed (#26).
       Hero (M0) landed on `p4-hero-scene` (#31; spec
       `docs/design/hero-scene-brief.md`; `lib/hero_screen.dart`,
