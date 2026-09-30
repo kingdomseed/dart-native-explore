@@ -14,7 +14,7 @@ textures, text, or external assets are required.
 | Module | Geometry and main variation controls |
 | --- | --- |
 | `forge` | Masonry firebox, wedge arch, tapered hood, coke and flame tongues; width, depth, height, hearth_height, mouth_spring, stone_tone, energy |
-| `anvil` | London profile, drawn horn, cutting step, pierced heel, feet and banded stump; length, stump_height, wood_tone, metal_finish |
+| `anvil` | London profile, drawn horn, cutting step, pierced heel, feet and bark-covered log with sawn end grain and radial splits; length, stump_height, wood_tone, metal_finish |
 | `oak_table` | Separate planks, breadboard ends, pegs, aprons, chamfered legs, through stretcher; width, depth, height, thickness, wood_tone, scorch |
 | `tool_rack` | Pivoted tongs, two peen types, chisels, punches, horseshoes and suspension loops; width, height, wood_tone, metal_finish |
 | `lantern` | Hexagonal glazed cage, diamond bars, peaked cap, candle, chain and hook; height, radius, chain_length, metal_finish, energy |
@@ -37,7 +37,7 @@ textures, text, or external assets are required.
 | `masonry` | Varied hewn ashlar with real rectangular openings; width, height, thickness, openings, tone |
 
 `geometry.py` supplies construction helpers. `materials.py` supplies procedural
-PBR surfaces. `preview_asset.py` renders one asset in a neutral studio with an
+PBR surfaces, including dull fissured bark and sawn end grain for log sections. `preview_asset.py` renders one asset in a neutral studio with an
 unlettered 10 cm scale bar. Run it through Blender with arguments after `--`,
 for example `--asset anvil --out <dice_lookdev>/out/r2/assets`.
 
@@ -46,13 +46,16 @@ angle. All previews and temporary files must stay below `dice_lookdev/out`.
 
 Emberforged rotates the room root -90 degrees and keeps the tray at z=0.
 The table top is z=-1.2, flush with the bottom of the 1.2 cm forged plate.
-The room camera is 35.2 cm above the tabletop, at f/4 with the aperture converted
-for the centimetre scene. Its hero layout spreads the seven dice along the tray.
-The top-down layout remains unchanged. The player floor stays at z=-76;
-four 10 cm steps descend to a working bay at z=-116. The bay sits 70 cm
-farther behind the table, preserving the furniture dimensions while allowing
-the forge arch, anvil stump and window to appear together in the seated view.
-Full-size tongs rest beyond the 10 cm exclusion zone at the far table edge.
+The seated camera is 40.2 cm above the tabletop, looks down 25 degrees, and
+uses a 50 mm lens at f/8 with the aperture converted for centimetre scene units.
+Focus is slightly behind the middle dice to retain background definition.
+The hero layout spreads the seven dice along the tray; the top-down layout
+remains unchanged. The shallower player table clears the view of the hearth
+and anvil base, and the tabletop tongs have been removed.
+The player floor stays at z=-76; six 9 cm steps descend to the working bay at
+z=-130. Fixtures sit roughly 1.9-2.5 m behind the tray, with the forge to the
+left, tools and anvil in the middle, and the moonlit window to the right.
+The forge uses a separate grazing light so room fill does not wash out soot.
 
 Exposure is -1.15 EV. Room lights use a receiver collection containing room
 surfaces and the plate, so the room can be lit without changing the tray lights.

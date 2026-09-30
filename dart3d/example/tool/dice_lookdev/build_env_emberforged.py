@@ -95,129 +95,124 @@ def build(scene):
 
 
 def room(scene):
-    """Full-scale smithy, built facing local -Y and turned broadside to the tray."""
+    """A seated broadside view, with the working bay behind the player table."""
     from assets import (anvil, barrel, book, candles, ember_bowl, forge, fur_throw,
-                        geometry as G, lantern, leaded_window, leather_mat, loose_hardware, masonry, materials as M,
-                        oak_table, pouch, shelf, shield, stone_steps, strongbox, table_tools, tool_rack, vessel)
+                        geometry as G, lantern, leaded_window, leather_mat, loose_hardware,
+                        masonry, materials as M, oak_table, pouch, shelf, shield,
+                        stone_steps, strongbox, tool_rack, vessel)
     import bpy
 
     before = set(bpy.data.objects)
+    floor_z, bay_z = RC.FLOOR_Z, RC.FLOOR_Z - 40
     wood = (0.095, 0.038, 0.013)
-    floor_z = RC.FLOOR_Z
-    oak_table.build("Player work table", loc=(0, -6, floor_z), width=136, depth=72,
+    oak_table.build("Player work table", loc=(0, -14, floor_z), width=136, depth=56,
                     height=74.8, thickness=7, wood_tone=wood, seed=2)
-    masonry.build("Smithy back wall", loc=(0, 160, floor_z), width=470, height=265,
-                  openings=((108, 26.5, 104, 119),), tone=(0.105, 0.10, 0.085))
-    masonry.build("Left return", loc=(-235, 30, floor_z), rot_z=math.pi / 2,
-                  width=270, height=265, tone=(0.09, 0.086, 0.074), seed=21)
+    vessel.build("Foreground chased goblet", loc=(-35, 5, -1.2), height=18, radius=5.1, seed=8)
+    book.build(loc=(-40, -6, -0.83), rot_z=-0.12, width=17, depth=24, thickness=5, seed=9)
+    pouch.build(loc=(35, 6, -1.2), radius=6, height=11, seed=4)
+    ember_bowl.build(loc=(36.5, 4, -1.2), radius=8.5, height=4.5, energy=70, seed=5)
+    leather_mat.build(loc=(-43, -6, -1.17), rot_z=0.1, width=24, depth=31, seed=4)
+    loose_hardware.build(loc=(43, 3, -1.2), rot_z=-0.3, length=14, seed=9)
+    lantern.build("Above-table lantern", loc=(31, 10, 25), height=32, radius=7, chain_length=36, energy=900)
+    foreground = set(bpy.data.objects) - before
+
+    masonry.build("Smithy back wall", loc=(0, 218, bay_z), width=350, height=255,
+                  openings=((-48.5, 50, 44, 60), (77, 10.5, 84, 74)), tone=(0.15, 0.135, 0.105))
+    masonry.build("Left return", loc=(-175, 50, bay_z), rot_z=math.pi / 2,
+                  width=335, height=255, tone=(0.12, 0.105, 0.083), seed=21)
     floor = M.stone("Worn flagstones", (0.064, 0.056, 0.043), wear=0.6, seed=18)
-    E.cube("Room flagstone floor", (475, 650, 5), (0, 25, floor_z - 2.5), floor, bevel=0.3)
-    forge.build(loc=(-98, 123, floor_z), width=120, depth=62, height=235,
-                energy=240000, stone_tone=(0.048, 0.045, 0.04), seed=12, hearth_height=30, mouth_spring=32)
-    anvil.build(loc=(-32, 83, floor_z), rot_z=-0.12, length=68, stump_height=49, seed=8)
-    barrel.build("Quench tub", loc=(-2, 126, floor_z), radius=24, height=48, open_top=True, water=True, seed=9)
-    barrel.build("Left cask", loc=(-158, 69, floor_z), radius=24, height=83, seed=6)
-    barrel.build("Rear cask", loc=(-178, 118, floor_z), radius=24, height=87, seed=12)
-    barrel.build("Right cask", loc=(175, 91, floor_z), radius=25, height=83, seed=14)
-    tool_rack.build(loc=(-18, 158, -52), width=70, height=74, seed=7)
-    shield.build(loc=(-36, 159, 35), radius=22, seed=5)
-    shelf.build("Shelves beside tools", loc=(44, 160, -12), width=44, levels=2, spacing=34, seed=4)
-    shelf.build("Right shelves", loc=(190, 160, -12), width=65, levels=3, spacing=32, seed=21)
-    leaded_window.build(loc=(108, 160, -45), width=80, height=110, energy=65000, seed=9, moon_height=0.30, exterior_slope=0.35, moon_offset=0.8)
-    oak_table.build("Back workbench", loc=(97, 122, floor_z), width=130, depth=76, height=62,
+    E.cube("Room flagstone floor", (350, 500, 5), (0, 70, bay_z - 2.5), floor, bevel=0.3)
+    platform = G.Asset("Player floor platform")
+    platform.block("Raised stone floor", (350, 290, 54), (0, -45, floor_z - 27), floor, 0.3)
+    stone_steps.build("Work bay steps", loc=(110, 100, bay_z - 14), width=60, tread=15, rise=9, count=6)
+    forge.build(loc=(-44, 204, bay_z), rot_z=0.18, width=70, depth=50, height=215,
+                energy=75000, stone_tone=(0.048, 0.045, 0.04), seed=12,
+                hearth_height=50, mouth_spring=22)
+    anvil.build(loc=(29, 187, bay_z), rot_z=math.pi + 0.08, length=55, stump_height=49, seed=8)
+    barrel.build("Quench tub", loc=(-89, 156, bay_z), radius=19, height=48,
+                 open_top=True, water=True, seed=9)
+    barrel.build("Left cask", loc=(-121, 187, bay_z), radius=23, height=80, seed=6)
+    barrel.build("Right cask", loc=(150, 154, bay_z), radius=23, height=80, seed=14)
+    tool_rack.build(loc=(0, 215, -94), width=70, height=52, metal_finish="steel", seed=7)
+    shield.build(loc=(-91, 215, -38), radius=19, seed=5)
+    shelf.build("High smithy shelf", loc=(-5, 217, -33), width=59, levels=1, spacing=30, count=4, seed=4)
+    shelf.build("Right shelves", loc=(147, 217, -67), width=40, levels=2, spacing=28, seed=21)
+    leaded_window.build(loc=(77, 218, -105), width=60, height=65, reveal=14, energy=42000,
+                         seed=9, moon_height=0.8, moon_offset=0.6, exterior_slope=0.47)
+    oak_table.build("Back workbench", loc=(80, 174, bay_z), width=86, depth=57, height=56,
                     thickness=6, wood_tone=(0.1, 0.04, 0.016), seed=8)
-    fur_throw.build(loc=(85, 106.5, -13.9), width=52, length=83, drop=38, tone=(0.115, 0.078, 0.043), seed=12)
-    strongbox.build(loc=(89, 144, -14), width=30, depth=24, height=25, seed=3)
-    candles.build(loc=(45, 112, -14), height=12, radius=1.8, energy=1800, seed=5)
-    lantern.build("Bench lantern", loc=(60, 145, -14), height=35, radius=9, chain_length=0, energy=13500)
-    lantern.build("Forge-side hanging lantern", loc=(-25, 145, -8), height=32, radius=8, chain_length=137, energy=28000)
-    lantern.build("Window-side hanging lantern", loc=(58, 151, -12), height=34, radius=8, chain_length=139, energy=22000)
-    lantern.build("Above-table lantern", loc=(31, 10, 65), height=32, radius=7, chain_length=65, energy=900)
-    vessel.build("Foreground chased goblet", loc=(-35, 21, -1.2), height=18, radius=5.1, seed=8)
-    book.build(loc=(-40, 3, -0.83), rot_z=-0.12, width=17, depth=24, thickness=5, seed=9)
-    pouch.build(loc=(35, 24, -1.2), radius=6, height=11, seed=4)
-    ember_bowl.build(loc=(36.5, 9.5, -1.2), radius=8.5, height=4.5, energy=70, seed=5)
-    leather_mat.build(loc=(-43, 6, -1.17), rot_z=0.1, width=24, depth=31, seed=4)
-    loose_hardware.build(loc=(43, 12, -1.2), rot_z=-0.3, length=14, seed=9)
-    table_tools.build("Table tongs", loc=(0, 25, -1.2), length=45, seed=6)
+    fur_throw.build(loc=(96, 158.5, -59.9), width=38, length=62, drop=30,
+                    tone=(0.115, 0.078, 0.043), seed=12)
+    strongbox.build(loc=(108, 191, -60), width=26, depth=21, height=22, seed=3)
+    candles.build(loc=(69, 164, -60), height=10, radius=1.5, energy=1400, seed=5)
+    lantern.build("Bench lantern", loc=(44, 180, -60), height=26, radius=6.5, chain_length=0, energy=13000)
+    lantern.build("Forge-side hanging lantern", loc=(-87, 198, -56), height=28, radius=7,
+                  chain_length=134, energy=18000)
+    lantern.build("Tools hanging lantern", loc=(26, 206, -55), height=25, radius=6.5,
+                  chain_length=136, energy=18000)
+    lantern.build("Window-side hanging lantern", loc=(99, 206, -65), height=30, radius=7,
+                  chain_length=141, energy=18000)
     dressing = G.Asset("Smithy fixtures")
     im = M.metal("Smithy chains", wear=0.7)
     beam_wood = M.oak("Roof timber", (0.07, 0.028, 0.012), axis="Z", seed=4)
-    for x in (-220, -35, 52, 173):
-        dressing.block("Roof post", (13, 12, 260), (x, 163, floor_z + 130), beam_wood, 0.65)
-    dressing.block("Wall head beam", (468, 16, 18), (0, 153, 161), beam_wood, 0.8)
-    for x in (-20, 31, 61):
-        dressing.block("Lantern supporting joist", (14, 280, 18), (x, 80, 161), beam_wood, 0.7)
-    for x, z, length in ((-196, 124, 73), (-171, 119, 86), (37, 81, 62), (182, 112, 62)):
-        G.chain(dressing, "Hanging smithy chain", (x, 153, z), length, im, radius=1.55)
-    dressing.light("Warm room bounce", (-55, 56, 65), 90000, (1, 0.58, 0.31), 100,
-                   target=(0, 158, 15), kind="AREA")
-    dressing.light("Window bench bounce", (145, 120, 55), 5500, (0.40, 0.52, 1), 65,
-                   target=(120, 115, 10), kind="AREA")
-    tool_fill = dressing.light("Forge reflection on tools", (-56, 94, 42), 28000, (1, 0.55, 0.25), 45,
-                   target=(8, 156, -5), kind="AREA")
-    tool_fill.visible_glossy = True
-    tool_fill.data.specular_factor = 1
-    dressing.light("Bench lantern reflected warmth", (70, 71, 42), 15000, (1, 0.68, 0.4), 45,
-                   target=(110, 110, -8), kind="AREA")
-    dressing.light("Anvil forge-side sheen", (-72, 48, 39), 15000, (1, 0.56, 0.28), 35,
-                   target=(-30, 82, 0), kind="AREA")
-    sheen = dressing.light("Forge reflection on anvil", (-53, 126, 37), 35000, (1, 0.71, 0.44), 55,
-                           target=(-32, 83, 3), kind="AREA")
-    sheen.visible_glossy = True
-    sheen.visible_transmission = False
-    sheen.data.specular_factor = 1
-    soot_rake = dressing.light("Warm grazing light on soot", (-150, 60, 60), 20000, (1, 0.68, 0.42), 55,
-                               target=(-98, 108, 5), kind="AREA")
-    moon_fill = dressing.light("Moon reflection on work station", (126, 140, 48), 40000, (0.30, 0.46, 1), 60,
-                               target=(-12, 110, -8), kind="AREA")
-    moon_fill.visible_glossy = True
-    moon_fill.visible_transmission = False
-    moon_fill.data.specular_factor = 1
-    table_bounce = dressing.light("Lantern table bounce", (-20, 4, 38), 6500, (1, 0.69, 0.4), 38,
-                                  target=(0, 12, -1.2), kind="AREA")
-    table_bounce.visible_glossy = True
-    table_bounce.data.specular_factor = 1
-    foreground = {"Player work table", "Foreground chased goblet", "Leather book", "Coin pouch",
-                  "Ember bowl", "Tooled leather mat", "Loose iron hardware", "Table tongs", "Above-table lantern"}
+    for x in (-155, -92, 29, 124):
+        dressing.block("Roof post", (11, 10, 255), (x, 222, bay_z + 127.5), beam_wood, 0.65)
+    dressing.block("Wall head beam", (348, 14, 16), (0, 216, 121), beam_wood, 0.8)
+    for x in (-87, 26, 31, 99):
+        dressing.block("Lantern supporting joist", (12, 280, 18), (x, 115, 121), beam_wood, 0.7)
+    for x, z, length in ((-108, -10, 73), (-95, -4, 62), (28, -35, 42), (131, -12, 62)):
+        G.chain(dressing, "Hanging smithy chain", (x, 210, z), length, im, radius=1.25)
+
+    def area(name, loc, target, energy, color, size, specular=True):
+        ob = dressing.light(name, loc, energy, color, size, target=target, kind="AREA")
+        ob.visible_glossy = specular
+        ob.data.specular_factor = 1 if specular else 0
+        return ob
+
+    area("Forge light on wall and tools", (-58, 112, -26), (-12, 215, -65),
+         165000, (1, 0.62, 0.35), 65)
+    area("Warm smithy bounce", (10, 85, 2), (18, 210, -55),
+         105000, (1, 0.76, 0.51), 120)
+    soot_rake = area("Warm grazing light on soot", (-96, 100, 7), (-44, 146, -21),
+                     150000, (1, 0.66, 0.4), 55)
+    area("Anvil reflected forge light", (-12, 132, -14), (16, 180, -38),
+         28000, (1, 0.73, 0.46), 38)
+    area("Bench lantern reflected warmth", (49, 142, -21), (81, 180, -48),
+         24000, (1, 0.72, 0.43), 45)
+    area("Window moonlit edge", (80, 213, -46), (26, 144, -43),
+         50000, (0.32, 0.53, 1), 48)
+    table_bounce = area("Lantern table bounce", (-20, 4, 38), (0, 12, -1.2),
+                        6500, (1, 0.69, 0.4), 38)
     for ob in set(bpy.data.objects) - before:
-        if ob.parent is None and ob.name not in foreground:
-            ob.location.y += 70
-            ob.location.z -= 40
-    table_bounce.location.y -= 70
-    table_bounce.location.z += 40
-    bpy.data.objects["Above-table lantern"].location.z -= 40
-    platform = G.Asset("Player floor platform")
-    platform.block("Raised stone floor", (475, 270, 40), (0, -85, floor_z - 20), floor, 0.3)
-    stone_steps.build("Work bay steps", loc=(0, 50, floor_z - 40), width=440, tread=15, rise=10, count=4)
-    receivers = bpy.data.collections.new("Table lantern receivers")
-    for ob in set(bpy.data.objects) - before:
-        if ob.type in {"MESH", "CURVE"}:
-            receivers.objects.link(ob)
-    receivers.objects.link(bpy.data.objects["forge_slab"])
-    table_bounce.light_linking.receiver_collection = receivers
+        if ob.parent is None and ob not in foreground and ob.name not in {"Player floor platform", "Work bay steps"}:
+            ob.location.y += 30
+            ob.location.z -= 14
+    table_bounce.location.y -= 30
+    table_bounce.location.z += 14
+    table_receivers = bpy.data.collections.new("Player table light receivers")
+    room_receivers = bpy.data.collections.new("Smithy light receivers")
+    hearth_receivers = bpy.data.collections.new("Hearth stone receivers")
+    furnishings = bpy.data.collections.new("Room illumination without washing soot")
     hearth_objects = set(bpy.data.objects["Stone forge"].children_recursive)
-    hearth_receivers = bpy.data.collections.new("Soot surface illumination")
-    for ob in hearth_objects:
+    for ob in set(bpy.data.objects) - before:
         if ob.type in {"MESH", "CURVE"}:
-            hearth_receivers.objects.link(ob)
-    furnishings = bpy.data.collections.new("Room fill without washing the hearth")
-    for ob in receivers.objects:
-        if ob not in hearth_objects:
-            furnishings.objects.link(ob)
-    moon_receivers = bpy.data.collections.new("Cool work station reflections")
-    for name in ("Anvil", "Quench tub", "Tool wall", "Smithy back wall", "Shelves beside tools"):
-        for ob in bpy.data.objects[name].children_recursive:
-            if ob.type in {"MESH", "CURVE"}:
-                moon_receivers.objects.link(ob)
+            table_receivers.objects.link(ob)
+            if ob not in foreground:
+                room_receivers.objects.link(ob)
+            if ob in hearth_objects:
+                hearth_receivers.objects.link(ob)
+            elif ob not in foreground:
+                furnishings.objects.link(ob)
+    table_receivers.objects.link(bpy.data.objects["forge_slab"])
     group = G.Asset("Emberforged room frame", rot_z=-math.pi / 2)
     for ob in set(bpy.data.objects) - before:
         if ob.type == "LIGHT":
-            ob.data.energy *= 7.0
-            ob.light_linking.receiver_collection = (moon_receivers if ob == moon_fill else
-                                                   hearth_receivers if ob == soot_rake else receivers if ob in hearth_objects else furnishings)
+            restrained = ob == table_bounce or ob in foreground or ob.name in {
+                "Window moonlit edge", "Bench lantern reflected warmth", "Moon through window"}
+            ob.data.energy *= 7 if restrained else 13
+            ob.light_linking.receiver_collection = (table_receivers if ob == table_bounce or ob in foreground else
+                                                   hearth_receivers if ob == soot_rake else room_receivers if ob in hearth_objects else furnishings)
         if ob != group.root and ob.parent is None:
             group.add(ob)
-    # Blender's optical calculation uses metres even in a centimetre scene.
-    return dict(loc=(-34, 0, 34), target=(65, 0, -33), lens=30,
-                fstop=4 * scene.unit_settings.scale_length, focus=(0, 0, 1.4))
+    return dict(loc=(-61, 0, 39), target=(0, 0, 10.55), lens=50,
+                fstop=8 * scene.unit_settings.scale_length, focus=(8, 0, 1.4))

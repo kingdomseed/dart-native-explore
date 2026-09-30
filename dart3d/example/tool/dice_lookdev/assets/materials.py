@@ -127,3 +127,41 @@ def glass(name="Lantern glass", tone=(0.8, 0.56, 0.3), reflection=0.16):
     tr = k.node("ShaderNodeBsdfTransparent").outputs[0]
     k.surface(k.mix_shader(reflection, tr, pane))
     return m
+
+
+def bark(name="Rough oak bark", tone=(0.10, 0.042, 0.016), wear=0.8, seed=0):
+    m, k = E.material(name)
+    vec = mapped(k, (0.48, 0.48, 0.026), seed)
+    ridges = k.voronoi(vec, 2.4, feature="DISTANCE_TO_EDGE").outputs["Distance"]
+    n = k.noise(vec, 2, 3, 0.7).outputs["Fac"]
+    col = k.ramp(n, [(0.2, tuple(c * 0.15 for c in tone)),
+                     (0.5, tuple(c * 0.7 for c in tone)),
+                     (0.8, tuple(c * 1.3 + 0.018 for c in tone))])
+    split = k.math("LESS_THAN", ridges, 0.045)
+    col = k.mix(split, col, (0.009, 0.006, 0.003, 1))
+    normal = k.bump(ridges, 0.75, 0.42 * wear)
+    normal = k.bump(n, 0.4, 0.18, normal=normal)
+    k.surface(k.bsdf(Base_Color=col, Metallic=0, Roughness=0.92, Normal=normal))
+    return m
+
+
+def end_grain(name="Sawn oak end grain", tone=(0.16, 0.085, 0.038), wear=0.8, seed=0):
+    m, k = E.material(name)
+    vec = k.coords().outputs["Object"]
+    sep = k.node("ShaderNodeSeparateXYZ")
+    k.link(vec, sep.inputs[0])
+    x = k.math("ADD", sep.outputs["X"], 3.2)
+    y = k.math("SUBTRACT", sep.outputs["Y"], 1.4)
+    radius = k.math("SQRT", k.math("ADD", k.math("MULTIPLY", x, x),
+                                    k.math("MULTIPLY", k.math("MULTIPLY", y, y), 1.13)))
+    n = k.noise(vec, 0.16, 3, 0.7).outputs["Fac"]
+    radius = k.math("ADD", radius, k.math("MULTIPLY", n, 2.5))
+    ring = k.math("SINE", k.math("MULTIPLY", radius, 5.2))
+    latewood = k.math("GREATER_THAN", ring, 0.65)
+    col = k.ramp(n, [(0.2, tuple(c * 0.48 for c in tone)), (0.8, tone)])
+    col = k.mix(k.math("MULTIPLY", latewood, 0.55), col, tuple(c * 0.2 for c in tone) + (1,))
+    normal = k.bump(ring, 0.25, 0.035 * wear)
+    saw = k.noise(mapped(k, (0.025, 1.5, 0.04), seed), 2, 2).outputs["Fac"]
+    k.surface(k.bsdf(Base_Color=col, Metallic=0, Roughness=0.86,
+                     Normal=k.bump(saw, 0.25, 0.045, normal=normal)))
+    return m
