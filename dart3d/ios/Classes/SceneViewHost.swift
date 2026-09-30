@@ -1111,6 +1111,13 @@ final class SceneViewHost: SCNView {
                 ])
                 off += 12
             }
+            // A static/kinematic body doesn't follow its node on its
+            // own: re-seat it in the physics world (e.g. screen-fitted
+            // tray walls moving on rotation).
+            if mask & 3 != 0, let body = node.physicsBody,
+               body.type != .dynamic {
+                body.resetTransform()
+            }
         }
     }
 

@@ -1,7 +1,7 @@
 // The dice-table + showcase document builders against the real bundled
-// assets: `buildDiceTable` composes seven `.fsceneb` prefabs host-side
-// through upstream `composeScene` (id remap, addedComponents delta,
-// resolver-injected materialsVariants), and `loadShowcaseScene` decodes
+// assets: `buildDiceTable` composes six `.fsceneb` prefabs host-side
+// through upstream `composeScene` (id remap, addedComponents delta)
+// plus the procedural shard d4, and `loadShowcaseScene` decodes
 // the wider upstream corpus (skins, animations, textures, prefab
 // references). Same constraint as the codec fixture: pure-Dart
 // libraries only — `package:dart3d/dart3d.dart` needs DartNative's
@@ -28,79 +28,59 @@ Uint8List? bytesFromDisk(String key) {
 }
 
 void main() {
-  group('loadDiceFaceMaps', () {
-    test('parses all seven dice with rollable faces', () {
-      final maps = loadDiceFaceMaps(bytesFor: bytesFromDisk);
-      expect(maps.keys, containsAll(['d4', 'd6', 'd8', 'd10t', 'd10u', 'd12', 'd20']));
-      expect(maps['d6']!.faces, hasLength(6));
-      expect(maps['d20']!.faces, hasLength(20));
-      expect(maps['d10u']!.faces, hasLength(10));
-      for (final map in maps.values) {
-        expect(map.resultSide, 'up');
-        for (final f in map.faces) {
-          expect(f.normal.length, closeTo(1.0, 0.01));
-        }
-      }
-    });
-
-    test('read() reports the up face', () {
-      final maps = loadDiceFaceMaps(bytesFor: bytesFromDisk);
-      final d6 = maps['d6']!;
-      // Identity rotation — whatever value the generator put on +Y.
-      final top = d6.faces
-          .reduce((a, b) => a.normal.y > b.normal.y ? a : b)
-          .value;
-      expect(d6.read(Quaternion.identity()), top);
-      // Flip 180° about X — the bottom face comes up; standard dice
-      // sum opposites to 7.
-      final flipped = Quaternion.axisAngle(Vector3(1, 0, 0), pi);
-      expect(d6.read(flipped), 7 - top);
-    });
-  });
-
   group('buildDiceTable', () {
-    test('composes seven dice with physics + selection variants', () {
+    test('composes seven dice with physics', () {
       final scene = buildDiceTable(bytesFor: bytesFromDisk)!;
       final doc = scene.document;
 
-      expect(scene.dice, hasLength(7));
+      expect(scene.dice.map((d) => d.label), kDiceOrder);
       // Prefab expansion is complete — no instance nodes remain.
       for (final node in doc.nodes.values) {
         expect(node.instance, isNull, reason: '${node.name} unexpanded');
       }
-      // Each die node carries the addedComponents physics delta plus
-      // the resolver-injected materialsVariants.
+      // Each die node carries its mesh and the physics components.
       for (final die in scene.dice) {
         final node = doc.nodes[die.node];
         expect(node, isNotNull, reason: '${die.label} missing');
         final types = node!.components.map((c) => c.type).toSet();
-        expect(types, containsAll(['mesh', 'collider', 'rigidBody', 'materialsVariants']),
-            reason: '${die.label} components: $types');
-        // The variants binding targets the composed node itself.
-        final variants = node.components
-            .firstWhere((c) => c.type == 'materialsVariants');
-        final bindings =
-            (variants.properties['bindings'] as ListValue).values;
-        expect(bindings, hasLength(2)); // shell + numeral inlay
-        for (final b in bindings) {
-          final m = (b as MapValue).values;
-          expect((m['node'] as NodeRefValue).id, die.node);
-        }
+        expect(
+          types,
+          containsAll(['mesh', 'collider', 'rigidBody']),
+          reason: '${die.label} components: $types',
+        );
+        expect(die.faceMap.faces, isNotEmpty, reason: die.label);
+        final body = node.components.firstWhere((c) => c.type == 'rigidBody');
+        expect((body.properties['ccdEnabled'] as BoolValue).value, isTrue);
       }
-      // Tray: wood slab + 4 invisible walls + world + camera + 2 lights.
-      expect(doc.payloads, hasLength(29)); // 7 dice × 4 + wood texture
+      // 6 imported dice × 4 payloads + shard (vertices, indices, atlas)
+      // + wood texture.
+      expect(doc.payloads, hasLength(28));
+      // Tray: wood slab + 4 walls + ceiling + physics world.
       expect(
         doc.nodes.values.where((n) => n.name.startsWith('tray.')),
-        hasLength(6),
-      );
-      expect(doc.stage.environmentRef, isNotNull);
-      expect(doc.nodes[scene.cameraNode], isNotNull);
-      // Dice ids survive composition as the instance ids — the tap
-      // raycast resolves them directly.
-      expect(
-        scene.dice.map((d) => d.node).toSet(),
         hasLength(7),
       );
+      expect(scene.wallNodes, hasLength(4));
+      expect(doc.stage.environmentRef, isNotNull);
+      expect(doc.nodes[scene.cameraNode], isNotNull);
+      expect(scene.dice.map((d) => d.node).toSet(), hasLength(7));
+      // Dice start racked inside the play area, resting on the table.
+      for (final die in scene.dice) {
+        final t = doc.nodes[die.node]!.transform as TrsTransform;
+        expect(
+          scene.layout.contains(t.translation, slack: -die.radius * 0.5),
+          isTrue,
+          reason: '${die.label} at ${t.translation}',
+        );
+        expect(t.translation.y, closeTo(die.restY, 1e-6));
+        // Racked squarely face up, so a reset never tips a die over.
+        expect(
+          die.faceMap.top(t.rotation).$2,
+          closeTo(1.0, 1e-5),
+          reason: die.label,
+        );
+        expect(die.restY, inInclusiveRange(4.0, 12.0), reason: die.label);
+      }
     });
   });
 
@@ -116,13 +96,11 @@ void main() {
       final doc = load('dash').document;
       expect(doc.skins, hasLength(1));
       expect(doc.animations, hasLength(9));
-      expect(
-        doc.resources.values.whereType<TextureResource>(),
-        hasLength(2),
-      );
+      expect(doc.resources.values.whereType<TextureResource>(), hasLength(2));
       // Image payloads decoded with the document.
-      final images = doc.payloads.values
-          .where((p) => p.encoding == PayloadEncoding.image);
+      final images = doc.payloads.values.where(
+        (p) => p.encoding == PayloadEncoding.image,
+      );
       expect(images, hasLength(2));
       for (final p in images) {
         expect(p.bytes, isNotNull);
@@ -183,10 +161,7 @@ void main() {
       expect(meshNodes.single.name, 'DartNativeLogo');
       expect(doc.animations, hasLength(1));
       expect(doc.animations.values.single.name, 'Spin');
-      expect(
-        doc.resources.values.whereType<TextureResource>(),
-        hasLength(1),
-      );
+      expect(doc.resources.values.whereType<TextureResource>(), hasLength(1));
       final image = doc.payloads.values.singleWhere(
         (p) => p.encoding == PayloadEncoding.image,
       );
@@ -242,10 +217,7 @@ void main() {
         bytesFor: bytesFromDisk,
       )!;
       final doc = scene.document;
-      expect(
-        doc.nodes.values.where((n) => n.name == 'showcase.slab'),
-        isEmpty,
-      );
+      expect(doc.nodes.values.where((n) => n.name == 'showcase.slab'), isEmpty);
       final env =
           doc.resources[doc.stage.environmentRef]! as EnvironmentResource;
       expect(env.effects.vignetteEnabled, isFalse);
@@ -306,9 +278,8 @@ void main() {
       const item = ShowcaseItem('nlight', 'test/nlight.fscene', 'n field');
       final scene = loadShowcaseScene(
         item,
-        bytesFor: (key) => key == item.assetKey
-            ? utf8.encode(writeFscene(doc))
-            : null,
+        bytesFor: (key) =>
+            key == item.assetKey ? utf8.encode(writeFscene(doc)) : null,
       );
       expect(scene, isNotNull);
       final light = scene!.document.nodes.values.firstWhere(
@@ -372,8 +343,7 @@ void main() {
       // UV-set lane: the uv1 twin's texture transform selects set 1,
       // and its vertex payload really carries a nonzero uv1 channel.
       final uv1 = materialOf('materials.uv1').properties;
-      final transform =
-          (uv1['baseColorTextureTransform'] as MapValue).values;
+      final transform = (uv1['baseColorTextureTransform'] as MapValue).values;
       expect((transform['texCoord'] as IntValue).value, 1);
       final uv1Node = doc.nodes.values.firstWhere(
         (n) => n.name == 'materials.uv1',
@@ -407,11 +377,12 @@ void main() {
 
       // HDR env lane: the payload environment resolves to a real
       // equirect file (hdr on this host — non-iOS pick).
-      final envRes = doc.resources[doc.stage.environmentRef]!
-          as EnvironmentResource;
+      final envRes =
+          doc.resources[doc.stage.environmentRef]! as EnvironmentResource;
       expect(envRes.environment, isA<PayloadEnvironment>());
-      final envPayload =
-          doc.payload((envRes.environment as PayloadEnvironment).payload)!;
+      final envPayload = doc.payload(
+        (envRes.environment as PayloadEnvironment).payload,
+      )!;
       expect(envPayload.format, 'hdr');
       expect(envPayload.bytes, isNotEmpty);
     });
