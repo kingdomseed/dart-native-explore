@@ -58,7 +58,6 @@ dartnative:
     - assets/dice/scene.d10u.86203b0d.fsceneb
     - assets/dice/scene.d12.a5cbecd0.fsceneb
     - assets/dice/scene.d20.a5fdb0b1.fsceneb
-    - assets/dice/dice_faces.json
     - assets/showcase/dash.fsceneb
     - assets/showcase/fcar.fsceneb
     - assets/showcase/dn_logo.fsceneb

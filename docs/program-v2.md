@@ -202,6 +202,23 @@ scaffolding, not the demo.
       fling toss; sweep from a die. Input is `GestureDetector` on the
       scene view (`Listener` hides/doesn't reach it on Android). A142
       evidence `docs/artifacts/p3-dr2/`; iOS device check pending.
+      **DartNative set** on `p3-dartnative-dice-set`: the example's dice
+      are the look-dev DartNative set, built procedurally in Dart
+      (`dice_polyhedra.dart` geometry + numbering, `dice_numerals.dart`
+      atlas from Inter outlines, `dice_set.dart` mesh/material): smoky
+      frosted translucent shell, the P4 logo inside each die held level
+      as a soft glow, near-white numerals in dark keylines; d20 at 21%
+      of the short side; deep-indigo felt tray with the gradient rim.
+      Real-time gaps (both documented, smallest honest approximation):
+      no refraction/blur — the frost is alpha-blended smoke on both
+      natives (SceneKit has no refraction; Filament screen-space
+      transmission untried to keep one path), so the logo reads sharp
+      but dim rather than frost-blurred; dart3d's Android blended
+      variants didn't cull back faces (far side showed through the
+      numerals) — fixed natively (explicit `CullingMode.BACK`). Two
+      point lights hung the A142's GPU (Vulkan, 60 s frames) — not
+      used. A142 evidence `docs/artifacts/p3-dartnative-set/`; iOS
+      device check pending.
 - [ ] P4 Hero launch scene + 3D DartNative logo. Logo landed (#26).
       Hero (M0) landed on `p4-hero-scene` (#31; spec
       `docs/design/hero-scene-brief.md`; `lib/hero_screen.dart`,

@@ -284,16 +284,19 @@ ThrowPlan planThrow({
   for (final (i, o) in offsets.indexed) {
     final p = spawn + o;
     final speed = aimSpeed(s) * (0.9 + rng.nextDouble() * 0.2);
-    final target = touchdown + o;
+    // Keep the cluster's shape, but every die touches down inside the
+    // tray — a wide cluster in a narrow tray would land its outer dice
+    // beyond the side walls.
+    final target = layout.clampInside(touchdown + o, radii[i] * 1.3);
     final flat = Vector3(target.x - p.x, 0, target.z - p.z);
     final dist = max(flat.length, maxR);
     final t = dist / speed;
     final g = gravity;
     // Lift that touches down (centre one radius up) at `target` after
-    // `t`, jittered 0–15% longer (never short: the lane's entry edge is
+    // `t`, jittered 0–7% longer (never short: the lane's entry edge is
     // right behind), never reaching the ceiling.
     var vy =
-        (0.5 * g * t * t - (h0 - radii[i])) / t * (1 + rng.nextDouble() * 0.15);
+        (0.5 * g * t * t - (h0 - radii[i])) / t * (1 + rng.nextDouble() * 0.07);
     vy = vy.clamp(0.0, sqrt(2 * g * max(ceilingClear - h0, 1.0)));
     final heading = flat.normalized();
     final scatter = (rng.nextDouble() - 0.5) * 2.2 * kUpstreamUnit;

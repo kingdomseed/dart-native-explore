@@ -408,7 +408,7 @@ loads each die live (`--dart-define=DART3D_MODEL=<die>` for headless).
 The user-facing demo: seven dice as prefab instances (composeScene
 host-side → one flat doc), felt-lined tray with rails inside a wooden
 table, tap-select → `raycast` → `materialsVariants` swap, user-driven
-rolls, face readout from bundled `dice_faces.json`. Authored mm-scale —
+rolls, face readout from the procedural dice set (`dice_set.dart`). Authored mm-scale —
 the imported dice are Ø23–33 units, so the world runs g=-9800 with a
 120Hz `fixedTimestep`; throw energy is real-scale (~±1600 u/s lateral,
 ~30–60 rad/s tumble).

@@ -5,9 +5,10 @@
 // ignore_for_file: implementation_imports
 
 import 'dart:math';
-import 'dart:typed_data';
 
-import 'package:dart3d/src/scene_model.dart';
+import 'package:dart3d_example/dice_numerals.dart';
+import 'package:dart3d_example/dice_polyhedra.dart';
+import 'package:dart3d_example/dice_set.dart';
 import 'package:dart3d_example/dice_settle.dart';
 import 'package:dart3d_example/dice_shard_d4.dart';
 import 'package:dart3d_example/dice_table_scene.dart';
@@ -33,37 +34,34 @@ const gravity = 30 * kUpstreamUnit;
 Quaternion faceUp(Vector3 n, double yaw) =>
     Quaternion.axisAngle(Vector3(0, 1, 0), yaw) * faceUpRotation(n);
 
+final DieGeo shardGeo = buildDieGeo('d4');
+
+/// The shard's face map.
+final DieFaceMap shardFaceMap = DieFaceMap(
+  faces: [for (final f in shardGeo.numbered) DieFace(f.normal, f.value!)],
+);
+
 /// The shard's long faces as (mesh-space direction of image-right +u,
-/// of image-up −v, face normal), solved from each quad's UVs.
+/// of image-up −v, face normal), solved from the drawn mesh's UVs on
+/// each face's first flat triangle.
 List<(Vector3, Vector3, Vector3)> shardFaceFrames() {
-  final doc = SceneDocument();
-  addShardD4(doc);
-  final vp = doc.payloads.values.firstWhere(
-    (p) => p.encoding == PayloadEncoding.vertexBuffer,
-  );
-  final bd = ByteData.sublistView(vp.bytes!);
-  Vector3 v3(int i, int o) => Vector3(
-    bd.getFloat32(i * 72 + o, Endian.little),
-    bd.getFloat32(i * 72 + o + 4, Endian.little),
-    bd.getFloat32(i * 72 + o + 8, Endian.little),
-  );
-  Vector2 uv(int i) => Vector2(
-    bd.getFloat32(i * 72 + 24, Endian.little),
-    bd.getFloat32(i * 72 + 28, Endian.little),
-  );
+  final mesh = buildDieMesh(shardGeo, buildDieAtlas(shardGeo));
+  final p = mesh.positions, t = mesh.uvs, n = mesh.normals;
   final out = <(Vector3, Vector3, Vector3)>[];
-  // The four long faces are the first 16 vertices, 4 per quad.
-  for (var q = 0; q < 4; q++) {
-    final b = q * 4;
-    final p0 = v3(b, 0), p1 = v3(b + 1, 0), p3 = v3(b + 3, 0);
-    final t0 = uv(b), t1 = uv(b + 1), t3 = uv(b + 3);
-    // Solve the linear map (du, dv) → position over the quad.
-    final e1 = p1 - p0, e2 = p3 - p0;
-    final a = t1 - t0, c = t3 - t0;
-    final det = a.x * c.y - a.y * c.x;
-    final dPdu = (e1 * c.y - e2 * a.y) / det;
-    final dPdv = (e2 * a.x - e1 * c.x) / det;
-    out.add((dPdu.normalized(), (-dPdv).normalized(), v3(b, 12)));
+  for (final f in shardGeo.numbered) {
+    for (var i = 0; i < mesh.indices.length; i += 3) {
+      final a = mesh.indices[i], b = mesh.indices[i + 1];
+      final c = mesh.indices[i + 2];
+      if ([a, b, c].any((k) => n[k].dot(f.normal) < 0.99999)) continue;
+      // Solve the linear map (du, dv) → position over the triangle.
+      final e1 = p[b] - p[a], e2 = p[c] - p[a];
+      final d1 = t[b] - t[a], d2 = t[c] - t[a];
+      final det = d1.x * d2.y - d1.y * d2.x;
+      final dPdu = (e1 * d2.y - e2 * d1.y) / det;
+      final dPdv = (e2 * d1.x - e1 * d2.x) / det;
+      out.add((dPdu.normalized(), (-dPdv).normalized(), f.normal));
+      break;
+    }
   }
   return out;
 }

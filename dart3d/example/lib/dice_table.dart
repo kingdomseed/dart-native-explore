@@ -16,6 +16,7 @@
 library;
 
 import 'dart:async';
+import 'dart:isolate';
 import 'dart:math';
 
 import 'package:dart3d/dart3d.dart';
@@ -24,6 +25,7 @@ import 'package:dartnative/dartnative.dart';
 import 'package:vector_math/vector_math.dart' hide Colors;
 
 import 'back_chevron.dart';
+import 'dice_obsidian_tray.dart';
 import 'dice_settle.dart';
 import 'dice_shard_d4.dart';
 import 'dice_table_scene.dart';
@@ -168,20 +170,48 @@ class _DiceTableScreenState extends State<DiceTableScreen>
   @override
   void initState() {
     super.initState();
-    final scene = buildDiceTable(
-      bytesFor: loadAssetBytes,
-      log: dnLog,
-      spec: _spec,
-    );
+    unawaited(_build());
+  }
+
+  /// Builds the table off the UI isolate — the dice's atlases and meshes
+  /// take about a second on a phone — then loads it.
+  Future<void> _build() async {
+    final logo = loadAssetBytes(kLogoAsset);
+    final spec = _spec;
+    final sw = Stopwatch()..start();
+    var messages = <String>[];
+    DiceTableScene? scene;
+    try {
+      (scene, messages) = await Isolate.run(() {
+        final log = <String>[];
+        final s = buildDiceTable(
+          bytesFor: (key) => key == kLogoAsset ? logo : null,
+          log: log.add,
+          spec: spec,
+        );
+        return (s, log);
+      });
+    } catch (e) {
+      dnLog('dart3d: dice table — background build failed ($e); inline');
+      scene = buildDiceTable(bytesFor: loadAssetBytes, log: dnLog, spec: spec);
+    }
+    messages.forEach(dnLog);
+    dnLog('dart3d: dice table ready after ${sw.elapsedMilliseconds} ms');
+    if (!mounted) return;
     if (scene == null) {
-      _status = 'Couldn’t build the table — see log';
+      setState(() => _status = 'Couldn’t build the table — see log');
       return;
     }
     _scene = scene;
     _layout = scene.layout;
+    final load = Stopwatch()..start();
     _controller.loadDocument(scene.document);
+    dnLog(
+      'dart3d: dice table handed to the view in '
+      '${load.elapsedMilliseconds} ms',
+    );
     _events = _controller.physicsEvents.listen(_onPhysicsEvent);
-    _status = _hint;
+    setState(() => _status = _hint);
   }
 
   @override
@@ -244,11 +274,29 @@ class _DiceTableScreenState extends State<DiceTableScreen>
       for (final p in poses) {
         _poses[p.node] = p;
       }
+      if (_held.isEmpty) _levelLogos();
       if (_gates.isNotEmpty) _checkGates();
       if (_turning != null) _stepTurn();
     } finally {
       _poseInFlight = false;
     }
+  }
+
+  /// Holds every logo level, reading side up, whatever its die is doing
+  /// — a gimbal: its local rotation is the die's inverse times its
+  /// fixed world facing. [rotations] overrides the cached poses (dice we
+  /// just placed ourselves).
+  void _levelLogos([Map<LocalId, Quaternion>? rotations]) {
+    final scene = _scene;
+    if (scene == null) return;
+    final writes = <NodeTransform>[];
+    for (final die in scene.dice) {
+      final logo = die.logo;
+      final q = rotations?[die.node] ?? _poses[die.node]?.rotation;
+      if (logo == null || q == null) continue;
+      writes.add(NodeTransform(logo, rotation: die.logoLocalRotation(q)));
+    }
+    if (writes.isNotEmpty) _controller.setNodeTransforms(writes);
   }
 
   // MARK: - Touch
@@ -398,6 +446,10 @@ class _DiceTableScreenState extends State<DiceTableScreen>
           rotation: plan.dice[i].rotation,
         ),
     ]);
+    _levelLogos({
+      for (final (i, die) in scene.dice.indexed)
+        die.node: plan.dice[i].rotation,
+    });
     for (final (i, die) in scene.dice.indexed) {
       final l = plan.dice[i];
       _controller.setBodyVelocity(
@@ -582,6 +634,10 @@ class _DiceTableScreenState extends State<DiceTableScreen>
       final p = h.from + (at - h.from) * lift;
       final q = Quaternion.axisAngle(h.spinAxis, h.spinRate * age) * h.rot;
       writes.add(NodeTransform(h.die.node, translation: p, rotation: q));
+      final logo = h.die.logo;
+      if (logo != null) {
+        writes.add(NodeTransform(logo, rotation: h.die.logoLocalRotation(q)));
+      }
       _controller.setBodyVelocity(
         h.die.node,
         linear: carry * lift,
@@ -674,6 +730,7 @@ class _DiceTableScreenState extends State<DiceTableScreen>
     for (final p in event.poses) {
       _poses[p.node] = p;
     }
+    if (_held.isEmpty) _levelLogos();
     if (!_rolling || _now - _rollStart < _minSettle || _held.isNotEmpty) {
       return;
     }
@@ -906,6 +963,7 @@ class _DiceTableScreenState extends State<DiceTableScreen>
       _poses[die.node] = ScenePose(die.node, at, die.restRotation);
     }
     _controller.setNodeTransforms(writes);
+    _levelLogos();
     setState(() {
       _values.clear();
       _total = null;
@@ -931,14 +989,16 @@ class _DiceTableScreenState extends State<DiceTableScreen>
     if (key == _fitKey) return;
     _fitKey = key;
     _view = size;
+    final ppu = trayPxPerUnit(size.shortestSide);
+    final rim = kRimReach * ppu;
     _layout = TrayLayout.fit(
       width: size.width,
       height: size.height,
-      pxPerUnit: trayPxPerUnit(size.shortestSide),
-      insetLeft: insets.left,
-      insetTop: insets.top,
-      insetRight: insets.right,
-      insetBottom: insets.bottom,
+      pxPerUnit: ppu,
+      insetLeft: insets.left + rim,
+      insetTop: insets.top + rim,
+      insetRight: insets.right + rim,
+      insetBottom: insets.bottom + rim,
     );
     final cam = _layout.camera;
     _gates = const {};
@@ -959,6 +1019,12 @@ class _DiceTableScreenState extends State<DiceTableScreen>
         translation: _layout.ceiling.position,
         rotation: _layout.ceiling.rotation,
       ),
+      for (final (i, rim) in rimPoses(_layout).indexed)
+        NodeTransform(
+          scene.rimNodes[i],
+          translation: rim.translation,
+          scale: rim.scale,
+        ),
     ]);
     dnLog(
       'dart3d: dice tray fit ${size.width.toStringAsFixed(0)}x'
