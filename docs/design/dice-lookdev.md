@@ -19,22 +19,23 @@ straight down, so every set now has a top-down in-app view as its primary
 render, and every set has to pass a measured readability gate on that view
 (§0.2).
 
-| # | Set | Environment | Top-down (primary) | Hero | d4 close-up |
-|---|---|---|---|---|---|
-| 0 | **DartNative** (example app) | Obsidian tray (recommended of 3) | [topdown](dice-lookdev/dartnative-a-topdown.jpg) · [real-time](dice-lookdev/dartnative-a-rt-topdown.jpg) | [hero](dice-lookdev/dartnative-a-hero.jpg) | [d20](dice-lookdev/dartnative-a-d20.jpg), [d4](dice-lookdev/dartnative-a-d4.jpg) |
-| 1 | **Emberforged** | The Forge Hearth | [topdown](dice-lookdev/emberforged-topdown.jpg) | [hero](dice-lookdev/emberforged-hero.jpg) | [d4](dice-lookdev/emberforged-d4.jpg) |
-| 2 | **Frostbound** | The Frozen Altar | [topdown](dice-lookdev/frostbound-topdown.jpg) | [hero](dice-lookdev/frostbound-hero.jpg) | [d4](dice-lookdev/frostbound-d4.jpg) |
-| 3 | **Arcane Study** | The Night Study | [topdown](dice-lookdev/arcane-topdown.jpg) | [hero](dice-lookdev/arcane-hero.jpg) | [d4](dice-lookdev/arcane-d4.jpg) |
-| 4 | **Fate Engine** | The Fate Engine | [topdown](dice-lookdev/fateengine-topdown.jpg) | [hero](dice-lookdev/fateengine-hero.jpg) | [d4](dice-lookdev/fateengine-d4.jpg) |
-| 5 | Celestial Observatory | The Star Balcony | [topdown](dice-lookdev/celestial-topdown.jpg) | [hero](dice-lookdev/celestial-hero.jpg) | [d4](dice-lookdev/celestial-d4.jpg) |
-| 6 | Hearthside Tome | Fireside Reading | [topdown](dice-lookdev/hearthside-topdown.jpg) | [hero](dice-lookdev/hearthside-hero.jpg) | [d4](dice-lookdev/hearthside-d4.jpg) |
-| 7 | Old Road | The Wayfarer's Table | [topdown](dice-lookdev/oldroad-topdown.jpg) | [hero](dice-lookdev/oldroad-hero.jpg) | [d4](dice-lookdev/oldroad-d4.jpg) |
-| 8 | Northfield Relay | Kitchen Table, 1986 | [topdown](dice-lookdev/northfield-topdown.jpg) | [hero](dice-lookdev/northfield-hero.jpg) | [d4](dice-lookdev/northfield-d4.jpg) |
-| 9 | Voltline | Rain Counter | [topdown](dice-lookdev/voltline-topdown.jpg) | [hero](dice-lookdev/voltline-hero.jpg) | [d4](dice-lookdev/voltline-d4.jpg) |
-| 10 | Vermilion Court | Lantern Pavilion | [topdown](dice-lookdev/vermilion-topdown.jpg) | [hero](dice-lookdev/vermilion-hero.jpg) | [d4](dice-lookdev/vermilion-d4.jpg) |
-| 11 | Gemcutter | The Jeweler's Bench | [topdown](dice-lookdev/gemcutter-topdown.jpg) | [hero](dice-lookdev/gemcutter-hero.jpg) | [d4](dice-lookdev/gemcutter-d4.jpg) |
+| # | Set | Environment | Top-down (primary) | Hero | d4 close-up | Room (§3b) |
+|---|---|---|---|---|---|---|
+| 0 | **DartNative** (example app) | Obsidian tray (recommended of 3) | [topdown](dice-lookdev/dartnative-a-topdown.jpg) · [real-time](dice-lookdev/dartnative-a-rt-topdown.jpg) | [hero](dice-lookdev/dartnative-a-hero.jpg) | [d20](dice-lookdev/dartnative-a-d20.jpg), [d4](dice-lookdev/dartnative-a-d4.jpg) | — |
+| 1 | **Emberforged** | The Forge Hearth | [topdown](dice-lookdev/emberforged-topdown.jpg) | [hero](dice-lookdev/emberforged-hero.jpg) | [d4](dice-lookdev/emberforged-d4.jpg) | [room](dice-lookdev/emberforged-room.jpg) |
+| 2 | **Frostbound** | The Frozen Altar | [topdown](dice-lookdev/frostbound-topdown.jpg) | [hero](dice-lookdev/frostbound-hero.jpg) | [d4](dice-lookdev/frostbound-d4.jpg) | [room](dice-lookdev/frostbound-room.jpg) |
+| 3 | **Arcane Study** | The Night Study | [topdown](dice-lookdev/arcane-topdown.jpg) | [hero](dice-lookdev/arcane-hero.jpg) | [d4](dice-lookdev/arcane-d4.jpg) | [room](dice-lookdev/arcane-room.jpg) |
+| 4 | **Fate Engine** | The Fate Engine | [topdown](dice-lookdev/fateengine-topdown.jpg) | [hero](dice-lookdev/fateengine-hero.jpg) | [d4](dice-lookdev/fateengine-d4.jpg) | [room](dice-lookdev/fateengine-room.jpg) |
+| 5 | Celestial Observatory | The Star Balcony | [topdown](dice-lookdev/celestial-topdown.jpg) | [hero](dice-lookdev/celestial-hero.jpg) | [d4](dice-lookdev/celestial-d4.jpg) | [room](dice-lookdev/celestial-room.jpg) |
+| 6 | Hearthside Tome | Fireside Reading | [topdown](dice-lookdev/hearthside-topdown.jpg) | [hero](dice-lookdev/hearthside-hero.jpg) | [d4](dice-lookdev/hearthside-d4.jpg) | [room](dice-lookdev/hearthside-room.jpg) |
+| 7 | Old Road | The Wayfarer's Table | [topdown](dice-lookdev/oldroad-topdown.jpg) | [hero](dice-lookdev/oldroad-hero.jpg) | [d4](dice-lookdev/oldroad-d4.jpg) | [room](dice-lookdev/oldroad-room.jpg) |
+| 8 | Northfield Relay | Kitchen Table, 1986 | [topdown](dice-lookdev/northfield-topdown.jpg) | [hero](dice-lookdev/northfield-hero.jpg) | [d4](dice-lookdev/northfield-d4.jpg) | [room](dice-lookdev/northfield-room.jpg) |
+| 9 | Voltline | Rain Counter | [topdown](dice-lookdev/voltline-topdown.jpg) | [hero](dice-lookdev/voltline-hero.jpg) | [d4](dice-lookdev/voltline-d4.jpg) | [room](dice-lookdev/voltline-room.jpg) |
+| 10 | Vermilion Court | Lantern Pavilion | [topdown](dice-lookdev/vermilion-topdown.jpg) | [hero](dice-lookdev/vermilion-hero.jpg) | [d4](dice-lookdev/vermilion-d4.jpg) | [room](dice-lookdev/vermilion-room.jpg) |
+| 11 | Gemcutter | The Jeweler's Bench | [topdown](dice-lookdev/gemcutter-topdown.jpg) | [hero](dice-lookdev/gemcutter-hero.jpg) | [d4](dice-lookdev/gemcutter-d4.jpg) | [room](dice-lookdev/gemcutter-room.jpg) |
 
-Sheets: `all-sets-topdown.jpg` (every set as the phone shows it),
+Sheets: `all-rooms.jpg` (the eleven game-room establishing shots, §3b),
+`all-sets-topdown.jpg` (every set as the phone shows it),
 `all-sets-hero.jpg` (heroes), `readability-crops.jpg` (the seven dice of
 every set at phone pixels, 1:1). Per set: `<theme>-topdown.jpg`
 (1179×2556, iPhone portrait, straight down with the app's fov),
