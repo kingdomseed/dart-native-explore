@@ -1,16 +1,7 @@
-"""Emberforged environment: "The Forge Hearth".
-
-A cast-iron tray bolted onto a basalt forge slab. Faint lava seams in the
-tray floor, a coal brazier and an ember bowl behind the back wall, a sooty
-brick forge wall, rising sparks and warm smoke. The play area itself stays
-dark and matte so the glowing dice own the frame.
-"""
+"""Emberforged: a broadside dice tray on the worktable of a lived-in smithy."""
 from __future__ import annotations
 
 import math
-import random
-
-from mathutils import Vector
 
 import env_common as E
 import env_props as P
@@ -18,24 +9,6 @@ import room_common as RC
 
 W, D = E.TRAY_W, E.TRAY_D
 RIM_T, RIM_H = 2.4, 3.4
-
-
-def basalt_floor():
-    m, k = E.material("Forge floor basalt")
-    obj = k.coords().outputs["Object"]
-    grain = k.noise(obj, 0.9, 10, 0.62).outputs["Fac"]
-    base = k.ramp(grain, [(0.3, (0.018, 0.016, 0.015)), (0.7, (0.05, 0.045, 0.04))])
-    seams = k.voronoi(k.mix(0.25, obj, k.noise(obj, 0.2, 3).outputs["Color"], "LINEAR_LIGHT"), 0.06,
-                      feature="DISTANCE_TO_EDGE")
-    seam = k.math("LESS_THAN", seams.outputs["Distance"], 0.005)
-    mask = k.math("GREATER_THAN", k.noise(obj, 0.05, 2).outputs["Fac"], 0.5)
-    glow = k.math("MULTIPLY", seam, mask)
-    bump = k.bump(grain, 0.5, 0.2)
-    bump = k.bump(k.math("SUBTRACT", 1.0, seam), 0.6, 0.15, normal=bump)
-    s = k.bsdf(Base_Color=base, Roughness=0.86, Normal=bump,
-               Emission_Color=(1.0, 0.22, 0.02, 1), Emission_Strength=k.math("MULTIPLY", glow, 1.0))
-    k.surface(s)
-    return m
 
 
 def iron(name="Blackened iron", heat=True):
@@ -51,72 +24,10 @@ def iron(name="Blackened iron", heat=True):
     return m
 
 
-def coal():
-    m, k = E.material("Live coal")
-    obj = k.coords().outputs["Object"]
-    cr = k.voronoi(obj, 3.0, feature="DISTANCE_TO_EDGE")
-    crack = k.math("LESS_THAN", cr.outputs["Distance"], 0.06)
-    heat = k.noise(obj, 0.8, 3).outputs["Fac"]
-    col = k.ramp(heat, [(0.35, (0.9, 0.12, 0.01)), (0.7, (1.0, 0.5, 0.08))])
-    strength = k.math("MULTIPLY", k.math("ADD", crack, k.math("MULTIPLY", heat, 0.25)), 14.0)
-    s = k.bsdf(Base_Color=(0.02, 0.018, 0.017, 1), Roughness=0.9, Emission_Color=col, Emission_Strength=strength)
-    k.surface(s)
-    return m
-
-
-def flame_volume(strength=18.0):
-    """Surface flame (emission + transparency): reads as fire at a fraction of a volume's cost."""
-    return RC.fire_material(strength)
-
-
-def brick_wall():
-    m, k = E.material("Forge brick")
-    obj = RC.vertical_coords(k)
-    b = k.node("ShaderNodeTexBrick")
-    k.link(obj, b.inputs["Vector"])
-    k.set(b, Scale=0.06, Mortar_Size=0.02, Color1=(0.12, 0.05, 0.03, 1), Color2=(0.07, 0.03, 0.02, 1),
-          Mortar=(0.01, 0.01, 0.01, 1))
-    n = k.noise(obj, 0.3, 8, 0.6).outputs["Fac"]
-    soot = k.mix(k.math("MULTIPLY", n, 0.9), b.outputs["Color"], (0.005, 0.005, 0.005, 1))
-    bump = k.bump(b.outputs["Fac"], 0.7, 0.8)
-    k.surface(k.bsdf(Base_Color=soot, Roughness=0.9, Normal=bump))
-    return m
-
-
-def brazier(scene, x, y, z, r=5.5, seed=3, coals=26, flames=5):
-    im = iron("Brazier iron")
-    bowl = E.cylinder("brazier_bowl", r * 0.55, r * 0.7, (x, y, z + 8.5), im, r2=r, cap=True)
-    mod = bowl.modifiers.new("solid", "SOLIDIFY")
-    mod.thickness = 0.5
-    for i in range(3):
-        a = math.radians(120 * i + 30)
-        leg = E.cylinder(f"brazier_leg{i}", 0.35, 9.5, (x + math.cos(a) * r * 0.55, y + math.sin(a) * r * 0.55,
-                                                        z + 4.6), im, segs=12)
-        leg.rotation_euler = (math.sin(a) * 0.18, -math.cos(a) * 0.18, 0)
-    E.cylinder("brazier_ring", r * 0.62, 0.5, (x, y, z + 3.0), im, segs=48)
-    cm = coal()
-    rng = random.Random(seed)
-    for i in range(coals):
-        a, rr = rng.uniform(0, 6.28), r * 0.78 * math.sqrt(rng.random())
-        E.rock(f"coal{i}", rng.uniform(0.9, 1.6), (x + math.cos(a) * rr, y + math.sin(a) * rr,
-                                                   z + 8.8 + rng.uniform(0, 1.0)), cm, seed=i + seed * 100,
-               squash=(1, 1, 0.75), subdiv=2)
-    fm = flame_volume()
-    for i in range(flames):
-        a, rr = rng.uniform(0, 6.28), rng.uniform(0, r * 0.4)
-        h = rng.uniform(5, 9)
-        fl = E.sphere(f"flame{i}", 1.0, (x + math.cos(a) * rr, y + math.sin(a) * rr, z + 9.5 + h * 0.45), fm, subdiv=3,
-                 scale=(rng.uniform(1.8, 2.8), rng.uniform(1.8, 2.8), h))
-        fl.visible_shadow = False
-    E.light(scene, "POINT", "brazier_light", (x, y, z + 13), 9000, color=(1.0, 0.45, 0.14), size=3.0)
-    E.light(scene, "POINT", "brazier_coal_light", (x, y, z + 10), 2500, color=(1.0, 0.3, 0.06), size=4.0)
-
-
 def build(scene):
     E.world(scene, color=(0.004, 0.003, 0.003), strength=1.0)
-    # Basalt forge slab and the room floor.
-    slab_m = basalt_floor()
-    E.cube("forge_slab", (W + 46, D + 36, 6), (0, 0, -3.0), slab_m, bevel=0.6)
+    from assets import forge_plate
+    forge_plate.build(width=W + 4.8, depth=D + 4.8, thickness=1.2)
     # Tray: forged iron plate with an engraved forge sigil, ringed by a molten channel.
     sigil = P.mask_texture("forge_sigil", P.sigil_strokes(seed=5, points=5, runes=20,
                                                           rings=(0.47, 0.455, 0.37, 0.2), w=0.003),
@@ -164,35 +75,6 @@ def build(scene):
     for i, (x, y) in enumerate(E.rounded_rect(W + RIM_T, D + RIM_T, 3.0, seg=2)[::1]):
         E.sphere(f"rivet{i}", 0.35, (x, y, RIM_H + 0.05), rv, subdiv=2, scale=(1, 1, 0.6))
 
-    # Props behind the back wall.
-    brazier(scene, -13.0, D / 2 + 13, 0.0, r=5.8)
-    brazier(scene, 17.0, D / 2 + 8, 0.0, r=3.6, seed=9, coals=12, flames=3)
-    # anvil beside the tray
-    ax, ay = W / 2 + 9, -6
-    E.cube("anvil_foot", (5.5, 7, 3.5), (ax, ay, 1.75), im2 := iron("Anvil iron"), bevel=0.4)
-    E.cube("anvil_waist", (3.6, 5, 3), (ax, ay, 4.8), im2, bevel=0.3)
-    E.cube("anvil_face", (5, 11, 2.5), (ax, ay, 7.5), im2, bevel=0.3)
-    horn = E.cylinder("anvil_horn", 1.25, 5.5, (ax, ay - 8.2, 7.5), im2, segs=24, r2=0.15)
-    horn.rotation_euler = (math.radians(90), 0, 0)
-    E.light(scene, "POINT", "anvil_glint", (ax - 6, ay - 4, 20), 300, color=(1.0, 0.5, 0.2), size=2)
-    # tongs + ingots on the slab edge
-    for i in range(3):
-        E.cube(f"ingot{i}", (5.0, 2.2, 1.4), (-16.5 + i * 0.4, -D / 2 - 6.5 + i * 2.5 * 0, 0.7 + i * 1.4), im2,
-               bevel=0.3).rotation_euler = (0, 0, 0.12 * i)
-    t1 = E.cylinder("tong_a", 0.25, 26, (19.5, -4, 0.6), im2, segs=8)
-    t1.rotation_euler = (math.radians(90), 0, math.radians(8))
-    t2 = E.cylinder("tong_b", 0.25, 26, (20.5, -4, 0.6), im2, segs=8)
-    t2.rotation_euler = (math.radians(90), 0, math.radians(-4))
-
-    # Atmosphere: sparks rising off the brazier, drifting embers, warm smoke.
-    spark = E.emissive("Spark", (1.0, 0.45, 0.08), 60.0)
-    E.scatter("sparks", 140, ((-22, D / 2 + 4, 14), (-4, D / 2 + 22, 55)), 0.06, spark, seed=4,
-              stretch=lambda p, r: Vector((r.uniform(-0.3, 0.3), r.uniform(-0.3, 0.3), 1)) * r.uniform(4, 12))
-    ember = E.emissive("Drift ember", (1.0, 0.35, 0.05), 30.0)
-    E.scatter("embers", 90, ((-30, -30, 4), (30, 40, 30)), 0.09, ember, seed=5,
-              avoid=lambda p: abs(p.x) < W / 2 and abs(p.y) < D / 2 and p.z < 60)
-    E.haze_box("smoke", (150, 150, 70), (0, 10, 35), 0.0035, color=(1.0, 0.8, 0.65), noise_scale=0.03)
-
     # Lights: warm soft key over the tray, cold rim for separation.
     E.light(scene, "AREA", "key", (-14, -22, 46), 6500, color=(1.0, 0.85, 0.72), size=22, target=(0, 0, 0))
     E.light(scene, "AREA", "cold_rim", (26, 30, 18), 2200, color=(0.35, 0.5, 1.0), size=18, target=(0, 0, 0))
@@ -200,80 +82,142 @@ def build(scene):
 
     rc = room(scene)
     return dict(
-        samples=160, exposure=0.1, topdown=dict(width=W + 2 * RIM_T + 1.0), hero=dict(dist=32, elev=26, az=-8, lens=70, fstop=2.8),
+        samples=160, exposure=-1.15, topdown=dict(width=W + 2 * RIM_T + 1.0), hero=dict(dist=32, elev=26, az=-8, lens=70, fstop=2.8),
+        hero_layout={
+            "d20": ((-1.8, -1.0), 20, 0), "d12": ((2.6, 10.0), 12, 12),
+            "d10u": ((3.2, -11.5), 0, -15), "d10t": ((3.0, 4.0), 0, 20),
+            "d8": ((-1.7, -9.5), 8, -10), "d6": ((3.2, -3.0), 6, 18),
+            "d4": ((-0.4, 6.0), 4, 58),
+        },
         play_view=True, tray_half=(W / 2 + RIM_T, D / 2 + RIM_T),
         room_cam=rc,
     )
 
 
 def room(scene):
-    """The smithy around the forge slab (concept: room-concepts/emberforged-room).
+    """Full-scale smithy, built facing local -Y and turned broadside to the tray."""
+    from assets import (anvil, barrel, book, candles, ember_bowl, forge, fur_throw,
+                        geometry as G, lantern, leaded_window, leather_mat, loose_hardware, masonry, materials as M,
+                        oak_table, pouch, shelf, shield, stone_steps, strongbox, table_tools, tool_rack, vessel)
+    import bpy
 
-    Light from four sides: the forge mouth (warm, strong, back-left), moonlight
-    through the leaded window (cool, back-right), two hanging lanterns (warm,
-    above the table and over the workbench on the right), and the tray's own
-    key and cold rim from the front. The oak work-table carries the forge slab.
-    """
-    wall = RC.stone("Smithy stone", (0.06, 0.05, 0.045), (0.2, 0.17, 0.14), scale=0.018)
-    floor = RC.stone("Flagstones", (0.03, 0.027, 0.024), (0.08, 0.07, 0.06), scale=0.012, rough=0.8, vertical=False)
-    RC.shell(half_w=200, back=190, front=-170, height=260, wall=wall, floor=floor,
-             openings={"back": [(105, 40, 56, 80)]})
-    im = iron("Room iron")
-    wood = P.dark_wood("Smithy oak", c1=(0.035, 0.018, 0.009), c2=(0.11, 0.055, 0.028))
-    RC.beams(wood, n=3)
-    RC.work_table(170, 115, top_z=-6.0, thick=9, mat=wood, leg_r=6)
-    # the forge: a brick mouth full of fire with a hood up to the beams
-    RC.fireplace(scene, "back", -110, w=150, h=120, depth=60, mat=brick_wall(), energy=500000, mantel=False,
-                 opening=(0.62, 0.5), color=(1.0, 0.42, 0.12), fire_scale=1.3, seed=2,
-                 flame=flame_volume(strength=8.0))
-    # a floor anvil on its stump in front of the forge, a quench tub beside it
-    stump = P.dark_wood("Stump", c1=(0.04, 0.02, 0.01), c2=(0.09, 0.05, 0.025))
-    E.cylinder("anvil_stump", 22, 50, (-165, 105, RC.FLOOR_Z + 25), stump, segs=24, bevel=1.5)
-    ax, ay, az = -165, 105, RC.FLOOR_Z + 50
-    E.cube("big_anvil_foot", (26, 34, 10), (ax, ay, az + 5), im, bevel=1.0)
-    E.cube("big_anvil_waist", (16, 22, 12), (ax, ay, az + 16), im, bevel=1.0)
-    E.cube("big_anvil_face", (24, 50, 11), (ax, ay, az + 27), im, bevel=1.0)
-    horn = E.cylinder("big_anvil_horn", 5.5, 26, (ax, ay - 37, az + 27), im, segs=24, r2=0.6)
-    horn.rotation_euler = (math.radians(90), 0, 0)
-    RC.barrel(-40, 150, r=24, h=45, mat=wood)
-    E.cylinder("quench_water", 22, 1, (-40, 150, RC.FLOOR_Z + 42), E.simple("Quench water", (0.01, 0.012, 0.015),
-                                                                           0.05), segs=32)
-    # tool wall between the forge and the window: tongs and hammers on a rail
-    E.cylinder("tool_rail", 1.2, 110, (15, 184, 50), im, segs=12).rotation_euler = (0, math.radians(90), 0)
-    rng = random.Random(21)
-    for i in range(12):
-        x = -35 + i * 9.0
-        L = rng.uniform(35, 55)
-        E.cylinder("tool_handle", 0.9, L, (x, 182, 50 - L / 2), im, segs=8)
-        if i % 3 == 0:
-            E.cube("hammer_head", (8, 4, 4), (x, 182, 50 - L), im, bevel=0.5)
-        else:
-            E.cube("tong_jaw", (2.5, 2.5, 7), (x, 182, 50 - L - 3), im)
-    RC.wall_shelf("back", 15, 95, w=110, seed=4, kind="mixed",
-                  palette=[(0.12, 0.08, 0.05), (0.2, 0.1, 0.04), (0.06, 0.06, 0.06), (0.25, 0.18, 0.1)])
-    # the leaded window: moon over a sleeping town, cool light pouring in
-    night = RC.sky("Smithy night", (0.02, 0.03, 0.09), (0.09, 0.11, 0.22), stars=2.0, strength=0.6,
-                   skyline=((0.008, 0.01, 0.02), 0.28))
-    RC.window("back", 105, 40, 56, 80, night, E.simple("Lead came", (0.02, 0.02, 0.02), 0.5, 0.6),
-              mullions=(4, 5), moon=(8, 18, 28), glow=(70000, (0.5, 0.62, 1.0)), bar=1.0)
-    # the workbench on the right with a fur throw, a strongbox and a lantern over it
-    E.cube("workbench", (65, 150, 7), (160, 60, -12), wood, bevel=0.5)
-    for sx in (-1, 1):
-        for sy in (-1, 1):
-            E.cube("bench_leg", (8, 8, 58), (160 + sx * 25, 60 + sy * 65, RC.FLOOR_Z + 29), wood)
-    fur = E.simple("Fur throw", (0.12, 0.09, 0.07), 0.95, Sheen_Weight=1.0)
-    E.rock("fur", 26, (158, 30, -5), fur, seed=3, squash=(1.0, 1.4, 0.3), strength=0.25)
-    E.cube("strongbox", (26, 30, 20), (160, 105, 1.5), im, bevel=1.0)
-    RC.wall_shelf("right", 60, 70, w=130, seed=7, kind="jars",
-                  palette=[(0.15, 0.1, 0.06), (0.25, 0.15, 0.08), (0.08, 0.06, 0.05)])
-    RC.hanging_lantern(scene, 150, 55, 55, energy=50000, mat=im)
-    # lanterns along the back wall wash the stone (the concept's lantern row)
-    RC.hanging_lantern(scene, -10, 165, 105, energy=50000, mat=im)
-    RC.hanging_lantern(scene, 60, 165, 100, energy=40000, mat=im)
-    # lantern over the play table: a warm top light from above-right (off the phone frame)
-    RC.hanging_lantern(scene, 40, -25, 75, energy=9000, mat=im)
-    # barrels and a sack pile on the left, a stool at the front
-    for x, y in ((-165, 30), (-172, -15), (-150, 70)):
-        RC.barrel(x, y, r=21, h=72, mat=wood)
-    RC.chair(-70, -75, rot=math.radians(35), mat=wood, back_h=0.1, seat_h=48, w=40)
-    return dict(loc=(12, -48, 28), target=(-6, 60, -3), lens=20, fstop=4.0, focus=(0, 0, 2))
+    before = set(bpy.data.objects)
+    wood = (0.095, 0.038, 0.013)
+    floor_z = RC.FLOOR_Z
+    oak_table.build("Player work table", loc=(0, -6, floor_z), width=136, depth=72,
+                    height=74.8, thickness=7, wood_tone=wood, seed=2)
+    masonry.build("Smithy back wall", loc=(0, 160, floor_z), width=470, height=265,
+                  openings=((108, 26.5, 104, 119),), tone=(0.105, 0.10, 0.085))
+    masonry.build("Left return", loc=(-235, 30, floor_z), rot_z=math.pi / 2,
+                  width=270, height=265, tone=(0.09, 0.086, 0.074), seed=21)
+    floor = M.stone("Worn flagstones", (0.064, 0.056, 0.043), wear=0.6, seed=18)
+    E.cube("Room flagstone floor", (475, 650, 5), (0, 25, floor_z - 2.5), floor, bevel=0.3)
+    forge.build(loc=(-98, 123, floor_z), width=120, depth=62, height=235,
+                energy=240000, stone_tone=(0.048, 0.045, 0.04), seed=12, hearth_height=30, mouth_spring=32)
+    anvil.build(loc=(-32, 83, floor_z), rot_z=-0.12, length=68, stump_height=49, seed=8)
+    barrel.build("Quench tub", loc=(-2, 126, floor_z), radius=24, height=48, open_top=True, water=True, seed=9)
+    barrel.build("Left cask", loc=(-158, 69, floor_z), radius=24, height=83, seed=6)
+    barrel.build("Rear cask", loc=(-178, 118, floor_z), radius=24, height=87, seed=12)
+    barrel.build("Right cask", loc=(175, 91, floor_z), radius=25, height=83, seed=14)
+    tool_rack.build(loc=(-18, 158, -52), width=70, height=74, seed=7)
+    shield.build(loc=(-36, 159, 35), radius=22, seed=5)
+    shelf.build("Shelves beside tools", loc=(44, 160, -12), width=44, levels=2, spacing=34, seed=4)
+    shelf.build("Right shelves", loc=(190, 160, -12), width=65, levels=3, spacing=32, seed=21)
+    leaded_window.build(loc=(108, 160, -45), width=80, height=110, energy=65000, seed=9, moon_height=0.30, exterior_slope=0.35, moon_offset=0.8)
+    oak_table.build("Back workbench", loc=(97, 122, floor_z), width=130, depth=76, height=62,
+                    thickness=6, wood_tone=(0.1, 0.04, 0.016), seed=8)
+    fur_throw.build(loc=(85, 106.5, -13.9), width=52, length=83, drop=38, tone=(0.115, 0.078, 0.043), seed=12)
+    strongbox.build(loc=(89, 144, -14), width=30, depth=24, height=25, seed=3)
+    candles.build(loc=(45, 112, -14), height=12, radius=1.8, energy=1800, seed=5)
+    lantern.build("Bench lantern", loc=(60, 145, -14), height=35, radius=9, chain_length=0, energy=13500)
+    lantern.build("Forge-side hanging lantern", loc=(-25, 145, -8), height=32, radius=8, chain_length=137, energy=28000)
+    lantern.build("Window-side hanging lantern", loc=(58, 151, -12), height=34, radius=8, chain_length=139, energy=22000)
+    lantern.build("Above-table lantern", loc=(31, 10, 65), height=32, radius=7, chain_length=65, energy=900)
+    vessel.build("Foreground chased goblet", loc=(-35, 21, -1.2), height=18, radius=5.1, seed=8)
+    book.build(loc=(-40, 3, -0.83), rot_z=-0.12, width=17, depth=24, thickness=5, seed=9)
+    pouch.build(loc=(35, 24, -1.2), radius=6, height=11, seed=4)
+    ember_bowl.build(loc=(36.5, 9.5, -1.2), radius=8.5, height=4.5, energy=70, seed=5)
+    leather_mat.build(loc=(-43, 6, -1.17), rot_z=0.1, width=24, depth=31, seed=4)
+    loose_hardware.build(loc=(43, 12, -1.2), rot_z=-0.3, length=14, seed=9)
+    table_tools.build("Table tongs", loc=(0, 25, -1.2), length=45, seed=6)
+    dressing = G.Asset("Smithy fixtures")
+    im = M.metal("Smithy chains", wear=0.7)
+    beam_wood = M.oak("Roof timber", (0.07, 0.028, 0.012), axis="Z", seed=4)
+    for x in (-220, -35, 52, 173):
+        dressing.block("Roof post", (13, 12, 260), (x, 163, floor_z + 130), beam_wood, 0.65)
+    dressing.block("Wall head beam", (468, 16, 18), (0, 153, 161), beam_wood, 0.8)
+    for x in (-20, 31, 61):
+        dressing.block("Lantern supporting joist", (14, 280, 18), (x, 80, 161), beam_wood, 0.7)
+    for x, z, length in ((-196, 124, 73), (-171, 119, 86), (37, 81, 62), (182, 112, 62)):
+        G.chain(dressing, "Hanging smithy chain", (x, 153, z), length, im, radius=1.55)
+    dressing.light("Warm room bounce", (-55, 56, 65), 90000, (1, 0.58, 0.31), 100,
+                   target=(0, 158, 15), kind="AREA")
+    dressing.light("Window bench bounce", (145, 120, 55), 5500, (0.40, 0.52, 1), 65,
+                   target=(120, 115, 10), kind="AREA")
+    tool_fill = dressing.light("Forge reflection on tools", (-56, 94, 42), 28000, (1, 0.55, 0.25), 45,
+                   target=(8, 156, -5), kind="AREA")
+    tool_fill.visible_glossy = True
+    tool_fill.data.specular_factor = 1
+    dressing.light("Bench lantern reflected warmth", (70, 71, 42), 15000, (1, 0.68, 0.4), 45,
+                   target=(110, 110, -8), kind="AREA")
+    dressing.light("Anvil forge-side sheen", (-72, 48, 39), 15000, (1, 0.56, 0.28), 35,
+                   target=(-30, 82, 0), kind="AREA")
+    sheen = dressing.light("Forge reflection on anvil", (-53, 126, 37), 35000, (1, 0.71, 0.44), 55,
+                           target=(-32, 83, 3), kind="AREA")
+    sheen.visible_glossy = True
+    sheen.visible_transmission = False
+    sheen.data.specular_factor = 1
+    soot_rake = dressing.light("Warm grazing light on soot", (-150, 60, 60), 20000, (1, 0.68, 0.42), 55,
+                               target=(-98, 108, 5), kind="AREA")
+    moon_fill = dressing.light("Moon reflection on work station", (126, 140, 48), 40000, (0.30, 0.46, 1), 60,
+                               target=(-12, 110, -8), kind="AREA")
+    moon_fill.visible_glossy = True
+    moon_fill.visible_transmission = False
+    moon_fill.data.specular_factor = 1
+    table_bounce = dressing.light("Lantern table bounce", (-20, 4, 38), 6500, (1, 0.69, 0.4), 38,
+                                  target=(0, 12, -1.2), kind="AREA")
+    table_bounce.visible_glossy = True
+    table_bounce.data.specular_factor = 1
+    foreground = {"Player work table", "Foreground chased goblet", "Leather book", "Coin pouch",
+                  "Ember bowl", "Tooled leather mat", "Loose iron hardware", "Table tongs", "Above-table lantern"}
+    for ob in set(bpy.data.objects) - before:
+        if ob.parent is None and ob.name not in foreground:
+            ob.location.y += 70
+            ob.location.z -= 40
+    table_bounce.location.y -= 70
+    table_bounce.location.z += 40
+    bpy.data.objects["Above-table lantern"].location.z -= 40
+    platform = G.Asset("Player floor platform")
+    platform.block("Raised stone floor", (475, 270, 40), (0, -85, floor_z - 20), floor, 0.3)
+    stone_steps.build("Work bay steps", loc=(0, 50, floor_z - 40), width=440, tread=15, rise=10, count=4)
+    receivers = bpy.data.collections.new("Table lantern receivers")
+    for ob in set(bpy.data.objects) - before:
+        if ob.type in {"MESH", "CURVE"}:
+            receivers.objects.link(ob)
+    receivers.objects.link(bpy.data.objects["forge_slab"])
+    table_bounce.light_linking.receiver_collection = receivers
+    hearth_objects = set(bpy.data.objects["Stone forge"].children_recursive)
+    hearth_receivers = bpy.data.collections.new("Soot surface illumination")
+    for ob in hearth_objects:
+        if ob.type in {"MESH", "CURVE"}:
+            hearth_receivers.objects.link(ob)
+    furnishings = bpy.data.collections.new("Room fill without washing the hearth")
+    for ob in receivers.objects:
+        if ob not in hearth_objects:
+            furnishings.objects.link(ob)
+    moon_receivers = bpy.data.collections.new("Cool work station reflections")
+    for name in ("Anvil", "Quench tub", "Tool wall", "Smithy back wall", "Shelves beside tools"):
+        for ob in bpy.data.objects[name].children_recursive:
+            if ob.type in {"MESH", "CURVE"}:
+                moon_receivers.objects.link(ob)
+    group = G.Asset("Emberforged room frame", rot_z=-math.pi / 2)
+    for ob in set(bpy.data.objects) - before:
+        if ob.type == "LIGHT":
+            ob.data.energy *= 7.0
+            ob.light_linking.receiver_collection = (moon_receivers if ob == moon_fill else
+                                                   hearth_receivers if ob == soot_rake else receivers if ob in hearth_objects else furnishings)
+        if ob != group.root and ob.parent is None:
+            group.add(ob)
+    # Blender's optical calculation uses metres even in a centimetre scene.
+    return dict(loc=(-34, 0, 34), target=(65, 0, -33), lens=30,
+                fstop=4 * scene.unit_settings.scale_length, focus=(0, 0, 1.4))
