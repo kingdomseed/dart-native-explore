@@ -56,6 +56,17 @@ class _DiceTableScreenState extends State<DiceTableScreen> {
   StreamSubscription<ScenePhysicsEvent>? _events;
   Timer? _settleTimer;
 
+  /// Bumped by every roll and reset, so a pose read or settle event that
+  /// belongs to an earlier throw (or to the rack drop) is never shown as
+  /// this roll's result.
+  int _rollId = 0;
+  final _sinceRoll = Stopwatch();
+
+  /// A real throw can't settle faster than this; a settle event inside the
+  /// window was already in flight from native before the roll (the racked
+  /// dice going to sleep) and is dropped.
+  static const _minSettle = Duration(milliseconds: 250);
+
   DiceTableScene? _scene;
   final _values = <LocalId, int>{};
 
@@ -100,7 +111,9 @@ class _DiceTableScreenState extends State<DiceTableScreen> {
   /// armed) — racking and refitting also wake and settle the dice, but
   /// they don't produce a result.
   void _onPhysicsEvent(ScenePhysicsEvent event) {
-    if (event is SceneSettledEvent && (_settleTimer?.isActive ?? false)) {
+    if (event is SceneSettledEvent &&
+        (_settleTimer?.isActive ?? false) &&
+        _sinceRoll.elapsed >= _minSettle) {
       _read(event.poses, source: 'settled');
     }
   }
@@ -210,6 +223,10 @@ class _DiceTableScreenState extends State<DiceTableScreen> {
         angularRate: w.length,
       );
     }
+    _rollId++;
+    _sinceRoll
+      ..reset()
+      ..start();
     _settleTimer?.cancel();
     _settleTimer = Timer(_settleTimeout, _settleFallback);
     setState(() {
@@ -222,8 +239,9 @@ class _DiceTableScreenState extends State<DiceTableScreen> {
 
   /// No settle event within upstream's 8 s: read the poses as they are.
   Future<void> _settleFallback() async {
+    final id = _rollId;
     final poses = await _controller.poses();
-    if (!mounted) return;
+    if (!mounted || id != _rollId) return;
     _read(poses, source: 'timeout');
   }
 
@@ -232,6 +250,7 @@ class _DiceTableScreenState extends State<DiceTableScreen> {
   void _reset() {
     final scene = _scene;
     if (scene == null) return;
+    _rollId++;
     _settleTimer?.cancel();
     final slots = _layout.rack(scene.dice.length, rackSpacingFor(scene.dice));
     final writes = <NodeTransform>[];
