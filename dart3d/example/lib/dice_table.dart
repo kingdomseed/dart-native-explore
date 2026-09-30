@@ -989,14 +989,16 @@ class _DiceTableScreenState extends State<DiceTableScreen>
     if (key == _fitKey) return;
     _fitKey = key;
     _view = size;
+    final ppu = trayPxPerUnit(size.shortestSide);
+    final rim = kRimReach * ppu;
     _layout = TrayLayout.fit(
       width: size.width,
       height: size.height,
-      pxPerUnit: trayPxPerUnit(size.shortestSide),
-      insetLeft: insets.left,
-      insetTop: insets.top,
-      insetRight: insets.right,
-      insetBottom: insets.bottom,
+      pxPerUnit: ppu,
+      insetLeft: insets.left + rim,
+      insetTop: insets.top + rim,
+      insetRight: insets.right + rim,
+      insetBottom: insets.bottom + rim,
     );
     final cam = _layout.camera;
     _gates = const {};

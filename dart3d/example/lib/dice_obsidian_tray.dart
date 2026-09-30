@@ -38,6 +38,10 @@ const kDnGradient = [
 // ever covers the rim.
 const double kRimWidth = 0.9, kRimOffset = kRimWidth / 2;
 
+/// How far the rim reaches past the play edge. The play area is inset by
+/// this much so the rim keeps clear of the screen edges and the chrome.
+const double kRimReach = kRimOffset + kRimWidth / 2;
+
 /// Corner radius of the rim.
 const double kRimCorner = 9.0;
 
