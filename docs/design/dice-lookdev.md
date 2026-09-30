@@ -1054,18 +1054,35 @@ cabinet, chair, barrel, beams); each `build_env_<set>.py` only composes it
 in a `room(scene)` that returns the room camera. Render one with
 `render_set.py --theme <set> --shots topdown,room --check`.
 
+Round 2 (operator: "blocky, sparse primitives"): furniture and props are
+now modeled assets in `tool/dice_lookdev/assets/` (one module per asset,
+`build(name, loc, rot_z, **params) -> root`, shared procedural PBR in
+`assets/materials.py`, turntable checks with `assets/preview_asset.py`;
+see `assets/README.md`), built by Codex (gpt-6-astra) and art-directed
+against the concepts. Each room is re-blocked from its concept: the tray
+is shot broadside and carries the frame, table dressing frames it in the
+foreground corners, and the room reads at mid-distance behind it.
+
 Lighting recipes (the tray lights are unchanged unless noted):
 
-- **Emberforged — the smithy.** Forge mouth back-left (area light at the
-  mouth, 500 kW, 1.0/0.42/0.12, plus a shadowless inner glow): the warm
-  key on the room and a grazing back-light on the tray. Leaded window
-  back-right (area, 70 kW, 0.5/0.62/1.0): cool moonlight, the counter
-  colour. Three iron cage lanterns (40–50 kW, warm) wash the back wall and
-  the workbench on the right; a fourth hangs above-right of the table (9
-  kW) as a top light outside the phone frame. Stone walls, flagstones,
-  oak beams and table, floor anvil, tool rail, barrels. Camera: seated
-  eye height, 20 mm, f/4 on the tray. Gate: numeral 5.17 (d12), die vs
-  tray 2.38, stroke 0.121–0.130, PASS.
+- **Emberforged — the smithy (round 2, the quality bar).** Shot broadside
+  like the concept: camera out along −x, 40 cm above the table, 25° down,
+  50 mm, f/8, the tray spanning ~78% of the frame with its near rim at the
+  bottom edge. The tray sits on a 1.2 cm hammered forge plate on a heavy
+  oak table (`oak_table`), dressed with a pewter goblet, a tooled
+  leather mat and tome, a coin pouch, loose chain and a copper bowl of
+  glowing ember crystals, all ≥10 cm clear of the rim. Behind, left to
+  right: the arched forge (`forge`: hewn sooty ashlar, fractured coal bed
+  with buried heat, layered flame tongues; its fire lights the arch and
+  floor, 62.5 kW), the London-pattern anvil on a bark log stump, the tool
+  rack, shelves of vessels, a bench with candles, a lantern and the fur
+  hide, and the leaded window with the moon (18 kW, cool) at the back-
+  right; three chain-hung cage lanterns (18 kW each) make pools on the
+  back wall and a small one above the table (0.9 kW) adds a warm top
+  light. Fill was cut so the light comes in pools (forge falloff, lantern
+  pools, moon edge) and the corners fall into shadow; exposure −1.15.
+  Tray lights unchanged. Gate: numeral 8.51 (d12), die vs tray 2.20,
+  stroke 0.121–0.130, PASS.
 
 - **Frostbound — the frozen altar hall.** Room floor is the snow ground
   (z −14); frost-stone walls, eight granite pillars, glowing ice

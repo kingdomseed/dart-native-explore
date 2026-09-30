@@ -121,6 +121,52 @@ def flame(name="Flame", strength=3):
     return m
 
 
+
+def forge_flame(name="Forge flame", strength=28):
+    m, k = E.material(name)
+    uv = k.coords().outputs["UV"]
+    sep = k.node("ShaderNodeSeparateXYZ")
+    k.link(uv, sep.inputs[0])
+    height = sep.outputs["Y"]
+    col = k.ramp(height, [(0, (1, 0.92, 0.48)), (0.14, (1, 0.65, 0.08)),
+                          (0.42, (1, 0.19, 0.007)), (0.76, (0.75, 0.028, 0.001)),
+                          (1, (0.35, 0.003, 0.0003))])
+    edge = k.math("POWER", k.math("MAXIMUM", 0, k.math("SINE", k.math("MULTIPLY", sep.outputs["X"], 3.141593))), 0.7)
+    fade = k.ramp(height, [(0, (0, 0, 0)), (0.055, (0.78, 0.78, 0.78)), (0.25, (0.86, 0.86, 0.86)),
+                           (0.65, (0.38, 0.38, 0.38)), (0.98, (0, 0, 0))])
+    mapping = k.node("ShaderNodeVectorMath")
+    mapping.operation = "MULTIPLY"
+    k.link(uv, mapping.inputs[0])
+    mapping.inputs[1].default_value = (3, 7, 1)
+    n = k.noise(mapping.outputs[0], 1.6, 2, 0.6, dist=0.4).outputs["Fac"]
+    wisps = k.ramp(n, [(0.22, (0.06, 0.06, 0.06)), (0.48, (0.7, 0.7, 0.7)), (0.74, (1, 1, 1))])
+    opacity = k.math("MULTIPLY", k.math("MULTIPLY", edge, fade), wisps)
+    transparent = k.node("ShaderNodeBsdfTransparent").outputs[0]
+    heat = k.ramp(height, [(0, (1, 1, 1)), (0.22, (0.6, 0.6, 0.6)),
+                           (0.55, (0.15, 0.15, 0.15)), (1, (0.035, 0.035, 0.035))])
+    k.surface(k.mix_shader(opacity, transparent, k.emission(col, k.math("MULTIPLY", strength, heat))))
+    return m
+
+
+def coal(name="Cracked coke", heat=1):
+    m, k = E.material(name)
+    vec = k.coords().outputs["Generated"]
+    sep = k.node("ShaderNodeSeparateXYZ")
+    k.link(vec, sep.inputs[0])
+    n = k.noise(vec, 5, 3).outputs["Fac"]
+    cracks = k.voronoi(vec, 2.4, feature="DISTANCE_TO_EDGE").outputs["Distance"]
+    cracks = k.ramp(cracks, [(0, (1, 1, 1)), (0.018, (0.65, 0.65, 0.65)), (0.038, (0, 0, 0))])
+    crust = k.ramp(sep.outputs["Z"], [(0, (1, 1, 1)), (0.36, (0.8, 0.8, 0.8)),
+                                     (0.66, (0.13, 0.13, 0.13)), (0.85, (0.08, 0.08, 0.08))])
+    glow = k.math("MULTIPLY", k.math("MULTIPLY", cracks, crust), 15 * heat)
+    col = k.ramp(n, [(0.2, (0.0008, 0.0006, 0.0005)), (0.65, (0.003, 0.0024, 0.002)),
+                     (0.85, (0.008, 0.006, 0.004))])
+    k.surface(k.bsdf(Base_Color=col, Roughness=0.98, Specular_IOR_Level=0.08,
+                     Normal=k.bump(n, 0.6, 0.16),
+                     Emission_Color=(1, 0.055 + heat * 0.29, 0.003 + heat * 0.018, 1),
+                     Emission_Strength=glow))
+    return m
+
 def glass(name="Lantern glass", tone=(0.8, 0.56, 0.3), reflection=0.16):
     m, k = E.material(name)
     pane = k.bsdf(Base_Color=(*tone, 1), Roughness=0.13, Transmission_Weight=1, IOR=1.46)

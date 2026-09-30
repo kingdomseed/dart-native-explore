@@ -2,6 +2,8 @@
 
 Arguments after --: --asset anvil --out <path under dice_lookdev/out>.
 The unlettered scale bar is 10 cm long with 1 cm divisions.
+Use --target, --extent and --direction for detail views; --studio-strength
+allows inspection of emissive assets under their own light.
 """
 import argparse
 import importlib
@@ -25,6 +27,12 @@ def run():
     parser.add_argument("--out", default=str(HERE / "out" / "r2" / "assets"))
     parser.add_argument("--params", default="{}")
     parser.add_argument("--elevation", type=float, default=0.83)
+    parser.add_argument("--target", type=float, nargs=3)
+    parser.add_argument("--direction", type=float, nargs=3)
+    parser.add_argument("--exposure", type=float, default=0)
+    parser.add_argument("--view", default="AgX")
+    parser.add_argument("--extent", type=float)
+    parser.add_argument("--studio-strength", type=float, default=1.0)
     args = parser.parse_args(sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else [])
     out = Path(args.out).resolve()
     if not out.is_relative_to(HERE / "out"):
@@ -77,9 +85,18 @@ def run():
         direction = Vector((-0.32, -1.7, 0.18))
     else:
         direction = Vector((-0.95, -1.5, args.elevation))
+    if args.target is not None:
+        center = Vector(args.target)
+    if args.extent is not None:
+        extent = args.extent
+    for name in ("Softbox", "Cool strip", "Front fill"):
+        bpy.data.objects[name].data.energy *= args.studio_strength
+    scene.world.node_tree.nodes.get("Background").inputs["Strength"].default_value *= args.studio_strength
+    if args.direction is not None:
+        direction = Vector(args.direction)
     camera_loc = center + direction * extent
     camera = E.camera(scene, "Studio", camera_loc, center, lens=50)
-    E.setup_cycles(scene, samples=32, res=(800, 650), view="AgX")
+    E.setup_cycles(scene, samples=32, res=(800, 650), view=args.view, exposure=args.exposure)
     E.render_to(scene, camera, out / f"{args.asset}.png", out / f"{args.asset}.jpg")
     print(f"dice_lookdev: asset {args.asset}: {triangles:,} evaluated triangles, bounds {tuple(round(v, 2) for v in upper-lower)} cm")
 

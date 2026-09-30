@@ -27,6 +27,31 @@ def fire_tongue(a, name, loc, radius, height, mat, lean=0, phase=0):
     return ob
 
 
+
+def flame_sheet(a, loc, width, height, mat, lean, phase, angle):
+    rows, columns = 21, 7
+    verts, uv = [], []
+    for j in range(rows):
+        t = j / (rows - 1)
+        breadth = width * (0.48 + 0.7 * math.sin(math.pi * t)) * (1 - t) ** 0.7 + 0.005
+        curl = lean * t * t + width * math.sin(t * 9 + phase) * t * 0.65
+        for i in range(columns):
+            u = i / (columns - 1)
+            x = curl + (u * 2 - 1) * breadth
+            y = width * (math.sin(t * 7 + phase) * t * 0.5 + math.sin(u * math.pi) * 0.45)
+            verts.append((loc[0] + x * math.cos(angle) - y * math.sin(angle),
+                          loc[1] + x * math.sin(angle) + y * math.cos(angle), loc[2] + t * height))
+            uv.append((u, t))
+    faces = [(j * columns + i, j * columns + i + 1,
+              (j + 1) * columns + i + 1, (j + 1) * columns + i)
+             for j in range(rows - 1) for i in range(columns - 1)]
+    ob = a.mesh("Licking flame sheet", verts, faces, mat, smooth=True)
+    layer = ob.data.uv_layers.new(name="Flame height and edge")
+    for loop in ob.data.loops:
+        layer.data[loop.index].uv = uv[loop.vertex_index]
+    ob.visible_shadow = False
+    return ob
+
 def build(name="Stone forge", loc=(0, 0, 0), rot_z=0, width=150, depth=65, height=230,
           stone_tone=(0.09, 0.085, 0.072), wear=0.85, seed=2, energy=380000,
           hearth_height=65, mouth_spring=43) -> bpy.types.Object:
@@ -50,7 +75,7 @@ def build(name="Stone forge", loc=(0, 0, 0), rot_z=0, width=150, depth=65, heigh
                          (x + w / 2, -depth / 2 + rng.uniform(-0.7, 0.7), (row + 0.5) * (hearth - 4) / 4),
                          rng.choice(stones), 1.0, wear, rng.randrange(100000))
             x += w
-    a.hewn_block("Worn hearth lip", (width + 10, depth + 14, 5), (0, -4, hearth - 1.5), stones[3], 1.2, wear, seed)
+    a.hewn_block("Worn hearth lip", (width + 10, depth + 14, 5), (0, -4, hearth - 1.5), soot[3], 1.2, wear, seed)
     side_w = width / 2 - radius
     for side in (-1, 1):
         a.block("Recessed pier mortar", (side_w - 2, depth - 3, spring - hearth),
@@ -108,54 +133,57 @@ def build(name="Stone forge", loc=(0, 0, 0), rot_z=0, width=150, depth=65, heigh
                          soot[3] if abs(x) < w * 0.26 else rng.choice(soot[:2]),
                          0.9, wear, rng.randrange(100000))
         z += h
-    coal, k = E.material(f"{name} cracked coke")
-    vec = k.coords().outputs["Generated"]
-    veins = k.node("ShaderNodeTexVoronoi")
-    veins.feature = "DISTANCE_TO_EDGE"
-    k.link(vec, veins.inputs["Vector"])
-    veins.inputs["Scale"].default_value = 1.8
-    crack = k.math("LESS_THAN", veins.outputs["Distance"], 0.011)
-    sep = k.node("ShaderNodeSeparateXYZ")
-    k.link(vec, sep.inputs[0])
-    crust = k.ramp(sep.outputs["Z"], [(0.1, (1, 1, 1)), (0.5, (0.18, 0.18, 0.18)), (0.8, (0.015, 0.015, 0.015))])
-    n = k.noise(vec, 5, 3).outputs["Fac"]
-    col = k.ramp(n, [(0.15, (0.001, 0.0008, 0.0006)), (0.7, (0.004, 0.003, 0.002)), (0.9, (0.012, 0.010, 0.008))])
-    glow = k.math("MULTIPLY", k.math("MULTIPLY", crack, k.math("ADD", 0.04, crust)), 5)
-    k.surface(k.bsdf(Base_Color=col, Roughness=0.92, Normal=k.bump(n, 0.6, 0.35),
-                     Emission_Color=(1, 0.16, 0.007, 1), Emission_Strength=glow))
-    cold_coal = coal.copy()
-    cold_coal.name = f"{name} cooled coal crust"
-    for node in cold_coal.node_tree.nodes:
-        if node.type == "BSDF_PRINCIPLED":
-            emission = node.inputs["Emission Strength"]
-            for link in list(emission.links):
-                cold_coal.node_tree.links.remove(link)
-            emission.default_value = 0
-    ember = E.emissive(f"{name} buried ember cores", (1, 0.08, 0.002), 3.2)
-    for layer in range(3):
-        for row in range(6 - layer):
-            for col in range(11 - layer * 2):
-                if layer and abs(col - (10 - layer * 2) / 2) > (4 - layer) + rng.uniform(-1, 1):
-                    continue
-                x = (col - (10 - layer * 2) / 2) * 6.1 * scale + rng.uniform(-2.2, 2.2)
-                y = (row - (5 - layer) / 2) * 6.3 + 1 + layer * 1.7 + rng.uniform(-2, 2)
-                z = hearth + 2.6 + layer * 3.5 + rng.uniform(-1.1, 1.1)
-                r = rng.uniform(3.2, 4.6) * scale
-                coal_finish = cold_coal if rng.random() < 0.1 + layer * 0.30 else coal
-                a.add(E.rock("Heaped charcoal crust", r, (x, y, z), coal_finish, seed=seed * 1000 + col + row * 20 + layer * 200,
-                             subdiv=2, squash=(1.15, 1, 0.8), strength=0.35))
-                if layer == 0:
-                    a.sphere("Buried hot core", r * 0.65, (x, y, z - 0.5), ember, subdiv=1)
-    fire = M.flame(f"{name} flame", 4.5)
-    for i, (x, y, h, r) in enumerate(((-22, 0, 13, 4.6), (-12, 5, 26, 6), (1, 1, 38, 6.8),
-                                    (13, 6, 21, 5), (25, 0, 12, 3.9), (-3, -8, 16, 4))):
-        fire_tongue(a, "Twisting fire tongue", (x * scale, y, hearth + 8), r * scale, h * scale,
-                    fire, rng.uniform(-8, 8), rng.uniform(0, 6))
-    spark = E.emissive(f"{name} spark", (1, 0.28, 0.012), 5)
-    for i in range(6):
-        x, y, z = rng.uniform(-23, 23) * scale, rng.uniform(-8, 8), hearth + rng.uniform(23, 58)
-        a.tube("Rising spark", [(x, y, z), (x + 0.2, y, z + rng.uniform(0.35, 0.9))], 0.06, spark, resolution=1)
-    a.light("Forge mouth glow", (0, -depth * 0.20, hearth + 20), energy, (1, 0.34, 0.07), 11)
-    a.light("Forge warm spill", (0, -depth * 0.7, hearth + 15), energy * 0.5, (1, 0.45, 0.17),
-            38, target=(20, -130, 10), kind="AREA")
+    stone_receivers = bpy.data.collections.new(f"{name} firelit masonry")
+    for ob in a.root.children_recursive:
+        if ob.type == "MESH":
+            stone_receivers.objects.link(ob)
+    rng = random.Random(seed + 403)
+    coal_materials = [M.coal(f"{name} coke heat {i}", heat) for i, heat in enumerate((0, 0.24, 0.65, 1))]
+    ember_materials = [E.emissive(f"{name} buried heat {i}", color, strength)
+                       for i, (color, strength) in enumerate((((1, 0.025, 0.001), 2.5),
+                                                              ((1, 0.16, 0.006), 7),
+                                                              ((1, 0.38, 0.016), 9)))]
+    bed_radius, bed_depth = radius * 0.91, depth * 0.31
+    spacing = width * 0.042
+    for row in range(-5, 6):
+        for col in range(-6, 7):
+            x = (col + (row % 2) * 0.5) * spacing + rng.uniform(-0.25, 0.25) * spacing
+            y = row * spacing + 2 + rng.uniform(-0.25, 0.25) * spacing
+            distance = (x / bed_radius) ** 2 + ((y - 2) / bed_depth) ** 2
+            if distance > 1:
+                continue
+            mound = max(0, 1 - distance) * 3.2 * scale
+            z = hearth + 2.1 + mound
+            r = spacing * rng.uniform(0.64, 0.9)
+            hot = 2 if distance < 0.34 else 1 if distance < 0.72 else 0
+            a.add(E.rock("Buried incandescent coke", r * 0.86, (x, y, z - 0.55), ember_materials[hot],
+                         seed=seed * 1000 + row * 20 + col, subdiv=1, squash=(1, 1, 0.42), strength=0.3))
+            material = coal_materials[0 if rng.random() < 0.2 else hot + 1]
+            ob = a.add(E.rock("Black fractured coal crust", r, (x, y, z + 0.45), material,
+                             seed=seed * 2000 + row * 20 + col, subdiv=1,
+                             squash=(rng.uniform(0.85, 1.3), rng.uniform(0.8, 1.25), rng.uniform(0.38, 0.62)), strength=0.42))
+            for face in ob.data.polygons:
+                face.use_smooth = False
+    fire = M.forge_flame(f"{name} furnace flame", 20)
+    for i in range(30):
+        x = rng.uniform(-0.76, 0.76) * radius
+        y = rng.uniform(-depth * 0.20, depth * 0.19)
+        arch_height = mouth_spring * scale + math.sqrt(max(0, radius ** 2 - x ** 2))
+        h = (arch_height - 5) * (rng.uniform(0.57, 0.98) if i < 12 else rng.uniform(0.18, 0.55))
+        flame_sheet(a, (x, y, hearth + 3.1 + scale), rng.uniform(2.1, 4.2) * scale, h,
+                    fire, rng.uniform(-4.5, 4.5) * scale, rng.uniform(0, math.tau), rng.uniform(-0.7, 0.7))
+    spark = E.emissive(f"{name} spark", (1, 0.38, 0.016), 12)
+    for i in range(7):
+        x, y = rng.uniform(-0.65, 0.65) * radius, rng.uniform(-depth * 0.25, 0)
+        z = hearth + rng.uniform(8, 18) * scale + mouth_spring * scale
+        a.tube("Rising spark", [(x, y, z), (x + 0.3 * scale, y, z + rng.uniform(0.7, 1.8) * scale)],
+               0.085 * scale, spark, resolution=1)
+    a.light("Forge mouth glow", (0, -depth * 0.10, hearth + 5), energy, (1, 0.24, 0.022), 3.5 * scale)
+    a.light("Forge inner arch glow", (0, -depth * 0.22, hearth + 10 * scale), energy * 0.35,
+            (1, 0.37, 0.055), 5 * scale, target=(0, 0, spring + radius), kind="AREA")
+    a.light("Forge warm spill", (0, -depth * 0.62, hearth + 7), energy * 0.5, (1, 0.28, 0.04),
+            16 * scale, target=(20, -130, 10), kind="AREA")
+    for ob in a.root.children_recursive:
+        if ob.type == "LIGHT":
+            ob.light_linking.receiver_collection = stone_receivers
     return a.root

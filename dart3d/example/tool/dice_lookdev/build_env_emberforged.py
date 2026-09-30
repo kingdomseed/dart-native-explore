@@ -117,16 +117,16 @@ def room(scene):
     foreground = set(bpy.data.objects) - before
 
     masonry.build("Smithy back wall", loc=(0, 218, bay_z), width=350, height=255,
-                  openings=((-48.5, 50, 44, 60), (77, 10.5, 84, 74)), tone=(0.15, 0.135, 0.105))
+                  openings=((-48.5, 50, 44, 60), (77, 10.5, 84, 74)), tone=(0.085, 0.06, 0.038))
     masonry.build("Left return", loc=(-175, 50, bay_z), rot_z=math.pi / 2,
-                  width=335, height=255, tone=(0.12, 0.105, 0.083), seed=21)
+                  width=335, height=255, tone=(0.065, 0.046, 0.029), seed=21)
     floor = M.stone("Worn flagstones", (0.064, 0.056, 0.043), wear=0.6, seed=18)
     E.cube("Room flagstone floor", (350, 500, 5), (0, 70, bay_z - 2.5), floor, bevel=0.3)
     platform = G.Asset("Player floor platform")
     platform.block("Raised stone floor", (350, 290, 54), (0, -45, floor_z - 27), floor, 0.3)
     stone_steps.build("Work bay steps", loc=(110, 100, bay_z - 14), width=60, tread=15, rise=9, count=6)
     forge.build(loc=(-44, 204, bay_z), rot_z=0.18, width=70, depth=50, height=215,
-                energy=75000, stone_tone=(0.048, 0.045, 0.04), seed=12,
+                energy=62500, stone_tone=(0.048, 0.036, 0.024), seed=12,
                 hearth_height=50, mouth_spring=22)
     anvil.build(loc=(29, 187, bay_z), rot_z=math.pi + 0.08, length=55, stump_height=49, seed=8)
     barrel.build("Quench tub", loc=(-89, 156, bay_z), radius=19, height=48,
@@ -137,7 +137,7 @@ def room(scene):
     shield.build(loc=(-91, 215, -38), radius=19, seed=5)
     shelf.build("High smithy shelf", loc=(-5, 217, -33), width=59, levels=1, spacing=30, count=4, seed=4)
     shelf.build("Right shelves", loc=(147, 217, -67), width=40, levels=2, spacing=28, seed=21)
-    leaded_window.build(loc=(77, 218, -105), width=60, height=65, reveal=14, energy=42000,
+    leaded_window.build(loc=(77, 218, -105), width=60, height=65, reveal=14, energy=18000, stone_tone=(0.075, 0.061, 0.042),
                          seed=9, moon_height=0.8, moon_offset=0.6, exterior_slope=0.47)
     oak_table.build("Back workbench", loc=(80, 174, bay_z), width=86, depth=57, height=56,
                     thickness=6, wood_tone=(0.1, 0.04, 0.016), seed=8)
@@ -169,18 +169,16 @@ def room(scene):
         ob.data.specular_factor = 1 if specular else 0
         return ob
 
-    area("Forge light on wall and tools", (-58, 112, -26), (-12, 215, -65),
-         165000, (1, 0.62, 0.35), 65)
-    area("Warm smithy bounce", (10, 85, 2), (18, 210, -55),
-         105000, (1, 0.76, 0.51), 120)
-    soot_rake = area("Warm grazing light on soot", (-96, 100, 7), (-44, 146, -21),
-                     150000, (1, 0.66, 0.4), 55)
-    area("Anvil reflected forge light", (-12, 132, -14), (16, 180, -38),
-         28000, (1, 0.73, 0.46), 38)
-    area("Bench lantern reflected warmth", (49, 142, -21), (81, 180, -48),
-         24000, (1, 0.72, 0.43), 45)
-    area("Window moonlit edge", (80, 213, -46), (26, 144, -43),
-         50000, (0.32, 0.53, 1), 48)
+    area("Forge light on wall and tools", (-38, 179, -56), (-4, 215, -51),
+         45000, (1, 0.34, 0.065), 22)
+    soot_rake = area("Fire reflected onto arch face", (-47, 168, -65), (-44, 204, -54),
+                     23000, (1, 0.32, 0.055), 15)
+    area("Anvil reflected forge light", (-12, 174, -55), (24, 189, -45),
+         18000, (1, 0.43, 0.12), 18)
+    area("Bench lantern reflected warmth", (49, 176, -40), (67, 204, -55),
+         9000, (1, 0.47, 0.16), 18)
+    area("Window moonlit edge", (80, 213, -46), (101, 176, -60),
+         18000, (0.22, 0.4, 1), 26)
     table_bounce = area("Lantern table bounce", (-20, 4, 38), (0, 12, -1.2),
                         6500, (1, 0.69, 0.4), 38)
     for ob in set(bpy.data.objects) - before:
@@ -191,17 +189,16 @@ def room(scene):
     table_bounce.location.z += 14
     table_receivers = bpy.data.collections.new("Player table light receivers")
     room_receivers = bpy.data.collections.new("Smithy light receivers")
-    hearth_receivers = bpy.data.collections.new("Hearth stone receivers")
+    hearth_receivers = bpy.data.collections["Stone forge firelit masonry"]
     furnishings = bpy.data.collections.new("Room illumination without washing soot")
     hearth_objects = set(bpy.data.objects["Stone forge"].children_recursive)
+    hearth_stones = set(hearth_receivers.objects)
     for ob in set(bpy.data.objects) - before:
         if ob.type in {"MESH", "CURVE"}:
             table_receivers.objects.link(ob)
-            if ob not in foreground:
+            if ob not in foreground and (ob not in hearth_objects or ob in hearth_stones):
                 room_receivers.objects.link(ob)
-            if ob in hearth_objects:
-                hearth_receivers.objects.link(ob)
-            elif ob not in foreground:
+            if ob not in foreground and ob not in hearth_objects:
                 furnishings.objects.link(ob)
     table_receivers.objects.link(bpy.data.objects["forge_slab"])
     group = G.Asset("Emberforged room frame", rot_z=-math.pi / 2)
@@ -209,7 +206,9 @@ def room(scene):
         if ob.type == "LIGHT":
             restrained = ob == table_bounce or ob in foreground or ob.name in {
                 "Window moonlit edge", "Bench lantern reflected warmth", "Moon through window"}
-            ob.data.energy *= 7 if restrained else 13
+            ob.data.energy *= 7 if restrained else 4 if ob in hearth_objects else 13
+            if ob.name.startswith("Lantern glow") and ob not in foreground:
+                ob.data.color = (1, 0.43, 0.12)
             ob.light_linking.receiver_collection = (table_receivers if ob == table_bounce or ob in foreground else
                                                    hearth_receivers if ob == soot_rake else room_receivers if ob in hearth_objects else furnishings)
         if ob != group.root and ob.parent is None:
