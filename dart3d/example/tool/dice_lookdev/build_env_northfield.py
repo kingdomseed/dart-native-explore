@@ -20,6 +20,7 @@ import bpy
 
 import env_common as E
 import env_props as P
+import room_common as RC
 
 W, D = E.TRAY_W, E.TRAY_D
 RIM_T, RIM_H = 2.8, 3.0
@@ -249,7 +250,86 @@ def build(scene):
     P.backdrop_window(0, top + 80, 45, 90, 70, sky_top=(0.2, 0.25, 0.35), sky_bot=(0.45, 0.45, 0.5), moon=False,
                       frame_mat=E.simple("Window white", (0.8, 0.8, 0.78), 0.5))
     E.light(scene, "AREA", "dusk", (0, top + 75, 45), 8000, color=(0.6, 0.7, 1.0), size=60, target=(0, 0, 0))
+    rc = room(scene, table, top)
     return dict(
         samples=128, exposure=0.0, hero=dict(dist=32, elev=30, az=8, lens=65, fstop=2.8),
         topdown=dict(width=W + 2 * RIM_T + 3.0),
+        play_view=True, tray_half=(W / 2 + RIM_T, D / 2 + RIM_T), room_cam=rc,
     )
+
+
+def room(scene, table, top):
+    """The 1986 countryside kitchen (concept: room-concepts/northfield-room).
+
+    Striped wallpaper, a checkered lino floor, a run of cream kitchen units
+    along the left and back walls (worktop, patterned tile splashback, wall
+    cupboards, a cooker and a tall fridge), a radiator under the window with
+    floral curtains, and outside the grey field with a tree line and a
+    strange tall machine. Lights from four sides: the orange pendant over
+    the table (warm key, above), the window (grey-blue daylight, back), the
+    CRT (green accent, left) and a strip under the wall cupboards (warm,
+    back-left).
+    """
+    wy = top + 80
+    paper = RC.wallpaper("Kitchen wallpaper", (0.42, 0.36, 0.22), (0.3, 0.33, 0.2), stripes=0.08)
+    RC.shell(half_w=180, back=wy, front=-170, height=250, wall=paper,
+             floor=RC.tiles("Kitchen lino", (0.45, 0.4, 0.32), (0.1, 0.12, 0.08), scale=0.03),
+             openings={"back": [(0, 45, 90, 70)]}, ceiling=RC.plaster("Kitchen ceiling", (0.5, 0.48, 0.44)))
+    white = E.simple("Window white", (0.8, 0.8, 0.78), 0.5)
+    RC.window("back", 0, 45, 90, 70, RC.sky("Field sky", (0.2, 0.25, 0.35), (0.45, 0.45, 0.5), strength=0.9),
+              white, mullions=(2, 1), glow=(30000, (0.65, 0.72, 0.9)))
+    # outside, flat against the grey sky: a tree line and the tall machine
+    far = E.emissive("Far silhouette", (0.17, 0.19, 0.24), 1.0)
+    rng = random.Random(3)
+    for i in range(26):
+        h = rng.uniform(4, 9)
+        E.cylinder("far_tree", 1.4, h, (-45 + i * 3.6, wy + 28, 45 - 35 + 3 + h / 2), far, segs=6, r2=0.1)
+    for a in (-0.25, 0.0, 0.25):
+        leg = E.cylinder("machine_leg", 0.25, 26, (22 + a * 20, wy + 28, 45 - 35 + 16), far, segs=6)
+        leg.rotation_euler = (0, a * 0.9, 0)
+    E.sphere("machine_body", 2.4, (22, wy + 28, 45 - 35 + 30), far, subdiv=2, scale=(1.6, 0.5, 0.7))
+    E.sphere("machine_eye", 0.35, (23.5, wy + 27, 45 - 35 + 30), E.emissive("Machine eye", (1.0, 0.1, 0.05), 6.0))
+    # radiator under the window, floral curtains either side
+    for i in range(14):
+        E.cube("radiator_fin", (3, 8, 45), RC.to_world("back", -35 + i * 5.4, (0, -6, RC.FLOOR_Z + 40)), white,
+               bevel=0.8)
+    cur, k = E.material("Floral curtain")
+    obj = k.coords().outputs["Object"]
+    v = k.voronoi(RC.vertical_coords(k), 0.08)
+    dot = k.math("LESS_THAN", v.outputs["Distance"], 0.25)
+    k.surface(k.bsdf(Base_Color=k.mix(dot, (0.7, 0.66, 0.55, 1), (0.25, 0.35, 0.15, 1)), Roughness=0.9,
+                     Transmission_Weight=0.2, Sheen_Weight=0.5))
+    for sx in (-1, 1):
+        c = E.cube("curtain", (30, 3, 110), RC.to_world("back", sx * 62, (0, -8, 52)), cur)
+        c.modifiers.new("wave", "WAVE").height = 1.5
+    E.cylinder("curtain_rod", 1.0, 170, RC.to_world("back", 0, (0, -8, 110)), P.brass("Rod brass"), segs=12
+               ).rotation_euler = (0, math.radians(90), 0)
+    # kitchen units: base cabinets + worktop along the left wall, cooker, fridge, wall cupboards
+    cream = E.simple("Unit cream", (0.62, 0.58, 0.48), 0.45)
+    wood_top = P.dark_wood("Worktop", c1=(0.12, 0.07, 0.035), c2=(0.3, 0.18, 0.09), varnish=0.4)
+    for u in (-110, -50, 10):
+        RC.cabinet("left", u, w=60, h=86, depth=58, mat=cream, top_mat=wood_top)
+        RC.cabinet("left", u, w=60, h=70, depth=34, z0=RC.FLOOR_Z + 150, mat=cream, doors=2)
+    stove = RC.cabinet("left", 70, w=60, h=86, depth=60, mat=E.simple("Cooker white", (0.8, 0.79, 0.75), 0.3),
+                       doors=1)
+    for dx in (-14, 14):
+        for dy in (-12, 12):
+            p = RC.to_world("left", 70 + dx, (0, -30 + dy, RC.FLOOR_Z + 90.5))
+            E.cylinder("hob_ring", 8, 0.8, p, E.simple("Hob iron", (0.03, 0.03, 0.03), 0.4), segs=24)
+    E.cylinder("kettle", 9, 18, RC.to_world("left", 76, (0, -32, RC.FLOOR_Z + 100)),
+               E.simple("Kettle enamel", (0.7, 0.35, 0.1), 0.25), segs=24, r2=6)
+    E.cube("fridge", (62, 65, 170), RC.to_world("left", 140, (0, -34, RC.FLOOR_Z + 85)), cream, bevel=3.0)
+    tiles_m = RC.tiles("Splashback tiles", (0.75, 0.55, 0.25), (0.35, 0.2, 0.07), scale=0.07, checker=True)
+    back_splash = E.plane("splashback", 240, 60, RC.to_world("left", -20, (0, -1.5, RC.FLOOR_Z + 118)), tiles_m)
+    back_splash.rotation_euler = (math.radians(90), 0, math.radians(90))
+    RC.wall_shelf("left", -50, RC.FLOOR_Z + 128, w=60, depth=10, seed=5, kind="jars", mat=wood_top,
+                  palette=[(0.6, 0.5, 0.3), (0.3, 0.1, 0.05), (0.15, 0.25, 0.1)])
+    E.light(scene, "AREA", "under_cupboard", RC.to_world("left", -40, (0, -25, RC.FLOOR_Z + 146)), 6000,
+            color=(1.0, 0.8, 0.5), size=90, target=RC.to_world("left", -40, (0, -25, RC.FLOOR_Z + 50)))
+    RC.chair(0, 95 - 40, rot=math.radians(180), mat=wood_top, seat_h=46, back_h=40)
+    # the pendant's cord up to the ceiling; the CRT's green spills onto the left side
+    E.cylinder("lamp_cord", 0.35, 250 - 76 - 73, (6, 10, 73 + (250 - 76 - 73) / 2), E.simple("Cord", (0.9, 0.9, 0.9),
+               0.5), segs=6)
+    E.light(scene, "AREA", "crt_spill", (-3.0, top + 10, 14), 2500, color=(0.3, 1.0, 0.45), size=20,
+            target=(-60, -20, 0), shadow=False)
+    return dict(loc=(26, -66, 36), target=(-10, 90, 6), lens=20, fstop=4.0, focus=(0, 0, 2))

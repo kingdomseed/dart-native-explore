@@ -139,14 +139,14 @@ def room(scene):
     """
     wall = RC.plaster("Nook plaster", (0.22, 0.17, 0.12))
     oak = P.dark_wood("Nook oak", c1=(0.05, 0.025, 0.012), c2=(0.16, 0.085, 0.04))
-    RC.shell(half_w=180, back=150, front=-190, height=260, wall=wall, floor=RC.planks(),
+    RC.shell(half_w=180, back=230, front=-190, height=260, wall=wall, floor=RC.planks(),
              openings={"right": [(70, 45, 80, 110)]})
     RC.beams(oak, n=3)
     RC.work_table(200, 150, top_z=0.0, thick=6.0, mat=oak, leg_r=6, y=20, top=False)
-    RC.fireplace(scene, "back", 0, w=150, h=125, depth=40, energy=120000, seed=3,
+    RC.fireplace(scene, "back", -40, w=150, h=125, depth=40, energy=150000, seed=3, base=40,
                  mat=RC.stone("Nook fieldstone", (0.08, 0.07, 0.06), (0.24, 0.2, 0.16), scale=0.03, blocks=True))
-    for u, seed in ((-125, 5), (125, 6)):
-        RC.bookshelf("back", u, w=90, h=220, depth=30, rows=7, seed=seed, mat=oak)
+    for u, w, seed in ((-148, 60, 5), (100, 100, 6)):
+        RC.bookshelf("back", u, w=w, h=220, depth=30, rows=7, seed=seed, mat=oak)
     rain = RC.sky("Rainy dusk", (0.05, 0.07, 0.14), (0.14, 0.16, 0.26), stars=0.0, strength=0.8,
                   skyline=((0.03, 0.04, 0.07), 0.3))
     RC.window("right", 70, 45, 80, 110, rain, oak, mullions=(2, 3), glow=(45000, (0.55, 0.65, 0.95)))
@@ -184,4 +184,4 @@ def room(scene):
     RC.hanging_lantern(scene, -95, 10, 80, energy=18000, color=(0.75, 0.4, 1.0), glass_color=(0.6, 0.3, 0.9),
                        mat=brass)
     RC.rug(0, -20, 280, 220, (0.25, 0.08, 0.05), (0.08, 0.05, 0.1), name="Nook rug")
-    return dict(loc=(-14, -72, 44), target=(4, 100, 2), lens=20, fstop=4.0, focus=(0, 0, 4))
+    return dict(loc=(-26, -70, 40), target=(18, 120, 8), lens=20, fstop=4.0, focus=(0, 0, 4))

@@ -401,7 +401,7 @@ def column(x, y, h, r, mat, base=True):
 # --------------------------------------------------------------------------
 
 def fireplace(scene, wall, u, w=120, h=110, depth=45, mat=None, energy=90000, mantel=True, breast=True,
-              opening=(0.56, 0.52), color=(1.0, 0.45, 0.14), fire_scale=1.0, seed=0, flame=None):
+              opening=(0.56, 0.52), color=(1.0, 0.45, 0.14), fire_scale=1.0, seed=0, flame=None, base=0.0):
     """A fireplace / forge mouth against `wall` at u: surround with a real
     opening, sooty firebox, flames and coals, a warm light at the mouth and
     a dimmer one inside (so the reveal glows and the light spills out in a
@@ -448,10 +448,19 @@ def fireplace(scene, wall, u, w=120, h=110, depth=45, mat=None, energy=90000, ma
     parts.append(E.plane("firebox_glow", ow * 0.9, oh * 0.6, (0, -5.5, oh * 0.3), glow_in))
     parts[-1].rotation_euler = (math.radians(90), 0, 0)
     loc, rz = _wall_frame(wall, u)
-    _group("fireplace", parts, loc + Vector((0, 0, FLOOR_Z)), rz)
-    E.light(scene, "POINT", "hearth_inner", to_world(wall, u, (0, -depth * 0.4, FLOOR_Z + 30 * fire_scale)),
+    if base:  # a raised hearth: everything sits on a stone plinth (visible over a table)
+        _group("fireplace_plinth", [E.cube("hearth_plinth", (w * 1.15, depth * 1.6, base),
+                                           (0, -depth * 0.8, base / 2), mat)], loc + Vector((0, 0, FLOOR_Z)), rz)
+        top = _ROOM["height"]
+        for p_ in parts:
+            if p_.name.startswith("chimney_breast"):
+                p_.scale.z = (top - h - base) / (top - h)
+                p_.location.z = h + (top - h - base) / 2
+    fz0 = FLOOR_Z + base
+    _group("fireplace", parts, loc + Vector((0, 0, fz0)), rz)
+    E.light(scene, "POINT", "hearth_inner", to_world(wall, u, (0, -depth * 0.4, fz0 + 30 * fire_scale)),
             energy * 0.25, color=color, size=15, shadow=False)
-    return E.light(scene, "AREA", "hearth_mouth", to_world(wall, u, (0, -depth - 6, FLOOR_Z + oh * 0.45)), energy,
+    return E.light(scene, "AREA", "hearth_mouth", to_world(wall, u, (0, -depth - 6, fz0 + oh * 0.45)), energy,
                    color=color, size=ow * 0.8, target=to_world(wall, u, (0, -depth - 200, FLOOR_Z + 40)))
 
 

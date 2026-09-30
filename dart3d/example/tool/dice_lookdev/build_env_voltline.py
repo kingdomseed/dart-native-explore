@@ -15,6 +15,7 @@ from mathutils import Vector
 
 import env_common as E
 import env_props as P
+import room_common as RC
 
 W, D = E.TRAY_W, E.TRAY_D
 RIM_T, RIM_H = 1.6, 1.8
@@ -131,6 +132,64 @@ def build(scene):
     E.light(scene, "AREA", "neon_c", (22, top + 60, 50), 12000, color=CYAN, size=30, target=(0, 0, 0))
     E.light(scene, "AREA", "key", (0, -40, 50), 1800, color=(0.8, 0.85, 1.0), size=25, target=(0, 0, 0))
     E.haze_box("haze", (200, 200, 80), (0, 60, 40), 0.004, color=(0.9, 0.9, 1.0), noise_scale=0.03)
+    rc = room(scene, top, chrome)
     return dict(
         samples=128, exposure=0.2, topdown=dict(width=W + 2 * RIM_T + 1.0), hero=dict(dist=32, elev=28, az=6, lens=65, fstop=2.8),
+        play_view=True, tray_half=(W / 2 + RIM_T, D / 2 + RIM_T), room_cam=rc,
     )
+
+
+def room(scene, top, chrome):
+    """The late-night diner (concept: room-concepts/voltline-room).
+
+    The tray is on the window counter; the rain window is the whole back
+    wall. To the left the diner runs away from camera: a long chrome-edged
+    bar with red stools, a back bar of bottles, warm pendants over it and a
+    magenta neon strip along the ceiling; black-and-white checker floor,
+    dark panelled walls; across the street, lit windows in the far block.
+    Lights from four sides: the street neon through the window (magenta and
+    cyan, back), the bar pendants (warm, left), the ceiling neon strip
+    (magenta, above-left) and the tray's cool key from the front.
+    """
+    wy = top + 41
+    panel = P.dark_wood("Diner panel", c1=(0.02, 0.012, 0.01), c2=(0.05, 0.03, 0.02), varnish=0.6)
+    RC.shell(half_w=200, back=wy, front=-240, height=210, wall=panel, floor_z=-105.0,
+             floor=RC.tiles("Diner floor", (0.6, 0.58, 0.55), (0.02, 0.02, 0.02), scale=0.025, rough=0.2),
+             openings={"back": [(0, 44, 220, 90)]}, ceiling=E.simple("Diner ceiling", (0.02, 0.02, 0.025), 0.6))
+    E.cube("window_counter_front", (220, 4, 99), (0, -27, -55.5), chrome, bevel=0.5)
+    # lit windows across the street (a card just in front of the far wall)
+    city, k = E.material("Street block")
+    tc = k.coords().outputs["Object"]
+    b = k.node("ShaderNodeTexBrick")
+    k.link(tc, b.inputs["Vector"])
+    k.set(b, Scale=0.08, Mortar_Size=0.25, Color1=(1, 1, 1, 1), Color2=(1, 1, 1, 1), Mortar=(0, 0, 0, 1))
+    lit = k.math("MULTIPLY", k.math("SUBTRACT", 1.0, b.outputs["Fac"]),
+                 k.math("GREATER_THAN", k.noise(tc, 0.3, 2).outputs["Fac"], 0.52))
+    col = k.mix(k.noise(tc, 0.05, 2).outputs["Fac"], (1.0, 0.75, 0.45, 1), (0.5, 0.7, 1.0, 1))
+    k.surface(k.emission(col, k.math("MULTIPLY", lit, 1.2)))
+    card = E.plane("street_block", 400, 200, (0, top + 158, 60), city)
+    card.rotation_euler = (math.radians(90), math.radians(180), 0)
+    # the bar on the left: counter, chrome edge, stools, back bar, pendants
+    red = E.simple("Stool vinyl", (0.4, 0.02, 0.03), 0.3, Coat_Weight=0.6)
+    bar_top = E.simple("Bar top", (0.03, 0.03, 0.035), 0.1, Coat_Weight=1.0)
+    E.cube("bar", (60, 220, 100), (-150, -100, -55), panel, bevel=0.5)
+    E.cube("bar_top", (66, 224, 5), (-150, -100, -3), bar_top, bevel=0.8)
+    E.cube("bar_chrome", (2, 224, 6), (-117, -100, -8), chrome)
+    for i in range(5):
+        y = -190 + i * 45
+        E.cylinder("stool_post", 2.5, 70, (-100, y, -70), chrome, segs=16)
+        E.cylinder("stool_seat", 17, 9, (-100, y, -32), red, segs=32, bevel=2.0)
+        E.cylinder("stool_foot", 16, 3, (-100, y, -103), chrome, segs=32)
+    RC.wall_shelf("left", -100, -10 + 25, w=200, depth=18, seed=14, kind="bottles", mat=chrome,
+                  palette=[(0.05, 0.2, 0.05), (0.3, 0.12, 0.02), (0.2, 0.2, 0.25), (0.25, 0.02, 0.05)])
+    RC.wall_shelf("left", -100, 20 + 25, w=200, depth=18, seed=15, kind="bottles", mat=chrome,
+                  palette=[(0.05, 0.2, 0.05), (0.3, 0.12, 0.02), (0.2, 0.2, 0.25), (0.25, 0.02, 0.05)])
+    for y in (-170, -100, -30):
+        RC.pendant_lamp(scene, -145, y, 55, energy=20000, color=(1.0, 0.72, 0.45), shade=(0.8, 0.8, 0.82), r=16,
+                        spot_deg=100)
+    RC.neon_bar(scene, (-190, -235, 100), (-190, wy - 5, 100), MAGENTA, strength=18.0, energy=15000)
+    RC.neon_bar(scene, (-195, wy - 4, 96), (195, wy - 4, 96), CYAN, strength=14.0, energy=12000)
+    # a booth bench behind the camera side on the right, with a table lamp glow
+    E.cube("booth_seat", (60, 130, 45), (170, -130, -82), red, bevel=4)
+    E.cube("booth_back", (15, 130, 70), (195, -130, -40), red, bevel=4)
+    return dict(loc=(22, -62, 34), target=(-24, 80, 4), lens=20, fstop=4.0, focus=(0, 0, 2))

@@ -1111,6 +1111,17 @@ Lighting recipes (the tray lights are unchanged unless noted):
   looking up into the sky. Gate: numeral 11.35 (d12), die vs tray 2.45,
   stroke 0.121–0.130, PASS.
 
+- **Hearthside — the fireside reading nook.** A raised fieldstone
+  fireplace behind the oak table (back-left, 150 kW, the warm key that
+  also back-lights the tome; the old stand-in hearth box on the table is
+  gone, its glow light stays), bookcases either side, a leather wing
+  armchair with a wine-red throw by the rain-streaked window on the right
+  wall (area, 45 kW, blue-grey, the cool fill), lavender in a jug on the
+  sill, a brass floor lamp by the chair (25 kW, warm, right-front) and a
+  violet-glass lantern hung on the left (18 kW, the lavender accent);
+  over the tray's reading key and cool fill. Camera: 20 mm, f/4. Gate:
+  numeral 5.45 (d4), die vs tray 2.21, stroke 0.123–0.129, PASS.
+
 ## 4. dart3d features to verify (before building these for real)
 
 1. **Emissive intensity > 1 + bloom threshold** on both platforms, and
