@@ -105,45 +105,9 @@ def build(scene):
                             E.TMP)
     E.plane("altar_floor", W + 2 * RIM_T, D + 2 * RIM_T, (0, 0, 0.01),
             granite("Altar granite", frost_lines=circle, size=W * 0.95, dark=True))
-    E.cube("altar_block", (W + 30, D + 26, 14), (0, 0, -7.0), granite("Altar block", snow=0.6), bevel=1.2)
     prof = E.profile_curve("altar_rim_profile", [(-1.3, -1.6), (1.3, -1.6), (1.3, 0.9), (0.8, 1.6),
                                                  (-0.8, 1.6), (-1.3, 0.9)])
     E.rim("altar_rim", W + RIM_T, D + RIM_T, 2.5, RIM_H, RIM_T, granite("Rim granite", snow=0.8), profile=prof)
-    # ground: snow drifts over rock
-    snow_m, k = E.material("Snow")
-    obj = k.coords().outputs["Object"]
-    k.surface(k.bsdf(Base_Color=(0.8, 0.86, 0.95, 1), Roughness=0.55, Subsurface_Weight=0.7,
-                     Subsurface_Radius=(0.6, 0.9, 1.4),
-                     Normal=k.bump(k.noise(obj, 0.3, 6).outputs["Fac"], 0.5, 1.0)))
-    ground = E.plane("snow_ground", 500, 500, (0, 0, -14), snow_m, subdiv=60)
-    for poly in ground.data.polygons:
-        poly.use_smooth = True
-    ground.modifiers.new("smooth", "SUBSURF").levels = 1
-    tex = bpy.data.textures.new("drift", "CLOUDS")
-    tex.noise_scale = 25.0
-    dm = ground.modifiers.new("drift", "DISPLACE")
-    dm.texture = tex
-    dm.strength = 6.0
-    # boulders + crystals framing the altar
-    rock_m = granite("Boulder", snow=0.7)
-    ice_m = ice("Crystal ice", glow=6.0)
-    rng = random.Random(3)
-    for i, (x, y, r) in enumerate(((-24, 30, 9), (22, 34, 11), (-24, -8, 7), (23, 4, 8), (-20, -30, 6),
-                                   (21, -27, 7), (0, 40, 10))):
-        E.rock(f"boulder{i}", r, (x, y, -8 + r * 0.3), rock_m, seed=i + 40, squash=(1.2, 1, 0.8))
-    crystal_cluster(-W / 2 - 8, D / 2 + 6, 0.3, 9, 1, ice_m, 1.0)
-    crystal_cluster(W / 2 + 8, D / 2 + 7, 0.3, 7, 2, ice_m, 0.85)
-    crystal_cluster(W / 2 + 9, -D / 2 - 3, 0.3, 5, 3, ice_m, 0.6)
-    crystal_cluster(-W / 2 - 9, -D / 2 - 5, 0.3, 4, 4, ice_m, 0.5)
-    crystal_cluster(-W / 2 - 10, 2, 0.3, 3, 5, ice_m, 0.45)
-    # low shards in the strips above/below the tray (read at top-down)
-    crystal_cluster(-W / 2 + 1.5, D / 2 + RIM_T + 3.4, 0.3, 4, 11, ice_m, 0.28)
-    crystal_cluster(W / 2 - 1.0, -D / 2 - RIM_T - 3.2, 0.3, 5, 12, ice_m, 0.3)
-    crystal_cluster(W / 2 + 1.5, D / 2 + RIM_T + 4.0, 0.3, 3, 13, ice_m, 0.22)
-    # cave wall of ice behind
-    for i, (x, y, r) in enumerate(((-150, 215, 60), (150, 225, 70), (190, 120, 55), (-195, 110, 50))):  # flank the hall arch
-        E.rock(f"ice_wall{i}", r, (x, y, 10), ice("Cave wall ice", glow=1.2), seed=99 + i, squash=(1.0, 0.7, 1.4),
-               strength=0.45)
     E.light(scene, "AREA", "cave_glow", (0, 260, 40), 90000, color=(0.25, 0.55, 1.0), size=120,
             target=(0, 100, 10), shadow=False)
     # crystals glow
@@ -153,65 +117,116 @@ def build(scene):
     E.light(scene, "AREA", "moon_key", (-20, -18, 60), 9000, color=(0.75, 0.85, 1.0), size=25, target=(0, 0, 0))
     E.light(scene, "AREA", "fill", (25, -45, 15), 700, color=(0.55, 0.65, 1.0), size=30, target=(0, 0, 2))
     E.light(scene, "AREA", "warm_bounce", (0, -60, 5), 150, color=(1.0, 0.75, 0.55), size=40, target=(0, 0, 0))
-    # atmosphere: falling snow + ground mist
-    flake = E.simple("Snowflake", (0.95, 0.97, 1.0), 0.5, Emission_Color=(0.8, 0.9, 1.0, 1),
-                     Emission_Strength=0.6)
-    E.scatter("snow", 700, ((-60, -60, 1), (60, 90, 70)), 0.09, flake, seed=8, scale_range=(0.4, 1.2),
-              avoid=lambda p: abs(p.x) < W / 2 + 4 and abs(p.y) < D / 2 + 6)  # none between camera and dice
-    E.haze_box("mist", (170, 200, 12), (0, 20, -8), 0.02, color=(0.8, 0.9, 1.0), essential=True)
-    E.haze_box("air", (160, 220, 80), (0, 30, 45), 0.0015, color=(0.7, 0.85, 1.0))
-    rc = room(scene, ice_m)
+    rc = room(scene)
     return dict(
-        samples=160, exposure=0.2, topdown=dict(width=W + 2 * RIM_T + 1.0), hero=dict(dist=32, elev=26, az=10, lens=70, fstop=2.8),
-        play_view=True, tray_half=(W / 2 + RIM_T, D / 2 + RIM_T), room_cam=rc,
+        samples=160, exposure=-.9, topdown=dict(width=W + 2 * RIM_T + 1.0),
+        hero=dict(dist=32, elev=26, az=10, lens=70, fstop=2.8),
+        hero_layout={
+            "d20": ((-1.8,-1.0),20,0), "d12": ((2.6,10.0),12,12),
+            "d10u": ((3.2,-11.5),0,-15), "d10t": ((3.0,4.0),0,20),
+            "d8": ((-1.7,-9.5),8,-10), "d6": ((3.2,-3.0),6,18),
+            "d4": ((-.4,6.0),4,58),
+        },
+        play_view=True, tray_half=(W/2+RIM_T,D/2+RIM_T), room_cam=rc,
     )
 
 
-def room(scene, ice_m):
-    """The frozen altar chamber (concept: room-concepts/frostbound-room).
-
-    A pillared hall of frost-rimed stone on the snow floor, a tall arch at the
-    back open onto a glacier valley at dusk, ice formations along the walls,
-    icicles, deep-blue banners. Lights from four sides: two fire bowls
-    (warm key, front-left and right), the arch (cool sky fill from the back),
-    blue ice glows at the sides (accent rim), plus the tray's moon key.
-    """
-    wall = RC.stone("Frost stone", (0.09, 0.11, 0.14), (0.28, 0.32, 0.38), scale=0.012)
-    RC.shell(half_w=230, back=260, front=-170, height=330, wall=wall, floor=False, floor_z=-14.0,
-             openings={"back": [(0, 96, 150, 220)]})
-    glacier = RC.sky("Glacier dusk", (0.12, 0.25, 0.55), (0.55, 0.72, 0.95), stars=1.5, strength=0.55,
-                     skyline=((0.16, 0.24, 0.38), 0.45, False))
-    RC.window("back", 0, 96, 150, 220, glacier, wall, mullions=(1, 1), sill=False,
-              glow=(90000, (0.55, 0.72, 1.0)))
-    col_m = granite("Pillar granite", snow=0.5)
-    for sx in (-1, 1):
-        for y in (20, 150):
-            RC.column(sx * 125, y, 330, 17, col_m)
-    # warm key: fire bowls on carved pedestals, front-left and back-right
-    ped = granite("Pedestal granite", snow=0.4)
-    RC.fire_bowl(scene, -75, -25, 45, r=16, energy=45000, pedestal=ped, seed=1)
-    RC.fire_bowl(scene, 85, 95, 50, r=16, energy=35000, pedestal=ped, seed=2)
-    RC.fire_bowl(scene, -110, 215, 60, r=14, energy=30000, pedestal=ped, seed=3)
-    # deep-blue banners with a gold lattice between the pillars
-    for u in (-150, 150):
-        RC.banner("back", u, 250, w=60, h=170, color=(0.02, 0.04, 0.16), trim=(0.55, 0.42, 0.2), pattern=True)
-    # ice formations along the side walls, glowing blue: the accent rim
-    wall_ice = ice("Hall ice", glow=0.5)
-    for i, (x, y, r) in enumerate(((-200, 60, 45), (-190, 170, 55), (200, 20, 50), (195, 140, 45),
-                                   (-205, -60, 35), (205, -80, 40))):
-        E.rock(f"hall_ice{i}", r, (x, y, -14 + r * 0.6), wall_ice, seed=200 + i, squash=(0.6, 1.0, 1.8),
-               strength=0.4)
-    for sx in (-1, 1):
-        E.light(scene, "AREA", "ice_glow", (sx * 175, 60, 60), 9000, color=(0.25, 0.6, 1.0), size=80,
-                target=(0, 0, 0), shadow=False)
-    # icicles along the arch lintel and the wall tops
-    rng = random.Random(9)
-    for i in range(40):
-        x = rng.uniform(-220, 220)
-        y = 250 if abs(x) > 80 else 252
-        z_top = 316 - 14 if abs(x) > 80 else 96 + 110 - 14 + 14
-        L = rng.uniform(10, 45)
-        E.cylinder("icicle", 0.05, L, (x, y - rng.uniform(0, 6), z_top - L / 2), ice_m, segs=6,
-                   r2=rng.uniform(1.0, 2.5))
-    return dict(loc=(16, -62, 50), target=(-4, 80, 4), lens=16, fstop=4.0, focus=(0, 0, 2))
-
+def room(scene):
+    """A broadside altar between warm bronze braziers and a luminous glacier arch."""
+    from assets import (geometry as G, materials as M, stone_altar, frost_pillar, frozen_arch,
+                        fire_bowl, ice_formation, winter_banner, glacier_vista, cold_mist,
+                        amethyst_cluster, vessel, candles, armillary, stone_steps)
+    before=set(bpy.data.objects)
+    fixtures=G.Asset("Frozen sanctuary fixtures")
+    stone=M.frozen_stone("Chamber foundation granite",(.11,.15,.20),.65,.7,9)
+    snow=M.snow("Sanctuary settled snow",seed=8)
+    fixtures.block("Player chamber pavement",(270,110,8),(0,0,-80),stone,.8)
+    fixtures.block("Lower frozen hall",(430,170,9),(0,140,-139.5),stone,.8)
+    fixtures.block("Sanctuary apse floor",(520,70,9),(0,260,-204.5),stone,.8)
+    fixtures.block("Deep arch landing",(450,100,8),(0,352,-244),stone,.8)
+    stone_steps.build("Glacier threshold descent",loc=(10,295,-240),width=160,tread=7,rise=10,count=4,tone=(.13,.17,.22))
+    ice_formation.build("Near snow drift",loc=(0,0,-75.8),kind="drift",width=270,depth=110,height=3,seed=3)
+    ice_formation.build("Hall snow drift",loc=(0,140,-134.8),kind="drift",width=430,depth=170,height=5,seed=7)
+    ice_formation.build("Apse snow drift",loc=(0,260,-199.8),kind="drift",width=520,depth=70,height=5,seed=9)
+    stone_steps.build("Hall descent",loc=(130,55,-135),width=85,tread=12,rise=9.83,count=6,tone=(.13,.17,.22))
+    stone_steps.build("Apse descent",loc=(165,225,-200),width=90,tread=10,rise=10.83,count=6,tone=(.13,.17,.22))
+    stone_altar.build(loc=(0,-7,-76),width=106,depth=40,height=76,tone=(.085,.115,.16),frost=.22,seed=4)
+    stone_altar.build("Left altar return",loc=(-39,30,-76),width=28,depth=34,height=76,
+                      tone=(.085,.115,.16),frost=.95,seed=5)
+    stone_altar.build("Right altar return",loc=(39,30,-76),width=28,depth=34,height=76,
+                      tone=(.085,.115,.16),frost=.95,seed=7)
+    vessel.build("Bronze votive cup",loc=(-29,24,.1),rot_z=math.pi,kind="tankard",height=10,radius=3.2,metal_finish="brass",seed=8)
+    candles.build("Small altar candles",loc=(-28,37,.1),height=8,radius=.8,count=3,energy=45,seed=9)
+    amethyst_cluster.build("Near clear ice shards",loc=(-31,42,.1),radius=5,height=9,count=8,bowl=False,
+                           mineral="ice",tone=(.61,.83,.94),glow=2.5,energy=30,seed=10)
+    amethyst_cluster.build("Right ice offering",loc=(35,28,.1),radius=6,height=11,count=9,bowl=True,
+                           mineral="ice",tone=(.61,.83,.94),glow=2.5,energy=65,seed=12)
+    ice_formation.build("Left altar snow",loc=(-42,27,.025),kind="drift",width=24,depth=29,height=1.4,seed=4)
+    ice_formation.build("Right altar snow",loc=(42,29,.025),kind="drift",width=23,depth=28,height=1.4,seed=7)
+    frost_pillar.build("Near brazier pedestal",loc=(-35,135,-135),height=91,radius=10,tone=(.12,.16,.21),seed=11)
+    fire_bowl.build("Near warm bronze brazier",loc=(-35,135,-44),radius=12,height=12,flame_height=23,energy=15500,seed=4)
+    for x,y,z,h,r,energy,seed in ((-25,205,-135,63,10,18500,7),(47,230,-200,117,10,22000,9),
+                                  (103,337,-240,120,8,15500,14)):
+        frost_pillar.build("Carved brazier plinth",loc=(x,y,z),height=h,radius=r*.80,seed=seed)
+        fire_bowl.build("Receding bronze brazier",loc=(x,y,z+h),radius=r,height=r,
+                        flame_height=r*2.1,energy=energy,seed=seed)
+    frost_pillar.build("Instrument pedestal",loc=(48,104,-135),height=101,radius=9,seed=8)
+    armillary.build("Bronze winter armillary",loc=(48,104,-34),radius=8,pedestal=8,
+                    metal_tone=(.43,.26,.085),seed=8)
+    for x,y,z,h,r in ((-68,196,-135,175,12),(101,239,-200,205,14),(-145,280,-200,228,14)):
+        frost_pillar.build("Hall frost pillar",loc=(x,y,z),height=h,radius=r,seed=int(y))
+    frozen_arch.build(loc=(10,330,-240),width=155,shoulder=136,radius=12,depth=29,seed=12)
+    winter_banner.build("Left snow-star banner",loc=(-61,243,-13),width=38,height=92,seed=3)
+    winter_banner.build("Right snow-star banner",loc=(100,325,-35),width=40,height=95,seed=6)
+    for x,y,z,w,h,d,rz,seed in ((-122,169,-135,92,183,35,.16,1),(138,191,-135,94,210,32,-.25,2),
+                              (-122,310,-240,98,265,37,.08,4),(133,335,-240,103,270,34,-.12,5)):
+        ice_formation.build("Deep cave ice wall",loc=(x,y,z),rot_z=rz,width=w,height=h,depth=d,
+                            count=20,tone=(.23,.54,.76),glow=.23,seed=seed)
+    for x,seed in ((-99,31),(99,35)):
+        ice_formation.build("Fractured ice beside sanctuary",loc=(x,195,-135),rot_z=-.18 if x>0 else .18,
+                            width=62,depth=22,height=148,tone=(.55,.80,.93),glow=.35,wear=.6,count=28,seed=seed)
+    for name,loc,w,h,d,seed in (("Left glacial ceiling vault",(-98,220,23),145,180,28,20),
+                               ("Right glacial ceiling vault",(92,220,23),160,180,28,22),
+                               ("Near cave ceiling",(0,130,47),330,110,20,23)):
+        roof=ice_formation.build(name,loc=loc,width=w,height=h,depth=d,count=14,seed=seed)
+        roof.rotation_euler.x=-math.pi/2
+    for x,y,z,w,h,seed in ((-53,243,9,64,95,3),(66,254,9,60,104,4),(-127,174,39,77,61,8),(123,202,44,82,72,9)):
+        ice_formation.build("Hanging cave icicles",loc=(x,y,z),kind="icicles",width=w,depth=17,height=h,count=15,seed=seed)
+    for x,y,z,r,h,seed in ((-97,141,-135,22,58,4),(110,166,-135,24,80,5),(-65,256,-200,22,132,7),(67,273,-200,23,145,9)):
+        amethyst_cluster.build("Ice footwall cluster",loc=(x,y,z),radius=r,height=h,count=11,bowl=False,
+                               mineral="ice",tone=(.58,.82,.94),glow=4,energy=300,seed=seed)
+    cold_mist.build("Low hall cold mist",loc=(0,117,-133),width=260,depth=145,height=33,
+                    layers=4,opacity=.35,flakes=24,flake_height=170,seed=14)
+    cold_mist.build("Mist through glacier arch",loc=(0,277,-177),width=190,depth=85,height=48,
+                    layers=3,opacity=.45,flakes=12,flake_height=140,seed=18)
+    cold_mist.build("Ceiling crack snowfall",loc=(-5,205,-110),width=24,depth=40,height=0,layers=0,
+                    flakes=14,flake_height=130,seed=22)
+    glacier_vista.build(slope=.48,sky_strength=2.8,seed=11)
+    def area(name,loc,target,energy,color,size):
+        ob=fixtures.light(name,loc,energy,color,size,target=target,kind="AREA")
+        ob.visible_glossy=True;ob.data.specular_factor=1
+        return ob
+    area("Near brazier golden spill",(-35,130,-28),(-25,110,-70),16500,(1,.53,.22),20)
+    area("Warm altar stone return",(-42,18,20),(-25,3,0),6000,(1,.65,.34),23)
+    area("Brazier light on left capital",(-55,184,-47),(-68,196,-10),55000,(1,.47,.17),25)
+    area("Right fire on carved stone",(47,224,-59),(101,239,-70),75000,(1,.51,.21),25)
+    area("Glacier opening cold fill",(14,334,30),(0,180,-90),380000,(.51,.74,1),95)
+    area("Left ice blue caustic pool",(-95,155,-15),(-66,175,-75),45000,(.13,.56,1),40)
+    area("Right ice blue rim",(130,179,3),(35,110,-20),75000,(.19,.63,1),45)
+    area("Glacial crystal edge light",(85,235,-40),(65,273,-90),50000,(.15,.55,1),30)
+    area("Light through left ice",(-57,160,-60),(-89,195,-60),65000,(.15,.63,1),28)
+    area("Light through right ice",(68,143,-50),(85,195,-65),85000,(.15,.70,1),28)
+    area("Blue rim across altar edge",(45,60,33),(18,12,0),10000,(.36,.70,1),25)
+    receivers=bpy.data.collections.new("Frostbound room light receivers")
+    for ob in set(bpy.data.objects)-before:
+        if ob.type in {"MESH","CURVE"}:receivers.objects.link(ob)
+    group=G.Asset("Frostbound room frame",rot_z=-math.pi/2)
+    for ob in set(bpy.data.objects)-before:
+        if ob.type=="LIGHT":
+            ob.data.energy*=2
+            if ob.light_linking.receiver_collection is None:
+                ob.light_linking.receiver_collection=receivers
+        if ob!=group.root and ob.parent is None:group.add(ob)
+    E.light(scene,"AREA","Glacier bounce across altar",(24,4,9),4500,color=(.38,.72,1),size=10,target=(0,0,1))
+    return dict(loc=(-46,8,33),target=(2,0,8),lens=39.5,
+                fstop=8*scene.unit_settings.scale_length,focus=(10,0,1.4))

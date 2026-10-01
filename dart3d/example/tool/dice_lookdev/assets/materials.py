@@ -416,3 +416,58 @@ def cloud_bank(name="Moonlit cloud bank", tone=(0.17,0.2,0.30), seed=0):
     tr=k.node("ShaderNodeBsdfTransparent").outputs[0]
     k.surface(k.mix_shader(alpha,tr,k.emission(color,1)))
     return m
+
+
+def frozen_stone(name="Frost-rimed granite", tone=(.14,.18,.23), frost=.7, wear=.6, seed=0, rime_start=.35):
+    m,k=E.material(name)
+    vec=mapped(k,(1,1,1),seed)
+    grain=k.noise(vec,.7,4,.65).outputs["Fac"]
+    weather=k.noise(vec,.075,3).outputs["Fac"]
+    col=k.ramp(grain,[(.2,tuple(c*.38 for c in tone)),(.55,tone),(.8,tuple(c*1.45 for c in tone))])
+    normal=k.bump(grain,.3,.10*wear)
+    normal=k.bump(weather,.28,.30*wear,normal=normal)
+    stone=k.bsdf(Base_Color=col,Roughness=.66,Normal=normal)
+    geo=k.node("ShaderNodeNewGeometry")
+    sep=k.node("ShaderNodeSeparateXYZ");k.link(geo.outputs["Normal"],sep.inputs[0])
+    ledges=k.math("MULTIPLY",k.math("MAXIMUM",0,k.math("SUBTRACT",sep.outputs["Z"],rime_start)),1.6,clamp=True)
+    mask=k.math("MULTIPLY",ledges,k.ramp(weather,[(.25,(.05,.05,.05)),(.6,(frost,frost,frost))]))
+    snow=k.bsdf(Base_Color=(.65,.76,.84,1),Roughness=.78,Subsurface_Weight=.12,
+                Normal=k.bump(k.noise(vec,2.5,2).outputs["Fac"],.22,.045))
+    k.surface(k.mix_shader(mask,stone,snow))
+    return m
+
+
+def snow(name="Settled snow", tone=(.66,.78,.87), seed=0):
+    m,k=E.material(name)
+    vec=mapped(k,(1,1,1),seed)
+    n=k.noise(vec,.5,3).outputs["Fac"]
+    k.surface(k.bsdf(Base_Color=(*tone,1),Roughness=.76,Subsurface_Weight=.18,
+                     Subsurface_Radius=(.25,.4,.6),Normal=k.bump(n,.18,.10)))
+    return m
+
+
+def frozen_ice(name="Glacial blue ice", tone=(.30,.64,.82), glow=.12, wear=.3, seed=0):
+    m,k=E.material(name)
+    vec=mapped(k,(.12,.12,.24),seed)
+    n=k.noise(vec,1,3).outputs["Fac"]
+    pale=k.ramp(n,[(.22,tuple(c*.60 for c in tone)),(.78,tuple(min(.95,c*1.3) for c in tone))])
+    k.surface(k.bsdf(Base_Color=pale,Transmission_Weight=.88,IOR=1.31,
+                     Roughness=k.math("ADD",.045,k.math("MULTIPLY",n,wear*.15)),
+                     Coat_Weight=.25,Coat_Roughness=.065,
+                     Normal=k.bump(n,.12,.035),Emission_Color=(.08,.39,.66,1),
+                     Emission_Strength=k.math("MULTIPLY",n,glow*.04)))
+    return m
+
+
+def cold_mist(name="Cold ground mist", tone=(.30,.43,.55), opacity=.25, seed=0):
+    m,k=E.material(name)
+    uv=k.coords().outputs["UV"]
+    sep=k.node("ShaderNodeSeparateXYZ");k.link(uv,sep.inputs[0])
+    v=k.node("ShaderNodeVectorMath",operation="MULTIPLY");k.link(uv,v.inputs[0]);v.inputs[1].default_value=(4,.65,1)
+    n=k.noise(v.outputs[0],3,3,.6,dist=.25).outputs["Fac"]
+    x=k.math("SINE",k.math("MULTIPLY",sep.outputs["X"],math.pi))
+    y=k.math("POWER",k.math("SINE",k.math("MULTIPLY",sep.outputs["Y"],math.pi)),1.4)
+    density=k.math("MULTIPLY",k.math("MULTIPLY",x,y),k.math("MULTIPLY",n,opacity))
+    tr=k.node("ShaderNodeBsdfTransparent").outputs[0]
+    k.surface(k.mix_shader(density,tr,k.emission((*tone,1),1)))
+    return m
