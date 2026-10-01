@@ -40,8 +40,8 @@ named `mythic_scene` or anything infringing on `flutter_scene` naming.
 
 ## Program state
 
-- Active plan: `docs/program-v2.md` (tracks S/E/P/R, verification tiers
-  T1–T4, decisions D1–D8). Why it was reset: `docs/program-audit-2026-09-28.md`.
+- Active plan: `docs/program-v2.md` (tracks S/E/P/R/V, verification tiers
+  T1–T4, decisions D1–D9). Start at its **Where we are** section. Why it was reset: `docs/program-audit-2026-09-28.md`.
 - `docs/full-engine-program.md` is superseded; use it only for W17–W34 scope text.
 - Parity: milestone flutter_scene 0.23.0 / scene 0.3.0 (bdero/flutter_scene
   `0dc6ee80`); final goal flutter_scene 0.24 / scene 0.4 (Track V), after
@@ -77,6 +77,15 @@ named `mythic_scene` or anything infringing on `flutter_scene` naming.
 - Physical Android: Nothing A142 ("Pacman"), serial `00064149A002033`,
   Mali-G610 / GLES 3.2. `dn devices` doesn't list it; pass
   `-d 00064149A002033` to `dn run` and it works.
+- Physical Android tablet: Amazon Fire KFTUWI, serial `GN434J02409203LD`,
+  Android 11 (API 30), Mali-G52 MC2 / GLES 3.2 / Vulkan 1.1, 1200×1920.
+  The low-end floor; shared with other projects, so check with the
+  operator before assuming it is free.
+- Device policy (operator, 2026-10-01): dart3d work runs on the A142 and
+  the Fire tablet only. No iOS simulators, Android emulators or iPad
+  until the operator re-enables them (Mac mini load). Before any `adb`
+  input, confirm the foreground package is
+  `com.jasonholtdigital.dart3d_example`.
 - Android emulators: Pixel_Tablet_API36, Tablet_WXGA_API30/36, TomeKeeper_Beta6_Smoke
 
 ## Android build recipe (dart3d example)
