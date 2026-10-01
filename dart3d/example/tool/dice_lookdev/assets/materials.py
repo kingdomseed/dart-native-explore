@@ -321,3 +321,93 @@ def rain_streak(name="Backlit falling rain", strength=1):
     transparent = k.node("ShaderNodeBsdfTransparent").outputs[0]
     k.surface(k.mix_shader(alpha, transparent, k.emission((0.48, 0.64, 0.8, 1), strength)))
     return m
+
+
+def fine_marble(name="Warm statuary marble", tone=(0.46, 0.43, 0.37), wear=0.35, seed=0, quiet=(0, 0)):
+    m, k = E.material(name)
+    vec = mapped(k, (0.045, 0.045, 0.065), seed)
+    n = k.noise(vec, 1, 4, 0.62, dist=0.35).outputs["Fac"]
+    vein = k.ramp(n, [(0.455, (0,0,0)), (0.474, (0.48,0.48,0.48)),
+                      (0.481, (0.75,0.75,0.75)), (0.493, (0,0,0))])
+    if quiet != (0, 0):
+        sep = k.node("ShaderNodeSeparateXYZ")
+        k.link(k.coords().outputs["Object"], sep.inputs[0])
+        outside = k.math("MAXIMUM", k.math("SUBTRACT", k.math("ABSOLUTE", sep.outputs["X"]), quiet[0]),
+                         k.math("SUBTRACT", k.math("ABSOLUTE", sep.outputs["Y"]), quiet[1]))
+        vein = k.math("MULTIPLY", vein, k.math("MAXIMUM", 0.14, k.math("MULTIPLY", k.math("MAXIMUM", 0, outside), 0.2, clamp=True)))
+    col = k.mix(vein, (*tone,1), tuple(c*0.42 for c in tone)+(1,))
+    n2 = k.noise(vec, 8, 2).outputs["Fac"]
+    k.surface(k.bsdf(Base_Color=col, Roughness=k.math("ADD", 0.19, k.math("MULTIPLY", n2, wear*0.27)),
+                     Coat_Weight=0.28, Coat_Roughness=0.16, Subsurface_Weight=0.04,
+                     Normal=k.bump(n2, 0.12, 0.009)))
+    return m
+
+
+def velvet(name="Violet silk velvet", tone=(0.045,0.008,0.075), wear=0.35, seed=0):
+    m, k = E.material(name)
+    vec = mapped(k, (0.12,0.12,0.12), seed)
+    n = k.noise(vec, 1, 2).outputs["Fac"]
+    col = k.mix(n, tuple(c*0.4 for c in tone)+(1,), (*tone,1))
+    k.surface(k.bsdf(Base_Color=col, Roughness=0.92, Sheen_Weight=0.55, Sheen_Roughness=0.65, Sheen_Tint=(0.16,0.025,0.26,1),
+                     Normal=k.bump(k.noise(vec, 80, 2).outputs["Fac"], 0.15, 0.009)))
+    return m
+
+
+def amethyst(name="Amethyst quartz", tone=(0.21,0.055,0.38), seed=0):
+    m, k = E.material(name)
+    sep=k.node("ShaderNodeSeparateXYZ"); k.link(k.coords().outputs["Generated"],sep.inputs[0])
+    col=k.ramp(sep.outputs["Z"],[(0,tuple(c*0.42 for c in tone)),(0.65,tone),(1,(0.65,0.42,0.78))])
+    k.surface(k.bsdf(Base_Color=col, Metallic=0, Roughness=0.075, Transmission_Weight=0.82,
+                     IOR=1.55, Coat_Weight=0.4, Coat_Roughness=0.055))
+    return m
+
+
+def night_sky(name="Indigo galaxy", strength=1, seed=0):
+    m,k=E.material(name)
+    uv=k.coords().outputs["Generated"]
+    sep=k.node("ShaderNodeSeparateXYZ"); k.link(uv,sep.inputs[0])
+    n=k.noise(uv,7,5,0.7,dist=0.3).outputs["Fac"]
+    axis=k.math("ABSOLUTE",k.math("SUBTRACT",sep.outputs["Z"],k.math("ADD",0.32,k.math("MULTIPLY",sep.outputs["X"],0.65))))
+    band=k.ramp(axis,[(0,(1,1,1)),(0.025,(0.8,0.8,0.8)),(0.095,(0.22,0.22,0.22)),(0.19,(0,0,0))])
+    dust=k.ramp(n,[(0.28,(0.02,0.02,0.02)),(0.48,(0.18,0.18,0.18)),(0.66,(0.8,0.8,0.8)),(0.8,(1,1,1))])
+    base=k.ramp(sep.outputs["Z"],[(0,(0.04,0.064,0.13)),(0.45,(0.009,0.022,0.055)),(1,(0.0015,0.003,0.012))])
+    col=k.mix(k.math("MULTIPLY",band,dust),base,(0.26,0.21,0.37,1))
+    star=0
+    for scale,size,power in ((370,0.037,1.8),(143,0.034,3.8),(47,0.023,7)):
+        v=k.voronoi(uv,scale)
+        mask=k.math("LESS_THAN",v.outputs["Distance"],size)
+        star=k.math("ADD",star,k.math("MULTIPLY",mask,power))
+    k.surface(k.add_shader(k.emission(col,strength),k.emission((0.64,0.77,1,1),star)))
+    return m
+
+
+def moon_surface(name="Moon maria", strength=1.4, seed=0):
+    m,k=E.material(name)
+    uv=k.coords().outputs["Generated"]
+    n=k.noise(uv,5.5,5,0.67,dist=0.28).outputs["Fac"]
+    maria=k.ramp(n,[(0.28,(0.065,0.088,0.14)),(0.44,(0.13,0.17,0.24)),
+                    (0.52,(0.4,0.46,0.57)),(0.68,(0.68,0.73,0.8))])
+    v=k.voronoi(uv,28).outputs["Distance"]
+    crater=k.ramp(v,[(0.12,(0.55,0.55,0.55)),(0.20,(0.6,0.6,0.6)),(0.24,(0.95,0.95,0.95)),(0.29,(0.8,0.8,0.8))])
+    col=k.mix(0.22,maria,k.mix(crater,(0.10,0.14,0.2,1),maria))
+    geo=k.node("ShaderNodeNewGeometry")
+    dot=k.node("ShaderNodeVectorMath",operation="DOT_PRODUCT"); k.link(geo.outputs["Normal"],dot.inputs[0]); dot.inputs[1].default_value=(-0.65,-0.65,0.4)
+    light=k.ramp(dot.outputs["Value"],[(0,(0.015,0.015,0.015)),(0.18,(0.2,0.2,0.2)),(0.6,(0.9,0.9,0.9)),(1,(1,1,1))])
+    k.surface(k.emission(col,k.math("MULTIPLY",light,strength)))
+    return m
+
+
+def cloud_bank(name="Moonlit cloud bank", tone=(0.17,0.2,0.30), seed=0):
+    m,k=E.material(name)
+    uv=k.coords().outputs["UV"]
+    sep=k.node("ShaderNodeSeparateXYZ"); k.link(uv,sep.inputs[0])
+    v=k.node("ShaderNodeVectorMath",operation="MULTIPLY"); k.link(uv,v.inputs[0]); v.inputs[1].default_value=(5,1.5,1)
+    n=k.noise(v.outputs[0],3,4,0.65,dist=0.35).outputs["Fac"]
+    x=k.math("POWER",k.math("SINE",k.math("MULTIPLY",sep.outputs["X"],math.pi)),0.65)
+    y=k.math("SINE",k.math("MULTIPLY",sep.outputs["Y"],math.pi))
+    shape=k.math("MULTIPLY",x,y)
+    alpha=k.ramp(k.math("MULTIPLY",shape,n),[(0.08,(0,0,0)),(0.22,(0.15,0.15,0.15)),(0.34,(0.88,0.88,0.88)),(0.47,(1,1,1))])
+    color=k.ramp(n,[(0.2,tuple(c*0.25 for c in tone)),(0.5,tone),(0.78,tuple(c*2 for c in tone))])
+    tr=k.node("ShaderNodeBsdfTransparent").outputs[0]
+    k.surface(k.mix_shader(alpha,tr,k.emission(color,1)))
+    return m

@@ -1,20 +1,14 @@
-"""Celestial Observatory environment: "The Star Balcony".
-
-A veined marble table on an open balcony at night. The rolling surface is
-an inlaid silver astrolabe disc (moon-phase ring, star-chart dots). Around
-it: amethyst clusters, a brass-and-glass lantern, a silver armillary and a
-star globe; beyond the balustrade a violet, star-dusted sky.
-"""
+"""Celestial: a marble observatory loggia above moonlit floating citadels."""
 from __future__ import annotations
 
 import math
 import random
 
+import bpy
+
 import env_common as E
 import env_props as P
-import room_common as RC
 from build_dice import _circle
-from build_env_frostbound import crystal_cluster
 
 W, D = E.TRAY_W, E.TRAY_D
 RIM_T, RIM_H = 2.2, 2.4
@@ -65,24 +59,9 @@ def marble(name):
     return m
 
 
-def sky():
-    m, k = E.material("Violet sky")
-    tc = k.coords().outputs["Generated"]
-    sep = k.node("ShaderNodeSeparateXYZ")
-    k.link(tc, sep.inputs[0])
-    neb = k.noise(tc, 3.0, 10, 0.65, dist=0.6).outputs["Fac"]
-    col = k.ramp(k.math("MULTIPLY", neb, sep.outputs["Z"]), [(0.1, (0.01, 0.005, 0.03)), (0.35, (0.12, 0.03, 0.25)),
-                                                             (0.5, (0.35, 0.12, 0.5))])
-    stars = k.voronoi(tc, 400.0)
-    st = k.math("LESS_THAN", stars.outputs["Distance"], 0.04)
-    k.surface(k.add_shader(k.emission(col, 1.5), k.emission((1, 1, 1, 1), k.math("MULTIPLY", st, 6.0))))
-    return m
-
-
 def build(scene):
     E.world(scene, color=(0.01, 0.005, 0.02), strength=1.0)
     inlay = P.mask_texture("astrolabe", astrolabe_strokes(), E.TMP, res=4096)
-    E.cube("table", (180, 140, 6), (0, 20, -3.0), marble("Table marble"), bevel=0.8)
     lapis, k = E.material("Lapis field")
     obj = k.coords().outputs["Object"]
     n = k.noise(obj, 0.4, 8, 0.6).outputs["Fac"]
@@ -105,121 +84,91 @@ def build(scene):
     E.rim("rim", W + RIM_T, D + RIM_T, 3.0, RIM_H, RIM_T, marble("Rim marble"), z0=0.3)
     E.rim("rim_cap", W + RIM_T, D + RIM_T, 3.0, 0.4, 0.6, E.simple("Silver", (0.9, 0.9, 0.95), 0.2, 1.0),
           z0=RIM_H + 0.1)
-    top = D / 2 + RIM_T
-    am = P.glass("Amethyst", color=(0.6, 0.3, 0.9), rough=0.05, ior=1.55)
-    crystal_cluster(-W / 2 - 9, top + 2, 0, 7, 11, am, 1.1)
-    crystal_cluster(W / 2 + 8, -D / 2 + 4, 0, 5, 12, am, 0.8)
-    E.light(scene, "POINT", "amethyst_glow", (-W / 2 - 9, top + 2, 6), 600, color=(0.7, 0.35, 1.0), size=3)
-    P.armillary(W / 2 + 12, top + 10, 0.0, R=6.0, mat=E.simple("Armillary silver", (0.85, 0.87, 0.92), 0.2, 1.0))
-    globe_m, k = E.material("Star globe")
-    obj = k.coords().outputs["Object"]
-    st = k.math("LESS_THAN", k.voronoi(obj, 2.5).outputs["Distance"], 0.06)
-    k.surface(k.mix_shader(st, k.bsdf(Base_Color=(0.02, 0.03, 0.12, 1), Roughness=0.3, Coat_Weight=1.0),
-                           k.bsdf(Base_Color=(1.0, 0.8, 0.4, 1), Metallic=1.0, Roughness=0.3)))
-    E.cylinder("globe_stand", 2.5, 1.0, (-W / 2 - 14, 16, 0.5), P.brass())
-    E.cylinder("globe_post", 0.3, 6, (-W / 2 - 14, 16, 3.5), P.brass(), segs=12)
-    E.sphere("star_globe", 5.0, (-W / 2 - 14, 16, 11), globe_m, subdiv=4)
-    P.torus("globe_ring", 5.6, 0.2, (-W / 2 - 14, 16, 11), P.brass(), rot=(math.radians(70), 0, 0.4))
-    # lantern
-    lx, ly = 10.0, top + 18
-    E.cylinder("lantern_base", 3.2, 1.2, (lx, ly, 0.6), P.brass(), segs=8, bevel=0.2)
-    E.cylinder("lantern_glass", 2.8, 8, (lx, ly, 5.2), P.glass("Lantern glass", rough=0.08), segs=8)
-    E.cylinder("lantern_roof", 3.4, 3, (lx, ly, 10.7), P.brass(), segs=8, r2=0.5)
-    P.torus("lantern_ring", 1.0, 0.15, (lx, ly, 12.8), P.brass(), rot=(math.radians(90), 0, 0))
-    P.candle(scene, lx, ly, 1.2, h=4, r=0.9, holder=False, energy=70)
-    # balustrade + sky
-    for i in range(-9, 10):
-        E.cylinder("baluster", 1.6, 60, (i * 9, 95, -30), marble("Baluster marble"), segs=24, r2=1.2)
-    E.cube("balustrade_top", (190, 6, 3), (0, 95, 1.5), marble("Rail marble"), bevel=0.4)
-    sky_ob = E.plane("sky", 1200, 500, (0, 450, 100), sky())
-    sky_ob.rotation_euler = (math.radians(90), 0, 0)
     E.light(scene, "AREA", "moon", (-40, 120, 90), 22000, color=(0.65, 0.7, 1.0), size=40, target=(0, 0, 0))
     E.light(scene, "AREA", "violet_rim", (40, 60, 20), 3500, color=(0.6, 0.35, 1.0), size=30, target=(0, 0, 3))
     E.light(scene, "AREA", "soft_front", (0, -60, 40), 1500, color=(0.85, 0.85, 1.0), size=40, target=(0, 0, 0))
-    E.scatter("stardust", 160, ((-40, -30, 3), (40, 60, 40)), 0.04, E.emissive("Stardust", (0.8, 0.75, 1.0), 6.0),
-              seed=31, scale_range=(0.3, 1.0), avoid=lambda p: abs(p.x) < W / 2 + 6 and abs(p.y) < D / 2 + 10)
     E.overhead(scene, 2500, color=(0.85, 0.85, 1.0), size=90, height=110)  # silver frames read top-down
-    # Top-down framing: a star chart, a silver compass and loose amethyst.
-    bot = -D / 2 - RIM_T
-    chart_m, k = E.material("Star chart")
-    o2 = k.coords().outputs["Object"]
-    st2 = k.math("LESS_THAN", k.voronoi(o2, 0.9).outputs["Distance"], 0.05)
-    k.surface(k.bsdf(Base_Color=k.mix(st2, (0.05, 0.07, 0.2, 1), (0.9, 0.85, 0.6, 1)), Roughness=0.8))
-    P.paper(-2.0, top + 4.0, 0.0, 17, 8, rot=-0.05, mat=chart_m, curl=0.25, seed=41)
-    silver = E.simple("Compass silver", (0.88, 0.9, 0.95), 0.2, 1.0)
-    P.torus("compass_ring", 2.6, 0.25, (W / 2 - 1.5, bot - 3.3, 0.25), silver)
-    E.cylinder("compass_face", 2.4, 0.2, (W / 2 - 1.5, bot - 3.3, 0.15), E.simple("Compass face", (0.05, 0.06, 0.18),
-                                                                                  0.3), segs=48)
-    ndl = E.cube("compass_needle", (0.3, 4.0, 0.1), (W / 2 - 1.5, bot - 3.3, 0.35), silver)
-    ndl.rotation_euler = (0, 0, 0.5)
-    crystal_cluster(-W / 2 + 2.0, bot - 3.0, 0, 3, 17, am, 0.3)
-    rc = room(scene, am)
+    rc = room(scene)
     return dict(
-        samples=128, exposure=0.3, topdown=dict(width=W + 2 * RIM_T + 1.0), hero=dict(dist=32, elev=30, az=8, lens=65, fstop=2.8),
+        samples=128, exposure=-0.5, topdown=dict(width=W + 2 * RIM_T + 1.0),
+        hero=dict(dist=32, elev=30, az=8, lens=65, fstop=2.8),
+        hero_layout={
+            "d20": ((-1.8, -1.0), 20, 0), "d12": ((2.6, 10.0), 12, 12),
+            "d10u": ((3.2, -11.5), 0, -15), "d10t": ((3.0, 4.0), 0, 20),
+            "d8": ((-1.7, -9.5), 8, -10), "d6": ((3.2, -3.0), 6, 18),
+            "d4": ((-0.4, 6.0), 4, 58),
+        },
         play_view=True, tray_half=(W / 2 + RIM_T, D / 2 + RIM_T), room_cam=rc,
     )
 
 
-def room(scene, am):
-    """The observatory loggia (concept: room-concepts/celestial-room).
-
-    An open marble arcade on the star balcony: columns and a lintel frame the
-    nebula sky over the balustrade, marble side walls with deep-violet
-    hangings, a brass telescope on its tripod, a great floor armillary and
-    an amethyst geode. Lights from four sides: the moon (cool, back-left),
-    a brass lantern hung on the left (warm), the amethyst glow (violet,
-    right) and two sconces on the side walls; plus the tray's soft front.
-    """
-    mar, k = E.material("Loggia marble")  # pale, fine-veined (the tray's marble is too bold at room scale)
-    obj = k.coords().outputs["Object"]
-    vein = k.noise(obj, 0.02, 8, 0.7, dist=2.0).outputs["Fac"]
-    v = k.math("LESS_THAN", k.math("ABSOLUTE", k.math("SUBTRACT", vein, 0.5)), 0.012)
-    k.surface(k.bsdf(Base_Color=k.mix(v, (0.62, 0.6, 0.66, 1), (0.3, 0.28, 0.36, 1)), Roughness=0.25,
-                     Coat_Weight=0.3))
-    RC.shell(half_w=200, back=95, front=-200, height=320, wall=mar, floor=RC.tiles("Loggia floor", (0.35, 0.33, 0.4), (0.06, 0.05, 0.08), scale=0.02), floor_z=-60.0,
-             back_wall=False)
-    RC.work_table(180, 140, top_z=-6.0, thick=0.1, mat=mar, leg_r=7, y=20, top=False)
-    # the arcade: columns at the balustrade and a lintel under the open sky
-    for x in (-190, -95, 95, 190):
-        RC.column(x, 100, 320, 14, mar)
-    E.cube("arcade_lintel", (420, 30, 30), (0, 100, RC.FLOOR_Z + 305), mar, bevel=1.5)
-    # violet hangings on the side walls
-    for side, u in (("left", -20), ("right", -20), ("left", -130), ("right", -130)):
-        RC.banner(side, u, 230, w=55, h=180, color=(0.08, 0.02, 0.14), trim=(0.6, 0.48, 0.25), pattern=True)
-    brass = P.brass("Observatory brass", worn=0.35)
-    # a brass telescope on a tripod, back-left, aimed at the sky
-    tx, ty = -125, 55
+def room(scene):
+    """A seated view across the astronomer's table into an open night loggia."""
+    from assets import (geometry as G, materials as M, marble_loggia, marble_table, telescope,
+                        armillary, amethyst_cluster, velvet_drape, astronomer_tools,
+                        night_vista, lantern, book, stone_steps)
+    before=set(bpy.data.objects)
+    top=-.3
+    marble_table.build(loc=(0,-10,-76),width=110,depth=62,height=75.7,quiet=(28,30),back_wings=0,seed=8)
+    velvet_drape.build(loc=(-47,4,top+.2),rot_z=-math.pi/2,width=26,length=32,drop=18,seed=5)
+    astronomer_tools.build("Foreground astrolabe",loc=(-35.5,14,top+.8),rot_z=-.3,radius=7,seed=4)
+    lantern.build("Table brass lantern",loc=(-67,154,-74.5),height=30,radius=6.5,
+                  metal_finish="brass",chain_length=0,energy=1700,seed=9)
     for i in range(3):
-        a = math.radians(120 * i + 20)
-        leg = E.cylinder("tripod_leg", 1.4, 120, (tx + math.cos(a) * 18, ty + math.sin(a) * 18, RC.FLOOR_Z + 58),
-                         P.dark_wood("Tripod wood"), segs=10)
-        leg.rotation_euler = (-math.sin(a) * 0.3, math.cos(a) * 0.3, 0)
-    tube = E.cylinder("telescope", 6, 110, (tx + 12, ty + 25, RC.FLOOR_Z + 135), brass, segs=32, r2=4.5)
-    tube.rotation_euler = (math.radians(-60), 0, math.radians(-25))
-    # a great floor armillary on the right
-    P.armillary(125, 40, RC.FLOOR_Z, R=38.0, mat=brass)
-    # an amethyst geode with its violet glow (right, front of the armillary)
-    import build_env_frostbound as F
-    F.crystal_cluster(110, -30, RC.FLOOR_Z + 0.5, 11, 31, am, 3.2)
-    E.light(scene, "POINT", "geode_glow", (110, -30, RC.FLOOR_Z + 40), 30000, color=(0.65, 0.3, 1.0), size=15,
-            shadow=False)
-    # a warm lantern hung on the left and sconces on the side walls
-    RC.hanging_lantern(scene, -80, -20, 70, energy=35000, mat=brass, glass_color=(1.0, 0.75, 0.45))
-    for side in ("left", "right"):
-        RC.sconce(scene, side, 40, 120, energy=9000)
-    # a star layer in front of the nebula, sized for the room shot
-    sm, k = E.material("Room stars")
-    tc = k.coords().outputs["Generated"]
-    v = k.voronoi(tc, 90.0)
-    st = k.math("LESS_THAN", v.outputs["Distance"], k.math("MULTIPLY", v.outputs["Color"], 0.07))
-    k.surface(k.mix_shader(st, k.node("ShaderNodeBsdfTransparent").outputs[0],
-                           k.emission((0.95, 0.9, 1.0, 1), 5.0)))
-    card = E.plane("room_stars", 1150, 480, (0, 420, 110), sm)
-    card.rotation_euler = (math.radians(90), 0, 0)
-    card.visible_shadow = False
-    # a ringed planet and a pale moon hanging in the nebula
-    moon = E.sphere("sky_moon", 45, (-170, 430, 190), E.emissive("Sky moon", (0.5, 0.48, 0.62), 0.9), subdiv=4)
-    moon.visible_shadow = False
-    pl = E.sphere("sky_planet", 22, (190, 430, 250), E.emissive("Sky planet", (0.4, 0.33, 0.55), 0.7), subdiv=4)
-    pl.visible_shadow = False
-    return dict(loc=(-10, -75, 22), target=(5, 100, 45), lens=18, fstop=4.0, focus=(0, 0, 2))
+        book.build(f"Gilt observatory folio {i}",loc=(-68,180,-74.5+i*4),rot_z=-.09+i*.10,
+                   width=22,depth=28,thickness=4,tone=(.027,.011,.04),seed=10+i)
+    amethyst_cluster.build("Right amethyst bowl",loc=(100,210,-100),radius=7.4,height=10.5,seed=8,energy=280)
+    amethyst_cluster.build("Left amethyst bowl",loc=(-48,165,-75),radius=7,height=9,seed=5,energy=110)
+    astronomer_tools.build("Parchment star chart",loc=(37,13,top),rot_z=0,kind="chart",width=17,depth=23,seed=6)
+    astronomer_tools.build("Brass magnifier",loc=(35,16,top+.65),rot_z=-.25,kind="magnifier",radius=3.6)
+    astronomer_tools.build("Incense burner",loc=(44,14,top),kind="incense",radius=3.2,seed=3)
+    armillary.build("Table celestial globe",loc=(51,150,-75),kind="globe",radius=10,pedestal=10,seed=7)
+    fixtures=G.Asset("Observatory fixtures")
+    marble=M.fine_marble("Loggia floor marble",(.27,.26,.25),.6,seed=11)
+    fixtures.block("Player loggia floor",(290,150,8),(0,-10,-80),marble,.7)
+    fixtures.block("Astronomy terrace",(350,180,8),(0,154,-197),marble,.7)
+    fixtures.block("Lower loggia terrace",(510,150,8),(0,300,-294),marble,.7)
+    fixtures.block("Outer balcony pavement",(510,75,8),(0,412,-329),marble,.7)
+    stone_steps.build("Terrace stair",loc=(110,65,-193),width=70,tread=11,rise=13,count=9,tone=(.20,.20,.23))
+    stone_steps.build("Arcade stair",loc=(140,244,-290),width=80,tread=10,rise=12.125,count=8,tone=(.20,.20,.23))
+    stone_steps.build("Balcony edge steps",loc=(0,375,-325),width=500,tread=7,rise=7,count=5,tone=(.20,.20,.23))
+    marble_loggia.build(loc=(0,330,-290),bays=3,span=135,height=125,radius=10,balustrade_height=95,rail_offset=70,rail_base=-35,seed=6)
+    marble_table.build("Instrument console",loc=(-68,170,-147),width=32,depth=50,height=72,quiet=(0,0),seed=9)
+    armillary.build("Great brass armillary",loc=(-51,211,-125),radius=20,pedestal=18,seed=12)
+    telescope.build(loc=(-13,210,-193),rot_z=.08,length=91,radius=4.8,stand_height=91,elevation=-12,seed=6)
+    velvet_drape.build("Console velvet",loc=(-68,170,-74.5),width=30,length=46,drop=20,seed=13)
+    lantern.build("Distant brass lantern",loc=(134,274,-134),height=33,radius=8,metal_finish="brass",chain_length=0,energy=24000,seed=18)
+    fixtures.lathe("Lantern marble pedestal",[(0,0),(18,0),(18,6),(12,12),(9,20),(9,135),(14,143),(18,147),(18,156),(0,156)],
+                   marble,(134,274,-290),segments=48)
+    fixtures.lathe("Armillary marble plinth",[(0,0),(22,0),(22,4),(17,9),(14,16),(14,58),(20,66),(22,68),(0,68)],
+                   marble,(-51,211,-193),segments=48)
+    marble_table.build("Globe side console",loc=(51,150,-147),width=30,depth=30,height=72,quiet=(0,0),seed=19)
+    night_vista.build(seed=15,slope=.60,sky_strength=2.3,moon_strength=2.4)
+    def area(name,loc,target,energy,color,size):
+        ob=fixtures.light(name,loc,energy,color,size,target=target,kind="AREA")
+        ob.visible_glossy=True;ob.data.specular_factor=1
+        return ob
+    area("Lantern reflected table warmth",(-62,139,-47),(-50,172,-75),36000,(1,.65,.32),20)
+    area("Moonlit table edge",(23,60,38),(19,9,0),25000,(.47,.62,1),35)
+    area("Amethyst bowl reflected accent",(39,32,20),(20,14,0),3000,(.60,.35,1),15)
+    area("Lantern on brass instruments",(-61,162,-68),(-35,208,-97),65000,(1,.67,.35),55)
+    area("Moonlit arcade stone",(20,410,80),(0,320,-100),900000,(.40,.56,1),180)
+    area("Warm loggia return",(-150,220,-25),(-40,320,-120),140000,(1,.68,.38),85)
+    area("Right lantern stone pool",(127,251,-105),(147,330,-125),180000,(1,.64,.30),45)
+    area("Instrument moon edge",(38,195,42),(-10,180,-30),170000,(.52,.65,1),55)
+    fixtures.block("Left console landing",(34,52,46),(-68,170,-170),marble,.5)
+    fixtures.block("Right console landing",(32,32,46),(51,150,-170),marble,.5)
+    for x,y,r,h in ((-48,165,8,118),(100,210,9,93)):
+        fixtures.lathe("Crystal display pedestal",[(0,0),(r*1.2,0),(r*1.2,5),(r*.7,12),
+            (r*.6,h-13),(r,h-5),(r*1.15,h-3),(r*1.15,h),(0,h)],marble,(x,y,-193),segments=48)
+    receivers=bpy.data.collections.new("Celestial room light receivers")
+    for ob in set(bpy.data.objects)-before:
+        if ob.type in {"MESH","CURVE"}:receivers.objects.link(ob)
+    group=G.Asset("Celestial room frame",rot_z=-math.pi/2)
+    for ob in set(bpy.data.objects)-before:
+        if ob.type=="LIGHT":
+            ob.light_linking.receiver_collection=receivers
+            ob.data.energy *= 1.7
+        if ob!=group.root and ob.parent is None:group.add(ob)
+    return dict(loc=(-50,0,41),target=(0,0,7.5),lens=46.3,
+                fstop=8*scene.unit_settings.scale_length,focus=(5,0,1.4))
