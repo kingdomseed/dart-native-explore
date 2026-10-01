@@ -1098,19 +1098,21 @@ Lighting recipes (the tray lights are unchanged unless noted):
   dice get a cool back rim. Gate: numeral 8.85 (d4), die vs tray 2.11,
   stroke 0.121–0.130, PASS.
 
-- **Arcane Study — the night study (round 2).** An oblique broadside
-  view, 39 mm at f/8, with the tray spanning 79.7% of the frame and its near
-  rim cropped at the bottom. A dark oak desk and supported side returns
-  carry navy star-embroidered velvet, a brass compass, a parchment chart,
-  magnifier and rolled scroll. Candles, a chased inkwell with a barbed quill,
-  glowing geometric runestones, gilt leather books and a brass armillary
-  overlap at different depths. Carved oak bookcases frame a pointed Gothic
-  window onto the moonlit spired town. Candle pools, moonlight and the blue
-  bowl accent use linked room receivers. Exposure -0.15 EV and two linked
-  candle reflections on the existing brass floor preserve the original
-  tray materials and lights. Foreground clearance is at least 12.7 cm.
-  At 50% / 32 samples, gate: numeral 5.13 (d20), die vs tray 3.59,
-  stroke 0.124–0.130, PASS.
+- **Arcane Study — the night study (round 2).** A closer
+  oblique broadside view looks down 35.2 degrees, using 20.4 mm at effective
+  f/8. The tray spans 84.6% of the frame with its near rim cropped at the
+  bottom. One planked oak desktop replaces the separate box-shaped returns;
+  its moulded rear recess frames the supported armillary instrument table.
+  Heaped navy velvet, larger gold stars, candles, inkwell, blue runestones,
+  gilt leather books and a pierced brass censer bring the dressing together
+  on the main desktop. The armillary stays on the lower table behind it.
+  Carved bookcases and the moonlit Gothic window remain legible above.
+  Stronger candle pools lift the warm mid-tones; two linked reflections
+  warm the existing brass floor and rim cap. Exposure remains -0.15 EV;
+  the tray shaders, geometry and original lights are unchanged. Bright
+  dressing and cloth clear the rim by at least 10.37 cm.
+  Gate: numeral 7.93 (d20), die vs tray 4.78, stroke 0.124–0.130,
+  PASS.
 
 - **Fate Engine — the inventor's workshop.** Brick walls run with copper
   pipes and big brass wall gears, a tall mullioned window onto a spired

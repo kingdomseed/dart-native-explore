@@ -16,7 +16,7 @@ textures, text, or external assets are required.
 | --- | --- |
 | `forge` | Masonry firebox, wedge arch, tapered hood, coke and flame tongues; width, depth, height, hearth_height, mouth_spring, stone_tone, energy |
 | `anvil` | London profile, drawn horn, cutting step, pierced heel, feet and bark-covered log with sawn end grain and radial splits; length, stump_height, wood_tone, metal_finish |
-| `oak_table` | Separate planks, breadboard ends, pegs, aprons, chamfered legs, through stretcher; width, depth, height, thickness, wood_tone, scorch, leg_inset, leg_width |
+| `oak_table` | Separate planks, breadboard ends, pegs, aprons, chamfered legs, through stretcher; width, depth, height, thickness, wood_tone, scorch, leg_inset, leg_width, optional rear_recess |
 | `tool_rack` | Pivoted tongs, two peen types, chisels, punches, horseshoes and suspension loops; width, height, wood_tone, metal_finish |
 | `lantern` | Hexagonal glazed cage, diamond bars, peaked cap, candle, chain and hook; height, radius, chain_length, metal_finish, energy |
 | `leaded_window` | Stone reveal, diamond cames, glazing, moon and town backdrop; width, height, reveal, moon_height, moon_offset, sky_strength, moon_strength, exterior_slope, energy |
@@ -54,7 +54,7 @@ textures, text, or external assets are required.
 | `telescope` | Sectioned refractor, dew cap, lens, focuser, finder, equatorial bearings and braced tripod; length, radius, stand_height, elevation, wood_tone, metal_tone |
 | `armillary` | Graduated nested brass bands and central sphere, or enamel celestial globe with inlaid coordinates; kind, radius, pedestal, metal_tone |
 | `amethyst_cluster` | Terminated quartz prisms, pale tips, internal inclusions and spun brass bowl; radius, height, count, bowl, tone, metal_finish, energy, mineral, glow, fractures, edge_glow |
-| `velvet_drape` | Folded velvet runner with an edge drop, sewn borders and gold star embroidery; width, length, drop, tone, stars, sheen_tone, stitch_width |
+| `velvet_drape` | Folded velvet runner with an edge drop, sewn borders and gold star embroidery; width, length, drop, tone, stars, sheen_tone, stitch_width; optional heap, curved sweep, embroidery spacing/band and weighted rest patches |
 | `astronomer_tools` | Rete disk, curled constellation chart, convex magnifier or pierced incense vessel; kind, radius, width, depth, metal_tone |
 | `night_vista` | Indigo galaxy, maria and terminator, distant planet, spired floating citadels and layered surface clouds; width, depth, slope, sky_strength, moon_strength, moon_offset, planet_offset, cloud_drop |
 | `stone_altar` | Chamfered granite mensa, moulded edge, carved trestles and bronze geometric inlays; width, depth, height, tone, metal_tone, frost, carving, accumulation, quiet, quiet_center |
@@ -202,23 +202,28 @@ Emberforged, Voltline and Celestial retain their material behavior.
 
 
 Arcane preserves the original board shader, board/base/rim/boss geometry and all
-five build-stage lights, including the overhead. Its room rotates around the
-tray for an oblique broadside view. The tray spans 79.7 percent of the frame,
-with the near rim cropped at the bottom; the camera uses a 39 mm lens at f/8
-converted for centimetre units. Foreground dressing clears the rim by at least
-12.7 cm. The oak desk ends just behind the tray, with supported side returns
-for navy velvet, the brass compass, parchment, rolled scroll and magnifier.
+five build-stage lights, including the overhead. Its second-pass camera looks
+down 35.2 degrees with a 20.4 mm lens at effective f/8. The camera is 21.5 cm
+above the desktop; the close, wider view makes the tray span 84.6 percent of
+the frame, with the near rim cropped at the bottom.
 
-Candles, the writing set, runestone basin, stacked gilt tomes and armillary sit
-at separate depths on the side consoles. Carved bookcases fill the left
-background, with the pointed window, moon and town to the right. Warm candle
-pools, a cool window edge and a small blue runestone accent use environment
-light receivers. Exposure is -0.15 EV. Two reflected candle sources are
-linked only to the existing brass board, retaining floor separation without
-changing the tray materials or original lights.
+The separate box-shaped side returns are replaced by one planked oak desktop
+with a rounded, beaded rear recess for the armillary reading table. Candles,
+inkwell, runestone bowl, gilt tomes, parchment and a pierced brass censer share
+the main desktop. Heaped navy velvet has larger sewn stars following its folds
+and weighted flat patches beneath the supported objects. The armillary remains
+on a lower supported instrument table behind the recess. Carved bookcases and
+the moonlit Gothic window frame the upper part of the shot.
 
-The new parchment, feather and runestone materials are additive. Optional
-`gilt_spine`, narrow-table leg spacing, velvet sheen color and stitch width
-preserve their previous defaults. The approved Emberforged, Voltline, Celestial
-and Frostbound rooms are checked at 25 percent / 16 samples after these shared
-additions. There are no room volumes, downloads, lettering or external assets.
+Warm candle pools and cool window light are linked to room receivers. Two
+additional warm reflections illuminate the existing brass board and rim cap;
+exposure remains -0.15 EV. The original tray materials and lights are unchanged.
+At 50 percent / 32 samples the top-down gate passes: numeral 5.20, die versus
+tray 5.02, stroke 0.124–0.130. Dressing clearance is at least 10.37 cm.
+
+Optional `oak_table.rear_recess` takes the two radii of the curved desk cutout;
+it leaves the normal table unchanged when omitted. `velvet_drape.heap`, sweep
+controls, rest patches and embroidery controls likewise preserve their previous
+defaults. No shared material behavior changes. Emberforged, Voltline, Celestial
+and Frostbound are re-rendered serially at 25 percent / 16 samples after these
+extensions. There are no room volumes, downloads, lettering or external assets.

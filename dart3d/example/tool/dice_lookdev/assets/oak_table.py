@@ -10,7 +10,8 @@ from . import geometry as G, materials as M
 
 
 def build(name="Oak table", loc=(0, 0, 0), rot_z=0, width=150, depth=85, height=70,
-          thickness=7, wood_tone=(0.095, 0.038, 0.013), wear=0.7, seed=1, scorch=0.4, leg_inset=(16, 12), leg_width=9) -> bpy.types.Object:
+          thickness=7, wood_tone=(0.095, 0.038, 0.013), wear=0.7, seed=1, scorch=0.4, leg_inset=(16, 12), leg_width=9,
+          rear_recess=None) -> bpy.types.Object:
     a = G.Asset(name, loc, rot_z)
     rng = random.Random(seed)
     boards = max(4, round(depth / 14))
@@ -42,6 +43,8 @@ def build(name="Oak table", loc=(0, 0, 0), rot_z=0, width=150, depth=85, height=
     for i in range(round(45 * wear)):
         x, y = rng.uniform(-width * 0.4, width * 0.4), rng.uniform(-depth * 0.43, depth * 0.43)
         length = rng.uniform(0.7, 4.5)
+        if rear_recess and any((xx/rear_recess[0])**2+((y-depth/2-8)/rear_recess[1])**2<1.1 for xx in (x,x+length)):
+            continue
         a.tube("Shallow work scar", [(x, y, height + 0.016), (x + length, y + rng.uniform(-0.3, 0.3), height + 0.016)],
                rng.uniform(0.012, 0.035), scratch, resolution=1)
     cross = M.oak(f"{name} end grain", wood_tone, wear, seed, axis="Y")
@@ -68,4 +71,22 @@ def build(name="Oak table", loc=(0, 0, 0), rot_z=0, width=150, depth=85, height=
         a.block("Long apron", (lx * 2, 5, 14), (0, sy * ly, height - thickness - 7), long, 0.35)
     for sx in (-1, 1):
         a.block("Stretcher wedge", (2, 9, 15), (sx * (lx + 5), 0, 20), peg, 0.2)
+    if rear_recess:
+        rx,ry=rear_recess
+        cutter=a.cylinder("Desk recess construction",1,height*2,(0,depth/2+8,height/2),grime,bevel=0,segments=96)
+        cutter.scale=(rx,ry,1)
+        cutter.hide_render=True
+        cutter.display_type="WIRE"
+        bpy.context.view_layer.update()
+        for ob in list(a.root.children):
+            if ob.type!="MESH" or ob==cutter or ob.name.startswith("Old heat stain"):
+                continue
+            cut=ob.modifiers.new("Curved writing recess","BOOLEAN")
+            cut.operation="DIFFERENCE";cut.object=cutter
+            edge=ob.modifiers.new("Rounded recess arris","BEVEL")
+            edge.width=.18;edge.segments=3;edge.harden_normals=True
+        start=math.pi+math.asin(8/ry);end=math.tau-math.asin(8/ry)
+        for z,radius in ((height-.35,.22),(height-thickness+.4,.32)):
+            a.tube("Carved recess bead",[(rx*math.cos(t),depth/2+8+ry*math.sin(t),z)
+                    for t in (start+(end-start)*i/100 for i in range(101))],radius,cross)
     return a.root
