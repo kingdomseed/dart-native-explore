@@ -10,9 +10,10 @@ from __future__ import annotations
 
 import math
 
+import bpy
+
 import env_common as E
 import env_props as P
-import room_common as RC
 
 W, D = E.TRAY_W, E.TRAY_D
 RIM_T, RIM_H = 2.2, 2.6
@@ -88,8 +89,6 @@ def board(sigil, size):
 def build(scene):
     E.world(scene, color=(0.004, 0.005, 0.012), strength=1.0)
     sigil = P.mask_texture("arcane_sigil", P.sigil_strokes(seed=7, points=7, runes=30), E.TMP, res=4096)
-    table = P.dark_wood("Study table", c1=(0.02, 0.01, 0.006), c2=(0.06, 0.03, 0.015))
-    E.cube("table", (220, 160, 6), (0, 20, -3.0), table, bevel=0.5)
     E.plane("board", W + 2 * RIM_T, D + 2 * RIM_T, (0, 0, 0.31), board(sigil, W * 0.96))
     E.cube("board_base", (W + 2 * RIM_T + 1, D + 2 * RIM_T + 1, 0.6), (0, 0, 0.0),
            P.dark_wood("Board edge", c1=(0.02, 0.01, 0.006), c2=(0.05, 0.025, 0.012)), bevel=0.2)
@@ -101,50 +100,8 @@ def build(scene):
             E.sphere("rim_boss", 0.8, (sx * (W / 2 + RIM_T / 2), sy * (D / 2 + RIM_T / 2), RIM_H + 0.7),
                      P.brass(), subdiv=3, scale=(1, 1, 0.6))
 
-    # Back edge: candles, tomes, armillary, window.
     top = D / 2 + RIM_T
-    P.candle(scene, -9.0, top + 7.0, 0.0, h=13, r=1.7, seed=1, energy=55)
-    P.candle(scene, 11.0, top + 5.5, 0.0, h=9, r=1.5, seed=2, energy=45)
-    P.candle(scene, 3.5, top + 16.0, 0.0, h=16, r=1.9, seed=3, energy=60)
-    P.book_stack(-26.0, top + 8.0, 0.0, 5, seed=1)
-    P.book_stack(28.0, top + 4.0, 0.0, 4, seed=2)
-    P.armillary(18.0, top + 20.0, 0.0, R=6.5)
-    P.backdrop_window(0, top + 80, 45, 70, 80)
-    # Sides/front: runestones, velvet, coins, maps, hourglass, inkwell + quill.
-    P.bowl(W / 2 + 12, -8.0, 0.0, 6.0, P.brass("Bowl brass", worn=0.6))
-    P.runestones(W / 2 + 12, -8.0, 0.8, 7, spread=3.5)
     E.light(scene, "POINT", "rune_glow", (W / 2 + 12, -8, 5), 250, color=(0.25, 0.5, 1.0), size=3)
-    cloth = P.paper(W / 2 + 18, 14, 0.0, 30, 40, rot=0.2, mat=P.velvet("Star velvet"), curl=1.2, seed=3)
-    P.paper(-W / 2 - 16, -6, 0.0, 22, 30, rot=-0.25, curl=0.8, seed=4)
-    P.paper(-W / 2 - 10, -D / 2 - 6, 0.0, 26, 18, rot=0.35, curl=0.6, seed=5)
-    for i, (x, y) in enumerate(((-W / 2 - 7, -D / 2 + 4), (-W / 2 - 4.5, -D / 2 + 1), (-W / 2 - 9.5, -D / 2),
-                                (-W / 2 - 5, -D / 2 - 3))):
-        P.coin(x, y, 0.1 + 0.25 * (i == 3), r=1.5, tilt=(0.05 * i, -0.04 * i))
-    P.hourglass(W / 2 + 9, D / 2 - 4, 0.0, h=11)
-    ink = E.cube("inkwell", (4, 4, 3.6), (-W / 2 - 8, 12, 1.8), P.glass("Ink glass", color=(0.05, 0.08, 0.2)),
-                 bevel=0.4)
-    E.cylinder("inkwell_cap", 1.2, 0.8, (-W / 2 - 8, 12, 4.0), P.brass())
-    quill = E.sphere("quill", 1.0, (-W / 2 - 11, 16, 5), E.simple("Quill", (0.02, 0.02, 0.03), 0.4,
-                                                                Sheen_Weight=1.0), subdiv=3,
-                     scale=(0.9, 9.0, 0.08))
-    quill.rotation_euler = (math.radians(-35), math.radians(10), math.radians(25))
-
-    # Top-down framing: low props peeking into the strips above and below
-    # the tray (tall ones leave the frame under perspective).
-    top_in, bot_in = D / 2 + RIM_T, -D / 2 - RIM_T
-    P.paper(-4.0, top_in + 4.2, 0.0, 16, 7, rot=0.06, curl=0.25, seed=21)  # a map sheet
-    for i, (x, y) in enumerate(((5.5, top_in + 2.6), (7.6, top_in + 3.5), (6.3, top_in + 5.0))):
-        P.coin(x, y, 0.05 + 0.23 * i, r=1.3, tilt=(0.04 * i, -0.03 * i))
-    letter = P.paper(2.5, bot_in - 3.6, 0.0, 14, 8, rot=-0.08, curl=0.2, seed=22)
-    E.cylinder("wax_seal", 1.25, 0.35, (6.5, bot_in - 3.2, 0.3), E.simple("Seal wax", (0.35, 0.02, 0.02), 0.35,
-                                                                        Coat_Weight=0.5), segs=32, bevel=0.1)
-    q = E.sphere("quill_low", 1.0, (-5.0, bot_in - 2.6, 0.4), E.simple("Quill low", (0.85, 0.82, 0.75), 0.6,
-                                                                     Sheen_Weight=1.0), subdiv=3,
-                 scale=(0.7, 7.5, 0.08))
-    q.rotation_euler = (0, 0, math.radians(72))
-    E.cube("velvet_corner", (12, 10, 0.5), (-W / 2 - 3.0, bot_in - 4.0, 0.25), P.velvet("Bag velvet"), bevel=0.2)
-    P.bowl(W / 2 + 2.2, bot_in - 4.0, 0.0, 4.5, P.brass("Low bowl brass", worn=0.6), depth=1.8)
-    P.runestones(W / 2 + 2.2, bot_in - 4.0, 0.4, 5, spread=2.4, seed=8)
 
     # Lights. Round 2: a warm candle key pooled on the tray from the candle
     # cluster (angled, so no hotspot in the dice's top faces), a big soft
@@ -155,55 +112,128 @@ def build(scene):
             target=(0, -5, 0))
     E.light(scene, "AREA", "warm_fill", (-30, -30, 30), 900, color=(1.0, 0.7, 0.45), size=25, target=(0, 0, 0))
     E.overhead(scene, 3500, color=(1.0, 0.85, 0.65), size=90, height=110)
-    # Dust motes in the candlelight (kept off the tray so they don't read as
-    # specks on the dice at top-down).
-    E.scatter("motes", 160, ((-35, -25, 3), (35, 50, 35)), 0.05, E.emissive("Mote", (1.0, 0.85, 0.6), 4.0),
-              seed=12, scale_range=(0.3, 1.0), avoid=lambda p: abs(p.x) < W / 2 + 6 and abs(p.y) < D / 2 + 10)
-    E.haze_box("haze", (160, 180, 70), (0, 20, 34), 0.004, color=(0.9, 0.85, 1.0), noise_scale=0.03)
-    rc = room(scene, table, top)
+    rc = room(scene)
     return dict(
-        samples=128, exposure=0.6, topdown=dict(width=W + 2 * RIM_T + 1.0), hero=dict(dist=32, elev=30, az=6, lens=65, fstop=2.8),
+        samples=128, exposure=-.15, topdown=dict(width=W + 2 * RIM_T + 1.0), hero=dict(dist=32, elev=30, az=6, lens=65, fstop=2.8),
+        hero_layout={
+            "d20": ((-1.8, -1.0), 20, 0), "d12": ((2.6, 10.0), 12, 12),
+            "d10u": ((3.2, -11.5), 0, -15), "d10t": ((3.0, 4.0), 0, 20),
+            "d8": ((-1.7, -9.5), 8, -10), "d6": ((3.2, -3.0), 6, 18),
+            "d4": ((-0.4, 6.0), 4, 58),
+        },
         play_view=True, tray_half=(W / 2 + RIM_T, D / 2 + RIM_T), room_cam=rc,
     )
 
 
-def room(scene, table, top):
-    """The night study (concept: room-concepts/arcane-room).
+def room(scene):
+    """Layered candlelit library, broadside desk and a moonlit pointed window.
 
-    The desk stands against the window wall: a tall leaded window with a
-    moonlit skyline of spires behind the tray, floor-to-ceiling bookcases
-    either side of it and along the left wall, a fireplace on the right
-    wall, candle sconces, a rug. Lights from four sides: moonlight through
-    the window (cool, back), the fireplace (warm, right), sconces and the
-    desk candles (warm, back-left and back-right), the tray's candle key.
+    Room coordinates are lateral X, depth Y; the parent rotates the study
+    around the untouched tray. Room lights only illuminate room receivers.
     """
-    wy = top + 80  # the window plane (P.backdrop_window's mullions)
-    wall = RC.plaster("Study plaster", (0.12, 0.1, 0.09))
-    panel = P.dark_wood("Study panelling", c1=(0.025, 0.012, 0.007), c2=(0.07, 0.035, 0.016))
-    RC.shell(half_w=190, back=wy, front=-200, height=280, wall=wall, floor=RC.planks(),
-             openings={"back": [(0, 45, 70, 80)]}, side_mats={"left": panel})
-    spires = RC.sky("Study night", (0.015, 0.02, 0.06), (0.07, 0.09, 0.2), stars=2.0, strength=0.7,
-                    skyline=((0.01, 0.012, 0.025), 0.3))
-    RC.window("back", 0, 45, 70, 80, spires, panel, mullions=(1, 1), sill=False,
-              glow=(25000, (0.55, 0.65, 1.0)))
-    RC.work_table(220, 160, top_z=0.0, thick=6.0, mat=table, leg_r=6, y=20, top=False)
-    oak = P.dark_wood("Study oak", c1=(0.03, 0.015, 0.008), c2=(0.09, 0.045, 0.02))
-    for u, seed in ((-120, 1), (120, 2)):
-        RC.bookshelf("back", u, w=110, h=250, depth=32, rows=8, seed=seed, mat=oak)
-    for u, seed in ((-60, 3), (-170, 4)):
-        RC.bookshelf("left", u, w=110, h=250, depth=32, rows=8, seed=seed, mat=oak)
-    RC.fireplace(scene, "right", -60, w=130, h=115, depth=40, energy=160000, seed=5,
-                 mat=RC.stone("Study hearth", (0.1, 0.09, 0.08), (0.22, 0.2, 0.17), scale=0.03))
-    for u in (-58, 58):
-        RC.sconce(scene, "back", u, 80, energy=6000)
-    RC.rug(0, -60, 260, 200, (0.12, 0.02, 0.03), (0.03, 0.02, 0.08), name="Study rug")
-    RC.chair(-20, -95, rot=math.radians(180 - 10), mat=oak)
-    # a tall brass candelabrum on the floor by the left bookcase (warm, left)
-    brass = P.brass("Candelabrum brass", worn=0.4)
-    E.cylinder("candelabrum", 1.5, 150, (-150, 60, RC.FLOOR_Z + 75), brass, segs=16)
-    E.cylinder("candelabrum_foot", 16, 4, (-150, 60, RC.FLOOR_Z + 2), brass, segs=32, r2=6)
-    for dx in (-12, 0, 12):
-        P.candle(scene, -150 + dx, 60, RC.FLOOR_Z + 150, h=14, r=1.6, seed=int(dx) + 30, energy=0, light=False)
-    E.light(scene, "POINT", "candelabrum_light", (-150, 60, RC.FLOOR_Z + 170), 20000, color=(1.0, 0.65, 0.35),
-            size=8)
-    return dict(loc=(16, -72, 44), target=(-2, 90, 2), lens=20, fstop=4.0, focus=(0, 0, 2))
+    from assets import (geometry as G, materials as M, oak_table, bookcase,
+                        gothic_window, writing_set, runestone_bowl, candlestick,
+                        candles, book, armillary, velvet_drape, astronomer_tools,
+                        vessel, stone_steps)
+    before=set(bpy.data.objects)
+    top=-.3
+    fixtures=G.Asset("Study architecture")
+    oak=M.oak("Study wall oak",(.075,.027,.009),.45,7,axis="Z")
+    dark=M.oak("Study recessed panels",(.038,.016,.009),.4,8,axis="Z")
+    stone=M.stone("Warm study plaster",(.085,.068,.048),.25,7)
+    oak_table.build("Scholar desk",loc=(0,-9,-76),width=100,depth=42,height=75.7,
+                    thickness=3.8,wood_tone=(.07,.026,.008),wear=.25,scorch=0,seed=11)
+    oak_table.build("Left writing return",loc=(-38,32,-76),width=26,depth=40,height=75.7,leg_inset=(4,6),leg_width=6,
+                    thickness=3.8,wood_tone=(.07,.026,.008),wear=.25,scorch=0,seed=11)
+    oak_table.build("Right writing return",loc=(38,32,-76),width=26,depth=40,height=75.7,leg_inset=(4,6),leg_width=6,
+                    thickness=3.8,wood_tone=(.07,.026,.008),wear=.25,scorch=0,seed=11)
+    velvet_drape.build("Star embroidered desk velvet",loc=(-37,30,top+.45),rot_z=math.pi/2,width=26,
+                       length=30,drop=16,tone=(.006,.011,.033),stars=19,seed=8,sheen_tone=(.02,.04,.10),stitch_width=.065)
+    writing_set.build("Quill and inkwell",loc=(-22,70,-17),width=5.6,height=5.8,quill_length=21,seed=4)
+    runestone_bowl.build("Luminous blue basin",loc=(-23,91,-17),radius=8,height=4.8,energy=170,seed=7)
+    astronomer_tools.build("Foreground brass compass",loc=(-34,23,top+.9),radius=6,seed=6)
+    astronomer_tools.build("Study parchment chart",loc=(37,28,top+.02),kind="chart",width=17,depth=24,seed=8)
+    writing_set.build("Rolled scholar scroll",loc=(39,45,top+.15),rot_z=-.18,kind="scroll",width=17,seed=12)
+    astronomer_tools.build("Desk magnifier",loc=(37,27,top+.65),rot_z=-.5,kind="magnifier",radius=3.2,seed=8)
+    # Supported side consoles extend the library into the view at distinct depths.
+    fixtures.block("Player oak floor",(360,104,8),(0,-7,-80),dark,.5)
+    fixtures.block("Library lower floor",(430,80,8),(0,90,-149),dark,.5)
+    fixtures.block("Back library floor",(480,190,8),(0,225,-174),dark,.5)
+    stone_steps.build("Library shallow stair",loc=(135,130,-170),width=60,tread=9,rise=5,count=5,tone=(.10,.063,.032))
+    stone_steps.build("Study stair",loc=(125,52,-145),width=70,tread=11.5,rise=11.5,count=6,tone=(.10,.063,.032))
+    oak_table.build("Left candle console",loc=(-35,84,-145),width=44,depth=60,height=128,
+                    wood_tone=(.075,.028,.009),scorch=0,wear=.3,seed=5)
+    candlestick.build("Tall left candle",loc=(-34,143,-60),height=19,radius=4.2,candle_height=15,
+                       candle_radius=1.8,energy=1300,seed=3)
+    candlestick.build("Short left candle",loc=(-32,62,-17),height=10,radius=3.4,candle_height=12,
+                       energy=850,seed=9)
+    for i in range(4):
+        book.build(f"Left stacked grimoire {i}",loc=(-43,100,-17+i*4.4),rot_z=math.pi/2-.12+i*.06,
+                   width=22,depth=25,thickness=4.4,tone=(.018,.023,.039),seed=4+i,gilt_spine=True)
+    oak_table.build("Armillary console",loc=(-15,157,-170),width=52,depth=43,height=110,
+                    wood_tone=(.063,.024,.01),scorch=0,seed=14)
+    armillary.build("Brass scholar armillary",loc=(-15,157,-60),radius=16,pedestal=14,seed=8)
+    oak_table.build("Right book console",loc=(87,155,-170),width=54,depth=44,height=132,
+                    wood_tone=(.07,.023,.01),scorch=0,seed=3)
+    for i in range(5):
+        book.build(f"Right stacked codex {i}",loc=(81,155,-38+i*4.3),rot_z=math.pi/2+.12-i*.047,
+                   width=19,depth=25,thickness=4.3,tone=(.028,.012,.009),seed=30+i,gilt_spine=True)
+    candlestick.build("Right console candle",loc=(65,155,-38),height=10,radius=3.2,
+                       candle_height=10,energy=2300,seed=5)
+    vessel.build("Scholar brass cup",loc=(87,139,-38),kind="goblet",height=13,radius=3.4,metal_finish="brass",seed=5)
+    # The surrounding wall is real panel construction with a clear window aperture.
+    for x,w in ((-99,268),(226,110)):
+        fixtures.block("Study back plaster",(w,8,260),(x,292,-20),stone,.2)
+        for j in range(max(1,int(w/25))):
+            xx=x-w/2+13+j*25
+            fixtures.block("Recessed oak wall panel",(22,2,72),(xx,286,-122),dark,.35)
+            fixtures.block("Wall panel stile",(2.2,3,76),(xx-12,284,-122),oak,.25)
+    fixtures.block("Window wall below sill",(130,9,75),(99,292,-204),stone,.3)
+    fixtures.block("Window wall above arch",(130,9,120),(99,292,64),stone,.3)
+    gothic_window.build("Moonlit Gothic window",loc=(99,285,-166),width=110,height=170,
+                         reveal=17,stone_tone=(.095,.075,.055),sky_strength=2.6,
+                         moon_strength=3.7,moon_offset=.67,energy=70000,exterior_slope=.46,seed=12)
+    bookcase.build("Left tall library",loc=(-39,232,-170),width=145,height=236,depth=31,rows=7,seed=3)
+    bookcase.build("Left returning library",loc=(-127,193,-170),rot_z=math.pi/2,
+                    width=120,height=236,depth=29,rows=7,seed=9)
+    bookcase.build("Right tall library",loc=(206,264,-170),width=100,height=236,depth=31,rows=7,seed=16)
+    for x,z in ((33,-67),(166,-65)):
+        fixtures.block("Window candle bracket",(13,17,3),(x,267,z-1.5),oak,.4)
+        fixtures.beam("Window bracket scroll support",(x,275,z-18),(x,261,z-3),3,3,oak,.5)
+        candlestick.build("Window sill taper",loc=(x,267,z),height=12,radius=3.2,
+                           candle_height=11,energy=4000,seed=int(x+60))
+    def area(name,loc,target,energy,color,size,gloss=True):
+        ob=fixtures.light(name,loc,energy,color,size,target=target,kind="AREA")
+        ob.visible_glossy=gloss;ob.data.specular_factor=1 if gloss else .12
+        return ob
+    area("Candle pool on desk",(-33,57,27),(-28,28,0),6200,(1,.62,.27),17,False)
+    area("Candle catches quill and embroidery",(-43,29,21),(-36,35,1),3200,(1,.72,.43),13)
+    area("Blue basin reflected accent",(-23,91,-9),(-30,59,-10),750,(.035,.19,1),10,False)
+    area("Window cool desk edge",(38,86,12),(12,16,0),4800,(.42,.57,1),30,False)
+    area("Left candle brass highlights",(-44,66,22),(-22,124,-32),23000,(1,.63,.29),22)
+    area("Warm library candle pool",(-44,169,-30),(-39,231,-50),130000,(1,.64,.31),36)
+    area("Left return candle pool",(-77,149,-20),(-127,193,-50),82000,(1,.64,.31),32)
+    area("Right candle book pool",(70,127,-10),(82,155,-27),31000,(1,.64,.31),25)
+    area("Right shelf candle glow",(167,224,-35),(205,264,-50),90000,(1,.61,.27),35)
+    area("Moon on tracery and brass",(80,274,-12),(15,155,-42),105000,(.38,.54,1),55)
+    area("Window sill warm left",(33,261,-34),(33,285,-66),18000,(1,.58,.23),16)
+    area("Window sill warm right",(165,261,-32),(165,285,-64),18000,(1,.58,.23),16)
+    receivers=bpy.data.collections.new("Arcane environment light receivers")
+    for ob in set(bpy.data.objects)-before:
+        if ob.type in {"MESH","CURVE"}:receivers.objects.link(ob)
+    group=G.Asset("Arcane room frame",rot_z=-math.pi/2-.18)
+    for ob in set(bpy.data.objects)-before:
+        if ob.type=="LIGHT":
+            ob.light_linking.receiver_collection=receivers
+            ob.data.energy *= 1.68
+        if ob!=group.root and ob.parent is None:group.add(ob)
+    floor_receivers=bpy.data.collections.new("Arcane brass field candle return")
+    floor_receivers.objects.link(bpy.data.objects["board"])
+    bounce=E.light(scene,"AREA","Candle return on brass field",(5,-24,34),5000,
+                    color=(1,.79,.49),size=25,target=(0,-6,0))
+    bounce.light_linking.receiver_collection=floor_receivers
+    reflection=E.light(scene,"AREA","Candle reflected in brass ground",(32,-12,25),2600,
+                        color=(1,.80,.53),size=23,target=(0,0,0))
+    reflection.light_linking.receiver_collection=floor_receivers
+    return dict(loc=(-41,16,31),target=(2,0,8),lens=39,
+                fstop=8*scene.unit_settings.scale_length,focus=(5,0,1.4))

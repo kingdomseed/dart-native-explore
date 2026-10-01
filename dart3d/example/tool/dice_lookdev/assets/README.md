@@ -16,7 +16,7 @@ textures, text, or external assets are required.
 | --- | --- |
 | `forge` | Masonry firebox, wedge arch, tapered hood, coke and flame tongues; width, depth, height, hearth_height, mouth_spring, stone_tone, energy |
 | `anvil` | London profile, drawn horn, cutting step, pierced heel, feet and bark-covered log with sawn end grain and radial splits; length, stump_height, wood_tone, metal_finish |
-| `oak_table` | Separate planks, breadboard ends, pegs, aprons, chamfered legs, through stretcher; width, depth, height, thickness, wood_tone, scorch |
+| `oak_table` | Separate planks, breadboard ends, pegs, aprons, chamfered legs, through stretcher; width, depth, height, thickness, wood_tone, scorch, leg_inset, leg_width |
 | `tool_rack` | Pivoted tongs, two peen types, chisels, punches, horseshoes and suspension loops; width, height, wood_tone, metal_finish |
 | `lantern` | Hexagonal glazed cage, diamond bars, peaked cap, candle, chain and hook; height, radius, chain_length, metal_finish, energy |
 | `leaded_window` | Stone reveal, diamond cames, glazing, moon and town backdrop; width, height, reveal, moon_height, moon_offset, sky_strength, moon_strength, exterior_slope, energy |
@@ -25,7 +25,7 @@ textures, text, or external assets are required.
 | `strongbox` | Oak coffer, curved plank lid, iron straps, hasp, handles; width, depth, height, wood_tone, metal_finish |
 | `shelf` | Bracketed shelves populated with vessels; width, depth, levels, spacing, count, wood_tone |
 | `vessel` | Lathed and decorated goblet, tankard, jar or bottle; kind, height, radius, metal_finish, tone |
-| `book` | Leather covers, raised binding cords, parchment, clasps and corner mounts; width, depth, thickness, tone, metal_finish |
+| `book` | Leather covers, raised binding cords, parchment, clasps, corner mounts and optional unlettered spine tooling; width, depth, thickness, tone, metal_finish, gilt_spine |
 | `pouch` | Gathered leather, eyelets, drawstring and knots; radius, height, tone, metal_finish |
 | `ember_bowl` | Hammered copper bowl and refractive crystals with separate glowing cores; radius, height, metal_finish, energy |
 | `candles` | Beeswax, drips, wick, small flames and drip pan; height, radius, count, tone, energy |
@@ -54,10 +54,9 @@ textures, text, or external assets are required.
 | `telescope` | Sectioned refractor, dew cap, lens, focuser, finder, equatorial bearings and braced tripod; length, radius, stand_height, elevation, wood_tone, metal_tone |
 | `armillary` | Graduated nested brass bands and central sphere, or enamel celestial globe with inlaid coordinates; kind, radius, pedestal, metal_tone |
 | `amethyst_cluster` | Terminated quartz prisms, pale tips, internal inclusions and spun brass bowl; radius, height, count, bowl, tone, metal_finish, energy, mineral, glow, fractures, edge_glow |
-| `velvet_drape` | Folded velvet runner with an edge drop, sewn borders and gold star embroidery; width, length, drop, tone, stars |
+| `velvet_drape` | Folded velvet runner with an edge drop, sewn borders and gold star embroidery; width, length, drop, tone, stars, sheen_tone, stitch_width |
 | `astronomer_tools` | Rete disk, curled constellation chart, convex magnifier or pierced incense vessel; kind, radius, width, depth, metal_tone |
 | `night_vista` | Indigo galaxy, maria and terminator, distant planet, spired floating citadels and layered surface clouds; width, depth, slope, sky_strength, moon_strength, moon_offset, planet_offset, cloud_drop |
-
 | `stone_altar` | Chamfered granite mensa, moulded edge, carved trestles and bronze geometric inlays; width, depth, height, tone, metal_tone, frost, carving, accumulation, quiet, quiet_center |
 | `frost_pillar` | Fluted entasis drum shaft, moulded foot, leaf-rib capital and riveted bronze collars; height, radius, tone, frost, metal_tone, accumulation, cap_hole |
 | `frozen_arch` | Frosted column pair, separate wedge voussoirs and concentric archivolts; width, shoulder, radius, depth, tone, frost |
@@ -67,6 +66,11 @@ textures, text, or external assets are required.
 | `cold_mist` | Low soft transparent mist surfaces and sparse falling ice motes; width, depth, height, layers, opacity, tone, flakes, flake_height, flake_radius, flake_glow |
 | `glacier_vista` | Layered snow-covered mountain meshes, masonry bridge, frozen cascade and cloud banks; width, depth, slope, sky_strength, tone |
 | `snow_cover` | Modeled granular snow with feathered edges, clear footprints and sparse crystal glints; width, depth, thickness, quiet, quiet_center, holes, shape, sparkle |
+| `bookcase` | Carved oak pilasters, rosettes, moulded cornice, dentils and varied leather-bound volumes with gilt spine divisions; width, height, depth, rows, fullness, wood_tone |
+| `gothic_window` | Moulded pointed reveal, supported lancet and quatrefoil tracery, glazing, shaded moon and layered spired town; width, height, reveal, stone_tone, exterior_slope, moon_offset, sky_strength, energy |
+| `writing_set` | Chased botanical inkwell, curved feather with individual barbs, or spirally rolled parchment and leather tie; kind, width, height, quill_length, metal_finish, tone |
+| `runestone_bowl` | Repousse basin and faceted blue stones with recessed luminous triangles, diamonds and circles; radius, height, count, tone, metal_finish, energy |
+| `candlestick` | Turned pricket foot, knop and fluting around the reused wax candle, drip pan and flame; height, radius, candle_height, candle_radius, metal_finish, energy, flame_strength |
 
 `geometry.py` supplies construction helpers. `materials.py` supplies procedural
 PBR surfaces, including dull fissured bark and sawn end grain for log sections. `preview_asset.py` renders one asset in a neutral studio with an
@@ -195,3 +199,26 @@ The `amethyst_cluster` ice mode shares its original prism construction and
 supports optional internal fractures and edge glow. The default amethyst mode
 is unchanged. Snow, ice and mist material additions are confined to Frostbound;
 Emberforged, Voltline and Celestial retain their material behavior.
+
+
+Arcane preserves the original board shader, board/base/rim/boss geometry and all
+five build-stage lights, including the overhead. Its room rotates around the
+tray for an oblique broadside view. The tray spans 79.7 percent of the frame,
+with the near rim cropped at the bottom; the camera uses a 39 mm lens at f/8
+converted for centimetre units. Foreground dressing clears the rim by at least
+12.7 cm. The oak desk ends just behind the tray, with supported side returns
+for navy velvet, the brass compass, parchment, rolled scroll and magnifier.
+
+Candles, the writing set, runestone basin, stacked gilt tomes and armillary sit
+at separate depths on the side consoles. Carved bookcases fill the left
+background, with the pointed window, moon and town to the right. Warm candle
+pools, a cool window edge and a small blue runestone accent use environment
+light receivers. Exposure is -0.15 EV. Two reflected candle sources are
+linked only to the existing brass board, retaining floor separation without
+changing the tray materials or original lights.
+
+The new parchment, feather and runestone materials are additive. Optional
+`gilt_spine`, narrow-table leg spacing, velvet sheen color and stitch width
+preserve their previous defaults. The approved Emberforged, Voltline, Celestial
+and Frostbound rooms are checked at 25 percent / 16 samples after these shared
+additions. There are no room volumes, downloads, lettering or external assets.

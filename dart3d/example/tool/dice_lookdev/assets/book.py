@@ -8,7 +8,7 @@ from . import geometry as G, materials as M
 
 
 def build(name="Leather book", loc=(0, 0, 0), rot_z=0, width=17, depth=24, thickness=5,
-          tone=(0.075, 0.022, 0.009), metal_finish="brass", wear=0.7, seed=2) -> bpy.types.Object:
+          tone=(0.075, 0.022, 0.009), metal_finish="brass", wear=0.7, seed=2, gilt_spine=False) -> bpy.types.Object:
     a = G.Asset(name, loc, rot_z)
     leather = M.leather(f"{name} calfskin", tone, wear, seed)
     metal = M.metal(f"{name} mounts", metal_finish, wear, seed)
@@ -45,4 +45,14 @@ def build(name="Leather book", loc=(0, 0, 0), rot_z=0, width=17, depth=24, thick
                                   (width / 2 - 2, -depth / 2 + 2, thickness + 0.02),
                                   (width / 2 - 2, depth / 2 - 2, thickness + 0.02),
                                   (-width / 2 + 2, depth / 2 - 2, thickness + 0.02)], 0.06, metal, cyclic=True)
+    if gilt_spine:
+        x=-width/2-.17
+        for y in (-depth*.40,-depth*.30,depth*.30,depth*.40):
+            a.tube("Gilt spine rule",[(x,y,.65),(x,y,thickness-.65)],.045,metal)
+        for y in (-depth*.17,0,depth*.17):
+            pts=[]
+            for j in range(8):
+                t=j*math.tau/8; r=min(.85,thickness*.22) if j%2==0 else thickness*.075
+                pts.append((x-.015,y+r*math.cos(t),thickness/2+r*math.sin(t)))
+            a.tube("Unlettered gilt spine star",pts,.047,metal,cyclic=True,resolution=1)
     return a.root

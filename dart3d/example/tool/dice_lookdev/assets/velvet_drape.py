@@ -6,9 +6,9 @@ from . import geometry as G, materials as M
 
 
 def build(name="Astronomer velvet",loc=(0,0,0),rot_z=0,width=25,length=38,drop=16,
-          tone=(.045,.008,.075),wear=.35,seed=1,stars=9) -> bpy.types.Object:
+          tone=(.045,.008,.075),wear=.35,seed=1,stars=9,sheen_tone=(.16,.025,.26),stitch_width=.033) -> bpy.types.Object:
     a=G.Asset(name,loc,rot_z); rng=random.Random(seed)
-    velvet=M.velvet(name+" velvet",tone,wear,seed)
+    velvet=M.velvet(name+" velvet",tone,wear,seed,sheen_tone=sheen_tone)
     gold=M.polished_metal(name+" gold thread",(.54,.34,.105),.3,seed,.36)
     def point(u,v):
         x=u*width/2; y=(v-.5)*length
@@ -33,5 +33,5 @@ def build(name="Astronomer velvet",loc=(0,0,0),rot_z=0,width=25,length=38,drop=1
             t=j*math.tau/16; r=rr if j%2==0 else rr*.21
             x,y,z=point(u+2*r*math.cos(t)/width,v+r*math.sin(t)/length)
             pts.append((x,y,z+.08))
-        a.tube("Eight-point gold star embroidery",pts,.033,gold,cyclic=True)
+        a.tube("Eight-point gold star embroidery",pts,stitch_width,gold,cyclic=True)
     return a.root

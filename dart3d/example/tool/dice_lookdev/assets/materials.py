@@ -343,12 +343,12 @@ def fine_marble(name="Warm statuary marble", tone=(0.46, 0.43, 0.37), wear=0.35,
     return m
 
 
-def velvet(name="Violet silk velvet", tone=(0.045,0.008,0.075), wear=0.35, seed=0):
+def velvet(name="Violet silk velvet", tone=(0.045,0.008,0.075), wear=0.35, seed=0, sheen_tone=(.16,.025,.26)):
     m, k = E.material(name)
     vec = mapped(k, (0.12,0.12,0.12), seed)
     n = k.noise(vec, 1, 2).outputs["Fac"]
     col = k.mix(n, tuple(c*0.4 for c in tone)+(1,), (*tone,1))
-    k.surface(k.bsdf(Base_Color=col, Roughness=0.92, Sheen_Weight=0.55, Sheen_Roughness=0.65, Sheen_Tint=(0.16,0.025,0.26,1),
+    k.surface(k.bsdf(Base_Color=col, Roughness=0.92, Sheen_Weight=0.55, Sheen_Roughness=0.65, Sheen_Tint=(*sheen_tone,1),
                      Normal=k.bump(k.noise(vec, 80, 2).outputs["Fac"], 0.15, 0.009)))
     return m
 
@@ -480,4 +480,34 @@ def cold_mist(name="Cold ground mist", tone=(.30,.43,.55), opacity=.25, seed=0):
     density=k.math("MULTIPLY",k.math("MULTIPLY",x,y),k.math("MULTIPLY",wisps,opacity))
     tr=k.node("ShaderNodeBsdfTransparent").outputs[0]
     k.surface(k.mix_shader(density,tr,k.emission((*tone,1),1)))
+    return m
+
+
+def parchment(name="Scholar parchment", tone=(.55,.38,.19), seed=0):
+    m,k=E.material(name)
+    n=k.noise(mapped(k,(1,1,1),seed),.42,3).outputs["Fac"]
+    fibre=k.noise(mapped(k,(.9,4,1),seed),5,2).outputs["Fac"]
+    k.surface(k.bsdf(Base_Color=k.ramp(n,[(.2,tuple(c*.52 for c in tone)),(.8,tone)]),
+                     Roughness=.83,Normal=k.bump(fibre,.16,.012)))
+    return m
+
+
+def feather(name="Raven quill", tone=(.009,.022,.045), seed=0):
+    m,k=E.material(name)
+    n=k.noise(mapped(k,(1,12,.5),seed),2,2).outputs["Fac"]
+    k.surface(k.bsdf(Base_Color=k.ramp(n,[(.25,tuple(c*.25 for c in tone)),(.8,tone)]),
+                     Roughness=.34,Sheen_Weight=.55,Coat_Weight=.25,
+                     Normal=k.bump(n,.25,.014)))
+    return m
+
+
+def rune_stone(name="Blue runestone", tone=(.009,.035,.17), seed=0):
+    m,k=E.material(name)
+    n=k.noise(mapped(k,(1,1,1),seed),2.7,3).outputs["Fac"]
+    col=k.ramp(n,[(.25,tuple(c*.14 for c in tone)),(.60,tone),(.8,tuple(c*1.6 for c in tone))])
+    fleck=k.math("GREATER_THAN",k.noise(mapped(k,(1,1,1),seed),12,2).outputs["Fac"],.79)
+    k.surface(k.bsdf(Base_Color=col,Roughness=.19,Coat_Weight=.6,Coat_Roughness=.12,
+                     Metallic=0,Transmission_Weight=.12,IOR=1.53,
+                     Emission_Color=(.015,.12,1,1),Emission_Strength=k.math("MULTIPLY",fleck,.7),
+                     Normal=k.bump(n,.12,.017)))
     return m

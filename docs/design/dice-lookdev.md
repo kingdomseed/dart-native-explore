@@ -1098,15 +1098,19 @@ Lighting recipes (the tray lights are unchanged unless noted):
   dice get a cool back rim. Gate: numeral 8.85 (d4), die vs tray 2.11,
   stroke 0.121–0.130, PASS.
 
-- **Arcane Study — the night study.** The desk stands against the window
-  wall: a leaded window onto a moonlit skyline of spires (area, 25 kW,
-  0.55/0.65/1.0, cool from the back), floor-to-ceiling oak bookcases
-  either side of it and along the panelled left wall, a stone fireplace on
-  the right wall (160 kW, warm side light), two brass candle sconces
-  flanking the window (6 kW each) and a floor candelabrum by the left
-  bookcase (20 kW), over the tray's candle key and moon. Plaster walls,
-  plank floor, a burgundy-and-ink rug. Camera: 20 mm, seated, f/4. Gate:
-  numeral 5.97 (d4), die vs tray 2.16, stroke 0.124–0.130, PASS.
+- **Arcane Study — the night study (round 2).** An oblique broadside
+  view, 39 mm at f/8, with the tray spanning 79.7% of the frame and its near
+  rim cropped at the bottom. A dark oak desk and supported side returns
+  carry navy star-embroidered velvet, a brass compass, a parchment chart,
+  magnifier and rolled scroll. Candles, a chased inkwell with a barbed quill,
+  glowing geometric runestones, gilt leather books and a brass armillary
+  overlap at different depths. Carved oak bookcases frame a pointed Gothic
+  window onto the moonlit spired town. Candle pools, moonlight and the blue
+  bowl accent use linked room receivers. Exposure -0.15 EV and two linked
+  candle reflections on the existing brass floor preserve the original
+  tray materials and lights. Foreground clearance is at least 12.7 cm.
+  At 50% / 32 samples, gate: numeral 5.13 (d20), die vs tray 3.59,
+  stroke 0.124–0.130, PASS.
 
 - **Fate Engine — the inventor's workshop.** Brick walls run with copper
   pipes and big brass wall gears, a tall mullioned window onto a spired

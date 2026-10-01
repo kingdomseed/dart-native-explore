@@ -10,7 +10,7 @@ from . import geometry as G, materials as M
 
 
 def build(name="Oak table", loc=(0, 0, 0), rot_z=0, width=150, depth=85, height=70,
-          thickness=7, wood_tone=(0.095, 0.038, 0.013), wear=0.7, seed=1, scorch=0.4) -> bpy.types.Object:
+          thickness=7, wood_tone=(0.095, 0.038, 0.013), wear=0.7, seed=1, scorch=0.4, leg_inset=(16, 12), leg_width=9) -> bpy.types.Object:
     a = G.Asset(name, loc, rot_z)
     rng = random.Random(seed)
     boards = max(4, round(depth / 14))
@@ -52,13 +52,13 @@ def build(name="Oak table", loc=(0, 0, 0), rot_z=0, width=150, depth=85, height=
                 (side * (width - bread) / 2, 0, height - thickness / 2), cross, 0.35)
         for j in (-0.35, 0, 0.35):
             a.cylinder("Breadboard peg", 0.42, 0.12, (side * (width / 2 - bread / 2), depth * j, height - 0.03), peg)
-    lx, ly = width / 2 - 16, depth / 2 - 12
+    lx, ly = width / 2 - leg_inset[0], depth / 2 - leg_inset[1]
     for sx in (-1, 1):
         for sy in (-1, 1):
-            a.block("Chamfered oak leg", (9, 9, height - thickness),
+            a.block("Chamfered oak leg", (leg_width, leg_width, height - thickness),
                     (sx * lx, sy * ly, (height - thickness) / 2), upright, 0.65)
             for z in (height - 16, 19):
-                dowel = a.cylinder("Mortise peg", 0.6, 9.1, (sx * lx, sy * ly, z), peg)
+                dowel = a.cylinder("Mortise peg", 0.6, leg_width + 0.1, (sx * lx, sy * ly, z), peg)
                 dowel.rotation_euler.x = 1.5708
         a.block("Short stretcher", (8, ly * 2, 10), (sx * lx, 0, 18), cross, 0.45)
         a.block("End apron", (5, ly * 2, 14), (sx * lx, 0, height - thickness - 7), cross, 0.4)
