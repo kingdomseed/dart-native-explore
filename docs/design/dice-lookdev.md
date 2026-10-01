@@ -1277,15 +1277,28 @@ Lighting recipes (the tray lights are unchanged unless noted):
   separately by the art director.
   Gate: numeral 4.90 (d8), die vs tray 2.91, stroke 0.123–0.128, PASS.
 
-- **Gemcutter — the jeweler's atelier.** Dark panelled walls, a tall
-  mullioned window at the back-right onto a spired city at sunset (area,
-  35 kW, 1.0/0.62/0.35: the warm counter-light), a many-drawered gem chest
-  on the right with an emerald-glass lamp on it (shadowless 12 kW green,
-  the accent), a tool rack of gravers above it, glass display shelves of
-  cut stones and a brass sconce (12 kW, warm) on the left wall. The bench
-  lamp keeps its cool-white key and now stands on a brass arm. Camera:
-  20 mm, f/4. Gate: numeral 5.15 (d20), die vs tray 2.74, stroke
-  0.121–0.130, PASS.
+- **Gemcutter — the jeweler's atelier.** Round 2 replaces the empty bench
+  with a joinered walnut workbench, optical loupe, tapered spring tweezers,
+  hinged velvet specimen cases with brilliant and emerald cuts, a turned
+  brass balance with suspended pans, an articulated daylight lamp, and a
+  framed chest of fifteen drawers with brass pulls. The reused oak casement
+  opens onto layered gables, spires and scattered windows against a clouded
+  blue-and-amber sunset. An emerald cage lantern supplies the right accent.
+  The curved rear bench recess keeps the balance visible; the rear workbenches
+  stand on lower connected landings. The tray, its walnut base, padded velvet
+  rim and all four original lighting calls remain unchanged.
+  Camera: broadside, 25 mm, looking down 36.2 degrees at effective f/8,
+  converted for centimetre scene units; the tray spans 77.7 percent of the
+  frame with its near rim cropped at the bottom. Foreground tools remain
+  at least 10.8 cm clear in plan. The cool-white task pool, warm sunset and
+  wall returns, and emerald edge use environment light receivers. Exposure
+  is +0.85 EV with gamma 0.75; a 0.3-pixel phone filter preserves the small
+  enamel strokes, while the room retains the normal 1.5-pixel filter. No
+  dice or tray material changes, volumes, lettering or downloaded assets.
+  Shared additions are three new material recipes only; all existing
+  material functions are unchanged. The ten earlier approved rooms are
+  rechecked serially at 25 percent / 16 samples.
+  Gate: numeral 6.83 (d12), die vs tray 3.37, stroke 0.121–0.130, PASS.
 
 ## 4. dart3d features to verify (before building these for real)
 

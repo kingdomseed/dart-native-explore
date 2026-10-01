@@ -373,3 +373,32 @@ New `materials.py` functions are `urushi`, `washi`, `rush_weave`, `woven_silk`
 and `gold_leaf`. All pre-existing material functions remain unchanged. The
 nine earlier approved rooms are checked at 25 percent / 16 samples after
 these additions.
+
+
+Gemcutter adds reusable atelier assets:
+
+| Module | Geometry and main variation controls |
+| --- | --- |
+| `jeweler_bench` | Existing pegged table joinery with rubbed walnut boards, apron drawers, drop pulls and a removable V-notched bench pin; width, depth, height, wood_tone, bench_pin, rear_recess |
+| `bench_lamp` | Weighted foot, paired adjustable arms, tension springs, locking pivots and a hollow spun reflector; height, reach, radius, head_tilt, metal_finish, energy, color |
+| `balance_scale` | Turned base and column, knife-edge beam, pointer, linked suspensions and dished pans; height, width, pan_radius, tilt, metal_finish |
+| `cut_gem` | Closed, flat-shaded brilliant or stepped emerald cuts with a crown, girdle and pavilion; radius, cut, tone |
+| `gem_case` | Joinered walnut case, velvet compartments, hinged padded lid and brass fittings; width, depth, height, rows, columns, lid_angle, wood_tone, velvet_tone, stones |
+| `jeweler_tools` | Hollow knurled optical loupe with convex lens, spring tweezers with tapered jaws, or pear-handled graver; kind, length, radius, wood_tone, metal_finish |
+| `drawer_chest` | Framed cabinet, individually recessed drawer fronts, mouldings, turned knobs and bun feet; width, depth, height, rows, columns, wood_tone, metal_finish |
+| `atelier_window` | Reused oak casement and catches, procedural sunset clouds, layered gabled streets and pointed towers; width, height, wood_tone, view, exterior_slope, sky_strength, energy |
+
+All eight modules accept `name`, `loc`, `rot_z`, `wear` and `seed`. The three
+added material recipes are `bench_walnut`, `cut_stone` and `atelier_sky`;
+pre-existing material functions and asset defaults are unchanged.
+
+The original velvet, walnut tray base, padded rim and four light calls remain
+unchanged. The broadside 25 mm camera looks down 36.2 degrees at effective
+f/8. A curved rear recess exposes the balance; lowered, supported working
+bays carry the balance, lamp and drawer chest. The tray spans 77.7 percent
+of the image. Foreground loupes and tweezers clear the tray by at least
+10.8 cm and rest on the bench. The task lamp remains cool white; sunset
+and amber reflections warm the walnut and brass, with emerald at the right.
+Room lamps use environment receivers. The global grade is +0.85 EV and
+gamma 0.75, with a 0.3-pixel phone filter and the normal 1.5-pixel room
+filter. The half-resolution gate passes without altering the tray or dice.

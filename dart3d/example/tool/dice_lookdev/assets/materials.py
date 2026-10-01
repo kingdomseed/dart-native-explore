@@ -3,6 +3,41 @@ import math
 import env_common as E
 
 
+def bench_walnut(name="Rubbed walnut",tone=(.11,.046,.018),wear=.6,seed=1):
+    m,k=E.material(name)
+    v=mapped(k,(.045,1.6,.8),seed)
+    grain=k.noise(v,2,4,.68,dist=.35).outputs["Fac"]
+    pores=k.noise(mapped(k,(.12,11,2),seed),2,2).outputs["Fac"]
+    col=k.ramp(grain,[(.25,tuple(c*.22 for c in tone)),(.43,tuple(c*.65 for c in tone)),(.65,tone),(.8,tuple(c*1.4 for c in tone))])
+    rough=k.math("ADD",.24,k.math("MULTIPLY",grain,.2*wear))
+    k.surface(k.bsdf(Base_Color=col,Roughness=rough,Metallic=0,
+        Coat_Weight=.28,Coat_Roughness=.24,Normal=k.bump(pores,.22,.012)))
+    return m
+
+
+def atelier_sky(name="Clouded sunset",strength=1.3,seed=1):
+    m,k=E.material(name)
+    coord=k.coords().outputs["Generated"]
+    sep=k.node("ShaderNodeSeparateXYZ");k.link(coord,sep.inputs[0])
+    col=k.ramp(sep.outputs["Z"],[(0,(.11,.12,.19)),(.43,(.42,.20,.16)),(.51,(.88,.46,.20)),(.59,(.25,.19,.31)),(.8,(.055,.105,.23)),(1,(.015,.035,.09))])
+    mapping=k.node("ShaderNodeMapping");k.link(coord,mapping.inputs["Vector"])
+    mapping.inputs["Scale"].default_value=(2,2,14)
+    n=k.noise(mapping.outputs[0],3,4,.7,dist=.5).outputs["Fac"]
+    mask=k.ramp(n,[(.4,(0,0,0)),(.58,(.55,.55,.55)),(.78,(.9,.9,.9))])
+    col=k.mix(mask,col,(.06,.08,.145,1))
+    k.surface(k.emission(col,strength))
+    return m
+
+
+def cut_stone(name="Faceted coloured crystal", tone=(.025,.46,.19), wear=.1, seed=1):
+    m,k=E.material(name)
+    n=k.noise(mapped(k,(.6,.6,.6),seed),2,2).outputs["Fac"]
+    col=k.mix(k.math("MULTIPLY",n,.14),(*tone,1),tuple(min(1,c*1.4+.04) for c in tone)+(1,))
+    k.surface(k.bsdf(Base_Color=col,Metallic=0,Roughness=k.math("ADD",.025,k.math("MULTIPLY",n,wear*.08)),
+                     Transmission_Weight=.93,IOR=1.78,Coat_Weight=.25,Coat_Roughness=.035))
+    return m
+
+
 def urushi(name="Hand-polished lacquer", tone=(.016,.005,.004), wear=.35, seed=1):
     m,k=E.material(name)
     vec=mapped(k,(1,1,1),seed)
