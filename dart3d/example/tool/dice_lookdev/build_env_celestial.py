@@ -103,64 +103,81 @@ def build(scene):
 
 
 def room(scene):
-    """A seated view across the astronomer's table into an open night loggia."""
+    """Overlapping instruments frame a low, broadside view through the arcade."""
     from assets import (geometry as G, materials as M, marble_loggia, marble_table, telescope,
                         armillary, amethyst_cluster, velvet_drape, astronomer_tools,
                         night_vista, lantern, book, stone_steps)
-    before=set(bpy.data.objects)
-    top=-.3
-    marble_table.build(loc=(0,-10,-76),width=110,depth=62,height=75.7,quiet=(28,30),back_wings=0,seed=8)
-    velvet_drape.build(loc=(-47,4,top+.2),rot_z=-math.pi/2,width=26,length=32,drop=18,seed=5)
-    astronomer_tools.build("Foreground astrolabe",loc=(-35.5,14,top+.8),rot_z=-.3,radius=7,seed=4)
-    lantern.build("Table brass lantern",loc=(-67,154,-74.5),height=30,radius=6.5,
-                  metal_finish="brass",chain_length=0,energy=1700,seed=9)
+    before = set(bpy.data.objects)
+    top = -.3
+    marble_table.build(loc=(0,-7,-76),width=104,depth=40,height=75.7,
+                       tone=(.60,.55,.46),wear=.12,quiet=(22,12),polish=.85,seed=8)
+    marble_table.build("Left dressing return",loc=(-40.5,32.5,-76),width=27,depth=39,height=75.7,
+                       tone=(.60,.55,.46),wear=.12,polish=.85,quiet=(0,0),seed=8)
+    velvet_drape.build(loc=(-36,32,top+.5),rot_z=math.pi/2,width=28,length=30,drop=20,
+                       tone=(.085,.009,.13),stars=18,seed=5)
+    astronomer_tools.build("Foreground astrolabe",loc=(-32,23,top+1),rot_z=-.3,radius=6,seed=4)
+    marble_table.build("Right dressing return",loc=(40,26.5,-76),width=26,depth=27,height=75.7,
+                       tone=(.60,.55,.46),wear=.12,polish=.85,quiet=(0,0),seed=8)
+    astronomer_tools.build("Parchment star chart",loc=(37,13,top+.05),rot_z=0,
+                           kind="chart",width=17,depth=23,seed=6)
+    astronomer_tools.build("Brass magnifier",loc=(35,14,top+.7),rot_z=-.25,kind="magnifier",radius=3.6)
+    astronomer_tools.build("Incense burner",loc=(44,10,top),kind="incense",radius=3.2,seed=3)
+    fixtures = G.Asset("Observatory fixtures")
+    marble = M.fine_marble("Loggia floor marble",(.36,.33,.28),.4,seed=11)
+    fixtures.block("Player loggia floor",(290,110,8),(0,-10,-80),marble,.7)
+    fixtures.block("Astronomy terrace",(400,130,8),(0,115,-134),marble,.7)
+    fixtures.block("Tripod landing",(100,60,8),(-12,210,-141),marble,.6)
+    fixtures.block("Tripod terrace step",(100,8,7),(-12,184,-133.5),marble,.4)
+    fixtures.block("Lantern console landing",(36,46,30),(-34,74,-115),marble,.6)
+    fixtures.block("Arcade pavement",(520,110,8),(0,270,-191),marble,.7)
+    stone_steps.build("Terrace stair",loc=(120,50,-130),width=70,tread=11,rise=9,count=6,tone=(.32,.30,.27))
+    stone_steps.build("Arcade stair",loc=(150,230,-187),width=75,tread=9,rise=9.5,count=6,tone=(.32,.30,.27))
+    marble_loggia.build(loc=(35,245,-187),bays=3,span=180,height=127,radius=9,
+                        balustrade_height=65,rail_offset=38,rail_base=-5,tone=(.57,.52,.44),seed=6)
+    marble_table.build("Left lantern console",loc=(-34,74,-100),width=34,depth=44,height=86,
+                       tone=(.55,.48,.37),quiet=(0,0),seed=9)
+    lantern.build("Table brass lantern",loc=(-33,65,-14),height=30,radius=6.5,
+                  metal_finish="brass",chain_length=0,energy=850,seed=9)
     for i in range(3):
-        book.build(f"Gilt observatory folio {i}",loc=(-68,180,-74.5+i*4),rot_z=-.09+i*.10,
-                   width=22,depth=28,thickness=4,tone=(.027,.011,.04),seed=10+i)
-    amethyst_cluster.build("Right amethyst bowl",loc=(100,210,-100),radius=7.4,height=10.5,seed=8,energy=280)
-    amethyst_cluster.build("Left amethyst bowl",loc=(-48,165,-75),radius=7,height=9,seed=5,energy=110)
-    astronomer_tools.build("Parchment star chart",loc=(37,13,top),rot_z=0,kind="chart",width=17,depth=23,seed=6)
-    astronomer_tools.build("Brass magnifier",loc=(35,16,top+.65),rot_z=-.25,kind="magnifier",radius=3.6)
-    astronomer_tools.build("Incense burner",loc=(44,14,top),kind="incense",radius=3.2,seed=3)
-    armillary.build("Table celestial globe",loc=(51,150,-75),kind="globe",radius=10,pedestal=10,seed=7)
-    fixtures=G.Asset("Observatory fixtures")
-    marble=M.fine_marble("Loggia floor marble",(.27,.26,.25),.6,seed=11)
-    fixtures.block("Player loggia floor",(290,150,8),(0,-10,-80),marble,.7)
-    fixtures.block("Astronomy terrace",(350,180,8),(0,154,-197),marble,.7)
-    fixtures.block("Lower loggia terrace",(510,150,8),(0,300,-294),marble,.7)
-    fixtures.block("Outer balcony pavement",(510,75,8),(0,412,-329),marble,.7)
-    stone_steps.build("Terrace stair",loc=(110,65,-193),width=70,tread=11,rise=13,count=9,tone=(.20,.20,.23))
-    stone_steps.build("Arcade stair",loc=(140,244,-290),width=80,tread=10,rise=12.125,count=8,tone=(.20,.20,.23))
-    stone_steps.build("Balcony edge steps",loc=(0,375,-325),width=500,tread=7,rise=7,count=5,tone=(.20,.20,.23))
-    marble_loggia.build(loc=(0,330,-290),bays=3,span=135,height=125,radius=10,balustrade_height=95,rail_offset=70,rail_base=-35,seed=6)
-    marble_table.build("Instrument console",loc=(-68,170,-147),width=32,depth=50,height=72,quiet=(0,0),seed=9)
-    armillary.build("Great brass armillary",loc=(-51,211,-125),radius=20,pedestal=18,seed=12)
-    telescope.build(loc=(-13,210,-193),rot_z=.08,length=91,radius=4.8,stand_height=91,elevation=-12,seed=6)
-    velvet_drape.build("Console velvet",loc=(-68,170,-74.5),width=30,length=46,drop=20,seed=13)
-    lantern.build("Distant brass lantern",loc=(134,274,-134),height=33,radius=8,metal_finish="brass",chain_length=0,energy=24000,seed=18)
-    fixtures.lathe("Lantern marble pedestal",[(0,0),(18,0),(18,6),(12,12),(9,20),(9,135),(14,143),(18,147),(18,156),(0,156)],
-                   marble,(134,274,-290),segments=48)
-    fixtures.lathe("Armillary marble plinth",[(0,0),(22,0),(22,4),(17,9),(14,16),(14,58),(20,66),(22,68),(0,68)],
-                   marble,(-51,211,-193),segments=48)
-    marble_table.build("Globe side console",loc=(51,150,-147),width=30,depth=30,height=72,quiet=(0,0),seed=19)
-    night_vista.build(seed=15,slope=.60,sky_strength=2.3,moon_strength=2.4)
+        book.build(f"Gilt observatory folio {i}",loc=(-37,86,-14+i*4),rot_z=-.09+i*.10,
+                   width=22,depth=25,thickness=4,tone=(.035,.009,.05),seed=10+i)
+    amethyst_cluster.build("Left amethyst bowl",loc=(-44,103,-40),radius=7,height=10,seed=5,energy=110)
+    marble_table.build("Instrument console",loc=(-27,135,-130),width=46,depth=42,height=77,
+                       tone=(.52,.45,.34),quiet=(0,0),seed=12)
+    velvet_drape.build("Console velvet",loc=(-27,135,-52.8),width=44,length=42,drop=22,seed=13)
+    armillary.build("Great brass armillary",loc=(-27,135,-52),radius=19,pedestal=15,seed=12)
+    telescope.build(loc=(-12,210,-137),rot_z=.35,length=64,radius=3.8,
+                    stand_height=79,elevation=38,seed=6)
+    marble_table.build("Globe side console",loc=(52,130,-130),width=34,depth=40,height=90,
+                       tone=(.52,.45,.35),quiet=(0,0),seed=19)
+    armillary.build("Table celestial globe",loc=(52,130,-40),kind="globe",radius=10,pedestal=12,seed=7)
+    amethyst_cluster.build("Right amethyst bowl",loc=(40,32,top),radius=7.4,height=13,seed=8,energy=110)
+    fixtures.lathe("Left crystal pedestal",[(0,0),(10,0),(10,4),(6,9),(4,15),(4,77),(8,84),(10,90),(0,90)],
+                   marble,(-44,103,-130),segments=48)
+    lantern.build("Distant brass lantern",loc=(121,229,-68),height=30,radius=7,
+                  metal_finish="brass",chain_length=0,energy=8000,seed=18)
+    fixtures.lathe("Lantern marble pedestal",[(0,0),(14,0),(14,5),(8,12),(7,20),(7,104),(12,112),(14,119),(0,119)],
+                   marble,(121,229,-187),segments=48)
+    night_vista.build(seed=15,slope=.39,sky_strength=2.8,moon_strength=2.4,
+                      moon_offset=(270,200),planet_offset=(420,260),cloud_drop=55)
     def area(name,loc,target,energy,color,size):
         ob=fixtures.light(name,loc,energy,color,size,target=target,kind="AREA")
-        ob.visible_glossy=True;ob.data.specular_factor=1
+        ob.visible_glossy=True
+        ob.data.specular_factor=1
+        if name in {"Lantern golden table pool", "Amethyst bowl reflected accent", "Moonlit table reflection"}:
+            ob.visible_glossy=False
+            ob.data.specular_factor=.12
         return ob
-    area("Lantern reflected table warmth",(-62,139,-47),(-50,172,-75),36000,(1,.65,.32),20)
-    area("Moonlit table edge",(23,60,38),(19,9,0),25000,(.47,.62,1),35)
-    area("Amethyst bowl reflected accent",(39,32,20),(20,14,0),3000,(.60,.35,1),15)
-    area("Lantern on brass instruments",(-61,162,-68),(-35,208,-97),65000,(1,.67,.35),55)
-    area("Moonlit arcade stone",(20,410,80),(0,320,-100),900000,(.40,.56,1),180)
-    area("Warm loggia return",(-150,220,-25),(-40,320,-120),140000,(1,.68,.38),85)
-    area("Right lantern stone pool",(127,251,-105),(147,330,-125),180000,(1,.64,.30),45)
-    area("Instrument moon edge",(38,195,42),(-10,180,-30),170000,(.52,.65,1),55)
-    fixtures.block("Left console landing",(34,52,46),(-68,170,-170),marble,.5)
-    fixtures.block("Right console landing",(32,32,46),(51,150,-170),marble,.5)
-    for x,y,r,h in ((-48,165,8,118),(100,210,9,93)):
-        fixtures.lathe("Crystal display pedestal",[(0,0),(r*1.2,0),(r*1.2,5),(r*.7,12),
-            (r*.6,h-13),(r,h-5),(r*1.15,h-3),(r*1.15,h),(0,h)],marble,(x,y,-193),segments=48)
+    area("Lantern golden table pool",(-35,25,25),(-24,0,0),11000,(1,.72,.41),22)
+    area("Lantern return on gold embroidery",(-37,12,23),(-34,28,0),2200,(1,.78,.50),13)
+    area("Lantern brass highlights",(-43,78,3),(-35,124,-25),28000,(1,.70,.39),26)
+    area("Moonlit table reflection",(18,75,48),(12,0,0),5500,(.75,.83,1),34)
+    area("Amethyst bowl reflected accent",(40,32,10),(27,12,0),1500,(.61,.36,1),12)
+    area("Moonlit arcade stone",(30,320,70),(0,240,-75),250000,(.55,.68,1),100)
+    area("Warm loggia return",(-125,185,-20),(-45,245,-90),75000,(1,.71,.42),60)
+    area("Right lantern stone pool",(119,224,-52),(120,250,-90),55000,(1,.65,.31),32)
+    area("Lantern return on globe and quartz",(60,62,24),(52,130,-15),27000,(1,.79,.49),25)
+    area("Instrument moon edge",(40,230,32),(-12,210,-85),65000,(.60,.74,1),35)
     receivers=bpy.data.collections.new("Celestial room light receivers")
     for ob in set(bpy.data.objects)-before:
         if ob.type in {"MESH","CURVE"}:receivers.objects.link(ob)
@@ -168,7 +185,17 @@ def room(scene):
     for ob in set(bpy.data.objects)-before:
         if ob.type=="LIGHT":
             ob.light_linking.receiver_collection=receivers
-            ob.data.energy *= 1.7
         if ob!=group.root and ob.parent is None:group.add(ob)
-    return dict(loc=(-50,0,41),target=(0,0,7.5),lens=46.3,
-                fstop=8*scene.unit_settings.scale_length,focus=(5,0,1.4))
+    chart_receivers=bpy.data.collections.new("Celestial silver engraving receivers")
+    for name in ("disc_field","slab","rim","rim_cap"):
+        chart_receivers.objects.link(bpy.data.objects[name])
+    chart=E.light(scene,"AREA","Reflected moon on silver chart",(42,12,48),8500,
+                  color=(.78,.85,1),size=27,target=(0,0,0))
+    chart.light_linking.receiver_collection=chart_receivers
+    slab_receivers=bpy.data.collections.new("Celestial marble base receivers")
+    slab_receivers.objects.link(bpy.data.objects["slab"])
+    slab_light=E.light(scene,"AREA","Warm return on thin marble base",(-25,25,20),6500,
+                       color=(1,.83,.63),size=24,target=(0,0,0))
+    slab_light.light_linking.receiver_collection=slab_receivers
+    return dict(loc=(-46,8,29),target=(2,0,8),lens=38.5,
+                fstop=8*scene.unit_settings.scale_length,focus=(4,0,1.4))

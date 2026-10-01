@@ -50,13 +50,13 @@ textures, text, or external assets are required.
 | `street_car` | Parked saloon silhouette with a shaped body, curved roof, glazing, wheels, brightwork and lamps; length, width, height, tone, tail_lights, lamp_gain |
 | `neon_street` | Wet road and puddles, kerbs, articulated facades at multiple depths, mostly dark window grids, mounted neon signs, street lamps, curbside cars and falling rain; width, depth, cars, exterior_slope, falling_rain, lead_in, emission_gain, light_gain, ambient_gain |
 | `marble_loggia` | Entasis shafts, carved capitals, dressed arches, molded archivolts and turned balustrade; bays, span, height, radius, balustrade_height, rail_offset, rail_base, tone |
-| `marble_table` | Fine-veined polished top, ogee edge and turned stone trestles; width, depth, height, thickness, tone, quiet, back_wings |
+| `marble_table` | Fine-veined polished top, ogee edge and turned stone trestles; width, depth, height, thickness, tone, quiet, back_wings, polish |
 | `telescope` | Sectioned refractor, dew cap, lens, focuser, finder, equatorial bearings and braced tripod; length, radius, stand_height, elevation, wood_tone, metal_tone |
 | `armillary` | Graduated nested brass bands and central sphere, or enamel celestial globe with inlaid coordinates; kind, radius, pedestal, metal_tone |
 | `amethyst_cluster` | Terminated quartz prisms, pale tips, internal inclusions and spun brass bowl; radius, height, count, bowl, tone, metal_finish, energy |
 | `velvet_drape` | Folded velvet runner with an edge drop, sewn borders and gold star embroidery; width, length, drop, tone, stars |
 | `astronomer_tools` | Rete disk, curled constellation chart, convex magnifier or pierced incense vessel; kind, radius, width, depth, metal_tone |
-| `night_vista` | Indigo galaxy, maria and terminator, distant planet, spired floating citadels and layered surface clouds; width, depth, slope, sky_strength, moon_strength |
+| `night_vista` | Indigo galaxy, maria and terminator, distant planet, spired floating citadels and layered surface clouds; width, depth, slope, sky_strength, moon_strength, moon_offset, planet_offset, cloud_drop |
 
 `geometry.py` supplies construction helpers. `materials.py` supplies procedural
 PBR surfaces, including dull fissured bark and sawn end grain for log sections. `preview_asset.py` renders one asset in a neutral studio with an
@@ -128,16 +128,28 @@ lights remain unchanged.
 the viewing elevation through the reveal (rise/run; default 0 for a level view).
 
 Celestial keeps the original tray, marble builders, astrolabe inlay and four tray
-lights. The room rotates -90 degrees around the tray, with a 46.3 mm seated
-camera 41.3 cm above the table and f/8 converted for centimetre scene units.
-The near half of the table stays quiet; foreground instruments are more than
-10 cm beyond the tray slab. Lanterns and instruments sit on stepped, supported
-consoles, with a separate colonnade and outer balustrade behind them. Room
-lights use an environment receiver collection. Exposure is -0.5 EV to retain
-numeral contrast at the required 50 percent preview size.
+lights. The room rotates -90 degrees around the tray. Its lower camera sits
+29.3 cm above the table, with a 38.5 mm lens and f/8 converted for centimetre
+scene units. The rounded rim spans 77.9 percent of the frame. Foreground
+instruments and embroidered velvet remain at least 10.3 cm beyond the tray slab.
+The table ends just behind the tray, with supported side returns for the cloth,
+astrolabe, chart and crystals. Lanterns, armillary, telescope and globe overlap
+at distinct depths rather than sharing a single back edge. The refractor points
+38 degrees upward and its tripod stands on the lower terrace landing.
 
-The new marble, velvet, quartz, sky, moon and cloud builders are additions to
-`materials.py`; the previous material builders remain unchanged. The night
-vista uses procedural surfaces and multiple geometry layers, without volumes,
-external images or lettering. The `slope` parameter aligns the distant vista
-with a seated downward view without flattening its depth.
+The marble table's optional `polish` parameter tightens the coat and base
+reflection; zero preserves its previous finish. Warm lantern returns, a cooler
+back edge and a violet crystal accent light the room through an environment
+receiver collection. Separate linked lights illuminate only the existing tray
+chart and thin marble slab. No tray material, geometry or original light is
+changed. Exposure remains -0.5 EV for numeral contrast at the required
+50 percent preview size.
+
+The night vista uses procedural surfaces and multiple geometry layers, without
+volumes, external images or lettering. Its `slope` aligns the vista with the
+seated viewing angle. `moon_offset` and `planet_offset` control horizontal
+position and height above that slope; `cloud_drop` reveals more of the floating
+crags. Two-dimensional, brightness-selected stars avoid the sparse cross-section
+of the original three-dimensional noise. The moon retains maria and a soft
+terminator with gentler surface contrast. Earlier room material functions remain
+unchanged.

@@ -1116,17 +1116,23 @@ Lighting recipes (the tray lights are unchanged unless noted):
   Camera: 20 mm, f/4. Gate: numeral 11.81 (d12), die vs tray 2.92, stroke
   0.124–0.130, PASS.
 
-- **Celestial — the observatory loggia.** An open marble arcade on the star
-  balcony (no back wall): columns and a lintel frame the nebula with a
-  room-scale star layer, a pale moon and a small planet; violet hangings
-  with a gold lattice on the side walls, a brass telescope on a tripod
-  (back-left), a great floor armillary (right) and an amethyst geode.
-  Lights: the tray's moon (cool, back-left) and soft front, a brass
-  lantern hung on the left (35 kW, warm key), the geode's shadowless
-  violet glow (30 kW, right, the accent) and brass sconces on both side
-  walls (9 kW each). Room marble is a pale fine-veined variant (the tray's
-  bold marble reads as zebra stripes at room scale). Camera: 18 mm, low,
-  looking up into the sky. Gate: numeral 11.35 (d12), die vs tray 2.45,
+- **Celestial — the observatory loggia (round 2).** Broadside from −x,
+  38.5 mm, f/8, low seated height so the tabletop is a narrow band. The
+  tray on a pale, warm, fine-veined polished `marble_table` (slim base,
+  no dark plinth). Left: the brass `lantern` (the warm key, a visible
+  pool on the marble), books, the `armillary`, the brass refractor
+  (`telescope`) on its tripod angled up at the sky, a violet
+  `velvet_drape` with gold stars and a brass astrolabe cropped in the
+  corner. Right: a celestial globe, an `amethyst_cluster` bowl (the violet
+  accent, shadowless glow), the magnifier and the parchment star chart
+  (`astronomer_tools`). Behind, the `marble_loggia` arches frame
+  `night_vista`: the round-1 sky was a harsh saturated purple wall; now a
+  blue-black to indigo sky, a desaturated violet-blue galaxy band, dense
+  stars with a few glints, a big detailed moon and a small planet, a
+  moonlit cloud sea and the floating spired citadel with warm windows.
+  Tray lights unchanged (moon 22 kW cool from the back, violet rim, soft
+  front); a cool return on the chart and a warm return on the marble
+  base; exposure −0.5. Gate: numeral 14.31 (d12), die vs tray 2.21,
   stroke 0.121–0.130, PASS.
 
 - **Hearthside — the fireside reading nook.** A raised fieldstone

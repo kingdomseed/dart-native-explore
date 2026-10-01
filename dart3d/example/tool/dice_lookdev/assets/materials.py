@@ -323,7 +323,7 @@ def rain_streak(name="Backlit falling rain", strength=1):
     return m
 
 
-def fine_marble(name="Warm statuary marble", tone=(0.46, 0.43, 0.37), wear=0.35, seed=0, quiet=(0, 0)):
+def fine_marble(name="Warm statuary marble", tone=(0.46, 0.43, 0.37), wear=0.35, seed=0, quiet=(0, 0), polish=0):
     m, k = E.material(name)
     vec = mapped(k, (0.045, 0.045, 0.065), seed)
     n = k.noise(vec, 1, 4, 0.62, dist=0.35).outputs["Fac"]
@@ -337,8 +337,8 @@ def fine_marble(name="Warm statuary marble", tone=(0.46, 0.43, 0.37), wear=0.35,
         vein = k.math("MULTIPLY", vein, k.math("MAXIMUM", 0.14, k.math("MULTIPLY", k.math("MAXIMUM", 0, outside), 0.2, clamp=True)))
     col = k.mix(vein, (*tone,1), tuple(c*0.42 for c in tone)+(1,))
     n2 = k.noise(vec, 8, 2).outputs["Fac"]
-    k.surface(k.bsdf(Base_Color=col, Roughness=k.math("ADD", 0.19, k.math("MULTIPLY", n2, wear*0.27)),
-                     Coat_Weight=0.28, Coat_Roughness=0.16, Subsurface_Weight=0.04,
+    k.surface(k.bsdf(Base_Color=col, Roughness=k.math("ADD", 0.19-0.10*polish, k.math("MULTIPLY", n2, wear*0.27)),
+                     Coat_Weight=0.28+0.3*polish, Coat_Roughness=0.16-0.11*polish, Subsurface_Weight=0.04,
                      Normal=k.bump(n2, 0.12, 0.009)))
     return m
 
@@ -372,11 +372,16 @@ def night_sky(name="Indigo galaxy", strength=1, seed=0):
     dust=k.ramp(n,[(0.28,(0.02,0.02,0.02)),(0.48,(0.18,0.18,0.18)),(0.66,(0.8,0.8,0.8)),(0.8,(1,1,1))])
     base=k.ramp(sep.outputs["Z"],[(0,(0.04,0.064,0.13)),(0.45,(0.009,0.022,0.055)),(1,(0.0015,0.003,0.012))])
     col=k.mix(k.math("MULTIPLY",band,dust),base,(0.26,0.21,0.37,1))
+    star_uv=k.node("ShaderNodeCombineXYZ")
+    k.link(k.math("MULTIPLY",sep.outputs["X"],1.875),star_uv.inputs["X"])
+    k.link(sep.outputs["Z"],star_uv.inputs["Y"])
     star=0
-    for scale,size,power in ((370,0.037,1.8),(143,0.034,3.8),(47,0.023,7)):
-        v=k.voronoi(uv,scale)
-        mask=k.math("LESS_THAN",v.outputs["Distance"],size)
-        star=k.math("ADD",star,k.math("MULTIPLY",mask,power))
+    for scale,size,power in ((170,.08,4.0),(70,.068,6.0),(24,.046,10.0)):
+        v=k.voronoi(star_uv.outputs[0],scale)
+        v.voronoi_dimensions="2D"
+        mask=k.math("SUBTRACT",1,k.math("DIVIDE",v.outputs["Distance"],size),clamp=True)
+        selected=k.math("GREATER_THAN",v.outputs["Color"],.60)
+        star=k.math("ADD",star,k.math("MULTIPLY",k.math("MULTIPLY",mask,selected),power))
     k.surface(k.add_shader(k.emission(col,strength),k.emission((0.64,0.77,1,1),star)))
     return m
 
@@ -385,8 +390,8 @@ def moon_surface(name="Moon maria", strength=1.4, seed=0):
     m,k=E.material(name)
     uv=k.coords().outputs["Generated"]
     n=k.noise(uv,5.5,5,0.67,dist=0.28).outputs["Fac"]
-    maria=k.ramp(n,[(0.28,(0.065,0.088,0.14)),(0.44,(0.13,0.17,0.24)),
-                    (0.52,(0.4,0.46,0.57)),(0.68,(0.68,0.73,0.8))])
+    maria=k.ramp(n,[(0.25,(0.15,0.19,0.27)),(0.43,(0.23,0.28,0.37)),
+                    (0.55,(0.46,0.52,0.63)),(0.74,(0.63,0.69,0.79))])
     v=k.voronoi(uv,28).outputs["Distance"]
     crater=k.ramp(v,[(0.12,(0.55,0.55,0.55)),(0.20,(0.6,0.6,0.6)),(0.24,(0.95,0.95,0.95)),(0.29,(0.8,0.8,0.8))])
     col=k.mix(0.22,maria,k.mix(crater,(0.10,0.14,0.2,1),maria))
