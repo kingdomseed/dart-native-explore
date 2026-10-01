@@ -225,6 +225,28 @@ def polished_metal(name="Worn chrome", tone=(0.65, 0.68, 0.72), wear=0.35, seed=
     return m
 
 
+def machined_metal(name="Aged machine brass", finish="brass", wear=.55, seed=0):
+    m,k=E.material(name)
+    tones={"brass":(.56,.34,.105),"copper":(.54,.205,.095),"steel":(.39,.43,.46),"iron":(.065,.072,.076)}
+    tone=tones[finish]
+    vec=mapped(k,(1,1,1),seed)
+    stain=k.noise(vec,.19,3,.65).outputs["Fac"]
+    tarnish=k.ramp(stain,[(.22,(.06,.06,.06)),(.48,(.7,.7,.7)),(.76,(1,1,1))])
+    col=k.mix(wear,(*tone,1),k.mix(tarnish,tuple(c*.2 for c in tone)+(1,),(*tone,1)))
+    geo=k.node("ShaderNodeNewGeometry")
+    edge=k.math("MULTIPLY",k.math("MAXIMUM",0,k.math("SUBTRACT",geo.outputs["Pointiness"],.495)),wear*22,clamp=True)
+    col=k.mix(edge,col,tuple(min(.8,c*1.35) for c in tone)+(1,))
+    tool=k.noise(mapped(k,(.035,4,.6),seed),2.5,2).outputs["Fac"]
+    pits=k.noise(vec,2.2,2).outputs["Fac"]
+    oxidation=k.ramp(pits,[(.40,(0,0,0)),(.55,(0,0,0)),(.67,(1,1,1))])
+    oxidation=k.math("MULTIPLY",oxidation,wear*.6)
+    col=k.mix(oxidation,col,tuple(c*.10 for c in tone)+(1,))
+    rough=k.math("ADD",k.math("ADD",.16,k.math("MULTIPLY",stain,.29*wear)),k.math("MULTIPLY",oxidation,.3))
+    normal=k.bump(tool,.15*wear,.012,normal=k.bump(pits,.25*wear,.065))
+    k.surface(k.bsdf(Base_Color=col,Metallic=1,Roughness=rough,Normal=normal))
+    return m
+
+
 def ceramic(name="Glazed porcelain", tone=(0.67, 0.62, 0.48), wear=0.25, seed=0):
     m, k = E.material(name)
     n = k.noise(mapped(k, (1, 1, 1), seed), 2, 2).outputs["Fac"]

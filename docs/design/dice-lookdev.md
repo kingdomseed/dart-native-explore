@@ -1114,15 +1114,25 @@ Lighting recipes (the tray lights are unchanged unless noted):
   Gate: numeral 7.93 (d20), die vs tray 4.78, stroke 0.124–0.130,
   PASS.
 
-- **Fate Engine — the inventor's workshop.** Brick walls run with copper
-  pipes and big brass wall gears, a tall mullioned window onto a spired
-  city at night (area, 40 kW, cool, back-right), a side bench with bottle
-  shelves on the left, a glass tesla column with a teal coil on the right
-  (shadowless 25 kW teal, the accent), an industrial pendant above-left of
-  the table (spot, 60 kW, 1.0/0.72/0.42, the warm key) and a caged lamp on
-  the back wall (40 kW, warm, back-left); over the tray's own key and rim.
-  Camera: 20 mm, f/4. Gate: numeral 11.81 (d12), die vs tray 2.92, stroke
-  0.124–0.130, PASS.
+- **Fate Engine — the inventor's workshop (round 2).** A broadside
+  17.7 mm, effective f/8 camera looks down 34.8 degrees, 22.3 cm above the
+  workbench. The tray spans 79.95% of the frame with its near rim cropped.
+  A planked oak bench with a rounded rear recess reveals the riveted brass
+  dice machine, sloped mouth, phased involute gear train and pressure
+  instruments. The separate glass induction column carries a continuous
+  teal helix. Drafting sheets, calipers, dividers, a magnifier and loose
+  gears frame the corners; minimum dressing clearance is 10.37 cm.
+  Behind: an armillary bench, modeled brick courses, flanged copper pipes
+  and valves, pinned technical drawings, bottle shelves and a Gothic
+  window onto the cool spired city. Two guarded industrial lamps motivate
+  the warm pools (22/20 kW practicals, with warm returns on brass and brick).
+  The window contributes 55 kW cool light plus a 90 kW brass-edge return;
+  the coil provides 2.4 kW teal plus a restrained 1.8 kW reflected accent.
+  Room lights are linked to environment receivers. A separate 9.5 kW
+  warm reflection illuminates the existing tray field and rail. The tray
+  geometry, shaders, engraving and original lights are unchanged;
+  exposure remains +0.1 EV. No room-wide haze volume.
+  Gate: numeral 13.76 (d10t), die vs tray 2.81, stroke 0.124–0.130, PASS.
 
 - **Celestial — the observatory loggia (round 2).** Broadside from −x,
   38.5 mm, f/8, low seated height so the tabletop is a narrow band. The

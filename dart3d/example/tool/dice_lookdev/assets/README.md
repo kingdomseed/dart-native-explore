@@ -35,7 +35,7 @@ textures, text, or external assets are required.
 | `forge_plate` | Thin hammered support plate; width, depth, thickness, metal_finish |
 | `leather_mat` | Curled hide, blind-tooled rings and lozenges, sewn border; width, depth, roll, tone |
 | `loose_hardware` | Resting interlocked chain and blank iron counters; length, coins, metal_finish |
-| `masonry` | Varied hewn ashlar with real rectangular openings; width, height, thickness, openings, tone |
+| `masonry` | Varied hewn ashlar with real rectangular openings; width, height, thickness, openings, tone; optional block_width, course_height, arris and relief |
 | `diner_counter` | Rounded laminate top, continuous chrome bullnose, walnut panels, kick plate, foot rail, individual water beads and small puddles; width, depth, height, tone, wood_tone, quiet, droplets, puddles, streaks, drop_radius, back_wings, back_wing_inset |
 | `bar_stool` | Spun pedestal and foot ring, upholstered red vinyl cushion with button dimples and piping; height, radius, tone, metal_tone |
 | `dome_pendant` | Spun chrome dome, enamel lining, socket, bulb and suspension cord; radius, height, drop, tone, color, energy |
@@ -71,6 +71,14 @@ textures, text, or external assets are required.
 | `writing_set` | Chased botanical inkwell, curved feather with individual barbs, or spirally rolled parchment and leather tie; kind, width, height, quill_length, metal_finish, tone |
 | `runestone_bowl` | Repousse basin and faceted blue stones with recessed luminous triangles, diamonds and circles; radius, height, count, tone, metal_finish, energy |
 | `candlestick` | Turned pricket foot, knop and fluting around the reused wax candle, drip pan and flame; height, radius, candle_height, candle_radius, metal_finish, energy, flame_strength |
+
+| `clockwork_gear` | Sampled involute spur teeth, open spoke web and bored stepped hub; pitch radius, teeth, thickness, spokes, bore, phase, axis, metal_finish |
+| `pipework` | Swept elbows, bolted unions, wheel valves or convex-glass pressure dials with ticks and needle; kind, points, radius, gauge_radius, reading, wheel_radius, metal_finish |
+| `tesla_column` | Turned electrode caps, flanges, tie rods, thin glazing, porcelain sheds and continuous emissive helix; radius, height, turns, tone, strength, energy, metal_finish |
+| `dice_machine` | Cast frame, riveted barrel crown, sloped discharge plate, rollers, gear train and pressure fittings; width, depth, height, output_height, metal_finish |
+| `industrial_lamp` | Reused spun pendant with bowed bulb guard, reinforcing hoops and brass rivets; radius, height, drop, metal_finish, energy, color |
+| `engineering_sheet` | Curled technical drawing with gear elevations, section hatching and dimension ticks; width, depth, blueprint, curl, pinned, ink_width |
+| `precision_tools` | Graduated sliding caliper, hinged dividers or turned-handle screwdriver; kind, length, opening, wood_tone, metal_finish |
 
 `geometry.py` supplies construction helpers. `materials.py` supplies procedural
 PBR surfaces, including dull fissured bark and sawn end grain for log sections. `preview_asset.py` renders one asset in a neutral studio with an
@@ -227,3 +235,26 @@ controls, rest patches and embroidery controls likewise preserve their previous
 defaults. No shared material behavior changes. Emberforged, Voltline, Celestial
 and Frostbound are re-rendered serially at 25 percent / 16 samples after these
 extensions. There are no room volumes, downloads, lettering or external assets.
+
+
+Fateengine preserves its brushed-steel floor, inlaid gear chart, riveted brass
+rail and all four original tray lights. The broadside 17.7 mm camera at effective
+f/8 looks down 34.8 degrees; the tray spans 79.95 percent of the frame. Room
+lights have separate receivers. A 9.5 kW warm work-lamp return lights only the
+existing tray field and rail. Exposure remains +0.1 EV.
+
+The planked workbench has a rounded rear recess; a lower mounting bench supports
+the cast dice engine and its glass induction column. The engine has sampled
+involute gears of a common module, phased at the sum of their pitch radii,
+shaft bearings, a riveted crown and a sloped mouth. Copper pipes use swept
+elbows and bolted unions. The gauges have physical tick marks and needles,
+without text. Drafting sheets and precision tools frame the desk; the minimum
+measured foreground clearance is 10.37 cm beyond the tray rim.
+
+The new `machined_metal` material adds tarnish, machining scratches, roughness
+breakup and rubbed edges without changing existing material functions.
+`masonry` gains optional brick-course dimensions, arris radius and face relief;
+its original defaults remain unchanged. Emberforged, Voltline, Celestial,
+Frostbound and Arcane are re-rendered serially at 25 percent / 16 samples and
+visually checked. The engine is about 92k evaluated triangles, the induction
+column 15k, and the largest wall 132k. There are no room volumes or external assets.
