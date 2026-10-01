@@ -15,6 +15,47 @@ where this file re-scopes it. Why the reset: see
    `mythic_dice_parser`, with the dice feel the operator asked for.
 3. **Release:** dart3d published on dartpub.dev as the first 3D plugin.
 
+## Where we are (2026-10-01)
+
+**Landed since the reset.** S0a/b/e/f, the Vulkan relaunch fix, the P4
+hero (#31), `switchAnimation` (#34), the Track V re-cut (#37; upstream
+0.24 is still unpublished), and the example's dice experience through
+DR2 with the DartNative set (#36, #38–#42).
+
+**In flight.** P2 game rooms, round 3 (defects + a second art pass on six
+rooms), on `p3-game-rooms-wip`. Blender look-dev only; nothing in the app
+depends on it.
+
+**Next, in order.**
+
+1. **Fire tablet findings** — the baseline ran on 2026-10-01
+   (`docs/artifacts/s0-fire-tablet-baseline/`, #44). The scene view did
+   not start below API 33 (jolt-jni's `Cleaner`; fixed in #44). Still
+   open from it: the dice tray rim is wrong in landscape, the dice
+   screen runs at about 15–20 fps on the Mali-G52, and native lifetime
+   on API 26–32 needs an audit now that the automatic cleaner is off
+   there.
+2. **S0h cold start** — ~10–14 s of material compile before the first
+   frame on a fresh install (about 15 s on the Fire tablet); every demo
+   opens with it.
+3. **P3 DR3** — notation entry, count-up total, audio. Needs P1's
+   pre-rolled parser contract (explode/reroll stays on the virtual
+   fallback until `CallbackDiceRoller` is async).
+4. **E1** Filament upgrade + instancing, then E2 and E3. E3 also gives
+   the dice a lighting cue; today they sit under no light sources.
+5. **S0c / S0g** backfill, as each lane's unit is touched.
+
+**Verification debt.** iOS simulators and devices are paused by the
+operator (Mac mini load, 2026-09-30), so #36 and #38–#42 merged on A142
+evidence only. #39 changed Android culling natively and has no iOS or
+GL-backend run. Owed when iOS is re-enabled: T2 on the simulator plus the
+dice lanes (readout, d4 turn, cocked nudge, gestures, numerals, culling
+parity). The toss gesture has only been driven by scripted swipes.
+
+**Review.** Codex code review is out of quota; PRs since #36 were
+reviewed by an Opus reviewer agent, each finding checked against the
+code before fixing (verdicts are in the PR comments).
+
 ## Decisions (made here, change only with the operator)
 
 | # | Decision | Why |
@@ -46,7 +87,7 @@ stayed empty. The new gate is smaller and mandatory.
 | Tier | When | Required evidence |
 |---|---|---|
 | **T1 — CI** | every PR | `dn analyze` + `dn test` in **every Dart package the PR changes** (`dart3d/`, `dart3d/example/`, and each new package such as `dart3d_audio/` or the dice app gets its own CI step when it is created). Target (R3): add Android `compileReleaseKotlin` and iOS `swiftc -typecheck` jobs. |
-| **T2 — device smoke** | every PR touching `dart3d/android/**`, `dart3d/ios/**`, or the wire vocabulary | On A142 **Vulkan and GL** and on the iOS sim: app boots, harness (booted with `--dart-define=DART3D_SCENE=harness`; it has no UI entry) runs to completion, dice roll and settle, zero FATAL/crash in logs. One screenshot per surface + log excerpt, committed under `docs/artifacts/<unit>/`. |
+| **T2 — device smoke** | every PR touching `dart3d/android/**`, `dart3d/ios/**`, or the wire vocabulary | On A142 **Vulkan and GL**, on the Fire tablet (KFTUWI, Mali-G52 — once its baseline is recorded), and on the iOS sim (paused 2026-09-30; see *Verification debt*): app boots, harness (booted with `--dart-define=DART3D_SCENE=harness`; it has no UI entry) runs to completion, dice roll and settle, zero FATAL/crash in logs. One screenshot per surface + log excerpt, committed under `docs/artifacts/<unit>/`. |
 | **T3 — feature lanes** | every unit | The unit's own live checks, same evidence rules: the subset of its old "Verify, live" block that exercises new behavior, or for units new in v2, the checks listed under **New-unit T3** below. |
 | **T4 — review** | units that change what users see | Operator reviews screenshots (video optional) in the PR before merge. |
 | **Perf** | only units that claim a perf number | The measured number, device, and method, committed. |
@@ -175,6 +216,16 @@ scaffolding, not the demo.
       `p3-dice-lookdev`) and a **cinematic intro**: start in a side camera
       view exploring the themed environment, fly to the table, then roll
       top-down. Starts after the example's dice experience reaches DR3.
+      **Game rooms (look-dev, Blender only)** on `p3-game-rooms-wip`:
+      round 2 rebuilt all 11 rooms from the Codex concept images with
+      ~100 modeled props (`tool/dice_lookdev/assets/`, built by Codex
+      `gpt-6-astra`); every set passes the readability gate in its
+      top-down play view. Round 3 in flight: defects (a curved cut-out
+      behind the tray, dark bands, gate headroom) and a second art pass
+      on six rooms. Then density/wear/atmosphere and painted window
+      backdrops. How the rooms reach real time (bake, reduce, optimize)
+      is undecided on purpose — finish the look first (operator,
+      2026-10-01).
 - [ ] P3 **Dice experience in the example** — the demo's main experience:
       a **DartNative-themed dice set** with really fluid rolls (operator,
       2026-09-30). Phases DR1–DR5 (demo-program §5): readout fix +
@@ -186,13 +237,13 @@ scaffolding, not the demo.
       the brightest, sharpest element).
       Includes the 09-17 feedback (pick-up-and-toss, walls = screen
       edges, quality picker, iPad white screen).
-      **DR1 (foundation)** on `p3-dr1-dice-foundation`: readout fix,
+      **DR1 (foundation)** — merged #36: readout fix,
       crystal-shard d4 (procedural, look-dev geometry), screen-fitted
       walls + ceiling in the frustum planes (safe areas, rotation),
       top-down 35° camera at 15% d20, labeled Reset, upstream physics
       numbers; A142 evidence `docs/artifacts/p3-dr1/`; iOS device check
       pending.
-      **DR2 (the throw)** on `p3-dr2-dice-feel`: d4 numerals read along
+      **DR2 (the throw)** — merged #38: d4 numerals read along
       the crystal and the d4 turns upright after settling; cocked-die
       detection (per-die tolerance, catches d20 edge-rests) + physical
       nudge, read at the next settle; aim arrow (420 px pull, colour/
@@ -202,7 +253,7 @@ scaffolding, not the demo.
       fling toss; sweep from a die. Input is `GestureDetector` on the
       scene view (`Listener` hides/doesn't reach it on Android). A142
       evidence `docs/artifacts/p3-dr2/`; iOS device check pending.
-      **DartNative set** on `p3-dartnative-dice-set`: the example's dice
+      **DartNative set** — merged #39: the example's dice
       are the look-dev DartNative set, built procedurally in Dart
       (`dice_polyhedra.dart` geometry + numbering, `dice_numerals.dart`
       atlas from Inter outlines, `dice_set.dart` mesh/material): smoky
@@ -219,6 +270,13 @@ scaffolding, not the demo.
       point lights hung the A142's GPU (Vulkan, 60 s frames) — not
       used. A142 evidence `docs/artifacts/p3-dartnative-set/`; iOS
       device check pending.
+      Operator tweaks after #39: no dark band behind the numerals (#40);
+      every numeral fits inside its face's inlay, one size for one-digit
+      and one for two-digit numerals per die (#41); no dot by the 9, the
+      6 keeps its dot (#42).
+      **Next: DR3** — notation + count-up + audio. Open with the
+      operator: the indigo table may still read as black; the toss needs
+      a real-finger check.
 - [ ] P4 Hero launch scene + 3D DartNative logo. Logo landed (#26).
       Hero (M0) landed on `p4-hero-scene` (#31; spec
       `docs/design/hero-scene-brief.md`; `lib/hero_screen.dart`,
