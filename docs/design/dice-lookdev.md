@@ -1130,26 +1130,33 @@ Lighting recipes (the tray lights are unchanged unless noted):
   Pass 1 preview gate (50% / 32 samples): numeral 5.20 (d20),
   die vs tray 5.01, stroke 0.124–0.130, PASS.
 
-- **Fate Engine — the inventor's workshop (round 2).** A broadside
-  17.7 mm, effective f/8 camera looks down 34.8 degrees, 22.3 cm above the
-  workbench. The tray spans 79.95% of the frame with its near rim cropped.
-  A complete planked oak bench with a straight far edge stands in front of
-  the separately supported riveted brass dice machine, sloped mouth, phased
-  involute gear train and pressure instruments. The separate glass induction column carries a continuous
-  teal helix. Drafting sheets, calipers, dividers, a magnifier and loose
-  gears frame the corners; minimum dressing clearance is 10.37 cm.
-  Behind: an armillary bench, modeled brick courses, flanged copper pipes
-  and valves, pinned technical drawings, bottle shelves and a Gothic
-  window onto the cool spired city. Two guarded industrial lamps motivate
-  the warm pools (22/20 kW practicals, with warm returns on brass and brick).
-  The window contributes 55 kW cool light plus a 90 kW brass-edge return;
-  the coil provides 2.4 kW teal plus a restrained 1.8 kW reflected accent.
-  Room lights are linked to environment receivers. A separate 9.5 kW
-  warm reflection illuminates the existing tray field and rail. The tray
-  geometry, shaders, engraving and original lights are unchanged;
-  exposure remains +0.1 EV. No room-wide haze volume.
-  Pass 1 preview gate (50% / 32 samples): numeral 14.31 (d10t),
-  die vs tray 2.85, stroke 0.124–0.130, PASS.
+- **Fate Engine — the inventor's workshop (round 3, pass 2).** A closer
+  broadside 15.5 mm camera at effective f/8 keeps the d20 fully in view at
+  7.5% of image width; the near rail is cropped below the frame. Focus stays
+  on the dice. The continuous oak desktop is raised to z=0.305 beneath the
+  unchanged z=0.31 steel surface, hiding the projecting support-board edge. A shallow hidden bedding cut
+  accommodates that unchanged base within the desktop.
+  The far table edge remains straight, without a recess.
+  A separately supported, riveted brass casting dominates the rear centre:
+  bolted mouth jambs, a sloped outlet, reinforcing crown hoops, exposed piston
+  rods and the phased involute gear train. The extended chute clears the rim
+  by 12.9 cm and visually aims into the tray. The glass induction column is
+  separated from the gears on the right, beside a connected pressure dial
+  and a flanged receiver with two more gauges. The caged work lamp and the
+  larger armillary overlap the left midground. Drawing sheets, a magnifier,
+  caliper, dividers, hexagonal pencils and loose hardware frame the bench.
+  Evaluated support placement seats the tools on the oak or curled paper;
+  minimum measured foreground clearance is 10.44 cm.
+  The closer Gothic window retains its existing spired-city geometry; its
+  sightline is raised and the distant window emission reduced. Warm lamp
+  pools and smaller brass highlights replace stronger broad returns. A
+  3.5 kW warm reflection and a 4.8 kW teal reflection illuminate only the
+  existing tray field and rail. Room lights retain separate environment
+  receivers. The tray geometry, materials, engraving and original light
+  calls are unchanged; exposure remains +0.1 EV. No room-wide volume.
+  Pass 2 preview gate (50% / 32 samples): numeral 14.11 (d10t),
+  die vs tray 2.59, stroke 0.124–0.130, PASS.
+  Gate: numeral 13.79 (d10t), die vs tray 2.49, stroke 0.124–0.130, PASS.
 
 - **Celestial — the observatory loggia (round 2).** Broadside from −x,
   38.5 mm, f/8, low seated height so the tabletop is a narrow band. The

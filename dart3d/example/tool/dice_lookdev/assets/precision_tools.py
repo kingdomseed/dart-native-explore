@@ -20,6 +20,21 @@ def build(name="Precision workshop tool",loc=(0,0,0),rot_z=0,kind="caliper",leng
         a.beam("Divider adjustment screw",(-opening*.4,-length*.42,.65),(opening*.4,-length*.42,.65),.22,.22,steel,.05)
         nut=a.cylinder("Divider knurled nut",.48,.45,(opening*.35,-length*.42,.65),brass,segments=16)
         nut.rotation_euler.y=math.pi/2
+    elif kind=="pencil":
+        wood=M.oak(name+" cedar",wood_tone,wear*.3,seed,axis="Z")
+        paint=M.leather(name+" worn painted barrel",(.11,.055,.018),wear,seed)
+        graphite=M.machined_metal(name+" graphite","iron",.7,seed)
+        span=length-2.2
+        verts=[(.32*math.cos(j*math.tau/6),span*(i/24-.5),.29+.32*math.sin(j*math.tau/6))
+               for i in range(25) for j in range(6)]
+        faces=[(i*6+j,i*6+(j+1)%6,(i+1)*6+(j+1)%6,(i+1)*6+j)
+               for i in range(24) for j in range(6)]
+        faces.extend((tuple(reversed(range(6))),tuple(range(144,150))))
+        a.mesh("Hexagonal drafting pencil",verts,faces,paint,bevel=.018)
+        tip=a.cylinder("Exposed sharpened cedar",.32,1.8,(0,-length/2+.2,.29),wood,segments=6,r2=.075,bevel=.015)
+        tip.rotation_euler.x=math.pi/2
+        lead=a.cylinder("Graphite point",.075,.40,(0,-length/2-.9,.29),graphite,segments=12,r2=0,bevel=0)
+        lead.rotation_euler.x=math.pi/2
     elif kind=="screwdriver":
         wood=M.oak(name+" worn handle",wood_tone,wear,seed,axis="Z")
         handle=a.lathe("Turned wooden tool handle",[(0,0),(.6,0),(1,.5),(1.1,1.7),(.95,length*.35),(.7,length*.42),(0,length*.42)],wood,segments=40)

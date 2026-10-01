@@ -5,7 +5,8 @@ from . import geometry as G, materials as M, clockwork_gear, pipework
 
 
 def build(name="Brass dice engine",loc=(0,0,0),rot_z=0,width=40,depth=36,height=75,
-          output_height=None,metal_finish="brass",wear=.65,seed=1) -> bpy.types.Object:
+          output_height=None,metal_finish="brass",wear=.65,seed=1,
+          reinforced=False,outlet_reach=.80) -> bpy.types.Object:
     a=G.Asset(name,loc,rot_z)
     brass=M.machined_metal(name+" worked plating",metal_finish,wear,seed)
     trim=M.machined_metal(name+" rubbed edges",metal_finish,wear*.45,seed+1)
@@ -13,7 +14,8 @@ def build(name="Brass dice engine",loc=(0,0,0),rot_z=0,width=40,depth=36,height=
     steel=M.machined_metal(name+" bearing steel","steel",wear,seed+3)
     w,d,h=width,depth,height
     output=h*.56 if output_height is None else output_height
-    lintel=h*.87;front=-d*.35;back=d*.34
+    lintel=h*.87
+    front=-d*.35;back=d*.34
     for sx in (-1,1):
         a.lathe("Cast machine foot",[(0,0),(w*.17,0),(w*.19,.7),(w*.19,2),(w*.14,2.8),(w*.1,4),(0,4)],brass,
                 loc=(sx*w*.37,0,0),segments=40)
@@ -54,7 +56,7 @@ def build(name="Brass dice engine",loc=(0,0,0),rot_z=0,width=40,depth=36,height=
         boss.rotation_euler.x=math.pi/2
         a.ring("Cap seam",1.38,.09,(sx*w*.26,front-.4,lintel+3),iron,plane="XZ")
     a.block("Mouth lintel",(w*.82,2.2,2.5),(0,front-.4,lintel-1),trim,.35)
-    inner=w*.34;exit_y=-d*.80;entry_y=back-2;entry_z=lintel-4
+    inner=w*.34;exit_y=-d*outlet_reach;entry_y=back-2;entry_z=lintel-(1.4 if reinforced else 4)
     verts=[(-inner,exit_y,output),(inner,exit_y,output),(inner,entry_y,entry_z),(-inner,entry_y,entry_z)]
     chute=a.mesh("Sloped discharge chute",verts,[(0,1,2,3)],brass,bevel=.12)
     solid=chute.modifiers.new("Rolled chute plate thickness","SOLIDIFY");solid.thickness=.7
@@ -93,4 +95,32 @@ def build(name="Brass dice engine",loc=(0,0,0),rot_z=0,width=40,depth=36,height=
     a.add(pipe)
     valve=pipework.build(name+" pressure wheel",loc=(-w*.62,0,h*.47),kind="valve",radius=.85,wheel_radius=3,wear=wear,seed=seed)
     a.add(valve)
+    if reinforced:
+        for sx in (-1,1):
+            x=sx*w*.395
+            a.block("Bolted mouth jamb",(w*.105,2.1,lintel-output+2),
+                    (x,front-1.7,(lintel+output)/2),brass,.22)
+            a.beam("Rubbed jamb arris",(sx*w*.345,front-2.85,output),
+                   (sx*w*.345,front-2.85,lintel),.22,.22,trim,.08)
+            for j in range(5):
+                z=output+(lintel-output)*j/4
+                a.ring("Mouth bolt washer",.57,.095,(x,front-2.85,z),iron,plane="XZ",segments=24)
+                bolt=a.cylinder("Mouth hex bolt",.37,.35,(x,front-3,z),trim,segments=6,bevel=.045)
+                bolt.rotation_euler.x=math.pi/2
+            for t in (.16,.45,.74):
+                yy=exit_y+(entry_y-exit_y)*t
+                zz=output+(entry_z-output)*t
+                a.sphere("Chute guard flush rivet",.16,(sx*(inner+.38),yy,zz+1.2),iron,subdiv=2)
+        for yy in (front+3,back-3):
+            a.tube("Crown strengthening hoop",[(w*.436*math.cos(i*math.pi/64),yy,
+                   lintel+(h-lintel+.35)*math.sin(i*math.pi/64)) for i in range(65)],.38,trim)
+        for sx in (-1,1):
+            x=sx*w*.28
+            a.cylinder("Rear piston barrel",1.45,h*.24,(x,back-1,h*.94),brass,segments=32,bevel=.18)
+            for z in (h*.82,h*1.04):
+                pipework.flange(a,(x,back-1,z),(0,0,1),1.4,trim,iron)
+            a.cylinder("Exposed piston rod",.64,h*.14,(x,back-1,h*1.10),steel,segments=24)
+        a.beam("Piston crosshead",(-w*.34,back-1,h*1.16),(w*.34,back-1,h*1.16),2.1,2.8,brass,.25)
+        for yy in (front+1,back-1):
+            a.beam("Casting lower tie",(-w*.44,yy,8),(w*.44,yy,8),2,2.7,brass,.25)
     return a.root
