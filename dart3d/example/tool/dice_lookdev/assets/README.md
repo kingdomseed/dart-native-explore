@@ -304,3 +304,36 @@ uses +1.5 EV, gamma 0.8 and a 0.5-pixel Cycles filter to preserve fine numerals
 in the half-size phone check. Environment lamps use separate receivers. A gentle 2 kW hearth reflection
 illuminates only the subsequently created dice. The 50% / 32-sample top-down
 gate passes: numeral 5.45, die versus tray 3.35, stroke 0.123–0.128.
+
+
+### Northfield countryside kitchen assets
+
+All dimensions are centimetres. These new assets use a floor or tabletop origin
+and face local -Y unless noted. Each accepts `name`, `loc`, `rot_z`, `wear` and
+`seed`; existing material recipes and asset defaults remain unchanged.
+
+- `crt_terminal`: deep moulded ABS cabinet, ventilation slots, bowed rectangular CRT, recessed bezel, abstract phosphor marks and blank keyboard caps; `width`, `height`, `depth`, `tone`, `keyboard`, `energy`.
+- `portable_radio`: cassette door and reels, woven metal speaker grille, tuning ticks, knurled controls, carry handle and telescopic aerial; `width`, `height`, `depth`, `tone`, `antenna`.
+- `kitchen_unit`: fitted cupboard/drawer fronts, pulls and worktop, enamel cooker with hotplates and oven window, or two-door fridge with seals and handles; `kind`, `width`, `height`, `depth`, `tone`, `wood_tone`, `doors`.
+- `kettle`: spun enamel body, removable lid, open tapered spout and insulated bail; `radius`, `height`, `tone`.
+- `laminate_table`: continuous walnut-print top, rounded perimeter, aluminium edging, aprons and splayed legs; `width`, `depth`, `height`, `thickness`, `wood_tone`, optional `rear_recess` radii.
+- `dining_chair`: scooped plywood seat, bowed veneer back, beech stiles, stretchers and legs; `width`, `depth`, `height`, `seat_height`, `wood_tone`.
+- `breakfast_plate`: hollow ironstone profile, green rim bands, porous toast, butter and crumbs; `radius`, `tone`, `band_tone`, `butter`.
+- `potted_plant`: curved stalks and dished leaves in a glazed pot; `height`, `radius`, `tone`, `pot_tone`, `leaves`.
+- `countryside_window`: moulded painted casement, catches, gathered floral curtains and radiator, with layered spruce stands, sloping fields, a red barn and a distant articulated tripod machine; `width`, `height`, `tone`, `curtains`, `radiator`, `view`, `machine_x`, `machine_height`, `exterior_slope`.
+
+Optional shared variants: `coffee_mug(floral=True, print_tone=...)` confines the
+flower transfer to the cup's outer wall. `dome_pendant(finish="enamel",
+recessed_bulb=True)` makes the orange kitchen shade. The added material recipes
+are `aged_plastic`, `wood_laminate`, `retro_flower`, `toast_crumb` and `foliage`.
+
+Northfield preserves the original calibration mat, ABS case, orange case stripe
+and all three original light calls. Room lamps use an environment receiver
+collection. The broadside 27.7 mm camera looks down 29.8 degrees at effective
+f/8, focusing on the dice. The tray spans about 83 percent of the frame; the
+closest breakfast dressing clears its board by 11.5 cm. The room uses +0.7 EV,
+gamma 0.7 and a 0.2-pixel Cycles phone filter for legible small printed numerals at
+half resolution. A room-only render hook uses a 1.5-pixel filter for smooth
+grid lines; it does not change the gate mask pass. The required 50-percent /
+32-sample gate gives numeral 4.69,
+die versus tray 7.10, stroke 0.124–0.132, PASS. No volumes or external assets.

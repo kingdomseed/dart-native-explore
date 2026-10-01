@@ -3,6 +3,72 @@ import math
 import env_common as E
 
 
+def aged_plastic(name="Warm ABS", tone=(.52,.47,.34), wear=.4, seed=1):
+    m,k=E.material(name)
+    vec=mapped(k,(1,1,1),seed)
+    n=k.noise(vec,.13,3).outputs["Fac"]
+    micro=k.noise(vec,5,2).outputs["Fac"]
+    col=k.mix(k.math("MULTIPLY",n,wear*.32),(*tone,1),tuple(c*.55 for c in tone)+(1,))
+    k.surface(k.bsdf(Base_Color=col,Roughness=k.math("ADD",.31,k.math("MULTIPLY",n,.16)),
+                     Normal=k.bump(micro,.11,.006)))
+    return m
+
+
+def toast_crumb(name="Toasted bread crumb", seed=1):
+    m,k=E.material(name)
+    vec=mapped(k,(1,1,1),seed)
+    n=k.noise(vec,.7,4).outputs["Fac"]
+    pores=k.voronoi(vec,5).outputs["Distance"]
+    pits=k.ramp(pores,[(.04,(0,0,0)),(.14,(.25,.25,.25)),(.23,(1,1,1))])
+    col=k.ramp(n,[(.20,(.07,.018,.003)),(.45,(.32,.13,.032)),(.68,(.66,.41,.15)),(.86,(.78,.57,.27))])
+    col=k.mix(.48,col,k.mix(pits,(.05,.018,.005,1),col))
+    k.surface(k.bsdf(Base_Color=col,Roughness=.76,Normal=k.bump(pores,.7,.12)))
+    return m
+
+
+def foliage(name="Waxy foliage", tone=(.09,.17,.025), seed=1):
+    m,k=E.material(name)
+    n=k.noise(mapped(k,(1,1,1),seed),2,3).outputs["Fac"]
+    col=k.mix(n,tuple(c*.5 for c in tone)+(1,),(*tone,1))
+    k.surface(k.bsdf(Base_Color=col,Roughness=.48,Subsurface_Weight=.06,
+                     Normal=k.bump(n,.08,.018)))
+    return m
+
+
+def wood_laminate(name="Walnut print laminate", tone=(.24,.105,.032), wear=.4, seed=1):
+    m,k=E.material(name)
+    vec=mapped(k,(.035,.72,.72),seed)
+    grain=k.noise(vec,1.5,4,.65,dist=.45).outputs["Fac"]
+    wave=k.node("ShaderNodeTexWave",wave_type="BANDS",bands_direction="Y")
+    k.link(vec,wave.inputs["Vector"])
+    k.set(wave,Scale=.7,Distortion=8,Detail=4,Detail_Scale=.5)
+    col=k.ramp(grain,[(.22,tuple(c*.19 for c in tone)),(.49,tone),(.78,tuple(c*1.8 for c in tone))])
+    col=k.mix(.21,col,k.mix(wave.outputs["Fac"],tuple(c*.3 for c in tone)+(1,),col))
+    rough=k.math("ADD",.22,k.math("MULTIPLY",grain,.15*wear))
+    k.surface(k.bsdf(Base_Color=col,Roughness=rough,Coat_Weight=.45,Coat_Roughness=.18,
+                     Normal=k.bump(wave.outputs["Fac"],.04,.008)))
+    return m
+
+
+def retro_flower(name="1970s floral print", tone=(.58,.49,.31), ink=(.22,.25,.055), scale=.15,
+                 axes=("X","Z"), ceramic=False, seed=1):
+    m,k=E.material(name)
+    sep=k.node("ShaderNodeSeparateXYZ"); k.link(k.coords().outputs["Object"],sep.inputs[0])
+    x=k.math("SUBTRACT",k.math("FRACT",k.math("MULTIPLY",sep.outputs[axes[0]],scale)),.5)
+    y=k.math("SUBTRACT",k.math("FRACT",k.math("MULTIPLY",sep.outputs[axes[1]],scale)),.5)
+    r=k.math("SQRT",k.math("ADD",k.math("MULTIPLY",x,x),k.math("MULTIPLY",y,y)))
+    angle=k.math("ARCTAN2",y,x)
+    petal=k.math("ADD",.24,k.math("MULTIPLY",k.math("COSINE",k.math("MULTIPLY",angle,6)),.11))
+    flower=k.math("MULTIPLY",k.math("LESS_THAN",r,petal),k.math("GREATER_THAN",r,.065))
+    dot=k.math("LESS_THAN",r,.039)
+    mask=k.math("MAXIMUM",flower,dot)
+    n=k.noise(mapped(k,(1,1,1),seed),3,2).outputs["Fac"]
+    col=k.mix(mask,(*tone,1),(*ink,1))
+    k.surface(k.bsdf(Base_Color=col,Roughness=.25 if ceramic else .78,Coat_Weight=.4 if ceramic else 0,
+                     Normal=k.bump(n,.12,.008 if ceramic else .025)))
+    return m
+
+
 def mapped(k, scale, seed=0):
     mapping = k.node("ShaderNodeMapping")
     mapping.inputs["Scale"].default_value = scale

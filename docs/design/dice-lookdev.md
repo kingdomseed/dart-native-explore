@@ -1206,18 +1206,31 @@ Lighting recipes (the tray lights are unchanged unless noted):
   all seven approved rooms are rechecked at 25% / 16 samples.
   Gate: numeral 5.90 (d4), die vs tray 3.21, stroke 0.123–0.128, PASS.
 
-- **Northfield — the 1986 countryside kitchen.** Striped wallpaper, a
-  checkered lino floor, cream kitchen units along the left wall (worktop,
-  orange tile splashback, wall cupboards, cooker with an enamel kettle, a
-  tall fridge), a radiator under the window with floral curtains, and
-  outside the grey field, a tree line and the tall three-legged machine
-  (flat silhouettes against the sky). Lights: the orange pendant over the
-  table, now on a cord (warm key, above), the window (area, 30 kW,
-  grey-blue daylight, back), the CRT's shadowless green spill (2.5 kW,
-  left, the accent) and a warm strip under the wall cupboards (6 kW,
-  back-left). Camera: 20 mm, looking across the table toward the window
-  and the units. Gate: numeral 7.46 (d10t), die vs tray 5.49, stroke
-  0.124–0.132, PASS.
+- **Northfield — the 1986 countryside kitchen (room round 2).** A close
+  broadside breakfast view: the calibration tray spans about 83% of the frame,
+  near rim at the bottom; 27.7 mm, 29.8 degrees down, effective f/8 on the dice.
+  A walnut-print laminate table with rolled aluminium edging, a floral mug,
+  buttered toast on an ironstone plate and a woven runner frame the tray.
+  The closest dressing clears the tray board by 11.5 cm. Behind it: a beige
+  terminal with bowed green CRT, cooling slots and separate blank keyboard,
+  a bent-plywood chair, fitted cream units, enamel cooker, hollow-spout kettle,
+  fridge and a cassette radio with physical grille, reels and tuning ticks.
+  Floral wallpaper and gathered curtains surround a painted casement and
+  radiator. The clear window looks across layered spruce stands, a red barn
+  and descending fields to an articulated three-legged machine with a tiny
+  red warning light. All graphics are abstract; no lettering or logos.
+  The orange enamel pendant pools warm light onto the laminate, cupboard
+  strips warm the cooker, grey-blue window light catches the right edge,
+  and the CRT contributes a green reflection. Room lights have separate
+  receivers; the original tray, materials and `lamp`, `dusk`, `crt_glow`
+  light calls remain unchanged. +0.7 EV, gamma 0.7 and a 0.2-pixel phone
+  filter keep the thin instrument print legible at half resolution. The room
+  uses a normal
+  1.5-pixel filter for smooth grid lines; the gate mask pass is unchanged.
+  Shared mug and pendant variants preserve their defaults; all eight approved
+  rooms are checked at
+  25% / 16 samples. No room volumes or external assets.
+  Gate: numeral 9.51 (d10t), die vs tray 7.04, stroke 0.124–0.132, PASS.
 
 - **Voltline — the late-night diner (round 2).** Broadside from −x,
   54 mm, f/8 on the dice, seated eye height. The holo tray on a wet
