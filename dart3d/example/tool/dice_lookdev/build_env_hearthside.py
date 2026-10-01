@@ -9,14 +9,11 @@ around the book on a worn oak table.
 from __future__ import annotations
 
 import math
-import random
 
 import bmesh
 import bpy
 
 import env_common as E
-import env_props as P
-import room_common as RC
 
 W, D = E.TRAY_W, E.TRAY_D
 
@@ -75,113 +72,145 @@ def open_book(scene):
 
 
 def build(scene):
+    # Preserve the fine ink strokes when the phone preview is rendered at half size.
+    scene.cycles.filter_width = 0.5
+    scene.view_settings.gamma = 0.8
     E.world(scene, color=(0.012, 0.006, 0.003), strength=1.0)
-    E.cube("table", (200, 150, 6), (0, 20, -3.0), P.dark_wood("Oak table", c1=(0.07, 0.035, 0.015),
-                                                          c2=(0.2, 0.11, 0.05), varnish=0.2), bevel=0.5)
     open_book(scene)
     top = D / 2 + 6
-    # stoneware mug
-    mug_m = E.simple("Stoneware", (0.25, 0.2, 0.16), 0.5, Coat_Weight=0.6)
-    mx, my = W / 2 + 5.5, top + 1.5  # top-right corner of the phone frame
-    mug = E.cylinder("mug", 4.0, 9, (mx, my, 4.5), mug_m, segs=48, bevel=0.4)
-    P.torus("mug_handle", 2.4, 0.6, (mx + 4.5, my, 5), mug_m, rot=(math.radians(90), 0, 0))
-    E.cylinder("tea", 3.6, 0.2, (mx, my, 8.2), E.simple("Tea", (0.1, 0.04, 0.01), 0.05))
-    # velvet pouch
-    pouch = E.rock("pouch", 5.0, (-W / 2 - 5.5, top + 0.5, 3.5), P.velvet("Pouch velvet", color=(0.12, 0.02, 0.1),
-                                                                         stars=False), seed=4,
-                   squash=(1, 1, 0.9), strength=0.2)
-    E.cylinder("pouch_neck", 1.8, 3, (-W / 2 - 5.5, top + 0.5, 8.5), P.velvet("Pouch velvet"), segs=24, r2=2.6)
-    # wax seals + lavender
-    wax = E.simple("Seal wax", (0.35, 0.02, 0.02), 0.35, Coat_Weight=0.5)
-    for i, (x, y) in enumerate(((W / 2 + 1.5, -D / 2 - 7.8), (W / 2 + 5.0, -D / 2 - 9.0))):
-        E.cylinder("seal", 1.8, 0.5, (x, y, 0.25), wax, segs=32, bevel=0.15)
-    rng = random.Random(8)
-    stem = E.simple("Lavender stem", (0.18, 0.25, 0.12), 0.6)
-    bud = E.simple("Lavender bud", (0.35, 0.22, 0.6), 0.6)
-    for i in range(9):
-        a = rng.uniform(-0.2, 0.2)
-        x0, y0 = -W / 2 - 16 + i * 0.6, -D / 2 + 5
-        s = E.cylinder("stem", 0.12, 22, (x0, y0, 0.5), stem, segs=6)
-        s.rotation_euler = (math.radians(90), 0, a)
-        for j in range(8):
-            E.sphere("bud", 0.35, (x0 - math.sin(a) * (-11 - j * 0.7), y0 - 11 - j * 0.7, 0.55), bud, subdiv=1,
-                     scale=(1, 1.4, 1))
-    P.candle(scene, W / 2 + 10, top + 8, 0.0, h=10, seed=4, energy=45)
     # the hearth's glow on the tray (the fireplace itself is in room())
     E.light(scene, "AREA", "fire", (0, top + 45, 12), 16000, color=(1.0, 0.5, 0.2), size=35, target=(0, 0, 0))
     E.light(scene, "AREA", "cool_fill", (-50, -40, 40), 1200, color=(0.55, 0.65, 1.0), size=40, target=(0, 0, 0))
     # reading key from the side (its hotspot misses the top faces), strong
     # enough that the bone reads bright against the tea-stained vellum
     E.light(scene, "AREA", "reading_key", (40, -20, 40), 11000, color=(1.0, 0.9, 0.8), size=20, target=(0, 0, 0))
-    E.haze_box("haze", (160, 180, 70), (0, 20, 34), 0.004, color=(1.0, 0.85, 0.7), noise_scale=0.03)
     return dict(
-        samples=128, exposure=0.9, surface_z=3.3, centre=(0, 9.0, 4.3),
+        samples=128, exposure=1.15, surface_z=3.3, centre=(0, 9.0, 4.3),
         topdown=dict(width=W + 9.0),
         # keep the dice off the gutter's slope (the physics floor is flat)
         topdown_layout={"d20": ((0.4, -4.2), 18, 8), "d12": ((-3.9, 4.6), 11, -14), "d10u": ((3.7, 4.2), 9, 12),
                         "d10t": ((-0.3, 9.0), 40, -6), "d8": ((-3.8, -8.6), 5, 16), "d6": ((3.8, -8.4), 3, -9),
                         "d4": ((0.4, 13.0), 3, 22)},
+        hero_layout={"d20":((-5.2,-13),18,8),"d12":((-4.6,0),11,-14),
+                     "d10u":((2.5,4),9,12),"d10t":((2,-3),40,-6),
+                     "d8":((2,-22),5,16),"d6":((1,-14),3,-9),
+                     "d4":((-4,-23),3,22)},
         hero=dict(dist=32, elev=30, az=-8, lens=65, fstop=2.8),
         play_view=True, tray_half=(W / 2 + 4, D / 2 + 6), room_cam=room(scene),
     )
 
 
 def room(scene):
-    """The fireside reading nook (concept: room-concepts/hearthside-room).
+    """A compact broadside reading table before a lower, firelit sitting bay.
 
-    A rough-stone fireplace right behind the oak table, bookcases either
-    side of it, a leather wing armchair with a wine-red throw by the
-    rain-streaked window on the right, a lavender jug on the sill, a
-    patterned rug. Lights from four sides: the fire (warm key from the
-    back), the window (cool blue-grey fill from the right), a violet-glass
-    lantern (the set's accent, left) and a brass floor lamp by the chair;
-    plus the tray's reading key.
+    The room frame uses lateral X and depth Y around the untouched tome.
+    Environmental lamps exclude the play surface to preserve its gate recipe.
     """
-    wall = RC.plaster("Nook plaster", (0.22, 0.17, 0.12))
-    oak = P.dark_wood("Nook oak", c1=(0.05, 0.025, 0.012), c2=(0.16, 0.085, 0.04))
-    RC.shell(half_w=180, back=230, front=-190, height=260, wall=wall, floor=RC.planks(),
-             openings={"right": [(70, 45, 80, 110)]})
-    RC.beams(oak, n=3)
-    RC.work_table(200, 150, top_z=0.0, thick=6.0, mat=oak, leg_r=6, y=20, top=False)
-    RC.fireplace(scene, "back", -40, w=150, h=125, depth=40, energy=150000, seed=3, base=40,
-                 mat=RC.stone("Nook fieldstone", (0.08, 0.07, 0.06), (0.24, 0.2, 0.16), scale=0.03, blocks=True))
-    for u, w, seed in ((-148, 60, 5), (100, 100, 6)):
-        RC.bookshelf("back", u, w=w, h=220, depth=30, rows=7, seed=seed, mat=oak)
-    rain = RC.sky("Rainy dusk", (0.05, 0.07, 0.14), (0.14, 0.16, 0.26), stars=0.0, strength=0.8,
-                  skyline=((0.03, 0.04, 0.07), 0.3))
-    RC.window("right", 70, 45, 80, 110, rain, oak, mullions=(2, 3), glow=(45000, (0.55, 0.65, 0.95)))
-    # rain streaks on the glass (thin emissive-ish droplets on a pane)
-    drops, k = E.material("Rain on glass")
-    obj = k.coords().outputs["Object"]
-    v = k.voronoi(obj, 0.35)
-    dr = k.math("LESS_THAN", v.outputs["Distance"], 0.08)
-    k.surface(k.mix_shader(dr, k.node("ShaderNodeBsdfTransparent").outputs[0],
-                           k.bsdf(Base_Color=(0.8, 0.85, 1.0, 1), Roughness=0.05, Transmission_Weight=0.8,
-                                  Emission_Color=(0.5, 0.6, 0.9, 1), Emission_Strength=0.6)))
-    pane = E.plane("rain_pane", 80, 110, RC.to_world("right", 70, (0, 4, 45)), drops)
-    pane.rotation_euler = (math.radians(90), 0, math.radians(-90))
-    pane.visible_shadow = False
-    # the armchair by the window with a throw; a jug of lavender on the sill
-    RC.armchair(120, 95, rot=math.radians(150), mat=RC.leather("Chair leather", (0.14, 0.04, 0.025)),
-                throw=P.velvet("Throw wool", color=(0.2, 0.02, 0.04), stars=False))
-    jug = RC.to_world("right", 40, (0, -4, RC.FLOOR_Z + 121 - 76 + 76 - 10))
-    E.cylinder("lavender_jug", 7, 18, (jug.x, jug.y, 45 - 55 + 9 + 2), E.simple("Jug glaze", (0.3, 0.3, 0.32), 0.3),
-               segs=24, bevel=1.0)
-    rng = random.Random(4)
-    bud = E.simple("Sill lavender", (0.35, 0.22, 0.6), 0.6)
-    for i in range(12):
-        bx, by = jug.x + rng.uniform(-6, 6), jug.y + rng.uniform(-6, 6)
-        E.cylinder("sill_stem", 0.3, 26, (bx, by, 12 + 13), E.simple("Sill stem", (0.18, 0.25, 0.12), 0.6), segs=6)
-        E.sphere("sill_bud", 1.2, (bx, by, 12 + 26 + 3), bud, subdiv=1, scale=(1, 1, 3))
-    # a brass floor lamp beside the chair (warm, right-front) and a violet lantern (left)
-    brass = P.brass("Lamp brass", worn=0.4)
-    E.cylinder("floor_lamp_post", 1.5, 150, (150, 20, RC.FLOOR_Z + 75), brass, segs=12)
-    E.cylinder("floor_lamp_foot", 14, 3, (150, 20, RC.FLOOR_Z + 1.5), brass, segs=32)
-    E.cylinder("floor_lamp_shade", 22, 26, (150, 20, RC.FLOOR_Z + 160), E.simple("Lamp shade", (0.6, 0.45, 0.25), 0.8,
-               Transmission_Weight=0.3, Emission_Color=(1.0, 0.7, 0.4, 1), Emission_Strength=1.0), segs=32, r2=13,
-               cap=False).visible_shadow = False
-    E.light(scene, "POINT", "floor_lamp", (150, 20, RC.FLOOR_Z + 155), 25000, color=(1.0, 0.72, 0.45), size=10)
-    RC.hanging_lantern(scene, -95, 10, 80, energy=18000, color=(0.75, 0.4, 1.0), glass_color=(0.6, 0.3, 0.9),
-                       mat=brass)
-    RC.rug(0, -20, 280, 220, (0.25, 0.08, 0.05), (0.08, 0.05, 0.1), name="Nook rug")
-    return dict(loc=(-26, -70, 40), target=(18, 120, 8), lens=20, fstop=4.0, focus=(0, 0, 4))
+    from assets import (geometry as G, materials as M, oak_table, bookcase,
+                        hearth_fireplace, wing_armchair, cottage_window,
+                        lavender, coffee_mug, pouch, book, candlestick,
+                        lantern, amethyst_cluster, firewood)
+    before=set(bpy.data.objects)
+    a=G.Asset("Reading nook architecture")
+    oak=M.oak("Nook oiled oak",(.095,.039,.014),.55,12,axis="Z")
+    dark=M.oak("Nook recessed oak",(.044,.017,.007),.6,14,axis="Z")
+    plaster=M.stone("Soft warm lime plaster",(.16,.115,.077),.25,3)
+    brass=M.metal("Nook antique brass","brass",.65,4)
+    oak_table.build("Small reading table",loc=(0,0,-76),width=126,depth=84,height=76,
+                    thickness=4,wood_tone=(.075,.026,.009),wear=.45,scorch=0,seed=9,grain_scale=2.8,
+                    leg_width=6,leg_inset=(13,11),rear_recess=(23,25))
+    a.block("Reading platform",(350,180,8),(0,15,-80),dark,.5)
+    a.block("Sitting bay oak floor",(420,230,8),(0,285,-189),dark,.5)
+    for x,w in ((-81,279),(238,105)):
+        a.block("Warm nook wall",(w,9,280),(x,383,-30),plaster,.5)
+        for j in range(int(w/28)):
+            xx=x-w/2+14+j*28
+            a.block("Recessed oak wainscot",(24,2,70),(xx,376,-110),dark,.4)
+            a.block("Panel stile",(2,3,75),(xx-13,374,-110),oak,.3)
+    a.block("Wall beneath rain window",(125,10,35),(122,383,-280),plaster,.5)
+    a.block("Wall above rain window",(125,10,90),(122,383,-44),plaster,.5)
+    hearth_fireplace.build("Reading nook fieldstone hearth",loc=(-93,280,-185),width=142,
+                           depth=55,height=218,hearth_height=32,energy=320000,seed=6)
+    wing_armchair.build("Leather wing chair and wine throw",loc=(54,285,-185),rot_z=-.12,
+                         width=85,depth=90,height=105,tone=(.115,.029,.014),seed=4)
+    cottage_window.build("Rainy blue casement",loc=(122,375,-260),width=125,height=172,
+                          density=.032,drop_radius=.21,seed=7)
+    bookcase.build("Books beside the hearth",loc=(2,352,-185),width=66,height=228,depth=27,rows=7,seed=8)
+    bookcase.build("Left returning bookcase",loc=(-181,308,-185),rot_z=.28,width=72,height=235,depth=26,rows=7,seed=12)
+    bookcase.build("Window-side books",loc=(235,352,-185),width=72,height=235,depth=25,rows=7,seed=17)
+    # The compact side table supports the jug beside the chair.
+    oak_table.build("Chair side table",loc=(113,285,-185),width=45,depth=41,height=67,
+                    thickness=3,wood_tone=(.065,.023,.007),seed=15,scorch=0,leg_width=4,leg_inset=(7,7))
+    lavender.build("Lavender beside the chair",loc=(114,287,-106),height=39,radius=6.2,seed=9)
+    for i in range(3):
+        book.build(f"Chair-side book {i}",loc=(113,285,-118+i*4),width=17,depth=23,thickness=4,seed=20+i)
+    # Corner dressing: no object occupies the ten-centimetre clear band.
+    for i in range(2):
+        book.build(f"Left reading volume {i}",loc=(-43,20,4.2*i),rot_z=.05+i*.05,
+                   width=17,depth=24,thickness=4.2,tone=(.10,.029,.011),seed=30+i,gilt_spine=True)
+    candlestick.build("Foreground reading candle",loc=(-38.4,24,8.4),height=2.5,radius=3,
+                       candle_height=5,candle_radius=1.8,energy=900,seed=7)
+    pouch.build("Wine velvet dice pouch",loc=(-26,34,0),radius=6.3,height=12.5,
+                tone=(.095,.006,.019),fabric="velvet",seed=6)
+    for i in range(2):
+        book.build(f"Right reading volume {i}",loc=(53,15,4.3*i),rot_z=-.06+i*.12,
+                   width=17,depth=23,thickness=4.3,tone=(.035,.017,.008),seed=40+i,gilt_spine=True)
+    coaster=M.bark("Cork mug coaster",(.10,.060,.025),.7,4)
+    a.cylinder("Cork coaster",6.7,.8,(35.5,23,.4),coaster,bevel=.25,segments=64)
+    coffee_mug.build("Fireside stoneware coffee",loc=(35.5,23,.8),rot_z=.18,height=10.2,radius=4.5,
+                     tone=(.25,.18,.095),glaze_style="stoneware",steam_height=11,steam_width=1.6,
+                     steam_strength=2.4,steam_opacity=.24,steam_drift=1.6,seed=13)
+    lavender.build("Table lavender bundle",loc=(-43,38,9.1),rot_z=.3,kind="bundle",height=25,radius=4,stems=13,seed=18)
+    amethyst_cluster.build("Foreground amethyst dish",loc=(-47,14,8.4),radius=4.5,height=5.5,count=9,energy=45,seed=9)
+    a.beam("Lantern ceiling joist",(-210,252,5),(260,252,5),10,12,oak,.5)
+    lantern.build("Brass reading lantern",loc=(-150,252,-90),height=30,radius=7,metal_finish="brass",chain_length=60,
+                  energy=1000,seed=6,glass_tone=(.26,.06,.43),glow_color=(.55,.08,1),light_color=(.52,.18,1))
+    candlestick.build("Mantel candle",loc=(-126,263,-52),height=4,radius=4,candle_height=16,candle_radius=2.2,energy=5000,seed=5)
+    for i in range(4):
+        book.build(f"Mantel volume {i}",loc=(-74,276,-52+i*4),width=22,depth=25,thickness=4,seed=60+i,gilt_spine=True)
+    candlestick.build("Window candle",loc=(72,358,-151),height=3,radius=3.5,candle_height=12,energy=4200,seed=11)
+    a.block("Window candle bracket",(15,21,3),(72,365,-152.5),oak,.7)
+    a.beam("Window bracket scroll",(72,373,-167),(72,357,-153),3,3,oak,.6)
+    for i in range(4):
+        firewood.build(f"Hearth spare log {i}",loc=(-137,250+i%2*8,-185+i//2*7.4),length=24,radius=3.7,rot_z=.18*i,seed=30+i)
+    def area(name,loc,target,energy,color,size,gloss=True):
+        light=a.light(name,loc,energy,color,size,target=target,kind="AREA")
+        light.visible_glossy=gloss;light.data.specular_factor=1 if gloss else .1
+        return light
+    area("Firelight caught on leather",(-67,239,-96),(47,278,-106),290000,(1,.49,.18),42)
+    area("Warm light on hearth arch",(-95,215,-104),(-93,282,-104),55000,(1,.47,.15),45)
+    area("Firelight on middle books",(-68,283,-77),(0,348,-68),170000,(1,.59,.28),38)
+    area("Firelight on left shelves",(-104,232,-68),(-181,308,-65),210000,(1,.62,.32),48)
+    area("Rain light on chair",(122,362,-94),(58,279,-92),230000,(.35,.48,1),60)
+    area("Window edge on jug",(136,348,-86),(114,280,-102),95000,(.42,.57,1),42)
+    area("Candle pool on desk",(-41,24,25),(-20,13,0),15000,(1,.65,.30),20)
+    area("Lantern across oak",(-46,44,20),(7,23,0),23000,(1,.70,.38),26)
+    area("Blue glass reflected on cup",(49,69,23),(34,26,6),7000,(.48,.63,1),25,False)
+    area("Candle highlight on mug",(18,26,20),(36,26,6),8000,(1,.72,.39),17)
+    area("Soft purple crystal return",(-43,42,19),(-37,15,0),1000,(.51,.17,1),9,False)
+    area("Window candle on panelling",(72,352,-129),(86,375,-143),22000,(1,.62,.26),22)
+    receivers=bpy.data.collections.new("Hearthside environment light receivers")
+    for ob in set(bpy.data.objects)-before:
+        if ob.type in {"MESH","CURVE"}:receivers.objects.link(ob)
+    group=G.Asset("Hearthside room frame",rot_z=-math.pi/2+.16)
+    for ob in set(bpy.data.objects)-before:
+        if ob.type=="LIGHT" and ob.light_linking.receiver_collection is None:
+            ob.light_linking.receiver_collection=receivers
+        if ob!=group.root and ob.parent is None:group.add(ob)
+    excluded=bpy.data.collections.new("Reading candle bounce exclusions")
+    for ob in bpy.data.objects:
+        if ob.type in {"MESH","CURVE"}:excluded.objects.link(ob)
+    for entry in excluded.collection_objects:entry.light_linking.link_state="EXCLUDE"
+    bounce=E.light(scene,"AREA","Candle return on ivory",(-25,-20,45),10000,
+                   color=(1,.83,.61),size=25,target=(0,0,3.3))
+    bounce.light_linking.receiver_collection=excluded
+    bounce.visible_glossy=False
+    bounce.visible_transmission=False
+    bounce.data.specular_factor=0
+    pages=bpy.data.collections.new("Warm vellum light receivers")
+    for label in ("pages1","pages-1"):pages.objects.link(bpy.data.objects[label])
+    page_light=E.light(scene,"AREA","Candle return on vellum",(-15,24,30),2500,
+                       color=(1,.75,.43),size=30,target=(0,0,3))
+    page_light.light_linking.receiver_collection=pages
+    return dict(loc=(-34,-7,38),target=(0,0,12),lens=27.7,
+                fstop=8*scene.unit_settings.scale_length,focus=(3,0,4.3))

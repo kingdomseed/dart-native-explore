@@ -9,7 +9,9 @@ from .forge import fire_tongue
 
 
 def build(name="Cage lantern", loc=(0, 0, 0), rot_z=0, height=36, radius=9,
-          metal_finish="iron", wear=0.5, seed=1, chain_length=35, energy=18000) -> bpy.types.Object:
+          metal_finish="iron", wear=0.5, seed=1, chain_length=35, energy=18000,
+          glass_tone=(.65,.33,.095), glow_color=(1,.29,.055),
+          light_color=(1,.57,.23)) -> bpy.types.Object:
     a = G.Asset(name, loc, rot_z)
     iron = M.metal(f"{name} frame", metal_finish, wear, seed)
     trim = M.metal(f"{name} worn rims", "brass", wear, seed)
@@ -18,12 +20,12 @@ def build(name="Cage lantern", loc=(0, 0, 0), rot_z=0, height=36, radius=9,
     sep = k.node("ShaderNodeSeparateXYZ")
     k.link(vec, sep.inputs[0])
     glow = k.ramp(sep.outputs["Z"], [(0, (0.12, 0.12, 0.12)), (0.4, (0.6, 0.6, 0.6)), (1, (0.08, 0.08, 0.08))])
-    pane = k.bsdf(Base_Color=(0.65, 0.33, 0.095, 1), Roughness=0.19, Transmission_Weight=1, IOR=1.46)
+    pane = k.bsdf(Base_Color=(*glass_tone, 1), Roughness=0.19, Transmission_Weight=1, IOR=1.46)
     tr = k.node("ShaderNodeBsdfTransparent").outputs[0]
     clear = k.mix_shader(0.1, tr, pane)
     add = k.node("ShaderNodeAddShader")
     k.link(clear, add.inputs[0])
-    k.link(k.emission((1, 0.29, 0.055, 1), glow), add.inputs[1])
+    k.link(k.emission((*glow_color, 1), glow), add.inputs[1])
     k.surface(add.outputs[0])
     lower, upper = height * 0.15, height * 0.75
     a.lathe("Lantern foot", [(0, 0), (radius * 0.8, 0), (radius, height * 0.05),
@@ -48,7 +50,7 @@ def build(name="Cage lantern", loc=(0, 0, 0), rot_z=0, height=36, radius=9,
     a.cylinder("Wick", 0.12, 1, (0, 0, lower + candle_h + 0.2), iron, bevel=0)
     fire_tongue(a, "Candle flame", (0, 0, lower + candle_h), radius * 0.11, height * 0.16,
                 M.flame(f"{name} flame", 15), lean=0.4)
-    glow_light = a.light("Lantern glow", (0, 0, lower + candle_h + 1.5), energy, (1, 0.57, 0.23), radius * 0.25)
+    glow_light = a.light("Lantern glow", (0, 0, lower + candle_h + 1.5), energy, light_color, radius * 0.25)
     glow_light.visible_glossy = False
     glow_light.visible_transmission = False
     glow_light.data.specular_factor = 0

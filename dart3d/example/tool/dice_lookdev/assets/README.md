@@ -258,3 +258,14 @@ its original defaults remain unchanged. Emberforged, Voltline, Celestial,
 Frostbound and Arcane are re-rendered serially at 25 percent / 16 samples and
 visually checked. The engine is about 92k evaluated triangles, the induction
 column 15k, and the largest wall 132k. There are no room volumes or external assets.
+
+### Hearthside reading nook assets
+
+- `wing_armchair`: padded leather wings, rolled arms, piped seat, turned feet, brass nailheads and optional tartan cushion/knitted throw; `width`, `depth`, `height`, `tone`, `wood_tone`, `wear`, `seed`, `throw`, `throw_tone`, `pillow`. Floor origin; faces local -Y. Chair plus throw stays below 150k evaluated triangles.
+- `knit_throw`: curved support cloth with modeled interlocking wool loops, selvedges and fringe; `width`, Y/Z `path`, stitch `pitch`, `fold`, `tone`, `wear`, `seed`. Paths follow the supported furniture profile; preview contact after changing them.
+- `hearth_fireplace`: hewn fieldstone, shallow voussoir arch, oak mantel/corbels, soot-lined hearth, charred logs, andirons and reused layered forge flames; `width`, `depth`, `height`, `hearth_height`, `stone_tone`, `wood_tone`, `wear`, `seed`, `energy`. The interior lamps illuminate masonry separately from the charred logs.
+- `firewood`: irregular barked log with sawn ends or glowing char fissures; `length`, `radius`, `tone`, `wear`, `heat`, `seed`. Local X length; floor origin.
+- `lavender`: individual branched stalks, narrow leaves and whorled dried buds, in an open handled stoneware jug or a tied flat bundle; `kind`, `height`, `radius`, `stems`, flower `tone`, `jug_tone`, `wear`, `seed`.
+- `cottage_window`: deep moulded oak casement, divided lights, brass catches and the existing clear rain bead geometry; `width`, `height`, `panes`, `rows`, `wood_tone`, `wear`, `seed`, `density`, `drop_radius`, optional dusk `view`.
+
+Backward-compatible variants: `coffee_mug(glaze_style="stoneware")`, `pouch(fabric="velvet")`, `vessel(kind="jug")`, and optional `lantern` glass/glow/light colours. `oak_table` and `materials.oak` also accept `grain_scale` (default 1.0) for tighter wood grain on smaller furniture. Their previous defaults are unchanged. New material functions are `upholstery`, `wool` (optional plaid), `stoneware` and `charred_wood`; the existing material recipes remain unchanged.

@@ -50,6 +50,18 @@ def build(name="Vessel", loc=(0, 0, 0), rot_z=0, kind="goblet", height=18, radiu
         a.tube("Scrolled handle", [(radius * 0.88, 0, height * 0.8), (radius * 1.55, 0, height * 0.86),
                                    (radius * 1.8, 0, height * 0.65), (radius * 1.78, 0, height * 0.38),
                                    (radius * 1.42, 0, height * 0.2), (radius * 0.96, 0, height * 0.25)], 0.65, metal)
+    elif kind == "jug":
+        glaze=M.stoneware(name+" salt glaze",tone,wear,seed)
+        profile=[(0,0),(.61,0),(.72,.035),(.91,.15),(1,.38),(.94,.59),(.71,.76),
+                 (.49,.86),(.48,.97),(.56,1),(.49,1.02),(.41,.97),(.42,.86),(.62,.72),(.85,.56),(.9,.33),(.66,.08),(0,.08)]
+        ob=a.lathe("Open thrown jug",[(r*radius,z*height) for r,z in profile],glaze,segments=64)
+        for v in ob.data.vertices:
+            if v.co.z>height*.88 and v.co.x<0:
+                lip=max(0,(-v.co.x/radius-.15)/.4)*((v.co.z/height-.88)/.14)
+                v.co.x-=lip*radius*.22
+                v.co.z+=lip*height*.035
+        pts=[(radius*(.5+1.07*math.sin(t)),0,height*(.60+.28*math.cos(t))) for t in [math.pi*i/40 for i in range(41)]]
+        a.tube("Pulled ceramic handle",pts,radius*.13,glaze,resolution=3)
     else:
         if kind == "bottle":
             m, k = E.material(f"{name} green glass")

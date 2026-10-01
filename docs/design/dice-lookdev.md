@@ -1153,16 +1153,35 @@ Lighting recipes (the tray lights are unchanged unless noted):
   base; exposure −0.5. Gate: numeral 14.31 (d12), die vs tray 2.21,
   stroke 0.121–0.130, PASS.
 
-- **Hearthside — the fireside reading nook.** A raised fieldstone
-  fireplace behind the oak table (back-left, 150 kW, the warm key that
-  also back-lights the tome; the old stand-in hearth box on the table is
-  gone, its glow light stays), bookcases either side, a leather wing
-  armchair with a wine-red throw by the rain-streaked window on the right
-  wall (area, 45 kW, blue-grey, the cool fill), lavender in a jug on the
-  sill, a brass floor lamp by the chair (25 kW, warm, right-front) and a
-  violet-glass lantern hung on the left (18 kW, the lavender accent);
-  over the tray's reading key and cool fill. Camera: 20 mm, f/4. Gate:
-  numeral 5.45 (d4), die vs tray 2.21, stroke 0.123–0.129, PASS.
+- **Hearthside — the fireside reading nook (round 2).** Broadside open
+  tome on a jointed oak table with a moulded rear recess; a hewn fieldstone hearth with a
+  shallow voussoir arch, charred logs and layered flame sheets on the left;
+  a padded leather wing chair with piping, nailheads, tartan cushion and
+  modeled knitted wine-red throw on the right. Varied leather books fill
+  carved oak cases; a divided oak rain casement shows a blue dusk village.
+  Foreground: speckled stoneware coffee and faint steam on a cork coaster,
+  a gathered velvet dice pouch, a brass pricket candle, gilt books, dried
+  lavender and a small amethyst dish; a violet glass brass lantern hangs
+  from an oak joist beside the hearth. All props are true
+  scale; the tabletop supports the whole group with a clear band around
+  the tome, including its preserved ribbon.
+  Lighting: 320 kW fire core with separate masonry receivers and a warm
+  hearth spill; shaped warm returns on the chair and books; cool window
+  edge on leather and the lavender jug; localized candle/lantern pools
+  across the oak and mug. The original `fire`, `cool_fill`, `reading_key`,
+  page shader, open-book geometry, ribbon and top-down layout are unchanged.
+  Added candle returns illuminate the ivory dice and vellum separately;
+  other room lights exclude the play surface. Exposure +1.15, gamma 0.8
+  and a 0.5 px reconstruction filter keep the ivory ink crisp at half
+  resolution without changing its material. Broadside camera 27.7 mm at 38 cm above the table, 36.8 degrees down, effective
+  f/8 with focus on the dice; the tome spans about 78% of the frame.
+  Final room preview: 50% / 64 samples, 7 s render (24.9 s command).
+  Foreground clearance is at least 11.77 cm. Emberforged, Voltline,
+  Celestial, Frostbound, Arcane and Fateengine were re-rendered serially
+  at 25% / 16 samples and checked against their approved previews.
+  Preview verification and full-render gate numbers are recorded separately.
+  Previous full-render gate (to be refreshed by the operator): numeral 5.45
+  (d4), die vs tray 2.21, stroke 0.123–0.129, PASS.
 
 - **Old Road — the wayfarer's inn corner.** Timber-and-plaster walls, a
   small window at the back onto the blue hour (area, 8 kW, cool), a raised

@@ -7,9 +7,9 @@ from . import geometry as G, materials as M
 
 def build(name="Diner coffee", loc=(0, 0, 0), rot_z=0, height=10, radius=4.2,
           tone=(0.7, 0.64, 0.49), wear=0.3, seed=1, steam_height=12,
-          steam_strength=1.2, steam_width=1, steam_drift=0, steam_opacity=0.12) -> bpy.types.Object:
+          steam_strength=1.2, steam_width=1, steam_drift=0, steam_opacity=0.12, glaze_style="porcelain") -> bpy.types.Object:
     a = G.Asset(name, loc, rot_z)
-    glaze = M.ceramic(f"{name} glaze", tone, wear, seed)
+    glaze = (M.stoneware if glaze_style == "stoneware" else M.ceramic)(f"{name} glaze", tone, wear, seed)
     profile = [(0, 0.12), (radius * 0.68, 0.12), (radius * 0.74, 0), (radius * 0.87, 0),
                (radius * 0.92, 0.5), (radius * 0.98, height * 0.7), (radius, height - 0.2),
                (radius * 0.97, height), (radius * 0.89, height), (radius * 0.86, height - 0.3),

@@ -11,9 +11,10 @@ def mapped(k, scale, seed=0):
     return mapping.outputs[0]
 
 
-def oak(name="Oiled oak", tone=(0.12, 0.047, 0.016), wear=0.4, seed=0, axis="X"):
+def oak(name="Oiled oak", tone=(0.12, 0.047, 0.016), wear=0.4, seed=0, axis="X", grain_scale=1.0):
     m, k = E.material(name)
-    vec = mapped(k, {"X": (0.018, 0.32, 0.32), "Y": (0.32, 0.018, 0.32), "Z": (0.32, 0.32, 0.018)}[axis], seed)
+    scale = {"X": (0.018, 0.32, 0.32), "Y": (0.32, 0.018, 0.32), "Z": (0.32, 0.32, 0.018)}[axis]
+    vec = mapped(k, tuple(v * grain_scale for v in scale), seed)
     grain = k.noise(vec, 1, 4, 0.7, dist=0.45).outputs["Fac"]
     wave = k.node("ShaderNodeTexWave")
     wave.bands_direction = "Y" if axis == "X" else "X"
@@ -532,4 +533,74 @@ def rune_stone(name="Blue runestone", tone=(.009,.035,.17), seed=0):
                      Metallic=0,Transmission_Weight=.12,IOR=1.53,
                      Emission_Color=(.015,.12,1,1),Emission_Strength=k.math("MULTIPLY",fleck,.7),
                      Normal=k.bump(n,.12,.017)))
+    return m
+
+
+def upholstery(name="Rubbed upholstery leather", tone=(.13,.035,.019), wear=.6, seed=0):
+    m,k=E.material(name)
+    vec=mapped(k,(1,1,1),seed)
+    n=k.noise(vec,.17,3,.65).outputs["Fac"]
+    pores=k.voronoi(vec,8,feature="DISTANCE_TO_EDGE").outputs["Distance"]
+    folds=k.noise(mapped(k,(.08,1.7,.22),seed),1.4,3,.7).outputs["Fac"]
+    col=k.ramp(n,[(.2,tuple(c*.32 for c in tone)),(.55,tone),(.8,tuple(c*1.6 for c in tone))])
+    geo=k.node("ShaderNodeNewGeometry")
+    edge=k.math("MULTIPLY",k.math("MAXIMUM",0,k.math("SUBTRACT",geo.outputs["Pointiness"],.49)),wear*9,clamp=True)
+    col=k.mix(edge,col,tuple(c*1.9 for c in tone)+(1,))
+    normal=k.bump(pores,.25,.025,normal=k.bump(folds,.24,.045*wear))
+    k.surface(k.bsdf(Base_Color=col,Roughness=k.math("ADD",.27,k.math("MULTIPLY",n,.24)),
+                     Normal=normal,Coat_Weight=.16,Coat_Roughness=.3,Sheen_Weight=.12))
+    return m
+
+
+def wool(name="Wool yarn", tone=(.11,.012,.029), seed=0, plaid=False):
+    m,k=E.material(name)
+    vec=mapped(k,(1,1,1),seed)
+    n=k.noise(vec,3.5,2).outputs["Fac"]
+    col=k.ramp(n,[(.2,tuple(c*.45 for c in tone)),(.8,tone)])
+    if plaid:
+        sep=k.node("ShaderNodeSeparateXYZ");k.link(k.coords().outputs["Object"],sep.inputs[0])
+        for axis in ("X","Z"):
+            stripe=k.math("PINGPONG",sep.outputs[axis],7)
+            wide=k.math("LESS_THAN",stripe,2.2)
+            fine=k.math("LESS_THAN",k.math("ABSOLUTE",k.math("SUBTRACT",stripe,3.7)),.18)
+            col=k.mix(k.math("MULTIPLY",wide,.75),col,(.025,.045,.065,1))
+            col=k.mix(fine,col,(.32,.18,.055,1))
+    k.surface(k.bsdf(Base_Color=col,Roughness=.86,Sheen_Weight=.35,Sheen_Roughness=.65,Sheen_Tint=tuple(c*2 for c in tone)+(1,),
+                     Normal=k.bump(n,.28,.027)))
+    return m
+
+
+def stoneware(name="Iron-speckled salt glaze", tone=(.30,.22,.12), wear=.4, seed=0):
+    m,k=E.material(name)
+    vec=mapped(k,(1,1,1),seed)
+    n=k.noise(vec,1.5,3,.7).outputs["Fac"]
+    speck=k.ramp(n,[(.28,(1,1,1)),(.40,(.75,.75,.75)),(.44,(0,0,0)),(.67,(0,0,0)),(.75,(1,1,1))])
+    col=k.mix(speck,(*tone,1),(.025,.015,.008,1))
+    wheel=k.noise(mapped(k,(.05,.05,4),seed),1,2).outputs["Fac"]
+    k.surface(k.bsdf(Base_Color=col,Roughness=k.math("ADD",.16,k.math("MULTIPLY",n,.17)),
+                     Normal=k.bump(n,.32,.035,normal=k.bump(wheel,.24,.024)),
+                     Coat_Weight=.6,Coat_Roughness=.17))
+    return m
+
+
+def charred_wood(name="Burning oak", heat=.7, seed=0):
+    m,k=E.material(name)
+    vec=mapped(k,(.8,.8,.55),seed)
+    distortion=k.noise(vec,1.8,3,.7).outputs["Color"]
+    offset=k.node("ShaderNodeVectorMath",operation="SCALE")
+    k.link(distortion,offset.inputs[0]);offset.inputs[3].default_value=.7
+    warped=k.node("ShaderNodeVectorMath",operation="ADD")
+    k.link(vec,warped.inputs[0]);k.link(offset.outputs[0],warped.inputs[1])
+    fissure=k.voronoi(warped.outputs[0],1.2,feature="DISTANCE_TO_EDGE").outputs["Distance"]
+    n=k.noise(vec,1.7,4,.7).outputs["Fac"]
+    crack=k.ramp(fissure,[(0,(1,1,1)),(.006,(.6,.6,.6)),(.022,(0,0,0))])
+    pockets=k.ramp(k.noise(vec,.45,3).outputs["Fac"],[(.38,(0,0,0)),(.58,(.3,.3,.3)),(.8,(1,1,1))])
+    geo=k.node("ShaderNodeNewGeometry");sep=k.node("ShaderNodeSeparateXYZ")
+    k.link(geo.outputs["Normal"],sep.inputs[0])
+    crust=k.math("SUBTRACT",1,k.math("MULTIPLY",k.math("MAXIMUM",0,sep.outputs["Z"]),.92))
+    glow=k.math("MULTIPLY",k.math("MULTIPLY",crack,pockets),k.math("MULTIPLY",crust,heat*10))
+    col=k.ramp(n,[(.2,(.0015,.001,.0007)),(.8,(.027,.022,.018))])
+    normal=k.bump(n,.6,.15,normal=k.bump(fissure,.7,.19))
+    k.surface(k.bsdf(Base_Color=col,Roughness=.93,Normal=normal,
+                     Emission_Color=(1,.095,.003,1),Emission_Strength=glow))
     return m

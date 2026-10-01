@@ -11,13 +11,13 @@ from . import geometry as G, materials as M
 
 def build(name="Oak table", loc=(0, 0, 0), rot_z=0, width=150, depth=85, height=70,
           thickness=7, wood_tone=(0.095, 0.038, 0.013), wear=0.7, seed=1, scorch=0.4, leg_inset=(16, 12), leg_width=9,
-          rear_recess=None) -> bpy.types.Object:
+          rear_recess=None, grain_scale=1.0) -> bpy.types.Object:
     a = G.Asset(name, loc, rot_z)
     rng = random.Random(seed)
     boards = max(4, round(depth / 14))
     bread = 10
     for i in range(boards):
-        mat = M.oak(f"{name} board {i}", tuple(c * (0.65 + (i * 0.37 % 0.85)) for c in wood_tone), wear, seed + i)
+        mat = M.oak(f"{name} board {i}", tuple(c * (0.65 + (i * 0.37 % 0.85)) for c in wood_tone), wear, seed + i, grain_scale=grain_scale)
         a.block("Oak plank", (width - bread * 2, depth / boards - 0.23, thickness),
                 (0, -depth / 2 + (i + 0.5) * depth / boards, height - thickness / 2), mat, 0.32)
     grime = M.leather(f"{name} seam grime", (0.013, 0.009, 0.005), seed=seed)
