@@ -40,8 +40,6 @@ final class DiceFaceLook {
     this.keylineWidth = 0.12,
     this.inlayInset = 0.3,
     this.inlayWidth = 0.022,
-    this.backing = 0.4,
-    this.backingOpacity = 0.8,
   });
 
   /// The frost body: near-#090E12 smoke, alpha = its opacity.
@@ -62,12 +60,6 @@ final class DiceFaceLook {
   /// Inlay: its inset from the face edge and its width, as fractions of
   /// the face's inradius.
   final double inlayInset, inlayWidth;
-
-  /// Denser frost behind each numeral (the look-dev's numeral band, dark
-  /// for black frost): a soft band [backing] × inradius wide beyond the
-  /// keyline that closes [backingOpacity] of the body's translucency, so
-  /// the numeral sits on calm smoke rather than on the logo's colours.
-  final double backing, backingOpacity;
 }
 
 /// A die's atlas: pixels, size, and where each face's cell sits.
@@ -258,8 +250,7 @@ void _paintFace(
       gy1 = max(gy1, s[i + 1]);
     }
   }
-  final backW = look.backing * rin;
-  final pad = keyW + backW + 2 * texel;
+  final pad = keyW + 2 * texel;
   final (cc, cr) = cell;
   for (var ty = 0; ty < cellPx; ty++) {
     final y = (0.5 - (ty + 0.5) / cellPx) * span;
@@ -275,12 +266,11 @@ void _paintFace(
       }
       // The inlay line — broken near the numeral (keyline + a gap).
       final inlayCov = _cov((inside - inlayAt).abs() - inlayHalf, texel);
-      if (inlayCov <= 0 && sd > keyW + backW) continue; // plain body
-      // Layers, bottom to top: body, backing, inlay, keyline, numeral.
+      if (inlayCov <= 0 && sd > keyW + texel) continue; // plain body
+      // Layers, bottom to top: body, inlay, keyline, numeral.
       var r = look.body.$1.toDouble(), g = look.body.$2.toDouble();
       var b = look.body.$3.toDouble(), a = look.body.$4.toDouble();
       final layers = [
-        (look.keyline, look.backingOpacity * _smooth(1 - (sd - keyW) / backW)),
         (look.inlay, inlayCov * (1 - _cov(sd - keyW * 1.6, texel))),
         (look.keyline, _cov(sd - keyW, texel)),
         (look.numeral, _cov(sd, texel)),
@@ -355,12 +345,6 @@ int _crc32(List<int> bytes) {
     c = _crcTable[(c ^ b) & 0xFF] ^ (c >>> 8);
   }
   return (c ^ 0xFFFFFFFF) & 0xFFFFFFFF;
-}
-
-/// Smoothstep of [t] clamped to 0…1.
-double _smooth(double t) {
-  final x = t.clamp(0.0, 1.0);
-  return x * x * (3 - 2 * x);
 }
 
 /// Coverage of a shape whose signed distance (positive outside) is [d],
