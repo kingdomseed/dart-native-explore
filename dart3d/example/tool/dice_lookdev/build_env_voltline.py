@@ -73,125 +73,112 @@ def build(scene):
 
 
 def room(scene, top, chrome):
-    """A raised window counter looking broadside into the lower diner and wet street."""
+    """A window table above the receding diner bar and a rain-wet avenue."""
     from assets import (geometry as G, materials as M, diner_counter, bar_stool, dome_pendant,
-                        rain_window, neon_street, neon_sign, napkin_dispenser, salt_shaker,
+                        rain_window, neon_street, napkin_dispenser, salt_shaker,
                         coffee_mug, leather_menu, espresso_machine, pie_stand, vessel, stone_steps)
     before = set(bpy.data.objects)
     diner_counter.build("Window counter", loc=(0, 0, -76), width=80, depth=64, height=75.75,
-                        quiet=(28, 22), droplets=600, footrail=False, seed=11)
+                        quiet=(28, 20), droplets=1400, puddles=18, streaks=28,
+                        drop_radius=(0.075, 0.24), footrail=False, seed=11)
     napkin_dispenser.build(loc=(-28, 22, -0.25), rot_z=-0.1, width=8, depth=7, height=12, seed=3)
     salt_shaker.build(loc=(-24, 29.5, -0.25), seed=4)
-    coffee_mug.build(loc=(27, 25, -0.25), rot_z=0.12, height=9.5, radius=4.2, steam_height=8.5, seed=7)
+    coffee_mug.build(loc=(27, 25, -0.25), rot_z=0.12, height=9.5, radius=4.2,
+                     steam_height=7.5, steam_strength=3, steam_width=1.3, steam_drift=-1.5, seed=7)
     leather_menu.build(loc=(33.5, 7, -0.25), rot_z=-0.06, width=10, depth=18, seed=9)
-    foreground = set(bpy.data.objects) - before
     fixtures = G.Asset("Diner architecture")
     chrome = M.polished_metal("Diner architectural chrome", wear=0.4, seed=6)
     wood = M.oak("Diner wall walnut", (0.032, 0.01, 0.008), wear=0.5, seed=2, axis="Z")
     black = E.simple("Diner black frames", (0.008, 0.01, 0.018), 0.35, 0.65)
     floor = RC.tiles("Diner checker floor", (0.32, 0.29, 0.24), (0.012, 0.014, 0.019), scale=0.00045, rough=0.24)
-    fixtures.block("Checker floor", (245, 300, 4), (-151.5, 135, -142), floor, 0.2)
-    fixtures.block("Player counter platform", (240, 90, 64), (0, -10, -108), wood, 0.6)
-    stone_steps.build("Diner side steps", loc=(-126, 24, -140), width=60, tread=18, rise=10.6, count=6,
-                      tone=(0.042, 0.032, 0.027), seed=4)
-    for i in range(9):
-        y = 20 + i * 31
-        fixtures.block("Walnut wall panel", (4, 29.7, 165), (-166, y, -58), wood, 0.4)
-        fixtures.block("Wall chrome upright", (0.8, 1.2, 165), (-163.8, y - 15, -58), chrome, 0.2)
     mirror = E.simple("Smoked bar mirror", (0.38, 0.42, 0.46), 0.065, 1)
-    for y in (88, 178, 243):
-        fixtures.block("Backbar mirror", (0.7, 83, 112), (-162, y, -29), mirror, 0.3)
-        for zz in (-85, 27): fixtures.block("Mirror frame", (2, 87, 2), (-161, y, zz), chrome, 0.4)
-    diner_counter.build("Long service bar", loc=(-105, 160, -140), rot_z=math.pi / 2,
-                        width=250, depth=54, height=88, quiet=(0, 0), droplets=65, seed=22)
-    for i, y in enumerate((65, 110, 155, 200, 245)):
-        bar_stool.build(f"Red stool {i}", loc=(-58, y, -140), radius=16, height=65, seed=20 + i)
-    for i, (x, y, z) in enumerate(((-98, 70, -1), (-87, 105, -17), (-76, 135, -23))):
-        dome_pendant.build(f"Warm pendant {i}", loc=(x, y, z), radius=13 - i, height=17,
-                           drop=47 - z, energy=60000, seed=i)
-    espresso_machine.build(loc=(-105, 118, -52), rot_z=0.3, width=46, depth=31, height=34, seed=4)
-    pie_stand.build(loc=(-99, 183, -52), radius=13, height=13, seed=3)
-    pie_stand.build("Second pie stand", loc=(-106, 264, -52), radius=12, height=16, seed=7)
+    fixtures.block("Player counter platform", (155, 92, 64), (-17, -10, -108), wood, 0.6)
     rng = random.Random(16)
-    for level, z in enumerate((-41, 1)):
-        fixtures.block("Backbar shelf", (22, 220, 3), (-148, 165, z), chrome, 0.6)
-        for i in range(11):
-            y = 74 + i * 18
-            tone = rng.choice(((0.025, 0.09, 0.042), (0.16, 0.055, 0.013), (0.07, 0.035, 0.095)))
-            vessel.build(f"Backbar bottle {level}-{i}", loc=(-149 + rng.uniform(-3, 3), y, z + 1.5),
-                         kind="bottle", height=rng.uniform(17, 26), radius=rng.uniform(3, 4.2), tone=tone, seed=100 + i)
-    fixtures.block("End bar mirror", (56, 1.2, 44), (-105, 159, -29), mirror, 0.4)
-    fixtures.block("Display chrome foot", (56, 5, 1.2), (-105, 157, -51.4), chrome, 0.4)
-    for i, h in enumerate((18, 21, 24, 17, 20)):
-        vessel.build(f"Counter display bottle {i}", loc=(-125 + i * 10, 155, -50.8), kind="bottle",
-                     height=h, radius=3.1, tone=((0.025, 0.11, 0.035), (0.15, 0.05, 0.012))[i % 2], seed=200 + i)
-    bar_objects = set(bpy.data.objects) - before - foreground
-    for ob in bar_objects:
-        if ob.parent is None:
-            ob.location.x += 54
-    rain_window.build(loc=(150, 310, -150), rot_z=0.4, width=310, height=300,
-                      panes=3, density=0.01, drop_radius=0.22, seed=41)
-    near_window = rain_window.build("Near rain window", loc=(40, 151.8, -90), rot_z=math.pi / 2,
-                                    width=223.6, height=220, panes=1, density=0.014, drop_radius=0.2, seed=44)
-    rain_window.build("Rear rain window", loc=(-46, 292, -115), width=144, height=230, panes=2,
-                      density=0.012, drop_radius=0.22, seed=43)
-    neon_street.build(loc=(70, 480, -220), depth=1900, exterior_slope=0.4, seed=30)
-    # Nearby window neon gives a clear motif; the remaining signs are across the road.
-    neon_sign.build("Window orbital neon", loc=(74, 277.9, -85), rot_z=0.4, width=36, height=34,
-                    design="planet", strength=4.5, backing=False, seed=17)
-    neon_m = E.emissive("Ceiling magenta", (1, 0.009, 0.25), 12)
-    neon_c = E.emissive("Ceiling cyan", (0.008, 0.6, 1), 12)
-    fixtures.tube("Magenta ceiling rail", [(-162, 20, 35), (-162, 367, 35)], 0.8, neon_m)
-    fixtures.tube("Cyan ceiling rail", [(-156, 360, 29), (30, 360, 29)], 0.8, neon_c)
-    fixtures.tube("Counter canopy magenta", [(-80, 112, 40), (12, 112, 40)], 0.5, neon_m)
-    fixtures.tube("Counter canopy cyan", [(-79, 129, 45), (15, 129, 45)], 0.45, neon_c)
-    fixtures.tube("Window cyan return", [(-14, 40, -10), (-14, 40, 42)], 0.22, neon_c)
-    fixtures.block("Ceiling soffit", (335, 460, 7), (-2, 225, 72), black, 0.6)
-    for y in range(35, 451, 60): fixtures.beam("Ceiling ribs", (-162, y, 64), (157, y, 64), 2, 4, chrome, 0.5)
-    fixtures.light("Warm bar reflected light", (-138, 137, -16), 170000, (1, 0.49, 0.18), 65,
-                   target=(-81, 180, -65), kind="AREA")
-    fixtures.light("Backbar shelf warmth", (-125, 210, 8), 130000, (1, 0.56, 0.26), 80,
-                   target=(-163, 197, -25), kind="AREA")
-    fixtures.light("Cyan through rain", (89, 178, 1), 150000, (0.025, 0.6, 1), 75,
-                   target=(17, 12, -2), kind="AREA")
-    fixtures.light("Magenta window reflection", (-50, 92, 28), 12000, (1, 0.014, 0.28), 60,
-                   target=(-45, 24, -1), kind="AREA")
-    fixtures.light("Warm counter pendant pool", (-85, 3, 47), 18000, (1, 0.57, 0.27), 24,
-                   target=(-89, 18, 0), kind="AREA")
-    fixtures.light("Coffee pendant bounce", (-24, 5, 30), 2500, (1, 0.69, 0.4), 16,
-                   target=(-27, 25, 5), kind="AREA")
-    fixtures.light("Cyan edge on service bar", (-30, 215, -12), 85000, (0.04, 0.56, 1), 45,
-                   target=(-75, 165, -55), kind="AREA")
-    fixtures.light("Rain window raking neon", (-38, 80, 22), 5000, (0.08, 0.5, 1), 70,
-                   target=(-14, 150, -40), kind="AREA")
+    for level, (y, top_z) in enumerate(((165, -90), (285, -150), (405, -210))):
+        floor_z = top_z - 88
+        fixtures.block("Checker floor terrace", (210, 120, 5), (-75, y, floor_z - 2.5), floor, 0.2)
+        diner_counter.build(f"Service bar {level}", loc=(-58, y, floor_z), rot_z=math.pi / 2,
+                            width=118, depth=54, height=88, quiet=(0, 0), droplets=60, seed=22+level)
+        for j, yy in enumerate((y-25, y+29)):
+            bar_stool.build(f"Red stool {level}-{j}", loc=(-9, yy, floor_z), radius=15, height=65, seed=20+level*2+j)
+        dome_pendant.build(f"Warm pendant {level}", loc=(-58, y, top_z+50), radius=8.5-level*0.4,
+                           height=13, drop=60-top_z-50, energy=52000, seed=level)
+        for j in range(4):
+            yy = y-45+j*30
+            fixtures.block("Walnut wall panel", (4, 29, 240), (-122, yy, top_z+5), wood, 0.4)
+            fixtures.block("Wall chrome upright", (0.8, 1, 235), (-119.8, yy-15, top_z+5), chrome, 0.2)
+        fixtures.block("Backbar mirror", (0.7, 110, 125), (-118, y, top_z+24), mirror, 0.3)
+        for zz in (top_z-38, top_z+87):
+            fixtures.block("Mirror frame", (2, 114, 2), (-117, y, zz), chrome, 0.4)
+        for shelf, zz in enumerate((top_z+7, top_z+43)):
+            fixtures.block("Backbar shelf", (20, 110, 3), (-107, y, zz), chrome, 0.6)
+            for j in range(6):
+                tone = rng.choice(((0.025,0.09,0.042),(0.16,0.055,0.013),(0.07,0.035,0.095)))
+                vessel.build(f"Backbar bottle {level}-{shelf}-{j}", loc=(-109+rng.uniform(-2,2),y-45+j*18,zz+1.5),
+                             kind="bottle", height=rng.uniform(17,26), radius=rng.uniform(3,4.2), tone=tone, seed=100+j)
+        fixtures.light(f"Backbar shelf warmth {level}", (-95,y,top_z+60), 125000, (1,0.52,0.22), 60,
+                       target=(-115,y,top_z+10), kind="AREA")
+        fixtures.light(f"Bar cyan edge {level}", (10,y+40,top_z+50), 65000, (0.03,0.46,1), 40,
+                       target=(-58,y,top_z), kind="AREA")
+        if level:
+            stone_steps.build(f"Diner aisle steps {level}", loc=(-163,y-61,floor_z), width=42,
+                              tread=26, rise=15, count=4, tone=(0.035,0.03,0.025), seed=level)
+    espresso_machine.build(loc=(-58,140,-90), rot_z=0.3, width=46, depth=31, height=34, seed=4)
+    pie_stand.build(loc=(-57,270,-150), radius=13, height=13, seed=3)
+    pie_stand.build("Second pie stand", loc=(-58,406,-210), radius=12, height=16, seed=7)
+    near_window = rain_window.build("Rain window", loc=(47,60,-65), rot_z=0.18, width=110, height=110,
+                                    panes=2, density=0.30, drop_radius=0.20, bottom_density=0.2, fog=0.9, seed=44)
+    neon_street.build(loc=(80,1900,-650), depth=2400, exterior_slope=0.22, lead_in=900, seed=30)
+    neon_m = E.emissive("Ceiling magenta", (1,0.009,0.25), 12)
+    neon_c = E.emissive("Ceiling cyan", (0.008,0.6,1), 12)
+    fixtures.tube("Magenta window header neon", [(-27,96,30),(17,96,30)], 0.25, neon_m)
+    fixtures.tube("Cyan window header neon", [(11,88,28),(41,88,28)], 0.25, neon_c)
+    fixtures.tube("Magenta ceiling rail", [(-118,90,60),(-118,465,60)], 0.8, neon_m)
+    fixtures.tube("Cyan ceiling rail", [(-118,465,52),(15,465,52)], 0.8, neon_c)
+    fixtures.block("Ceiling soffit", (155,400,7), (-62,265,72), black, 0.6)
+    for y in range(90,466,60):
+        fixtures.beam("Ceiling ribs", (-138,y,64),(15,y,64),2,4,chrome,0.5)
+    fixtures.light("Warm bar chrome strip", (-20,75,-15), 180000, (1,0.6,0.28), 60,
+                   target=(-70,240,-100), kind="AREA")
+    fixtures.light("Cyan through rain", (110,105,10), 115000, (0.025,0.6,1), 60,
+                   target=(30,24,-1), kind="AREA")
+    fixtures.light("Magenta window reflection", (-5,96,30), 4500, (1,0.014,0.28), 45,
+                   target=(0,27,-1), kind="AREA")
+    fixtures.light("Cyan counter reflection", (26,88,28), 3500, (0.025,0.6,1), 30,
+                   target=(15,27,-1), kind="AREA")
+    fixtures.light("Warm counter pendant pool", (-31,3,47), 18000, (1,0.57,0.27),24,
+                   target=(-35,18,0), kind="AREA")
+    fixtures.light("Coffee pendant bounce", (30,5,30),2500,(1,0.69,0.4),16,
+                   target=(27,25,5), kind="AREA")
+    fixtures.light("Rain window raking neon", (15,85,30),80000,(0.35,0.72,1),20,
+                   target=(25,55,-10),kind="AREA")
+    fixtures.light("Rain window warm glint", (30,95,-5),18000,(1,0.7,0.4),18,
+                   target=(20,55,-10),kind="AREA")
     rain_receivers = bpy.data.collections.new("Voltline rain glint receivers")
     for ob in near_window.children_recursive:
-        if ob.type in {"MESH", "CURVE"}:
+        if ob.name.startswith(("Rain bead", "Large running drop", "Running rain trail")):
             rain_receivers.objects.link(ob)
     receivers = bpy.data.collections.new("Voltline room light receivers")
-    for ob in set(bpy.data.objects) - before:
-        if ob.type in {"MESH", "CURVE"}: receivers.objects.link(ob)
-    group = G.Asset("Voltline room frame", rot_z=-math.pi / 2)
-    for ob in set(bpy.data.objects) - before:
+    for ob in set(bpy.data.objects)-before:
+        if ob.type in {"MESH","CURVE"}: receivers.objects.link(ob)
+    group = G.Asset("Voltline room frame", rot_z=-math.pi/2)
+    for ob in set(bpy.data.objects)-before:
         if ob.type == "LIGHT":
             ob.light_linking.receiver_collection = receivers
-            if ob.name == "Rain window raking neon":
+            if ob.name.startswith("Rain window "):
                 ob.light_linking.receiver_collection = rain_receivers
-                ob.visible_glossy = True
-                ob.data.specular_factor = 1
                 ob.data.shape = "RECTANGLE"
-                ob.data.size_y = 0.8
-            if ob.name.startswith("Pendant pool"):
+                ob.data.size_y = 10
                 ob.visible_glossy = True
                 ob.data.specular_factor = 1
-            if ob.name.startswith(("Neon spill on street", "Streetlamp road pool")):
+                ob.visible_transmission = True
+            if ob.name.startswith(("Pendant pool","Neon spill on street","Streetlamp road pool")) or ob.name in {
+                    "Warm bar chrome strip","Rain window raking neon","Warm counter pendant pool","Cyan through rain"}:
                 ob.visible_glossy = True
                 ob.data.specular_factor = 1
-            if ob.name in {"Warm counter pendant pool", "Cyan through rain"}:
-                ob.visible_glossy = True
-                ob.data.specular_factor = 1
+            if ob.name in {"Warm counter pendant pool","Cyan through rain"}:
                 ob.data.shape = "RECTANGLE"
-                ob.data.size_y = 4
+                ob.data.size_y = 0.6 if ob.name in {"Magenta window reflection", "Cyan counter reflection"} else 4
         if ob != group.root and ob.parent is None: group.add(ob)
-    return dict(loc=(-60, 0, 38.5), target=(0, -1.5, 11), lens=54,
-                fstop=8 * scene.unit_settings.scale_length, focus=(8, 0, 1.4))
+    return dict(loc=(-60,0,38.5), target=(0,-1.5,11), lens=54,
+                fstop=32*scene.unit_settings.scale_length, focus=(25,0,1.4))

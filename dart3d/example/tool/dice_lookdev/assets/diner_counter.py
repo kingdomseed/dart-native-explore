@@ -8,7 +8,8 @@ from . import geometry as G, materials as M
 
 def build(name="Diner counter", loc=(0, 0, 0), rot_z=0, width=140, depth=60, height=76,
           tone=(0.013, 0.016, 0.021), wood_tone=(0.025, 0.009, 0.009), wear=0.45, seed=1,
-          quiet=(0, 0), droplets=170, footrail=True, back_wings=0, back_wing_inset=24) -> bpy.types.Object:
+          quiet=(0, 0), droplets=170, footrail=True, back_wings=0, back_wing_inset=24,
+          puddles=9, streaks=0, drop_radius=(0.055, 0.19)) -> bpy.types.Object:
     a = G.Asset(name, loc, rot_z)
     top = M.wet_surface(f"{name} polished laminate", tone, wear, seed, quiet)
     chrome = M.polished_metal(f"{name} edge chrome", wear=wear, seed=seed)
@@ -61,12 +62,18 @@ def build(name="Diner counter", loc=(0, 0, 0), rot_z=0, width=140, depth=60, hei
         x, y = rng.uniform(-width / 2 + 2, width / 2 - 2), rng.uniform(-depth / 2 + 2, depth / 2 + back_wings - 2)
         if back_wings and abs(x) < back_wing_inset + 1 and y > depth / 2 - 1: continue
         if abs(x) < quiet[0] and abs(y) < quiet[1]: continue
-        r = rng.uniform(0.055, 0.19)
+        r = rng.uniform(*drop_radius)
         a.sphere("Counter water bead", r, (x, y, height + r * 0.2), water, scale=(1.25, 1, 0.4), subdiv=2)
-    for i in range(9):
-        x, y = rng.uniform(-width / 2 + 9, width / 2 - 9), rng.uniform(-depth / 2 + 7, depth / 2 - 7)
-        if abs(x) < quiet[0] + 5 and abs(y) < quiet[1] + 5: continue
+    for i in range(puddles + streaks):
         rx, ry = rng.uniform(1.2, 3.5), rng.uniform(0.7, 1.9)
+        if i >= puddles:
+            rx, ry = rng.uniform(0.12, 0.3), rng.uniform(1.1, 2.8)
+        for attempt in range(40):
+            x, y = rng.uniform(-width / 2 + rx + 2, width / 2 - rx - 2), rng.uniform(-depth / 2 + ry + 2, depth / 2 - ry - 2)
+            if abs(x) > quiet[0] + rx * 1.12 or abs(y) > quiet[1] + ry:
+                break
+        else:
+            continue
         verts = [(x, y, height + 0.025)]
         verts += [(x + rx * math.cos(t) * (1 + 0.12 * math.sin(t * 5)), y + ry * math.sin(t), height + 0.02)
                   for t in [i * math.tau / 40 for i in range(40)]]

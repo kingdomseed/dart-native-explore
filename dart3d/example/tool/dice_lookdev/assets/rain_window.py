@@ -7,11 +7,12 @@ from . import geometry as G, materials as M
 
 
 def build(name="Rain window", loc=(0, 0, 0), rot_z=0, width=330, height=210, panes=4,
-          density=0.009, drop_radius=0.16, wear=0.3, seed=1) -> bpy.types.Object:
+          density=0.009, drop_radius=0.16, wear=0.3, seed=1,
+          large_drop_fraction=0.08, bottom_density=0.3, fog=0.25) -> bpy.types.Object:
     a = G.Asset(name, loc, rot_z)
     chrome = M.polished_metal(f"{name} chrome", wear=wear, seed=seed)
     black = E.simple(f"{name} black frames", (0.008, 0.011, 0.014), 0.25, metal=1)
-    glass = M.rain_pane(f"{name} clear pane")
+    glass = M.rain_pane(f"{name} clear pane", fog=fog)
     for i in range(panes):
         x = -width / 2 + (i + 0.5) * width / panes
         ob = a.block("Clear undistorted glazing", (width / panes - 3.5, 0.3, height - 4), (x, 0, height / 2), glass, 0.06)
@@ -27,15 +28,18 @@ def build(name="Rain window", loc=(0, 0, 0), rot_z=0, width=330, height=210, pan
     water = M.clear_glass(f"{name} individual droplets", 0.045, 1.333)
     count = int(width * height * density)
     for i in range(count):
-        x, z = rng.uniform(-width / 2 + 3, width / 2 - 3), rng.uniform(4, height - 3)
+        x = rng.uniform(-width / 2 + 3, width / 2 - 3)
+        z = rng.uniform(4, height * 0.3 if rng.random() < bottom_density else height - 3)
         if abs((x + width / 2) % (width / panes) - width / panes / 2) > width / panes / 2 - 3: continue
-        r = drop_radius * rng.uniform(0.4, 1.5)
-        ob = a.sphere("Rain bead", r, (x, 0.22, z), water, scale=(1, 0.38, rng.uniform(1, 1.8)), subdiv=2)
+        large = rng.random() < large_drop_fraction
+        r = drop_radius * rng.uniform(1.7, 2.5) if large else drop_radius * rng.uniform(0.4, 1.2)
+        ob = a.sphere("Large running drop" if large else "Rain bead", r, (x, -0.18 - r * 0.3, z), water,
+                      scale=(0.85, 0.6, rng.uniform(1.3, 2) if large else rng.uniform(1, 1.4)), subdiv=2 if large else 1)
         ob.visible_shadow = False
     for i in range(max(4, count // 30)):
         x, z = rng.uniform(-width / 2 + 5, width / 2 - 5), rng.uniform(15, height - 8)
         length = rng.uniform(3, 11)
-        pts = [(x + math.sin(t * 4 + i) * 0.1, 0.20, z - length * t) for t in [j / 12 for j in range(13)]]
-        ob = a.tube("Running rain trail", pts, drop_radius * rng.uniform(0.18, 0.4), water, resolution=1)
+        pts = [(x + math.sin(t * 4 + i) * 0.1, -0.20, z - length * t) for t in [j / 12 for j in range(13)]]
+        ob = a.tube("Running rain trail", pts, drop_radius * rng.uniform(0.2, 0.5), water, resolution=1)
         ob.visible_shadow = False
     return a.root

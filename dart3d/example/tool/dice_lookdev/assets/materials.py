@@ -1,4 +1,5 @@
 """Centimetre-scale PBR surfaces; each builder owns its material variants."""
+import math
 import env_common as E
 
 
@@ -247,14 +248,14 @@ def wet_surface(name="Wet dark laminate", tone=(0.013, 0.016, 0.021), wear=0.35,
     vec = k.coords().outputs["Object"]
     sep = k.node("ShaderNodeSeparateXYZ")
     k.link(vec, sep.inputs[0])
-    outside = k.math("MAXIMUM", k.math("MULTIPLY", k.math("SUBTRACT", k.math("ABSOLUTE", sep.outputs["X"]), quiet[0]), 0.125, clamp=True),
-                     k.math("MULTIPLY", k.math("SUBTRACT", k.math("ABSOLUTE", sep.outputs["Y"]), quiet[1]), 0.125, clamp=True))
+    outside = k.math("MAXIMUM", k.math("MULTIPLY", k.math("SUBTRACT", k.math("ABSOLUTE", sep.outputs["X"]), quiet[0]), 0.5, clamp=True),
+                     k.math("MULTIPLY", k.math("SUBTRACT", k.math("ABSOLUTE", sep.outputs["Y"]), quiet[1]), 0.5, clamp=True))
     n = k.noise(vec, 1.4, 2).outputs["Fac"]
     col = k.ramp(n, [(0.25, tuple(c * 0.55 for c in tone)), (0.8, tone)])
     damp = k.noise(vec, 0.08, 2).outputs["Fac"]
-    rough = k.mix(outside, (0.27, 0.27, 0.27, 1), k.ramp(damp, [(0.2, (0.095, 0.095, 0.095)), (0.8, (0.18, 0.18, 0.18))]))
-    k.surface(k.bsdf(Base_Color=col, Roughness=rough, Coat_Weight=k.math("ADD", 0.2, k.math("MULTIPLY", outside, 0.8)),
-                     Coat_Roughness=0.065, Normal=k.bump(n, 0.1 * wear, 0.009)))
+    rough = k.mix(outside, (0.32, 0.32, 0.32, 1), k.ramp(damp, [(0.2, (0.045, 0.045, 0.045)), (0.8, (0.095, 0.095, 0.095))]))
+    k.surface(k.bsdf(Base_Color=col, Roughness=rough, Coat_Weight=outside,
+                     Coat_Roughness=0.035, Normal=k.bump(n, 0.1 * wear, 0.009)))
     return m
 
 
@@ -286,11 +287,11 @@ def pastry(name="Baked pastry", seed=0):
     return m
 
 
-def rain_pane(name="Rain pane"):
+def rain_pane(name="Rain pane", fog=0.25):
     m, k = E.material(name)
     vec = k.coords().outputs["Generated"]
     sep = k.node("ShaderNodeSeparateXYZ"); k.link(vec, sep.inputs[0])
-    low = k.math("MULTIPLY", k.math("MAXIMUM", 0, k.math("SUBTRACT", 0.12, sep.outputs["Z"])), 0.65)
+    low = k.math("MULTIPLY", k.math("MAXIMUM", 0, k.math("SUBTRACT", 0.25, sep.outputs["Z"])), fog)
     pane = k.bsdf(Base_Color=(0.88, 0.93, 1, 1), Roughness=k.math("ADD", 0.035, low), Transmission_Weight=1, IOR=1.46)
     tr = k.node("ShaderNodeBsdfTransparent").outputs[0]
     k.surface(k.mix_shader(k.math("ADD", 0.055, low), tr, pane))
@@ -301,8 +302,21 @@ def wet_asphalt(name="Wet asphalt", seed=0):
     m, k = E.material(name)
     vec = mapped(k, (1, 1, 1), seed)
     n = k.noise(vec, 1.7, 2).outputs["Fac"]
-    ripple = k.noise(mapped(k, (0.05, 0.7, 1), seed), 1.2, 2).outputs["Fac"]
+    ripple = k.noise(mapped(k, (0.025, 0.6, 1), seed), 1.2, 2).outputs["Fac"]
     col = k.ramp(n, [(0.2, (0.008, 0.011, 0.017)), (0.8, (0.019, 0.025, 0.033))])
-    k.surface(k.bsdf(Base_Color=col, Roughness=k.math("ADD", 0.13, k.math("MULTIPLY", ripple, 0.11)),
-                     Coat_Weight=1, Coat_Roughness=0.09, Normal=k.bump(ripple, 0.25, 0.09)))
+    k.surface(k.bsdf(Base_Color=col, Roughness=k.math("ADD", 0.055, k.math("MULTIPLY", ripple, 0.07)),
+                     Coat_Weight=1, Coat_Roughness=0.035,
+                     Normal=k.bump(ripple, 0.5, 0.22)))
+    return m
+
+
+def rain_streak(name="Backlit falling rain", strength=1):
+    m, k = E.material(name)
+    sep = k.node("ShaderNodeSeparateXYZ")
+    k.link(k.coords().outputs["UV"], sep.inputs[0])
+    x = k.math("POWER", k.math("SINE", k.math("MULTIPLY", sep.outputs["X"], math.pi)), 2)
+    y = k.math("SINE", k.math("MULTIPLY", sep.outputs["Y"], math.pi))
+    alpha = k.math("MULTIPLY", k.math("MULTIPLY", x, y), 0.28)
+    transparent = k.node("ShaderNodeBsdfTransparent").outputs[0]
+    k.surface(k.mix_shader(alpha, transparent, k.emission((0.48, 0.64, 0.8, 1), strength)))
     return m

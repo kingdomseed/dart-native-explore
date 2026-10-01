@@ -36,19 +36,19 @@ textures, text, or external assets are required.
 | `leather_mat` | Curled hide, blind-tooled rings and lozenges, sewn border; width, depth, roll, tone |
 | `loose_hardware` | Resting interlocked chain and blank iron counters; length, coins, metal_finish |
 | `masonry` | Varied hewn ashlar with real rectangular openings; width, height, thickness, openings, tone |
-| `diner_counter` | Rounded laminate top, continuous chrome bullnose, walnut panels, kick plate, foot rail, individual water beads and small puddles; width, depth, height, tone, wood_tone, quiet, droplets, back_wings, back_wing_inset |
+| `diner_counter` | Rounded laminate top, continuous chrome bullnose, walnut panels, kick plate, foot rail, individual water beads and small puddles; width, depth, height, tone, wood_tone, quiet, droplets, puddles, streaks, drop_radius, back_wings, back_wing_inset |
 | `bar_stool` | Spun pedestal and foot ring, upholstered red vinyl cushion with button dimples and piping; height, radius, tone, metal_tone |
 | `dome_pendant` | Spun chrome dome, enamel lining, socket, bulb and suspension cord; radius, height, drop, tone, color, energy |
 | `espresso_machine` | Shaped boiler cover, gauges, group heads, portafilters, steam wands, drip grille and warming cups; width, depth, height, tone |
 | `pie_stand` | Raised pie plate, crimped crust, lattice filling and glass cloche; radius, height |
 | `napkin_dispenser` | Pressed curved shell, paper opening, folded tissues, cover rivets and rubber feet; width, depth, height, metal_tone |
 | `salt_shaker` | Fluted glass, salt fill, domed chrome cap and perforations; height, radius |
-| `coffee_mug` | Thick porcelain, rolled lip, swept ear handle, coffee meniscus and curling steam sheets; height, radius, tone, steam_height |
+| `coffee_mug` | Thick porcelain, rolled lip, swept ear handle, coffee meniscus and curling steam sheets; height, radius, tone, steam_height, steam_strength, steam_width, steam_drift |
 | `leather_menu` | Folded leather, inset cover, rolled binding and saddle stitches; width, depth, thickness, tone |
-| `rain_window` | Clear panes, chrome and black frames, separate refracting droplets, runoff trails and slight low condensation; width, height, panes, density, drop_radius |
+| `rain_window` | Clear panes, chrome and black frames, separate refracting droplets, runoff trails and slight low condensation; width, height, panes, density, drop_radius, large_drop_fraction, bottom_density, fog |
 | `neon_sign` | Supported original tubes shaped as a planet, rings, bars or chevrons; width, height, design, color, strength, backing |
 | `street_car` | Parked saloon silhouette with a shaped body, curved roof, glazing, wheels, brightwork and lamps; length, width, height, tone, tail_lights |
-| `neon_street` | Wet road, curb, two depths of buildings, lit window grids, neon signs, street lamps and parked cars; width, depth, cars, exterior_slope |
+| `neon_street` | Wet road and puddles, kerbs, articulated facades at multiple depths, mostly dark window grids, mounted neon signs, street lamps, curbside cars and falling rain; width, depth, cars, exterior_slope, falling_rain, lead_in |
 
 `geometry.py` supplies construction helpers. `materials.py` supplies procedural
 PBR surfaces, including dull fissured bark and sawn end grain for log sections. `preview_asset.py` renders one asset in a neutral studio with an
@@ -67,17 +67,24 @@ flush with the preserved holo base. The broadside room and furniture rotate
 as one root while the tray stays in its original orientation. Foreground
 props are at least 10 cm from the tray and sit directly on the counter.
 The camera is 38.75 cm above the top, looks down 24.6 degrees through a
-54 mm lens, and uses f/8 converted for centimetre scene units. Focus sits
-8 cm behind the tray centre; the visible neon rim spans 77% of the frame.
+54 mm lens. The second pass stops down to f/32 converted for centimetre
+scene units and focuses 25 cm behind the tray centre to keep the street legible; the visible neon rim spans 77% of the frame.
 `diner_counter.quiet` sets the half-widths of a rectangle without water beads
-or puddles, with a gradual material transition to the wet surface outside.
+or puddles. Voltline uses a 28 × 20 cm half-extent, preserving at least
+10 cm of quiet surface beyond the rim, with a gradual material transition to the wet surface outside.
 Rain is separate geometry on clear panes; the glass has no large-scale bump
 or distortion. City windows, signs, cars and their reflections are actual
 geometry behind the glazing. All signage is abstract and unlettered.
 `neon_street.exterior_slope` grades the road with depth, places the buildings
 on that grade, and pitches the cars to keep their tires on the road. The
 window counter can therefore overlook a descending street without flattening
-the exterior into a backdrop.
+the exterior into a backdrop. `lead_in` extends the wet approach toward the
+camera without moving the facades. Voltline uses a 0.22 grade; the camera
+stays above the road plane so its reflections remain visible. The planet sign
+mounts to the near building end wall. The 17–15.4 cm pendant shades recede
+roughly 2.3–5.1 m from the camera over descending bar terraces. Rain glint
+lights affect only drops and trails and remain visible to transmission rays,
+so individual water lenses catch light without washing out the pane.
 
 Voltline adds procedural polished metal, porcelain, vinyl, wet laminate,
 clear glass, steam, pastry, clear rain glazing and wet asphalt helpers to
