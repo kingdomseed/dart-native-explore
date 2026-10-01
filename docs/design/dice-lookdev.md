@@ -1062,6 +1062,8 @@ see `assets/README.md`), built by Codex (gpt-6-astra) and art-directed
 against the concepts. Each room is re-blocked from its concept: the tray
 is shot broadside and carries the frame, table dressing frames it in the
 foreground corners, and the room reads at mid-distance behind it.
+All eleven: `dice-lookdev/all-rooms.jpg`; round 1 vs round 2 side by
+side: `dice-lookdev/rooms-before-after.jpg`.
 
 Lighting recipes (the tray lights are unchanged unless noted):
 
