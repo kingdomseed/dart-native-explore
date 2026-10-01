@@ -3,6 +3,72 @@ import math
 import env_common as E
 
 
+def urushi(name="Hand-polished lacquer", tone=(.016,.005,.004), wear=.35, seed=1):
+    m,k=E.material(name)
+    vec=mapped(k,(1,1,1),seed)
+    n=k.noise(vec,.75,3).outputs["Fac"]
+    slow=k.noise(vec,.06,2).outputs["Fac"]
+    col=k.mix(slow,tuple(c*.65 for c in tone)+(1,),tuple(c*1.4 for c in tone)+(1,))
+    geo=k.node("ShaderNodeNewGeometry")
+    edge=k.math("MINIMUM",k.math("MULTIPLY",k.math("MAXIMUM",k.math("SUBTRACT",geo.outputs["Pointiness"],.49),0),wear*12),.18)
+    col=k.mix(edge,col,(.11,.025,.009,1))
+    k.surface(k.bsdf(Base_Color=col,Roughness=k.math("ADD",.2,k.math("MULTIPLY",n,.13*wear)),
+        Coat_Weight=.7,Coat_Roughness=.13,Normal=k.bump(n,.12,.012*wear)))
+    return m
+
+
+def washi(name="Mulberry paper", tone=(.75,.56,.32), glow=.5, seed=1):
+    m,k=E.material(name)
+    vec=mapped(k,(1.1,1.1,.16),seed)
+    fibers=k.noise(vec,4,3).outputs["Fac"]
+    cloud=k.noise(vec,.13,3).outputs["Fac"]
+    col=k.mix(k.math("MULTIPLY",cloud,.35),(*tone,1),(.92,.83,.61,1))
+    sep=k.node("ShaderNodeSeparateXYZ");k.link(k.coords().outputs["Generated"],sep.inputs[0])
+    core=k.math("MAXIMUM",k.math("SUBTRACT",1,k.math("MULTIPLY",k.math("ABSOLUTE",k.math("SUBTRACT",sep.outputs["Z"],.48)),1.8)),0)
+    strength=k.math("MULTIPLY",glow,k.math("ADD",.3,k.math("MULTIPLY",core,1.4)))
+    diffuse=k.bsdf(Base_Color=col,Roughness=.85,Normal=k.bump(fibers,.16,.017),
+        Emission_Color=(*tone,1),Emission_Strength=strength)
+    trans=k.node("ShaderNodeBsdfTranslucent");k.link(col,trans.inputs["Color"])
+    k.surface(k.mix_shader(.32,diffuse,trans.outputs[0]))
+    return m
+
+
+def rush_weave(name="Woven igusa", tone=(.28,.25,.11), seed=1):
+    m,k=E.material(name);v=mapped(k,(1,1,1),seed)
+    reed=k.node("ShaderNodeTexWave",bands_direction="Y");k.link(v,reed.inputs["Vector"])
+    k.set(reed,Scale=.75,Distortion=.08,Detail=2)
+    cross=k.node("ShaderNodeTexWave",bands_direction="X");k.link(v,cross.inputs["Vector"])
+    k.set(cross,Scale=.075,Distortion=.2,Detail=2)
+    n=k.noise(v,.2,3).outputs["Fac"]
+    col=k.mix(n,tuple(c*.7 for c in tone)+(1,),tuple(c*1.28 for c in tone)+(1,))
+    weave=k.math("MULTIPLY",reed.outputs["Fac"],k.math("ADD",.7,k.math("MULTIPLY",cross.outputs["Fac"],.3)))
+    k.surface(k.bsdf(Base_Color=k.mix(k.math("MULTIPLY",weave,.5),col,(.15,.13,.055,1)),
+        Roughness=.73,Normal=k.bump(weave,.28,.045)))
+    return m
+
+
+def woven_silk(name="Figured silk", tone=(.012,.025,.035), seed=1):
+    m,k=E.material(name);vec=mapped(k,(1,1,1),seed)
+    n=k.noise(vec,12,2).outputs["Fac"]
+    sep=k.node("ShaderNodeSeparateXYZ");k.link(vec,sep.inputs[0])
+    wave=k.math("MULTIPLY",k.math("SINE",k.math("MULTIPLY",sep.outputs["X"],1.7)),k.math("SINE",k.math("MULTIPLY",sep.outputs["Y"],1.7)))
+    pattern=k.math("GREATER_THAN",wave,.82)
+    col=k.mix(pattern,(*tone,1),(.19,.115,.033,1))
+    k.surface(k.bsdf(Base_Color=col,Roughness=.7,Sheen_Weight=.3,Sheen_Roughness=.5,Sheen_Tint=tuple(min(1,c*3) for c in tone)+(1,),Normal=k.bump(n,.2,.013)))
+    return m
+
+
+def gold_leaf(name="Laid gold leaf", wear=.3, seed=1):
+    m,k=E.material(name);vec=mapped(k,(1,1,1),seed)
+    patches=k.noise(vec,.045,3).outputs["Fac"]
+    creases=k.noise(vec,2,2).outputs["Fac"]
+    cells=k.voronoi(vec,.09).outputs["Color"]
+    col=k.mix(k.math("MULTIPLY",patches,.35),(.63,.34,.075,1),(.86,.61,.24,1))
+    col=k.mix(.035,col,cells)
+    k.surface(k.bsdf(Base_Color=col,Metallic=1,Roughness=k.math("ADD",.33,k.math("MULTIPLY",patches,.15)),Normal=k.bump(creases,.16,.012*wear)))
+    return m
+
+
 def aged_plastic(name="Warm ABS", tone=(.52,.47,.34), wear=.4, seed=1):
     m,k=E.material(name)
     vec=mapped(k,(1,1,1),seed)

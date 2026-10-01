@@ -1250,18 +1250,32 @@ Lighting recipes (the tray lights are unchanged unless noted):
   plus small counter glints), exposure +0.2. Tray lights unchanged.
   Gate: numeral 14.39 (d10u), die vs tray 4.68, stroke 0.124–0.132, PASS.
 
-- **Vermilion Court — the lantern pavilion.** A tatami room (the tray
-  sits on the mats; room floor z = 0, camera at seated-on-the-floor
-  height): shoji along the left wall glowing faintly, lacquered posts, the
-  gold-leaf folding screen behind the tray, a tansu chest with a
-  vermilion top on the right, cushions, and the back open onto a
-  vermilion veranda railing over dusk mountains, a pagoda silhouette and
-  a cherry tree in blossom. Lights: a paper andon floor lantern (9 kW,
-  warm, left), a big vermilion paper lantern hung on the right (14 kW,
-  red accent), the dusk sky through the opening (area, 30 kW, cool
-  violet, back), over the tray's warm key, moon and overhead and the
-  small table lanterns. Camera: 20 mm, f/4. Gate: numeral 5.26 (d10u),
-  die vs tray 2.28, stroke 0.123–0.128, PASS.
+- **Vermilion Court — the lantern pavilion.** Round 2 replaces the
+  floor-level miniature tray composition with a close broadside view of
+  the preserved tray on a modeled low lacquer table. The table has a
+  rounded moulded top, scalloped aprons and curved feet; gilt tea bowls,
+  a fitted tea caddy, a pleated fan and a few cupped cherry petals frame
+  it outside a 10 cm quiet margin. Bound woven tatami and stuffed silk
+  zabuton seats furnish the raised tea platform. Joinered washi andon
+  lamps, a ribbed red chochin, half-lap shoji screens and a folding
+  gold-leaf byobu with original pine/cloud brushwork fill the midground.
+  Stepped landings open the view past the vermilion veranda railing to
+  twig-supported cherry blossoms, layered dusk mountains and a timber
+  pagoda with swept tiled eaves and warm slit windows. No volume haze,
+  downloaded assets or text. Camera: 18.4 mm, 31.3 degrees down,
+  effective f/8 on the dice; tray spans 83.8% of the frame. Table top
+  z=0, foreground tatami z=-32. Warm andon pools, red lantern accent
+  and cool dusk are linked to environment receivers. Diffuse-only
+  paper-ceiling (12 kW) and dusk (3.3 kW) returns lift the dice without
+  white specular patches on their red faces; original key, moon and
+  overhead calls and all tray materials/geometry stay unchanged.
+  Exposure +1.3 EV; standard view transform and pixel filter retained.
+  Added shared materials preserve all earlier functions; the nine
+  approved rooms are rechecked at 25% / 16 samples. Preview gate
+  (50% / 32 samples): numeral 4.79 (d10u), die vs tray 3.01,
+  stroke 0.123–0.128, PASS. Final full-render numbers are refreshed
+  separately by the art director.
+  Gate: numeral 4.90 (d8), die vs tray 2.91, stroke 0.123–0.128, PASS.
 
 - **Gemcutter — the jeweler's atelier.** Dark panelled walls, a tall
   mullioned window at the back-right onto a spired city at sunset (area,

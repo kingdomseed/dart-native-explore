@@ -337,3 +337,39 @@ half resolution. A room-only render hook uses a 1.5-pixel filter for smooth
 grid lines; it does not change the gate mask pass. The required 50-percent /
 32-sample gate gives numeral 4.69,
 die versus tray 7.10, stroke 0.124–0.132, PASS. No volumes or external assets.
+
+
+Vermilion adds reusable pavilion assets:
+
+| Module | Geometry and main variation controls |
+| --- | --- |
+| `pavilion_lantern` | Joinered andon or ribbed chochin with translucent washi, collars and suspension; kind, height, radius, tone, wood_tone, glow, energy, drop |
+| `tatami_mat` | Rounded rush-straw core and separate woven edge binding; width, depth, thickness, tone, border_tone |
+| `shoji_screen` | Mortised cedar rails, half-lap lattice, paper backing and recessed finger pull; width, height, columns, rows, wood_tone, paper_tone, glow |
+| `byobu_screen` | Hinged gold-leaf panels, black frames, original pine brushwork and cloud lines; panels, panel_width, height, fold, wood_tone |
+| `lacquer_table` | Rounded solid top, fine gilt mouldings, scalloped aprons and curved legs; width, depth, height, thickness, tone, gilt |
+| `zabuton` | Stuffed cushion, pinched corners, sewn welt and central tuft; width, depth, height, tone |
+| `tea_service` | Hollow tea bowl, fitted-lid tea caddy or pleated folding fan; kind, radius, height, tone, metal_finish, tea |
+| `cherry_branch` | Tapered limbs, blossom-bearing twigs, cupped five-petal flowers or loose resting petals; width, height, count, tone, kind |
+| `pavilion_vista` | Atmospheric mountain ridges, procedural dusk sky and a four-storey pagoda with swept roofs, tile seams and bronze finial; width, depth, slope, pagoda_x, pagoda_depth, pagoda_width, pagoda_height, sky_strength |
+
+The low table meets the preserved tray base at z=0; the foreground tatami
+is at z=-32. The broadside camera uses an 18.4 mm lens, looks down 31.3 degrees,
+and focuses on the dice at effective f/8, converted for centimetre scene units.
+The tray spans 83.8 percent of the frame. Stepped landings lower the gold-screen
+and veranda areas into the seated view. Tea bowls, the caddy, fan and fallen
+petals remain at least 10 cm clear of the tray base in plan. The table props
+are supported, and the fan's lowest ribs rest directly on the lacquer.
+
+Warm andon light pools on gold leaf and the table, the red chochin provides
+the accent, and blue dusk enters from the veranda. Room lights are linked to
+environment receivers. Two additional diffuse-only paper/dusk returns light
+the dice, preventing white area-light reflections from obscuring the lacquer
+faces. Original key, moon and overhead calls remain unchanged. Exposure is
++1.3 EV; the standard pixel filter and view transform are retained. The room
+uses no volumes, downloaded textures or lettering.
+
+New `materials.py` functions are `urushi`, `washi`, `rush_weave`, `woven_silk`
+and `gold_leaf`. All pre-existing material functions remain unchanged. The
+nine earlier approved rooms are checked at 25 percent / 16 samples after
+these additions.
