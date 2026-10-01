@@ -190,8 +190,26 @@ DieAtlas buildDieAtlas(DieGeo geo, {DiceFaceLook look = const DiceFaceLook()}) {
     px[i * 4 + 2] = bb;
     px[i * 4 + 3] = ba;
   }
+  // Every numeral stays inside its face's inlay line. One size per die
+  // for the one-digit numerals and one for the two-digit ones.
+  int digits(int i) =>
+      geo.faces[i].label(geo.kind)!.replaceAll('.', '').length;
+  final fit = <int, double>{};
   for (final i in numbered) {
-    _paintFace(px, w, cellPx, cells[i]!, geo, geo.faces[i], look);
+    final f = numeralFit(geo, geo.faces[i], look);
+    fit.update(digits(i), (v) => min(v, f), ifAbsent: () => f);
+  }
+  for (final i in numbered) {
+    _paintFace(
+      px,
+      w,
+      cellPx,
+      cells[i]!,
+      geo,
+      geo.faces[i],
+      look,
+      fit[digits(i)]!,
+    );
   }
   return DieAtlas(
     pixels: px,
@@ -202,20 +220,10 @@ DieAtlas buildDieAtlas(DieGeo geo, {DiceFaceLook look = const DiceFaceLook()}) {
   );
 }
 
-void _paintFace(
-  Uint8List px,
-  int w,
-  int cellPx,
-  (int, int) cell,
-  DieGeo geo,
-  DieFaceGeo face,
-  DiceFaceLook look,
-) {
-  final span = geo.cellSpan;
-  final texel = span / cellPx; // world units per texel
-  final rin = face.inradius;
+/// The numeral's outline on [face], face-local world units, scaled by
+/// [fit] about its own centre.
+List<Float64List> _numeralContours(DieGeo geo, DieFaceGeo face, double fit) {
   final glyphs = layoutLabel(face.label(geo.kind)!);
-  // Glyph outline in face-local world units.
   final contours = [
     for (final s in glyphs)
       Float64List.fromList([
@@ -225,17 +233,90 @@ void _paintFace(
         ],
       ]),
   ];
-  // The face outline (for the inlay), face-local.
-  final poly = [for (final p in face.points) face.local(p)];
-  final edges = _edgeTable(poly);
-  // The outline's centroid-based inradius sets the inlay.
-  var polyRin = double.infinity;
+  if (fit == 1) return contours;
+  var x0 = double.infinity, x1 = -double.infinity;
+  var y0 = double.infinity, y1 = -double.infinity;
+  for (final s in contours) {
+    for (var i = 0; i < s.length; i += 2) {
+      x0 = min(x0, s[i]);
+      x1 = max(x1, s[i]);
+      y0 = min(y0, s[i + 1]);
+      y1 = max(y1, s[i + 1]);
+    }
+  }
+  final cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+  for (final s in contours) {
+    for (var i = 0; i < s.length; i += 2) {
+      s[i] = cx + (s[i] - cx) * fit;
+      s[i + 1] = cy + (s[i + 1] - cy) * fit;
+    }
+  }
+  return contours;
+}
+
+/// The centroid-based inradius of a face outline (sets the inlay).
+double _polyInradius(List<Vector2> poly) {
+  var rin = double.infinity;
   for (var i = 0; i < poly.length; i++) {
-    polyRin = min(
-      polyRin,
+    rin = min(
+      rin,
       _segDist(Vector2.zero(), poly[i], poly[(i + 1) % poly.length]),
     );
   }
+  return rin;
+}
+
+/// The largest scale (≤ 1) at which [face]'s numeral, keyline included,
+/// stays inside the face's inlay line with half a keyline of air.
+double numeralFit(DieGeo geo, DieFaceGeo face, DiceFaceLook look) {
+  final poly = [for (final p in face.points) face.local(p)];
+  final edges = _edgeTable(poly);
+  final polyRin = _polyInradius(poly);
+  final keyW = look.keylineWidth * face.inradius;
+  // Inside distance every outline point must keep: the inlay's inner
+  // edge, plus the keyline, plus half as much again as a gap.
+  final need =
+      (look.inlayInset + look.inlayWidth / 2) * polyRin + 1.5 * keyW;
+  bool fits(double k) {
+    for (final s in _numeralContours(geo, face, k)) {
+      for (var i = 0; i < s.length; i += 2) {
+        if (_insideDistance(edges, s[i], s[i + 1]) < need) return false;
+      }
+    }
+    return true;
+  }
+
+  if (fits(1)) return 1;
+  var lo = 0.2, hi = 1.0;
+  for (var i = 0; i < 12; i++) {
+    final mid = (lo + hi) / 2;
+    if (fits(mid)) {
+      lo = mid;
+    } else {
+      hi = mid;
+    }
+  }
+  return lo;
+}
+
+void _paintFace(
+  Uint8List px,
+  int w,
+  int cellPx,
+  (int, int) cell,
+  DieGeo geo,
+  DieFaceGeo face,
+  DiceFaceLook look,
+  double fit,
+) {
+  final span = geo.cellSpan;
+  final texel = span / cellPx; // world units per texel
+  final rin = face.inradius;
+  final contours = _numeralContours(geo, face, fit);
+  // The face outline (for the inlay), face-local.
+  final poly = [for (final p in face.points) face.local(p)];
+  final edges = _edgeTable(poly);
+  final polyRin = _polyInradius(poly);
   final keyW = look.keylineWidth * rin;
   final inlayAt = look.inlayInset * polyRin;
   final inlayHalf = max(look.inlayWidth * polyRin, texel * 0.7) / 2;
