@@ -53,19 +53,20 @@ textures, text, or external assets are required.
 | `marble_table` | Fine-veined polished top, ogee edge and turned stone trestles; width, depth, height, thickness, tone, quiet, back_wings, polish |
 | `telescope` | Sectioned refractor, dew cap, lens, focuser, finder, equatorial bearings and braced tripod; length, radius, stand_height, elevation, wood_tone, metal_tone |
 | `armillary` | Graduated nested brass bands and central sphere, or enamel celestial globe with inlaid coordinates; kind, radius, pedestal, metal_tone |
-| `amethyst_cluster` | Terminated quartz prisms, pale tips, internal inclusions and spun brass bowl; radius, height, count, bowl, tone, metal_finish, energy, mineral, glow |
+| `amethyst_cluster` | Terminated quartz prisms, pale tips, internal inclusions and spun brass bowl; radius, height, count, bowl, tone, metal_finish, energy, mineral, glow, fractures, edge_glow |
 | `velvet_drape` | Folded velvet runner with an edge drop, sewn borders and gold star embroidery; width, length, drop, tone, stars |
 | `astronomer_tools` | Rete disk, curled constellation chart, convex magnifier or pierced incense vessel; kind, radius, width, depth, metal_tone |
 | `night_vista` | Indigo galaxy, maria and terminator, distant planet, spired floating citadels and layered surface clouds; width, depth, slope, sky_strength, moon_strength, moon_offset, planet_offset, cloud_drop |
 
-| `stone_altar` | Chamfered granite mensa, moulded edge, carved trestles and bronze geometric inlays; width, depth, height, tone, metal_tone, frost |
-| `frost_pillar` | Fluted entasis drum shaft, moulded foot, leaf-rib capital and riveted bronze collars; height, radius, tone, frost, metal_tone |
+| `stone_altar` | Chamfered granite mensa, moulded edge, carved trestles and bronze geometric inlays; width, depth, height, tone, metal_tone, frost, carving, accumulation, quiet, quiet_center |
+| `frost_pillar` | Fluted entasis drum shaft, moulded foot, leaf-rib capital and riveted bronze collars; height, radius, tone, frost, metal_tone, accumulation, cap_hole |
 | `frozen_arch` | Frosted column pair, separate wedge voussoirs and concentric archivolts; width, shoulder, radius, depth, tone, frost |
 | `fire_bowl` | Spun bronze brazier, embossed bands, dark heaped coals, buried embers and curling fire sheets; radius, height, flame_height, metal_tone, flames, energy |
 | `ice_formation` | Thick folded glacial wall with internal fractures, tapered curved icicles, or scalloped snow banks; kind, width, depth, height, count, tone, glow |
-| `winter_banner` | Draped pointed cloth, gold piping and snowflake embroidery that follows the folds; width, height, tone, metal_tone |
-| `cold_mist` | Low soft transparent mist surfaces and sparse falling ice motes; width, depth, height, layers, opacity, tone, flakes, flake_height |
+| `winter_banner` | Draped pointed cloth, gold piping and snowflake embroidery that follows the folds; width, height, tone, metal_tone, stitch_width |
+| `cold_mist` | Low soft transparent mist surfaces and sparse falling ice motes; width, depth, height, layers, opacity, tone, flakes, flake_height, flake_radius, flake_glow |
 | `glacier_vista` | Layered snow-covered mountain meshes, masonry bridge, frozen cascade and cloud banks; width, depth, slope, sky_strength, tone |
+| `snow_cover` | Modeled granular snow with feathered edges, clear footprints and sparse crystal glints; width, depth, thickness, quiet, quiet_center, holes, shape, sparkle |
 
 `geometry.py` supplies construction helpers. `materials.py` supplies procedural
 PBR surfaces, including dull fissured bark and sawn end grain for log sections. `preview_asset.py` renders one asset in a neutral studio with an
@@ -165,26 +166,32 @@ unchanged.
 
 
 Frostbound keeps the original granite floor shader, engraved circle, rim profile,
-rim material and all six original environment lights. The new carved altar top
-meets the tray at z=0. Its room root rotates -90 degrees; a 39.5 mm broadside
-camera sits 33 cm above the altar at f/8, converted for centimetre units. The rim
-spans 79.4 percent of the frame and its near edge meets the lower frame boundary.
-The player floor remains at z=-76, with stepped hall landings at -135, -200 and
--240 cm opening toward the bridge and frozen cascade.
+rim material and all six original lights. Its carved altar top meets the tray at
+z=0. The room rotates -90 degrees; a 39.5 mm camera sits 33 cm above the altar at
+f/8, converted for centimetre units. The rim spans 79.4 percent of the frame and
+its near edge meets the lower frame boundary. The player floor remains at z=-76,
+with stepped hall landings at -135, -200 and -240 cm opening toward the bridge
+and frozen cascade.
 
-Four bronze braziers create warm pools on the pillar capitals and snow ledges;
-blue grazing lights reveal the folded ice walls and the altar edge. Room lights
-are linked to environment surfaces, with a separate low glacier bounce across
-the tray to preserve die separation at the 50 percent phone preview. Exposure
-is -0.9 EV. No original tray light or material is changed. Foreground cups,
-candles, crystal bowls and snow banks remain beyond the 10 cm quiet margin.
-Snowfall is sparse and mist consists of fading transparent surfaces, without
-room-scale volumes. The ceiling is split to admit the cold shaft and falling ice.
+The right return is replaced by internally glowing, fractured ice and an
+armillary on a snow-capped carved pedestal. Supported navy and gold banners
+frame the bridge behind the warm bronze braziers. Chipped altar edges carry
+geometric friezes. Modeled snow accumulates on the altar, capital and base
+ledges; `quiet` and `holes` preserve the play-view margin and the feet of objects.
+Snow coverage tapers through a mesh attribute to avoid hard grid edges. Small
+refractive grains add sparse glints. The clear area around the tray extends
+10.2 cm beyond the rim before any bright snow accumulation begins.
 
-The ice option in `amethyst_cluster` reuses its prism and bowl geometry; the
-original amethyst mode and inclusion brightness remain the default. `glow`
-optionally sets inclusion intensity. Frostbound adds frozen granite, snow, ice
-and mist functions to `materials.py`; existing shared material functions are
-unchanged. Ice wall cracks are geometry inside the clear shell, with a blue
-core behind them. Snow banks have irregular tapered outlines. New asset sizes,
-finishes, wear and deterministic seeds are exposed through their build functions.
+Warm fire pools sit against darker granite, with a bright glacier valley and
+cyan ice edges. Room lights use environment receivers. Two added cool lights
+exclude existing environment surfaces so they illuminate the dice created by
+the renderer afterward; the original tray lights and materials stay unchanged.
+This avoids washing out the floor while strengthening die separation. Exposure
+remains -0.9 EV. Mist uses independently seeded, irregular transparent wisps;
+low layers beyond the altar retain the 10 cm clearance. Snowfall is sparse and
+there are no room-scale volumes.
+
+The `amethyst_cluster` ice mode shares its original prism construction and
+supports optional internal fractures and edge glow. The default amethyst mode
+is unchanged. Snow, ice and mist material additions are confined to Frostbound;
+Emberforged, Voltline and Celestial retain their material behavior.

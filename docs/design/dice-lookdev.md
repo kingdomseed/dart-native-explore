@@ -1084,17 +1084,19 @@ Lighting recipes (the tray lights are unchanged unless noted):
   Tray lights unchanged. Gate: numeral 8.51 (d12), die vs tray 2.20,
   stroke 0.121–0.130, PASS.
 
-- **Frostbound — the frozen altar hall.** Room floor is the snow ground
-  (z −14); frost-stone walls, eight granite pillars, glowing ice
-  formations along the side walls, icicles, deep-blue lattice banners.
-  Warm key: three bronze fire bowls on pedestals (front-left 45 kW, right
-  35 kW, back-left 30 kW), so shadows fall two ways. Cool fill: the tall
-  arch at the back onto a glacier valley at dusk (area, 90 kW,
-  0.55/0.72/1.0). Accent rim: shadowless blue ice glows from both sides
-  (9 kW each, 0.25/0.6/1.0), over the tray's moon key. The cave-ice
-  boulders now flank the arch. Camera: 16 mm from standing height (the
-  hall is tall), f/4. Gate: numeral 5.51 (d4), die vs tray 2.19, stroke
-  0.121–0.130, PASS.
+- **Frostbound — the frozen altar chamber (round 2).** Broadside, f/8,
+  the tray spanning ~79% of the frame on the carved granite
+  `stone_altar` with `snow_cover` on every ledge. Left: bronze
+  `fire_bowl`s on frost-rimed pedestals (the warm key; curling flames
+  over coals) and candles; behind, carved `frost_pillar`s, blue
+  `winter_banner`s with gold snowflake embroidery and the `frozen_arch`
+  onto the `glacier_vista` (peaks, bridge, frozen cascade) with
+  `cold_mist` at its foot and sparse flakes. Right: a big fractured
+  glowing `ice_formation` (the cyan accent and rim) with a bronze
+  armillary on a pedestal. Round-1 lesson kept: die vs tray was at the
+  gate (2.01), so bright ice reflections stay off the tray floor and the
+  dice get a cool back rim. Gate: numeral 8.85 (d4), die vs tray 2.11,
+  stroke 0.121–0.130, PASS.
 
 - **Arcane Study — the night study.** The desk stands against the window
   wall: a leaded window onto a moonlit skyline of spires (area, 25 kW,

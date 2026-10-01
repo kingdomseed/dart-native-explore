@@ -5,7 +5,7 @@ from . import geometry as G, materials as M
 
 
 def build(name="Frost-carved pillar",loc=(0,0,0),rot_z=0,height=185,radius=13,
-          tone=(.16,.19,.23),frost=.8,metal_tone=(.36,.22,.085),wear=.65,seed=1) -> bpy.types.Object:
+          tone=(.16,.19,.23),frost=.8,metal_tone=(.36,.22,.085),wear=.65,seed=1,accumulation=0,cap_hole=0) -> bpy.types.Object:
     a=G.Asset(name,loc,rot_z);r=radius;h=height
     mat=M.frozen_stone(name+" granite",tone,frost,wear,seed)
     metal=M.polished_metal(name+" bronze collars",metal_tone,wear,seed,.35)
@@ -36,4 +36,10 @@ def build(name="Frost-carved pillar",loc=(0,0,0),rot_z=0,height=185,radius=13,
         a.lathe("Aged bronze collar",[(rr-.14,z-.55),(rr+.1,z-.55),(rr+.1,z+.55),(rr-.14,z+.55)],metal,segments=48)
         for j in range(12):
             t=j*math.tau/12;a.sphere("Collar rivet",r*.038,((rr+.08)*math.cos(t),(rr+.08)*math.sin(t),z),metal,subdiv=1)
+    if accumulation:
+        from . import snow_cover
+        a.add(snow_cover.build(name+" capital snow",loc=(0,0,h+.025),width=r*2.75,depth=r*2.75,
+                              thickness=accumulation,holes=((0,0,cap_hole),) if cap_hole else (),sparkle=70,seed=seed))
+        a.add(snow_cover.build(name+" base snow",loc=(0,0,h*.055),width=r*2.55,depth=r*2.55,
+                              thickness=accumulation*.6,holes=((0,0,r*1.02),),shape="disk",sparkle=30,seed=seed+1))
     return a.root

@@ -5,7 +5,7 @@ from . import geometry as G, materials as M
 
 
 def build(name="Winter sanctuary banner",loc=(0,0,0),rot_z=0,width=40,height=105,
-          tone=(.009,.028,.085),metal_tone=(.42,.26,.10),wear=.5,seed=1) -> bpy.types.Object:
+          tone=(.009,.028,.085),metal_tone=(.42,.26,.10),wear=.5,seed=1,stitch_width=.13) -> bpy.types.Object:
     a=G.Asset(name,loc,rot_z)
     cloth=M.velvet(name+" woven wool",tone,wear,seed)
     gold=M.polished_metal(name+" gold embroidery",metal_tone,wear,seed,.42)
@@ -26,7 +26,7 @@ def build(name="Winter sanctuary banner",loc=(0,0,0),rot_z=0,width=40,height=105
             def point(rad,angle):
                 u=rad*math.cos(angle)*2/width;v=v0-rad*math.sin(angle)/height
                 x,y,z=pos(u,v);return (x,y-.17,z)
-            a.tube("Sixfold stitched snow star",[point(r*k/24,t) for k in range(25)],.13,gold)
+            a.tube("Sixfold stitched snow star",[point(r*k/24,t) for k in range(25)],stitch_width,gold)
             for q in (.5,.76):
                 bx,bz=r*q*math.cos(t),r*q*math.sin(t)
                 for sign in (-1,1):
@@ -35,7 +35,7 @@ def build(name="Winter sanctuary banner",loc=(0,0,0),rot_z=0,width=40,height=105
                     for k in range(13):
                         q=k/12;x=bx*(1-q)+ex*q;z=bz*(1-q)+ez*q
                         px,py,pz=pos(x*2/width,v0-z/height);pts.append((px,py-.17,pz))
-                    a.tube("Branch embroidery",pts,.09,gold)
+                    a.tube("Branch embroidery",pts,stitch_width*.70,gold)
     a.beam("Banner crossbar",(-width*.60,0,2),(width*.60,0,2),1.3,1.3,gold,.3)
     for x in (-width*.60,width*.60):a.sphere("Crossbar finial",1.7,(x,0,2),gold,subdiv=2)
     return a.root
