@@ -43,12 +43,12 @@ textures, text, or external assets are required.
 | `pie_stand` | Raised pie plate, crimped crust, lattice filling and glass cloche; radius, height |
 | `napkin_dispenser` | Pressed curved shell, paper opening, folded tissues, cover rivets and rubber feet; width, depth, height, metal_tone |
 | `salt_shaker` | Fluted glass, salt fill, domed chrome cap and perforations; height, radius |
-| `coffee_mug` | Thick porcelain, rolled lip, swept ear handle, coffee meniscus and curling steam sheets; height, radius, tone, steam_height, steam_strength, steam_width, steam_drift |
+| `coffee_mug` | Thick porcelain, rolled lip, swept ear handle, coffee meniscus and curling steam sheets; height, radius, tone, steam_height, steam_strength, steam_width, steam_drift, steam_opacity |
 | `leather_menu` | Folded leather, inset cover, rolled binding and saddle stitches; width, depth, thickness, tone |
 | `rain_window` | Clear panes, chrome and black frames, separate refracting droplets, runoff trails and slight low condensation; width, height, panes, density, drop_radius, large_drop_fraction, bottom_density, fog |
 | `neon_sign` | Supported original tubes shaped as a planet, rings, bars or chevrons; width, height, design, color, strength, backing |
-| `street_car` | Parked saloon silhouette with a shaped body, curved roof, glazing, wheels, brightwork and lamps; length, width, height, tone, tail_lights |
-| `neon_street` | Wet road and puddles, kerbs, articulated facades at multiple depths, mostly dark window grids, mounted neon signs, street lamps, curbside cars and falling rain; width, depth, cars, exterior_slope, falling_rain, lead_in |
+| `street_car` | Parked saloon silhouette with a shaped body, curved roof, glazing, wheels, brightwork and lamps; length, width, height, tone, tail_lights, lamp_gain |
+| `neon_street` | Wet road and puddles, kerbs, articulated facades at multiple depths, mostly dark window grids, mounted neon signs, street lamps, curbside cars and falling rain; width, depth, cars, exterior_slope, falling_rain, lead_in, emission_gain, light_gain, ambient_gain |
 
 `geometry.py` supplies construction helpers. `materials.py` supplies procedural
 PBR surfaces, including dull fissured bark and sawn end grain for log sections. `preview_asset.py` renders one asset in a neutral studio with an
@@ -67,8 +67,8 @@ flush with the preserved holo base. The broadside room and furniture rotate
 as one root while the tray stays in its original orientation. Foreground
 props are at least 10 cm from the tray and sit directly on the counter.
 The camera is 38.75 cm above the top, looks down 24.6 degrees through a
-54 mm lens. The second pass stops down to f/32 converted for centimetre
-scene units and focuses 25 cm behind the tray centre to keep the street legible; the visible neon rim spans 77% of the frame.
+54 mm lens at f/8 converted for centimetre scene units, focused on the dice
+at the tray centre; the visible neon rim spans 77% of the frame.
 `diner_counter.quiet` sets the half-widths of a rectangle without water beads
 or puddles. Voltline uses a 28 × 20 cm half-extent, preserving at least
 10 cm of quiet surface beyond the rim, with a gradual material transition to the wet surface outside.
@@ -82,7 +82,13 @@ the exterior into a backdrop. `lead_in` extends the wet approach toward the
 camera without moving the facades. Voltline uses a 0.22 grade; the camera
 stays above the road plane so its reflections remain visible. The planet sign
 mounts to the near building end wall. The 17–15.4 cm pendant shades recede
-roughly 2.3–5.1 m from the camera over descending bar terraces. Rain glint
+over descending bar terraces. The bar terraces are lifted 60 cm and shifted
+35 cm left from the previous blocking, putting their red seats and chrome
+edges above the foreground counter. A lit bottle return sits on the rear
+service bar. Street emission, practical-light power and ambient bounce have
+independent gain parameters. The steam uses a broad, low-opacity fade instead
+of narrow oscillating sheets. Counter beads and short streaks receive linked
+magenta, cyan and warm glints; the quiet margin receives only a smooth light wash. Rain glint
 lights affect only drops and trails and remain visible to transmission rays,
 so individual water lenses catch light without washing out the pane.
 

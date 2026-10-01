@@ -1165,17 +1165,23 @@ Lighting recipes (the tray lights are unchanged unless noted):
   and the units. Gate: numeral 7.46 (d10t), die vs tray 5.49, stroke
   0.124–0.132, PASS.
 
-- **Voltline — the late-night diner.** The rain window is the whole back
-  wall (the existing street neon outside: magenta and cyan, the back
-  light); a lit block of windows across the street; to the left a long
-  bar with a mint formica top and chrome edge, red vinyl stools, a back
-  bar of bottles and three chrome pendants over it (spot, 20 kW each,
-  warm, left); a magenta neon strip along the left ceiling edge (15 kW)
-  and a cyan one over the window (12 kW); checker floor, dark panelling,
-  a red booth. The tray keeps its cool front key. Room floor at −105 (bar
-  height). Camera: 20 mm from standing height so the bar reads over the
-  counter. Gate: numeral 12.35 (d4), die vs tray 4.66, stroke
-  0.124–0.132, PASS.
+- **Voltline — the late-night diner (round 2).** Broadside from −x,
+  54 mm, f/8 on the dice, seated eye height. The holo tray on a wet
+  laminate window counter (`diner_counter`: chrome trim, water beads that
+  catch the neon, a clean margin round the tray), framed by a chrome
+  napkin dispenser and a fluted salt shaker (left) and a diner mug with a
+  faint steam wisp and a leather menu (right). Behind, the `rain_window`
+  (clear glazing with separate droplets and run trails: the round-1 rain
+  normal smeared the street into blobs) onto `neon_street`: layered
+  façades with varied window grids, the ringed-planet, ring, bar and
+  chevron signs (`neon_sign`), parked cars with tail lights, a wet road
+  with streak reflections. To the left the diner recedes: service bar,
+  tufted red `bar_stool`s, a back bar of bottles, `espresso_machine`,
+  `pie_stand`s, warm `dome_pendant`s (85 kW) in depth. Round 1 was too
+  dark: the street emission and the warm bar light were raised (bar
+  strip 850 kW, back-bar warmth 700 kW, cyan through the rain 115 kW,
+  plus small counter glints), exposure +0.2. Tray lights unchanged.
+  Gate: numeral 14.39 (d10u), die vs tray 4.68, stroke 0.124–0.132, PASS.
 
 - **Vermilion Court — the lantern pavilion.** A tatami room (the tray
   sits on the mats; room floor z = 0, camera at seated-on-the-floor

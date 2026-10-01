@@ -6,7 +6,7 @@ from . import geometry as G, materials as M
 
 
 def build(name="Parked saloon", loc=(0, 0, 0), rot_z=0, length=420, width=174, height=140,
-          tone=(0.015, 0.023, 0.038), wear=0.4, seed=1, tail_lights=True) -> bpy.types.Object:
+          tone=(0.015, 0.023, 0.038), wear=0.4, seed=1, tail_lights=True, lamp_gain=1) -> bpy.types.Object:
     a = G.Asset(name, loc, rot_z)
     paint = M.ceramic(f"{name} paint", tone, wear, seed)
     chrome = M.polished_metal(f"{name} trim", wear=wear, seed=seed)
@@ -45,8 +45,8 @@ def build(name="Parked saloon", loc=(0, 0, 0), rot_z=0, length=420, width=174, h
             ob.rotation_euler.x = math.pi / 2
             ob = a.cylinder("Wheel hub", height * 0.145, 1.2, (x, side * width * 0.488, height * 0.235), chrome, bevel=0.9, segments=32)
             ob.rotation_euler.x = math.pi / 2
-    red = E.emissive(f"{name} rear lamps", (1, 0.007, 0.003), 3.5 if tail_lights else 0)
-    white = E.emissive(f"{name} headlights", (1, 0.74, 0.4), 4)
+    red = E.emissive(f"{name} rear lamps", (1, 0.007, 0.003), 3.5 * lamp_gain if tail_lights else 0)
+    white = E.emissive(f"{name} headlights", (1, 0.74, 0.4), 4 * lamp_gain)
     for end in (-1, 1):
         a.block("Chrome bumper", (4, width * 0.95, 8), (end * length * 0.495, 0, height * 0.31), chrome, 2)
         for side in (-1, 1):

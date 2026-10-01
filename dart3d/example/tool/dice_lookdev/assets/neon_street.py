@@ -8,7 +8,7 @@ import env_common as E
 from . import geometry as G, materials as M, neon_sign, street_car
 
 
-def _building(name, loc, rotation, width, depth, height, seed, style):
+def _building(name, loc, rotation, width, depth, height, seed, style, emission_gain):
     a = G.Asset(name, loc, rotation)
     rng = random.Random(seed)
     tones = ((0.055, 0.045, 0.042), (0.038, 0.05, 0.06), (0.07, 0.065, 0.053))
@@ -16,8 +16,8 @@ def _building(name, loc, rotation, width, depth, height, seed, style):
     trim = M.stone(name + " coping", (0.085, 0.08, 0.068), 0.35, seed)
     iron = M.polished_metal(name + " frames", (0.035, 0.043, 0.05), 0.5, seed, roughness=0.32)
     dark = E.simple(name + " unlit glazing", (0.006, 0.009, 0.014), 0.19, metal=0.12, Coat_Weight=0.8)
-    warm = E.emissive(name + " occupied warm rooms", (1, 0.56, 0.23), 1.35)
-    cool = E.emissive(name + " occupied cool rooms", (0.26, 0.56, 0.8), 0.85)
+    warm = E.emissive(name + " occupied warm rooms", (1, 0.56, 0.23), 1.35 * emission_gain)
+    cool = E.emissive(name + " occupied cool rooms", (0.26, 0.56, 0.8), 0.85 * emission_gain)
     a.block("Building mass", (width, depth, height), (0, depth / 2, height / 2), wall, 2)
     a.block("Roof coping", (width + 8, depth + 6, 10), (0, depth / 2, height), trim, 0.8)
     for x in (-width / 2 + 7, width / 2 - 7):
@@ -53,7 +53,7 @@ def _building(name, loc, rotation, width, depth, height, seed, style):
 
 
 def build(name="Night street", loc=(0, 0, 0), rot_z=0, width=1400, depth=1700,
-          wear=0.6, seed=1, cars=True, exterior_slope=0, falling_rain=90, lead_in=0) -> bpy.types.Object:
+          wear=0.6, seed=1, cars=True, exterior_slope=0, falling_rain=90, lead_in=0, emission_gain=1, light_gain=1, ambient_gain=1) -> bpy.types.Object:
     a = G.Asset(name, loc, rot_z)
     rng = random.Random(seed)
     road_w = width * 0.44
@@ -72,34 +72,34 @@ def build(name="Night street", loc=(0, 0, 0), rot_z=0, width=1400, depth=1700,
             front_x = side * (road_w / 2 + 104)
             building_width = 320 + rng.uniform(-35, 45)
             a.add(_building(f"{name} side building {side}-{i}", (front_x, y, 15), -side * math.pi / 2,
-                            building_width, 230, rng.uniform(650, 980), seed + i + (side + 1) * 5, i + side + 1))
+                            building_width, 230, rng.uniform(650, 980), seed + i + (side + 1) * 5, i + side + 1, emission_gain))
             if side == 1 and i == 0:
                 near_end = y - building_width / 2
     for i, x in enumerate((-420, 0, 420)):
         a.add(_building(f"{name} far building {i}", (x, depth + 80, 15), 0,
-                        380, 260, 900 + i * 130, seed + 30 + i, i + 1))
+                        380, 260, 900 + i * 130, seed + 30 + i, i + 1, emission_gain))
     a.add(neon_sign.build(name + " corner planet", loc=(road_w/2+215, near_end-3, 25),
-                          width=180, height=160, design="planet", strength=6, backing=False, seed=seed+60))
+                          width=180, height=160, design="planet", strength=6 * emission_gain, backing=False, seed=seed+60))
     signs = [(-road_w / 2 - 82, depth * 0.28, 210, math.pi / 2, "chevrons", (1, 0.012, 0.26)),
              (road_w / 2 + 82, depth * 0.4, 215, -math.pi / 2, "bars", (0.015, 0.62, 1)),
              (road_w / 2 + 82, depth * 0.71, 190, -math.pi / 2, "rings", (1, 0.025, 0.35)),
              (70, depth + 65, 170, 0, "bars", (0.015, 0.6, 1))]
     for i, (x, y, z, angle, design, color) in enumerate(signs):
         sign = neon_sign.build(f"{name} facade neon {i}", loc=(x, y, z), rot_z=angle,
-                               width=70, height=180, design=design, color=color, strength=7, seed=seed + i)
+                               width=70, height=180, design=design, color=color, strength=7 * emission_gain, seed=seed + i)
         a.add(sign)
         sign_axis = Vector((-math.sin(angle), math.cos(angle), 0))
         for xx in (-24, 24):
             for zz in (25, 150):
                 start = Vector((x, y, z + zz)) + Vector((math.cos(angle), math.sin(angle), 0)) * xx + sign_axis * 4
                 a.beam("Neon wall bracket", start, start + sign_axis * 25, 3, 3, iron, 0.4)
-        lamp = a.light("Neon spill on street", (x * 0.84, y - 35, z + 80), 360000, color, 75,
+        lamp = a.light("Neon spill on street", (x * 0.84, y - 35, z + 80), 360000 * light_gain, color, 75,
                        target=(x * 0.4, y - 150, 0), kind="AREA")
         lamp.visible_glossy = True
         lamp.data.specular_factor = 1
         lamp.data.shape = "RECTANGLE"
         lamp.data.size_y = 18
-    glow = E.emissive(name + " sodium lamps", (1, 0.66, 0.3), 12)
+    glow = E.emissive(name + " sodium lamps", (1, 0.66, 0.3), 12 * emission_gain)
     lamp_positions = []
     for i, (side, f) in enumerate(((-1, 0.22), (1, 0.36), (-1, 0.63), (1, 0.81))):
         x, y = side * (road_w / 2 - 8), depth * f
@@ -109,15 +109,15 @@ def build(name="Night street", loc=(0, 0, 0), rot_z=0, width=1400, depth=1700,
         a.tube("Street lamp post", [(x, y, 20), (x, y, h - 15), (x - side * 8, y, h), (x - side * 35, y, h)], 2.7, iron)
         a.sphere("Street lamp reflector", 12, (x - side * 35, y, h), iron, scale=(1.3, 1, 0.28))
         a.sphere("Street lamp glowing lens", 9, (x - side * 35, y, h - 3), glow, scale=(1.2, 1, 0.18))
-        light = a.light("Streetlamp road pool", (x - side * 35, y, h - 5), 250000, (1, 0.62, 0.28), 16,
+        light = a.light("Streetlamp road pool", (x - side * 35, y, h - 5), 250000 * light_gain, (1, 0.62, 0.28), 16,
                         target=(x - side * 80, y - 35, 0), kind="AREA")
         light.visible_glossy = True
         light.data.specular_factor = 1
     if cars:
         a.add(street_car.build(name + " blue car", loc=(road_w/2-100, 390, 0), rot_z=math.pi/2, length=350, width=158, height=110,
-                              tone=(0.025, 0.065, 0.12), seed=seed))
+                              tone=(0.025, 0.065, 0.12), seed=seed, lamp_gain=emission_gain))
         a.add(street_car.build(name + " burgundy car", loc=(-road_w/2+100, 840, 0), rot_z=-math.pi/2, length=370, width=160, height=120,
-                              tone=(0.065, 0.014, 0.02), seed=seed + 1))
+                              tone=(0.065, 0.014, 0.02), seed=seed + 1, lamp_gain=emission_gain))
     water = M.clear_glass(name + " road puddles", 0.025, 1.333)
     for i in range(24):
         x, y = rng.uniform(-road_w / 2 + 35, road_w / 2 - 35), rng.uniform(30 - lead_in, depth - 30)
@@ -141,7 +141,7 @@ def build(name="Night street", loc=(0, 0, 0), rot_z=0, width=1400, depth=1700,
         uv = ob.data.uv_layers.new()
         for loop, co in zip(uv.data, ((0, 0), (1, 0), (1, 1), (0, 1))): loop.uv = co
         ob.visible_shadow = False
-    a.light("Blue city ambience", (0, depth * 0.6, 650), 1400000, (0.16, 0.29, 0.5), 550,
+    a.light("Blue city ambience", (0, depth * 0.6, 650), 1400000 * ambient_gain, (0.16, 0.29, 0.5), 550,
             target=(0, depth * 0.4, 0), kind="AREA")
     if exterior_slope:
         for ob in a.root.children:

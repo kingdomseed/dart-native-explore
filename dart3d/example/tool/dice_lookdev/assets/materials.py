@@ -266,14 +266,15 @@ def clear_glass(name="Clear glass", roughness=0.035, ior=1.46):
     return m
 
 
-def steam(name="Coffee steam", strength=1.2):
+def steam(name="Coffee steam", strength=1.2, opacity=0.12):
     m, k = E.material(name)
     uv = k.coords().outputs["UV"]
     sep = k.node("ShaderNodeSeparateXYZ"); k.link(uv, sep.inputs[0])
     edge = k.math("POWER", k.math("MAXIMUM", 0, k.math("SINE", k.math("MULTIPLY", sep.outputs["X"], 3.14159))), 2)
-    fade = k.math("POWER", k.math("MAXIMUM", 0, k.math("SINE", k.math("MULTIPLY", sep.outputs["Y"], 3.14159))), 1.5)
-    n = k.noise(uv, 7, 2, dist=1.1).outputs["Fac"]
-    alpha = k.math("MULTIPLY", k.math("MULTIPLY", edge, fade), k.math("MULTIPLY", n, 0.38))
+    fade = k.math("MULTIPLY", k.math("POWER", k.math("SUBTRACT", 1, sep.outputs["Y"]), 2),
+                  k.math("MINIMUM", 1, k.math("MULTIPLY", sep.outputs["Y"], 8)))
+    n = k.noise(uv, 2.5, 2, dist=0.3).outputs["Fac"]
+    alpha = k.math("MULTIPLY", k.math("MULTIPLY", edge, fade), k.math("MULTIPLY", n, opacity))
     tr = k.node("ShaderNodeBsdfTransparent").outputs[0]
     k.surface(k.mix_shader(alpha, tr, k.emission((0.45, 0.55, 0.65, 1), strength)))
     return m
