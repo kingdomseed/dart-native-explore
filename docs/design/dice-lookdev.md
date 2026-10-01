@@ -1179,9 +1179,6 @@ Lighting recipes (the tray lights are unchanged unless noted):
   Foreground clearance is at least 11.77 cm. Emberforged, Voltline,
   Celestial, Frostbound, Arcane and Fateengine were re-rendered serially
   at 25% / 16 samples and checked against their approved previews.
-  Preview verification and full-render gate numbers are recorded separately.
-  Previous full-render gate (to be refreshed by the operator): numeral 5.45
-  (d4), die vs tray 2.21, stroke 0.123–0.129, PASS.
   Gate: numeral 9.14 (d4), die vs tray 3.40, stroke 0.123–0.129, PASS.
 
 - **Old Road — the wayfarer's inn corner.** Timber-and-plaster walls, a
