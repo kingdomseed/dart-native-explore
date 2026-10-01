@@ -174,7 +174,12 @@ class JoltWorld {
         fun ensureJolt() {
             if (joltReady) return
             System.loadLibrary("joltjni")
-            JoltPhysicsObject.startCleaner()
+            // jolt-jni's automatic native cleanup needs java.lang.ref.Cleaner
+            // (API 33). Below that, natives are freed only by the explicit
+            // close() calls in this file.
+            if (android.os.Build.VERSION.SDK_INT >= 33) {
+                JoltPhysicsObject.startCleaner()
+            }
             Jolt.registerDefaultAllocator()
             Jolt.installDefaultAssertCallback()
             Jolt.installDefaultTraceCallback()
