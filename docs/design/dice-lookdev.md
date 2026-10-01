@@ -1181,17 +1181,30 @@ Lighting recipes (the tray lights are unchanged unless noted):
   at 25% / 16 samples and checked against their approved previews.
   Gate: numeral 9.14 (d4), die vs tray 3.40, stroke 0.123–0.129, PASS.
 
-- **Old Road — the wayfarer's inn corner.** Timber-and-plaster walls, a
-  small window at the back onto the blue hour (area, 8 kW, cool), a raised
-  fieldstone hearth on the right wall (60 kW, warm side light) with a fur
-  stool, a travel pack on a chair, a walking staff, a barrel and a shelf of
-  jugs; a candle on a side table back-right (4 kW). The tin lantern on the
-  table stays the warm key from the left, with the tray's overhead and
-  warm key. No ceiling beams here: the polished-gold dice mirror what is
-  above them, and a dark beam over the table pulled the d4 below the gate
-  (4.18); without beams it is back to 4.60. Camera: 20 mm, turned right
-  to take in the hearth. Gate: numeral 4.60 (d4), die vs tray 2.95,
-  stroke 0.123–0.128, PASS.
+- **Old Road — the wayfarer's inn corner (round 2).** A close broadside
+  leather/map tray spans 84.76% of the frame, with its near rim at the bottom.
+  The 26.4 mm camera looks down 28.3 degrees from 24 cm above the tabletop at
+  effective f/8. A worn planked oak tavern table has a rounded rear recess;
+  below it, a stepped sitting bay supports the canvas/leather travel pack on
+  a pegged chair, its spiral bedroll and hanging pewter cup, the bound walking
+  staff and a sheepskin-covered stool. A raised fieldstone log hearth is on
+  the right; a real half-timber wall and small oak casement frame a blue-hour
+  village with warm windows. The foreground tin hurricane lantern, wooden
+  tankard, short clay pipe and fringed red plaid balance a pewter tankard and
+  country loaf on a handled trencher at the right edge.
+  The lantern makes a warm pool on the oak, the hearth lights the travel gear
+  from the right, and the dusk window provides a cool return. Room lights use
+  separate environment receivers; a gentle 2 kW hearth reflection lights the
+  gold dice without lifting the map floor. The original map, leather board/rim,
+  `blue_hour`, `warm_key` and overhead are unchanged. No ceiling beams cross
+  the table: polished gold mirrors what is above it, and round 1's dark beam
+  pulled the d4 below the gate (4.18). Exposure is +1.5 EV, gamma 0.8, with a
+  0.5-pixel Cycles filter for the fine numerals at preview resolution.
+  Foreground clearance is at least 10.329 cm; the lantern, tankards, pipe,
+  trencher and pack are checked for contact with their supports. There are
+  no room volumes. Shared asset variants retain their existing defaults;
+  all seven approved rooms are rechecked at 25% / 16 samples.
+  Gate: numeral 5.90 (d4), die vs tray 3.21, stroke 0.123–0.128, PASS.
 
 - **Northfield — the 1986 countryside kitchen.** Striped wallpaper, a
   checkered lino floor, cream kitchen units along the left wall (worktop,

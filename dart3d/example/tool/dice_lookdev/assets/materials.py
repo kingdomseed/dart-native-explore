@@ -552,14 +552,14 @@ def upholstery(name="Rubbed upholstery leather", tone=(.13,.035,.019), wear=.6, 
     return m
 
 
-def wool(name="Wool yarn", tone=(.11,.012,.029), seed=0, plaid=False):
+def wool(name="Wool yarn", tone=(.11,.012,.029), seed=0, plaid=False, plaid_axes=("X","Z")):
     m,k=E.material(name)
     vec=mapped(k,(1,1,1),seed)
     n=k.noise(vec,3.5,2).outputs["Fac"]
     col=k.ramp(n,[(.2,tuple(c*.45 for c in tone)),(.8,tone)])
     if plaid:
         sep=k.node("ShaderNodeSeparateXYZ");k.link(k.coords().outputs["Object"],sep.inputs[0])
-        for axis in ("X","Z"):
+        for axis in plaid_axes:
             stripe=k.math("PINGPONG",sep.outputs[axis],7)
             wide=k.math("LESS_THAN",stripe,2.2)
             fine=k.math("LESS_THAN",k.math("ABSOLUTE",k.math("SUBTRACT",stripe,3.7)),.18)
@@ -603,4 +603,42 @@ def charred_wood(name="Burning oak", heat=.7, seed=0):
     normal=k.bump(n,.6,.15,normal=k.bump(fissure,.7,.19))
     k.surface(k.bsdf(Base_Color=col,Roughness=.93,Normal=normal,
                      Emission_Color=(1,.095,.003,1),Emission_Strength=glow))
+    return m
+
+
+def canvas(name="Weathered canvas", tone=(.15,.12,.07), wear=.6, seed=1):
+    m,k=E.material(name)
+    vec=mapped(k,(1,1,1),seed)
+    broad=k.noise(vec,.21,4,.7).outputs["Fac"]
+    col=k.ramp(broad,[(.2,tuple(c*.35 for c in tone)),(.55,tone),(.8,tuple(c*1.5 for c in tone))])
+    weave=[]
+    for direction in ("X","Z"):
+        wave=k.node("ShaderNodeTexWave");wave.bands_direction=direction
+        k.link(vec,wave.inputs["Vector"]);k.set(wave,Scale=8,Distortion=1.5,Detail=2)
+        weave.append(wave.outputs["Color"])
+    yarn=k.math("MULTIPLY",weave[0],weave[1])
+    normal=k.bump(yarn,.24,.022,normal=k.bump(broad,.3,.11*wear))
+    k.surface(k.bsdf(Base_Color=col,Roughness=.87,Sheen_Weight=.28,Normal=normal))
+    return m
+
+
+def limewash(name="Aged lime plaster",tone=(.43,.34,.23),wear=.6,seed=1):
+    m,k=E.material(name);vec=mapped(k,(1,1,1),seed)
+    n=k.noise(vec,.07,5,.65).outputs["Fac"]
+    col=k.ramp(n,[(.18,tuple(c*.4 for c in tone)),(.52,tone),(.85,tuple(c*1.2 for c in tone))])
+    pores=k.noise(vec,1.8,3).outputs["Fac"]
+    k.surface(k.bsdf(Base_Color=col,Roughness=.88,Normal=k.bump(pores,.22,.07,normal=k.bump(n,.55,.6*wear))))
+    return m
+
+
+def bread_crust(name="Scored bread crust", seed=1):
+    m,k=E.material(name)
+    vec=mapped(k,(1,1,1),seed)
+    n=k.noise(vec,.55,3).outputs["Fac"]
+    pore=k.noise(vec,7,2).outputs["Fac"]
+    crust=k.ramp(n,[(.20,(.10,.031,.006)),(.52,(.34,.13,.027)),(.80,(.50,.28,.09))])
+    attr=k.node("ShaderNodeAttribute");attr.attribute_name="Bread scoring"
+    cut=k.math("MULTIPLY",attr.outputs["Fac"],.9)
+    color=k.mix(cut,crust,(.47,.31,.14,1))
+    k.surface(k.bsdf(Base_Color=color,Roughness=.73,Normal=k.bump(pore,.25,.032),Subsurface_Weight=.025))
     return m

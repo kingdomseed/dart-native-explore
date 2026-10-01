@@ -8,7 +8,7 @@ from . import geometry as G, materials as M, rain_window
 
 def build(name="Rainy oak casement",loc=(0,0,0),rot_z=0,width=125,height=160,
           panes=3,rows=4,wood_tone=(.08,.028,.012),wear=.65,seed=1,
-          density=.026,drop_radius=.18,view=True) -> bpy.types.Object:
+          density=.026,drop_radius=.18,view=True,sky_colors=None,sky_strength=1.4,exterior_slope=0,town_altitude=0,sky_horizon=.35) -> bpy.types.Object:
     a=G.Asset(name,loc,rot_z)
     wood=M.oak(name+" oak framing",wood_tone,wear,seed,axis="Z")
     bronze=M.metal(name+" latch brass","brass",wear,seed)
@@ -36,14 +36,19 @@ def build(name="Rainy oak casement",loc=(0,0,0),rot_z=0,width=125,height=160,
         uv=k.coords().outputs["Generated"]
         n=k.noise(uv,4,4,.65).outputs["Fac"]
         col=k.ramp(n,[(.25,(.015,.035,.085)),(.7,(.065,.12,.26))])
-        k.surface(k.emission(col,1.4))
-        a.block("Clouded night beyond glass",(width*3,.5,height*2),(0,210,height*.65),m,0)
+        if sky_colors is not None:
+            sep=k.node("ShaderNodeSeparateXYZ");k.link(uv,sep.inputs[0])
+            col=k.ramp(sep.outputs["Z"],[(0,sky_colors[0]),(sky_horizon,sky_colors[1]),(1,sky_colors[2])])
+            col=k.mix(.2,col,k.ramp(n,[(.2,tuple(c*.3 for c in sky_colors[1])),(.8,sky_colors[2])]))
+        k.surface(k.emission(col,sky_strength))
+        a.block("Clouded night beyond glass",(width*3,.5,height*(4 if sky_colors is not None else 2)),(0,210,height*.65-exterior_slope*210),m,0)
         silhouette=E.simple(name+" distant slate roofs",(.025,.041,.068),.9,Emission_Color=(.025,.039,.062,1),Emission_Strength=.4)
         lit=E.simple(name+" distant warm windows",(.6,.23,.04),.5,Emission_Color=(1,.36,.065,1),Emission_Strength=2.5)
         rng=random.Random(seed)
         for i in range(9):
-            x=(i-4)*width*.24;w=rng.uniform(14,25);h=rng.uniform(30,65);z=-25
-            a.block("Distant cottage",(w,12,h),(x,140,z+h/2),silhouette,.3)
+            x=(i-4)*width*.24;w=rng.uniform(14,25);h=rng.uniform(30,65);z=-25-exterior_slope*140+town_altitude
+            foundation=height*2 if sky_colors is not None else 0
+            a.block("Distant cottage",(w,12,h+foundation),(x,140,z+(h-foundation)/2),silhouette,.3)
             a.extrude("Slate pitched roof",[(x-w*.6,z+h),(x,z+h+15),(x+w*.6,z+h)],16,silhouette,y=139,bevel=.2)
             for xx in (-w*.24,w*.24):
                 if rng.random()<.6: a.block("Tiny warm window",(2.1,.3,4.3),(x+xx,133.7,z+h*.68),lit,.1)

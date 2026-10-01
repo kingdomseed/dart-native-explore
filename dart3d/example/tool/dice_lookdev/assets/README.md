@@ -269,3 +269,38 @@ column 15k, and the largest wall 132k. There are no room volumes or external ass
 - `cottage_window`: deep moulded oak casement, divided lights, brass catches and the existing clear rain bead geometry; `width`, `height`, `panes`, `rows`, `wood_tone`, `wear`, `seed`, `density`, `drop_radius`, optional dusk `view`.
 
 Backward-compatible variants: `coffee_mug(glaze_style="stoneware")`, `pouch(fabric="velvet")`, `vessel(kind="jug")`, and optional `lantern` glass/glow/light colours. `oak_table` and `materials.oak` also accept `grain_scale` (default 1.0) for tighter wood grain on smaller furniture. Their previous defaults are unchanged. New material functions are `upholstery`, `wool` (optional plaid), `stoneware` and `charred_wood`; the existing material recipes remain unchanged.
+
+### Oldroad wayfarer's inn assets
+
+- `hurricane_lantern`: spun tin reservoir, hollow glass chimney, wick/flame, crossed guards, side air pipes and hinged bail; `height`, `radius`, `metal_finish`, `glass_tone`, `wear`, `seed`, `energy`. The compact room version is 22 cm high.
+- `travel_pack`: loaded canvas body, sewn bellows pocket, curved leather flap, punched load straps, buckles, shoulder loops, a spiral wool bedroll and suspended pewter cup; `width`, `depth`, `height`, canvas/leather/roll tones, `wear`, `seed`, `bedroll`, `cup`, `buckle_height`, `cup_height`. Faces local -Y; floor origin.
+- `walking_staff`: tapered crooked ash, iron shoe, wrapped grip, carved bands and wrist thong; `height`, `radius`, `wood_tone`, `metal_finish`, `wear`, `seed`, `carved_bands`. Origin at the shoe.
+- `clay_pipe`: hollow clay bowl, darkened interior, impressed lozenges, curved tapered horn stem and brass ferrule; `length`, `bowl_height`, `radius`, `tone`, `metal_finish`, `wear`, `seed`. The stem runs along local +X.
+- `tavern_chair`: scooped seat, turned legs, stretchers, pegged bowed back rails and finials; `width`, `depth`, `seat_height`, `height`, `wood_tone`, `wear`, `seed`, `back`. `back=False` builds a stool.
+- `timber_wall`: pegged oak posts, rails and diagonal braces around lime-plaster infill and real window openings; `width`, `height`, `thickness`, `bays`, `openings`, wood/plaster tones, `wear`, `seed`. Openings are `(center_x, bottom_z, width, height)` in local X/Z.
+- `bread_board`: scored country loaf on a wooden handled trencher, with crumbs and knife marks; `width`, `depth`, `loaf_height`, `wood_tone`, `wear`, `seed`.
+
+Shared extensions retain their previous defaults: `vessel(kind="wooden_tankard")`
+uses the existing coopered `barrel` with adjustable wall/hoop thickness, rivet
+radius, stave/hoop counts, bottom thickness and grain scale. `velvet_drape`
+accepts `fabric="wool"` for a fringed plaid; weighted rest patches support the
+pipe and tankard. `materials.wool` gains `plaid_axes`, defaulting to its original
+X/Z axes. New materials are `canvas`, `limewash` and attribute-driven
+`bread_crust`.
+
+`cottage_window` gains optional blue-hour `sky_colors`, `sky_strength`,
+`sky_horizon`, `exterior_slope` and `town_altitude`. The sky and lower village
+silhouettes extend beyond the view for the downward room angle. Omitted
+parameters preserve the approved Hearthside window.
+
+Oldroad keeps the original map, leather board/rim and three tray lights. The
+84.76-percent broadside composition uses 26.4 mm at effective f/8; the camera
+is 24 cm above the table, looking down 28.3 degrees. A lower inn sitting bay
+supports the pack chair, staff, fur stool and raised hearth. All foreground
+feet contact the table or weighted wool, with at least 10.329 cm clearance
+beyond the tray board. The warm lantern and hearth contrast with the dusk
+window; no dark ceiling beam crosses the polished dice reflections. The room
+uses +1.5 EV, gamma 0.8 and a 0.5-pixel Cycles filter to preserve fine numerals
+in the half-size phone check. Environment lamps use separate receivers. A gentle 2 kW hearth reflection
+illuminates only the subsequently created dice. The 50% / 32-sample top-down
+gate passes: numeral 5.45, die versus tray 3.35, stroke 0.123–0.128.

@@ -50,6 +50,16 @@ def build(name="Vessel", loc=(0, 0, 0), rot_z=0, kind="goblet", height=18, radiu
         a.tube("Scrolled handle", [(radius * 0.88, 0, height * 0.8), (radius * 1.55, 0, height * 0.86),
                                    (radius * 1.8, 0, height * 0.65), (radius * 1.78, 0, height * 0.38),
                                    (radius * 1.42, 0, height * 0.2), (radius * 0.96, 0, height * 0.25)], 0.65, metal)
+    elif kind == "wooden_tankard":
+        from . import barrel
+        a.add(barrel.build(name+" coopered cup",radius=radius,height=height,wood_tone=tone,
+                          metal_finish=metal_finish,wear=wear,seed=seed,open_top=True,
+                          stave_thickness=.55,hoop_thickness=.24,rivet_radius=.17,staves=14,
+                          hoops=(.13,.84),base_thickness=.8,grain_scale=4))
+        pts=[(radius*(.89+.95*math.sin(t)),0,height*(.49+.32*math.cos(t))) for t in (math.pi*i/32 for i in range(33))]
+        verts=[(x,y+side*.7,z+dz) for x,y,z in pts for side,dz in ((-1,-.2),(1,-.2),(1,.2),(-1,.2))]
+        faces=[(i*4+j,i*4+(j+1)%4,(i+1)*4+(j+1)%4,(i+1)*4+j) for i in range(32) for j in range(4)]
+        a.mesh("Bent strap handle",verts,faces,metal,bevel=.14,smooth=True)
     elif kind == "jug":
         glaze=M.stoneware(name+" salt glaze",tone,wear,seed)
         profile=[(0,0),(.61,0),(.72,.035),(.91,.15),(1,.38),(.94,.59),(.71,.76),
