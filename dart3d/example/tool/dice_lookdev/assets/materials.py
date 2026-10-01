@@ -211,3 +211,98 @@ def end_grain(name="Sawn oak end grain", tone=(0.16, 0.085, 0.038), wear=0.8, se
     k.surface(k.bsdf(Base_Color=col, Metallic=0, Roughness=0.86,
                      Normal=k.bump(saw, 0.25, 0.045, normal=normal)))
     return m
+
+
+def polished_metal(name="Worn chrome", tone=(0.65, 0.68, 0.72), wear=0.35, seed=0, roughness=0.13):
+    m, k = E.material(name)
+    n = k.noise(mapped(k, (0.7, 0.7, 0.7), seed), 0.3, 2).outputs["Fac"]
+    scratches = k.noise(mapped(k, (0.025, 5, 1), seed), 2, 2).outputs["Fac"]
+    col = k.mix(k.math("MULTIPLY", n, wear * 0.35), (*tone, 1), tuple(c * 0.55 for c in tone) + (1,))
+    rough = k.math("ADD", roughness, k.math("MULTIPLY", n, wear * 0.18))
+    k.surface(k.bsdf(Base_Color=col, Metallic=1, Roughness=rough,
+                     Normal=k.bump(scratches, 0.12 * wear, 0.006)))
+    return m
+
+
+def ceramic(name="Glazed porcelain", tone=(0.67, 0.62, 0.48), wear=0.25, seed=0):
+    m, k = E.material(name)
+    n = k.noise(mapped(k, (1, 1, 1), seed), 2, 2).outputs["Fac"]
+    col = k.mix(k.math("MULTIPLY", n, wear * 0.16), (*tone, 1), tuple(c * 0.62 for c in tone) + (1,))
+    k.surface(k.bsdf(Base_Color=col, Roughness=k.math("ADD", 0.18, k.math("MULTIPLY", n, 0.1)),
+                     Coat_Weight=0.4, Coat_Roughness=0.12, Normal=k.bump(n, 0.15, 0.008)))
+    return m
+
+
+def vinyl(name="Diner vinyl", tone=(0.24, 0.014, 0.024), wear=0.45, seed=0):
+    m, k = E.material(name)
+    n = k.noise(mapped(k, (1, 1, 1), seed), 3, 2).outputs["Fac"]
+    col = k.ramp(n, [(0.2, tuple(c * 0.65 for c in tone)), (0.8, tone)])
+    k.surface(k.bsdf(Base_Color=col, Roughness=0.32 + wear * 0.12, Coat_Weight=0.35,
+                     Coat_Roughness=0.24, Normal=k.bump(n, 0.22, 0.012), Sheen_Weight=0.14))
+    return m
+
+
+def wet_surface(name="Wet dark laminate", tone=(0.013, 0.016, 0.021), wear=0.35, seed=0, quiet=(0, 0)):
+    m, k = E.material(name)
+    vec = k.coords().outputs["Object"]
+    sep = k.node("ShaderNodeSeparateXYZ")
+    k.link(vec, sep.inputs[0])
+    outside = k.math("MAXIMUM", k.math("MULTIPLY", k.math("SUBTRACT", k.math("ABSOLUTE", sep.outputs["X"]), quiet[0]), 0.125, clamp=True),
+                     k.math("MULTIPLY", k.math("SUBTRACT", k.math("ABSOLUTE", sep.outputs["Y"]), quiet[1]), 0.125, clamp=True))
+    n = k.noise(vec, 1.4, 2).outputs["Fac"]
+    col = k.ramp(n, [(0.25, tuple(c * 0.55 for c in tone)), (0.8, tone)])
+    damp = k.noise(vec, 0.08, 2).outputs["Fac"]
+    rough = k.mix(outside, (0.27, 0.27, 0.27, 1), k.ramp(damp, [(0.2, (0.095, 0.095, 0.095)), (0.8, (0.18, 0.18, 0.18))]))
+    k.surface(k.bsdf(Base_Color=col, Roughness=rough, Coat_Weight=k.math("ADD", 0.2, k.math("MULTIPLY", outside, 0.8)),
+                     Coat_Roughness=0.065, Normal=k.bump(n, 0.1 * wear, 0.009)))
+    return m
+
+
+def clear_glass(name="Clear glass", roughness=0.035, ior=1.46):
+    m, k = E.material(name)
+    k.surface(k.bsdf(Base_Color=(0.96, 0.98, 1, 1), Roughness=roughness,
+                     Transmission_Weight=1, IOR=ior))
+    return m
+
+
+def steam(name="Coffee steam", strength=1.2):
+    m, k = E.material(name)
+    uv = k.coords().outputs["UV"]
+    sep = k.node("ShaderNodeSeparateXYZ"); k.link(uv, sep.inputs[0])
+    edge = k.math("POWER", k.math("MAXIMUM", 0, k.math("SINE", k.math("MULTIPLY", sep.outputs["X"], 3.14159))), 2)
+    fade = k.math("POWER", k.math("MAXIMUM", 0, k.math("SINE", k.math("MULTIPLY", sep.outputs["Y"], 3.14159))), 1.5)
+    n = k.noise(uv, 7, 2, dist=1.1).outputs["Fac"]
+    alpha = k.math("MULTIPLY", k.math("MULTIPLY", edge, fade), k.math("MULTIPLY", n, 0.38))
+    tr = k.node("ShaderNodeBsdfTransparent").outputs[0]
+    k.surface(k.mix_shader(alpha, tr, k.emission((0.45, 0.55, 0.65, 1), strength)))
+    return m
+
+
+def pastry(name="Baked pastry", seed=0):
+    m, k = E.material(name)
+    n = k.noise(mapped(k, (1, 1, 1), seed), 0.6, 3).outputs["Fac"]
+    col = k.ramp(n, [(0.18, (0.09, 0.024, 0.006)), (0.52, (0.36, 0.15, 0.035)), (0.8, (0.55, 0.32, 0.1))])
+    k.surface(k.bsdf(Base_Color=col, Roughness=0.6, Normal=k.bump(n, 0.35, 0.05)))
+    return m
+
+
+def rain_pane(name="Rain pane"):
+    m, k = E.material(name)
+    vec = k.coords().outputs["Generated"]
+    sep = k.node("ShaderNodeSeparateXYZ"); k.link(vec, sep.inputs[0])
+    low = k.math("MULTIPLY", k.math("MAXIMUM", 0, k.math("SUBTRACT", 0.12, sep.outputs["Z"])), 0.65)
+    pane = k.bsdf(Base_Color=(0.88, 0.93, 1, 1), Roughness=k.math("ADD", 0.035, low), Transmission_Weight=1, IOR=1.46)
+    tr = k.node("ShaderNodeBsdfTransparent").outputs[0]
+    k.surface(k.mix_shader(k.math("ADD", 0.055, low), tr, pane))
+    return m
+
+
+def wet_asphalt(name="Wet asphalt", seed=0):
+    m, k = E.material(name)
+    vec = mapped(k, (1, 1, 1), seed)
+    n = k.noise(vec, 1.7, 2).outputs["Fac"]
+    ripple = k.noise(mapped(k, (0.05, 0.7, 1), seed), 1.2, 2).outputs["Fac"]
+    col = k.ramp(n, [(0.2, (0.008, 0.011, 0.017)), (0.8, (0.019, 0.025, 0.033))])
+    k.surface(k.bsdf(Base_Color=col, Roughness=k.math("ADD", 0.13, k.math("MULTIPLY", ripple, 0.11)),
+                     Coat_Weight=1, Coat_Roughness=0.09, Normal=k.bump(ripple, 0.25, 0.09)))
+    return m
