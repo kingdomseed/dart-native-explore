@@ -28,10 +28,16 @@ depends on it.
 
 **Next, in order.**
 
-1. **Fire tablet baseline** — run T2 on the second Android device
-   (Mali-G52, API 30) and record what breaks. It is the new low-end floor.
+1. **Fire tablet findings** — the baseline ran on 2026-10-01
+   (`docs/artifacts/s0-fire-tablet-baseline/`, #44). The scene view did
+   not start below API 33 (jolt-jni's `Cleaner`; fixed in #44). Still
+   open from it: the dice tray rim is wrong in landscape, the dice
+   screen runs at about 15–20 fps on the Mali-G52, and native lifetime
+   on API 26–32 needs an audit now that the automatic cleaner is off
+   there.
 2. **S0h cold start** — ~10–14 s of material compile before the first
-   frame on a fresh install; every demo opens with it.
+   frame on a fresh install (about 15 s on the Fire tablet); every demo
+   opens with it.
 3. **P3 DR3** — notation entry, count-up total, audio. Needs P1's
    pre-rolled parser contract (explode/reroll stays on the virtual
    fallback until `CallbackDiceRoller` is async).
