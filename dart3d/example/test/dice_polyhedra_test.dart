@@ -95,11 +95,12 @@ void main() {
     );
   });
 
-  test('labels: 00 on the tens die, a dot under 6 and 9', () {
+  test('labels: 00 on the tens die, a dot by the 6 only', () {
     final d10t = buildDieGeo('d10t');
     expect(d10t.numbered.firstWhere((f) => f.value == 0).label('d10t'), '00');
     final d20 = buildDieGeo('d20');
-    expect(d20.numbered.firstWhere((f) => f.value == 9).label('d20'), '9.');
+    expect(d20.numbered.firstWhere((f) => f.value == 9).label('d20'), '9');
+    expect(d20.numbered.firstWhere((f) => f.value == 6).label('d20'), '6.');
     final d8 = buildDieGeo('d8');
     expect(d8.numbered.firstWhere((f) => f.value == 6).label('d8'), '6');
   });

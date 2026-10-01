@@ -112,13 +112,13 @@ final class DieFaceGeo {
   /// The numeral's font size (em), world units.
   final double em;
 
-  /// The label printed: "00" on the tens die, "6." / "9." where they
-  /// could be misread upside down.
+  /// The label printed: "00" on the tens die, and "6." where a 6 could be
+  /// misread upside down as a 9 (the dot marks the 6, so a 9 needs none).
   String? label(String kind) {
     final v = value;
     if (v == null) return null;
     if (kind == 'd10t') return v == 0 ? '00' : '$v';
-    if ((v == 6 || v == 9) && const {'d10u', 'd12', 'd20'}.contains(kind)) {
+    if (v == 6 && const {'d10u', 'd12', 'd20'}.contains(kind)) {
       return '$v.';
     }
     return '$v';
