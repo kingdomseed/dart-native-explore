@@ -29,12 +29,12 @@ def atelier_sky(name="Clouded sunset",strength=1.3,seed=1):
     return m
 
 
-def cut_stone(name="Faceted coloured crystal", tone=(.025,.46,.19), wear=.1, seed=1):
+def cut_stone(name="Faceted coloured crystal", tone=(.025,.46,.19), wear=.1, seed=1, ior=1.78):
     m,k=E.material(name)
     n=k.noise(mapped(k,(.6,.6,.6),seed),2,2).outputs["Fac"]
     col=k.mix(k.math("MULTIPLY",n,.14),(*tone,1),tuple(min(1,c*1.4+.04) for c in tone)+(1,))
     k.surface(k.bsdf(Base_Color=col,Metallic=0,Roughness=k.math("ADD",.025,k.math("MULTIPLY",n,wear*.08)),
-                     Transmission_Weight=.93,IOR=1.78,Coat_Weight=.25,Coat_Roughness=.035))
+                     Transmission_Weight=.93,IOR=ior,Coat_Weight=.25,Coat_Roughness=.035))
     return m
 
 
@@ -808,4 +808,32 @@ def bread_crust(name="Scored bread crust", seed=1):
     cut=k.math("MULTIPLY",attr.outputs["Fac"],.9)
     color=k.mix(cut,crust,(.47,.31,.14,1))
     k.surface(k.bsdf(Base_Color=color,Roughness=.73,Normal=k.bump(pore,.25,.032),Subsurface_Weight=.025))
+    return m
+
+
+def workbench_stain(name="Lapidary oil stain",tone=(.035,.018,.007),seed=1):
+    m,k=E.material(name)
+    uv=k.coords().outputs["Generated"]
+    sep=k.node("ShaderNodeSeparateXYZ");k.link(uv,sep.inputs[0])
+    x=k.math("MULTIPLY",k.math("SUBTRACT",sep.outputs["X"],.5),2)
+    y=k.math("MULTIPLY",k.math("SUBTRACT",sep.outputs["Y"],.5),2)
+    r=k.math("ADD",k.math("MULTIPLY",x,x),k.math("MULTIPLY",y,y))
+    edge=k.math("MAXIMUM",k.math("SUBTRACT",1,r),0)
+    n=k.noise(mapped(k,(1,1,1),seed),1.6,3).outputs["Fac"]
+    opacity=k.math("MULTIPLY",edge,k.math("MULTIPLY",n,.78))
+    transparent=k.node("ShaderNodeBsdfTransparent").outputs[0]
+    k.surface(k.mix_shader(opacity,transparent,k.bsdf(Base_Color=(*tone,1),Roughness=.72)))
+    return m
+
+
+def rough_mineral(name="Fractured beryl",tone=(.025,.3,.13),wear=.5,seed=1):
+    m,k=E.material(name)
+    vec=mapped(k,(1,1,1),seed)
+    n=k.noise(vec,3.5,3,.7).outputs["Fac"]
+    v=k.voronoi(vec,2.8,feature="DISTANCE_TO_EDGE").outputs["Distance"]
+    fracture=k.math("MULTIPLY",k.math("LESS_THAN",v,.028),k.math("GREATER_THAN",n,.48))
+    col=k.mix(k.math("MULTIPLY",fracture,.28),(*tone,1),(.55,.79,.64,1))
+    k.surface(k.bsdf(Base_Color=col,Transmission_Weight=.78,IOR=1.59,
+        Roughness=k.math("ADD",.11,k.math("MULTIPLY",n,.18*wear)),
+        Normal=k.bump(k.math("ADD",n,k.math("MULTIPLY",fracture,.15)),.24,.03)))
     return m

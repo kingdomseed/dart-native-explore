@@ -382,26 +382,46 @@ Gemcutter adds reusable atelier assets:
 | `jeweler_bench` | Existing pegged table joinery with rubbed walnut boards, apron drawers, drop pulls and a removable V-notched bench pin; width, depth, height, wood_tone, bench_pin, rear_recess |
 | `bench_lamp` | Weighted foot, paired adjustable arms, tension springs, locking pivots and a hollow spun reflector; height, reach, radius, head_tilt, metal_finish, energy, color |
 | `balance_scale` | Turned base and column, knife-edge beam, pointer, linked suspensions and dished pans; height, width, pan_radius, tilt, metal_finish |
-| `cut_gem` | Closed, flat-shaded brilliant or stepped emerald cuts with a crown, girdle and pavilion; radius, cut, tone |
+| `cut_gem` | Closed, flat-shaded brilliant, oval, pear, cushion or stepped emerald cuts with a crown, girdle and pavilion; radius, cut, tone, ior, glints |
 | `gem_case` | Joinered walnut case, velvet compartments, hinged padded lid and brass fittings; width, depth, height, rows, columns, lid_angle, wood_tone, velvet_tone, stones |
 | `jeweler_tools` | Hollow knurled optical loupe with convex lens, spring tweezers with tapered jaws, or pear-handled graver; kind, length, radius, wood_tone, metal_finish |
 | `drawer_chest` | Framed cabinet, individually recessed drawer fronts, mouldings, turned knobs and bun feet; width, depth, height, rows, columns, wood_tone, metal_finish |
-| `atelier_window` | Reused oak casement and catches, procedural sunset clouds, layered gabled streets and pointed towers; width, height, wood_tone, view, exterior_slope, sky_strength, energy |
+| `atelier_window` | Reused oak casement and catches, procedural sunset clouds, layered gabled streets and pointed towers; width, height, wood_tone, view, exterior_slope, sky_strength, energy, city_style, town_altitude, sky_altitude |
 
 All eight modules accept `name`, `loc`, `rot_z`, `wear` and `seed`. The three
 added material recipes are `bench_walnut`, `cut_stone` and `atelier_sky`;
 pre-existing material functions and asset defaults are unchanged.
 
-The original velvet, walnut tray base, padded rim and four light calls remain
-unchanged. The broadside 25 mm camera looks down 36.2 degrees at effective
-f/8. A curved rear recess exposes the balance; lowered, supported working
-bays carry the balance, lamp and drawer chest. The tray spans 77.7 percent
-of the image. Foreground loupes and tweezers clear the tray by at least
-10.8 cm and rest on the bench. The task lamp remains cool white; sunset
-and amber reflections warm the walnut and brass, with emerald at the right.
-Room lamps use environment receivers. The global grade is +0.85 EV and
-gamma 0.75, with a 0.3-pixel phone filter and the normal 1.5-pixel room
-filter. The half-resolution gate passes without altering the tray or dice.
+Round 3 pass 2 adds these parameterised assets (all have `name`, `loc`,
+`rot_z`, `wear` and `seed`):
+
+| Module | Geometry and main variation controls |
+| --- | --- |
+| `gem_scatter` | Resting faceted stones in five cuts and five colours, with sparse facet glints; width, depth, count, radius range, quiet rectangle, occupied rectangles |
+| `loupe_stand` | Weighted turned foot, locking collar, articulated arm and convex optical loupe; height, radius, metal_finish |
+| `mineral_display` | Rough fractured beryl cluster on an oval velvet cushion and turned brass pedestal; radius, height, tone, metal_finish |
+| `jeweler_tool_rack` | Walnut rack with brass fasteners, pear-handled gravers and two pivoted pliers; width, height, wood_tone, metal_finish |
+| `bench_patina` | Scored grain, polishing-oil marks and curled brass filings; width, depth, quiet rectangle, wear |
+
+`materials.py` adds `workbench_stain` and `rough_mineral`; `cut_stone`
+accepts an IOR with its original 1.78 default. `cut_gem` keeps its old
+geometry by default; optional alternate cuts and tiny coloured facet glints
+are used for the loose stones. `atelier_window` adds a spired skyline option
+and independent sky/city altitude controls; its existing defaults remain.
+
+The velvet floor, padded rim, walnut base and four original tray-light calls
+remain unchanged. The straight main workbench top is raised to z=0.402 cm,
+just below the velvet at z=0.410, hiding the projecting walnut board.
+The 21.5 mm broadside room camera looks down 23.1 degrees at effective f/8;
+the near rim is cropped and the d20 spans 7.8 percent of the image. The
+nearest foreground instrument has 10.6 cm plan clearance. Cases, tools,
+loose stones and supported rear workbenches were checked for intersection.
+The cool-white task lamp, amber sunset and emerald accent create separate
+pools. A linked grazing light illuminates only the unchanged velvet mesh.
+Room grading is +0.25 EV / gamma 0.95; the phone view retains +0.85 EV /
+gamma 0.75 and its 0.3-pixel filter. Room filtering remains 1.5 pixels.
+The ten earlier rooms are rechecked serially at 25 percent / 16 samples.
+
 
 
 ### Round 3 pass 1 small worktop dressing

@@ -1304,30 +1304,40 @@ Lighting recipes (the tray lights are unchanged unless noted):
   Gate (full resolution, 128 samples): numeral 6.52 (d8), die vs tray 2.37,
   Gate: numeral 6.52 (d8), die vs tray 2.37, stroke 0.123–0.128, PASS.
 
-- **Gemcutter — the jeweler's atelier.** Round 2 replaces the empty bench
-  with a joinered walnut workbench, optical loupe, tapered spring tweezers,
-  hinged velvet specimen cases with brilliant and emerald cuts, a turned
-  brass balance with suspended pans, an articulated daylight lamp, and a
-  framed chest of fifteen drawers with brass pulls. The reused oak casement
-  opens onto layered gables, spires and scattered windows against a clouded
-  blue-and-amber sunset. An emerald cage lantern supplies the right accent.
-  The main bench has a continuous straight far edge; the balance and rear
-  workbenches stand behind it on lower connected landings. The balance
-  workbench is 10 cm taller so its pans remain visible above that edge. The tray, its walnut base, padded velvet
-  rim and all four original lighting calls remain unchanged.
-  Camera: broadside, 25 mm, looking down 36.2 degrees at effective f/8,
-  converted for centimetre scene units; the tray spans 77.7 percent of the
-  frame with its near rim cropped at the bottom. Foreground tools remain
-  at least 10.8 cm clear in plan. The cool-white task pool, warm sunset and
-  wall returns, and emerald edge use environment light receivers. Exposure
-  is +0.85 EV with gamma 0.75; a 0.3-pixel phone filter preserves the small
-  enamel strokes, while the room retains the normal 1.5-pixel filter. No
-  dice or tray material changes, volumes, lettering or downloaded assets.
-  Shared additions are three new material recipes only; all existing
-  material functions are unchanged. The ten earlier approved rooms are
-  rechecked serially at 25 percent / 16 samples.
-  Pass 1 preview gate (50% / 32 samples): numeral 5.04 (d20),
-  die vs tray 3.50, stroke 0.121–0.130, PASS.
+- **Gemcutter — the jeweler's atelier.** Round 3 pass 2 brings the room
+  camera closer: 21.5 mm, 23.1 degrees down, effective f/8 in centimetre
+  units, focused on the dice. The near rim is cropped; the d20 spans 7.8
+  percent of the frame. The straight walnut bench top is raised to
+  z=0.402 cm, immediately below the original velvet plane at z=0.410,
+  concealing the projecting walnut base without moving the tray. The tray
+  geometry, materials and all four original light calls are unchanged.
+  Open compartmented cases flank irregular spills of diamonds, emeralds,
+  sapphires, rubies and champagne stones in brilliant, stepped, oval, pear
+  and cushion cuts. Their sharp facets use varied IORs and sparse coloured
+  glints. A handheld optical loupe, mounted loupe, resting gravers and
+  tweezers frame the left, with a rough beryl cluster on velvet and a
+  turned brass pedestal. The right carries an emerald lantern, drawer
+  chest and rack of gravers and pivoted pliers. The larger articulated
+  daylight lamp and centred balance stand on a supported rear bench;
+  separate working heights keep their silhouettes visible. The nearest
+  instrument clears the rim by 10.6 cm in plan; a mesh intersection audit
+  covers the cases, loose stones and tabletop instruments.
+  Scored grain, oil marks and curled filings stay outside the play margin.
+  The enlarged mullioned casement has layered slender spires, a warm sunset,
+  sill greenery and candles. Cool task light, amber sunset pools and an
+  emerald accent light environment receivers; an additional grazing room
+  light reaches only the unchanged velvet floor and rim. The room uses
+  +0.25 EV / gamma 0.95 and a 1.5-pixel filter; top-down retains +0.85 EV /
+  gamma 0.75 and the 0.3-pixel phone filter. No dice material, tray material,
+  renderer or gate changes. Velvet fibre detail remains limited by the
+  protected material; the distant skyline is deliberately soft.
+  Shared additions preserve existing defaults: `cut_stone` gains an IOR
+  parameter, `cut_gem` gains optional cuts/glints, and `atelier_window`
+  gains spire and altitude controls. All ten approved rooms are checked
+  serially at 25% / 16 samples after these changes.
+  Pass 2 preview gate (50% / 32 samples): numeral 5.39 (d20),
+  die vs tray 3.56, stroke 0.121–0.130, PASS.
+  Gate: numeral 6.82 (d20), die vs tray 3.39, stroke 0.121–0.130, PASS.
 
 ## 4. dart3d features to verify (before building these for real)
 

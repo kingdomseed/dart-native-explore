@@ -16,6 +16,8 @@ RIM_T,RIM_H=2.8,2.6
 def _room_sampling(scene, depsgraph=None):
     if scene.camera and scene.camera.name == "room" and "Gemcutter broadside room" in scene.objects:
         scene.cycles.filter_width=1.5
+        scene.view_settings.gamma=.95
+        scene.view_settings.exposure=.25
 
 
 def build(scene):
@@ -39,7 +41,7 @@ def build(scene):
     E.light(scene, "AREA", "rim", (30, 60, 20), 2000, color=(0.7, 0.9, 1.0), size=30, target=(0, 0, 2))
     return dict(samples=128,exposure=.85,topdown=dict(width=W+2*RIM_T+1),
         hero=dict(dist=32,elev=30,az=-8,lens=65,fstop=2.8),play_view=True,
-        hero_layout={"d20":((-4.8,0),18,8),"d12":((-2.8,9.5),11,-14),
+        hero_layout={"d20":((-2.5,0),18,8),"d12":((-2.8,9.5),11,-14),
                      "d10u":((3.5,-9.5),9,12),"d10t":((-2,-9.5),40,-6),
                      "d8":((3.7,10.8),5,16),"d6":((2,-2),3,-9),"d4":((4.1,4.9),3,22)},
         tray_half=(W/2+RIM_T,D/2+RIM_T),room_cam=room(scene))
@@ -47,65 +49,80 @@ def build(scene):
 
 def room(scene):
     from assets import (geometry as G,materials as M,jeweler_bench,bench_lamp,balance_scale,
-        gem_case,cut_gem,jeweler_tools,drawer_chest,atelier_window,lantern,
-        book,shelf,candles,potted_plant)
+        gem_case,cut_gem,jeweler_tools,drawer_chest,atelier_window,lantern,book,shelf,candles,
+        potted_plant,gem_scatter,loupe_stand,mineral_display,jeweler_tool_rack,bench_patina)
     before=set(bpy.data.objects)
     a=G.Asset("Atelier architecture")
     floor=-130
-    wood=M.oak("Atelier panelling",(.08,.028,.014),.65,4,axis="Z")
-    plaster=M.limewash("Warm atelier plaster",(.24,.17,.12),.55,3)
+    wood=M.oak("Atelier panelling",(.065,.022,.009),.75,4,axis="Z")
+    plaster=M.limewash("Warm atelier plaster",(.18,.115,.069),.6,3)
     a.block("Oak atelier floor",(420,410,5),(0,100,floor-2.5),RC.planks("Atelier boards"),.3)
     a.block("Player floor landing",(300,100,54.6),(0,-20,-102.7),wood,.4)
-    a.block("Balance bay landing",(116,64,24.6),(-25,75,-117.7),wood,.4)
-    a.block("Chest bay landing",(78,69,11.6),(49,101,-124.2),wood,.4)
+    a.block("Balance bay landing",(116,64,24.6),(0,65,-117.7),wood,.4)
+    a.block("Chest bay landing",(78,69,11.6),(44,96,-124.2),wood,.4)
     for i in range(4):a.block("Workshop level step",(38,14,13.65),(-100,37+i*14,-82.225-i*13.65),wood,.4)
-    wall=RC.wall_plane("Panelled atelier back wall",400,260,((42,83,150,142),),plaster,thickness=7)
-    a.add(wall);wall.location=(0,190,floor)
+    wall=RC.wall_plane("Panelled atelier back wall",400,260,((16,140,180,180),),plaster,thickness=7)
+    a.add(wall);wall.location=(0,172,floor)
     a.block("Atelier side wall",(6,400,260),(-198,0,0),plaster,.3)
     for x in range(-186,197,38):
-        a.block("Walnut wall pilaster",(4,3,234),(x,185,-9),wood,.5)
-        if x< -48 or x>132:
-            a.block("Recessed oak wall panel",(31,1,64),(x+19,186,-52),wood,.4)
-    a.block("Panelled dado rail",(400,4,6),(0,184,-13),wood,.8)
-    jeweler_bench.build("Hero walnut workbench",loc=(0,-2,-75.4),width=124,depth=76,height=75,bench_pin=False,seed=4)
-    jeweler_bench.build("Balance workbench",loc=(-25,75,-105.4),width=106,depth=62,height=85,seed=7)
-    jeweler_bench.build("Chest workbench",loc=(49,101,-118.4),width=72,depth=67,height=75,seed=9)
-    bench_lamp.build("Adjustable daylight bench lamp",loc=(-55,75,-20.4),reach=12,height=25,radius=8.7,rot_z=.35,head_tilt=-.65,energy=7500,seed=8)
-    balance_scale.build("Brass assay balance",loc=(-15,68,-20.4),height=30,width=29,pan_radius=4.8,rot_z=.05,seed=6)
-    gem_case.build("Left open specimen case",loc=(-40,28,-.4),width=18,depth=14,lid_angle=68,seed=3)
-    gem_case.build("Right open specimen case",loc=(48,27,-.4),width=18,depth=16,lid_angle=175,seed=7)
-    gem_case.build("Work in progress specimen case",loc=(-55,55,-20.4),width=24,depth=17,lid_angle=112,seed=2)
-    jeweler_tools.build("Foreground optical loupe",loc=(-32,5,-.4),radius=2.5,seed=4)
-    jeweler_tools.build("Foreground steel tweezers",loc=(-34,3,-.42),kind="tweezers",rot_z=-.72,length=15,seed=4)
-    jeweler_tools.build("Right spring tweezers",loc=(33,13,-.42),kind="tweezers",rot_z=.4,length=12,seed=8)
-    # Pale folded gem papers sit outside the ten-centimetre play margin.
-    paper=M.parchment("Folded white gem paper",(.66,.63,.55),3)
-    for x,y,angle in ((-40,15,.3),(39,9,-.15)):
-        ob=a.block("Folded gem packet",(8,7,.08),(x,y,-.34),paper,.04);ob.rotation_euler.z=angle
-        a.add(cut_gem.build("Loose specimen on paper",loc=(x,y,-.29),radius=1.3,tone=(.05,.48,.25),cut="emerald",rot_z=angle,seed=7))
-    drawer_chest.build("Many-drawered gem chest",loc=(49,101,-43.4),width=42,depth=26,height=39,columns=3,rows=5,rot_z=-.13,seed=4)
-    for i in range(9):
-        jeweler_tools.build("Upright precision graver",loc=(32+i*4,101,-4.4),kind="graver",length=14+i%3*3,seed=i)
-    a.block("Graver holder base",(38,8,3),(48,101,-2.9),wood,.6)
-    lantern.build("Emerald assay lantern",loc=(34,25,-.4),height=18,radius=3.5,chain_length=0,
-        metal_finish="brass",glass_tone=(.03,.48,.22),glow_color=(.015,.38,.11),light_color=(.10,1,.38),energy=1100,seed=6)
-    atelier_window.build("Sunset city casement",loc=(42,183,-119),width=142,height=136,exterior_slope=.36,energy=150000,seed=11)
-    potted_plant.build("Window vine",loc=(-24,168,-131),height=62,radius=8,seed=4)
-    shelf.build("Jewel bottles on left shelves",loc=(-126,178,-91),width=90,levels=3,spacing=35,count=5,seed=9)
-    for x in (-5,101):candles.build("Sill candle",loc=(x,170,-131),height=11,radius=1.7,energy=950,seed=3)
-    for x,y,z in ((-65,89,-20.4),):
-        book.build("Unlettered ledger",loc=(x,y,z),width=18,depth=24,thickness=3.4,tone=(.05,.022,.012),seed=4)
+        a.block("Walnut wall pilaster",(4,3,234),(x,167,-9),wood,.5)
+        if x< -84 or x>114:a.block("Recessed oak wall panel",(31,1,64),(x+19,168,-52),wood,.4)
+    a.block("Panelled dado rail",(400,4,6),(0,166,-13),wood,.8)
+    top=.402
+    desk=jeweler_bench.build("Hero walnut workbench",loc=(0,-2,-75.4),width=112,depth=82,height=75.802,
+        wood_tone=(.073,.027,.010),wear=.9,bench_pin=False,seed=4)
+    for ob in desk.children_recursive:
+        if ob.name.startswith(("Old heat stain","Shallow work scar")):
+            ob.hide_render=True
+        if ob.name.startswith("Oak plank"):
+            for mat in ob.data.materials:
+                for node in mat.node_tree.nodes:
+                    if node.type=="BSDF_PRINCIPLED":node.inputs["Coat Weight"].default_value=.1
+    bench_patina.build(loc=(0,-2,top),width=102,depth=78,quiet=(29,25),seed=7)
+    jeweler_bench.build("Balance workbench",loc=(0,74,-105.4),width=96,depth=66,height=99.802,seed=7)
+    jeweler_bench.build("Chest workbench",loc=(43,77,-118.4),width=66,depth=60,height=103.4,seed=9)
+    bench_lamp.build("Adjustable daylight bench lamp",loc=(-35,52,-5.598),reach=11,height=28,radius=11.5,
+        rot_z=.6,head_tilt=-.45,energy=9000,color=(.94,.96,1),seed=8)
+    balance_scale.build("Brass assay balance",loc=(0,85,-5.598),height=22,width=26,pan_radius=5.3,rot_z=.04,seed=6)
+    gem_case.build("Left open specimen case",loc=(-19,34,top),rot_z=0,width=17,depth=13,height=3,lid_angle=158,columns=4,rows=3,seed=3)
+    gem_case.build("Right open specimen case",loc=(22,30,top),rot_z=0,width=18,depth=13,height=3,lid_angle=150,columns=4,rows=3,seed=7)
+    jeweler_tools.build("Foreground optical loupe",loc=(-23,24,top),radius=2.6,seed=4)
+    jeweler_tools.build("Foreground steel tweezers",loc=(-33,27,top-.015),kind="tweezers",rot_z=math.pi/2,length=12,seed=4)
+    for i in range(2):
+        tool=jeweler_tools.build("Resting pear-handled graver",loc=(-40,20+i*3.5,top+1.55),kind="graver",length=9+i,seed=13+i)
+        tool.rotation_euler=(math.pi/2,0,math.pi/2)
+    loupe_stand.build("Mounted inspection loupe",loc=(-5,33,top),height=13,radius=2.1,rot_z=-.2,seed=5)
+    mineral_display.build("Rough emerald on velvet",loc=(-33,33,top),radius=4.4,height=7.8,seed=6)
+    occupied=[(-19,34,9,7),(22,30,10,7),(-23,24,3.3,3.3),(-36,23,6,5),(-33,27,6.5,1.2),(-33,33,4.8,4.8),(-5,33,4.2,4.2),(36,34,4,4)]
+    gem_scatter.build("Left sorting spill",loc=(-29,26,top+.025),width=19,depth=6,count=35,radius=(.4,1.15),quiet=(29,22),occupied=occupied,seed=19)
+    gem_scatter.build("Right sorting spill",loc=(30,25,top+.025),width=17,depth=8,count=32,radius=(.4,1.25),quiet=(29,22),occupied=occupied,seed=26)
+    gem_scatter.build("Rear diamond sorting",loc=(0,27,top+.025),width=42,depth=9,count=26,radius=(.4,1.0),quiet=(29,22),occupied=occupied,seed=9)
+    paper=M.parchment("Folded white gem paper",(.43,.39,.31),3)
+    for x,y,angle in ((-38,5,.3),(39,5,-.15)):
+        ob=a.block("Folded gem packet",(7,6,.06),(x,y,top+.03),paper,.04);ob.rotation_euler.z=angle
+        a.add(cut_gem.build("Loose specimen on paper",loc=(x,y,top+.07),radius=1.1,tone=(.02,.36,.16),cut="emerald",ior=1.59,glints=2,rot_z=angle,seed=7))
+    drawer_chest.build("Many-drawered gem chest",loc=(43,70,-15),width=34,depth=25,height=25,columns=3,rows=5,rot_z=-.12,seed=4)
+    jeweler_tool_rack.build("Precision graver and plier rack",loc=(42,70,10),width=25,height=10,rot_z=-.12,seed=8)
+    lantern.build("Emerald assay lantern",loc=(36,34,top),height=15,radius=3.3,chain_length=0,
+        metal_finish="brass",glass_tone=(.03,.48,.22),glow_color=(.015,.38,.11),light_color=(.10,1,.38),energy=800,seed=6)
+    atelier_window.build("Sunset city casement",loc=(16,165,-75),width=170,height=170,exterior_slope=.44,
+        energy=60000,sky_strength=1.5,city_style="spires",town_altitude=60,sky_altitude=170,seed=11)
+    for x,h in ((-58,65),(84,58)):
+        potted_plant.build("Sill climbing green",loc=(x,155,-84.5),height=h,radius=6,seed=4+int(h))
+    shelf.build("Jewel bottles on left shelves",loc=(-115,159,-91),width=82,levels=3,spacing=32,count=5,seed=9)
+    for i,x in enumerate((-28,37,53)):
+        candles.build("Sunset sill candle",loc=(x,156,-84.5),height=12+i*3,radius=1.6,energy=900,seed=3+i)
+    book.build("Unlettered ledger",loc=(-32,82,-5.598),width=18,depth=24,thickness=3.4,tone=(.05,.022,.012),seed=4)
     def area(name,loc,target,energy,color,size):
         light=a.light(name,loc,energy,color,size,target,"AREA")
         light.visible_glossy=True;light.data.specular_factor=1
-    area("Daylight task pool",(-27,13,40),(-4,5,0),11000,(.82,.91,1),18)
-    area("Amber glint on left walnut",(-46,15,28),(-29,8,0),9500,(1,.54,.24),24)
-    area("Sunset on workbench",(63,99,38),(-20,15,0),48000,(1,.56,.28),52)
-    area("Warm drawer-front return",(47,49,16),(49,94,-23),21000,(1,.66,.37),32)
-    area("Sunset on drawers",(32,155,-11),(67,94,-30),70000,(1,.61,.33),58)
-    area("Warm wall lamp pool",(-112,127,0),(-89,159,-47),60000,(1,.64,.36),43)
-    area("Cool open-window return",(5,134,10),(-16,70,-30),35000,(.48,.65,1),60)
-    area("Emerald edge reflection",(48,27,12),(33,-3,0),2200,(.09,1,.36),14)
+        return light
+    area("Daylight task pool",(-27,22,29),(-24,15,0),11000,(.90,.95,1),10)
+    area("Amber sunset pool on walnut",(44,72,17),(-25,18,0),24000,(1,.49,.20),23)
+    area("Warm drawer-front return",(30,39,4),(43,79,-23),6500,(1,.58,.26),14)
+    area("Wall candle reflected warmth",(-92,125,-13),(-99,155,-43),32000,(1,.54,.25),28)
+    area("Small gem inspection glint",(-17,35,20),(-29,19,0),2800,(.84,.94,1),2)
+    area("Emerald edge reflection",(38,26,10),(30,3,0),1600,(.09,1,.36),8)
     receivers=bpy.data.collections.new("Gemcutter environment light receivers")
     for ob in set(bpy.data.objects)-before:
         if ob.type in {"MESH","CURVE"}:receivers.objects.link(ob)
@@ -113,5 +130,10 @@ def room(scene):
     for ob in set(bpy.data.objects)-before:
         if ob.type=="LIGHT" and ob.light_linking.receiver_collection is None:ob.light_linking.receiver_collection=receivers
         if ob!=group.root and ob.parent is None:group.add(ob)
-    return dict(loc=(-28,-5,27),target=(0,0,6.2),lens=25,
-        fstop=8*scene.unit_settings.scale_length,focus=(0,0,2))
+    velvet_receivers=bpy.data.collections.new("Gemcutter velvet grazing receivers")
+    for ob in tuple(bpy.data.objects):
+        if ob.name in {"velvet","rim"} and ob.type=="MESH":velvet_receivers.objects.link(ob)
+    grazing=E.light(scene,"AREA","Low task reflection on velvet",(13,16,5),3500,color=(1,.72,.44),size=7,target=(0,0,1))
+    grazing.light_linking.receiver_collection=velvet_receivers
+    return dict(loc=(-18,-2,16),target=(3,0,7),lens=21.5,
+        fstop=8*scene.unit_settings.scale_length,focus=(-3,0,1.6))
