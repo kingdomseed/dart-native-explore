@@ -861,6 +861,58 @@ final class SceneViewHost: SCNView {
     /// decode, not N. Only touched on the render queue.
     private var realizePending = false
 
+    /// TRS fields `setTransforms` has written per node since the last
+    /// `loadScene` (bit 0 translation, 1 rotation, 2 scale). A
+    /// payload-arrival re-realize rebuilds every node at its manifest
+    /// pose; these fields are live state the manifest never saw, so
+    /// they carry across it. Only written fields carry, and never on a
+    /// node a clip drives: its current pose is a mid-clip sample, and
+    /// the sampler re-captures the rebuilt node's pose as the bind pose.
+    private var transformWrites: [UInt64: UInt8] = [:]
+    /// Ids written in the current drain: their presentation node has
+    /// not caught up with the model node yet.
+    private var writtenThisDrain: Set<UInt64> = []
+
+    private typealias WrittenPose = (
+        id: UInt64, mask: UInt8, position: SCNVector3,
+        orientation: SCNQuaternion, scale: SCNVector3)
+
+    /// The written nodes' current local TRS — current rather than
+    /// as-written: a dynamic body has moved since its write.
+    private func captureTransformWrites() -> [WrittenPose] {
+        var out: [WrittenPose] = []
+        animLock.lock()
+        let clipDriven = Set(
+            animTargets.filter { $0.value.drivesTransform }.keys)
+        animLock.unlock()
+        for (id, mask) in transformWrites where !clipDriven.contains(id) {
+            guard let node = nodesById[id] else { continue }
+            let live = node.physicsBody?.type == .dynamic
+                && !writtenThisDrain.contains(id) ? node.presentation : node
+            out.append((id: id, mask: mask, position: live.position,
+                        orientation: live.orientation, scale: live.scale))
+        }
+        return out
+    }
+
+    private func restoreTransformWrites(_ written: [WrittenPose]) {
+        var restored = 0
+        for pose in written {
+            guard let node = nodesById[pose.id] else { continue }
+            if pose.mask & 1 != 0 { node.position = pose.position }
+            if pose.mask & 2 != 0 { node.orientation = pose.orientation }
+            if pose.mask & 4 != 0 { node.scale = pose.scale }
+            if pose.mask & 3 != 0, let body = node.physicsBody,
+               body.type != .dynamic {
+                body.resetTransform()
+            }
+            restored += 1
+        }
+        if restored > 0 {
+            d3Log("re-realize: restored \(restored) written transform(s)")
+        }
+    }
+
     func retire(_ obj: AnyObject) { retiredThisFrame.append(obj) }
 
     func enqueueSceneWork(_ work: @escaping () -> Void) {
@@ -876,6 +928,7 @@ final class SceneViewHost: SCNView {
         // the passes that could still reference them have finished.
         retiredLastFrame = retiredThisFrame
         retiredThisFrame = []
+        writtenThisDrain.removeAll()
         pendingWorkLock.lock()
         let work = pendingWork
         pendingWork.removeAll()
@@ -902,12 +955,14 @@ final class SceneViewHost: SCNView {
                 animLock.lock()
                 let carriedClips = animClips
                 animLock.unlock()
+                let written = captureTransformWrites()
                 FsceneRealizer.realize(manifest: manifest, into: self,
                                        preserveStage: true)
                 // W15: the re-realize discarded the surgically
                 // streamed subtrees with the rest of the scene —
                 // rebuild each from its recorded load batch.
                 replayAfterRealize()
+                restoreTransformWrites(written)
                 animLock.lock()
                 for (key, clip) in carriedClips
                 where animationsById[key] != nil && animClips[key] == nil {
@@ -1001,6 +1056,7 @@ final class SceneViewHost: SCNView {
         streamedSubtreeOps.removeAll()
         nodeOpJournal.removeAll()
         commandCreatedKeys.removeAll()
+        transformWrites.removeAll()
         subtreeVisibleStamp = nil
         // Shadow-tier registry is per-scene — repopulated by the
         // coming decode's light pass.
@@ -1086,6 +1142,10 @@ final class SceneViewHost: SCNView {
                     + (mask & 4 != 0 ? 12 : 0)
                 continue
             }
+            if mask & 7 != 0 {
+                transformWrites[id, default: 0] |= mask & 7
+                writtenThisDrain.insert(id)
+            }
             if mask & 1 != 0 {
                 node.position = D3Wire.position([
                     Double(D3Wire.f32LE(data, off)),
@@ -1159,6 +1219,15 @@ final class SceneViewHost: SCNView {
         guard let op = json["op"] as? String else { return }
         commandDepth += 1
         defer { commandDepth -= 1 }
+        // A structural rewrite or removal replays from the journal
+        // instead of carrying the node's earlier `setTransforms` state.
+        if !replayingOps,
+           op == "addNode" || op == "removeNode" || (op == "updateNode"
+               && (json["flags"] as? [String] ?? []).contains("transform")),
+           let token = json["node"] as? String,
+           let key = D3Wire.localIdKey(token) {
+            transformWrites[key] = nil
+        }
         // Declared after the depth defer, so it runs first — the
         // journal step still sees this dispatch's depth.
         let journaled = op == "addNode" || op == "updateNode"
@@ -1568,6 +1637,7 @@ final class SceneViewHost: SCNView {
             // command-added node's addNode must not resurrect it on
             // the next re-realize (replay itself never prunes).
             if !replayingOps {
+                transformWrites[k] = nil
                 if commandCreatedKeys.remove(k) != nil {
                     removedCommandAdded.insert(k)
                 } else {

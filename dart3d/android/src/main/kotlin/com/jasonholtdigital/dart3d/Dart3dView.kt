@@ -1930,6 +1930,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // the outgoing scene).
         streamedSubtreeOps.clear()
         surgicalJournal.clear()
+        transformWrites.clear()
         // Payload-backed LUT refs are document-local ids.
         lutBuffers.clear()
         subtreeVisibleStamp = null
@@ -2003,6 +2004,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     (if (mask and 4 != 0) 12 else 0)
                 continue
             }
+            transformWrites.record(id, mask)
             if (mask and 1 != 0) {
                 rec.localPos = D3Wire.position(doubleArrayOf(
                     D3Wire.f32LE(data, off).toDouble(),
@@ -2111,6 +2113,32 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      */
     private val surgicalJournal = ArrayList<JournalEntry>()
     private var replayingJournal = false
+
+    private val transformWrites = TransformWrites()
+
+    /** Puts the `setTransforms` state captured before a re-realize back
+     * on the rebuilt nodes. Fields first, then the pushes: a body's
+     * teleport composes through its parents' restored transforms. */
+    private fun restoreTransformWrites(carried: List<TransformWrites.Pose>) {
+        val recs = ArrayList<FsceneRealizer.NodeRec>(carried.size)
+        for (pose in carried) {
+            val rec = nodesById[pose.id] ?: continue
+            if (pose.mask and TransformWrites.TRANSLATION != 0) {
+                rec.localPos = pose.pos
+            }
+            if (pose.mask and TransformWrites.ROTATION != 0) {
+                rec.localQuat = pose.quat
+            }
+            if (pose.mask and TransformWrites.SCALE != 0) {
+                rec.localScale = pose.scale
+            }
+            recs.add(rec)
+        }
+        for (rec in recs) applyLocalTransform(rec)
+        if (recs.isNotEmpty()) {
+            Log.i(TAG, "re-realize: restored ${recs.size} written transform(s)")
+        }
+    }
 
     /**
      * The supersession key of a latest-wins journaled op: ops with the
@@ -2272,7 +2300,12 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      * through the same handlers.
      */
     private fun applyCommandJson(json: JSONObject) {
-        when (val op = json.optString("op")) {
+        val op = json.optString("op")
+        if (!replayingJournal && (op == "addNode" || op == "removeNode" ||
+                (op == "updateNode" && "transform" in opFlags(json)))) {
+            jsonKey(json)?.let { transformWrites.supersede(it) }
+        }
+        when (op) {
             "removeNode" -> {
                 Log.i(TAG, "cmd removeNode")
                 val key = jsonKey(json) ?: return
@@ -2367,6 +2400,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 // but they only write back when the node exists, so
                 // pruning is equivalent and keeps the map small.
                 animTargets.keys.removeAll(doomed)
+                if (!replayingJournal) transformWrites.supersedeAll(doomed)
                 pendingParents.entries.removeAll {
                     it.key in doomed || it.value in doomed
                 }
@@ -4542,6 +4576,13 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 // of replaying the anim-op history, so playback time
                 // continues where it was.
                 val clips = HashMap(animClips)
+                val written = transformWrites.capture(
+                    clipDriven = { animTargets[it]?.drivesTransform == true },
+                ) { id ->
+                    nodesById[id]?.let {
+                        arrayOf(it.localPos, it.localQuat, it.localScale)
+                    }
+                }
                 deferJointPrune = true
                 try {
                     FsceneRealizer.realize(manifest, this,
@@ -4550,6 +4591,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     // streamed subtrees with the rest of the scene —
                     // rebuild each from its recorded load batch.
                     replayStreamedSubtrees()
+                    restoreTransformWrites(written)
                 } finally {
                     deferJointPrune = false
                 }

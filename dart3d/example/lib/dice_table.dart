@@ -1046,11 +1046,20 @@ class _DiceTableScreenState extends State<DiceTableScreen>
   }
 
   /// Moves any die outside the current play area to the nearest point
-  /// inside it, keeping its orientation (and so its readout).
+  /// inside it. A moved die can land against a neighbour and tumble to
+  /// another face, so a result on screen is read again at the next
+  /// settle.
   Future<void> _pullInside() async {
     final scene = _scene;
     if (scene == null) return;
-    final poses = await _controller.poses();
+    final id = _rollId;
+    final List<ScenePose> poses;
+    try {
+      poses = await _controller.poses();
+    } on StateError {
+      return; // the view detached
+    }
+    if (!mounted) return;
     final writes = <NodeTransform>[];
     for (final die in scene.dice) {
       for (final pose in poses) {
@@ -1065,7 +1074,14 @@ class _DiceTableScreenState extends State<DiceTableScreen>
         );
       }
     }
-    if (writes.isNotEmpty) _controller.setNodeTransforms(writes);
+    if (writes.isEmpty) return;
+    _controller.setNodeTransforms(writes);
+    if (id != _rollId || _total == null) return;
+    dnLog('dart3d: dice refit moved ${writes.length} — reading again');
+    _rollStart = _now;
+    _settleTimer?.cancel();
+    _settleTimer = Timer(_nudgeTimeout, _settleFallback);
+    _wake();
   }
 
   // MARK: - Build
