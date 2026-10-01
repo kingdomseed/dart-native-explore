@@ -195,19 +195,40 @@ def room(scene):
     for x,y,z,r,h,seed in ((-97,141,-135,22,58,4),(110,166,-135,24,80,5),(-78,266,-200,18,106,7),(140,305,-240,17,107,9)):
         amethyst_cluster.build("Ice footwall cluster",loc=(x,y,z),radius=r,height=h,count=11,bowl=False,
                                mineral="ice",tone=(.58,.82,.94),glow=6,fractures=5,edge_glow=.5,energy=300,seed=seed)
-    cold_mist.build("Low hall cold mist",loc=(0,117,-133),width=155,depth=145,height=60,
-                    layers=3,opacity=.70,tone=(.58,.78,.96),flakes=12,flake_height=170,seed=14)
-    cold_mist.build("Mist through glacier arch",loc=(10,285,-187),width=175,depth=85,height=75,
-                    layers=4,opacity=1.2,tone=(.80,.90,1),flakes=8,flake_height=140,seed=18)
+    cold_mist.build("Low hall cold mist",loc=(0,117,-133),width=155,depth=145,height=22,
+                    layers=2,opacity=.25,tone=(.58,.78,.96),flakes=12,flake_height=170,seed=14)
+    cold_mist.build("Mist through glacier arch",loc=(10,315,-239),width=175,depth=85,height=24,
+                    layers=2,opacity=.40,tone=(.80,.90,1),flakes=8,flake_height=140,seed=18)
     cold_mist.build("Ceiling crack snowfall",loc=(-5,205,-110),width=24,depth=40,height=0,layers=0,
                     flakes=14,flake_height=130,seed=22,flake_radius=(.08,.20),flake_glow=3)
     cold_mist.build("Thin mist beyond altar",loc=(0,45,-3),width=86,depth=20,height=7,
                     layers=2,opacity=.50,tone=(.44,.67,.87),seed=31)
-    glacier_vista.build(slope=.48,sky_strength=4.4,seed=11)
+    vista=glacier_vista.build(slope=.60,sky_strength=2.5,seed=11)
+    # Snow is concentrated on ledges; the exposed chasm carries the near value.
+    ridge_tones=((.13,.21,.30),(.10,.17,.26),(.052,.095,.15),(.033,.064,.11))
+    ridges=[ob for ob in vista.children_recursive if ob.name.startswith("Snow-laden distant peak")]
+    for i,ob in enumerate(sorted(ridges,key=lambda ob:ob.name)):
+        ob.data.materials.clear()
+        ob.data.materials.append(M.frozen_stone(f"Valley ridge depth {i}",ridge_tones[i],
+                                frost=.42-i*.055,wear=.7,seed=11+i,rime_start=.48))
+    near_rock=M.frozen_stone("Dark exposed chasm rock",(.024,.047,.075),.22,.8,31,rime_start=.58)
+    bridge_stone=M.frozen_stone("Valley bridge weathered granite",(.09,.13,.18),.42,.65,11,rime_start=.5)
+    for ob in vista.children_recursive:
+        if ob.name.startswith("Chasm rock face"):
+            ob.data.materials.clear();ob.data.materials.append(near_rock)
+        elif ob.name.startswith(("Valley bridge arch stone","Snowy bridge deck","Stone bridge pier course")):
+            ob.data.materials.clear();ob.data.materials.append(bridge_stone)
+        elif ob.name.startswith("Moon on snowy peaks"):
+            ob.data.energy=1500000
+        elif ob.name.startswith("Valley cloud sea"):
+            for cloud in ob.children_recursive:cloud.hide_render=True
+    cold_mist.build("Low cascade spindrift",loc=(0,620,-475),width=270,depth=110,height=27,
+                    layers=2,opacity=.38,tone=(.34,.51,.66),seed=25)
     def area(name,loc,target,energy,color,size):
         ob=fixtures.light(name,loc,energy,color,size,target=target,kind="AREA")
         ob.visible_glossy="ice" not in name.lower();ob.data.specular_factor=1
         return ob
+    area("Cold edge on frozen cascade",(45,538,-207),(0,665,-369),420000,(.46,.72,1),85)
     area("Near brazier golden spill",(-35,130,-28),(-25,110,-70),16500,(1,.53,.22),20)
     area("Warm altar stone return",(-42,18,20),(-25,3,0),9500,(1,.65,.34),23)
     area("Brazier light on left capital",(-48,215,-57),(-26,245,-48),26000,(1,.47,.17),25)
@@ -222,6 +243,13 @@ def room(scene):
     area("Light through left ice",(-57,160,-60),(-89,195,-60),65000,(.15,.63,1),28)
     area("Light through right ice",(68,143,-50),(85,195,-65),85000,(.15,.70,1),28)
     area("Blue rim across altar edge",(45,60,33),(18,12,0),10000,(.36,.70,1),25)
+    for ob in set(bpy.data.objects)-before:
+        if ob.type in {"MESH","CURVE"} and ob.name.startswith((
+                "Layered glacial wall","Blue depth behind ice","Internal branching ice fracture",
+                "Fine fracture fork","Terminated amethyst prism","Quartz internal inclusion",
+                "Branching internal fissure","Ice fracture branch","Tapered frozen drip",
+                "Drifting cold mist","Sparse falling ice mote")):
+            ob.visible_glossy=False
     receivers=bpy.data.collections.new("Frostbound room light receivers")
     for ob in set(bpy.data.objects)-before:
         if ob.type in {"MESH","CURVE"}:receivers.objects.link(ob)
@@ -232,7 +260,7 @@ def room(scene):
             if ob.light_linking.receiver_collection is None:
                 ob.light_linking.receiver_collection=receivers
         if ob!=group.root and ob.parent is None:group.add(ob)
-    bounce=E.light(scene,"AREA","Glacier bounce across altar",(24,4,9),12000,color=(.38,.72,1),size=10,target=(0,0,1))
+    bounce=E.light(scene,"AREA","Glacier bounce across altar",(24,4,9),26000,color=(.38,.72,1),size=10,target=(0,0,1))
     # Dice are created after the environment; exclude existing surfaces from the added ice highlights.
     bounce_receivers=bpy.data.collections.new("Glacier bounce exclusions")
     for ob in tuple(bpy.data.objects):
@@ -240,8 +268,10 @@ def room(scene):
     for entry in bounce_receivers.collection_objects:
         entry.light_linking.link_state="EXCLUDE"
     bounce.light_linking.receiver_collection=bounce_receivers
-    skylight=E.light(scene,"AREA","Cold skylight reflected in ice",(4,-10,26),1900,color=(.63,.84,1),size=14,target=(0,0,1))
+    skylight=E.light(scene,"AREA","Cold skylight reflected in ice",(4,-10,26),7000,color=(.63,.84,1),size=14,target=(0,0,1))
     skylight.data.shape="RECTANGLE";skylight.data.size_y=5
     skylight.light_linking.receiver_collection=bounce_receivers
+    side=E.light(scene,"AREA","Opposite ice wall return",(-22,8,14),10000,color=(.38,.68,1),size=18,target=(0,0,1))
+    side.light_linking.receiver_collection=bounce_receivers
     return dict(loc=(-46,8,33),target=(2,0,8),lens=39.5,
                 fstop=8*scene.unit_settings.scale_length,focus=(10,0,1.4))

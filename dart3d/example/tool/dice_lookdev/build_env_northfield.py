@@ -62,11 +62,11 @@ def room(scene):
     a=G.Asset("Northfield kitchen architecture")
     floor=-146
     laminate_table.build("Breakfast laminate table",loc=(0,0,-75.35),width=113,depth=84,height=75,
-        wood_tone=(.14,.057,.014),seed=2,rear_recess=(26,18))
+        wood_tone=(.14,.057,.014),seed=2)
     laminate_table.build("Terminal side table",loc=(-63,108,-95.35),width=64,depth=86,height=75,
         wood_tone=(.16,.065,.022),seed=7)
     crt_terminal.build("Beige green-screen terminal",loc=(-61,104,-20.35),rot_z=.12,seed=5,energy=1800)
-    dining_chair.build("Chair behind breakfast",loc=(8,48,-75.35),rot_z=math.pi,height=79,width=37,seed=5)
+    dining_chair.build("Chair behind breakfast",loc=(8,70,-75.35),rot_z=math.pi,height=79,width=37,seed=5)
     coffee_mug.build("Floral breakfast mug",loc=(-31,28,-.35),rot_z=math.pi,height=10,radius=4.2,
         tone=(.64,.58,.41),floral=True,steam_height=10,steam_opacity=.12,seed=7)
     breakfast_plate.build("Butter toast breakfast",loc=(-39,17,-.35),radius=10.5,rot_z=.28,seed=8)
@@ -76,6 +76,7 @@ def room(scene):
     lino=RC.tiles("Faded kitchen linoleum",(.17,.19,.105),(.31,.29,.22),scale=.055)
     a.block("Dining floor",(460,180,5),(0,-14,-77.85),lino,.3)
     a.block("Terminal landing",(460,82,5),(0,117,-97.85),lino,.3)
+    a.block("Chair landing extension",(59,23,20),(8,87.5,-85.35),lino,.3)
     a.block("Radio stand dais",(65,42,6),(79,138,-92.35),lino,.3)
     a.block("Kitchen floor",(460,230,5),(0,273,floor-2.5),lino,.3)
     for i in range(2):a.block("Dining landing step",(70,15,10),(-183,83.5+i*15,-80.35-i*10),lino,.3)

@@ -67,14 +67,14 @@ def room(scene):
         if x< -48 or x>132:
             a.block("Recessed oak wall panel",(31,1,64),(x+19,186,-52),wood,.4)
     a.block("Panelled dado rail",(400,4,6),(0,184,-13),wood,.8)
-    jeweler_bench.build("Hero walnut workbench",loc=(0,-2,-75.4),width=124,depth=76,height=75,bench_pin=False,rear_recess=(28,25),seed=4)
-    jeweler_bench.build("Balance workbench",loc=(-25,75,-105.4),width=106,depth=62,height=75,seed=7)
+    jeweler_bench.build("Hero walnut workbench",loc=(0,-2,-75.4),width=124,depth=76,height=75,bench_pin=False,seed=4)
+    jeweler_bench.build("Balance workbench",loc=(-25,75,-105.4),width=106,depth=62,height=85,seed=7)
     jeweler_bench.build("Chest workbench",loc=(49,101,-118.4),width=72,depth=67,height=75,seed=9)
-    bench_lamp.build("Adjustable daylight bench lamp",loc=(-55,75,-30.4),reach=12,height=25,radius=8.7,rot_z=.35,head_tilt=-.65,energy=7500,seed=8)
-    balance_scale.build("Brass assay balance",loc=(-15,68,-30.4),height=30,width=29,pan_radius=4.8,rot_z=.05,seed=6)
+    bench_lamp.build("Adjustable daylight bench lamp",loc=(-55,75,-20.4),reach=12,height=25,radius=8.7,rot_z=.35,head_tilt=-.65,energy=7500,seed=8)
+    balance_scale.build("Brass assay balance",loc=(-15,68,-20.4),height=30,width=29,pan_radius=4.8,rot_z=.05,seed=6)
     gem_case.build("Left open specimen case",loc=(-40,28,-.4),width=18,depth=14,lid_angle=68,seed=3)
     gem_case.build("Right open specimen case",loc=(48,27,-.4),width=18,depth=16,lid_angle=175,seed=7)
-    gem_case.build("Work in progress specimen case",loc=(-55,55,-30.4),width=24,depth=17,lid_angle=112,seed=2)
+    gem_case.build("Work in progress specimen case",loc=(-55,55,-20.4),width=24,depth=17,lid_angle=112,seed=2)
     jeweler_tools.build("Foreground optical loupe",loc=(-32,5,-.4),radius=2.5,seed=4)
     jeweler_tools.build("Foreground steel tweezers",loc=(-34,3,-.42),kind="tweezers",rot_z=-.72,length=15,seed=4)
     jeweler_tools.build("Right spring tweezers",loc=(33,13,-.42),kind="tweezers",rot_z=.4,length=12,seed=8)
@@ -93,7 +93,7 @@ def room(scene):
     potted_plant.build("Window vine",loc=(-24,168,-131),height=62,radius=8,seed=4)
     shelf.build("Jewel bottles on left shelves",loc=(-126,178,-91),width=90,levels=3,spacing=35,count=5,seed=9)
     for x in (-5,101):candles.build("Sill candle",loc=(x,170,-131),height=11,radius=1.7,energy=950,seed=3)
-    for x,y,z in ((-65,89,-30.4),):
+    for x,y,z in ((-65,89,-20.4),):
         book.build("Unlettered ledger",loc=(x,y,z),width=18,depth=24,thickness=3.4,tone=(.05,.022,.012),seed=4)
     def area(name,loc,target,energy,color,size):
         light=a.light(name,loc,energy,color,size,target,"AREA")

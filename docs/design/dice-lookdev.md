@@ -1083,8 +1083,11 @@ Lighting recipes (the tray lights are unchanged unless noted):
   back wall and a small one above the table (0.9 kW) adds a warm top
   light. Fill was cut so the light comes in pools (forge falloff, lantern
   pools, moon edge) and the corners fall into shadow; exposure −1.15.
-  Tray lights unchanged. Gate: numeral 8.51 (d12), die vs tray 2.20,
-  stroke 0.121–0.130, PASS.
+  Round 3 pass 1: warm forge and lantern rakes reveal the oak grain on both
+  sides; a small resting ball-peen hammer, oilstone, forged nails and leather
+  offcut sit on the extended rear boards, at least 13.23 cm clear of the rim.
+  Tray lights unchanged. Pass 1 preview gate (50% / 32 samples): numeral 4.70 (d4),
+  Gate: numeral 8.53 (d12), die vs tray 2.20, stroke 0.121–0.130, PASS.
 
 - **Frostbound — the frozen altar chamber (round 2).** Broadside, f/8,
   the tray spanning ~79% of the frame on the carved granite
@@ -1097,14 +1100,25 @@ Lighting recipes (the tray lights are unchanged unless noted):
   glowing `ice_formation` (the cyan accent and rim) with a bronze
   armillary on a pedestal. Round-1 lesson kept: die vs tray was at the
   gate (2.01), so bright ice reflections stay off the tray floor and the
-  dice get a cool back rim. Gate: numeral 8.85 (d4), die vs tray 2.11,
-  stroke 0.121–0.130, PASS.
+  dice get a cool back rim. Round 3 pass 1 lowers the distant vista in the
+  arch sightline, with a brighter sky gap, less snow on near rock, four
+  progressively lighter ridges, a readable stone bridge and a separately
+  lit frozen cascade. Mist is restricted to low banks at the foot. Distant
+  decorative ice and mist are excluded from glossy reflections.
+  Dice-only room returns increase the low glacier bounce from 12 to 26 kW
+  and the overhead sky reflection from 1.9 to 7 kW; a 10 kW opposite-side
+  ice return fills the dark facets. These lights exclude the tray and room
+  surfaces, increasing die separation without brightening the tray floor.
+  The original tray lights and tray/dice materials remain unchanged. Full-resolution
+  default-160-sample gate: numeral 5.51 (d6), die vs tray 2.54 (up from 2.11),
+  Gate: numeral 5.51 (d6), die vs tray 2.54, stroke 0.121–0.130, PASS.
 
 - **Arcane Study — the night study (round 2).** A closer
   oblique broadside view looks down 35.2 degrees, using 20.4 mm at effective
   f/8. The tray spans 84.6% of the frame with its near rim cropped at the
   bottom. One planked oak desktop replaces the separate box-shaped returns;
-  its moulded rear recess frames the supported armillary instrument table.
+  its straight worn far edge now runs continuously in front of the separate
+  lower armillary instrument table (round 3, pass 1).
   Heaped navy velvet, larger gold stars, candles, inkwell, blue runestones,
   gilt leather books and a pierced brass censer bring the dressing together
   on the main desktop. The armillary stays on the lower table behind it.
@@ -1113,15 +1127,15 @@ Lighting recipes (the tray lights are unchanged unless noted):
   warm the existing brass floor and rim cap. Exposure remains -0.15 EV;
   the tray shaders, geometry and original lights are unchanged. Bright
   dressing and cloth clear the rim by at least 10.37 cm.
-  Gate: numeral 7.93 (d20), die vs tray 4.78, stroke 0.124–0.130,
-  PASS.
+  Pass 1 preview gate (50% / 32 samples): numeral 5.20 (d20),
+  die vs tray 5.01, stroke 0.124–0.130, PASS.
 
 - **Fate Engine — the inventor's workshop (round 2).** A broadside
   17.7 mm, effective f/8 camera looks down 34.8 degrees, 22.3 cm above the
   workbench. The tray spans 79.95% of the frame with its near rim cropped.
-  A planked oak bench with a rounded rear recess reveals the riveted brass
-  dice machine, sloped mouth, phased involute gear train and pressure
-  instruments. The separate glass induction column carries a continuous
+  A complete planked oak bench with a straight far edge stands in front of
+  the separately supported riveted brass dice machine, sloped mouth, phased
+  involute gear train and pressure instruments. The separate glass induction column carries a continuous
   teal helix. Drafting sheets, calipers, dividers, a magnifier and loose
   gears frame the corners; minimum dressing clearance is 10.37 cm.
   Behind: an armillary bench, modeled brick courses, flanged copper pipes
@@ -1134,7 +1148,8 @@ Lighting recipes (the tray lights are unchanged unless noted):
   warm reflection illuminates the existing tray field and rail. The tray
   geometry, shaders, engraving and original lights are unchanged;
   exposure remains +0.1 EV. No room-wide haze volume.
-  Gate: numeral 13.76 (d10t), die vs tray 2.81, stroke 0.124–0.130, PASS.
+  Pass 1 preview gate (50% / 32 samples): numeral 14.31 (d10t),
+  die vs tray 2.85, stroke 0.124–0.130, PASS.
 
 - **Celestial — the observatory loggia (round 2).** Broadside from −x,
   38.5 mm, f/8, low seated height so the tabletop is a narrow band. The
@@ -1156,8 +1171,8 @@ Lighting recipes (the tray lights are unchanged unless noted):
   stroke 0.121–0.130, PASS.
 
 - **Hearthside — the fireside reading nook (round 2).** Broadside open
-  tome on a jointed oak table with a moulded rear recess; a hewn fieldstone hearth with a
-  shallow voussoir arch, charred logs and layered flame sheets on the left;
+  tome on a complete jointed oak table with a straight far edge; a hewn
+  fieldstone hearth with a shallow voussoir arch, charred logs and layered flame sheets on the left;
   a padded leather wing chair with piping, nailheads, tartan cushion and
   modeled knitted wine-red throw on the right. Varied leather books fill
   carved oak cases; a divided oak rain casement shows a blue dusk village.
@@ -1177,17 +1192,18 @@ Lighting recipes (the tray lights are unchanged unless noted):
   and a 0.5 px reconstruction filter keep the ivory ink crisp at half
   resolution without changing its material. Broadside camera 27.7 mm at 38 cm above the table, 36.8 degrees down, effective
   f/8 with focus on the dice; the tome spans about 78% of the frame.
-  Final room preview: 50% / 64 samples, 7 s render (24.9 s command).
+  Pass 1 room preview: 50% / 64 samples, 21 s render (88.58 s command).
   Foreground clearance is at least 11.77 cm. Emberforged, Voltline,
   Celestial, Frostbound, Arcane and Fateengine were re-rendered serially
   at 25% / 16 samples and checked against their approved previews.
-  Gate: numeral 9.14 (d4), die vs tray 3.40, stroke 0.123–0.129, PASS.
+  Pass 1 preview gate (50% / 32 samples): numeral 5.07 (d10t),
+  die vs tray 3.48, stroke 0.123–0.129, PASS.
 
 - **Old Road — the wayfarer's inn corner (round 2).** A close broadside
   leather/map tray spans 84.76% of the frame, with its near rim at the bottom.
   The 26.4 mm camera looks down 28.3 degrees from 24 cm above the tabletop at
-  effective f/8. A worn planked oak tavern table has a rounded rear recess;
-  below it, a stepped sitting bay supports the canvas/leather travel pack on
+  effective f/8. A worn planked oak tavern table has a continuous straight
+  far edge; behind and below it, a stepped sitting bay supports the canvas/leather travel pack on
   a pegged chair, its spiral bedroll and hanging pewter cup, the bound walking
   staff and a sheepskin-covered stool. A raised fieldstone log hearth is on
   the right; a real half-timber wall and small oak casement frame a blue-hour
@@ -1206,16 +1222,18 @@ Lighting recipes (the tray lights are unchanged unless noted):
   trencher and pack are checked for contact with their supports. There are
   no room volumes. Shared asset variants retain their existing defaults;
   all seven approved rooms are rechecked at 25% / 16 samples.
-  Gate: numeral 5.90 (d4), die vs tray 3.21, stroke 0.123–0.128, PASS.
+  Pass 1 preview gate (50% / 32 samples): numeral 5.48 (d10t),
+  die vs tray 3.35, stroke 0.123–0.128, PASS.
 
 - **Northfield — the 1986 countryside kitchen (room round 2).** A close
   broadside breakfast view: the calibration tray spans about 83% of the frame,
   near rim at the bottom; 27.7 mm, 29.8 degrees down, effective f/8 on the dice.
-  A walnut-print laminate table with rolled aluminium edging, a floral mug,
+  A complete walnut-print laminate table with rolled aluminium edging, a floral mug,
   buttered toast on an ironstone plate and a woven runner frame the tray.
   The closest dressing clears the tray board by 11.5 cm. Behind it: a beige
   terminal with bowed green CRT, cooling slots and separate blank keyboard,
-  a bent-plywood chair, fitted cream units, enamel cooker, hollow-spout kettle,
+  a bent-plywood chair moved 22 cm back onto an extended landing to clear the straight table edge,
+  fitted cream units, enamel cooker, hollow-spout kettle,
   fridge and a cassette radio with physical grille, reels and tuning ticks.
   Floral wallpaper and gathered curtains surround a painted casement and
   radiator. The clear window looks across layered spruce stands, a red barn
@@ -1232,7 +1250,8 @@ Lighting recipes (the tray lights are unchanged unless noted):
   Shared mug and pendant variants preserve their defaults; all eight approved
   rooms are checked at
   25% / 16 samples. No room volumes or external assets.
-  Gate: numeral 9.51 (d10t), die vs tray 7.04, stroke 0.124–0.132, PASS.
+  Pass 1 preview gate (50% / 32 samples): numeral 4.69 (d20),
+  die vs tray 7.10, stroke 0.124–0.132, PASS.
 
 - **Voltline — the late-night diner (round 2).** Broadside from −x,
   54 mm, f/8 on the dice, seated eye height. The holo tray on a wet
@@ -1249,8 +1268,12 @@ Lighting recipes (the tray lights are unchanged unless noted):
   `pie_stand`s, warm `dome_pendant`s (85 kW) in depth. Round 1 was too
   dark: the street emission and the warm bar light were raised (bar
   strip 850 kW, back-bar warmth 700 kW, cyan through the rain 115 kW,
-  plus small counter glints), exposure +0.2. Tray lights unchanged.
-  Gate: numeral 14.39 (d10u), die vs tray 4.68, stroke 0.124–0.132, PASS.
+  plus small counter glints), exposure +0.2. Round 3 pass 1 includes the
+  countertop in the neon reflection receivers, alongside its water beads
+  and streaks. A formed spoon on a ceramic saucer, folded cotton napkin and
+  unprinted sugar sachets sit at least 12.55 cm from the rim. Tray lights unchanged.
+  Pass 1 preview gate (50% / 32 samples): numeral 12.68 (d20),
+  die vs tray 4.27, stroke 0.124–0.132, PASS.
 
 - **Vermilion Court — the lantern pavilion.** Round 2 replaces the
   floor-level miniature tray composition with a close broadside view of
@@ -1268,16 +1291,18 @@ Lighting recipes (the tray lights are unchanged unless noted):
   effective f/8 on the dice; tray spans 83.8% of the frame. Table top
   z=0, foreground tatami z=-32. Warm andon pools, red lantern accent
   and cool dusk are linked to environment receivers. Diffuse-only
-  paper-ceiling (12 kW) and dusk (3.3 kW) returns lift the dice without
-  white specular patches on their red faces; original key, moon and
-  overhead calls and all tray materials/geometry stay unchanged.
+  paper-ceiling and dusk returns lift the dice without white specular
+  patches on their red faces. Round 3 pass 1 reduces the warm key from
+  16 to 9.6 kW, paper return from 12 to 7.2 kW and dusk return from 3.3
+  to 1.98 kW. This keeps the leaf bright while reducing wash on the red
+  faces; every die now exceeds 6 in the full-resolution numeral gate.
+  The moon, overhead, tray geometry and all materials remain unchanged.
   Exposure +1.3 EV; standard view transform and pixel filter retained.
   Added shared materials preserve all earlier functions; the nine
-  approved rooms are rechecked at 25% / 16 samples. Preview gate
-  (50% / 32 samples): numeral 4.79 (d10u), die vs tray 3.01,
-  stroke 0.123–0.128, PASS. Final full-render numbers are refreshed
-  separately by the art director.
-  Gate: numeral 4.90 (d8), die vs tray 2.91, stroke 0.123–0.128, PASS.
+  approved rooms were rechecked at 25% / 16 samples in round 2. Pass 1
+  changes only this room's lighting, leaving the shared assets unchanged.
+  Gate (full resolution, 128 samples): numeral 6.52 (d8), die vs tray 2.37,
+  Gate: numeral 6.52 (d8), die vs tray 2.37, stroke 0.123–0.128, PASS.
 
 - **Gemcutter — the jeweler's atelier.** Round 2 replaces the empty bench
   with a joinered walnut workbench, optical loupe, tapered spring tweezers,
@@ -1286,8 +1311,9 @@ Lighting recipes (the tray lights are unchanged unless noted):
   framed chest of fifteen drawers with brass pulls. The reused oak casement
   opens onto layered gables, spires and scattered windows against a clouded
   blue-and-amber sunset. An emerald cage lantern supplies the right accent.
-  The curved rear bench recess keeps the balance visible; the rear workbenches
-  stand on lower connected landings. The tray, its walnut base, padded velvet
+  The main bench has a continuous straight far edge; the balance and rear
+  workbenches stand behind it on lower connected landings. The balance
+  workbench is 10 cm taller so its pans remain visible above that edge. The tray, its walnut base, padded velvet
   rim and all four original lighting calls remain unchanged.
   Camera: broadside, 25 mm, looking down 36.2 degrees at effective f/8,
   converted for centimetre scene units; the tray spans 77.7 percent of the
@@ -1300,7 +1326,8 @@ Lighting recipes (the tray lights are unchanged unless noted):
   Shared additions are three new material recipes only; all existing
   material functions are unchanged. The ten earlier approved rooms are
   rechecked serially at 25 percent / 16 samples.
-  Gate: numeral 6.83 (d12), die vs tray 3.37, stroke 0.121–0.130, PASS.
+  Pass 1 preview gate (50% / 32 samples): numeral 5.04 (d20),
+  die vs tray 3.50, stroke 0.121–0.130, PASS.
 
 ## 4. dart3d features to verify (before building these for real)
 

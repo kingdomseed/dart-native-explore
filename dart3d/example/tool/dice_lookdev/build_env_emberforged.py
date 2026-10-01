@@ -99,14 +99,14 @@ def room(scene):
     from assets import (anvil, barrel, book, candles, ember_bowl, forge, fur_throw,
                         geometry as G, lantern, leaded_window, leather_mat, loose_hardware,
                         masonry, materials as M, oak_table, pouch, shelf, shield,
-                        stone_steps, strongbox, tool_rack, vessel)
+                        stone_steps, strongbox, tool_rack, vessel, table_tools, smithy_benchwork)
     import bpy
 
     before = set(bpy.data.objects)
     floor_z, bay_z = RC.FLOOR_Z, RC.FLOOR_Z - 40
     wood = (0.095, 0.038, 0.013)
-    oak_table.build("Player work table", loc=(0, -14, floor_z), width=136, depth=56,
-                    height=74.8, thickness=7, wood_tone=wood, seed=2)
+    oak_table.build("Player work table", loc=(0, -6, floor_z), width=136, depth=72,
+                    height=74.8, thickness=7, wood_tone=wood, grain_scale=2.2, scorch=.18, seed=2)
     vessel.build("Foreground chased goblet", loc=(-35, 5, -1.2), height=18, radius=5.1, seed=8)
     book.build(loc=(-40, -6, -0.83), rot_z=-0.12, width=17, depth=24, thickness=5, seed=9)
     pouch.build(loc=(35, 6, -1.2), radius=6, height=11, seed=4)
@@ -114,6 +114,10 @@ def room(scene):
     leather_mat.build(loc=(-43, -6, -1.17), rot_z=0.1, width=24, depth=31, seed=4)
     loose_hardware.build(loc=(43, 3, -1.2), rot_z=-0.3, length=14, seed=9)
     lantern.build("Above-table lantern", loc=(31, 10, 25), height=32, radius=7, chain_length=36, energy=900)
+    hammer = table_tools.build("Small bench ball-peen",loc=(-27,26,-1.2),rot_z=.12,
+                               kind="ball_peen",length=32,seed=11)
+    hammer.scale = (.5, .5, .5)
+    smithy_benchwork.build("Hone and smithy offcuts",loc=(27,26,-1.2),width=12,rot_z=-.15,seed=4)
     foreground = set(bpy.data.objects) - before
 
     masonry.build("Smithy back wall", loc=(0, 218, bay_z), width=350, height=255,
@@ -181,12 +185,17 @@ def room(scene):
          18000, (0.22, 0.4, 1), 26)
     table_bounce = area("Lantern table bounce", (-20, 4, 38), (0, 12, -1.2),
                         6500, (1, 0.69, 0.4), 38)
+    oak_rakes = [
+        area("Forge rake across left oak",(-39,24,17),(-26,1,-1.2),3800,(1,.52,.20),15),
+        area("Lantern rake across right oak",(35,25,21),(26,3,-1.2),3200,(1,.72,.40),17),
+    ]
     for ob in set(bpy.data.objects) - before:
         if ob.parent is None and ob not in foreground and ob.name not in {"Player floor platform", "Work bay steps"}:
             ob.location.y += 30
             ob.location.z -= 14
-    table_bounce.location.y -= 30
-    table_bounce.location.z += 14
+    for ob in [table_bounce, *oak_rakes]:
+        ob.location.y -= 30
+        ob.location.z += 14
     table_receivers = bpy.data.collections.new("Player table light receivers")
     room_receivers = bpy.data.collections.new("Smithy light receivers")
     hearth_receivers = bpy.data.collections["Stone forge firelit masonry"]
@@ -204,12 +213,12 @@ def room(scene):
     group = G.Asset("Emberforged room frame", rot_z=-math.pi / 2)
     for ob in set(bpy.data.objects) - before:
         if ob.type == "LIGHT":
-            restrained = ob == table_bounce or ob in foreground or ob.name in {
+            restrained = ob == table_bounce or ob in oak_rakes or ob in foreground or ob.name in {
                 "Window moonlit edge", "Bench lantern reflected warmth", "Moon through window"}
             ob.data.energy *= 7 if restrained else 4 if ob in hearth_objects else 13
             if ob.name.startswith("Lantern glow") and ob not in foreground:
                 ob.data.color = (1, 0.43, 0.12)
-            ob.light_linking.receiver_collection = (table_receivers if ob == table_bounce or ob in foreground else
+            ob.light_linking.receiver_collection = (table_receivers if ob == table_bounce or ob in oak_rakes or ob in foreground else
                                                    hearth_receivers if ob == soot_rake else room_receivers if ob in hearth_objects else furnishings)
         if ob != group.root and ob.parent is None:
             group.add(ob)

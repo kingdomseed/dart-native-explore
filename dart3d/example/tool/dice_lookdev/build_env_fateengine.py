@@ -132,7 +132,7 @@ def room(scene):
     iron=M.machined_metal("Workshop structural iron","iron",.7,13)
     brass=M.machined_metal("Workshop furniture brass","brass",.6,15)
     oak_table.build("Inventor output bench",loc=(0,2,-76),width=116,depth=62,height=75.7,
-                    thickness=4.8,wood_tone=(.09,.038,.014),wear=.6,scorch=.35,seed=7,rear_recess=(40,24))
+                    thickness=4.8,wood_tone=(.09,.038,.014),wear=.6,scorch=.35,seed=7)
     # The casting stands on a lower working deck; its chute arrives just above the desk.
     oak_table.build("Engine mounting bench",loc=(27,71,-144),width=86,depth=57,height=72,
                     thickness=6,wood_tone=(.065,.025,.008),wear=.6,seed=8)

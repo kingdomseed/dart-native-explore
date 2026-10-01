@@ -141,7 +141,7 @@ def room(scene):
     dark=M.oak("Study recessed panels",(.038,.016,.009),.4,8,axis="Z")
     stone=M.stone("Warm study plaster",(.085,.068,.048),.25,7)
     oak_table.build("Scholar desk",loc=(0,5,-76),width=118,depth=72,height=75.7,
-                    thickness=3.8,wood_tone=(.07,.026,.008),wear=.25,scorch=0,seed=11,rear_recess=(16,30))
+                    thickness=3.8,wood_tone=(.07,.026,.008),wear=.25,scorch=0,seed=11)
     velvet_drape.build("Star embroidered desk velvet",loc=(-43,-2,top),width=44,
                        length=72,drop=18,tone=(.008,.020,.06),stars=18,seed=8,
                        sheen_tone=(.08,.13,.32),stitch_width=.05,heap=5.5,

@@ -216,11 +216,11 @@ above the desktop; the close, wider view makes the tray span 84.6 percent of
 the frame, with the near rim cropped at the bottom.
 
 The separate box-shaped side returns are replaced by one planked oak desktop
-with a rounded, beaded rear recess for the armillary reading table. Candles,
+with a continuous straight far edge in front of the armillary reading table. Candles,
 inkwell, runestone bowl, gilt tomes, parchment and a pierced brass censer share
 the main desktop. Heaped navy velvet has larger sewn stars following its folds
 and weighted flat patches beneath the supported objects. The armillary remains
-on a lower supported instrument table behind the recess. Carved bookcases and
+on a lower supported instrument table behind the desk. Carved bookcases and
 the moonlit Gothic window frame the upper part of the shot.
 
 Warm candle pools and cool window light are linked to room receivers. Two
@@ -402,3 +402,11 @@ and amber reflections warm the walnut and brass, with emerald at the right.
 Room lamps use environment receivers. The global grade is +0.85 EV and
 gamma 0.75, with a 0.3-pixel phone filter and the normal 1.5-pixel room
 filter. The half-resolution gate passes without altering the tray or dice.
+
+
+### Round 3 pass 1 small worktop dressing
+
+- `smithy_benchwork`: a rounded oilstone, irregular leather offcut and square-shanked forged nails; `width`, `wood_tone`, `metal_finish`, `wear`, `seed`.
+- `diner_place_setting`: dished ceramic saucer, formed metal teaspoon, folded cotton napkin and sealed unprinted sugar packets; `radius`, `napkin`, `packets`, `tone`, `metal_tone`, `wear`, `seed`.
+
+All room calls to `rear_recess` are removed. The optional asset parameter remains available with its default of `None`; tables in the room builders use continuous straight far edges.

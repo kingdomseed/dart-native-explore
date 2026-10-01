@@ -43,7 +43,7 @@ def build(scene):
     E.light(scene, "AREA", "moon", (40, 60, 80), 2500, color=(0.55, 0.6, 1.0), size=40, target=(0, 0, 0),
             shadow=False)
     # key from the side: its mirror image in the lacquer lands off the tray
-    E.light(scene, "AREA", "key", (-46, -12, 36), 16000, color=(1.0, 0.75, 0.55), size=25, target=(0, 0, 0))
+    E.light(scene, "AREA", "key", (-46, -12, 36), 9600, color=(1.0, 0.75, 0.55), size=25, target=(0, 0, 0))
     # Round 2: soft warm overhead (a paper ceiling lamp) for the gold leaf,
     # which mirrors the ceiling when seen straight down.
     E.overhead(scene, 1500, color=(1.0, 0.82, 0.62), size=90, height=110)
@@ -140,10 +140,10 @@ def room(scene):
     for ob in tuple(bpy.data.objects):
         if ob.type in {"MESH","CURVE"}:dice_receivers.objects.link(ob)
     for entry in dice_receivers.collection_objects:entry.light_linking.link_state="EXCLUDE"
-    bounce=E.light(scene,"AREA","Pavilion paper ceiling return",(3,-3,42),12000,color=(1,.9,.72),size=26,target=(0,0,2))
+    bounce=E.light(scene,"AREA","Pavilion paper ceiling return",(3,-3,42),7200,color=(1,.9,.72),size=26,target=(0,0,2))
     bounce.light_linking.receiver_collection=dice_receivers
     bounce.data.specular_factor=0;bounce.visible_glossy=False
-    edge=E.light(scene,"AREA","Dusk edge across the dice",(20,12,16),3300,color=(.62,.72,1),size=16,target=(0,0,2))
+    edge=E.light(scene,"AREA","Dusk edge across the dice",(20,12,16),1980,color=(.62,.72,1),size=16,target=(0,0,2))
     edge.light_linking.receiver_collection=dice_receivers
     edge.data.specular_factor=0;edge.visible_glossy=False
     return dict(loc=(-23,-4,22),target=(0,0,7.8),lens=18.4,fstop=8*scene.unit_settings.scale_length,focus=(0,0,3))

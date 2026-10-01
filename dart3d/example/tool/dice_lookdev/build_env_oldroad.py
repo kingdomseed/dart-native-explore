@@ -57,7 +57,7 @@ def room(scene):
     timber=M.oak("Inn dark oak floor",(.085,.038,.014),.8,13,grain_scale=1.5)
     oak_table.build("Wayfarer tavern table",loc=(0,0,-76.35),width=110,depth=82,height=76,
         thickness=5,wood_tone=(.055,.024,.008),wear=.75,scorch=.07,grain_scale=2.2,
-        leg_width=6,leg_inset=(12,12),rear_recess=(29,30),seed=11)
+        leg_width=6,leg_inset=(12,12),seed=11)
     a.block("Raised table floor",(330,140,8),(0,-10,-80.35),timber,.5)
     a.block("Inn sitting bay floor",(440,300,8),(0,300,-139),timber,.5)
     for i in range(5):

@@ -76,7 +76,7 @@ def room(scene, top, chrome):
     """A window table above the receding diner bar and a rain-wet avenue."""
     from assets import (geometry as G, materials as M, diner_counter, bar_stool, dome_pendant,
                         rain_window, neon_street, napkin_dispenser, salt_shaker,
-                        coffee_mug, leather_menu, espresso_machine, pie_stand, vessel, stone_steps)
+                        coffee_mug, leather_menu, espresso_machine, pie_stand, vessel, stone_steps, diner_place_setting)
     before = set(bpy.data.objects)
     counter = diner_counter.build("Window counter", loc=(0, 0, -76), width=80, depth=64, height=75.75,
                         tone=(0.024, 0.022, 0.028), quiet=(28, 20), droplets=2400, puddles=10, streaks=48,
@@ -86,6 +86,7 @@ def room(scene, top, chrome):
     coffee_mug.build(loc=(27, 25, -0.25), rot_z=0.12, height=9.5, radius=4.2,
                      steam_height=7, steam_strength=1.1, steam_width=1.6, steam_drift=-1.8, steam_opacity=0.12, seed=7)
     leather_menu.build(loc=(33.5, 7, -0.25), rot_z=-0.06, width=10, depth=18, seed=9)
+    diner_place_setting.build("Spoon saucer and sugar",loc=(7,26,-.25),radius=4.3,rot_z=.08,seed=4)
     fixtures = G.Asset("Diner architecture")
     chrome = M.polished_metal("Diner architectural chrome", wear=0.4, seed=6)
     wood = M.oak("Diner wall walnut", (0.032, 0.01, 0.008), wear=0.5, seed=2, axis="Z")
@@ -161,9 +162,9 @@ def room(scene, top, chrome):
                    target=(-45,250,-90), kind="AREA")
     fixtures.light("Cyan through rain", (110,105,10), 115000, (0.025,0.6,1), 60,
                    target=(30,24,-1), kind="AREA")
-    fixtures.light("Magenta window reflection", (-5,96,30), 12000, (1,0.014,0.28), 45,
+    fixtures.light("Magenta window reflection", (-5,70,35), 15000, (1,0.014,0.28), 45,
                    target=(0,27,-1), kind="AREA")
-    fixtures.light("Cyan counter reflection", (26,88,28), 10000, (0.025,0.6,1), 30,
+    fixtures.light("Cyan counter reflection", (26,68,34), 13000, (0.025,0.6,1), 30,
                    target=(15,27,-1), kind="AREA")
     fixtures.light("Warm counter pendant pool", (-31,3,47), 18000, (1,0.57,0.27),24,
                    target=(-35,18,0), kind="AREA")
@@ -179,7 +180,7 @@ def room(scene, top, chrome):
                    target=(-24,24,0), kind="AREA")
     wet_receivers = bpy.data.collections.new("Voltline counter water receivers")
     for ob in counter.children_recursive:
-        if ob.name.startswith(("Counter water bead", "Small spilled puddle")):
+        if ob.name.startswith(("Countertop", "Counter water bead", "Small spilled puddle")):
             wet_receivers.objects.link(ob)
     rain_receivers = bpy.data.collections.new("Voltline rain glint receivers")
     for ob in near_window.children_recursive:

@@ -118,7 +118,7 @@ def room(scene):
     brass=M.metal("Nook antique brass","brass",.65,4)
     oak_table.build("Small reading table",loc=(0,0,-76),width=126,depth=84,height=76,
                     thickness=4,wood_tone=(.075,.026,.009),wear=.45,scorch=0,seed=9,grain_scale=2.8,
-                    leg_width=6,leg_inset=(13,11),rear_recess=(23,25))
+                    leg_width=6,leg_inset=(13,11))
     a.block("Reading platform",(350,180,8),(0,15,-80),dark,.5)
     a.block("Sitting bay oak floor",(420,230,8),(0,285,-189),dark,.5)
     for x,w in ((-81,279),(238,105)):
