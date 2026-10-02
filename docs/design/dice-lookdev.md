@@ -1250,33 +1250,41 @@ Lighting recipes (the tray lights are unchanged unless noted):
   die vs tray 3.29, stroke 0.123–0.128, PASS.
   Gate: numeral 5.81 (d4), die vs tray 3.15, stroke 0.123–0.128, PASS.
 
-- **Northfield — the 1986 countryside kitchen (room round 2).** A close
-  broadside breakfast view: the calibration tray spans about 83% of the frame,
-  near rim at the bottom; 27.7 mm, 29.8 degrees down, effective f/8 on the dice.
-  A complete walnut-print laminate table with rolled aluminium edging, a floral mug,
-  buttered toast on an ironstone plate and a woven runner frame the tray.
-  The closest dressing clears the tray board by 11.5 cm. Behind it: a beige
-  terminal with bowed green CRT, cooling slots and separate blank keyboard,
-  a bent-plywood chair moved 22 cm back onto an extended landing to clear the straight table edge,
-  fitted cream units, enamel cooker, hollow-spout kettle,
-  fridge and a cassette radio with physical grille, reels and tuning ticks.
-  Floral wallpaper and gathered curtains surround a painted casement and
-  radiator. The clear window looks across layered spruce stands, a red barn
-  and descending fields to an articulated three-legged machine with a tiny
-  red warning light. All graphics are abstract; no lettering or logos.
-  The orange enamel pendant pools warm light onto the laminate, cupboard
-  strips warm the cooker, grey-blue window light catches the right edge,
-  and the CRT contributes a green reflection. Room lights have separate
-  receivers; the original tray, materials and `lamp`, `dusk`, `crt_glow`
-  light calls remain unchanged. +0.7 EV, gamma 0.7 and a 0.2-pixel phone
-  filter keep the thin instrument print legible at half resolution. The room
-  uses a normal
-  1.5-pixel filter for smooth grid lines; the gate mask pass is unchanged.
-  Shared mug and pendant variants preserve their defaults; all eight approved
-  rooms are checked at
-  25% / 16 samples. No room volumes or external assets.
-  Pass 1 preview gate (50% / 32 samples): numeral 4.69 (d20),
-  die vs tray 7.10, stroke 0.124–0.132, PASS.
+- **Northfield — the 1986 countryside kitchen (round 3, pass 2).**
+  A closer broadside crop, 21.5 mm and effective f/8, makes the foreground
+  d20 about 8% of the frame width. The camera is 23.4 degrees down; the near
+  rim and side corners are cropped. The thin chair-back arc is removed to
+  reveal the cooker and keyboard. The continuous laminate top has a straight
+  far edge and is raised to z = 0.33, immediately below the original mat at
+  z = 0.36. A concealed bedding cut in the table follows the existing ABS
+  base; no tray object or tray material is altered.
+  Figured walnut print, varied sheen, worn scratches, a broken cup ring and
+  small breakfast crumbs replace the uniform stripe treatment. The floral
+  mug and toast sit on the table; an open cotton crochet placemat frames the
+  right. Its 10.83 cm clearance is the nearest foreground dressing to the
+  tray. Evaluated geometry checks verify support and no foreground prop
+  intersections. The terminal stands farther back with its separate keyboard
+  visible, a true cabinet recess behind the bowed glass, phosphor scanlines,
+  darker screen edges and green spill across the mug and laminate.
+  The orange pendant has an optional glowing opal diffuser. A tighter warm
+  table pool and cupboard strip contrast with restrained blue window light;
+  two broad fill lights are removed. The original `lamp`, `dusk`, `crt_glow`
+  calls remain unchanged and the room lights retain separate receivers.
+  Raising the kitchen bay exposes the patterned tile splashback, enamel
+  cooker, steel stockpot, kettle and hanging skillet/ladle/turner. Plants,
+  floral curtains and radiator surround the casement. The existing field
+  view is repositioned: a gap in the spruce stands exposes the three-legged
+  machine, with a smaller red barn beside it. No broader backdrop replacement.
+  Shared extensions are opt-in; all ten other approved rooms build and were
+  visually rechecked at 25% / 16 samples. Asset close-ups and delivery renders
+  are in `out/r3/pass2/northfield/`. No volumes or external assets.
+  Exposure is +0.4 EV, reduced from +0.7 to retain thin ink contrast; gamma
+  0.7, the 0.2-pixel phone filter and the room's 1.5-pixel filter are unchanged.
+  Adding more direct light reduced numeral contrast, so that trial light was
+  removed. Pass 2 preview gate (50% / 32 samples): numeral 5.09 (d20),
+  die vs tray 6.06, stroke 0.124–0.132, PASS. These are preview measurements;
+  the full-resolution gate remains for the operator's final render.
+  Gate: numeral 9.90 (d6), die vs tray 5.94, stroke 0.124–0.132, PASS.
 
 - **Voltline — the late-night diner (round 2).** Broadside from −x,
   54 mm, f/8 on the dice, seated eye height. The holo tray on a wet

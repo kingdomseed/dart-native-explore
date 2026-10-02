@@ -7,7 +7,7 @@ from . import geometry as G, materials as M
 
 def build(name="Dome pendant", loc=(0, 0, 0), rot_z=0, radius=17, height=21, drop=75,
           tone=(0.65, 0.68, 0.72), wear=0.25, seed=1, energy=50000, color=(1, 0.55, 0.23), finish="chrome",
-          recessed_bulb=False) -> bpy.types.Object:
+          recessed_bulb=False,diffuser=False) -> bpy.types.Object:
     a = G.Asset(name, loc, rot_z)
     chrome = (M.ceramic if finish == "enamel" else M.polished_metal)(f"{name} shade", tone, wear, seed)
     lining = M.ceramic(f"{name} enamel lining", (0.7, 0.65, 0.5), wear, seed)
@@ -21,5 +21,10 @@ def build(name="Dome pendant", loc=(0, 0, 0), rot_z=0, radius=17, height=21, dro
     bulb = E.emissive(f"{name} tungsten bulb", (1, 0.65, 0.28), 9)
     a.cylinder("Porcelain bulb socket", 1.6, 9, (0, 0, height*.62 if recessed_bulb else -1), lining, bevel=0.3)
     a.sphere("Warm globe", radius * 0.23, (0, 0, radius*.27 if recessed_bulb else -radius * 0.42), bulb, scale=(1, 1, 1.28), subdiv=3)
-    a.light("Pendant pool", (0, 0, -1), energy, color, radius * 0.62, target=(0, 0, -100), kind="AREA")
+    if diffuser:
+        opal=E.simple(name+" warm opal diffuser",(.7,.50,.25),.35,
+            Emission_Color=(1,.62,.23,1),Emission_Strength=2.4)
+        a.lathe("Shallow opal diffuser",[(radius*math.cos(t),-radius*.25*math.sin(t))
+            for t in [math.pi*.5*i/24 for i in range(25)]],opal,segments=64)
+    a.light("Pendant pool", (0, 0, -radius*.26 if diffuser else -1), energy, color, radius * 0.62, target=(0, 0, -100), kind="AREA")
     return a.root

@@ -7,9 +7,9 @@ from .crt_terminal import rounded_rect
 
 
 def build(name="Laminate kitchen table",loc=(0,0,0),rot_z=0,width=105,depth=76,height=75,
-          thickness=2.8,wood_tone=(.24,.105,.032),wear=.45,seed=1,rear_recess=None) -> bpy.types.Object:
+          thickness=2.8,wood_tone=(.24,.105,.032),wear=.45,seed=1,rear_recess=None,figured=False) -> bpy.types.Object:
     a=G.Asset(name,loc,rot_z)
-    top=M.wood_laminate(name+" walnut laminate",wood_tone,wear,seed)
+    top=(M.figured_laminate if figured else M.wood_laminate)(name+" walnut laminate",wood_tone,wear,seed)
     wood=M.oak(name+" birch legs",tuple(c*.7 for c in wood_tone),wear,seed,axis="Z",grain_scale=2)
     metal=M.polished_metal(name+" aluminium binding",(.52,.53,.48),wear,seed,.28)
     # Rounded corners are a full profile, not an excessive box bevel.

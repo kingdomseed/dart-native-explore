@@ -151,6 +151,25 @@ def wood_laminate(name="Walnut print laminate", tone=(.24,.105,.032), wear=.4, s
     return m
 
 
+def figured_laminate(name="Figured walnut laminate", tone=(.14,.065,.023), wear=.5, seed=1):
+    m,k=E.material(name)
+    vec=mapped(k,(.055,.32,.32),seed)
+    broad=k.noise(vec,1.4,3,.65,dist=.8).outputs["Fac"]
+    wave=k.node("ShaderNodeTexWave",wave_type="BANDS",bands_direction="Y")
+    k.link(vec,wave.inputs["Vector"])
+    k.set(wave,Scale=2.2,Distortion=12,Detail=4,Detail_Scale=.65)
+    grain=k.noise(mapped(k,(.08,2.4,1),seed),1,3).outputs["Fac"]
+    col=k.ramp(broad,[(.2,tuple(c*.30 for c in tone)),(.46,tone),(.74,tuple(c*1.75 for c in tone))])
+    line=k.ramp(wave.outputs["Fac"],[(.18,(.12,.12,.12)),(.42,(.65,.65,.65)),(.72,(1,1,1))])
+    col=k.mix(.32,col,k.mix(line,tuple(c*.28 for c in tone)+(1,),col))
+    col=k.mix(.12,col,k.mix(grain,tuple(c*.38 for c in tone)+(1,),col))
+    scuff=k.noise(mapped(k,(.12,.13,.1),seed+3),1,3).outputs["Fac"]
+    rough=k.math("ADD",.19,k.math("MULTIPLY",scuff,wear*.36))
+    k.surface(k.bsdf(Base_Color=col,Roughness=rough,Coat_Weight=.3,Coat_Roughness=.22,
+                     Normal=k.bump(grain,.10,.012)))
+    return m
+
+
 def retro_flower(name="1970s floral print", tone=(.58,.49,.31), ink=(.22,.25,.055), scale=.15,
                  axes=("X","Z"), ceramic=False, seed=1):
     m,k=E.material(name)

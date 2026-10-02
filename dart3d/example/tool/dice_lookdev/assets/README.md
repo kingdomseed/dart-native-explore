@@ -467,3 +467,17 @@ Oldroad reuses `table_wear` for quiet-band-aware knife marks and cup rings,
 and the rugged `hearth_fireplace` variant for dark fieldstone and a fuller
 log fire. No new asset module was needed. All ten other approved rooms were
 rendered serially at 25 percent / 16 samples and visually checked.
+
+
+### Northfield round 3, pass 2
+
+- `crochet_mat`: interlocking cotton flower loops and scalloped borders; `width`, `depth`, `stitch`, `tone`, `wear`, `seed`. About 35k evaluated triangles at the scene size.
+- `kitchen_cookware`: spun stockpot with fitted lid and handles, or a wall rail carrying a skillet, ladle and slotted turner; `kind`, `radius`, `height`, `width`, `wear`, `seed`.
+- `crt_terminal`: optional `optical_glass` adds a real recess behind the screen and phosphor edge falloff; `curvature` and `phosphor_strength` control the bowed face and glow. Existing defaults are preserved.
+- `laminate_table`: `figured=True` uses the new `materials.figured_laminate` walnut print, with broad figure, finer pores and wear-dependent sheen. The normal laminate and `rear_recess=None` defaults remain unchanged.
+- `dome_pendant`: optional `diffuser=True` fits a shallow glowing opal bowl below the enamel shade and moves its pool light beneath it.
+- `countryside_window`: optional `machine_width`, `barn_x`, `barn_scale`, `exterior_elevation` and `field_clearing` allow the existing machine, barn and field to be framed through a lower camera. Defaults preserve earlier views.
+
+Northfield reuses `table_wear` for ring marks and small scratches outside the
+play margin. All other approved rooms were rendered serially at 25% / 16
+samples after these shared changes; see `out/r3/pass2/northfield/regression/`.

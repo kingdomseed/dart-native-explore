@@ -9,7 +9,7 @@ from . import geometry as G, materials as M
 
 def build(name="Countryside window",loc=(0,0,0),rot_z=0,width=122,height=134,
           tone=(.67,.63,.51),wear=.4,seed=1,view=True,curtains=True,radiator=True,
-          machine_x=1150,machine_height=540,exterior_slope=.2) -> bpy.types.Object:
+          machine_x=1150,machine_height=540,exterior_slope=.2,machine_width=1,barn_x=180,exterior_elevation=0,barn_scale=1,field_clearing=None) -> bpy.types.Object:
     a=G.Asset(name,loc,rot_z);rng=random.Random(seed);w,h=width,height
     paint=M.aged_plastic(name+" old ivory paint",tone,wear,seed)
     metal=M.polished_metal(name+" catches",(.4,.43,.43),wear,seed,.28)
@@ -83,6 +83,7 @@ def build(name="Countryside window",loc=(0,0,0),rot_z=0,width=122,height=134,
             fir=E.simple(name+f" fir stand {layer}",tone_tree,.95,Emission_Color=(*tone_tree,1),Emission_Strength=.45)
             for i in range(100):
                 x=-1100+i*30+rng.uniform(-13,13);th=rng.uniform(65,125)
+                if field_clearing and field_clearing[0]*yy<x<field_clearing[1]*yy:continue
                 a.cylinder("Distant spruce trunk",2.7,th,(x,yy,-150+th/2),fir,segments=5,bevel=0)
                 for tier in range(6):
                     base=-150+th*(.07+tier*.135)
@@ -93,32 +94,39 @@ def build(name="Countryside window",loc=(0,0,0),rot_z=0,width=122,height=134,
                         r=rr*rng.uniform(.8,1.2)*(1 if j%2 else .65)
                         verts.append((x+r*math.cos(t),yy+r*math.sin(t),base+rng.uniform(-1,1)*th*.025))
                     a.mesh("Irregular spruce boughs",verts,[(0,j+1,(j+1)%20+1) for j in range(20)],fir)
+        before_barn=set(a.root.children)
         barn=E.simple(name+" red barn weatherboards",(.22,.058,.045),.85,Emission_Color=(.14,.055,.045,1),Emission_Strength=.35)
         roof=E.simple(name+" grey barn roof",(.22,.27,.29),.6)
-        bx,by=180,640
+        bx,by=barn_x,640
         a.block("Red field barn",(160,100,100),(bx,by,-100),barn,.8)
         a.extrude("Barn gable",[(bx-80,-50),(bx,3),(bx+80,-50)],100,barn,y=by,bevel=.3)
         for side in (-1,1):
             ob=a.block("Pitched tin roof",(98,113,2),(bx+side*41,by,-23),roof,.4);ob.rotation_euler.y=side*.58
         a.block("Barn doorway",(30,1,62),(bx,by-50.6,-119),paint,.2)
         for i in range(22):a.tube("Barn vertical siding",[(bx-77+i*7.3,by-50.8,-148),(bx-77+i*7.3,by-50.8,-51)],.22,roof)
+        if barn_scale!=1:
+            barn_group=G.Asset(name+" distant barn",loc=((1-barn_scale)*bx,(1-barn_scale)*by,(1-barn_scale)*-150))
+            a.add(barn_group.root)
+            for ob in set(a.root.children)-before_barn-{barn_group.root}:barn_group.add(ob)
+            barn_group.root.scale=(barn_scale,)*3
         steel=E.simple(name+" remote machine haze",(.16,.21,.25),.73,Emission_Color=(.15,.20,.24,1),Emission_Strength=.5)
         mx,my,mh=machine_x,2700,machine_height;ground=-450;top=ground+mh
-        a.sphere("Remote machine carapace",63,(mx,my,top),steel,scale=(1.45,1,.35),subdiv=2)
-        a.cylinder("Machine upper turret",39,15,(mx,my,top+18),steel,segments=12,bevel=2)
+        a.sphere("Remote machine carapace",63*machine_width,(mx,my,top),steel,scale=(1.45,1,.35),subdiv=2)
+        a.cylinder("Machine upper turret",39*machine_width,15,(mx,my,top+18),steel,segments=12,bevel=2)
         for i in range(3):
             theta=i*math.tau/3+.3
-            hip=Vector((mx+35*math.cos(theta),my+35*math.sin(theta),top-16))
-            knee=Vector((mx+85*math.cos(theta),my+85*math.sin(theta),top-mh*.48))
-            foot=Vector((mx+150*math.cos(theta),my+150*math.sin(theta),ground))
+            hip=Vector((mx+35*machine_width*math.cos(theta),my+35*machine_width*math.sin(theta),top-16))
+            knee=Vector((mx+85*machine_width*math.cos(theta),my+85*machine_width*math.sin(theta),top-mh*.48))
+            foot=Vector((mx+150*machine_width*math.cos(theta),my+150*machine_width*math.sin(theta),ground))
             a.beam("Tripod machine upper leg",hip,knee,12,15,steel,2)
             a.sphere("Tripod knee joint",12,knee,steel)
             a.beam("Tripod machine lower leg",knee,foot,9,11,steel,1.5)
             a.sphere("Broad machine foot",17,foot,steel,scale=(1.6,1,.35))
-        a.sphere("Distant red warning light",3,(mx+20,my-62,top-2),E.emissive(name+" warning glow",(.8,.035,.015),2),subdiv=2)
+        a.sphere("Distant red warning light",3,(mx+20*machine_width,my-62*machine_width,top-2),E.emissive(name+" warning glow",(.8,.035,.015),2),subdiv=2)
         landscape=G.Asset(name+" descending field vista")
         a.add(landscape.root)
         for ob in set(a.root.children)-before-{landscape.root}:
             landscape.add(ob)
+        landscape.root.location.z=exterior_elevation
         landscape.root.rotation_euler.x=-math.atan(exterior_slope)
     return a.root
