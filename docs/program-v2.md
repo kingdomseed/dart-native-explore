@@ -15,7 +15,30 @@ where this file re-scopes it. Why the reset: see
    `mythic_dice_parser`, with the dice feel the operator asked for.
 3. **Release:** dart3d published on dartpub.dev as the first 3D plugin.
 
-## Where we are (2026-10-01)
+## Definition of done (operator, 2026-10-02)
+
+dart3d is finished when all four hold. Nothing else is scheduled before
+they do — **no side quests until the engine is done**: no new demos,
+look-dev, dice polish or design passes; an idea that is not on this list
+goes into the backlog, not into a branch.
+
+1. **Engine at the 0.24 standard.** Tracks S, E and V closed: the API
+   surface and behavior match flutter_scene 0.24 / scene 0.4 on both
+   platforms, with evidence, and it holds frame rate on the low-end
+   device (Fire tablet).
+2. **An API a real app can adopt.** One pass over the public Dart API for
+   naming, defaults, errors and lifecycle; a fresh app can add dart3d and
+   show a lit, loaded model in a few lines (R6, R4).
+3. **Agent skills that match upstream's.** flutter_scene ships six
+   (`idioms`, `kit`, `looks`, `performance`, `procedural`,
+   `verification-loop`), an installer (`dart run flutter_scene:skills`)
+   and a test that compiles every snippet. dart3d ships the equivalents
+   for what it implements (R7).
+4. **Docs that make it clear.** README, a getting-started path, per-area
+   guides and a CHANGELOG, written for someone who has never seen the
+   repo (R8).
+
+## Where we are (2026-10-02)
 
 **Landed since the reset.** S0a/b/e/f, the Vulkan relaunch fix, the P4
 hero (#31), `switchAnimation` (#34), the Track V re-cut (#37; upstream
@@ -29,24 +52,23 @@ planned there. Nothing in dart3d depends on them. What dart3d does need
 from look-dev — the DartNative set's spec and reference renders — is on
 `main` (`docs/design/dice-lookdev.md`, `docs/design/dice-lookdev/`).
 
-**Next, in order.**
+**Next, in order.** Engine first, then release. Product work waits.
 
-1. **Fire tablet findings** — the baseline ran on 2026-10-01
-   (`docs/artifacts/s0-fire-tablet-baseline/`, #44). The scene view did
-   not start below API 33 (jolt-jni's `Cleaner`; fixed in #44). Still
-   open from it: the dice tray rim is wrong in landscape, the dice
-   screen runs at about 15–20 fps on the Mali-G52, and native lifetime
-   on API 26–32 needs an audit now that the automatic cleaner is off
-   there.
-2. **S0h cold start** — ~10–14 s of material compile before the first
-   frame on a fresh install (about 15 s on the Fire tablet); every demo
-   opens with it.
-3. **P3 DR3** — notation entry, count-up total, audio. Needs P1's
-   pre-rolled parser contract (explode/reroll stays on the virtual
-   fallback until `CallbackDiceRoller` is async).
-4. **E1** Filament upgrade + instancing, then E2 and E3. E3 also gives
-   the dice a lighting cue; today they sit under no light sources.
-5. **S0c / S0g** backfill, as each lane's unit is touched.
+1. **Stabilize** — Fire tablet frame rate (re-measure now that the tray
+   draws at the right size; it read 15–20 fps before #45), S0h cold start
+   (~10–15 s of material compile before the first frame), then S0g and
+   the S0c backfill. Baseline: `docs/artifacts/s0-fire-tablet-baseline/`.
+   Open from the tablet run: native lifetime on API 26–32 now that
+   jolt-jni's cleaner is off there (#44); dice at an edge can still cover
+   the rim line.
+2. **S1 renderer spike**, then **Track E** in its table order (E1 → E12).
+3. **Track V** — the 0.24 delta, re-pinned when upstream publishes.
+4. **Track R** — API pass, consumer build, agent skills, README and
+   docs, publish.
+
+**Paused until the engine is done.** P3 DR3 and later (notation, audio,
+juice), P5 demos, P7 design pass, and anything in P2. P6 (Dash/fcar
+replacements) stays tied to R5 because publishing needs it.
 
 **Verification debt.** iOS simulators and devices are paused by the
 operator (Mac mini load, 2026-09-30), so #36 and #38–#42 merged on A142
@@ -521,6 +543,27 @@ glTF sampler wrap modes at runtime import. dart3d's importer parses
 - [ ] R4 Consumer build test: a fresh `dn create` app depending on dart3d
       by path, then by git, resolves Filament/jolt-jni and builds both
       platforms.
+- [ ] R6 **API pass** — review the whole public Dart surface as a
+      consumer would meet it: names, defaults, nullability, error messages,
+      lifecycle (create, load, dispose, hot restart), what is exported and
+      what is internal. Remove or hide what a real app should not see.
+      Output: a short API guide and a `dart3d/example/lib/minimal/` app
+      that is the README's first code block, built in CI.
+- [ ] R7 **Agent skills**, mirroring upstream's set
+      (`packages/flutter_scene/skills/`): `dart3d-idioms` (correct usage,
+      the traps, what exists), `dart3d-looks` (lighting + post presets),
+      `dart3d-performance` (frame budget on device), `dart3d-procedural`
+      (content from code), `dart3d-verification-loop` (see your own
+      output: screenshots on device). Upstream's `kit` skill covers
+      gameplay kit code that is out of scope here (D7); `dart3d-idioms`
+      says so and points at what to build app-side. Include an installer
+      (`dart run dart3d:skills [--check]`, versioned like upstream's) and
+      a test that compiles every snippet in every skill.
+- [ ] R8 **README and docs** — README rewritten around: what it is,
+      install, first scene, loading a model, physics, materials and
+      looks, platform notes, limits. Per-area guides under `dart3d/doc/`,
+      CHANGELOG, and the doc truth pass (S0d) folded in. Every code block
+      is taken from a file that compiles.
 - [ ] R5 Publish to dartpub.dev (**requires P6**: the Dash/fcar showcase
       assets must be replaced or excluded via `.pubignore` before any publish) — operator signs in; GitHub-backed.
 
