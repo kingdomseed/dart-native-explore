@@ -14,9 +14,9 @@ def outline(width,depth,radius,segments=12):
 
 
 def build(name="Low lacquer table",loc=(0,0,0),rot_z=0,width=98,depth=65,height=32,
-          thickness=2.4,tone=(.018,.005,.004),wear=.4,seed=1,gilt=True) -> bpy.types.Object:
+          thickness=2.4,tone=(.018,.005,.004),wear=.4,seed=1,gilt=True,polish=0) -> bpy.types.Object:
     a=G.Asset(name,loc,rot_z)
-    lacquer=M.urushi(name+" rubbed urushi",tone,wear,seed)
+    lacquer=M.urushi(name+" rubbed urushi",tone,wear,seed,polish=polish)
     gold=M.metal(name+" fine gilt moulding","brass",wear,seed)
     perimeter=outline(width,depth,4)
     n=len(perimeter)

@@ -481,3 +481,19 @@ rendered serially at 25 percent / 16 samples and visually checked.
 Northfield reuses `table_wear` for ring marks and small scratches outside the
 play margin. All other approved rooms were rendered serially at 25% / 16
 samples after these shared changes; see `out/r3/pass2/northfield/regression/`.
+
+
+### Vermilion round 3, pass 2
+
+- `maki_e`: separate raised five-petal blossom and branch appliques; `width`, `height`, `flowers`, cylindrical `radius`, `metal_finish`, `wear`, `seed`. Its surface-mapping helper also follows the unchanged tray's rounded outer wall.
+- `stone_lantern`: moulded granite pedestal, open fire chamber, swept square roof and lotus finial; `height`, `radius`, `tone`, `energy`, `wear`, `seed`.
+- `tea_service`: optional `blossoms=True` adds gold floral decoration following the bowl/caddy profile; the existing default is unchanged.
+- `byobu_screen`: optional `blossoms=True` adds original painted flower branches over the pine and cloud motifs.
+- `lacquer_table`: optional `polish` controls the urushi coat through `materials.urushi`; `polish=0` retains the earlier finish.
+- `materials`: `urushi(polish=0)` retains its previous roughness and coat values by default. No other material recipes changed.
+
+The table's straight edge remains intact. A tray-shaped bedding cut is wholly
+inside the tabletop and conceals the existing support board; it is not a rear
+recess. The original tray geometry, floor, engraving, materials and existing
+light calls are unchanged. All ten other approved rooms were rendered and
+opened at 25% / 16 samples; see `out/r3/pass2/vermilion/regression/`.

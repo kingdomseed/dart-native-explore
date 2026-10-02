@@ -38,7 +38,7 @@ def cut_stone(name="Faceted coloured crystal", tone=(.025,.46,.19), wear=.1, see
     return m
 
 
-def urushi(name="Hand-polished lacquer", tone=(.016,.005,.004), wear=.35, seed=1):
+def urushi(name="Hand-polished lacquer", tone=(.016,.005,.004), wear=.35, seed=1, polish=0):
     m,k=E.material(name)
     vec=mapped(k,(1,1,1),seed)
     n=k.noise(vec,.75,3).outputs["Fac"]
@@ -47,8 +47,8 @@ def urushi(name="Hand-polished lacquer", tone=(.016,.005,.004), wear=.35, seed=1
     geo=k.node("ShaderNodeNewGeometry")
     edge=k.math("MINIMUM",k.math("MULTIPLY",k.math("MAXIMUM",k.math("SUBTRACT",geo.outputs["Pointiness"],.49),0),wear*12),.18)
     col=k.mix(edge,col,(.11,.025,.009,1))
-    k.surface(k.bsdf(Base_Color=col,Roughness=k.math("ADD",.2,k.math("MULTIPLY",n,.13*wear)),
-        Coat_Weight=.7,Coat_Roughness=.13,Normal=k.bump(n,.12,.012*wear)))
+    k.surface(k.bsdf(Base_Color=col,Roughness=k.math("ADD",.2-.12*polish,k.math("MULTIPLY",n,.13*wear)),
+        Coat_Weight=.7+.3*polish,Coat_Roughness=.13-.10*polish,Normal=k.bump(n,.12,.012*wear)))
     return m
 
 

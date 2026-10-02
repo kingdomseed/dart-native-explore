@@ -1308,34 +1308,40 @@ Lighting recipes (the tray lights are unchanged unless noted):
   Pass 1 preview gate (50% / 32 samples): numeral 12.68 (d20),
   die vs tray 4.27, stroke 0.124–0.132, PASS.
 
-- **Vermilion Court — the lantern pavilion.** Round 2 replaces the
-  floor-level miniature tray composition with a close broadside view of
-  the preserved tray on a modeled low lacquer table. The table has a
-  rounded moulded top, scalloped aprons and curved feet; gilt tea bowls,
-  a fitted tea caddy, a pleated fan and a few cupped cherry petals frame
-  it outside a 10 cm quiet margin. Bound woven tatami and stuffed silk
-  zabuton seats furnish the raised tea platform. Joinered washi andon
-  lamps, a ribbed red chochin, half-lap shoji screens and a folding
-  gold-leaf byobu with original pine/cloud brushwork fill the midground.
-  Stepped landings open the view past the vermilion veranda railing to
-  twig-supported cherry blossoms, layered dusk mountains and a timber
-  pagoda with swept tiled eaves and warm slit windows. No volume haze,
-  downloaded assets or text. Camera: 18.4 mm, 31.3 degrees down,
-  effective f/8 on the dice; tray spans 83.8% of the frame. Table top
-  z=0, foreground tatami z=-32. Warm andon pools, red lantern accent
-  and cool dusk are linked to environment receivers. Diffuse-only
-  paper-ceiling and dusk returns lift the dice without white specular
-  patches on their red faces. Round 3 pass 1 reduces the warm key from
-  16 to 9.6 kW, paper return from 12 to 7.2 kW and dusk return from 3.3
-  to 1.98 kW. This keeps the leaf bright while reducing wash on the red
-  faces; every die now exceeds 6 in the full-resolution numeral gate.
-  The moon, overhead, tray geometry and all materials remain unchanged.
-  Exposure +1.3 EV; standard view transform and pixel filter retained.
-  Added shared materials preserve all earlier functions; the nine
-  approved rooms were rechecked at 25% / 16 samples in round 2. Pass 1
-  changes only this room's lighting, leaving the shared assets unchanged.
-  Gate (full resolution, 128 samples): numeral 6.52 (d8), die vs tray 2.37,
-  Gate: numeral 6.52 (d8), die vs tray 2.37, stroke 0.123–0.128, PASS.
+- **Vermilion Court — the lantern pavilion.** Round 3 pass 2 uses a
+  close broadside 26 mm camera, 32.6 degrees down, at effective f/8.
+  The near rim is cropped; the d20 spans 7.4 percent of the frame,
+  larger than the previous shot but still below the concept's 8–10 percent.
+  The continuous 112 × 47 cm lacquer tabletop now reaches z=1.12.
+  A fitted bedding cut in the table follows the original tray base,
+  concealing its projecting board without changing the tray's position,
+  mesh or materials; the far table edge remains straight. The lacquer
+  uses an optional higher-polish coat and reflects a modeled ceiling
+  paper lantern. Smaller blossom-decorated tea bowls and a caddy frame
+  the rear corners. Cupped petals rest on the table and drift beyond the
+  play area. Evaluated foreground dressing clears the tray by at least
+  10.41 cm, with no prop intersections.
+  A separate gold blossom applique follows the tray's outer wall; the
+  original rim, gilt, floor and engraving are untouched. Bound tatami,
+  a silk zabuton and a low stand occupy a raised seating platform.
+  The closer gold-leaf screen has painted blossoms over the existing
+  pine/cloud brushwork. Warm andon pools, a red chochin, shoji, a
+  carved stone garden lantern, flowering branches, a vermilion railing
+  and a clouded dusk pagoda view form the upper layers.
+  Broad neutral fill and the hard cool area-light reflection are removed.
+  A receiver-linked warm strip lights the existing gilt and table without
+  illuminating the red dice faces. The pass-1 key, moon, overhead and
+  paper/dusk return calls stay unchanged. A new 2.2 kW diffuse-only warm
+  andon edge return, linked to the dice, raises die/tray separation from
+  2.40 to 2.53 while keeping every numeral above 6. Exposure remains
+  +1.3 EV. No volume, external assets, lettering or renderer changes.
+  Optional shared polish/blossom parameters preserve previous defaults;
+  all ten other approved rooms were re-rendered serially at 25% / 16
+  samples and visually checked. The background remains more cropped
+  and simpler than the concept, and some clear tabletop band remains.
+  Gate (full resolution, 128 samples): numeral 6.19 (d12), die vs tray 2.53,
+  stroke 0.123–0.128, PASS. Previews: `out/r3/pass2/vermilion/`.
+  Gate: numeral 6.19 (d12), die vs tray 2.53, stroke 0.123–0.128, PASS.
 
 - **Gemcutter — the jeweler's atelier.** Round 3 pass 2 brings the room
   camera closer: 21.5 mm, 23.1 degrees down, effective f/8 in centimetre

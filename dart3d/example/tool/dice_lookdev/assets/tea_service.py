@@ -6,7 +6,7 @@ import env_common as E
 
 
 def build(name="Lacquer tea bowl",loc=(0,0,0),rot_z=0,kind="bowl",radius=5.2,height=7,
-          tone=(.014,.006,.004),metal_finish="brass",wear=.35,seed=1,tea=True) -> bpy.types.Object:
+          tone=(.014,.006,.004),metal_finish="brass",wear=.35,seed=1,tea=True,blossoms=False) -> bpy.types.Object:
     a=G.Asset(name,loc,rot_z);lac=M.urushi(name+" urushi",tone,wear,seed)
     gold=M.metal(name+" maki-e",metal_finish,wear,seed)
     if kind=="fan":
@@ -58,4 +58,11 @@ def build(name="Lacquer tea bowl",loc=(0,0,0),rot_z=0,kind="bowl",radius=5.2,hei
             for side in (-1,1):
                 leaf=[(surface_radius(z+.6*t)*math.cos(ang+side*.08*math.sin(t*math.pi)),surface_radius(z+.6*t)*math.sin(ang+side*.08*math.sin(t*math.pi)),z+.6*t) for t in [k/8 for k in range(9)]]
                 a.tube("Gold leaf stroke",leaf,.035,gold,resolution=1)
+    if blossoms:
+        from .maki_e import sprig
+        def blossom_surface(u,v,d):
+            angle=u/radius;z=height*.26+v
+            r=surface_radius(z)+d
+            return (r*math.sin(angle),-r*math.cos(angle),z)
+        sprig(a,blossom_surface,radius*math.tau,height*.56,gold,seed,flowers=16)
     return a.root

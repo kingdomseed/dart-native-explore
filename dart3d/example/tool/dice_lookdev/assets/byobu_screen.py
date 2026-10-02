@@ -36,7 +36,7 @@ def pine(a,width,height,ink,seed):
 
 
 def build(name="Pine byobu",loc=(0,0,0),rot_z=0,panels=4,panel_width=43,height=145,
-          fold=.24,wood_tone=(.015,.008,.004),wear=.3,seed=1) -> bpy.types.Object:
+          fold=.24,wood_tone=(.015,.008,.004),wear=.3,seed=1,blossoms=False) -> bpy.types.Object:
     a=G.Asset(name,loc,rot_z)
     leaf=M.gold_leaf(name+" leaf",wear,seed)
     wood=M.urushi(name+" black frame",wood_tone,wear,seed)
@@ -59,4 +59,10 @@ def build(name="Pine byobu",loc=(0,0,0),rot_z=0,panels=4,panel_width=43,height=1
                 pts.append((x,-.67,z+math.sin(k*.24+i)*height*.018))
             for off in (0,1.3,2.6):panel.tube("Gold cloud brush line",[(x,y,zz+off) for x,y,zz in pts],.14,cloud,resolution=1)
         pine(panel,panel_width,height,ink,seed+i*5)
+        if blossoms:
+            from .maki_e import sprig
+            petal=E.simple(name+" ivory painted blossom",(.55,.35,.22),.75)
+            for j in range(3):
+                def surface(u,v,d):return (u,-.81-d,height*(.18+j*.24)+v)
+                sprig(panel,surface,panel_width*.88,height*.18,petal,seed+i*13+j,flowers=9,relief=.007)
     return a.root
