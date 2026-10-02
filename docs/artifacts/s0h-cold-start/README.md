@@ -153,12 +153,19 @@ was not re-measured, for the reason above.
 
 - `dn analyze` and `dn test` in `dart3d` (277 tests) and
   `dart3d/example` (227 tests): clean.
-- `:dart3d:testReleaseUnitTest`: passes, with 22 new tests.
-  `MaterialPackagesTest` covers the package sets, keys and
-  fingerprints; `MaterialStoreTest` the cache (round trip, damaged and
-  truncated files, eviction, export); `ShippedMaterialsTest` that the
-  assets are exactly the fixed set for the current recipes and Filament
-  pin.
+- `:dart3d:testReleaseUnitTest`: passes, with 30 new tests, and runs
+  in CI (job `android-unit`). `MaterialPackagesTest` covers the package
+  sets, keys and fingerprints and the refused-package decision;
+  `MaterialStoreTest` the cache (round trip, damaged and truncated
+  files, eviction, rejection, temp files, export);
+  `ShippedMaterialsTest` that the assets are exactly the fixed set for
+  the current recipes and Filament pin.
+- A stored package the engine refuses to load (an app that resolves
+  another Filament) is dropped and compiled on the device instead of
+  ending the view. That path is covered by the JVM tests only; it was
+  not provoked on a device.
+- The bake renders on OpenGL. A bake run that way reproduced all 22
+  packages, Vulkan ones included, byte for byte.
 
 ## Open
 

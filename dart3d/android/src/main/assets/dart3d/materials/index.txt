@@ -1,3 +1,4 @@
+# filament 1.71.6, source 87bf3ed
 d62212bfb13471184d27f65c613d40dd catcher|OPENGL
 988d1d9654f0bc12a19088533505997d catcher|VULKAN
 a17f4133f1e20ca033c9df56e7cfbe7b lit|false|MASKED|e0|s31|OPENGL
