@@ -54,9 +54,12 @@ from look-dev — the DartNative set's spec and reference renders — is on
 
 **Next, in order.** Engine first, then release. Product work waits.
 
-1. **Stabilize** — S0h cold start (17–18 s to the first frame on the
-   Fire tablet, 15.6 s of it three lit material compiles), then S0g and
-   the S0c backfill. Baseline: `docs/artifacts/s0-fire-tablet-baseline/`.
+1. **Stabilize** — S0h cold start is in review: material packages now
+   ship precompiled and are cached on disk, and the A142's first frame
+   went from 11.15 s to 0.57 s (`docs/artifacts/s0h-cold-start/`). The
+   Fire tablet (17–18 s before) was in use and has not been measured;
+   that run closes S0h. Then S0g and the S0c backfill. Baseline:
+   `docs/artifacts/s0-fire-tablet-baseline/`.
    Fire tablet frame rate (S0j) is in review: re-measured after #45 the
    dice screen ran at 8.7 fps, and it runs at 44 fps with the low-end
    device profile (`docs/artifacts/s0-tablet-frame-rate/`). Open from
@@ -188,15 +191,20 @@ Rules:
       remaining Filament builder sites for the GC-reachability hazard;
       W25 settle lane never passes after wLoose; body poses/velocities
       across deferred re-realize (M)
-- [ ] S0h Android cold-start material compile: on a fresh install the
-      first scene waits ~14 s — Filament compiles the lit material
-      packages one after another (~3.5 s each: `lit|false|OPAQUE|e0`,
-      `MASKED`, `TRANSPARENT`, then `OPAQUE|e1`; A142 Vulkan logcat,
-      #31). The P4 hero shows its copy over an empty stage meanwhile.
-      Options: compile the packages in parallel; persist compiled
-      packages to disk across launches; a tasteful loading state on the
-      hero (e.g. the logo fades in on its first rendered frame) until
-      the first frame lands. (M)
+- [ ] S0h Android cold-start material compile — *in review* (branch
+      `s0h-cold-start`); **the Fire tablet run is still owed**. Root
+      cause: filamat's SPIR-V optimizer, 3–6 s per lit package, run on
+      the device at every cold start. Fix: packages are named by a hash
+      of their recipe and the Filament pin, shipped as assets (the
+      plugin's fixed set of 20; an app can add its variants) and cached
+      on disk, with the runtime compile as the fallback. A142 hero,
+      first frame: 11.15 s → 0.57 s on first launch and on later ones;
+      the hero's clear-coat variant is on the first frame instead of
+      swapping in at 14 s. APK +1.0 MB. The tablet had another app in
+      the foreground for the whole session, so its targets (under 3 s
+      first launch, under 1.5 s later) and its dice frame rate are not
+      verified; the commands are in the artifact README. Tables and
+      what stays open: `docs/artifacts/s0h-cold-start/`
 - [ ] S0j Fire tablet frame rate — *in review* (branch
       `s0-tablet-frame-rate`). Measured with the new `dart3d.perf` log
       lane (frame intervals, Filament GPU time, physics). Dice screen
