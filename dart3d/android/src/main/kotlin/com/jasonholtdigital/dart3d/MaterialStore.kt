@@ -15,6 +15,10 @@ import java.util.zip.CRC32
  *   compiled at most once per install. Each file carries a CRC-32
  *   trailer; a file that fails it is deleted and reads as a miss. The
  *   directory keeps the [maxCached] most recently used packages.
+ * - A package the engine refused to load is marked with [reject]: its
+ *   shipped copy is skipped from then on and the cache holds the
+ *   recompiled one. That happens when the app's build resolves another
+ *   Filament than the one the shipped packages were built for.
  * - [exportDir], set only while baking, receives every compiled package
  *   raw, with an `index.txt` line naming its key.
  */
@@ -24,8 +28,37 @@ internal class MaterialStore(
     private val exportDir: File? = null,
     private val maxCached: Int = 48,
 ) {
-    fun find(fingerprint: String): ByteArray? =
-        shipped(fileName(fingerprint)) ?: readCache(fingerprint)
+    fun find(fingerprint: String): ByteArray? {
+        if (!isRejected(fingerprint)) {
+            shipped(fileName(fingerprint))?.let { return it }
+        }
+        return readCache(fingerprint)
+    }
+
+    /**
+     * Drops [fingerprint]'s cached file and stops serving its shipped
+     * copy, for as long as the cache directory lives.
+     */
+    fun reject(fingerprint: String) {
+        rejectedNow.add(fingerprint)
+        val dir = cacheDir ?: return
+        try {
+            File(dir, fileName(fingerprint)).delete()
+            dir.mkdirs()
+            File(dir, fingerprint + REJECTED_SUFFIX).createNewFile()
+        } catch (e: Exception) {
+            // Without the marker the next process retries the shipped
+            // copy and lands here again.
+        }
+    }
+
+    private val rejectedNow =
+        java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
+
+    private fun isRejected(fingerprint: String): Boolean =
+        fingerprint in rejectedNow ||
+            cacheDir?.let { File(it, fingerprint + REJECTED_SUFFIX).exists() }
+                ?: false
 
     fun save(fingerprint: String, key: String, bytes: ByteArray) {
         cacheDir?.let { dir ->
@@ -34,7 +67,8 @@ internal class MaterialStore(
             trim(dir)
         }
         exportDir?.let { dir ->
-            if (writeAtomically(File(dir, fileName(fingerprint)), bytes)) {
+            val target = File(dir, fileName(fingerprint))
+            if (!target.exists() && writeAtomically(target, bytes)) {
                 File(dir, INDEX_NAME).appendText(indexLine(fingerprint, key))
             }
         }
@@ -61,24 +95,32 @@ internal class MaterialStore(
     }
 
     private fun trim(dir: File) {
-        val files = dir.listFiles { f -> f.name.endsWith(SUFFIX) } ?: return
-        files.sortedByDescending { it.lastModified() }
+        val all = dir.listFiles() ?: return
+        all.filter { it.name.endsWith(SUFFIX) }
+            .sortedByDescending { it.lastModified() }
             .drop(maxCached)
+            .forEach { it.delete() }
+        val stale = System.currentTimeMillis() - TMP_MAX_AGE_MS
+        all.filter { it.name.endsWith(TMP_SUFFIX) && it.lastModified() < stale }
             .forEach { it.delete() }
     }
 
     private fun writeAtomically(
         target: File, vararg parts: ByteArray,
-    ): Boolean = try {
-        target.parentFile?.mkdirs()
-        val tmp = File(target.path + ".tmp")
-        tmp.outputStream().use { out ->
-            for (p in parts) out.write(p)
-            out.fd.sync()
+    ): Boolean {
+        val tmp = File(target.path + TMP_SUFFIX)
+        val written = try {
+            target.parentFile?.mkdirs()
+            tmp.outputStream().use { out ->
+                for (p in parts) out.write(p)
+                out.fd.sync()
+            }
+            tmp.renameTo(target)
+        } catch (e: Exception) {
+            false
         }
-        tmp.renameTo(target) || run { tmp.delete(); false }
-    } catch (e: Exception) {
-        false
+        if (!written) tmp.delete()
+        return written
     }
 
     companion object {
@@ -87,17 +129,25 @@ internal class MaterialStore(
         const val INDEX_NAME = "index.txt"
 
         private const val SUFFIX = ".filamat"
+        private const val TMP_SUFFIX = ".tmp"
+        private const val REJECTED_SUFFIX = ".rejected"
+
+        /** A temp file older than this was orphaned by a killed write. */
+        private const val TMP_MAX_AGE_MS = 60_000L
 
         fun fileName(fingerprint: String) = fingerprint + SUFFIX
 
         fun indexLine(fingerprint: String, key: String) = "$fingerprint $key\n"
 
-        /** `index.txt` → fingerprint to key; the last line for a fingerprint wins. */
+        /**
+         * `index.txt` → fingerprint to key; the last line for a
+         * fingerprint wins. `#` lines are comments.
+         */
         fun parseIndex(text: String): Map<String, String> {
             val out = LinkedHashMap<String, String>()
             for (line in text.lineSequence()) {
                 val cut = line.indexOf(' ')
-                if (cut <= 0) continue
+                if (cut <= 0 || line.startsWith("#")) continue
                 out[line.substring(0, cut)] = line.substring(cut + 1).trim()
             }
             return out

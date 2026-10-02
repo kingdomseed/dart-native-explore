@@ -83,6 +83,7 @@ internal object MaterialPackages {
     @Volatile private var store: MaterialStore? = null
     @Volatile private var baking = false
     private val storeMisses = ConcurrentHashMap.newKeySet<String>()
+    private val fromStore = ConcurrentHashMap.newKeySet<String>()
     private val storeLock = Any()
 
     /** Log tag that turns a run into a bake: `setprop log.tag.dart3d.bake DEBUG`. */
@@ -97,7 +98,7 @@ internal object MaterialPackages {
     fun attach(context: Context) {
         if (store != null) return
         val app = context.applicationContext ?: context
-        if (Log.isLoggable(BAKE_TAG, Log.DEBUG)) {
+        if (isBakeRun()) {
             val dir = File(app.getExternalFilesDir(null), "dart3d-materials")
             store = MaterialStore({ null }, null, dir)
             baking = true
@@ -106,7 +107,7 @@ internal object MaterialPackages {
             return
         }
         val assets = app.assets
-        store = MaterialStore(
+        attachStore(MaterialStore(
             shipped = { name ->
                 try {
                     assets.open("${MaterialStore.ASSET_DIR}/$name")
@@ -116,8 +117,20 @@ internal object MaterialPackages {
                 }
             },
             cacheDir = File(app.codeCacheDir, "dart3d-materials"),
-        )
+        ))
     }
+
+    fun attachStore(store: MaterialStore) {
+        this.store = store
+    }
+
+    /**
+     * True while the bake log tag is set. A bake renders on OpenGL:
+     * it compiles the catcher and particle packages while frames are
+     * drawn, which faults the Mali Vulkan driver (see [startPrewarm]).
+     * filamat builds both backends' packages whichever one renders.
+     */
+    fun isBakeRun(): Boolean = Log.isLoggable(BAKE_TAG, Log.DEBUG)
 
     /** The target APIs the plugin runs on, and so ships packages for. */
     val BAKED_APIS = listOf(MaterialBuilder.TargetApi.OPENGL,
@@ -216,7 +229,38 @@ internal object MaterialPackages {
                 return null
             }
             store(spec.key, bytes)
+            fromStore.add(spec.key)
             return bytes
+        }
+    }
+
+    /**
+     * Call when the engine refused to load [spec]'s bytes. True when
+     * they came from the store (shipped or cached): they are dropped,
+     * the store will not serve them again, and the caller should
+     * compile. False when they were compiled by this process, which
+     * leaves nothing to fall back to.
+     */
+    fun rejectStored(spec: Spec): Boolean {
+        if (!fromStore.remove(spec.key)) return false
+        if (isVariant(spec.key)) {
+            synchronized(variantCache) { variantCache.remove(spec.key) }
+        } else {
+            cache.remove(spec.key)
+        }
+        store?.reject(spec.fingerprint)
+        return true
+    }
+
+    /** Compiles [spec] off the calling thread; poll [peek] for it. */
+    fun compileAsync(spec: Spec) {
+        variantExecutor.execute {
+            try {
+                compile(spec)
+            } catch (t: Throwable) {
+                Log.w(TAG, "compile of ${spec.key} failed", t)
+                failed.add(spec.key)
+            }
         }
     }
 
@@ -425,9 +469,6 @@ internal object MaterialPackages {
      * `shadowMultiplier`; the engine multiplies the final color by the
      * shadow factor downstream.
      */
-    fun catcherPackage(api: MaterialBuilder.TargetApi): ByteArray? =
-        compile(catcherSpec(api))
-
     fun catcherSpec(api: MaterialBuilder.TargetApi): Spec =
         Spec("catcher|$api",
             MaterialRecipe()
@@ -477,10 +518,6 @@ internal object MaterialPackages {
                         "}\n"))
 
     /** W18 sprite billboard material — see Dart3dView.particleMaterial. */
-    fun particlePackage(
-        additive: Boolean, api: MaterialBuilder.TargetApi,
-    ): ByteArray? = compile(particleSpec(additive, api))
-
     fun particleSpec(
         additive: Boolean, api: MaterialBuilder.TargetApi,
     ): Spec {
@@ -531,14 +568,6 @@ internal object MaterialPackages {
      * filamat rejects it — the caller degrades (variants) or fatals
      * (the six prebuilts, which have no fallback).
      */
-    fun litPackage(
-        unlit: Boolean,
-        blending: MaterialBuilder.BlendingMode,
-        extFlags: Int,
-        boundSlots: Int,
-        api: MaterialBuilder.TargetApi,
-    ): ByteArray? = compile(litSpec(unlit, blending, extFlags, boundSlots, api))
-
     fun litSpec(
         unlit: Boolean,
         blending: MaterialBuilder.BlendingMode,

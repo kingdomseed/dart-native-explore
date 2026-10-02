@@ -4,6 +4,7 @@ import com.google.android.filament.filamat.MaterialBuilder
 import com.google.android.filament.filamat.MaterialBuilder.BlendingMode
 import com.google.android.filament.filamat.MaterialBuilder.TargetApi
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -94,6 +95,28 @@ class MaterialPackagesTest {
         assertNotEquals(base, recipe(filter = 0).fingerprint("v"))
         assertNotEquals(base,
             recipe().doubleSided(true).fingerprint("v"))
+    }
+
+    @Test
+    fun `a stored package the engine refuses is dropped and not served again`() {
+        val spec = MaterialPackages.litSpec(false, BlendingMode.TRANSPARENT,
+            FsceneRealizer.EXT_SHEEN, 0b00101, TargetApi.OPENGL)
+        val asked = ArrayList<String>()
+        MaterialPackages.attachStore(
+            MaterialStore({ asked += it; byteArrayOf(7) }, null))
+        assertEquals(1, MaterialPackages.cached(spec)?.size)
+        assertTrue(MaterialPackages.rejectStored(spec))
+        assertEquals(null, MaterialPackages.peek(spec.key))
+        assertEquals(null, MaterialPackages.cached(spec))
+        assertEquals(listOf(MaterialStore.fileName(spec.fingerprint)), asked)
+    }
+
+    @Test
+    fun `a package that did not come from the store cannot be rejected`() {
+        val spec = MaterialPackages.litSpec(false, BlendingMode.MASKED,
+            FsceneRealizer.EXT_SHEEN, 0b00011, TargetApi.OPENGL)
+        MaterialPackages.attachStore(MaterialStore({ null }, null))
+        assertFalse(MaterialPackages.rejectStored(spec))
     }
 
     @Test

@@ -107,8 +107,69 @@ class MaterialStoreTest {
     }
 
     @Test
-    fun `parseIndex skips blank and malformed lines`() {
+    fun `parseIndex skips blank, malformed and comment lines`() {
         assertEquals(mapOf("a" to "k 1", "b" to "k2"),
-            MaterialStore.parseIndex("a k 1\n\nnokey\nb k2\n"))
+            MaterialStore.parseIndex(
+                "# filament 1.71.6, source abc1234\na k 1\n\nnokey\nb k2\n"))
+    }
+
+    @Test
+    fun `exporting a package twice leaves one index line`() {
+        val out = tempDir()
+        val store = MaterialStore({ null }, null, out)
+        store.save("abc", "k", pkg)
+        store.save("abc", "k", pkg)
+        assertEquals("abc k\n", File(out, "index.txt").readText())
+    }
+
+    @Test
+    fun `a rejected package is no longer served from the shipped set or the cache`() {
+        val dir = tempDir()
+        val shipped = byteArrayOf(1, 2, 3)
+        val store = MaterialStore({ shipped }, dir)
+        store.save("abc", "k", pkg)
+        store.reject("abc")
+        assertNull(store.find("abc"))
+        assertFalse(File(dir, "abc.filamat").exists())
+    }
+
+    @Test
+    fun `after a rejection the recompiled package is served, also to a later process`() {
+        val dir = tempDir()
+        val shipped = byteArrayOf(1, 2, 3)
+        val store = MaterialStore({ shipped }, dir)
+        store.reject("abc")
+        store.save("abc", "k", pkg)
+        assertArrayEquals(pkg, store.find("abc"))
+        assertArrayEquals(pkg, MaterialStore({ shipped }, dir).find("abc"))
+        assertArrayEquals(shipped, MaterialStore({ shipped }, dir).find("other"))
+    }
+
+    @Test
+    fun `a rejection holds without a cache directory`() {
+        val store = MaterialStore({ byteArrayOf(1) }, null)
+        store.reject("abc")
+        assertNull(store.find("abc"))
+    }
+
+    @Test
+    fun `a failed write leaves no temp file`() {
+        val dir = tempDir()
+        File(dir, "abc.filamat/child").mkdirs()
+        MaterialStore({ null }, dir).save("abc", "k", pkg)
+        assertFalse(File(dir, "abc.filamat.tmp").exists())
+    }
+
+    @Test
+    fun `a save clears orphaned temp files but not a fresh one`() {
+        val dir = tempDir()
+        val old = File(dir, "old.filamat.tmp").apply {
+            writeBytes(pkg)
+            setLastModified(System.currentTimeMillis() - 10 * 60_000)
+        }
+        val fresh = File(dir, "fresh.filamat.tmp").apply { writeBytes(pkg) }
+        MaterialStore({ null }, dir).save("abc", "k", pkg)
+        assertFalse(old.exists())
+        assertTrue(fresh.exists())
     }
 }
