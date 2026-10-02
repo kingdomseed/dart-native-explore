@@ -1177,34 +1177,39 @@ Lighting recipes (the tray lights are unchanged unless noted):
   base; exposure −0.5. Gate: numeral 14.31 (d12), die vs tray 2.21,
   stroke 0.121–0.130, PASS.
 
-- **Hearthside — the fireside reading nook (round 2).** Broadside open
-  tome on a complete jointed oak table with a straight far edge; a hewn
-  fieldstone hearth with a shallow voussoir arch, charred logs and layered flame sheets on the left;
-  a padded leather wing chair with piping, nailheads, tartan cushion and
-  modeled knitted wine-red throw on the right. Varied leather books fill
-  carved oak cases; a divided oak rain casement shows a blue dusk village.
-  Foreground: speckled stoneware coffee and faint steam on a cork coaster,
-  a gathered velvet dice pouch, a brass pricket candle, gilt books, dried
-  lavender and a small amethyst dish; a violet glass brass lantern hangs
-  from an oak joist beside the hearth. All props are true
-  scale; the tabletop supports the whole group with a clear band around
-  the tome, including its preserved ribbon.
-  Lighting: 320 kW fire core with separate masonry receivers and a warm
-  hearth spill; shaped warm returns on the chair and books; cool window
-  edge on leather and the lavender jug; localized candle/lantern pools
-  across the oak and mug. The original `fire`, `cool_fill`, `reading_key`,
-  page shader, open-book geometry, ribbon and top-down layout are unchanged.
-  Added candle returns illuminate the ivory dice and vellum separately;
-  other room lights exclude the play surface. Exposure +1.15, gamma 0.8
-  and a 0.5 px reconstruction filter keep the ivory ink crisp at half
-  resolution without changing its material. Broadside camera 27.7 mm at 38 cm above the table, 36.8 degrees down, effective
-  f/8 with focus on the dice; the tome spans about 78% of the frame.
-  Pass 1 room preview: 50% / 64 samples, 21 s render (88.58 s command).
-  Foreground clearance is at least 11.77 cm. Emberforged, Voltline,
-  Celestial, Frostbound, Arcane and Fateengine were re-rendered serially
-  at 25% / 16 samples and checked against their approved previews.
-  Pass 1 preview gate (50% / 32 samples): numeral 5.07 (d10t),
-  die vs tray 3.48, stroke 0.123–0.129, PASS.
+- **Hearthside — the fireside reading nook (round 3, pass 2).** A close
+  broadside view makes the foreground d20 9.8% of the image width. The
+  preserved open tome fills the lower frame, with its near binding cropped;
+  it rests directly on a complete oak table with a straight far edge. The
+  20 mm camera is 13 cm above the table, looking down 19.9 degrees at
+  effective f/8, focused between the foreground dice. This is a lower,
+  tighter crop than the concept, chosen to keep the dice large while
+  showing the fireplace arch and chair above the tabletop.
+  The fieldstone hearth uses rounded irregular stones, deeply recessed
+  mortar, soot-dark voussoirs, charred logs and broader overlapping flames.
+  The leather wing chair has modeled button depressions and creases,
+  a tartan cushion and a wine-red knitted throw over the front arm. A
+  stepped sitting bay supports the chair and its side table. Local warm
+  fire returns illuminate the stone, leather and book spines, with cool
+  rain-window light behind; the fire core is 85 kW.
+  Corner dressing groups a violet glass brass lantern, a tall dripping
+  pillar candle, lavender, an amethyst bowl on a velvet pad over gilt
+  volumes, the velvet pouch, and coffee beside stacked books. Loose lavender
+  and biscuit crumbs sit near the mug. Darker oak, scratches and broken
+  cup rings catch the candle and hearth reflections. The original `fire`,
+  `cool_fill`, `reading_key`, page shader, open-book geometry, ribbon and
+  top-down layout remain unchanged. Room lamps retain their receiver
+  collections; the ivory/vellum candle returns, exposure +1.15, gamma 0.8
+  and 0.5 px reconstruction filter are preserved.
+  The minimum measured main-prop clearance is 10.34 cm from the book cover.
+  The room remains softer and more tightly cropped than the concept;
+  the rainy village and lavender are secondary details at half resolution.
+  Pass 2 preview gate (50% / 32 samples): numeral 4.60 (d10t),
+  die vs tray 3.50, stroke 0.123–0.129, PASS. Final room: 50% / 64 samples, 5 s rendering, 10.02 s total command. All ten
+  other approved rooms were rebuilt at 25% / 16 samples and visually compared
+  with their earlier previews; no appearance regressions were found. Logs,
+  asset close-ups and geometry audits are in `out/r3/pass2/hearthside/`.
+  Gate: numeral 9.21 (d4), die vs tray 3.41, stroke 0.123–0.129, PASS.
 
 - **Old Road — the wayfarer's inn corner (round 2).** A close broadside
   leather/map tray spans 84.76% of the frame, with its near rim at the bottom.

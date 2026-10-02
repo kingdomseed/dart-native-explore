@@ -434,3 +434,16 @@ The ten earlier rooms are rechecked serially at 25 percent / 16 samples.
 - `diner_place_setting`: dished ceramic saucer, formed metal teaspoon, folded cotton napkin and sealed unprinted sugar packets; `radius`, `napkin`, `packets`, `tone`, `metal_tone`, `wear`, `seed`.
 
 All room calls to `rear_recess` are removed. The optional asset parameter remains available with its default of `None`; tables in the room builders use continuous straight far edges.
+
+### Hearthside round 3, pass 2
+
+- `hearth_fireplace`: optional `rugged` masonry and `flame_height`; rounded
+  fieldstones, recessed mortar and a fuller log fire. Defaults are unchanged.
+- `wing_armchair`: optional `tufted` back with covered buttons and creases;
+  `throw_width`, `throw_fold`, `throw_pitch` control the arm drape. Defaults
+  retain the earlier chair and throw path.
+- `candles`: optional `drips` count (default 5).
+- `candlestick`: optional `drip_pan_radius` and `drips`, allowing a wide
+  pillar candle without an oversized drip pan. Defaults are unchanged.
+- `table_wear`: broken cup rings and low-relief scratches; dimensions,
+  quiet rectangle, wear, wood tone and seed. Use on a supported tabletop.

@@ -10,7 +10,7 @@ from .forge import fire_tongue
 
 
 def build(name="Candles", loc=(0, 0, 0), rot_z=0, height=12, radius=2, count=3,
-          tone=(0.58, 0.35, 0.12), wear=0.6, seed=1, energy=1500) -> bpy.types.Object:
+          tone=(0.58, 0.35, 0.12), wear=0.6, seed=1, energy=1500, drips=5) -> bpy.types.Object:
     a = G.Asset(name, loc, rot_z)
     rng = random.Random(seed)
     wax = E.simple(f"{name} beeswax", tone, 0.72, Subsurface_Weight=0.08)
@@ -24,7 +24,7 @@ def build(name="Candles", loc=(0, 0, 0), rot_z=0, height=12, radius=2, count=3,
         h = height * rng.uniform(0.6, 1)
         a.cylinder("Used candle", radius, h, (x, y, 0.5 + h / 2), wax, bevel=0.25)
         a.sphere("Wax pool", radius * 1.35, (x, y, 0.6), wax, scale=(1, 1, 0.13))
-        for j in range(5):
+        for j in range(drips):
             angle = rng.uniform(0, math.tau)
             xx, yy = x + radius * math.cos(angle), y + radius * math.sin(angle)
             length = rng.uniform(1, h * 0.55)

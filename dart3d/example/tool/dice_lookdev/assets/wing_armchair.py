@@ -21,9 +21,35 @@ def cushion(a,name,center,half,mat,power=.42,tilt=0):
     return ob
 
 
+def tufted_back(a,hide,piping):
+    buttons=[(x,z) for z in (-19,0,19) for x in ((-19,0,19) if z else (-28,-9.5,9.5,28))]
+    angle=math.radians(-9)
+    def front(x,z):
+        edge=max(abs(x)/33,abs(z)/35)
+        y=-9*max(.01,1-edge**12)**.3
+        for bx,bz in buttons:
+            dx=x-bx;dz=z-bz;r2=dx*dx+dz*dz
+            y+=2.4*math.exp(-r2/7)
+            for sign in (-1,1):
+                line=(dx+sign*dz)/1.414
+                y+=.3*math.exp(-line*line/.25)*math.exp(-r2/65)
+        y+=.14*math.sin(z*2.2+x*.25)*math.exp(-((abs(x)-29)/4)**2)
+        return y
+    def tilt(x,y,z):return (x,28+y*math.cos(angle)-z*math.sin(angle),77+y*math.sin(angle)+z*math.cos(angle))
+    n=64
+    verts=[tilt(-33+66*i/n,front(-33+66*i/n,-35+70*j/n),-35+70*j/n) for j in range(n+1) for i in range(n+1)]
+    faces=[(j*(n+1)+i,j*(n+1)+i+1,(j+1)*(n+1)+i+1,(j+1)*(n+1)+i) for j in range(n) for i in range(n)]
+    ob=a.mesh("Diamond buttoned leather back",verts,faces,hide,smooth=True)
+    solid=ob.modifiers.new("Padded hide backing","SOLIDIFY");solid.thickness=7
+    for x,z in buttons:
+        a.sphere("Leather covered tuft button",.85,tilt(x,front(x,z)-.25,z),hide,scale=(1,.35,1),subdiv=2)
+    for side in (-1,1):
+        a.tube("Back cushion welt",[tilt(side*32.7,front(side*32.7,z)-.10,z) for z in (-32,-24,-12,0,12,24,32)],.22,piping)
+
+
 def build(name="Wing armchair",loc=(0,0,0),rot_z=0,width=89,depth=92,height=114,
           tone=(.115,.029,.015),wood_tone=(.075,.028,.009),wear=.65,seed=1,
-          throw=True,throw_tone=(.16,.012,.026),pillow=True) -> bpy.types.Object:
+          throw=True,throw_tone=(.16,.012,.026),pillow=True,tufted=False,throw_width=36,throw_fold=1.4,throw_pitch=2.7) -> bpy.types.Object:
     a=G.Asset(name,loc,rot_z)
     hide=M.upholstery(name+" leather",tone,wear,seed)
     piping=M.leather(name+" dark piping",tuple(c*.36 for c in tone),wear,seed)
@@ -42,7 +68,10 @@ def build(name="Wing armchair",loc=(0,0,0),rot_z=0,width=89,depth=92,height=114,
         pts.append((31*math.copysign(abs(math.cos(t))**.4,math.cos(t)),
                     -7+33*math.copysign(abs(math.sin(t))**.4,math.sin(t)),40))
     a.tube("Seat welt seam",pts,.22,piping,True)
-    cushion(a,"Reclining upholstered back",(0,28,77),(33,9,35),hide,.5,math.radians(-9))
+    if tufted:
+        tufted_back(a,hide,piping)
+    else:
+        cushion(a,"Reclining upholstered back",(0,28,77),(33,9,35),hide,.5,math.radians(-9))
     cushion(a,"Lumbar pad",(0,15,54),(29,8,13),hide,.62,math.radians(-8))
     for side in (-1,1):
         outline=[(side*x,z) for x,z in ((26,50),(38,51),(46,76),(46,99),(42,113),(33,114),(29,101),(29,78))]
@@ -69,7 +98,8 @@ def build(name="Wing armchair",loc=(0,0,0),rot_z=0,width=89,depth=92,height=114,
         plaid=M.wool(name+" woven tartan",(.22,.085,.027),seed,plaid=True)
         cushion(a,"Soft tartan cushion",(-2,2,63),(20,7,16),plaid,.6,math.radians(-12))
     if throw:
-        child=knit_throw.build(name+" wine throw",loc=(32,0,0),width=36,tone=throw_tone,seed=seed)
+        params={"path":((10,80),(0,79),(-22,77),(-38,73),(-48,58),(-48,13))} if tufted else {}
+        child=knit_throw.build(name+" wine throw",loc=(32,0,0),width=throw_width,fold=throw_fold,pitch=throw_pitch,tone=throw_tone,seed=seed,**params)
         a.add(child)
     a.root.scale=(width/92,depth/92,height/114)
     return a.root
