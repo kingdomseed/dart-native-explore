@@ -125,6 +125,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         }
         Log.i(TAG, "Filament engine backend: $backend (pref=$pref," +
             " tier=${DeviceTier.of(context)})")
+        ColdStart.mark("engine created")
         return engine
     }
 
@@ -643,6 +644,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     destroySwapChainAndWait("native window changed")
                     swapChain = engine.createSwapChain(surface, uiHelper.swapChainFlags)
                     Log.i(TAG, "dart3d view $viewId swapchain created")
+                    ColdStart.mark("swapchain created")
                 }
                 override fun onDetachedFromSurface() {
                     destroySwapChainAndWait("surface destroyed")
@@ -950,6 +952,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 "${t.javaClass.simpleName}: ${t.message}")
             return false
         }
+        ColdStart.mark("base materials loaded")
         litMaterial = loaded[0]
         litMaskedMaterial = loaded[1]
         litBlendMaterial = loaded[2]
@@ -4048,6 +4051,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // merge back on top.
         resources.payloadSpecs.putAll(opPayloadSpecs)
         nodesById = nodes
+        if (nodes.isNotEmpty()) ColdStart.mark("scene installed")
         nodeSkinning = nodeSkins
         particleRuntimes = particles
         this.gpuMeshes = gpuMeshes
@@ -4991,11 +4995,21 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 }
             }
             renderer.endFrame()
+            if (!firstSceneFrameDone && nodesById.isNotEmpty()) {
+                firstSceneFrameDone = true
+                ColdStart.mark("first frame submitted")
+                if (perfEnabled()) {
+                    engine.flushAndWait()
+                    ColdStart.mark("first frame rendered")
+                }
+            }
             tickStats(tNanos)
             return true
         }
         return false
     }
+
+    private var firstSceneFrameDone = false
 
     private val framePerf = FramePerf()
     private val perfRecords = LongArray(FramePerf.HISTORY * 4)

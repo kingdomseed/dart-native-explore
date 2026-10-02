@@ -45,6 +45,7 @@ object Dart3dBridge : DNAndroidPluginProvider {
     /** Called by DartNativeDart3dPlugin.onAttachedToEngine. */
     fun register() {
         DNPluginRegistry.register(this)
+        ColdStart.mark("plugin registered")
         Log.i(TAG, "dart3d provider registered " +
             "(disposeView=${frameworkDisposes})")
         prewarmMaterials()
