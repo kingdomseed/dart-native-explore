@@ -50,6 +50,10 @@ esac
 adb -s "$serial" shell setprop log.tag.dart3d.perf DEBUG
 trap 'adb -s "$serial" shell setprop log.tag.dart3d.perf "\"\""' EXIT
 
+dart3d_log() {
+  adb -s "$serial" shell "logcat -d -T '$since' -s dart3d"
+}
+
 work=$(mktemp -d)
 i=1
 while [ "$i" -le "$runs" ]; do
@@ -58,11 +62,11 @@ while [ "$i" -le "$runs" ]; do
     adb -s "$serial" shell pm clear "$package" >/dev/null
   fi
   sleep 2
-  adb -s "$serial" logcat -c
+  since=$(adb -s "$serial" shell "date +'%m-%d %H:%M:%S.000'" | tr -d '\r')
   adb -s "$serial" shell monkey -p "$package" \
     -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
   tries=0
-  until adb -s "$serial" logcat -d -s dart3d | grep -q 'first frame rendered'; do
+  until dart3d_log | grep -q 'first frame rendered'; do
     tries=$((tries + 1))
     if [ "$tries" -gt 90 ]; then
       echo "run $i: no first frame after 90 s" >&2
@@ -71,7 +75,7 @@ while [ "$i" -le "$runs" ]; do
     sleep 1
   done
   sleep "$settle"
-  adb -s "$serial" logcat -d -s dart3d > "$work/run-$i.log"
+  dart3d_log > "$work/run-$i.log"
   echo "run $i"
   grep -E 'start \+|material package .* compiled in' "$work/run-$i.log" |
     sed -E 's/^[0-9-]+ ([0-9:.]+) .* dart3d *: /  \1 /'
