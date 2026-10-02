@@ -1,7 +1,6 @@
 package com.jasonholtdigital.dart3d
 
 import android.content.Context
-import android.content.pm.PackageManager
 import android.graphics.Typeface
 import android.opengl.Matrix
 import android.util.Base64
@@ -101,7 +100,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      * W30 backend selection, resolved once per engine. An explicit
      * `Dart3dSetBackend` pref (the example's `DART3D_BACKEND` define)
      * wins; `auto` takes [DEFAULT_BACKEND] when the device declares
-     * Vulkan and falls back to OpenGL when it does not. A backend that
+     * Vulkan and falls back to OpenGL when it does not, or when the
+     * device is [DeviceTier.LOW]. A backend that
      * fails to build (Vulkan claimed but unusable) retries on OpenGL.
      */
     private fun createEngine(): Engine {
@@ -109,8 +109,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         var backend = when (pref) {
             BACKEND_OPENGL -> Engine.Backend.OPENGL
             BACKEND_VULKAN -> Engine.Backend.VULKAN
-            else -> if (context.packageManager.hasSystemFeature(
-                    PackageManager.FEATURE_VULKAN_HARDWARE_VERSION)) {
+            else -> if (DeviceTier.autoBackendIsVulkan(context)) {
                 DEFAULT_BACKEND
             } else {
                 Engine.Backend.OPENGL
@@ -124,7 +123,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             backend = Engine.Backend.OPENGL
             Engine.Builder().backend(backend).build()
         }
-        Log.i(TAG, "Filament engine backend: $backend (pref=$pref)")
+        Log.i(TAG, "Filament engine backend: $backend (pref=$pref," +
+            " tier=${DeviceTier.of(context)})")
         return engine
     }
 
@@ -396,13 +396,48 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      */
     internal var viewQuality: String? = null
 
+    private val deviceTier = DeviceTier.of(context)
+
+    /** True while the device picks the pipeline: no `quality` tier is
+     *  set and the device is [DeviceTier.LOW]. */
+    private val lowDeviceProfile: Boolean
+        get() = viewQuality == null && deviceTier == DeviceTier.LOW
+
     /** The AA source for resolve chains — the tier when set, else the
-     *  widget's antialiasingMode. */
+     *  widget's antialiasingMode. On the low device profile any
+     *  requested MSAA resolves to FXAA alone (null falls through to
+     *  it); an explicit 0 still means none. */
     private fun effectiveViewConfigAa(): Int? = when (viewQuality) {
         "low" -> 0
         "medium" -> 1   // resolveAa maps <4 → MSAA×2 + FXAA
         "high" -> 4
-        else -> viewConfigAa
+        else -> viewConfigAa?.let { if (lowDeviceProfile && it > 0) null else it }
+    }
+
+    /** DPCF (dithered PCF) keeps a soft edge — PCSS's blocker search
+     *  runs ~300ms/frame on Mali at these world scales. On the Fire
+     *  tablet DPCF itself costs about 48 ms a dice frame over hard PCF,
+     *  so the low device profile takes PCF. */
+    private fun shadowType(): View.ShadowType =
+        if (lowDeviceProfile) View.ShadowType.PCF else View.ShadowType.DPCF
+
+    /** The swapchain passes' resolution policy when nothing authored
+     *  a `renderScale`. */
+    private fun defaultResolution(): View.DynamicResolutionOptions =
+        RenderTargets.dsrOptions(1.0, dynamic = lowDeviceProfile)
+
+    /** Writes the parts of the device profile that live on the shared
+     *  [view] and follow `quality`: shadow filter, HDR buffer size and,
+     *  for the default pass, resolution. */
+    private fun applyDeviceProfile() {
+        view.setShadowType(shadowType())
+        view.renderQuality = View.RenderQuality().apply {
+            hdrColorBuffer = if (lowDeviceProfile) View.QualityLevel.LOW
+                else View.QualityLevel.HIGH
+        }
+        if (screenViews.isEmpty()) {
+            view.dynamicResolutionOptions = defaultResolution()
+        }
     }
 
     /** Stage-level view-quality defaults (W14) — a views entry's
@@ -596,10 +631,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             // mask is all-layers — widen so node `layers` is the only gate.
             view.setVisibleLayers(0xFF, 0xFF)
             // Lights declaring castsShadow need a shadow type on the view —
-            // Filament renders no shadow maps without one. DPCF (dithered
-            // PCF) keeps a soft edge at fixed-kernel cost — PCSS's blocker
-            // search runs ~300ms/frame on Mali at these world scales.
-            view.setShadowType(View.ShadowType.DPCF)
+            // Filament renders no shadow maps without one.
+            applyDeviceProfile()
             // W22: KHR_materials_transmission variants render through
             // screen-space refraction — without the flag Filament skips
             // the refraction pass even for refraction-enabled materials.
@@ -1849,28 +1882,23 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             // iOS semantics: 0 = none, 2/4 = MSAA sample count. Other
             // values clamp to the nearest count SceneKit can express
             // (3 ties down to 2, matching its v>=4→4X / v>=2→2X map).
-            val count = when {
-                v <= 0 -> 0
-                v == 2 || v == 4 -> v
-                v < 4 -> 2.also {
-                    logCommandOnce("aa.$v",
-                        "antialiasingMode $v: clamped to MSAA x2")
-                }
-                else -> 4.also {
-                    logCommandOnce("aa.$v",
-                        "antialiasingMode $v: clamped to MSAA x4")
-                }
+            if (v == 1 || v == 3) {
+                logCommandOnce("aa.$v",
+                    "antialiasingMode $v: clamped to MSAA x2")
+            } else if (v > 4) {
+                logCommandOnce("aa.$v",
+                    "antialiasingMode $v: clamped to MSAA x4")
             }
-            val msaa = View.MultiSampleAntiAliasingOptions()
-            msaa.enabled = v > 0
-            if (count > 0) msaa.sampleCount = count
-            view.multiSampleAntiAliasingOptions = msaa
             // iOS pairs its MSAA with its own filtering — FXAA stays
             // on top, same as the previous boolean mapping.
-            view.antiAliasing = if (v > 0) View.AntiAliasing.FXAA
-                else View.AntiAliasing.NONE
-            Log.i(TAG, "antialiasingMode=$v → MSAA enabled=${msaa.enabled}" +
-                " sampleCount=${msaa.sampleCount} aa=${view.antiAliasing}")
+            val resolved = RenderTargets.resolveAa(
+                null, null, effectiveViewConfigAa())
+            view.multiSampleAntiAliasingOptions = resolved.msaa
+            view.antiAliasing = resolved.aa
+            Log.i(TAG, "antialiasingMode=$v → MSAA" +
+                " enabled=${resolved.msaa.enabled}" +
+                " sampleCount=${resolved.msaa.sampleCount}" +
+                " aa=${resolved.aa}")
         }
         if (json.has("quality")) {
             val q = json.optString("quality")
@@ -1900,8 +1928,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     private fun applyViewQuality() {
         val shadows = viewQuality != "low"
         view.setShadowingEnabled(shadows)
+        applyDeviceProfile()
         for (rec in viewRecs) {
             rec.view?.setShadowingEnabled(shadows)
+            rec.view?.setShadowType(shadowType())
             resolveViewQuality(rec)
         }
         if (screenViews.isEmpty()) {
@@ -1911,7 +1941,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             view.antiAliasing = restored.aa
         }
         Log.i(TAG, "quality=${viewQuality ?: "default"} → " +
-            "shadows=$shadows aaSrc=${effectiveViewConfigAa()}")
+            "shadows=$shadows aaSrc=${effectiveViewConfigAa()}" +
+            " tier=$deviceTier shadowType=${shadowType()}")
     }
 
     private fun applyLoadScene(data: ByteArray) {
@@ -2818,7 +2849,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 // an intermediate blit — offscreen passes keep the raw
                 // draw so the color attachment is the literal frame.
                 v.isPostProcessingEnabled = false
-                v.setShadowType(View.ShadowType.DPCF)
+                v.setShadowType(shadowType())
                 v.setShadowingEnabled(viewQuality != "low")
                 v.setRenderTarget(rtRec.rt)
                 v.viewport = rec.viewport?.let { viewportOf(it) }
@@ -2841,7 +2872,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             // restore the state a screen pass may have clobbered.
             view.viewport = Viewport(0, 0, viewportW, viewportH)
             view.setVisibleLayers(0xFF, 0xFF)
-            view.dynamicResolutionOptions = View.DynamicResolutionOptions()
+            view.dynamicResolutionOptions = defaultResolution()
             val restored = RenderTargets.resolveAa(null, null,
                 effectiveViewConfigAa())
             view.multiSampleAntiAliasingOptions = restored.msaa
@@ -2913,7 +2944,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         rec.msaa = resolved.msaa
         rec.aa = resolved.aa
         rec.dsr = RenderTargets.dsrOptions(
-            rec.renderScale ?: stageRenderScale)
+            rec.renderScale ?: stageRenderScale, dynamic = lowDeviceProfile)
         rec.view?.let {
             it.multiSampleAntiAliasingOptions = resolved.msaa
             it.antiAliasing = resolved.aa

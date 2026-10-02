@@ -1,7 +1,6 @@
 package com.jasonholtdigital.dart3d
 
 import android.content.Context
-import android.content.pm.PackageManager
 import android.graphics.Color
 import android.util.Log
 import android.view.Gravity
@@ -60,8 +59,7 @@ object Dart3dBridge : DNAndroidPluginProvider {
     private fun prewarmMaterials() {
         try {
             val ctx: Context? = DNAppContext.get()
-            val vulkan = ctx?.packageManager?.hasSystemFeature(
-                PackageManager.FEATURE_VULKAN_HARDWARE_VERSION) ?: true
+            val vulkan = ctx?.let { DeviceTier.autoBackendIsVulkan(it) } ?: true
             MaterialPackages.prewarmSpeculative(
                 if (vulkan) MaterialBuilder.TargetApi.VULKAN
                 else MaterialBuilder.TargetApi.OPENGL)

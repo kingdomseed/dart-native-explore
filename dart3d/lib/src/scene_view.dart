@@ -20,6 +20,11 @@ const String kSceneViewTypeKey = 'com.jasonholtdigital.dart3d/sceneView';
 /// Setting [quality] takes the whole pipeline — [antialiasingMode] is
 /// ignored while a tier is active. Leave `quality` null to drive AA
 /// (and per-light `castsShadow`) directly.
+///
+/// With `quality` null, Android also fits the pipeline to the device.
+/// One with under about 3 GB of memory gets hard-edged shadows, FXAA in
+/// place of MSAA, and a resolution that drops (to half at most) while
+/// frames run long. Set a tier to opt out.
 enum SceneQuality { low, medium, high }
 
 /// A 3D scene rendered by the platform's native 3D stack.

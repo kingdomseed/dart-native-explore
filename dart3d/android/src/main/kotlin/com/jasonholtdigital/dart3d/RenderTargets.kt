@@ -381,14 +381,25 @@ object RenderTargets {
      * `renderScale` → DynamicResolutionOptions — min==max pins a FIXED
      * scale through the DSR knob (not the semantic dynamic-resolution
      * feature); disabled at the default 1.0 so no scale pass runs.
+     * [dynamic] turns the default into the real feature: Filament
+     * lowers the scale toward [DeviceTier.LOW_MIN_RENDER_SCALE] while
+     * the GPU misses the frame interval and raises it back when it
+     * doesn't. An authored scale stays fixed either way.
      */
-    fun dsrOptions(scale: Double): View.DynamicResolutionOptions {
+    fun dsrOptions(
+        scale: Double, dynamic: Boolean = false,
+    ): View.DynamicResolutionOptions {
         val o = View.DynamicResolutionOptions()
         if (scale > 0.0 && scale != 1.0) {
             o.enabled = true
             o.homogeneousScaling = true
             o.minScale = scale.toFloat()
             o.maxScale = scale.toFloat()
+        } else if (dynamic) {
+            o.enabled = true
+            o.homogeneousScaling = true
+            o.minScale = DeviceTier.LOW_MIN_RENDER_SCALE
+            o.maxScale = 1f
         }
         return o
     }

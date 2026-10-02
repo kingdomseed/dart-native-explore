@@ -139,6 +139,14 @@ currently inert.
   The example selects it with `--dart-define=DART3D_BACKEND=`, but
   there is no plugin-level API yet, and a forced Vulkan request that
   fails falls back to GL without telling you.
+- Android low-end profile: with no `SceneQuality` set, a device with
+  under about 3 GB of memory renders with hard-edged shadows, FXAA in
+  place of MSAA and dynamic resolution (down to half scale), on the GL
+  backend. Setting `quality` opts out. Measured on a Fire tablet in
+  `../docs/artifacts/s0-tablet-frame-rate/`.
+- Android frame timings: `adb shell setprop log.tag.dart3d.perf DEBUG`
+  makes each view log a `perf` line every 2 s (frame interval, GPU time,
+  physics and submit cost, median and p95) under the `dart3d` tag.
 - Feature-capability warnings: unrealized `featuresRequired`/
   `featuresUsed` names log warnings, and `strictFeatures: true`
   refuses them.
