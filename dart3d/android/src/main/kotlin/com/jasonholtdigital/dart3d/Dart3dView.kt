@@ -4528,6 +4528,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     private var lastFrameRealized = false
 
     private fun stepFrame(tNanos: Long) {
+        val perf = perfEnabled()
+        val frameStart = if (perf) System.nanoTime() else 0L
         // Particle systems apply their own authored maxFrameTime —
         // they get the unclamped interval (bounded only against a
         // resume's first frame); everything else keeps the 100 ms cap.
@@ -4620,10 +4622,13 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         physicsAcc += dt
         val stepDt = world.fixedTimestep
         val steps = minOf((physicsAcc / stepDt).toInt(), world.maxSubsteps)
+        val physicsStart = if (perf) System.nanoTime() else 0L
         if (steps > 0) {
             world.update(stepDt * steps, steps)
             physicsAcc -= stepDt * steps
         }
+        val physicsMs =
+            if (perf) (System.nanoTime() - physicsStart) / 1e6f else 0f
         if (steps == world.maxSubsteps) physicsAcc = 0f
 
         if (dynamicBodyKeys.isNotEmpty()) {
@@ -4650,7 +4655,17 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // W26: camera-facing lines/billboards re-expand against this
         // frame's camera pose — after every camera write, before draw.
         updateCameraFacing()
-        render(tNanos)
+        val simEnd = if (perf) System.nanoTime() else 0L
+        val didRender = render(tNanos)
+        if (perf) {
+            val n = Dart3dJni.nativeFrameInfoHistory(
+                renderer.nativeObject, perfRecords)
+            if (n > 0) framePerf.timings(perfRecords, n)
+            framePerf.frame(tNanos, (simEnd - frameStart) / 1e6f,
+                physicsMs, (System.nanoTime() - simEnd) / 1e6f,
+                didRender, steps,
+            )?.let { Log.i(TAG, it) }
+        }
         // W15: this frame is the first a just-applied subtree is
         // visible in — stamp it for the latency lane (the Dart side
         // logs the send time against this). tNanos is the vsync
@@ -4901,11 +4916,13 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             inv[1] * d[0] + inv[5] * d[1] + inv[9] * d[2],
             inv[2] * d[0] + inv[6] * d[1] + inv[10] * d[2])
 
-    private fun render(tNanos: Long) {
+    /** False when no frame was drawn: no surface, or Filament's frame
+     *  pacing asked to skip this vsync. */
+    private fun render(tNanos: Long): Boolean {
         // No surface, no frame: UiHelper clears readiness in
         // onDetachedFromSurface, before Android destroys the window.
-        if (!uiHelper.isReadyToRender) return
-        val sc = swapChain ?: return
+        if (!uiHelper.isReadyToRender) return false
+        val sc = swapChain ?: return false
         if (renderer.beginFrame(sc, tNanos)) {
             // W14: due offscreen passes first — a material sampling an
             // rt reads this frame's output in the screen passes below.
@@ -4947,7 +4964,49 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             }
             renderer.endFrame()
             tickStats(tNanos)
+            return true
         }
+        return false
+    }
+
+    private val framePerf = FramePerf()
+    private val perfRecords = LongArray(FramePerf.HISTORY * 4)
+    private var perfOn = false
+    private var perfPoll = 0
+
+    /** The `dart3d.perf` log tag, re-read about once a second. */
+    private fun perfEnabled(): Boolean {
+        if (perfPoll++ % 64 != 0) return perfOn
+        val on = Log.isLoggable(FramePerf.TAG, Log.DEBUG)
+        if (on && !perfOn) {
+            framePerf.reset()
+            Log.i(TAG, "perf view: ${describeViewSettings()}")
+        }
+        perfOn = on
+        return on
+    }
+
+    private fun describeViewSettings(): String {
+        val vp = view.viewport
+        val msaa = view.multiSampleAntiAliasingOptions
+        val bloom = view.bloomOptions
+        val dsr = view.dynamicResolutionOptions
+        return "backend=${engine.backend} viewport=${vp.width}x${vp.height}" +
+            " msaa=${if (msaa.enabled) msaa.sampleCount else 0}" +
+            " aa=${view.antiAliasing}" +
+            " post=${view.isPostProcessingEnabled}" +
+            " hdr=${view.renderQuality.hdrColorBuffer}" +
+            " bloom=${bloom.enabled}(levels=${bloom.levels}" +
+            " res=${bloom.resolution} q=${bloom.quality})" +
+            " ssao=${view.ambientOcclusionOptions.enabled}" +
+            " taa=${view.temporalAntiAliasingOptions.enabled}" +
+            " ssr=${view.screenSpaceReflectionsOptions.enabled}" +
+            " dsr=${dsr.enabled}(${dsr.minScale}..${dsr.maxScale})" +
+            " dither=${view.dithering}" +
+            " quality=${viewQuality ?: "default"}" +
+            " physics=${Math.round(1f / world.fixedTimestep)}Hz" +
+            "x${world.maxSubsteps}" +
+            " entities=${nodesById.size} bodies=${bodies.size}"
     }
 
     private fun fireEvent(type: Int, payload: String) {

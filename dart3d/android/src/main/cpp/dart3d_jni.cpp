@@ -12,6 +12,7 @@
 
 #include <jni.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <dlfcn.h>
 #include <atomic>
 #include <mutex>
@@ -280,4 +281,96 @@ Java_com_jasonholtdigital_dart3d_TextureFactory_nKtx2Release(
         delete provider;
         LOGI("ktx2: provider released with its engine");
     }
+}
+
+// ------------------------------------------------------------------
+// Frame timing via filament::Renderer::getFrameInfoHistory.
+//
+// The pinned Filament (1.71.6) has no Java binding for it, but
+// libfilament-jni.so exports the C++ member. FrameInfo and
+// FixedCapacityVector below mirror 1.71.6's filament/Renderer.h and
+// utils/FixedCapacityVector.h; re-check both when the pin moves. Only
+// the `dart3d.perf` log lane reads this.
+
+namespace {
+
+struct D3FrameInfo {
+    uint32_t frameId;
+    int64_t gpuFrameDuration;
+    int64_t denoisedGpuFrameDuration;
+    int64_t beginFrame;
+    int64_t endFrame;
+    int64_t backendBeginFrame;
+    int64_t backendEndFrame;
+    int64_t gpuFrameComplete;
+    int64_t vsync;
+    int64_t displayPresent;
+    int64_t presentDeadline;
+    int64_t displayPresentInterval;
+    int64_t compositionToPresentLatency;
+    int64_t expectedPresentLatency;
+};
+
+// Non-trivial destructor: returned through the hidden result pointer,
+// as the real FixedCapacityVector is.
+struct D3FrameInfoVector {
+    D3FrameInfo* data = nullptr;
+    uint32_t size = 0;
+    uint32_t capacity = 0;
+    D3FrameInfoVector() = default;
+    D3FrameInfoVector(const D3FrameInfoVector&) = delete;
+    ~D3FrameInfoVector() { free(data); }
+};
+
+typedef D3FrameInfoVector (*FrameInfoHistoryFn)(const void* renderer,
+    size_t historySize);
+
+FrameInfoHistoryFn frameInfoHistory() {
+#if defined(__aarch64__)
+    static FrameInfoHistoryFn fn = [] {
+        const char* name = "_ZNK8filament8Renderer19getFrameInfoHistoryEm";
+        void* sym = dlsym(RTLD_DEFAULT, name);
+        if (!sym) {
+            void* handle = dlopen("libfilament-jni.so", RTLD_NOW | RTLD_LOCAL);
+            if (handle) sym = dlsym(handle, name);
+        }
+        return (FrameInfoHistoryFn)sym;
+    }();
+    return fn;
+#else
+    return nullptr;
+#endif
+}
+
+} // namespace
+
+/**
+ * Copies up to `out.length / 4` frame records, newest first, as
+ * `[frameId, gpuNanos, backendNanos, mainNanos]` each. A duration is
+ * negative while Filament has no value for it (-1 unsupported, -2
+ * pending). Returns the record count, or -1 when the symbol is missing.
+ */
+extern "C" JNIEXPORT jint JNICALL
+Java_com_jasonholtdigital_dart3d_Dart3dJni_nativeFrameInfoHistory(
+        JNIEnv* env, jclass, jlong nativeRenderer, jlongArray out) {
+    FrameInfoHistoryFn fn = frameInfoHistory();
+    if (!fn || !nativeRenderer || !out) return -1;
+    jsize capacity = env->GetArrayLength(out) / 4;
+    if (capacity <= 0) return 0;
+    D3FrameInfoVector history =
+        fn(reinterpret_cast<const void*>(nativeRenderer), (size_t)capacity);
+    jsize n = (jsize)history.size < capacity ? (jsize)history.size : capacity;
+    for (jsize i = 0; i < n; i++) {
+        const D3FrameInfo& f = history.data[i];
+        jlong rec[4] = {
+            (jlong)f.frameId,
+            f.gpuFrameDuration,
+            f.backendBeginFrame > 0 && f.backendEndFrame > 0
+                ? f.backendEndFrame - f.backendBeginFrame : -1,
+            f.beginFrame > 0 && f.endFrame > 0
+                ? f.endFrame - f.beginFrame : -1,
+        };
+        env->SetLongArrayRegion(out, i * 4, 4, rec);
+    }
+    return n;
 }
