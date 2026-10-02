@@ -1065,6 +1065,17 @@ foreground corners, and the room reads at mid-distance behind it.
 All eleven: `dice-lookdev/all-rooms.jpg`; round 1 vs round 2 side by
 side: `dice-lookdev/rooms-before-after.jpg`.
 
+Round 3 (operator: "a big improvement"; finish the rooms). Pass 1 fixed
+defects: the round recess cut into six tabletops behind the tray (it read
+as a rendering bug; tables now have straight far edges), the dead dark
+bands in Emberforged and Voltline, Frostbound's washed-out valley, and
+gate headroom (Vermilion numeral 4.90 -> 6.19, Frostbound die vs tray
+2.11 -> 2.54). Pass 2 was a second art-direction pass against the concepts
+on Fate Engine, Hearthside, Old Road, Northfield, Vermilion and Gemcutter:
+closer cameras so the dice read large, no plinth under the tray, denser
+dressing at the tray's edges, stronger motivated light. Round 2 vs round
+3: `dice-lookdev/rooms-r2-vs-r3.jpg`; interim: `all-rooms-r3-pass1.jpg`.
+
 Lighting recipes (the tray lights are unchanged unless noted):
 
 - **Emberforged — the smithy (round 2, the quality bar).** Shot broadside
