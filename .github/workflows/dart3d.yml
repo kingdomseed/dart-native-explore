@@ -33,3 +33,45 @@ jobs:
       - name: Example — analyze and test
         working-directory: dart3d/example
         run: dn pub get && dn analyze && dn test
+
+  # The Android plugin's JVM unit tests. ShippedMaterialsTest among them
+  # fails when a material recipe or the Filament pin changes without a
+  # re-bake of the shipped packages.
+  android-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install DartNative SDK
+        run: |
+          curl -fsSL https://cdn.dartnative.com/install.sh | sh
+          echo "$HOME/zero/bin" >> "$GITHUB_PATH"
+          echo "engine=$(cat "$HOME/zero/bin/internal/engine.version")" >> "$GITHUB_OUTPUT"
+        id: sdk
+      - name: Cache DartNative engine artifacts
+        uses: actions/cache@v4
+        with:
+          path: ~/zero/bin/cache
+          key: dn-cache-${{ runner.os }}-${{ steps.sdk.outputs.engine }}
+      - name: Finish the SDK update
+        run: dn upgrade
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      # The wrapper script and jar are not in git; the version matches
+      # gradle/wrapper/gradle-wrapper.properties.
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.14"
+      - name: Example — resolve plugins
+        working-directory: dart3d/example
+        run: dn pub get
+      # gradle.properties pins org.gradle.java.home to the Mac's JDK 21;
+      # the command line overrides it with the runner's.
+      - name: Plugin — JVM unit tests
+        working-directory: dart3d/example/android
+        env:
+          FLUTTER_STORAGE_BASE_URL: https://cdn.dartnative.com
+        run: |
+          printf 'sdk.dir=%s\ndn.sdk=%s\n' "$ANDROID_HOME" "$HOME/zero" > local.properties
+          gradle "-Dorg.gradle.java.home=$JAVA_HOME" :dart3d:testReleaseUnitTest
