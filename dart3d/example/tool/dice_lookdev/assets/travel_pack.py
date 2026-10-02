@@ -72,5 +72,8 @@ def build(name="Wayfarer pack",loc=(0,0,0),rot_z=0,width=36,depth=23,height=48,
         x=width*.58;y=-depth*.55;z=height*cup_height
         child=vessel.build(name+" hanging pewter cup",loc=(x,y,z),rot_z=math.pi,kind="tankard",height=9,radius=3.5,metal_finish="pewter",seed=seed)
         child.rotation_euler.y=-.12;a.add(child)
-        a.tube("Cup suspension thong",[(width*.45,-depth*.55,height*(cup_height+.26)),(x-4.5,y,height*(cup_height+.20)),(x-4.5,y,height*(cup_height+.12))],.23,hide)
+        anchor=(width*.45,-depth*.55,height*(cup_height+.26))
+        if bedroll and cup_height>.65:
+            anchor=(width*.28,2-(rr+.25)*.6,zc+(rr+.25)*.8)
+        a.tube("Cup suspension thong",[anchor,(x-4.5,y,height*(cup_height+.20)),(x-4.5,y,height*(cup_height+.12))],.23,hide)
     return a.root

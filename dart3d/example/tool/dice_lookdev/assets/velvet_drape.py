@@ -8,9 +8,9 @@ from . import geometry as G, materials as M
 def build(name="Astronomer velvet",loc=(0,0,0),rot_z=0,width=25,length=38,drop=16,
           tone=(.045,.008,.075),wear=.35,seed=1,stars=9,sheen_tone=(.16,.025,.26),stitch_width=.033,
           heap=0,sweep=0,edge_fraction=.20,star_scale=1,star_spacing=0,rest_patches=(),star_band=None,
-          sweep_peak=None,sweep_spread=.28,fabric="velvet") -> bpy.types.Object:
+          sweep_peak=None,sweep_spread=.28,fabric="velvet",weave=False) -> bpy.types.Object:
     a=G.Asset(name,loc,rot_z); rng=random.Random(seed)
-    velvet=(M.wool(name+" wool",tone,seed,plaid=True,plaid_axes=("X","Y")) if fabric=="wool"
+    velvet=(M.wool(name+" wool",tone,seed,plaid=True,plaid_axes=("X","Y"),weave=weave) if fabric=="wool"
             else M.velvet(name+" velvet",tone,wear,seed,sheen_tone=sheen_tone))
     gold=(M.wool(name+" sewn wool edge",(.28,.16,.07),seed) if fabric=="wool"
           else M.polished_metal(name+" gold thread",(.54,.34,.105),.3,seed,.36))
@@ -69,5 +69,11 @@ def build(name="Astronomer velvet",loc=(0,0,0),rot_z=0,width=25,length=38,drop=1
         count=max(12,int(width*2))
         for i in range(count):
             u=-.96+1.92*i/(count-1);x,y,z=point(u,0)
-            a.tube("Twisted blanket fringe",[(x,y,z),(x+.2*math.sin(i),y-.4,z-1.5),(x+.3*math.cos(i),y-.7,z-3.0)],.09,gold,resolution=1)
+            if weave and not drop:
+                for strand in range(3):
+                    dx=(strand-1)*.055
+                    a.tube("Frayed resting wool fringe",[(x+dx,y,z),(x+dx+.2*math.sin(i),y-1.5,z+.04),
+                           (x+dx+.3*math.cos(i+strand),y-3.0,z+.015)],.035,gold,resolution=1)
+            else:
+                a.tube("Twisted blanket fringe",[(x,y,z),(x+.2*math.sin(i),y-.4,z-1.5),(x+.3*math.cos(i),y-.7,z-3.0)],.09,gold,resolution=1)
     return a.root

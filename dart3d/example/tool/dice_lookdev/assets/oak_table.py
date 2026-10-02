@@ -11,13 +11,14 @@ from . import geometry as G, materials as M
 
 def build(name="Oak table", loc=(0, 0, 0), rot_z=0, width=150, depth=85, height=70,
           thickness=7, wood_tone=(0.095, 0.038, 0.013), wear=0.7, seed=1, scorch=0.4, leg_inset=(16, 12), leg_width=9,
-          rear_recess=None, grain_scale=1.0) -> bpy.types.Object:
+          rear_recess=None, grain_scale=1.0, finish="oiled") -> bpy.types.Object:
     a = G.Asset(name, loc, rot_z)
     rng = random.Random(seed)
     boards = max(4, round(depth / 14))
     bread = 10
+    wood = M.weathered_oak if finish=="weathered" else M.oak
     for i in range(boards):
-        mat = M.oak(f"{name} board {i}", tuple(c * (0.65 + (i * 0.37 % 0.85)) for c in wood_tone), wear, seed + i, grain_scale=grain_scale)
+        mat = wood(f"{name} board {i}", tuple(c * (0.65 + (i * 0.37 % 0.85)) for c in wood_tone), wear, seed + i, grain_scale=grain_scale)
         a.block("Oak plank", (width - bread * 2, depth / boards - 0.23, thickness),
                 (0, -depth / 2 + (i + 0.5) * depth / boards, height - thickness / 2), mat, 0.32)
     grime = M.leather(f"{name} seam grime", (0.013, 0.009, 0.005), seed=seed)
@@ -47,7 +48,7 @@ def build(name="Oak table", loc=(0, 0, 0), rot_z=0, width=150, depth=85, height=
             continue
         a.tube("Shallow work scar", [(x, y, height + 0.016), (x + length, y + rng.uniform(-0.3, 0.3), height + 0.016)],
                rng.uniform(0.012, 0.035), scratch, resolution=1)
-    cross = M.oak(f"{name} end grain", wood_tone, wear, seed, axis="Y")
+    cross = wood(f"{name} end grain", wood_tone, wear, seed, axis="Y")
     upright = M.oak(f"{name} legs", wood_tone, wear, seed + 10, axis="Z")
     peg = M.oak(f"{name} pegs", tuple(c * 0.5 for c in wood_tone), wear, seed, axis="Z")
     for side in (-1, 1):

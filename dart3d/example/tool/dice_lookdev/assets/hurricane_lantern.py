@@ -7,7 +7,8 @@ from .forge import fire_tongue
 
 
 def build(name="Road lantern",loc=(0,0,0),rot_z=0,height=32,radius=8,
-          metal_finish="pewter",wear=.7,seed=1,energy=6500,glass_tone=(.93,.86,.68)) -> bpy.types.Object:
+          metal_finish="pewter",wear=.7,seed=1,energy=6500,glass_tone=(.93,.86,.68),
+          flame_strength=18,flame_width=.8) -> bpy.types.Object:
     a=G.Asset(name,loc,rot_z);s=height/32;r=radius/8
     tin=M.metal(name+" worn tin",metal_finish,wear,seed)
     dark=M.metal(name+" burner iron","iron",wear,seed)
@@ -26,8 +27,8 @@ def build(name="Road lantern",loc=(0,0,0),rot_z=0,height=32,radius=8,
     k.surface(k.mix_shader(.20,tr,pane))
     profile=[(3.2,6.8),(4.8,7.7),(5.2,10),(5.0,14),(4.3,20),(3.7,23.6),(3.5,23.7),(4.1,20),(4.8,14),(5.0,10),(4.6,7.9),(3.0,7)]
     a.lathe("Bulged glass chimney",[(rr*r,z*s) for rr,z in profile],glass,segments=64)
-    flame=M.flame(name+" oil flame",18)
-    fire_tongue(a,"Oil wick flame",(0,0,7.6*s),.8*r,8*s,flame,lean=.65*r)
+    flame=M.flame(name+" oil flame",flame_strength)
+    fire_tongue(a,"Oil wick flame",(0,0,7.6*s),flame_width*r,8*s,flame,lean=.65*r)
     a.lathe("Spun ventilator cap",[(rr*r,z*s) for rr,z in ((3.8,23),(5.2,23.6),(5.6,24.2),(5.2,25.2),(4.5,25.5),(4.3,27),(5.4,27.2),(5.5,28),(4.7,28.6),(2.9,29.5),(2.7,30.7),(0,30.7))],tin,segments=64)
     for side in (-1,1):
         pts=[(side*x*r,0,z*s) for x,z in ((6.2,3.5),(8.7,6),(9,11),(8.6,22),(7.2,27),(5.0,28))]

@@ -1211,31 +1211,44 @@ Lighting recipes (the tray lights are unchanged unless noted):
   asset close-ups and geometry audits are in `out/r3/pass2/hearthside/`.
   Gate: numeral 9.21 (d4), die vs tray 3.41, stroke 0.123–0.129, PASS.
 
-- **Old Road — the wayfarer's inn corner (round 2).** A close broadside
-  leather/map tray spans 84.76% of the frame, with its near rim at the bottom.
-  The 26.4 mm camera looks down 28.3 degrees from 24 cm above the tabletop at
-  effective f/8. A worn planked oak tavern table has a continuous straight
-  far edge; behind and below it, a stepped sitting bay supports the canvas/leather travel pack on
-  a pegged chair, its spiral bedroll and hanging pewter cup, the bound walking
-  staff and a sheepskin-covered stool. A raised fieldstone log hearth is on
-  the right; a real half-timber wall and small oak casement frame a blue-hour
-  village with warm windows. The foreground tin hurricane lantern, wooden
-  tankard, short clay pipe and fringed red plaid balance a pewter tankard and
-  country loaf on a handled trencher at the right edge.
-  The lantern makes a warm pool on the oak, the hearth lights the travel gear
-  from the right, and the dusk window provides a cool return. Room lights use
-  separate environment receivers; a gentle 2 kW hearth reflection lights the
-  gold dice without lifting the map floor. The original map, leather board/rim,
-  `blue_hour`, `warm_key` and overhead are unchanged. No ceiling beams cross
-  the table: polished gold mirrors what is above it, and round 1's dark beam
-  pulled the d4 below the gate (4.18). Exposure is +1.5 EV, gamma 0.8, with a
-  0.5-pixel Cycles filter for the fine numerals at preview resolution.
-  Foreground clearance is at least 10.329 cm; the lantern, tankards, pipe,
-  trencher and pack are checked for contact with their supports. There are
-  no room volumes. Shared asset variants retain their existing defaults;
-  all seven approved rooms are rechecked at 25% / 16 samples.
-  Pass 1 preview gate (50% / 32 samples): numeral 5.48 (d10t),
-  die vs tray 3.35, stroke 0.123–0.128, PASS.
+- **Old Road — the wayfarer's inn corner (round 3, pass 2).** The close
+  broadside 19.5 mm camera looks down 26.1 degrees at effective f/6.3, focused
+  on the dice. The d20 spans 8.2% of the frame; the near rim and near corners
+  are cropped. This is a more aggressive crop than the concept, and should
+  not be described as the whole tray occupying 85% of the frame.
+  The oak table has a shorter continuous straight far edge and a worn,
+  dark open-grain finish, with broken cup rings and knife marks outside the
+  quiet band. Its top is at z=0.34 cm, immediately under the original map at
+  z=0.36. A concealed bedding cut in the table accommodates the unchanged
+  leather board; there is no rear recess or projecting plinth.
+  A brighter, wider oil flame is visible inside the iron hurricane lantern.
+  Folded red plaid has crossed yarn relief and split resting fringe, with a
+  briar pipe on it. The compact canvas/leather pack is closer on a supported
+  chair landing, with a dark green bedroll and a high tin cup whose thong is
+  anchored to the bedroll cinch. The bound staff, dark rugged fieldstone log
+  fire, sheepskin stool and side-table candle complete the sitting bay.
+  The smaller pewter tankard has moved to the side table; the loaf and
+  trencher are reduced to 18 by 12 cm. The village has quieter roof contrast,
+  dimmer window pinpoints and a less saturated blue-hour sky. Its simple roof
+  shapes remain more stylised than the concept; the blanket fringe and fur
+  stool are also less prominent in the establishing shot.
+  The lantern rakes warm light over the oak, the log hearth supplies the
+  warm counterlight, and dusk supplies the cool return. Two broad room fills
+  are removed and the remaining room lights use environment receivers.
+  The original map, leather board/rim/materials, `blue_hour`, `warm_key`,
+  overhead and existing 2 kW gold reflection return remain unchanged.
+  No dark ceiling beam crosses the gold dice's reflection field. Exposure
+  remains +1.5 EV, gamma 0.8, and the Cycles filter remains 0.5 pixels.
+  Audited foreground dressing clears the board by at least 11.28 cm, with
+  no prop intersections and no die/room contact errors. All ten other
+  approved rooms were rendered serially at 25% / 16 samples and visually
+  compared without visible shared-asset regressions. Final previews and
+  asset close-ups are in `out/r3/pass2/oldroad/`. The room at 50% / 64 samples
+  takes 5 seconds to render (7.61 seconds for the command, using verified
+  cached numeral atlases and MetalRT).
+  Pass 2 preview gate (50% / 32 samples): numeral 5.45 (d10t),
+  die vs tray 3.29, stroke 0.123–0.128, PASS.
+  Gate: numeral 5.81 (d4), die vs tray 3.15, stroke 0.123–0.128, PASS.
 
 - **Northfield — the 1986 countryside kitchen (room round 2).** A close
   broadside breakfast view: the calibration tray spans about 83% of the frame,

@@ -202,6 +202,22 @@ def oak(name="Oiled oak", tone=(0.12, 0.047, 0.016), wear=0.4, seed=0, axis="X",
     return m
 
 
+def weathered_oak(name="Weathered tavern oak", tone=(.035,.015,.005), wear=.8, seed=0, axis="X", grain_scale=1):
+    m,k=E.material(name)
+    scale=(.055,1.1,.8) if axis=="X" else (1.1,.055,.8)
+    vec=mapped(k,tuple(v*grain_scale for v in scale),seed)
+    grain=k.noise(vec,1,5,.72,dist=.35).outputs["Fac"]
+    pores=k.voronoi(vec,3,feature="DISTANCE_TO_EDGE").outputs["Distance"]
+    channels=k.ramp(pores,[(0,(0,0,0)),(.027,(.18,.18,.18)),(.085,(1,1,1))])
+    color=k.ramp(grain,[(.2,tuple(c*.12 for c in tone)),(.45,tuple(c*.55 for c in tone)),(.62,tone),(.82,tuple(c*2.4 for c in tone))])
+    color=k.mix(k.math("MULTIPLY",k.math("SUBTRACT",1,channels),wear*.7),color,tuple(c*.12 for c in tone)+(1,))
+    patches=k.noise(mapped(k,(.09,.09,.09),seed),1,3,.7).outputs["Fac"]
+    rough=k.ramp(patches,[(.2,(.25,.25,.25)),(.5,(.43,.43,.43)),(.8,(.67,.67,.67))])
+    k.surface(k.bsdf(Base_Color=color,Roughness=rough,Coat_Weight=.14,Coat_Roughness=.25,
+                     Normal=k.bump(channels,.36,.065,normal=k.bump(grain,.3,.11))))
+    return m
+
+
 def metal(name="Forged iron", finish="iron", wear=0.4, seed=0):
     m, k = E.material(name)
     vec = mapped(k, (1, 1, 1), seed)
@@ -719,7 +735,7 @@ def upholstery(name="Rubbed upholstery leather", tone=(.13,.035,.019), wear=.6, 
     return m
 
 
-def wool(name="Wool yarn", tone=(.11,.012,.029), seed=0, plaid=False, plaid_axes=("X","Z")):
+def wool(name="Wool yarn", tone=(.11,.012,.029), seed=0, plaid=False, plaid_axes=("X","Z"), weave=False):
     m,k=E.material(name)
     vec=mapped(k,(1,1,1),seed)
     n=k.noise(vec,3.5,2).outputs["Fac"]
@@ -732,8 +748,19 @@ def wool(name="Wool yarn", tone=(.11,.012,.029), seed=0, plaid=False, plaid_axes
             fine=k.math("LESS_THAN",k.math("ABSOLUTE",k.math("SUBTRACT",stripe,3.7)),.18)
             col=k.mix(k.math("MULTIPLY",wide,.75),col,(.025,.045,.065,1))
             col=k.mix(fine,col,(.32,.18,.055,1))
+    normal=k.bump(n,.28,.027)
+    if weave:
+        threads=[]
+        for axis in plaid_axes:
+            wave=k.node("ShaderNodeTexWave");wave.bands_direction=axis
+            k.link(k.coords().outputs["Object"],wave.inputs["Vector"])
+            k.set(wave,Scale=12,Distortion=.9,Detail=2,Detail_Scale=1)
+            threads.append(wave.outputs["Fac"])
+        thread=k.math("MULTIPLY",threads[0],threads[1])
+        normal=k.bump(thread,.38,.018,normal=normal)
+        col=k.mix(k.math("MULTIPLY",thread,.22),col,tuple(c*1.5 for c in tone)+(1,))
     k.surface(k.bsdf(Base_Color=col,Roughness=.86,Sheen_Weight=.35,Sheen_Roughness=.65,Sheen_Tint=tuple(c*2 for c in tone)+(1,),
-                     Normal=k.bump(n,.28,.027)))
+                     Normal=normal))
     return m
 
 

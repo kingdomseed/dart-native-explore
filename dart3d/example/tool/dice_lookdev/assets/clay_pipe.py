@@ -6,9 +6,10 @@ from . import geometry as G, materials as M
 
 
 def build(name="Clay pipe",loc=(0,0,0),rot_z=0,length=19,bowl_height=5.2,radius=2.4,
-          tone=(.20,.065,.025),metal_finish="brass",wear=.7,seed=1) -> bpy.types.Object:
+          tone=(.20,.065,.025),metal_finish="brass",wear=.7,seed=1,finish="clay") -> bpy.types.Object:
     a=G.Asset(name,loc,rot_z)
-    clay=M.stoneware(name+" fired clay",tone,wear,seed)
+    clay=(M.oak(name+" polished briar",tone,wear,seed,axis="Z",grain_scale=5)
+          if finish=="briar" else M.stoneware(name+" fired clay",tone,wear,seed))
     char=E.simple(name+" smoked interior",(.012,.009,.007),.96)
     dark=M.leather(name+" black horn",(.014,.009,.006),wear,seed)
     brass=M.metal(name+" stem ferrule",metal_finish,wear,seed)

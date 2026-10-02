@@ -447,3 +447,23 @@ All room calls to `rear_recess` are removed. The optional asset parameter remain
   pillar candle without an oversized drip pan. Defaults are unchanged.
 - `table_wear`: broken cup rings and low-relief scratches; dimensions,
   quiet rectangle, wear, wood tone and seed. Use on a supported tabletop.
+
+### Oldroad round 3, pass 2
+
+- `hurricane_lantern`: optional `flame_strength` and `flame_width` make the oil
+  flame readable through the globe; existing defaults remain.
+- `clay_pipe`: optional `finish="briar"` uses polished wood on the hollow bowl;
+  the default remains fired clay.
+- `oak_table`: optional `finish="weathered"` adds deeper open grain and
+  patchy rubbed sheen; ordinary oiled oak remains the default.
+- `materials`: adds `weathered_oak`; optional `wool(weave=True)` adds crossed
+  yarn relief without changing existing cloth materials.
+- `velvet_drape`: optional `weave=True` enables that yarn detail; with
+  `drop=0`, split fringe strands rest along the supporting surface.
+- `travel_pack`: high cup placements attach their suspension thong to the
+  bedroll cinch. Ordinary low cup placements retain their earlier anchor.
+
+Oldroad reuses `table_wear` for quiet-band-aware knife marks and cup rings,
+and the rugged `hearth_fireplace` variant for dark fieldstone and a fuller
+log fire. No new asset module was needed. All ten other approved rooms were
+rendered serially at 25 percent / 16 samples and visually checked.
