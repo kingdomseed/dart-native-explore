@@ -156,6 +156,30 @@ currently inert.
 - Android frame timings: `adb shell setprop log.tag.dart3d.perf DEBUG`
   makes each view log a `perf` line every 2 s (frame interval, GPU time,
   physics and submit cost, median and p95) under the `dart3d` tag.
+- Android material packages. Filament materials are compiled ahead of
+  time, because compiling one on a phone takes 3–6 s. The plugin ships
+  its fixed set (lit and unlit in three blend modes, trail, shadow
+  catcher, particles) for OpenGL and Vulkan, so a scene of plain PBR
+  materials starts without compiling anything.
+  - A material that uses a `KHR_materials_*` extension needs its own
+    package (one per combination of extensions and bound textures). The
+    first time an install meets one, it is compiled in the background
+    (the base material shows meanwhile) and cached on the device; later
+    launches load it from the cache.
+  - To skip that first compile, ship the variants your app uses: run
+    `tool/bake_materials.sh <adb-serial> --package <your.app.id>
+    --app-assets <your app>/android/app/src/main/assets --wait 60` and
+    open the screens that show those materials during the wait. The
+    example ships the hero's clear-coat variant this way.
+  - Packages are named by a hash of their recipe and the Filament
+    version, so one built for other shaders or another Filament is never
+    loaded. After changing a recipe in `MaterialPackages.kt` or the
+    Filament pin, re-run the script; `ShippedMaterialsTest` fails until
+    the shipped set matches.
+  - `adb logcat -s dart3d | grep 'start +'` shows the cold-start
+    timeline in ms since process start; `tool/cold_start.sh
+    <adb-serial> [--fresh]` times several launches and prints the
+    medians. Measured in `../docs/artifacts/s0h-cold-start/`.
 - Feature-capability warnings: unrealized `featuresRequired`/
   `featuresUsed` names log warnings, and `strictFeatures: true`
   refuses them.

@@ -106,9 +106,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      */
     private fun createEngine(): Engine {
         val pref = Dart3dJni.nativeBackendPref()
-        var backend = when (pref) {
-            BACKEND_OPENGL -> Engine.Backend.OPENGL
-            BACKEND_VULKAN -> Engine.Backend.VULKAN
+        var backend = when {
+            MaterialPackages.isBakeRun() -> Engine.Backend.OPENGL
+            pref == BACKEND_OPENGL -> Engine.Backend.OPENGL
+            pref == BACKEND_VULKAN -> Engine.Backend.VULKAN
             else -> if (DeviceTier.autoBackendIsVulkan(context)) {
                 DEFAULT_BACKEND
             } else {
@@ -125,6 +126,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         }
         Log.i(TAG, "Filament engine backend: $backend (pref=$pref," +
             " tier=${DeviceTier.of(context)})")
+        ColdStart.mark("engine created")
         return engine
     }
 
@@ -608,9 +610,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             // nothing to fall back to; the check stays fatal there.
             // Never compile on main here: DNPluginRegistry.createView runs
             // on the UI thread, and a cold compile of the lit set parked it
-            // for ~12 s (the captured ANR). Load whatever the process cache
-            // already holds; otherwise make sure a background compile for
-            // this engine's API is running and let stepFrame finish init.
+            // for ~12 s (the captured ANR). prewarm reads the shipped or
+            // disk-cached packages (a few ms); only when one is missing
+            // does it start a background compile for this engine's API
+            // and leave stepFrame to finish init.
+            MaterialPackages.attach(context)
             MaterialPackages.prewarm(MaterialPackages.apiFor(engine.backend))
             materialsReady = tryLoadBaseMaterials()
 
@@ -643,6 +647,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     destroySwapChainAndWait("native window changed")
                     swapChain = engine.createSwapChain(surface, uiHelper.swapChainFlags)
                     Log.i(TAG, "dart3d view $viewId swapchain created")
+                    ColdStart.mark("swapchain created")
                 }
                 override fun onDetachedFromSurface() {
                     destroySwapChainAndWait("surface destroyed")
@@ -790,10 +795,25 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // prebuilt meanwhile, and re-decode the waiting material
         // resources when the package lands.
         val api = MaterialPackages.apiFor(engine.backend)
-        val pkgKey = MaterialPackages.litKey(unlit, blendingForMode(mode),
+        val spec = MaterialPackages.litSpec(unlit, blendingForMode(mode),
             flags, boundSlots, api)
-        if (MaterialPackages.peek(pkgKey) == null &&
-            !MaterialPackages.hasFailed(pkgKey)) {
+        var bytes = MaterialPackages.cached(spec)
+        var built: Material? = null
+        if (bytes != null) {
+            built = try {
+                MaterialPackages.load(engine, bytes)
+            } catch (e: Exception) {
+                null
+            }
+            // A shipped or cached package this engine refuses (the app
+            // resolved another Filament) is compiled here instead.
+            if (built == null && MaterialPackages.rejectStored(spec)) {
+                Log.w(TAG, "stored package ${spec.key} did not load;" +
+                    " compiling it")
+                bytes = null
+            }
+        }
+        if (bytes == null && !MaterialPackages.hasFailed(spec.key)) {
             materialKey?.let {
                 variantWaiters.getOrPut(key) { HashSet() }.add(it)
             }
@@ -806,12 +826,6 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 }
             }
             return base()
-        }
-        val built = try {
-            buildMaterial(unlit, blendingForMode(mode), flags,
-                boundSlots)
-        } catch (e: Exception) {
-            null
         }
         if (built == null) {
             failedVariants.add(key)
@@ -884,27 +898,6 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     private var initFailureShown = false
 
     /**
-     * Compiles one material package. Returns null when filamat or the
-     * engine rejects it — the caller degrades (variants) or fatals
-     * (the six prebuilts, which have no fallback).
-     */
-    private fun buildMaterial(
-        unlit: Boolean,
-        blending: MaterialBuilder.BlendingMode,
-        extFlags: Int = 0,
-        boundSlots: Int = 0,
-    ): Material? {
-        val bytes = MaterialPackages.litPackage(unlit, blending, extFlags,
-            boundSlots, MaterialPackages.apiFor(engine.backend))
-            ?: return null
-        return try {
-            MaterialPackages.load(engine, bytes)
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    /**
      * Loads the six base prebuilts + the trail material from the
      * process package cache. Returns false (loading nothing) while any
      * package is still compiling; a package filamat rejected is fatal
@@ -914,17 +907,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         if (materialsReady) return true
         if (materialsFailed) return false
         val api = MaterialPackages.apiFor(engine.backend)
-        val modes = listOf(MaterialBuilder.BlendingMode.OPAQUE,
-            MaterialBuilder.BlendingMode.MASKED,
-            MaterialBuilder.BlendingMode.TRANSPARENT)
-        val keys = ArrayList<String>()
-        for (unlit in listOf(false, true)) {
-            for (mode in modes) {
-                keys += MaterialPackages.litKey(unlit, mode, 0,
-                    FsceneRealizer.ALL_BASE_SLOTS, api)
-            }
-        }
-        keys += MaterialPackages.trailKey(api)
+        val specs = MaterialPackages.baseSet(api)
+        val keys = specs.map { it.key }
         val failed = keys.filter { MaterialPackages.hasFailed(it) }
         if (failed.isNotEmpty()) {
             Log.e(TAG, "dart3d: base material compile FAILED ($failed) —" +
@@ -945,11 +929,22 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             // bridge's constructor catch. Free what loaded, then go
             // terminal instead of crashing the UI thread.
             for (m in loaded) engine.destroyMaterial(m)
+            val refused = specs[loaded.size]
+            if (MaterialPackages.rejectStored(refused)) {
+                // A shipped or cached package this engine refuses (the
+                // app resolved another Filament): compile it instead,
+                // and let stepFrame retry when it lands.
+                Log.w(TAG, "stored package ${refused.key} did not load" +
+                    " (${t.message}); compiling it")
+                MaterialPackages.compileAsync(refused)
+                return false
+            }
             Log.e(TAG, "dart3d: base material load FAILED", t)
             failTerminal("base material load failed for ${api.name}: " +
                 "${t.javaClass.simpleName}: ${t.message}")
             return false
         }
+        ColdStart.mark("base materials loaded")
         litMaterial = loaded[0]
         litMaskedMaterial = loaded[1]
         litBlendMaterial = loaded[2]
@@ -988,10 +983,25 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      * authored key.
      */
     private fun buildShadowCatcherMaterial(): Material {
-        val bytes = checkNotNull(MaterialPackages.catcherPackage(
+        return loadFixed(MaterialPackages.catcherSpec(
             MaterialPackages.apiFor(engine.backend)))
-            { "d3 shadow catcher failed to compile" }
-        return MaterialPackages.load(engine, bytes)
+    }
+
+    /**
+     * Loads a fixed package that is fetched at first use. A stored copy
+     * the engine refuses is compiled here, on the calling thread.
+     */
+    private fun loadFixed(spec: MaterialPackages.Spec): Material {
+        fun bytes() = checkNotNull(MaterialPackages.compile(spec))
+            { "material package ${spec.key} failed to compile" }
+        return try {
+            MaterialPackages.load(engine, bytes())
+        } catch (e: Exception) {
+            if (!MaterialPackages.rejectStored(spec)) throw e
+            Log.w(TAG, "stored package ${spec.key} did not load;" +
+                " compiling it")
+            MaterialPackages.load(engine, bytes())
+        }
     }
 
     // MARK: - W18 particles
@@ -1036,10 +1046,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      * (upstream's quad UVs are authored v-top).
      */
     private fun buildParticleMaterial(additive: Boolean): Material {
-        val bytes = checkNotNull(MaterialPackages.particlePackage(additive,
+        return loadFixed(MaterialPackages.particleSpec(additive,
             MaterialPackages.apiFor(engine.backend)))
-            { "d3 particle material failed to compile" }
-        return MaterialPackages.load(engine, bytes)
     }
 
     /**
@@ -4048,6 +4056,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // merge back on top.
         resources.payloadSpecs.putAll(opPayloadSpecs)
         nodesById = nodes
+        if (nodes.isNotEmpty()) ColdStart.mark("scene installed")
         nodeSkinning = nodeSkins
         particleRuntimes = particles
         this.gpuMeshes = gpuMeshes
@@ -4991,11 +5000,21 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 }
             }
             renderer.endFrame()
+            if (!firstSceneFrameDone && nodesById.isNotEmpty()) {
+                firstSceneFrameDone = true
+                ColdStart.mark("first frame submitted")
+                if (perfEnabled()) {
+                    engine.flushAndWait()
+                    ColdStart.mark("first frame rendered")
+                }
+            }
             tickStats(tNanos)
             return true
         }
         return false
     }
+
+    private var firstSceneFrameDone = false
 
     private val framePerf = FramePerf()
     private val perfRecords = LongArray(FramePerf.HISTORY * 4)

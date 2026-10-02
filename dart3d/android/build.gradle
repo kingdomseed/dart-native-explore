@@ -40,6 +40,10 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
+    buildFeatures {
+        buildConfig true
+    }
+
     // dart3d_jni: the DartNative dispatcher bridge — a tiny shim that
     // stores the Dart event callback pointer (same pattern as
     // Dart3dSetDispatcher on iOS) and fires physics events into Dart.
@@ -55,6 +59,9 @@ android {
         // jolt-jni Custom* listener methods are JNI-looked-up by name —
         // shipped to consumers so app-side R8 doesn't strip them.
         consumerProguardFiles 'proguard-rules.pro'
+        // Compiled material packages are named by a hash that includes
+        // this, so packages built by another filamat are never loaded.
+        buildConfigField 'String', 'FILAMENT_VERSION', "\"${filamentVersion}\""
         externalNativeBuild {
             cmake {
                 abiFilters "arm64-v8a", "x86_64"
