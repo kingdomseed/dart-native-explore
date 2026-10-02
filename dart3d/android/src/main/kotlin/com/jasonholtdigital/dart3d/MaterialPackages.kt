@@ -1,32 +1,48 @@
 package com.jasonholtdigital.dart3d
 
+import android.content.Context
 import android.util.Log
 import com.google.android.filament.Engine
 import com.google.android.filament.Material
 import com.google.android.filament.filamat.MaterialBuilder
+import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * Process-wide cache of compiled filamat material packages.
+ * The plugin's Filament material packages: what each one is
+ * ([MaterialRecipe]) and where its compiled bytes come from.
  *
- * `MaterialBuilder.build()` runs the full shader toolchain (GLSL →
- * SPIR-V/ESSL, optimization) — hundreds of ms per package on the A142,
- * and a `Dart3dView` needs seven at construction. Every screen switch
- * in the example re-creates the view, and `DNPluginRegistry.createView`
- * runs on the main thread, so compiling there parked main long enough
- * to trip Android's 5 s input-dispatch ANR (captured trace: main in
- * `MaterialBuilder.nBuilderBuild` ← `Dart3dView.<init>` ←
- * `DNPluginRegistry.createView`).
+ * Compiling a lit package with filamat takes 3–6 s on a phone, nearly
+ * all of it in the SPIR-V optimizer, so the runtime compiler is the
+ * last resort. A package is looked up, in order:
  *
- * Packages depend only on the builder inputs + target API — never on
- * an Engine — so they're compiled once per process and loaded into
- * each Engine with the cheap `Material.Builder().payload()`. [prewarm]
- * compiles the base set on a background thread at plugin registration
- * so the first view usually finds them ready.
+ * 1. in this process's memory;
+ * 2. among the packages shipped as assets — the fixed set
+ *    ([fixedSet]) is built ahead of time and packaged with the plugin,
+ *    and an app can add the variants its documents use;
+ * 3. in the install's on-disk cache of earlier compiles;
+ * 4. and only then compiled, on a background thread, and written to
+ *    that cache.
+ *
+ * Packages depend only on the builder inputs, the target API and the
+ * filamat version — never on an Engine — so one copy serves every
+ * view, loaded with the cheap `Material.Builder().payload()`.
+ * Compiles never run on the main thread: `DNPluginRegistry.createView`
+ * runs there, and a cold compile of the lit set once parked it past
+ * Android's 5 s input-dispatch ANR.
+ *
+ * Shipped packages are regenerated with `tool/bake_materials.sh`.
  */
 internal object MaterialPackages {
+
+    /** A package's cache key and the recipe that compiles it. */
+    class Spec(val key: String, val recipe: MaterialRecipe) {
+        val fingerprint: String by lazy {
+            recipe.fingerprint(BuildConfig.FILAMENT_VERSION)
+        }
+    }
 
     private const val TAG = "dart3d"
 
@@ -64,6 +80,67 @@ internal object MaterialPackages {
     }
     private val failed = ConcurrentHashMap.newKeySet<String>()
 
+    @Volatile private var store: MaterialStore? = null
+    @Volatile private var baking = false
+    private val storeMisses = ConcurrentHashMap.newKeySet<String>()
+    private val storeLock = Any()
+
+    /** Log tag that turns a run into a bake: `setprop log.tag.dart3d.bake DEBUG`. */
+    private const val BAKE_TAG = "dart3d.bake"
+
+    /**
+     * Points the package lookup at [context]'s assets and code cache
+     * (which Android empties on every app update). While baking,
+     * neither is read: everything compiles and is exported to the
+     * app's external files directory for `tool/bake_materials.sh`.
+     */
+    fun attach(context: Context) {
+        if (store != null) return
+        val app = context.applicationContext ?: context
+        if (Log.isLoggable(BAKE_TAG, Log.DEBUG)) {
+            val dir = File(app.getExternalFilesDir(null), "dart3d-materials")
+            store = MaterialStore({ null }, null, dir)
+            baking = true
+            Log.i(TAG, "bake: exporting material packages to $dir")
+            startBake()
+            return
+        }
+        val assets = app.assets
+        store = MaterialStore(
+            shipped = { name ->
+                try {
+                    assets.open("${MaterialStore.ASSET_DIR}/$name")
+                        .use { it.readBytes() }
+                } catch (e: java.io.IOException) {
+                    null
+                }
+            },
+            cacheDir = File(app.codeCacheDir, "dart3d-materials"),
+        )
+    }
+
+    /** The target APIs the plugin runs on, and so ships packages for. */
+    val BAKED_APIS = listOf(MaterialBuilder.TargetApi.OPENGL,
+        MaterialBuilder.TargetApi.VULKAN)
+
+    private fun startBake() {
+        val t = Thread({
+            try {
+                var n = 0
+                for (api in BAKED_APIS) {
+                    for (spec in fixedSet(api)) {
+                        if (compile(spec) != null) n++
+                    }
+                }
+                Log.i(TAG, "bake: fixed set exported ($n packages)")
+            } catch (t: Throwable) {
+                Log.e(TAG, "bake failed", t)
+            }
+        }, "dart3d-matbake")
+        t.isDaemon = true
+        t.start()
+    }
+
     // filamat's toolchain (glslang process state) is initialized once
     // and compiles are serialized — the prewarm thread and a view on
     // main never run the toolchain concurrently.
@@ -85,12 +162,14 @@ internal object MaterialPackages {
         else MaterialBuilder.TargetApi.OPENGL
 
     /**
-     * Returns the package bytes for [key], compiling [builder]'s output
-     * on a miss. Null when filamat rejects the package (cached as a
-     * failure so a bad variant isn't recompiled per decode).
+     * Returns [spec]'s package bytes: from memory, the store, or a
+     * compile (which blocks for seconds — never call it on main for a
+     * package that may be missing). Null when filamat rejects the
+     * package (remembered, so a bad variant isn't recompiled per decode).
      */
-    fun compile(key: String, builder: () -> MaterialBuilder): ByteArray? {
-        lookup(key)?.let { return it }
+    fun compile(spec: Spec): ByteArray? {
+        val key = spec.key
+        cached(spec)?.let { return it }
         if (key in failed) return null
         synchronized(compileLock) {
             lookup(key)?.let { return it }
@@ -98,7 +177,7 @@ internal object MaterialPackages {
             ensureInit()
             val start = android.os.SystemClock.uptimeMillis()
             val pkg = try {
-                builder().build()
+                spec.recipe.toBuilder().build()
             } catch (e: Exception) {
                 null
             }
@@ -110,13 +189,47 @@ internal object MaterialPackages {
             val bytes = ByteArray(buf.remaining())
             buf.get(bytes)
             store(key, bytes)
+            store?.save(spec.fingerprint, key, bytes)
+            storeMisses.remove(key)
             Log.i(TAG, "material package $key compiled in " +
-                "${android.os.SystemClock.uptimeMillis() - start}ms")
+                "${android.os.SystemClock.uptimeMillis() - start}ms" +
+                " (${bytes.size} B)")
             return bytes
         }
     }
 
-    /** Cached bytes for [key] without compiling (null while pending). */
+    /**
+     * [spec]'s bytes if they can be had without compiling: from memory,
+     * or read once from the store (a few ms of file I/O).
+     */
+    fun cached(spec: Spec): ByteArray? {
+        lookup(spec.key)?.let { return it }
+        val store = store ?: return null
+        // One reader at a time: a second caller waits out the read
+        // instead of taking the package for missing and compiling it.
+        synchronized(storeLock) {
+            lookup(spec.key)?.let { return it }
+            if (spec.key in storeMisses) return null
+            val bytes = store.find(spec.fingerprint)
+            if (bytes == null) {
+                storeMisses.add(spec.key)
+                return null
+            }
+            store(spec.key, bytes)
+            return bytes
+        }
+    }
+
+    /** Reads [api]'s base set from the store into memory; no compile. */
+    fun preload(api: MaterialBuilder.TargetApi): Boolean {
+        var all = true
+        for (spec in baseSet(api)) {
+            if (cached(spec) == null) all = false
+        }
+        return all
+    }
+
+    /** In-memory bytes for [key] (null while pending). */
     fun peek(key: String): ByteArray? = lookup(key)
 
     /** True when filamat rejected [key]'s package. */
@@ -164,7 +277,15 @@ internal object MaterialPackages {
     ) {
         variantExecutor.execute {
             val bytes = try {
-                litPackage(unlit, blending, extFlags, boundSlots, api)
+                if (baking) {
+                    // A bake exports each variant for both backends,
+                    // whichever one this device renders with.
+                    for (other in BAKED_APIS) {
+                        compile(litSpec(unlit, blending, extFlags,
+                            boundSlots, other))
+                    }
+                }
+                compile(litSpec(unlit, blending, extFlags, boundSlots, api))
             } catch (t: Throwable) {
                 Log.w(TAG, "variant compile failed", t)
                 null
@@ -180,17 +301,21 @@ internal object MaterialPackages {
     /** Called by a view for its engine's API (non-blocking). */
     fun prewarm(api: MaterialBuilder.TargetApi) {
         activeApi = api
+        if (preload(api)) return
         startPrewarm(api)
     }
 
     /**
-     * Plugin-registration prewarm. The app's backend pref
-     * (Dart3dSetBackend) lands from Dart main a few hundred ms after
-     * registration, so wait briefly, then compile for the pref — or
-     * [guess] (the `auto` resolution) when none was set.
+     * Plugin-registration prewarm: reads [guess]'s base set (the `auto`
+     * resolution) from the store right away. Only if that leaves a
+     * package to compile does it wait for the app's backend pref
+     * (Dart3dSetBackend lands from Dart main a few hundred ms after
+     * registration) and compile for the pref, or [guess] when none
+     * was set.
      */
     fun prewarmSpeculative(guess: MaterialBuilder.TargetApi) {
         val t = Thread({
+            if (preload(guess)) return@Thread
             try {
                 Thread.sleep(400)
             } catch (e: InterruptedException) {
@@ -215,19 +340,36 @@ internal object MaterialPackages {
     private val prewarmAttempts = ConcurrentHashMap<String, Int>()
     private const val MAX_PREWARM_ATTEMPTS = 2
 
-    /** The base package keys a view needs before it can render. */
-    fun baseKeys(api: MaterialBuilder.TargetApi): List<String> {
-        val keys = ArrayList<String>()
+    private val BLEND_MODES = listOf(
+        MaterialBuilder.BlendingMode.OPAQUE,
+        MaterialBuilder.BlendingMode.MASKED,
+        MaterialBuilder.BlendingMode.TRANSPARENT)
+
+    /**
+     * The packages a view needs before it can render, in the order
+     * `Dart3dView` binds them: lit ×3 blend modes, unlit ×3, trail.
+     */
+    fun baseSet(api: MaterialBuilder.TargetApi): List<Spec> {
+        val specs = ArrayList<Spec>()
         for (unlit in listOf(false, true)) {
-            for (mode in listOf(MaterialBuilder.BlendingMode.OPAQUE,
-                    MaterialBuilder.BlendingMode.MASKED,
-                    MaterialBuilder.BlendingMode.TRANSPARENT)) {
-                keys += litKey(unlit, mode, 0, FsceneRealizer.ALL_BASE_SLOTS, api)
+            for (mode in BLEND_MODES) {
+                specs += litSpec(unlit, mode, 0,
+                    FsceneRealizer.ALL_BASE_SLOTS, api)
             }
         }
-        keys += trailKey(api)
-        return keys
+        specs += trailSpec(api)
+        return specs
     }
+
+    /**
+     * Every package whose recipe does not depend on a document: the
+     * base set, the shadow catcher and both particle blends. These ship
+     * with the plugin for both target APIs. Lit variants (extension
+     * flags × bound slots) depend on the document and are open-ended.
+     */
+    fun fixedSet(api: MaterialBuilder.TargetApi): List<Spec> =
+        baseSet(api) + catcherSpec(api) +
+            particleSpec(false, api) + particleSpec(true, api)
 
     private fun startPrewarm(api: MaterialBuilder.TargetApi) {
         if (!prewarmStarted.add(api.name)) return
@@ -235,27 +377,21 @@ internal object MaterialPackages {
             // Abandon a speculative API once a view needs another one.
             fun stale() = activeApi.let { it != null && it != api }
             try {
-                for (unlit in listOf(false, true)) {
-                    for (mode in listOf(MaterialBuilder.BlendingMode.OPAQUE,
-                            MaterialBuilder.BlendingMode.MASKED,
-                            MaterialBuilder.BlendingMode.TRANSPARENT)) {
-                        if (stale()) return@Thread
-                        litPackage(unlit, mode, 0,
-                            FsceneRealizer.ALL_BASE_SLOTS, api)
-                    }
+                for (spec in baseSet(api)) {
+                    if (stale()) return@Thread
+                    compile(spec)
                 }
-                if (stale()) return@Thread
-                trailPackage(api)
                 // The lazily-used catcher + particle packages are NOT
-                // prewarmed (integration, 2026-09-28): compiling them
-                // here — i.e. concurrently with the first realized
-                // frames — reproducibly ended in a Mali CS_BUS_FAULT /
-                // GPU page fault ("cpu queue set unrecoverable error")
-                // ~0.5 s after the last one finished on the A142
-                // Vulkan materials lane (4/4 runs; 0/1 without them,
-                // GL unaffected). Mechanism not yet understood — see
-                // docs/triage/integration.md. A view compiles them on
-                // main at first use, as before 6b4dcca.
+                // compiled here (integration, 2026-09-28): compiling
+                // them concurrently with the first realized frames
+                // reproducibly ended in a Mali CS_BUS_FAULT / GPU page
+                // fault ("cpu queue set unrecoverable error") ~0.5 s
+                // after the last one finished on the A142 Vulkan
+                // materials lane (4/4 runs; 0/1 without them, GL
+                // unaffected). Mechanism not yet understood — see
+                // docs/triage/integration.md. They ship with the
+                // plugin; if one is ever missing, a view compiles it
+                // on main at first use, as before 6b4dcca.
             } catch (t: Throwable) {
                 // A throw (MaterialBuilder.init, a native linkage or
                 // runtime error) creates neither a cache entry nor a
@@ -268,8 +404,8 @@ internal object MaterialPackages {
                 Log.w(TAG, "material prewarm failed", t)
                 val attempts = prewarmAttempts.merge(api.name, 1, Int::plus) ?: 1
                 if (attempts >= MAX_PREWARM_ATTEMPTS) {
-                    for (key in baseKeys(api)) {
-                        if (lookup(key) == null) failed.add(key)
+                    for (spec in baseSet(api)) {
+                        if (lookup(spec.key) == null) failed.add(spec.key)
                     }
                     Log.e(TAG, "material prewarm for ${api.name} failed" +
                         " $attempts times — base packages marked failed")
@@ -290,8 +426,11 @@ internal object MaterialPackages {
      * shadow factor downstream.
      */
     fun catcherPackage(api: MaterialBuilder.TargetApi): ByteArray? =
-        compile("catcher|$api") {
-            MaterialBuilder()
+        compile(catcherSpec(api))
+
+    fun catcherSpec(api: MaterialBuilder.TargetApi): Spec =
+        Spec("catcher|$api",
+            MaterialRecipe()
                 .platform(MaterialBuilder.Platform.MOBILE)
                 .targetApi(api)
                 .name("d3_shadow_catcher")
@@ -318,13 +457,12 @@ internal object MaterialPackages {
                     "materialParams.shadowColor.rgb," +
                     " materialParams.shadowColor.a * " +
                     "materialParams.shadowIntensity);\n" +
-                    "}\n")
-        }
+                    "}\n"))
 
     /** W16 trail ribbon — vertex-color unlit + blend. */
-    fun trailPackage(api: MaterialBuilder.TargetApi): ByteArray? =
-        compile(trailKey(api)) {
-            MaterialBuilder()
+    fun trailSpec(api: MaterialBuilder.TargetApi): Spec =
+        Spec(trailKey(api),
+            MaterialRecipe()
                 .platform(MaterialBuilder.Platform.MOBILE)
                 .targetApi(api)
                 .name("d3_trail")
@@ -336,13 +474,16 @@ internal object MaterialPackages {
                     "void material(inout MaterialInputs material) {\n" +
                         "    prepareMaterial(material);\n" +
                         "    material.baseColor = getColor();\n" +
-                        "}\n")
-        }
+                        "}\n"))
 
     /** W18 sprite billboard material — see Dart3dView.particleMaterial. */
     fun particlePackage(
         additive: Boolean, api: MaterialBuilder.TargetApi,
-    ): ByteArray? = compile("particle|$additive|$api") {
+    ): ByteArray? = compile(particleSpec(additive, api))
+
+    fun particleSpec(
+        additive: Boolean, api: MaterialBuilder.TargetApi,
+    ): Spec {
         val frag = StringBuilder()
             .append("void material(inout MaterialInputs material) {\n")
             .append("    vec4 tex = mix(texture(materialParams_particleMap," +
@@ -358,7 +499,7 @@ internal object MaterialPackages {
             frag.append("    material.baseColor = c;\n")
         }
         frag.append("    prepareMaterial(material);\n}\n")
-        MaterialBuilder()
+        return Spec("particle|$additive|$api", MaterialRecipe()
             .platform(MaterialBuilder.Platform.MOBILE)
             .targetApi(api)
             .name(if (additive) "d3_particle_add" else "d3_particle_alpha")
@@ -381,7 +522,7 @@ internal object MaterialPackages {
             .materialVertex(
                 "void materialVertex(inout MaterialVertexInputs m) {\n" +
                 "    m.blendData = getCustom0();\n}\n")
-            .material(frag.toString())
+            .material(frag.toString()))
     }
 
     /**
@@ -396,15 +537,22 @@ internal object MaterialPackages {
         extFlags: Int,
         boundSlots: Int,
         api: MaterialBuilder.TargetApi,
-    ): ByteArray? {
-        ensureInit()
+    ): ByteArray? = compile(litSpec(unlit, blending, extFlags, boundSlots, api))
+
+    fun litSpec(
+        unlit: Boolean,
+        blending: MaterialBuilder.BlendingMode,
+        extFlags: Int,
+        boundSlots: Int,
+        api: MaterialBuilder.TargetApi,
+    ): Spec {
         val blendSuffix = when (blending) {
             MaterialBuilder.BlendingMode.OPAQUE -> ""
             MaterialBuilder.BlendingMode.MASKED -> "_mask"
             else -> "_blend"
         }
         val extSuffix = if (extFlags != 0) "_e$extFlags" else ""
-        val b = MaterialBuilder()
+        val b = MaterialRecipe()
             .platform(MaterialBuilder.Platform.MOBILE)
             // W30: SPIR-V under Vulkan, GLSL under OpenGL — matched to
             // the backend the engine actually resolved (incl. fallback).
@@ -799,8 +947,8 @@ internal object MaterialPackages {
         // variant bit for DPCF/SSR passes too — filtering it aborted
         // with "Requested variant 71 does not exist".)
         b.variantFilter(VARIANT_STE)
-        val key = litKey(unlit, blending, extFlags, boundSlots, api)
-        return compile(key) { b.material(body.toString()) }
+        return Spec(litKey(unlit, blending, extFlags, boundSlots, api),
+            b.material(body.toString()))
     }
 
     /**

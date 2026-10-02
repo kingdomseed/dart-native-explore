@@ -609,9 +609,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             // nothing to fall back to; the check stays fatal there.
             // Never compile on main here: DNPluginRegistry.createView runs
             // on the UI thread, and a cold compile of the lit set parked it
-            // for ~12 s (the captured ANR). Load whatever the process cache
-            // already holds; otherwise make sure a background compile for
-            // this engine's API is running and let stepFrame finish init.
+            // for ~12 s (the captured ANR). prewarm reads the shipped or
+            // disk-cached packages (a few ms); only when one is missing
+            // does it start a background compile for this engine's API
+            // and leave stepFrame to finish init.
+            MaterialPackages.attach(context)
             MaterialPackages.prewarm(MaterialPackages.apiFor(engine.backend))
             materialsReady = tryLoadBaseMaterials()
 
@@ -792,10 +794,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // prebuilt meanwhile, and re-decode the waiting material
         // resources when the package lands.
         val api = MaterialPackages.apiFor(engine.backend)
-        val pkgKey = MaterialPackages.litKey(unlit, blendingForMode(mode),
+        val spec = MaterialPackages.litSpec(unlit, blendingForMode(mode),
             flags, boundSlots, api)
-        if (MaterialPackages.peek(pkgKey) == null &&
-            !MaterialPackages.hasFailed(pkgKey)) {
+        if (MaterialPackages.cached(spec) == null &&
+            !MaterialPackages.hasFailed(spec.key)) {
             materialKey?.let {
                 variantWaiters.getOrPut(key) { HashSet() }.add(it)
             }
@@ -916,17 +918,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         if (materialsReady) return true
         if (materialsFailed) return false
         val api = MaterialPackages.apiFor(engine.backend)
-        val modes = listOf(MaterialBuilder.BlendingMode.OPAQUE,
-            MaterialBuilder.BlendingMode.MASKED,
-            MaterialBuilder.BlendingMode.TRANSPARENT)
-        val keys = ArrayList<String>()
-        for (unlit in listOf(false, true)) {
-            for (mode in modes) {
-                keys += MaterialPackages.litKey(unlit, mode, 0,
-                    FsceneRealizer.ALL_BASE_SLOTS, api)
-            }
-        }
-        keys += MaterialPackages.trailKey(api)
+        val keys = MaterialPackages.baseSet(api).map { it.key }
         val failed = keys.filter { MaterialPackages.hasFailed(it) }
         if (failed.isNotEmpty()) {
             Log.e(TAG, "dart3d: base material compile FAILED ($failed) —" +

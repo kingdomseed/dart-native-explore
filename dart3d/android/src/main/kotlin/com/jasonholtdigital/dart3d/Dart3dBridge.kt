@@ -52,14 +52,16 @@ object Dart3dBridge : DNAndroidPluginProvider {
     }
 
     /**
-     * Starts compiling the base material packages off the main thread
-     * so the first `createView` loads them instead of running filamat
-     * on main (the captured ANR). Targets the backend `auto` resolves
-     * to; a forced other backend compiles on its own first use.
+     * Gets the base material packages into memory off the main thread
+     * (read from the shipped set or the disk cache, compiled only as a
+     * last resort) so the first `createView` finds them ready. Targets
+     * the backend `auto` resolves to; a forced other backend is fetched
+     * on its own first use.
      */
     private fun prewarmMaterials() {
         try {
             val ctx: Context? = DNAppContext.get()
+            ctx?.let { MaterialPackages.attach(it) }
             val vulkan = ctx?.let { DeviceTier.autoBackendIsVulkan(it) } ?: true
             MaterialPackages.prewarmSpeculative(
                 if (vulkan) MaterialBuilder.TargetApi.VULKAN
