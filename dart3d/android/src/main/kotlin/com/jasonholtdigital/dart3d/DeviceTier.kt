@@ -14,12 +14,16 @@ import android.content.pm.PackageManager
  * 125 ms of GPU on a dice frame through the standard pipeline
  * (`docs/artifacts/s0-tablet-frame-rate/`).
  *
- * A LOW view renders with hard PCF shadows, FXAA without MSAA, the
- * small HDR buffer and Filament's dynamic resolution. Dynamic
- * resolution needs GPU frame times, which Filament's Vulkan backend
- * never produced on that tablet's driver, so LOW resolves the `auto`
- * backend to OpenGL. A fast device misfiled as LOW keeps full
- * resolution — the scale only drops while frames run long.
+ * Two things follow from LOW, and they are decided separately:
+ *
+ * - The `auto` backend resolves to OpenGL, at engine creation, whatever
+ *   `SceneQuality` says. Dynamic resolution needs GPU frame times, and
+ *   Filament's Vulkan backend never produced them on that tablet's
+ *   driver. Only the backend pref (`Dart3dSetBackend`) overrides this.
+ * - While no `SceneQuality` is set, the view takes the pipeline in
+ *   [DeviceProfile]: hard PCF shadows, FXAA without MSAA, the small HDR
+ *   buffer and dynamic resolution. A fast device misfiled as LOW keeps
+ *   full resolution — the scale only drops while frames run long.
  */
 internal enum class DeviceTier {
     LOW, STANDARD;
@@ -51,5 +55,56 @@ internal enum class DeviceTier {
         fun autoBackendIsVulkan(context: Context): Boolean =
             of(context) != LOW && context.packageManager.hasSystemFeature(
                 PackageManager.FEATURE_VULKAN_HARDWARE_VERSION)
+    }
+}
+
+/**
+ * The pipeline choices a [DeviceTier.LOW] device makes while the app
+ * sets no `SceneQuality`. Pure decisions; `Dart3dView` writes them to
+ * Filament.
+ */
+internal object DeviceProfile {
+
+    /** [quality] is the `viewConfig.quality` tier, null for unset. */
+    fun isLow(tier: DeviceTier, quality: String?): Boolean =
+        quality == null && tier == DeviceTier.LOW
+
+    /**
+     * The widget-level input to the AA resolve chain: a `quality` tier
+     * when set, else [antialiasingMode]. On the low profile a request
+     * for MSAA returns null, which the chain resolves to FXAA alone; an
+     * explicit 0 still means no AA.
+     */
+    fun aaSource(quality: String?, antialiasingMode: Int?, low: Boolean): Int? =
+        when (quality) {
+            "low" -> 0
+            "medium" -> 1   // resolveAa maps <4 → MSAA×2 + FXAA
+            "high" -> 4
+            else -> antialiasingMode?.let { if (low && it > 0) null else it }
+        }
+
+    /** Render-scale bounds; equal bounds pin a fixed scale. */
+    data class ScaleRange(val min: Float, val max: Float)
+
+    /**
+     * The scale a swapchain pass renders at, or null for full
+     * resolution with no scale pass.
+     *
+     * An authored scale — the view entry's, else the stage's — is
+     * always fixed, 1.0 included. Only when neither is authored does
+     * the low profile get dynamic resolution. The stage's scale counts
+     * as authored when its key is on the wire; the upstream codec
+     * leaves a stage scale of 1.0 off the wire, so pinning 1.0 on a
+     * LOW device takes a view entry's `renderScale` or a `SceneQuality`.
+     */
+    fun renderScale(
+        entryScale: Double?, stageScale: Double?, low: Boolean,
+    ): ScaleRange? {
+        val authored = entryScale ?: stageScale
+        if (authored != null) {
+            if (authored <= 0.0 || authored == 1.0) return null
+            return ScaleRange(authored.toFloat(), authored.toFloat())
+        }
+        return if (low) ScaleRange(DeviceTier.LOW_MIN_RENDER_SCALE, 1f) else null
     }
 }

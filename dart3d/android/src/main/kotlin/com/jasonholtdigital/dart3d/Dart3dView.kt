@@ -401,18 +401,12 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     /** True while the device picks the pipeline: no `quality` tier is
      *  set and the device is [DeviceTier.LOW]. */
     private val lowDeviceProfile: Boolean
-        get() = viewQuality == null && deviceTier == DeviceTier.LOW
+        get() = DeviceProfile.isLow(deviceTier, viewQuality)
 
     /** The AA source for resolve chains — the tier when set, else the
-     *  widget's antialiasingMode. On the low device profile any
-     *  requested MSAA resolves to FXAA alone (null falls through to
-     *  it); an explicit 0 still means none. */
-    private fun effectiveViewConfigAa(): Int? = when (viewQuality) {
-        "low" -> 0
-        "medium" -> 1   // resolveAa maps <4 → MSAA×2 + FXAA
-        "high" -> 4
-        else -> viewConfigAa?.let { if (lowDeviceProfile && it > 0) null else it }
-    }
+     *  widget's antialiasingMode ([DeviceProfile.aaSource]). */
+    private fun effectiveViewConfigAa(): Int? =
+        DeviceProfile.aaSource(viewQuality, viewConfigAa, lowDeviceProfile)
 
     /** DPCF (dithered PCF) keeps a soft edge — PCSS's blocker search
      *  runs ~300ms/frame on Mali at these world scales. On the Fire
@@ -421,10 +415,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     private fun shadowType(): View.ShadowType =
         if (lowDeviceProfile) View.ShadowType.PCF else View.ShadowType.DPCF
 
-    /** The swapchain passes' resolution policy when nothing authored
-     *  a `renderScale`. */
+    /** The default pass's resolution: no view entry exists there, and
+     *  the stage's `renderScale` reaches view entries only. */
     private fun defaultResolution(): View.DynamicResolutionOptions =
-        RenderTargets.dsrOptions(1.0, dynamic = lowDeviceProfile)
+        RenderTargets.dsrOptions(
+            DeviceProfile.renderScale(null, null, lowDeviceProfile))
 
     /** Writes the parts of the device profile that live on the shared
      *  [view] and follow `quality`: shadow filter, HDR buffer size and,
@@ -443,7 +438,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     /** Stage-level view-quality defaults (W14) — a views entry's
      *  absent antiAliasing/renderScale/filterQuality inherits these. */
     private var stageAntiAliasing: String? = null
-    private var stageRenderScale = 1.0
+    /** Null while the stage carries no `renderScale` key. */
+    private var stageRenderScale: Double? = null
     private var stageFilterQuality = "medium"
 
     // MARK: - W7 environment / IBL state
@@ -2922,7 +2918,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      * view rebuild.
      */
     internal fun applyStageQuality(
-        aa: String?, renderScale: Double, filterQuality: String,
+        aa: String?, renderScale: Double?, filterQuality: String,
     ) {
         stageAntiAliasing = aa
         stageRenderScale = renderScale
@@ -2933,9 +2929,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     /**
      * Resolves one view's quality trio ONCE at build/re-resolve —
      * AA (entry → stage → viewConfig → Filament default), renderScale
-     * (screen entries only — a fixed scale through
-     * DynamicResolutionOptions, min==max, not the semantic dynamic-res
-     * knob; rt dims are authoritative), and filterQuality (decoded +
+     * (screen entries only — an authored scale is fixed through
+     * DynamicResolutionOptions, min==max; with none authored the low
+     * device profile gets the real dynamic-res knob; rt dims are
+     * authoritative), and filterQuality (decoded +
      * retained only — no Java-binding knob; non-'medium' logs once).
      */
     private fun resolveViewQuality(rec: RenderTargets.ViewRec) {
@@ -2943,8 +2940,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             rec.aaMode, stageAntiAliasing, effectiveViewConfigAa())
         rec.msaa = resolved.msaa
         rec.aa = resolved.aa
-        rec.dsr = RenderTargets.dsrOptions(
-            rec.renderScale ?: stageRenderScale, dynamic = lowDeviceProfile)
+        rec.dsr = RenderTargets.dsrOptions(DeviceProfile.renderScale(
+            rec.renderScale, stageRenderScale, lowDeviceProfile))
         rec.view?.let {
             it.multiSampleAntiAliasingOptions = resolved.msaa
             it.antiAliasing = resolved.aa
