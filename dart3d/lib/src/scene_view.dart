@@ -24,7 +24,11 @@ const String kSceneViewTypeKey = 'com.jasonholtdigital.dart3d/sceneView';
 /// With `quality` null, Android also fits the pipeline to the device.
 /// One with under about 3 GB of memory gets hard-edged shadows, FXAA in
 /// place of MSAA, and a resolution that drops (to half at most) while
-/// frames run long. Set a tier to opt out.
+/// frames run long. Setting a tier restores that tier's pipeline.
+///
+/// `quality` controls the pipeline only. On those same devices Android
+/// renders through OpenGL instead of Vulkan whatever `quality` is; only
+/// the backend preference (`Dart3dSetBackend`) changes that.
 enum SceneQuality { low, medium, high }
 
 /// A 3D scene rendered by the platform's native 3D stack.

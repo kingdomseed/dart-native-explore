@@ -170,14 +170,19 @@ Fixed scales on Vulkan with the same settings gave 15.3 fps at 1.0,
    tag is set.
 2. **Jolt steps on the calling thread.** Rolling physics 5.1 → 1.1 ms
    median and 36 → 6.9 ms p95 on the tablet; 1.3 → 0.6 ms and 6.5 →
-   2.5 ms on the A142.
+   2.5 ms on the A142. Side effect: contact events are now sent from
+   inside the physics step, before that step's transforms reach the
+   nodes, instead of after the frame.
 3. **Device profile for low-end Android.** When the app sets no
    `SceneQuality`, a device with under 3.2 GB of memory (or the system's
    low-RAM flag) renders with PCF shadows, FXAA without MSAA, the LOW
-   HDR buffer and dynamic resolution between 0.5 and 1.0, and its `auto`
-   backend resolves to OpenGL, the one on which dynamic resolution has
-   GPU timings. An explicit `quality:` opts out. Everything else keeps
-   the previous pipeline. Memory is a proxy for the GPU; see *Open*.
+   HDR buffer and dynamic resolution between 0.5 and 1.0. An explicit
+   `quality:` restores that tier's pipeline, and an authored
+   `renderScale` stays fixed. Separately, such a device's `auto` backend
+   resolves to OpenGL, the one on which dynamic resolution has GPU
+   timings; `quality` does not change that, only the backend pref does.
+   Every other device keeps the previous pipeline. Memory is a proxy
+   for the GPU; see *Open*.
 
 After the change, `perf view` on the tablet's dice screen:
 
@@ -195,6 +200,11 @@ dsr=true(0.5..1.0) dither=TEMPORAL quality=default physics=120Hzx4
 
 The harness scene (`DART3D_SCENE=harness`) ran its lanes on the tablet
 under the new profile at 42 fps with no FATAL (`tablet-after-harness.jpg`).
+
+Re-run after the review fixes (authored `renderScale` kept fixed, the
+frame-info bridge guarded by Filament version): hero 54.8 fps, dice
+racked 44.1 fps, dice rolling 43.6 fps (slowest 2 s window 41.2, worst
+frame 83 ms), GPU 22.5 ms. Unchanged.
 
 ## A142 (Nothing A142, 90 Hz)
 
@@ -250,6 +260,7 @@ Three lit packages compiled one after another account for 15.6 of the
 - **The racked dice redraw every vsync** although nothing moves.
 - **Single long frames while rolling** (one of 67–83 ms per run) were
   not traced.
-- **The frame-info bridge mirrors Filament 1.71.6 struct layouts** and
-  must be re-checked when the pin moves.
+- **The frame-info bridge mirrors Filament 1.71.6 struct layouts.** It
+  compiles in only for that version (one pin in `build.gradle`), so a
+  bumped pin loses GPU time in the log until the mirror is re-checked.
 - A142 on the OpenGL backend and iOS were not run. iOS code is untouched.

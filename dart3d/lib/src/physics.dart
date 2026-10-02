@@ -255,6 +255,10 @@ final class SceneContactPoint {
 /// `components` array — `0` when the backend can't disambiguate a
 /// compound. The trigger subclasses replace began/ended whenever either
 /// collider is a sensor (`isTrigger`).
+///
+/// Android sends these from inside the physics step, before that step's
+/// transforms are written to the nodes, so an event can arrive up to a
+/// frame ahead of the pose that caused it.
 sealed class SceneCollisionEvent {
   /// Creates the event for one collider pair.
   const SceneCollisionEvent({
