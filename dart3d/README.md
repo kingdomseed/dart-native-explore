@@ -177,7 +177,9 @@ currently inert.
     Filament pin, re-run the script; `ShippedMaterialsTest` fails until
     the shipped set matches.
   - `adb logcat -s dart3d | grep 'start +'` shows the cold-start
-    timeline in ms since process start.
+    timeline in ms since process start; `tool/cold_start.sh
+    <adb-serial> [--fresh]` times several launches and prints the
+    medians. Measured in `../docs/artifacts/s0h-cold-start/`.
 - Feature-capability warnings: unrealized `featuresRequired`/
   `featuresUsed` names log warnings, and `strictFeatures: true`
   refuses them.
