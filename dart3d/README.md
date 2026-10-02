@@ -112,7 +112,9 @@ currently inert.
   anisotropy, IOR, volume, and dispersion.
 - Physics events, queries, and joints (W23): contact/trigger events,
   raycast/overlap/shape-cast queries, joint break events. Android
-  reports a single contact point per manifold. See
+  reports a single contact point per manifold, and sends contact events
+  from inside the physics step, before that step's transforms reach the
+  nodes. See
   `../docs/joints-spec.md` for how joints map to native constraints.
 - Split-screen views and shadow breadth (W24): per-view `viewport`
   rects (iOS realizes screen splits as sibling `SCNView`s, Android as
@@ -139,6 +141,21 @@ currently inert.
   The example selects it with `--dart-define=DART3D_BACKEND=`, but
   there is no plugin-level API yet, and a forced Vulkan request that
   fails falls back to GL without telling you.
+- Android low-end devices (under about 3 GB of memory) differ in two
+  ways, decided separately. Measured on a Fire tablet in
+  `../docs/artifacts/s0-tablet-frame-rate/`.
+  - Backend: `auto` resolves to OpenGL, whatever `quality` is. Only the
+    backend pref (`Dart3dSetBackend`, the example's `DART3D_BACKEND`)
+    overrides it.
+  - Pipeline: with no `SceneQuality` set, the view renders with
+    hard-edged shadows, FXAA in place of MSAA, and dynamic resolution
+    (down to half scale). Setting `quality` restores the tier's
+    pipeline; it does not change the backend. A `renderScale` authored
+    on a view entry, or a stage `renderScale` other than 1.0, stays
+    fixed.
+- Android frame timings: `adb shell setprop log.tag.dart3d.perf DEBUG`
+  makes each view log a `perf` line every 2 s (frame interval, GPU time,
+  physics and submit cost, median and p95) under the `dart3d` tag.
 - Feature-capability warnings: unrealized `featuresRequired`/
   `featuresUsed` names log warnings, and `strictFeatures: true`
   refuses them.

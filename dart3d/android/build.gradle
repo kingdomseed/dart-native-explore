@@ -18,6 +18,10 @@ buildscript {
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
+// One pin for the four Filament artifacts and for dart3d_jni.cpp, which
+// mirrors structs of this exact version (see CMakeLists.txt).
+def filamentVersion = '1.71.6'
+
 android {
     ndkVersion = "28.2.13676358" // 16 KB page-size compliance (Play/Android 15+)
     namespace 'com.jasonholtdigital.dart3d'
@@ -54,6 +58,7 @@ android {
         externalNativeBuild {
             cmake {
                 abiFilters "arm64-v8a", "x86_64"
+                arguments "-DDART3D_FILAMENT_VERSION=${filamentVersion}"
             }
         }
     }
@@ -66,9 +71,9 @@ dependencies {
     // (surface/swapchain lifecycle) and math types; filamat compiles the
     // lit material from a source string at startup — self-contained, no
     // matc toolchain step.
-    implementation 'com.google.android.filament:filament-android:1.71.6'
-    implementation 'com.google.android.filament:filament-utils-android:1.71.6'
-    implementation 'com.google.android.filament:filamat-android:1.71.6'
+    implementation "com.google.android.filament:filament-android:${filamentVersion}"
+    implementation "com.google.android.filament:filament-utils-android:${filamentVersion}"
+    implementation "com.google.android.filament:filamat-android:${filamentVersion}"
     // W21 KTX2: no Java-side standalone KTX2 decoder exists in the
     // pinned Filament (filament-utils ships KTX1Loader only). gltfio's
     // AAR carries libgltfio-jni.so, whose exported createKtx2Provider
@@ -76,7 +81,7 @@ dependencies {
     // TextureFactory reaches it through a dlsym shim in dart3d_jni.cpp.
     // None of gltfio's Java API is referenced; the dep only needs to
     // package the .so.
-    implementation 'com.google.android.filament:gltfio-android:1.71.6'
+    implementation "com.google.android.filament:gltfio-android:${filamentVersion}"
 
     // Physics: Jolt via stephengold's JNI bindings (plan-locked).
     // The upstream Android AARs split oddly: SpDebug carries the JVM

@@ -30,6 +30,16 @@ object Dart3dJni {
     external fun nativeBackendPref(): Int
 
     /**
+     * Filament's per-frame timing history for the `dart3d.perf` lane:
+     * fills [out] with `[frameId, gpuNanos, backendNanos, mainNanos]`
+     * records, newest first, and returns how many (-1 when the pinned
+     * Filament doesn't export it). Negative durations are not
+     * available (yet).
+     */
+    @JvmStatic
+    external fun nativeFrameInfoHistory(nativeRenderer: Long, out: LongArray): Int
+
+    /**
      * Fires one event frame through the plugin slot. The dispatcher
      * (a Dart NativeCallable) tolerates any calling thread, but the
      * physics loop already runs on the main Choreographer — hop to main

@@ -4910,7 +4910,8 @@ object FsceneRealizer {
             host.applyStageQuality(
                 stage?.optString("antiAliasing")
                     ?.takeIf { it.isNotEmpty() },
-                stage?.optDouble("renderScale", 1.0) ?: 1.0,
+                stage?.takeIf { it.has("renderScale") }
+                    ?.optDouble("renderScale", 1.0),
                 stage?.optString("filterQuality")
                     ?.takeIf { it.isNotEmpty() } ?: "medium")
 

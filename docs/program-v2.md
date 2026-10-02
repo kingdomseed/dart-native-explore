@@ -54,10 +54,14 @@ from look-dev — the DartNative set's spec and reference renders — is on
 
 **Next, in order.** Engine first, then release. Product work waits.
 
-1. **Stabilize** — Fire tablet frame rate (re-measure now that the tray
-   draws at the right size; it read 15–20 fps before #45), S0h cold start
-   (~10–15 s of material compile before the first frame), then S0g and
+1. **Stabilize** — S0h cold start (17–18 s to the first frame on the
+   Fire tablet, 15.6 s of it three lit material compiles), then S0g and
    the S0c backfill. Baseline: `docs/artifacts/s0-fire-tablet-baseline/`.
+   Fire tablet frame rate (S0j) is in review: re-measured after #45 the
+   dice screen ran at 8.7 fps, and it runs at 44 fps with the low-end
+   device profile (`docs/artifacts/s0-tablet-frame-rate/`). Open from
+   that: 60 fps at rest is not reached, the profile's shadows are hard,
+   and the tier is picked by memory.
    Open from the tablet run: native lifetime on API 26–32 now that
    jolt-jni's cleaner is off there (#44); dice at an edge can still cover
    the rim line.
@@ -193,6 +197,15 @@ Rules:
       packages to disk across launches; a tasteful loading state on the
       hero (e.g. the logo fades in on its first rendered frame) until
       the first frame lands. (M)
+- [ ] S0j Fire tablet frame rate — *in review* (branch
+      `s0-tablet-frame-rate`). Measured with the new `dart3d.perf` log
+      lane (frame intervals, Filament GPU time, physics). Dice screen
+      8.7 → 44 fps racked and 8.8 → 43 fps rolling; hero 34 → 55 fps.
+      Three changes: the frame log, Jolt stepping on the calling thread,
+      and a low-end device profile (PCF shadows, FXAA, dynamic
+      resolution, OpenGL) picked when no `SceneQuality` is set. Tables,
+      cold-start timeline and what stays open:
+      `docs/artifacts/s0-tablet-frame-rate/`
 - [x] ~~S0i Reduced motion~~ — **not planned** (operator, 2026-09-29):
       reduced motion is an app-level concern, not the dart3d package's, and the
       example is a motion showcase. DartNative exposes no reduced-motion signal

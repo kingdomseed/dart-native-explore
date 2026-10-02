@@ -23,7 +23,7 @@ import com.github.stephengold.joltjni.GroupFilterTable
 import com.github.stephengold.joltjni.HingeConstraint
 import com.github.stephengold.joltjni.HingeConstraintSettings
 import com.github.stephengold.joltjni.JobSystem
-import com.github.stephengold.joltjni.JobSystemThreadPool
+import com.github.stephengold.joltjni.JobSystemSingleThreaded
 import com.github.stephengold.joltjni.Jolt
 import com.github.stephengold.joltjni.JoltPhysicsObject
 import com.github.stephengold.joltjni.MotorSettings
@@ -253,10 +253,12 @@ class JoltWorld {
 
     val physicsSystem = PhysicsSystem()
     private val tempAllocator: TempAllocator = TempAllocatorMalloc()
-    private val jobSystem: JobSystem = JobSystemThreadPool(
-        Jolt.cMaxPhysicsJobs, Jolt.cMaxPhysicsBarriers,
-        Runtime.getRuntime().availableProcessors(),
-    )
+    // Steps on the caller's thread. A worker pool was slower at the body
+    // counts measured: seven rolling dice on the Fire tablet step in
+    // 1.1 ms a frame here against 5.1 ms on an 8-thread pool (p95 6.9
+    // vs 36 ms), and the A142 shows the same order (0.7 vs 1.3 ms).
+    private val jobSystem: JobSystem =
+        JobSystemSingleThreaded(Jolt.cMaxPhysicsJobs)
 
     val bodyInterface: BodyInterface
         get() = physicsSystem.bodyInterface
