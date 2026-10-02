@@ -22,9 +22,12 @@ hero (#31), `switchAnimation` (#34), the Track V re-cut (#37; upstream
 0.24 is still unpublished), and the example's dice experience through
 DR2 with the DartNative set (#36, #38–#42).
 
-**In flight.** P2 game rooms, round 3 (defects + a second art pass on six
-rooms), on `p3-game-rooms-wip`. Blender look-dev only; nothing in the app
-depends on it.
+**Sidelined.** The P2 game rooms (Blender look-dev) stopped after round
+3 and stay on `p3-game-rooms-wip` (operator, 2026-10-02). The operator's
+brother continues them on his own from the scripts; no agent work is
+planned there. Nothing in dart3d depends on them. What dart3d does need
+from look-dev — the DartNative set's spec and reference renders — is on
+`main` (`docs/design/dice-lookdev.md`, `docs/design/dice-lookdev/`).
 
 **Next, in order.**
 
@@ -220,12 +223,12 @@ scaffolding, not the demo.
       round 2 rebuilt all 11 rooms from the Codex concept images with
       ~100 modeled props (`tool/dice_lookdev/assets/`, built by Codex
       `gpt-6-astra`); every set passes the readability gate in its
-      top-down play view. Round 3 in flight: defects (a curved cut-out
-      behind the tray, dark bands, gate headroom) and a second art pass
-      on six rooms. Then density/wear/atmosphere and painted window
-      backdrops. How the rooms reach real time (bake, reduce, optimize)
-      is undecided on purpose — finish the look first (operator,
-      2026-10-01).
+      top-down play view. Round 3 fixed defects (a curved cut-out
+      behind the tray, dark bands, gate headroom) and gave six rooms a
+      second art pass. **Sidelined 2026-10-02:** the density/wear/
+      atmosphere and window-backdrop passes are not scheduled; the
+      operator's brother continues the rooms independently from the
+      scripts. How the rooms would reach real time is undecided.
 - [ ] P3 **Dice experience in the example** — the demo's main experience:
       a **DartNative-themed dice set** with really fluid rolls (operator,
       2026-09-30). Phases DR1–DR5 (demo-program §5): readout fix +
