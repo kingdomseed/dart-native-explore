@@ -331,7 +331,10 @@ final class SceneViewHost: SCNView {
         let resolved = resolvedCameras()
         for camera in viewCameras() {
             camera.wantsHDR = true
-            camera.exposureOffset = CGFloat(e > 0 ? log2(e) : 0)
+            let packed = resolved.contains { $0 === camera }
+            camera.exposureOffset = CGFloat(
+                (e > 0 ? log2(e) : 0)
+                    + (packed ? log2(ToneMapTechnique.packGain) : 0))
             // SceneKit's exposure adaptation is on unless switched
             // off, and `applyStageEffects` only writes it when the
             // stage has an `effects` block: a stage without one used
@@ -342,8 +345,10 @@ final class SceneViewHost: SCNView {
             // white point defines (`ToneMapTechnique`). A camera that
             // only renders into a texture has no resolve pass and
             // keeps the identity curve.
-            camera.whitePoint = resolved.contains { $0 === camera }
-                ? CGFloat(ToneMapTechnique.whitePoint) : 1
+            camera.whitePoint = packed
+                ? CGFloat(ToneMapTechnique.whitePoint
+                    * ToneMapTechnique.packGain)
+                : 1
             camera.averageGray = 0.18
         }
         applyToneMap()

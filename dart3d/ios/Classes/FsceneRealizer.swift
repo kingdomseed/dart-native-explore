@@ -6276,15 +6276,20 @@ enum FsceneRealizer {
 
             let envPixels = realizeEnvironmentSource(envRes,
                                                      envKey: envKey)
-            // Baked transforms: z-mirror + rotationY are column ops;
-            // intensity is a per-pixel scale. SceneKit has no native
-            // knobs for either, so they live in the pixels.
-            let lighting = envPixels.map {
-                scaledPixels(mirroredRotated($0, rotationY), intensity)
-            }
+            // The z-mirror and rotationY are column ops baked into the
+            // pixels. The intensity is the property's own: SceneKit
+            // clamps an environment image at 1 and stores an 8-bit one
+            // in 8 linear bits, so a scale baked into the pixels
+            // clipped above 1 and lost the dark end below it. A float
+            // source brighter than 1 is divided down to fit and the
+            // divisor goes into the intensity as well.
+            let lighting = envPixels.map { mirroredRotated($0, rotationY) }
             if !stageEnvDeferred {
+                let fitted = lighting.map(unitRange)
                 scene.lightingEnvironment.contents =
-                    lighting.flatMap(envContents)
+                    fitted.flatMap { envContents($0.pixels) }
+                scene.lightingEnvironment.intensity =
+                    CGFloat(intensity * (fitted?.divisor ?? 1))
                 if let envKey { deferredResourceIds.remove(envKey) }
             }
 
@@ -6297,7 +6302,7 @@ enum FsceneRealizer {
             case "environment":
                 guard !stageEnvDeferred else { break }
                 var background = lighting.map {
-                    scaledPixels($0, skyIntensity)
+                    linearPixels($0, scale: intensity * skyIntensity)
                 }
                 let blurriness =
                     plainDouble(source?["blurriness"]) ?? 0.0
@@ -6314,9 +6319,9 @@ enum FsceneRealizer {
             case "gradient":
                 // The sky is its own source — env intensity/rotation
                 // don't reach it, but the z-mirror does (world space).
-                let background = scaledPixels(
+                let background = linearPixels(
                     mirroredRotated(gradientEquirectPixels(source ?? [:]),
-                                    0), skyIntensity)
+                                    0), scale: skyIntensity)
                 scene.background.contents = envContents(background)
             case "fmat", "physical":
                 host.logOnce("skybox.\(source?["type"] ?? "")",
@@ -7032,55 +7037,62 @@ enum FsceneRealizer {
                              data: out)
         }
 
-        /// `environmentIntensity`/`skybox.intensity` baked into pixels —
-        /// sRGB bytes decode to linear, scale, and re-encode (a plain
-        /// byte multiply would mis-darken); float texels multiply in
-        /// place. Alpha passes through.
-        func scaledPixels(_ env: EnvPixels, _ k: Double) -> EnvPixels {
-            if k == 1 { return env }
-            var out = Data(count: env.data.count)
-            if env.isFloat {
-                env.data.withUnsafeBytes { srcBuf in
-                    out.withUnsafeMutableBytes { dstBuf in
-                        guard let sp = srcBuf.baseAddress?
-                            .assumingMemoryBound(to: Float.self),
-                              let dp = dstBuf.baseAddress?
-                            .assumingMemoryBound(to: Float.self)
-                        else { return }
-                        let kf = Float(k)
-                        for i in stride(from: 0,
-                                        to: env.width * env.height * 4,
-                                        by: 4) {
-                            dp[i] = sp[i] * kf
-                            dp[i + 1] = sp[i + 1] * kf
-                            dp[i + 2] = sp[i + 2] * kf
-                            dp[i + 3] = sp[i + 3]
-                        }
+        /// [env] as linear float pixels times [k] — what a sky is
+        /// drawn from. SceneKit stores an 8-bit image in 8 *linear*
+        /// bits, one step being 1/255 of white, so a dark sky came
+        /// out in two or three levels per channel: sRGB (36, 39, 41)
+        /// drew as (34, 38, 43). A float image keeps its values; it is
+        /// still clamped at 1.
+        func linearPixels(_ env: EnvPixels, scale k: Double) -> EnvPixels {
+            let count = env.width * env.height * 4
+            var out = [Float](repeating: 1, count: count)
+            env.data.withUnsafeBytes { src in
+                if env.isFloat {
+                    let sp = src.bindMemory(to: Float.self)
+                    let kf = Float(k)
+                    for i in stride(from: 0, to: count, by: 4) {
+                        out[i] = sp[i] * kf
+                        out[i + 1] = sp[i + 1] * kf
+                        out[i + 2] = sp[i + 2] * kf
                     }
-                }
-            } else {
-                env.data.withUnsafeBytes { srcBuf in
-                    out.withUnsafeMutableBytes { dstBuf in
-                        guard let sp = srcBuf.baseAddress?
-                            .assumingMemoryBound(to: UInt8.self),
-                              let dp = dstBuf.baseAddress?
-                            .assumingMemoryBound(to: UInt8.self)
-                        else { return }
-                        for i in stride(from: 0,
-                                        to: env.width * env.height * 4,
-                                        by: 4) {
-                            for c in 0..<3 {
-                                dp[i + c] = encodeSrgb(
-                                    srgbToLinear(Double(sp[i + c])
-                                                 / 255.0) * k)
-                            }
-                            dp[i + 3] = sp[i + 3]
-                        }
+                } else {
+                    let table = (0..<256).map {
+                        Float(srgbToLinear(Double($0) / 255.0) * k)
+                    }
+                    let sp = src.bindMemory(to: UInt8.self)
+                    for i in stride(from: 0, to: count, by: 4) {
+                        out[i] = table[Int(sp[i])]
+                        out[i + 1] = table[Int(sp[i + 1])]
+                        out[i + 2] = table[Int(sp[i + 2])]
                     }
                 }
             }
-            return EnvPixels(width: env.width, height: env.height,
-                             isFloat: env.isFloat, data: out)
+            return EnvPixels(
+                width: env.width, height: env.height, isFloat: true,
+                data: out.withUnsafeBufferPointer { Data(buffer: $0) })
+        }
+
+        /// [env] with its values inside 0…1, and what they were
+        /// divided by to get there (1 for an 8-bit source). The
+        /// divisor stops at 256: past that the rest of a float image
+        /// would fall below what a half float holds, and only the
+        /// very brightest texels clip instead.
+        func unitRange(_ env: EnvPixels)
+            -> (pixels: EnvPixels, divisor: Double)
+        {
+            guard env.isFloat else { return (env, 1) }
+            var peak: Float = 0
+            env.data.withUnsafeBytes { src in
+                let sp = src.bindMemory(to: Float.self)
+                for i in stride(from: 0, to: env.width * env.height * 4,
+                                by: 4) {
+                    let m = max(sp[i], max(sp[i + 1], sp[i + 2]))
+                    if m.isFinite, m > peak { peak = m }
+                }
+            }
+            guard peak > 1 else { return (env, 1) }
+            let divisor = Double(min(peak, 256))
+            return (linearPixels(env, scale: 1 / divisor), divisor)
         }
 
         /// Cheap separable box blur for `skybox.blurriness` — longitude

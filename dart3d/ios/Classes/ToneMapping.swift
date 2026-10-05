@@ -89,10 +89,11 @@ struct BloomChain: Equatable {
 /// own curve, though, is an extended Reinhard with the camera's
 /// `whitePoint` as the value that maps to 1 (measured:
 /// `x (1 + x / w²) / (1 + x)`, per channel, after exposure and bloom).
-/// So the camera runs with a white point of [whitePoint], which packs
-/// exposed radiance up to that value into 0…1, and the pass inverts
-/// the curve exactly to recover the linear image upstream's shader
-/// sees after `color *= exposure`.
+/// So the camera runs with a white point that packs exposed radiance
+/// up to [whitePoint] into 0…1 (after a gain, [packGain], that spends
+/// more of the 8-bit codes on dark colours), and the pass inverts the
+/// curve exactly to recover the linear image upstream's shader sees
+/// after `color *= exposure`.
 ///
 /// SceneKit applies its own saturation, contrast and vignette after
 /// that curve, where they would be inverted along with it; the host
@@ -117,8 +118,16 @@ struct BloomChain: Equatable {
 /// at (0, 0.92, 0), upstream's at (0.016, 0.88, 0.016)).
 enum ToneMapTechnique {
 
-    /// The radiance SceneKit's curve maps to 1. Brighter values clip.
+    /// The radiance the resolve pass can recover. Brighter values clip.
     static let whitePoint = 16.0
+
+    /// A gain the camera applies on top of the stage's exposure before
+    /// SceneKit packs the image, and the pass divides out again. The
+    /// packed image is stored in 8 bits per channel; without the gain
+    /// a near-black colour falls on so few codes that PBR Neutral's
+    /// toe, which subtracts almost all of it, turned (0.018, 0.021,
+    /// 0.023) into sRGB (0, 14, 23) instead of (4, 12, 18).
+    static let packGain = 8.0
 
     /// The lowest highlight limit Filament's bloom accepts.
     static let filamentHighlightFloor = 10.0
@@ -281,7 +290,8 @@ enum ToneMapTechnique {
                 float3 packed = colorSampler.sample(
                     s, in.uv + float2(x, y) * texel).rgb;
                 float3 c = d3_scene_radiance(saturate(packed),
-                                             params.d3Mode.z);
+                                             params.d3Mode.z)
+                    * params.d3Bloom.z;
                 c = max(c - 1.0, float3(0.0));
                 float peak = max(c.r, max(c.g, c.b));
                 sum += c / (1.0 + peak * params.d3Bloom.y);
@@ -339,7 +349,7 @@ enum ToneMapTechnique {
         constexpr sampler smooth(filter::linear, address::clamp_to_edge);
         float4 packed = colorSampler.sample(s, in.uv);
         float3 color = d3_scene_radiance(saturate(packed.rgb),
-                                         params.d3Mode.z);
+                                         params.d3Mode.z) * params.d3Bloom.z;
         if (params.d3Bloom.x > 0.0) {
             color += d3BloomSum.sample(smooth, in.uv).rgb * params.d3Bloom.x;
         }
@@ -519,7 +529,7 @@ enum ToneMapTechnique {
         let hasLut = lutSize >= 2
         let grading = resolve.grading
         set("d3Mode", Double(resolve.toneMap.modeIndex ?? 0),
-            hasLut ? Double(lutSize) : 0, whitePoint,
+            hasLut ? Double(lutSize) : 0, whitePoint * packGain,
             grading == nil ? 0 : 1)
         technique.setObject(
             NSValue(scnVector4: resolve.toneMap.agxParams),
@@ -537,9 +547,10 @@ enum ToneMapTechnique {
             vignette?.smoothness ?? 0, 0)
         if let bloom, let fx = resolve.bloom {
             set("d3Bloom", fx.intensity / Double(bloom.levels),
-                1 / max(fx.threshold, filamentHighlightFloor), 0, 0)
+                1 / max(fx.threshold, filamentHighlightFloor),
+                1 / packGain, 0)
         } else {
-            set("d3Bloom", 0, 0, 0, 0)
+            set("d3Bloom", 0, 0, 1 / packGain, 0)
         }
         let property = SCNMaterialProperty(
             contents: (hasLut ? resolve.lut : noLut) as Any)
