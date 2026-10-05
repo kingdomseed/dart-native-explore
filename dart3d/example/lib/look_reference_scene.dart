@@ -38,7 +38,15 @@ enum LookVariant {
   point('point', toneMapping: 'linear', pointLight: true),
   spot('spot', toneMapping: 'linear', spotLight: true),
   iblConstant('ibl-constant', toneMapping: 'linear', ibl: LookIbl.constant),
-  iblStudio('ibl-studio', toneMapping: 'linear', ibl: LookIbl.studio),
+
+  /// The studio environment at half intensity. The sky behind the board
+  /// is its own source and must not dim with it.
+  iblStudio(
+    'ibl-studio',
+    toneMapping: 'linear',
+    ibl: LookIbl.studio,
+    environmentIntensity: 0.5,
+  ),
   all(
     'all',
     directionalLight: true,
@@ -71,6 +79,7 @@ enum LookVariant {
     this.ibl = LookIbl.none,
     this.bloom = false,
     this.stage = true,
+    this.environmentIntensity = 1,
   });
 
   final String label;
@@ -84,6 +93,7 @@ enum LookVariant {
 
   /// Whether the document carries an environment resource.
   final bool stage;
+  final double environmentIntensity;
 }
 
 enum LookIbl { none, constant, studio }
@@ -599,7 +609,7 @@ SceneDocument buildLookReference(LookVariant variant, {required double aspect}) 
             LookIbl.constant => ConstantEnvironment(Vector3.all(kLookIblRadiance)),
             LookIbl.studio => const StudioEnvironment(),
           },
-          environmentIntensity: 1,
+          environmentIntensity: variant.environmentIntensity,
           exposure: variant.exposure,
           toneMapping: variant.toneMapping,
           skybox: SkyboxSpec(

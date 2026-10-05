@@ -5122,6 +5122,10 @@ object FsceneRealizer {
             val sky = envRes.optJSONObject("skybox")
             val source = sky?.optJSONObject("source")
             val skyIntensity = sky?.optDouble("intensity", 1.0) ?: 1.0
+            // Whether an IndirectLight will be bound (below). A zero
+            // intensity binds none: it would light nothing and black
+            // out the sky.
+            val lightsScene = sh != null && intensity > 0
             val skyType = source?.optString("type")
             val skyTextures = ArrayList<Texture>()
             var skybox: Skybox? = null
@@ -5161,6 +5165,17 @@ object FsceneRealizer {
                         }
                     }
                     if (cube != null) {
+                        // Filament draws the skybox at the
+                        // IndirectLight's intensity, which is the
+                        // environment's; its own applies only without
+                        // one.
+                        if (skyIntensity != 1.0 && lightsScene) {
+                            logOnce("skybox.environment.intensity",
+                                "skybox.intensity $skyIntensity on an" +
+                                    " environment sky: Filament draws" +
+                                    " the sky at the environment's" +
+                                    " intensity; ignored")
+                        }
                         skybox = Skybox.Builder()
                             .environment(cube)
                             .intensity((intensity * skyIntensity).toFloat())
@@ -5172,8 +5187,17 @@ object FsceneRealizer {
                     // rotation don't reach it, but the z-mirror does
                     // (world space). It does NOT light the scene —
                     // skyEnvironment re-lighting is deferred.
+                    // Filament multiplies a skybox by the
+                    // IndirectLight's intensity whenever the scene has
+                    // one, and by the skybox's own only when it has
+                    // none. Upstream's gradient sky is its own source,
+                    // so with an IndirectLight in place the pixels are
+                    // divided by its intensity.
                     val gp = EnvironmentFactory.filamentShifted(
-                        EnvironmentFactory.gradientEquirectPixels(source),
+                        EnvironmentFactory.gradientEquirectPixels(
+                            source,
+                            if (lightsScene) skyIntensity / intensity
+                            else 1.0),
                         0.0)
                     val gt = EnvironmentFactory.equirectTexture(
                         host.engine, gp)
@@ -5205,7 +5229,7 @@ object FsceneRealizer {
             // the payload lands); non-environment skies still apply.
             if (skyboxTouched) host.applySkybox(skybox, skyTextures)
             if (!stageEnvDeferred) {
-                val il = sh?.let {
+                val il = sh?.takeIf { intensity > 0 }?.let {
                     val b = IndirectLight.Builder()
                         .irradiance(3, it)
                         .intensity(intensity.toFloat())

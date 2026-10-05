@@ -486,9 +486,9 @@ DiceTableScene? buildDiceTable({
           toneMapping: 'pbrNeutral',
           skybox: SkyboxSpec(
             GradientSkySpec(
-              zenithColor: Vector3(0.0021, 0.0034, 0.0047),
-              horizonColor: Vector3(0.0021, 0.0034, 0.0047),
-              groundColor: Vector3(0.0021, 0.0034, 0.0047),
+              zenithColor: Vector3(0.00053, 0.00086, 0.00117),
+              horizonColor: Vector3(0.00053, 0.00086, 0.00117),
+              groundColor: Vector3(0.00053, 0.00086, 0.00117),
               sunColor: Vector3.zero(),
             ),
           ),

@@ -76,7 +76,7 @@ final class DnLogoStage {
     rimCyanIntensity: 1.417,
     flatBackdrop: true,
     groundSlab: false,
-    backdrop: (0.0325, 0.0375, 0.0413),
+    backdrop: (0.0179, 0.0206, 0.0227),
   );
 
   /// The pulse parameter. The logo emits its own baked gradient (the
@@ -241,9 +241,9 @@ EnvironmentResource dnLogoEnvironment(
             sunColor: Vector3.zero(),
           )
         : GradientSkySpec(
-            zenithColor: Vector3(0.0047, 0.0047, 0.0125),
-            horizonColor: Vector3(0.039, 0.0273, 0.0703),
-            groundColor: Vector3(0.0078, 0.0078, 0.0141),
+            zenithColor: Vector3(0.0014, 0.0014, 0.0038),
+            horizonColor: Vector3(0.0117, 0.0082, 0.0211),
+            groundColor: Vector3(0.0023, 0.0023, 0.0042),
             sunColor: Vector3.zero(),
           ),
   ),
@@ -266,4 +266,4 @@ Vector3 _backdrop(DnLogoStage stage) {
   return b == null ? _dnBgSky.clone() : Vector3(b.$1, b.$2, b.$3);
 }
 
-final Vector3 _dnBgSky = Vector3(0.0173, 0.0213, 0.0252);
+final Vector3 _dnBgSky = Vector3(0.0095, 0.0117, 0.0139);
