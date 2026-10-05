@@ -25,7 +25,9 @@ lifetime.
   closed.** Two causes outside the plugin's native code were found; see
   *What still grows*.
 - Three Filament use-after-destroy or leak paths fixed and all 31
-  builder sites fenced; no frame-rate change on the three devices.
+  builder sites fenced; no frame-rate change on the three devices
+  (the follow-up commit's changes are run on the Fire tablet only; see
+  *T2 and frame rate*).
 
 ## How it was measured
 
@@ -163,30 +165,38 @@ Both show on the A142 too: the same heap-dump path, and Java heap 11 →
 
 ## T2 and frame rate
 
-This branch, each device from a fresh launch: hero 30 s, dice racked
-30 s, 12 rolls 3 s apart, settle. Frame rates from the `dart3d.perf`
-log, first 2 s window dropped; baseline from
-`docs/artifacts/s0-three-device-baseline/`.
+Two heads were run. `75e9bbd` got the three-device run below. The
+final head adds two things on top of it: the GPU probe's
+`eglTerminate`, and the `JoltWorld.update` fences going through
+`Reachability.fence`. **The final head has only been run on the Fire
+tablet**; the A142 and the Wacom were lent to another project before
+their runs. Owed on the final head: A142 Vulkan, A142 OpenGL and the
+Wacom, each with the harness. The probe change matters most on the
+OpenGL devices, which is the Fire tablet (run) and the Wacom (owed).
 
-| Device | Backend, tier | Hero | Dice racked | Dice rolling | FATAL |
-|---|---|---|---|---|---|
-| Fire KFTUWI (Mali-G52 MC2) | OPENGL, LOW | 55.7 (55.0) | 44.5 (44.2) | 43.8 (43.7) | 0 |
-| Wacom DTHA116 (Mali-G57 MC2) | OPENGL, LOW | 54.3, 58.1 (57.5) | 51.4, 50.6 (51.2) | 44.9, 44.0 (44.1) | 0 |
-| Nothing A142 (Mali-G610 MC4) | VULKAN, STANDARD | 89.1 (89.7) | 49.7 (49.7) | 50.3 (50.3) | 0 |
+Each run from a fresh launch: hero 30 s, dice racked 30 s, 12 rolls
+3 s apart, settle. Frame rates from the `dart3d.perf` log, first 2 s
+window dropped; baseline from
+`docs/artifacts/s0-three-device-baseline/` in brackets.
+
+| Head | Device | Backend, tier | Hero | Dice racked | Dice rolling | Harness | FATAL |
+|---|---|---|---|---|---|---|---|
+| final | Fire KFTUWI (Mali-G52 MC2) | OPENGL, LOW | 55.9 (55.0) | 44.6 (44.2) | 43.9 (43.7) | to `w18`, complete | 0 |
+| `75e9bbd` | Fire KFTUWI | OPENGL, LOW | 55.7 (55.0) | 44.5 (44.2) | 43.8 (43.7) | not run | 0 |
+| `75e9bbd` | Wacom DTHA116 (Mali-G57 MC2) | OPENGL, LOW | 54.3, 58.1 (57.5) | 51.4, 50.6 (51.2) | 44.9, 44.0 (44.1) | not run | 0 |
+| `75e9bbd` | Nothing A142 (Mali-G610 MC4) | VULKAN, STANDARD | 89.1 (89.7) | 49.7 (49.7) | 50.3 (50.3) | to `w18`, complete | 0 |
+| `75e9bbd` | Nothing A142, `DART3D_BACKEND=opengl` | OPENGL (pref=1), STANDARD | not run | not run | not run | to `w18`, complete | 0 |
 
 The Wacom was run twice because its first hero figure came in 3 fps
 under the baseline; the second is above it.
 
-Harness (`--dart-define=DART3D_SCENE=harness`) on the A142, to `w18
-lane complete`, 0 FATAL: Vulkan (`pref=0`) and OpenGL
-(`DART3D_BACKEND=opengl`, `Filament engine backend: OPENGL (pref=1,
-tier=STANDARD)`). The `w25` dice close-out reports FAIL on both, as it
-does on `main`; that is the other S0g unit's subject.
-`a142-harness-vulkan.jpg`, `a142-harness-opengl.jpg`. The harness was
-not run on the tablets.
+The harness's `w25` dice close-out reports FAIL in every run here, as
+it does on `main`; that is the other S0g unit's subject.
+`a142-harness-vulkan.jpg`, `a142-harness-opengl.jpg`,
+`fire-harness.jpg`.
 
-Screens: `fire-*.jpg`, `wacom-*.jpg`, `a142-*.jpg` (hero, dice,
-settled).
+Screens: `fire-*.jpg` (final head), `wacom-*.jpg`, `a142-*.jpg` (hero,
+dice, settled).
 
 ## Checks
 
@@ -194,6 +204,8 @@ settled).
   tests, clean.
 - `:dart3d:testReleaseUnitTest`: 118 tests pass, 14 new
   (`NativeScopeTest`, `CollisionSubGroupsTest`, `FencedTest`).
+- `:dart3d:lintRelease`: 8 `NewApi` errors on `main` (the eight
+  `reachabilityFence` calls in `JoltWorld.update`), 0 on this branch.
 - No test covers the jolt-jni calls themselves (they need the native
   library); the device runs above are the evidence for those.
 
@@ -201,9 +213,10 @@ settled).
 
 - Memory per visit in the real app, both causes above.
 - A residual native slope under about 0.1 MB per load is not excluded.
+- T2 on the final head for the A142 (Vulkan and OpenGL) and the Wacom.
 - API 26 and 27 were not run: the `reachabilityFence` fix in
-  `JoltWorld.update` and the fallback fence come from reading the
-  release dex.
+  `JoltWorld.update` and the fallback fence are verified by the release
+  dex and by lint only.
 - The Filament hazards listed as not fixed in
   `docs/triage/android.md`.
 - A deliberately debuggable build cannot be used for heap dumps: the

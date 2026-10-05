@@ -382,20 +382,28 @@ plugin touches):
 | `Vec3`, `RVec3`, `Quat` in per-frame pose reads, impulses and velocity writes | per frame, per roll | plain Java | nothing to free | same |
 
 Per frame and per roll the plugin creates no owning jolt-jni object,
-before or after. Everything that leaked did so per scene realize, and
-the dice screen realizes twice per visit (the document, then again when
-its last payload lands).
+before or after. That includes `pollJointBreaks`, which runs every
+physics step and builds a `Vec3` and an `RVec3` per joint anchor in
+`anchorWorld` (review thread 4159700728 on #44): both are final Java
+classes with three number fields and no native peer, and
+`Body.getPosition`/`getRotation` fill them through a thread-local
+buffer. Everything that leaked did so per scene realize, and the dice
+screen realizes twice per visit (the document, then again when its last
+payload lands).
 
 Also found while reading:
 
-- **`JoltWorld.update` could not run on API 26 and 27.** It called
-  `Reference.reachabilityFence`, which is API 28. R8 moves the call
-  into an outline class, so the class loads, and the first physics step
-  throws `NoSuchMethodError` (the release dex has the direct
-  `invoke-static`; there is no backport). The fences guard against the
-  Cleaner, which only runs from API 33, so they now run only there.
-  No API 26 or 27 device was available: this is from the dex, not a
-  run.
+- **`JoltWorld.update` could not run on API 26 and 27** (review thread
+  4159700734 on #44). It called `Reference.reachabilityFence`, which is
+  API 28. R8 moves the call into an outline class, so the class loads,
+  and the first physics step throws `NoSuchMethodError` (the release
+  dex has the direct `invoke-static`; there is no backport). The eight
+  calls now go through `Reachability.fence` (`Fenced.kt`), which checks
+  the API level and falls back to a volatile store below 28.
+  `:dart3d:lintRelease` reported exactly those eight `NewApi` errors
+  and nothing else above API 26 in the module; it reports none now. No
+  API 26 or 27 device was available: this is verified by the dex and
+  by lint, not by a run.
 - **`ShapeResult.get()` was called without checking the result.** On a
   rejected hull or mesh Jolt's `Result::Get()` reads the error string's
   bytes as a shape reference. `shapeOf` checks `hasError()` and logs
@@ -452,6 +460,18 @@ against the native library here.
 
 The fence is `Reference.reachabilityFence` from API 28. On API 26 and
 27 it is a volatile store, which no device here could exercise.
+
+**The GPU probe's EGL reference** (review thread 4180998568 on #49).
+`GpuProbe` called `eglInitialize` and never `eglTerminate`. Android's
+libEGL counts initializations of the display
+(`egl_display_t::initialize` does `refs++`, and `terminate` only tears
+the display down for the last holder), so the probe held one reference
+for the life of the process. It now calls `eglTerminate` once, after
+restoring the previous context and destroying its own context and
+surface, on every path past a successful initialize. Filament's OpenGL
+backend and the system renderer hold their own references, and
+Filament's own platform code pairs the two calls the same way when an
+engine is destroyed.
 
 **Never destroyed, or used after destroy.** Every `engine.create…`,
 `Builder.build`, `EntityManager.create`, `MaterialInstance.duplicate`

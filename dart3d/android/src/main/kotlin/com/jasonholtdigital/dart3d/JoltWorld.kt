@@ -169,10 +169,6 @@ class JoltWorld {
 
         private var joltReady = false
 
-        /** True once jolt-jni's Cleaner runs: a wrapper nothing
-         * references can then have its native peer freed by a GC. */
-        private var cleanerStarted = false
-
         /** One-time global init — safe to call per view. */
         @Synchronized
         fun ensureJolt() {
@@ -184,7 +180,6 @@ class JoltWorld {
             // the only release there is below API 33.
             if (android.os.Build.VERSION.SDK_INT >= 33) {
                 JoltPhysicsObject.startCleaner()
-                cleanerStarted = true
             }
             Jolt.registerDefaultAllocator()
             Jolt.installDefaultAssertCallback()
@@ -222,7 +217,7 @@ class JoltWorld {
     // pointers, so the wrappers must stay reachable for the system's
     // lifetime — R8 strips write-only fields in release builds, which
     // lets the cleaner free the native peers mid-run. The fences in
-    // update() keep that contract where a cleaner runs.
+    // update() keep that contract.
     private val bpLayers = BroadPhaseLayerInterfaceTable(
         NUM_OBJ_LAYERS, NUM_BP_LAYERS).apply {
         mapObjectToBroadPhaseLayer(OBJ_NON_MOVING, BP_NON_MOVING)
@@ -408,23 +403,21 @@ class JoltWorld {
      */
     fun update(dt: Float, collisionSteps: Int): Boolean {
         val err = physicsSystem.update(dt, collisionSteps, tempAllocator, jobSystem)
-        // Reference.reachabilityFence is API 28; the cleaner it guards
-        // against is API 33.
-        if (cleanerStarted) {
-            java.lang.ref.Reference.reachabilityFence(bpLayers)
-            java.lang.ref.Reference.reachabilityFence(objVsBp)
-            java.lang.ref.Reference.reachabilityFence(pairFilter)
-            java.lang.ref.Reference.reachabilityFence(groupTable)
-            java.lang.ref.Reference.reachabilityFence(combineFriction)
-            java.lang.ref.Reference.reachabilityFence(combineRestitution)
-            java.lang.ref.Reference.reachabilityFence(contactListener)
-        }
+        // Not Reference.reachabilityFence directly: that is API 28 and
+        // minSdk is 26.
+        Reachability.fence(bpLayers)
+        Reachability.fence(objVsBp)
+        Reachability.fence(pairFilter)
+        Reachability.fence(groupTable)
+        Reachability.fence(combineFriction)
+        Reachability.fence(combineRestitution)
+        Reachability.fence(contactListener)
         if (err != EPhysicsUpdateError.None) {
             Log.w(TAG, "jolt update error: $err")
             return false
         }
         pollJointBreaks()
-        if (cleanerStarted) java.lang.ref.Reference.reachabilityFence(joints)
+        Reachability.fence(joints)
         return true
     }
 

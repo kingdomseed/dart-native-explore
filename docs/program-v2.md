@@ -213,14 +213,17 @@ Rules:
       nothing relies on the Cleaner, which API 26–32 lack); collision
       sub-group ids reused instead of running out after 1024 bodies;
       `JoltWorld.update` no longer calls an API 28 method on API 26–27
-      (from the dex, not run); all 31 Filament builder sites fenced;
+      (from the dex and lint, not run); the GPU probe gives back its EGL
+      display reference; all 31 Filament builder sites fenced;
       three Filament destroy-order hazards fixed (rect-light cluster
       entities, a variant binding's default after a material upsert, a
       doubleSided duplicate after a texture upsert); a released view
       drops its document. Measured on the Fire tablet (API 30): `main`
       dies of `OutOfMemoryError` at visit 22; the branch completes 50
       visits and 200 rolls; rolls are flat; frame rate unchanged on all
-      three devices. **Open:** per-visit growth in the app from two
+      three devices. **Open:** T2 on the final head for the A142 and
+      the Wacom (run on the Fire tablet only; the commit before it has
+      all three); per-visit growth in the app from two
       causes outside the plugin's native code (the framework's view
       registry holds the hero's view tree; the Dart heap grows about
       7 MB per visit, cause unknown); a native slope under about 0.1 MB
