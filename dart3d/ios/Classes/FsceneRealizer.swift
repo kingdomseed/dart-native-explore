@@ -4897,6 +4897,8 @@ enum FsceneRealizer {
                 // default (Filament shadows the whole view frustum),
                 // and a scene in larger units — the dice table's
                 // camera sits 316 above the felt — got none at all.
+                // A directional light's authored `shadowMaxDistance`
+                // replaces this in `decodeDirectionalShadow`.
                 light.maximumShadowDistance = 1e6
                 // iOS takes one shadow sample per fragment by default,
                 // which ignores `shadowRadius` and leaves the map's
@@ -4949,6 +4951,9 @@ enum FsceneRealizer {
                 // covers roughly ±v around the fitted center).
                 light.automaticallyAdjustsShadowProjection = false
                 light.orthographicScale = CGFloat(v)
+                // The field itself is a distance from the view camera
+                // (Filament's `shadowFar` on Android).
+                if v > 0 { light.maximumShadowDistance = CGFloat(v) }
             }
             // Dart-authored StringValues arrive tagged ({"s": …}) —
             // d3String first, a bare string as the fallback.

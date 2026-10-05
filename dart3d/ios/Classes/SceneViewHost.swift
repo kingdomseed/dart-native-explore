@@ -1015,7 +1015,14 @@ final class SceneViewHost: SCNView {
     /// after everything else, it changes nothing in the view; in the
     /// shadow pass it is the caster. `syncBlendCasters` keeps it on its
     /// mesh. Skinned and morphed meshes are left out (the stand-in
-    /// would need their deformers).
+    /// would need their deformers), and so are camera-facing ones
+    /// (lines, billboards): their geometry is rebuilt toward the view
+    /// camera every frame, which is not the shape the light sees.
+    ///
+    /// The cost: the stand-in's depth is in the camera's depth buffer
+    /// after the frame is drawn, so an effect that reads depth (depth
+    /// of field) treats what shows through a blended mesh as lying on
+    /// its surface.
     private func reconcileBlendCasters() {
         for caster in blendCasters {
             caster.proxy.removeFromParentNode()
@@ -1023,10 +1030,14 @@ final class SceneViewHost: SCNView {
         }
         blendCasters.removeAll()
         guard let root = scene?.rootNode else { return }
+        let facing = Set(cameraFacing.keys.compactMap {
+            nodesById[$0].map(ObjectIdentifier.init)
+        })
         var found: [SCNNode] = []
         root.enumerateHierarchy { node, _ in
             guard node.castsShadow, node.skinner == nil,
                   node.morpher == nil, let geometry = node.geometry,
+                  !facing.contains(ObjectIdentifier(node)),
                   geometry.materials.contains(where: Self.isBlended)
             else { return }
             found.append(node)
@@ -1043,6 +1054,17 @@ final class SceneViewHost: SCNView {
         syncBlendCasters()
     }
 
+    /// The ops that can add or remove a mesh, change its materials or
+    /// its deformers, or move it in the hierarchy. The rest (pose
+    /// queries, forces and velocities, clips, joints, stage and view
+    /// updates) arrive as often as every frame and leave the stand-ins
+    /// as they are.
+    private static let meshChangingOps: Set<String> = [
+        "addNode", "updateNode", "removeNode", "upsertResource",
+        "upsertPayload", "selectVariant", "loadSubtree", "unloadSubtree",
+        "upsertSkin", "removeSkin",
+    ]
+
     private static func isBlended(_ material: SCNMaterial) -> Bool {
         material.blendMode == .alpha && !material.writesToDepthBuffer
     }
@@ -1054,22 +1076,27 @@ final class SceneViewHost: SCNView {
     ) -> SCNNode? {
         let materials = geometry.materials
         guard !materials.isEmpty else { return nil }
+        func depthOnly(doubleSided: Bool) -> SCNMaterial {
+            let material = SCNMaterial()
+            material.lightingModel = .constant
+            material.colorBufferWriteMask = []
+            material.isDoubleSided = doubleSided
+            return material
+        }
+        let oneSided = depthOnly(doubleSided: false)
+        let twoSided = depthOnly(doubleSided: true)
         var elements: [SCNGeometryElement] = []
-        var doubleSided = false
+        var stands: [SCNMaterial] = []
         for (i, element) in geometry.elements.enumerated() {
             let material = materials[i % materials.count]
             guard isBlended(material) else { continue }
             elements.append(element)
-            doubleSided = doubleSided || material.isDoubleSided
+            stands.append(material.isDoubleSided ? twoSided : oneSided)
         }
         guard !elements.isEmpty else { return nil }
-        let depthOnly = SCNMaterial()
-        depthOnly.lightingModel = .constant
-        depthOnly.colorBufferWriteMask = []
-        depthOnly.isDoubleSided = doubleSided
         let stand = SCNGeometry(sources: geometry.sources,
                                 elements: elements)
-        stand.materials = [depthOnly]
+        stand.materials = stands
         let proxy = SCNNode(geometry: stand)
         proxy.name = "d3.blendCaster"
         // After the blended pass: its depth must not reach anything
@@ -1345,11 +1372,7 @@ final class SceneViewHost: SCNView {
         guard let op = json["op"] as? String else { return }
         commandDepth += 1
         defer { commandDepth -= 1 }
-        // Force and velocity ops arrive every frame and touch no mesh.
-        if op != "applyImpulse", op != "applyTorque", op != "setVelocity",
-           op != "clearForces" {
-            blendCastersDirty = true
-        }
+        if Self.meshChangingOps.contains(op) { blendCastersDirty = true }
         // Declared after the depth defer, so it runs first — the
         // journal step still sees this dispatch's depth.
         let journaled = op == "addNode" || op == "updateNode"
