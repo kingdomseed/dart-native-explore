@@ -1,0 +1,5 @@
+10:51:27.515 bake: exporting material packages to /storage/emulated/0/Android/data/com.jasonholtdigital.dart3d_example/files/dart3d-materials
+10:51:27.684 Filament engine backend: OPENGL (pref=0, tier=LOW)
+10:51:45.254 bake: variants compiling (1 in flight)
+10:51:59.300 bake: variants idle
+10:52:18.520 bake: fixed set exported (20 packages)

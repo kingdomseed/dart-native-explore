@@ -4695,12 +4695,14 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         val simEnd = if (perf) System.nanoTime() else 0L
         val didRender = render(tNanos)
         if (perf) {
+            // Before the frame-history read: that JNI copy and the sort
+            // behind it are the log's own cost, not the frame's.
+            val submitMs = (System.nanoTime() - simEnd) / 1e6f
             val n = Dart3dJni.nativeFrameInfoHistory(
                 renderer.nativeObject, perfRecords)
             if (n > 0) framePerf.timings(perfRecords, n)
             framePerf.frame(tNanos, (simEnd - frameStart) / 1e6f,
-                physicsMs, (System.nanoTime() - simEnd) / 1e6f,
-                didRender, steps,
+                physicsMs, submitMs, didRender, steps,
             )?.let { Log.i(TAG, it) }
         }
         // W15: this frame is the first a just-applied subtree is

@@ -19,7 +19,9 @@
 #
 # Before running: install a release build of the app on the device
 # (`dn run -d <serial> --release`). The script refuses to start while
-# another app is in the foreground.
+# another app is in the foreground. It copies nothing and exits
+# non-zero when filamat rejects any recipe of the fixed set, and it
+# waits for variant compiles still in flight before it pulls.
 #
 # Run it when a material recipe in MaterialPackages.kt or the Filament
 # pin in android/build.gradle changes; ShippedMaterialsTest fails until
@@ -56,6 +58,16 @@ case "$front" in
      exit 3 ;;
 esac
 
+# `monkey -p` would also launch it, but monkey switches auto-rotate on
+# when it exits, which unlocks a rotation-locked device.
+activity=$(adb -s "$serial" shell "cmd package resolve-activity --brief \
+  -c android.intent.category.LAUNCHER $package" | tail -1 | tr -d '\r')
+case "$activity" in
+  "$package"/*) ;;
+  *) echo "$package has no launcher activity on $serial (is it installed?)" >&2
+     exit 4 ;;
+esac
+
 filament=$(sed -n "s/^def filamentVersion = '\(.*\)'.*/\1/p" "$root/android/build.gradle")
 commit=$(git -C "$root" rev-parse --short HEAD)
 if [ -n "$(git -C "$root" status --porcelain -- android/src/main/kotlin android/build.gradle)" ]; then
@@ -77,12 +89,11 @@ adb -s "$serial" shell setprop log.tag.dart3d.bake DEBUG
 adb -s "$serial" shell am force-stop "$package"
 adb -s "$serial" shell rm -rf "$device_dir"
 since=$(adb -s "$serial" shell "date +'%m-%d %H:%M:%S.000'" | tr -d '\r')
-adb -s "$serial" shell monkey -p "$package" \
-  -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
+adb -s "$serial" shell am start -n "$activity" >/dev/null
 
 echo "compiling the fixed set on $serial (about a minute) ..."
 tries=0
-until dart3d_log | grep -q 'bake: fixed set exported'; do
+until dart3d_log | grep -q -E 'bake: fixed set (exported|INCOMPLETE)|bake failed'; do
   tries=$((tries + 1))
   if [ "$tries" -gt 150 ]; then
     echo "timed out waiting for the bake; see: adb logcat -s dart3d" >&2
@@ -90,12 +101,31 @@ until dart3d_log | grep -q 'bake: fixed set exported'; do
   fi
   sleep 2
 done
-dart3d_log | grep 'bake:'
+dart3d_log | grep -E 'bake:|bake failed'
+if ! dart3d_log | grep -q 'bake: fixed set exported'; then
+  echo "the fixed set is incomplete; nothing was copied" >&2
+  exit 1
+fi
 
 if [ "$wait_s" -gt 0 ]; then
   echo "visit the app's screens now; collecting variants in ${wait_s}s ..."
   sleep "$wait_s"
 fi
+
+# A variant queued near the end of the wait is still compiling (each is
+# built for both backends). The app logs when its compile lane starts
+# and when it is empty again; the last such line has to be the idle one.
+tries=0
+while dart3d_log | grep -E 'bake: variants (compiling|idle)' | tail -1 |
+    grep -q 'compiling'; do
+  if [ "$tries" -eq 0 ]; then echo "waiting for variant compiles to finish ..."; fi
+  tries=$((tries + 1))
+  if [ "$tries" -gt 150 ]; then
+    echo "variant compiles still running after 5 minutes; nothing was copied" >&2
+    exit 1
+  fi
+  sleep 2
+done
 
 adb -s "$serial" pull "$device_dir" "$work/out" >/dev/null
 sort -u "$work/out/index.txt" > "$work/index.txt"

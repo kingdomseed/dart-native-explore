@@ -136,16 +136,21 @@ internal object MaterialPackages {
     val BAKED_APIS = listOf(MaterialBuilder.TargetApi.OPENGL,
         MaterialBuilder.TargetApi.VULKAN)
 
+    private val bakeProgress = BakeProgress()
+
     private fun startBake() {
         val t = Thread({
             try {
-                var n = 0
+                val rejected = ArrayList<String>()
+                var expected = 0
                 for (api in BAKED_APIS) {
                     for (spec in fixedSet(api)) {
-                        if (compile(spec) != null) n++
+                        expected++
+                        if (compile(spec) == null) rejected.add(spec.key)
                     }
                 }
-                Log.i(TAG, "bake: fixed set exported ($n packages)")
+                val line = BakeProgress.fixedSetLine(expected, rejected)
+                if (rejected.isEmpty()) Log.i(TAG, line) else Log.e(TAG, line)
             } catch (t: Throwable) {
                 Log.e(TAG, "bake failed", t)
             }
@@ -319,6 +324,9 @@ internal object MaterialPackages {
         extFlags: Int, boundSlots: Int, api: MaterialBuilder.TargetApi,
         done: (ByteArray?) -> Unit,
     ) {
+        if (baking) {
+            Log.i(TAG, BakeProgress.busyLine(bakeProgress.started()))
+        }
         variantExecutor.execute {
             val bytes = try {
                 if (baking) {
@@ -333,6 +341,9 @@ internal object MaterialPackages {
             } catch (t: Throwable) {
                 Log.w(TAG, "variant compile failed", t)
                 null
+            }
+            if (baking && bakeProgress.finished()) {
+                Log.i(TAG, BakeProgress.IDLE_LINE)
             }
             done(bytes)
         }
