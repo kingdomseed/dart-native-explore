@@ -127,6 +127,17 @@ while dart3d_log | grep -E 'bake: variants (compiling|idle)' | tail -1 |
   sleep 2
 done
 
+# The lane was idle a moment ago, but a screen can queue a variant
+# between that reading and the pull. Stop the app so nothing can start,
+# then read the log once more: a compile that began in the gap was cut
+# off by the stop, and what it exported is not to be trusted.
+adb -s "$serial" shell am force-stop "$package"
+if dart3d_log | grep -E 'bake: variants (compiling|idle)' | tail -1 |
+    grep -q 'compiling'; then
+  echo "a variant compile started while the bake was stopping; nothing was copied, run it again" >&2
+  exit 1
+fi
+
 adb -s "$serial" pull "$device_dir" "$work/out" >/dev/null
 sort -u "$work/out/index.txt" > "$work/index.txt"
 

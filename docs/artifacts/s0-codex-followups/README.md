@@ -24,6 +24,7 @@ ones on #45 in the S0g re-realize PR (#52).
 | Thread | Verdict |
 |---|---|
 | 4184387488, `variants idle` can be logged after a newer `variants compiling` | **Real, fixed.** The count was decremented and the idle line written in two steps, so a compile queued in between could log `compiling` first and leave `idle` as the last line while it was still running; the script trusts the last line. `BakeProgress` now changes the count and writes its line under one lock, for both transitions. A test runs 400 start/finish pairs on 8 threads with one compile held in flight and checks that `idle` is never written. |
+| 4184508149, a variant queued between the idle reading and the pull | **Real, fixed in the script.** Once the lane reads idle the script force-stops the app, so nothing new can start, then reads the log once more; if a compile had begun in that gap (and was cut off by the stop) it exits 1 without copying. The pull then reads a directory nothing is writing to. The failing branch was not provoked on a device. |
 
 ## The T2 gaps from #49
 
@@ -89,15 +90,15 @@ The app's side was run on the Fire tablet with the bake tag set
 10:52:18.520 bake: fixed set exported (20 packages)
 ```
 
-**End to end on the A142**, twice: on the head before the fix above
-and again on the final head (`bake-run-a142.txt` is the second run):
+**End to end on the A142**, three times: before the two review fixes
+above, after the first, and on the final head (`bake-run-a142.txt`):
 
 ```
 tool/bake_materials.sh 00064149A002033 \
   --app-assets example/android/app/src/main/assets --wait 20
 ```
 
-Exit 0 both times. It launched with `am start`, saw `variants compiling` then
+Exit 0 each time. It launched with `am start`, saw `variants compiling` then
 `variants idle` then `fixed set exported (20 packages)`, pulled 23
 files, and wrote 20 plugin packages and the app's 2 variants. **All 22
 `.filamat` files came out byte-identical to the committed ones** (`git
@@ -121,8 +122,8 @@ lines both produce. On the Fire tablet the script cannot run at all:
 - The device runs above are on `0a59fdf`'s code. The final head
   differs from it only in `BakeProgress` and the two call sites that
   are behind the bake flag, which is off unless the bake log tag is
-  set, so those runs stand for it; the bake itself was rerun on the
-  final head.
+  set, and in `bake_materials.sh`, so those runs stand for it; the
+  bake itself was rerun on the final head.
 - `sh -n` on both scripts.
 - `:dart3d:lintRelease` still reports the eight `NewApi` errors `main`
   has in `JoltWorld.update`; #50 fixes those.
