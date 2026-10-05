@@ -153,7 +153,7 @@ no app code scales them per platform.
 | `skybox.intensity` | Multiplies the drawn sky, on top of `environmentIntensity` for an `environment` sky. |
 | `emissive` × `emissiveStrength` | Radiance added to the surface. |
 | `exposure` | One linear multiplier on everything above, applied before the tone map. Default 1. |
-| `toneMapping` | `pbrNeutral` (default), `aces`, `reinhard`, `linear`, `agx`. |
+| `toneMapping` | `pbrNeutral` (default), `aces`, `linear` on both natives. `agx` is upstream's curve on iOS and Filament's own AgX on Android. `reinhard` is implemented on iOS only: Filament has no such operator, and Android logs it and uses `pbrNeutral`. |
 
 Colours are linear RGB.
 

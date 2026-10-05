@@ -383,9 +383,12 @@ enum ToneMapTechnique {
         }
         if (params.d3Vignette.x > 0.0) {
             float dist = length((in.uv - 0.5) * 2.0);
+            // A zero smoothness is a hard edge; smoothstep needs a
+            // width.
             float falloff = smoothstep(
                 params.d3Vignette.y,
-                params.d3Vignette.y + params.d3Vignette.z, dist);
+                params.d3Vignette.y + max(params.d3Vignette.z, 1e-4),
+                dist);
             mapped *= 1.0 - falloff * params.d3Vignette.x;
         }
         if (params.d3Mode.y > 0.5) {
