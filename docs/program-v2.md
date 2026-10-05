@@ -213,7 +213,8 @@ Rules:
       iOS restores in two passes and restores a dynamic body's whole
       pose. **Open:** the iOS half of the body state (described, not
       built: iOS is paused) and a device run of the three iOS fixes,
-      which are type-checked only. Evidence:
+      which are type-checked only; T2 on the A142 for the final
+      head (OpenGL, and Vulkan hero/dice). Evidence:
       `docs/artifacts/s0g-physics-rerealize/`
 - [x] S0h Android cold-start material compile — **done** (#48; tablet
       run 2026-10-05). Root cause: filamat's SPIR-V optimizer, 3–6 s

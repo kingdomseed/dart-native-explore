@@ -99,7 +99,8 @@ was added.
 | `w25 lane complete` | FAIL | PASS |
 
 A142 Vulkan: `harness-main-a142-vulkan.log`, `harness-a142-vulkan.log`.
-Fire tablet (OpenGL, LOW): PASS, `harness-fire.log`.
+Fire tablet and Wacom (both OpenGL, LOW): PASS, `harness-fire.log`,
+`harness-wacom.log`.
 
 ## Review threads on #45
 
@@ -134,9 +135,11 @@ equivalent in `SceneViewHost.drainPendingWork`, beside
 
 ## T2 and frame rate
 
-**Incomplete.** The A142 and the Wacom were lent to another project
-partway through; the A142 on OpenGL and the Wacom are owed, and the
-A142's dice figures are from three commits before the final head.
+**Incomplete: the A142 is owed.** It was lent to another project
+partway through. Owed on the final head: A142 Vulkan (hero and dice;
+its harness is run) and A142 OpenGL (hero, dice and harness). The
+A142's hero and dice figures below are from three commits before the
+final head.
 
 Each device from a fresh launch: hero 30 s, dice racked 30 s, 12 rolls
 3 s apart, settle; then the harness (`DART3D_SCENE=harness`) to `w18
@@ -148,7 +151,7 @@ lane complete`. Frame rates from the `dart3d.perf` log, baseline from
 | Fire KFTUWI | OPENGL, LOW | 58.5, two windows only (55.0) | 44.2 (44.2) | 44.1 (43.7) | complete, W25 PASS | 0 |
 | Nothing A142 | VULKAN, STANDARD | 89.8 (89.7) | 49.7 (49.7) | 50.2 (50.3) | complete, W25 PASS | 0 |
 | Nothing A142, OpenGL forced | | not run | | | not run | |
-| Wacom DTHA116 | | not run | | | not run | |
+| Wacom DTHA116 | OPENGL, LOW | 57.7 (57.5) | 51.4 (51.2) | 45.4 (44.1) | complete, W25 PASS | 0 |
 
 - The Fire tablet's hero figure rests on two 2 s windows: the perf log
   switched on late in that run. Its dice figures have 16 and 22.
@@ -156,11 +159,19 @@ lane complete`. Frame rates from the `dart3d.perf` log, baseline from
   awake-count carry, moves the transform supersession into the
   add/update handlers and adds a test; none of it runs per frame. Its
   harness run is on the final head's code.
-- One attempt to install on the Wacom failed in `adb install` with no
-  reason given, shortly before the device was handed over. Not
-  investigated.
+- One earlier attempt to install on the Wacom failed in `adb install`
+  with an empty reason. The tablet's log shows the install session
+  opened at 09:56:23 and abandoned 1.7 s later with no
+  `INSTALL_FAILED` code, no signature or storage complaint (97 GB
+  free, same signing key as the build already on it). So the device
+  refused nothing; the transfer stopped on the host side. Three
+  `dn run` sessions and two log streams were using adb at that moment.
+  Why it stopped is not known. The same APK path installed first time
+  on every later run, with one device at a time, and nothing on the
+  tablet was changed to get there.
 
-`fire-*.jpg`, `a142-*.jpg` (hero, dice, settled, harness).
+`fire-*.jpg`, `wacom-*.jpg`, `a142-*.jpg` (hero, dice, settled,
+harness); `harness-wacom.log`.
 
 ## Checks
 
