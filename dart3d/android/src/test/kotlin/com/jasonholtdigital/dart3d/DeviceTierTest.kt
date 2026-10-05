@@ -10,39 +10,85 @@ import org.junit.Test
 /** [DeviceTier.classify] — which devices are low-end. */
 class DeviceTierTest {
 
+    private fun tier(memoryKb: Long, gpu: String?, lowRam: Boolean = false) =
+        DeviceTier.classify(memoryKb * 1024, lowRam, gpu)
+
     @Test
-    fun `the Fire tablet's 2_9 GB is low`() {
-        assertEquals(DeviceTier.LOW,
-            DeviceTier.classify(2_871_216L * 1024, lowRamDevice = false))
+    fun `the Fire tablet is low, by memory and by GPU`() {
+        assertEquals(DeviceTier.LOW, tier(2_871_216L, "Mali-G52 MC2"))
+        assertEquals(DeviceTier.LOW, tier(2_871_216L, null))
+        assertEquals(DeviceTier.LOW, tier(8_000_000L, "Mali-G52 MC2"))
+    }
+
+    @Test
+    fun `the Wacom tablet's 8 GB doesn't hide its Mali-G57`() {
+        assertEquals(DeviceTier.LOW, tier(8_070_660L, "Mali-G57 MC2"))
+    }
+
+    @Test
+    fun `the A142's Mali-G610 is standard`() {
+        assertEquals(DeviceTier.STANDARD, tier(7_590_488L, "Mali-G610 MC4"))
+    }
+
+    @Test
+    fun `a three-digit Mali-G model is not its two-digit prefix`() {
+        for (gpu in listOf("Mali-G510 MC4", "Mali-G310")) {
+            assertEquals(gpu, DeviceTier.STANDARD, tier(8_000_000L, gpu))
+        }
+    }
+
+    @Test
+    fun `the listed families are low whatever the memory`() {
+        for (gpu in listOf(
+            "Mali-G31", "Mali-G51 MP4", "Mali-T860", "Mali-450 MP",
+            "Adreno (TM) 308", "Adreno (TM) 506", "Adreno (TM) 512",
+            "Adreno (TM) 610", "PowerVR Rogue GE8320",
+        )) {
+            assertEquals(gpu, DeviceTier.LOW, tier(8_000_000L, gpu))
+        }
+    }
+
+    @Test
+    fun `an unlisted or unknown GPU is decided by memory`() {
+        for (gpu in listOf(
+            "Mali-G78", "Mali-G715-Immortalis MC11", "Adreno (TM) 540",
+            "Adreno (TM) 650", "Adreno (TM) 740", "Samsung Xclipse 920",
+            "Android Emulator OpenGL ES Translator (Apple M2)", "", null,
+        )) {
+            assertEquals(gpu, DeviceTier.STANDARD, tier(8_000_000L, gpu))
+            assertEquals(gpu, DeviceTier.LOW, tier(2_871_216L, gpu))
+        }
     }
 
     @Test
     fun `a 4 GB device and up is standard`() {
         assertEquals(DeviceTier.STANDARD,
-            DeviceTier.classify(3_700_000_000L, lowRamDevice = false))
+            DeviceTier.classify(3_700_000_000L, false, null))
         assertEquals(DeviceTier.STANDARD,
-            DeviceTier.classify(11_600_000_000L, lowRamDevice = false))
+            DeviceTier.classify(11_600_000_000L, false, null))
     }
 
     @Test
     fun `the boundary itself is standard, one byte under is low`() {
         assertEquals(3_200_000_000L, DeviceTier.LOW_MEMORY_BYTES)
         assertEquals(DeviceTier.STANDARD,
-            DeviceTier.classify(3_200_000_000L, lowRamDevice = false))
+            DeviceTier.classify(3_200_000_000L, false, null))
         assertEquals(DeviceTier.LOW,
-            DeviceTier.classify(3_199_999_999L, lowRamDevice = false))
+            DeviceTier.classify(3_199_999_999L, false, null))
     }
 
     @Test
     fun `the system's low-RAM flag wins`() {
         assertEquals(DeviceTier.LOW,
-            DeviceTier.classify(8_000_000_000L, lowRamDevice = true))
+            tier(8_000_000L, "Mali-G610 MC4", lowRam = true))
     }
 
     @Test
     fun `an unreadable memory size doesn't demote the device`() {
         assertEquals(DeviceTier.STANDARD,
-            DeviceTier.classify(0L, lowRamDevice = false))
+            DeviceTier.classify(0L, false, "Mali-G610 MC4"))
+        assertEquals(DeviceTier.LOW,
+            DeviceTier.classify(0L, false, "Mali-G57 MC2"))
     }
 }
 

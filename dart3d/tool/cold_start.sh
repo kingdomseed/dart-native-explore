@@ -47,6 +47,16 @@ case "$front" in
      exit 3 ;;
 esac
 
+# `monkey -p` would also launch it, but monkey switches auto-rotate on
+# when it exits, which unlocks a rotation-locked device.
+activity=$(adb -s "$serial" shell "cmd package resolve-activity --brief \
+  -c android.intent.category.LAUNCHER $package" | tail -1 | tr -d '\r')
+case "$activity" in
+  "$package"/*) ;;
+  *) echo "$package has no launcher activity on $serial (is it installed?)" >&2
+     exit 4 ;;
+esac
+
 adb -s "$serial" shell setprop log.tag.dart3d.perf DEBUG
 trap 'adb -s "$serial" shell setprop log.tag.dart3d.perf "\"\""' EXIT
 
@@ -63,8 +73,7 @@ while [ "$i" -le "$runs" ]; do
   fi
   sleep 2
   since=$(adb -s "$serial" shell "date +'%m-%d %H:%M:%S.000'" | tr -d '\r')
-  adb -s "$serial" shell monkey -p "$package" \
-    -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
+  adb -s "$serial" shell am start -n "$activity" >/dev/null
   tries=0
   until dart3d_log | grep -q 'first frame rendered'; do
     tries=$((tries + 1))

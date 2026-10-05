@@ -141,9 +141,13 @@ currently inert.
   The example selects it with `--dart-define=DART3D_BACKEND=`, but
   there is no plugin-level API yet, and a forced Vulkan request that
   fails falls back to GL without telling you.
-- Android low-end devices (under about 3 GB of memory) differ in two
-  ways, decided separately. Measured on a Fire tablet in
-  `../docs/artifacts/s0-tablet-frame-rate/`.
+- Android low-end devices differ in two ways, decided separately. A
+  device is low-end when its GPU is in a short list of fill-rate-bound
+  families (Mali-G31/G51/G52/G57, Mali-T and Mali-4xx, Adreno 3xx, 4xx,
+  50x, 51x and 61x, PowerVR GE8xxx; `DeviceTier.kt`), or when it has
+  under about 3 GB of memory. Only Mali-G52 and Mali-G57 are measured:
+  `../docs/artifacts/s0-tablet-frame-rate/` and
+  `../docs/artifacts/s0-three-device-baseline/`.
   - Backend: `auto` resolves to OpenGL, whatever `quality` is. Only the
     backend pref (`Dart3dSetBackend`, the example's `DART3D_BACKEND`)
     overrides it.

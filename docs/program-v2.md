@@ -38,7 +38,7 @@ goes into the backlog, not into a branch.
    guides and a CHANGELOG, written for someone who has never seen the
    repo (R8).
 
-## Where we are (2026-10-02)
+## Where we are (2026-10-05)
 
 **Landed since the reset.** S0a/b/e/f, the Vulkan relaunch fix, the P4
 hero (#31), `switchAnimation` (#34), the Track V re-cut (#37; upstream
@@ -54,17 +54,22 @@ from look-dev — the DartNative set's spec and reference renders — is on
 
 **Next, in order.** Engine first, then release. Product work waits.
 
-1. **Stabilize** — S0h cold start is in review: material packages now
-   ship precompiled and are cached on disk, and the A142's first frame
-   went from 11.15 s to 0.57 s (`docs/artifacts/s0h-cold-start/`). The
-   Fire tablet (17–18 s before) was in use and has not been measured;
-   that run closes S0h. Then S0g and the S0c backfill. Baseline:
-   `docs/artifacts/s0-fire-tablet-baseline/`.
-   Fire tablet frame rate (S0j) is in review: re-measured after #45 the
-   dice screen ran at 8.7 fps, and it runs at 44 fps with the low-end
-   device profile (`docs/artifacts/s0-tablet-frame-rate/`). Open from
-   that: 60 fps at rest is not reached, the profile's shadows are hard,
-   and the tier is picked by memory.
+1. **Stabilize** — S0h cold start is closed: material packages ship
+   precompiled and are cached on disk. First frame, first launch /
+   later launches: A142 0.57 / 0.52 s (was 11.2 s), Fire tablet 1.25 /
+   0.89 s (was 18.1 s), Wacom tablet 0.83 / 0.56 s
+   (`docs/artifacts/s0h-cold-start/`,
+   `docs/artifacts/s0-three-device-baseline/`). Next: S0g and the S0c
+   backfill. Fire tablet baseline: `docs/artifacts/s0-fire-tablet-baseline/`.
+   Frame rate (S0j): a third device, the Wacom DTHA116 (Mali-G57 MC2,
+   8 GB), ran the dice at 13 fps because the tier was picked by memory.
+   The tier is now picked by GPU name first, then memory (in review,
+   branch `s0-three-device-baseline`): dice racked / rolling are 44 / 44
+   fps on the Fire tablet, 51 / 44 on the Wacom and 50 / 50 on the
+   A142. Open from that: 60 fps at rest is not reached on either
+   tablet, the low profile's shadows are hard, LOW always takes OpenGL
+   although Vulkan is faster on the Wacom, and only two rows of the GPU
+   table are measured.
    Open from the tablet run: native lifetime on API 26–32 now that
    jolt-jni's cleaner is off there (#44); dice at an edge can still cover
    the rim line.
@@ -119,7 +124,7 @@ stayed empty. The new gate is smaller and mandatory.
 | Tier | When | Required evidence |
 |---|---|---|
 | **T1 — CI** | every PR | `dn analyze` + `dn test` in **every Dart package the PR changes** (`dart3d/`, `dart3d/example/`, and each new package such as `dart3d_audio/` or the dice app gets its own CI step when it is created). Target (R3): add Android `compileReleaseKotlin` and iOS `swiftc -typecheck` jobs. |
-| **T2 — device smoke** | every PR touching `dart3d/android/**`, `dart3d/ios/**`, or the wire vocabulary | On A142 **Vulkan and GL**, on the Fire tablet (KFTUWI, Mali-G52 — once its baseline is recorded), and on the iOS sim (paused 2026-09-30; see *Verification debt*): app boots, harness (booted with `--dart-define=DART3D_SCENE=harness`; it has no UI entry) runs to completion, dice roll and settle, zero FATAL/crash in logs. One screenshot per surface + log excerpt, committed under `docs/artifacts/<unit>/`. |
+| **T2 — device smoke** | every PR touching `dart3d/android/**`, `dart3d/ios/**`, or the wire vocabulary | On A142 **Vulkan and GL**, on the Fire tablet (KFTUWI, Mali-G52), on the Wacom tablet (DTHA116, Mali-G57, the weak-GPU/large-memory case; baseline in `docs/artifacts/s0-three-device-baseline/`), and on the iOS sim (paused 2026-09-30; see *Verification debt*): app boots, harness (booted with `--dart-define=DART3D_SCENE=harness`; it has no UI entry) runs to completion, dice roll and settle, zero FATAL/crash in logs. One screenshot per surface + log excerpt, committed under `docs/artifacts/<unit>/`. |
 | **T3 — feature lanes** | every unit | The unit's own live checks, same evidence rules: the subset of its old "Verify, live" block that exercises new behavior, or for units new in v2, the checks listed under **New-unit T3** below. |
 | **T4 — review** | units that change what users see | Operator reviews screenshots (video optional) in the PR before merge. |
 | **Perf** | only units that claim a perf number | The measured number, device, and method, committed. |
@@ -191,29 +196,38 @@ Rules:
       remaining Filament builder sites for the GC-reachability hazard;
       W25 settle lane never passes after wLoose; body poses/velocities
       across deferred re-realize (M)
-- [ ] S0h Android cold-start material compile — *in review* (branch
-      `s0h-cold-start`); **the Fire tablet run is still owed**. Root
-      cause: filamat's SPIR-V optimizer, 3–6 s per lit package, run on
-      the device at every cold start. Fix: packages are named by a hash
-      of their recipe and the Filament pin, shipped as assets (the
-      plugin's fixed set of 20; an app can add its variants) and cached
-      on disk, with the runtime compile as the fallback. A142 hero,
-      first frame: 11.15 s → 0.57 s on first launch and on later ones;
-      the hero's clear-coat variant is on the first frame instead of
-      swapping in at 14 s. APK +1.0 MB. The tablet had another app in
-      the foreground for the whole session, so its targets (under 3 s
-      first launch, under 1.5 s later) and its dice frame rate are not
-      verified; the commands are in the artifact README. Tables and
-      what stays open: `docs/artifacts/s0h-cold-start/`
-- [ ] S0j Fire tablet frame rate — *in review* (branch
-      `s0-tablet-frame-rate`). Measured with the new `dart3d.perf` log
-      lane (frame intervals, Filament GPU time, physics). Dice screen
-      8.7 → 44 fps racked and 8.8 → 43 fps rolling; hero 34 → 55 fps.
-      Three changes: the frame log, Jolt stepping on the calling thread,
-      and a low-end device profile (PCF shadows, FXAA, dynamic
-      resolution, OpenGL) picked when no `SceneQuality` is set. Tables,
-      cold-start timeline and what stays open:
-      `docs/artifacts/s0-tablet-frame-rate/`
+- [x] S0h Android cold-start material compile — **done** (#48; tablet
+      run 2026-10-05). Root cause: filamat's SPIR-V optimizer, 3–6 s
+      per lit package, run on the device at every cold start. Fix:
+      packages are named by a hash of their recipe and the Filament
+      pin, shipped as assets (the plugin's fixed set of 20; an app can
+      add its variants) and cached on disk, with the runtime compile as
+      the fallback. First frame, first launch / later launches: A142
+      11.15 s → 0.57 / 0.52 s; Fire tablet 18.1 s → 1.25 / 0.89 s
+      (targets: under 3 s and under 1.5 s); Wacom tablet 0.83 / 0.56 s.
+      The hero's clear-coat variant is on the first frame instead of
+      swapping in at 14 s. APK +1.0 MB. Tables and what stays open:
+      `docs/artifacts/s0h-cold-start/`,
+      `docs/artifacts/s0-three-device-baseline/`
+- [ ] S0j Low-end Android frame rate — #47 landed; the GPU-aware tier
+      is *in review* (branch `s0-three-device-baseline`). Measured with
+      the `dart3d.perf` log lane (frame intervals, Filament GPU time,
+      physics). #47: the frame log, Jolt stepping on the calling
+      thread, and a low-end device profile (PCF shadows, FXAA, dynamic
+      resolution, OpenGL) picked when no `SceneQuality` is set; Fire
+      tablet dice 8.7 → 44 fps racked and 8.8 → 43 fps rolling, hero
+      34 → 55 fps (`docs/artifacts/s0-tablet-frame-rate/`). The tier
+      was picked by memory, and the Wacom DTHA116 (Mali-G57 MC2, 8 GB,
+      1440×2200) showed the gap: 13 fps on the dice screen through the
+      standard pipeline. Now the GPU's name, read from the GL driver
+      before the engine is built, is checked against a short table of
+      fill-rate-bound families, with memory as the fallback: Wacom dice
+      13 → 51 fps racked and 13 → 44 fps rolling; Fire tablet (44 / 44)
+      and A142 (50 / 50, standard tier, Vulkan) unchanged. Open: 60 fps
+      at rest on the tablets; hard shadows on the low profile; LOW
+      always takes OpenGL although Vulkan runs the low pipeline faster
+      on the Wacom; only Mali-G52 and Mali-G57 are measured rows.
+      Tables: `docs/artifacts/s0-three-device-baseline/`
 - [x] ~~S0i Reduced motion~~ — **not planned** (operator, 2026-09-29):
       reduced motion is an app-level concern, not the dart3d package's, and the
       example is a motion showcase. DartNative exposes no reduced-motion signal
