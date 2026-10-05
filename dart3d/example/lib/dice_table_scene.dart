@@ -467,7 +467,7 @@ DiceTableScene? buildDiceTable({
         'directionalLight',
         properties: {
           'color': ColorValue(1.0, 0.96, 0.9, 1),
-          'intensity': DoubleValue(keyLightIntensity(2200)),
+          'intensity': DoubleValue(0.573),
           'castsShadow': BoolValue(true),
           'shadowRadius': DoubleValue(2.5),
           'shadowDepthBias': DoubleValue(0.01),
@@ -481,14 +481,14 @@ DiceTableScene? buildDiceTable({
         EnvironmentResource(
           composed.newId(),
           environment: const StudioEnvironment(),
-          environmentIntensity: 0.25,
+          environmentIntensity: 0.195,
           exposure: 1.0,
           toneMapping: 'pbrNeutral',
           skybox: SkyboxSpec(
             GradientSkySpec(
-              zenithColor: Vector3(0.0027, 0.0044, 0.006),
-              horizonColor: Vector3(0.0027, 0.0044, 0.006),
-              groundColor: Vector3(0.0027, 0.0044, 0.006),
+              zenithColor: Vector3(0.0021, 0.0034, 0.0047),
+              horizonColor: Vector3(0.0021, 0.0034, 0.0047),
+              groundColor: Vector3(0.0021, 0.0034, 0.0047),
               sunColor: Vector3.zero(),
             ),
           ),

@@ -136,66 +136,54 @@ Corrections to this spec's assumptions found during verification:
   resting inside the bowl is a luck-based bounce — tracked with the
   W3 margin evidence in loose ends.
 
-## Light units (W21)
+## Light units (S0g, replaces W21)
 
-The wire semantic is **SceneKit-scale `intensity`** — the unitless
-multiplier `SCNLight.intensity` reads (platform default 1000). All
-authored dart3d scenes use it directly: directional keys run
-1300–2400 (`showcase_loader.dart`, `imported_scene.dart`,
-`dice_table_scene.dart`), point fills `700–900 × radius`.
+The wire's numbers mean what upstream flutter_scene 0.23 says they
+mean. Nothing converts them between the document and the native, and
+no app code scales them per platform.
 
-Upstream's glTF importer does not emit that convention. Its
-`gltfLightIntensity` bakes the `KHR_lights_punctual` photometric value
-down to a radiometric multiplier:
+| Field | Meaning (linear, before exposure) |
+|---|---|
+| `directionalLight.intensity` | Scales `color` into the irradiance on a surface facing the light: a white Lambert surface leaves `intensity / π`. Default 3. |
+| `pointLight.intensity`, `spotLight.intensity` | The surface at distance `d` receives `intensity / d²`. Default 1. |
+| `range` | The light is windowed by `(1 − (d / range)⁴)²`. 0 or absent: no cut-off. |
+| `innerConeAngle`, `outerConeAngle` | Half-angles, radians. Defaults 0 and π/4. |
+| `rectAreaLight.intensity` | The panel's radiance; the light received grows with its area. |
+| `environmentIntensity` | Multiplies the environment's radiance. Default 1. |
+| `skybox.intensity` | Multiplies the drawn sky, on top of `environmentIntensity` for an `environment` sky. |
+| `emissive` × `emissiveStrength` | Radiance added to the surface. |
+| `exposure` | One linear multiplier on everything above, applied before the tone map. Default 1. |
+| `toneMapping` | `pbrNeutral` (default), `aces`, `reinhard`, `linear`, `agx`. |
 
-```text
-n = photometric / (683 · luminance(color))
-```
+Colours are linear RGB.
 
-(`683` lm/W is the peak photopic luminous efficacy; dividing by the
-color's luminance keeps `color · n` at the authored luminance, so
-saturated colors get a larger multiplier.) `.fsceneb` manifests from
-the importer therefore carry `n` on `directionalLight`/`pointLight`/
-`spotLight` component properties instead of a usable `intensity`.
+How each native gets there:
 
-**Decode boundary (Dart, landed):** `readFsceneb` runs
-`normalizeLightIntensity` after the manifest decode, and the `.fscene`
-text path applies it in `showcase_loader.dart`. For each punctual-light
-component carrying `n` but no `intensity`:
+- **Android (Filament).** The camera's exposure is set to the stage
+  value itself (`N = 1`, `t = 1.2 s`, `S = 100 · exposure`), so
+  Filament's photometric inputs take the wire numbers unscaled:
+  directional → illuminance, point and spot → `intensityCandela`,
+  `environmentIntensity` → the `IndirectLight` and `Skybox` intensity.
+  Filament's range window and spot-cone ramp are the functions upstream
+  uses. A light without a range gets a radius of 10⁵.
+- **iOS (SceneKit).** Measured with an offscreen `SCNRenderer`: a
+  directional light of SceneKit intensity 1000 puts 1.0 on a white
+  surface where upstream's `intensity / π` is wanted, so directional
+  intensities are multiplied by `1000 / π`. An omni or spot light of
+  SceneKit intensity `I` lights a surface with `I / d²` and uses the
+  same range window, so those pass through. An area light of SceneKit
+  intensity 1000 behaves as a panel of radiance 1, so area intensities
+  are multiplied by 1000. Cone angles are doubled and converted to
+  degrees. Exposure is `exposureOffset = log2(exposure)` with exposure
+  adaptation off.
 
-```text
-intensity = n · 683 · luminance(color) · kGltfToSceneKitLightScale
-```
+glTF imports: the importer writes upstream's
+`intensity = photometric / (683 · luminance(color))`, as upstream's
+does. Earlier revisions of dart3d read a light field `n` and rescaled
+it to a SceneKit-style 1000; no upstream version writes `n`, and that
+pass is gone.
 
-- `n · 683 · luminance(color)` inverts upstream's normalization —
-  the product is the glTF photometric value (lux for directional,
-  candela for point/spot).
-- `kGltfToSceneKitLightScale = 1000.0` maps photometric units onto the
-  SceneKit scale. **Derivation:** SCNLight's own default intensity is
-  1000, so a unit glTF directional lands on the platform default;
-  glTF assets commonly ship directional intensities of ~1–3 lux, which
-  map to 1000–3000 — inside dart3d's authored 1300–2400 key band and
-  the plausible 500–1400 conversion window. Point/spot candela ride
-  the same constant (upstream's `n` normalization is type-agnostic).
-- `color` may be `Vec3Value` (upstream's emit) or `ColorValue`
-  (dart3d-authored); absent → white (luminance 1); non-positive
-  luminance clamps to 0 rather than inventing a negative photometric.
-- An authored `intensity` always wins — a document carrying both keeps
-  `intensity` and `n` is left unread; `n` itself is preserved in the
-  property bag so re-encodes stay upstream-true, which also makes the
-  pass idempotent.
-- Non-light `n` properties and `rectAreaLight` do not translate —
-  the field convention is punctual-only.
-
-**Platform rows (integrator's lane):** both realizers consume the same
-`intensity` — the `n` inversion happens once, upstream of the wire, so
-imported documents carry the same SceneKit-scale semantic as authored
-ones. What remains per-platform is the wire→engine factor: iOS reads
-`intensity` directly, Android's `decodeLight` scales directional by
-`×10` (`FsceneRealizer.kt:1497`) toward Filament's lux expectation.
-That factor is now part of this spec's unit story — lane 9 verifies
-the exposure match within a stop and the constant stays documented
-here rather than buried as a heuristic.
+Measured agreement and what does not match: `docs/artifacts/s0g-look-parity/`.
 
 ## Physics fidelity (W23)
 

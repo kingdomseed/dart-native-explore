@@ -624,6 +624,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
 
             cameraEntity = EntityManager.get().create()
             camera = engine.createCamera(cameraEntity)
+            setCameraExposure(camera, 1.0f)
 
             view.scene = scene
             view.camera = camera
@@ -1219,32 +1220,25 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         envSkyboxTextures.addAll(textures)
     }
 
-    /**
-     * The env resource's look fields — exposure + the tone-mapping
-     * operator. `exposure` is a linear multiplier on Filament's
-     * photometric default (f/16, 1/125 s, ISO 100 — the exposure the
-     * scene's intensities were tuned under): the 3-arg
-     * `setExposure(16, 1/125, 100·exposure)` expresses exactly that —
-     * matching iOS's `exposureOffset = log2(exposure)` EV-offset
-     * semantics. The 1-arg `setExposure(float)` can't express it: its
-     * sensitivity floor of ISO 10 clamps the default exposure
-     * (~1/38400) out of range.
-     */
     /** The last effective stage exposure (exposure × 2^AE comp). */
     private var lastEffExposure = 1.0f
 
     /**
-     * `f/16, 1/125 s, ISO 100·e` — but Filament clamps sensitivity to
-     * [10, 204800], so compensation below ≈ −3.3 EV (or above ≈ +11 EV)
-     * moves into the shutter time instead; EV100 is identical.
+     * Sets the camera's exposure to exactly [e], the stage's linear
+     * multiplier (upstream's `exposure`; lights and the environment are
+     * in upstream's units, see FsceneRealizer's unit note). Filament
+     * computes exposure as `t·S / (1.2·N²·100)`, so `N = 1`,
+     * `t = 1.2 s`, `S = 100·e` gives `e`. It clamps `S` to
+     * [10, 204800]; outside that the remainder moves into the shutter
+     * time.
      */
     private fun setCameraExposure(cam: Camera, e: Float) {
         val iso = 100.0f * e
         when {
-            iso < 10f -> cam.setExposure(16.0f, (1.0f / 125.0f) * (iso / 10f), 10f)
-            iso > 204800f -> cam.setExposure(16.0f,
-                (1.0f / 125.0f) * (iso / 204800f), 204800f)
-            else -> cam.setExposure(16.0f, 1.0f / 125.0f, iso)
+            iso < 10f -> cam.setExposure(1.0f, 1.2f * (iso / 10f), 10f)
+            iso > 204800f -> cam.setExposure(1.0f,
+                1.2f * (iso / 204800f), 204800f)
+            else -> cam.setExposure(1.0f, 1.2f, iso)
         }
     }
 
@@ -1265,8 +1259,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         lastEffExposure = effExposure
         setCameraExposure(camera, effExposure)
         // W14: exposure is a Camera property — every screen-bound view
-        // camera takes it (offscreen views keep Filament's default,
-        // the same policy as the per-View post stack). applyViews
+        // camera takes it (offscreen views stay at exposure 1, the
+        // same policy as the per-View post stack). applyViews
         // re-applies [lastEffExposure] to cameras it creates later.
         for (rec in screenViews) {
             rec.camera?.let { setCameraExposure(it, effExposure) }
@@ -2901,7 +2895,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             rec.camera = cam
             // decodeStage may have run before these cameras existed
             // (initial load / re-realize) — carry the stage exposure.
-            if (rec.targetKey == null) setCameraExposure(cam, lastEffExposure)
+            // An offscreen view renders at exposure 1, never at
+            // Filament's photographic default.
+            setCameraExposure(cam,
+                if (rec.targetKey == null) lastEffExposure else 1.0f)
             val tk = rec.targetKey
             if (tk != null) {
                 val rtRec = renderTargets[tk]

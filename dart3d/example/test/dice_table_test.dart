@@ -9,7 +9,6 @@
 // `showcase_loader.dart` directly.
 // ignore_for_file: implementation_imports
 
-import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
@@ -262,7 +261,7 @@ void main() {
           doc.resources[doc.stage.environmentRef]! as EnvironmentResource;
       expect(env.effects.vignetteEnabled, isFalse);
       expect(env.effects.bloomEnabled, isTrue);
-      expect(env.exposure, DnLogoStage.reel.exposure);
+      expect(env.exposure, 1.0);
       final sky = env.skybox!.source as GradientSkySpec;
       expect(sky.zenithColor, sky.horizonColor);
       expect(sky.groundColor, sky.horizonColor);
@@ -292,44 +291,6 @@ void main() {
       final scene = load('playground');
       // Box + ball + tower within ±2 — not the 12-unit Floor.
       expect(scene.frameRadius, lessThan(6));
-    });
-
-    // W21: the `.fscene` text path normalizes the upstream `n` light
-    // field at load (the `.fsceneb` path does it inside readFsceneb).
-    test('.fscene light field n normalizes to intensity at load', () {
-      final doc = SceneDocument();
-      doc.addNode(
-        NodeSpec(
-          id: const LocalId(9, 7),
-          name: 'sun',
-          components: [
-            ComponentSpec(
-              'directionalLight',
-              properties: {
-                // White 1.0-lux glTF directional → n = 1/683.
-                'n': DoubleValue(1.0 / 683.0),
-                'color': Vec3Value(Vector3(1, 1, 1)),
-              },
-            ),
-          ],
-        ),
-        root: true,
-      );
-      const item = ShowcaseItem('nlight', 'test/nlight.fscene', 'n field');
-      final scene = loadShowcaseScene(
-        item,
-        bytesFor: (key) =>
-            key == item.assetKey ? utf8.encode(writeFscene(doc)) : null,
-      );
-      expect(scene, isNotNull);
-      final light = scene!.document.nodes.values.firstWhere(
-        (n) => n.name == 'sun',
-      );
-      final props = light.components.single.properties;
-      expect(
-        (props['intensity'] as DoubleValue).value,
-        closeTo(kGltfToSceneKitLightScale, 1),
-      );
     });
 
     // W21 conformance lane: the builtin materials scene carries the

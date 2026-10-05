@@ -208,27 +208,10 @@ const importedDice = [
         'directionalLight',
         properties: {
           'color': ColorValue(1, 1, 1, 1),
-          'intensity': DoubleValue(keyLightIntensity(1400)),
+          'intensity': DoubleValue(0.365),
           'castsShadow': BoolValue(true),
           'shadowRadius': DoubleValue(3.0),
           'shadowDepthBias': DoubleValue(0.005),
-        },
-      ),
-    ],
-    root: true,
-  );
-  doc.createNode(
-    name: 'fill',
-    transform: TrsTransform(
-      translation: Vector3(center.x - radius * 2, center.y + radius * 2, center.z - radius),
-    ),
-    components: [
-      ComponentSpec(
-        'pointLight',
-        properties: {
-          'color': ColorValue(0.6, 0.7, 1.0, 1),
-          'intensity': DoubleValue(900 * radius),
-          'range': DoubleValue(radius * 20),
         },
       ),
     ],
@@ -239,7 +222,7 @@ const importedDice = [
         EnvironmentResource(
           doc.newId(),
           environment: const StudioEnvironment(),
-          environmentIntensity: 1.0,
+          environmentIntensity: 0.78,
           exposure: 1.0,
           toneMapping: 'pbrNeutral',
           skybox: SkyboxSpec(EnvironmentSkySpec()),

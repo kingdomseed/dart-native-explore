@@ -103,10 +103,12 @@ final class LookPatch {
   };
 }
 
-/// The board's lights, in the wire's units.
-const double kLookDirectionalIntensity = 1000;
-const double kLookPointIntensity = 1000;
-const double kLookSpotIntensity = 1000;
+/// The board's lights. Each puts an irradiance of 2 on the card it
+/// faces head-on: the directional light everywhere, the point light
+/// from 1 unit away and the spot light from 1.5.
+const double kLookDirectionalIntensity = 2;
+const double kLookPointIntensity = 2;
+const double kLookSpotIntensity = 4.5;
 
 /// The directional light's travel direction: 30° off the board's
 /// normal, from the upper left.

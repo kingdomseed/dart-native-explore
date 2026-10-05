@@ -4862,23 +4862,47 @@ enum FsceneRealizer {
             if firstCameraNode == nil { firstCameraNode = node }
         }
 
+        /// Light units are upstream's (flutter_scene 0.23): `intensity`
+        /// scales the light's colour into the radiance a surface
+        /// receives. SceneKit's physically based lights, measured:
+        ///
+        ///  * directional — a white Lambert surface facing the light
+        ///    leaves `intensity / 1000`; upstream's leaves
+        ///    `intensity / π`. Hence `× 1000 / π`.
+        ///  * omni and spot — the surface receives `intensity / d²`,
+        ///    which is upstream's definition. No scale.
+        ///  * area — a panel of area A lights like an omni of
+        ///    `A × intensity / 1000`; upstream's `intensity` is the
+        ///    panel's radiance. Hence `× 1000`.
+        ///
+        /// SceneKit windows a light's range with the function upstream
+        /// uses, `(1 − (d / range)⁴)²`, and ignores the falloff
+        /// exponent for these lights. Its cone angles are whole
+        /// angles in degrees; the wire's are half-angles in radians.
         func decodeLight(_ node: SCNNode, _ p: [String: Any],
                          _ type: SCNLight.LightType) {
             let light = SCNLight()
             light.type = type
             if let c = d3Color(p["color"]) { light.color = c }
-            if let i = d3Double(p["intensity"]) { light.intensity = CGFloat(i) }
-            if let range = d3Double(p["range"]) {
+            let intensity = d3Double(p["intensity"])
+            switch type {
+            case .directional:
+                light.intensity = CGFloat((intensity ?? 3) * 1000 / .pi)
+            case .area:
+                light.intensity = CGFloat((intensity ?? 1) * 1000)
+            default:
+                light.intensity = CGFloat(intensity ?? 1)
+            }
+            if type != .directional {
+                let range = d3Double(p["range"]) ?? 0
                 light.attenuationStartDistance = 0
-                light.attenuationEndDistance = CGFloat(range)
+                light.attenuationEndDistance = CGFloat(max(range, 0))
             }
-            if let inner = d3Double(p["innerConeAngle"]),
-               type == .spot {
-                light.spotInnerAngle = CGFloat(inner * 180.0 / .pi)
-            }
-            if let outer = d3Double(p["outerConeAngle"]),
-               type == .spot {
-                light.spotOuterAngle = CGFloat(outer * 180.0 / .pi)
+            if type == .spot {
+                let inner = d3Double(p["innerConeAngle"]) ?? 0
+                let outer = d3Double(p["outerConeAngle"]) ?? .pi / 4
+                light.spotInnerAngle = CGFloat(inner * 2 * 180.0 / .pi)
+                light.spotOuterAngle = CGFloat(outer * 2 * 180.0 / .pi)
             }
             if type == .area {
                 // rectAreaLight (W12): the emitter's rectangle — the

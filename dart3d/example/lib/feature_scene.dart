@@ -885,7 +885,7 @@ final class FeatureScene {
 
     // ── W7 environment/IBL ──────────────────────────────────────────
     // `stage.environmentRef` → an EnvironmentResource on the baseline
-    // look (intensity/exposure 1, pbrNeutral, env-source skybox) with
+    // look (intensity 0.78, exposure 1, pbrNeutral, env-source skybox) with
     // only the sealed `environment` member swapped per lane
     // (docs/environment-ibl-spec.md). env 0 leaves the ref null —
     // natives default to studio — so the wire stays empty there.
@@ -918,7 +918,7 @@ final class FeatureScene {
             EnvironmentResource(
               doc.newId(),
               environment: environment,
-              environmentIntensity: 1.0,
+              environmentIntensity: 0.78,
               exposure: 1.0,
               toneMapping: 'pbrNeutral',
               skybox: SkyboxSpec(EnvironmentSkySpec()),
@@ -1221,7 +1221,7 @@ final class FeatureScene {
           'directionalLight',
           properties: {
             'color': ColorValue(1, 1, 1, 1),
-            'intensity': DoubleValue(keyLightIntensity(1400)),
+            'intensity': DoubleValue(0.365),
             'castsShadow': BoolValue(true),
             // W6 shadow lane — iOS reads these as
             // shadowRadius/shadowBias; Android maps them onto Filament
@@ -1242,7 +1242,7 @@ final class FeatureScene {
           'pointLight',
           properties: {
             'color': ColorValue(0.6, 0.7, 1.0, 1),
-            'intensity': DoubleValue(900),
+            'intensity': DoubleValue(0.0019),
             'range': DoubleValue(30),
           },
         ),
@@ -1297,7 +1297,7 @@ final class FeatureScene {
           'pointLight',
           properties: {
             'color': ColorValue(1.0, 0.75, 0.45, 1),
-            'intensity': DoubleValue(40),
+            'intensity': DoubleValue(0.00008),
             'range': DoubleValue(6),
           },
         ),
@@ -1697,7 +1697,7 @@ final class FeatureScene {
               'pointLight',
               properties: {
                 'color': ColorValue(1.0, 0.8, 0.5, 1),
-                'intensity': DoubleValue(60),
+                'intensity': DoubleValue(0.00012),
                 'range': DoubleValue(6),
               },
             ),
@@ -2692,7 +2692,7 @@ final class FeatureScene {
             properties: {
               'width': DoubleValue(2.0),
               'height': DoubleValue(1.0),
-              'intensity': DoubleValue(240.0),
+              'intensity': DoubleValue(0.00025),
               'color': ColorValue(1.0, 0.9, 0.75, 1.0),
               'enabled': BoolValue(false),
             },
@@ -3768,7 +3768,7 @@ final class FeatureScene {
             'directionalLight',
             properties: {
               'color': ColorValue(1, 1, 1, 1),
-              'intensity': DoubleValue(keyLightIntensity(1400)),
+              'intensity': DoubleValue(0.365),
               'castsShadow': BoolValue(true),
               // W6 fields — kept so the pass is a superset, not a swap.
               'shadowRadius': DoubleValue(3.0),
