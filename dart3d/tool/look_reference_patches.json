@@ -2,7 +2,7 @@
   "board": {
     "left": -3.5,
     "right": 3.5,
-    "top": 6.5,
+    "top": 7.5,
     "bottom": -5.5
   },
   "variants": [
@@ -20,6 +20,48 @@
     "all-bloom"
   ],
   "patches": [
+    {
+      "name": "texture.unlit.lime",
+      "kind": "texture",
+      "x": -2.5,
+      "y": 6.5,
+      "half": 0.2
+    },
+    {
+      "name": "texture.unlit.pink",
+      "kind": "texture",
+      "x": -1.5,
+      "y": 6.5,
+      "half": 0.2
+    },
+    {
+      "name": "texture.lit.lime",
+      "kind": "texture",
+      "x": -0.5,
+      "y": 6.5,
+      "half": 0.2
+    },
+    {
+      "name": "texture.emissive.lime",
+      "kind": "texture",
+      "x": 0.5,
+      "y": 6.5,
+      "half": 0.2
+    },
+    {
+      "name": "texture.emissive.pink",
+      "kind": "texture",
+      "x": 1.5,
+      "y": 6.5,
+      "half": 0.2
+    },
+    {
+      "name": "texture.unlit.factor",
+      "kind": "texture",
+      "x": 2.5,
+      "y": 6.5,
+      "half": 0.2
+    },
     {
       "name": "unlit.grey0.02",
       "kind": "unlit",

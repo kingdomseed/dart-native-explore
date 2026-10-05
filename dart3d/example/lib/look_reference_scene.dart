@@ -3,10 +3,14 @@
 /// platform and compared (`tool/look_compare.py`).
 ///
 /// The board lies in the XY plane facing the camera, which looks along
-/// +Z through an orthographic projection, so a patch's board
+/// +Z from far away through a narrow lens, so a patch's board
 /// coordinates map linearly to pixels. Two unlit magenta squares mark
 /// the board's top-left and bottom-right corners; the tool finds them
 /// and derives that map, whatever the screen size.
+///
+/// The camera is not orthographic: under an orthographic projection
+/// Filament 1.71 clips a point or spot light to a cross of froxels
+/// once the light is off the view axis.
 ///
 /// Pure Dart (no `dartnative` imports) so the document and the patch
 /// table are reachable under `dart test`.
@@ -14,6 +18,7 @@
 library;
 
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:dart3d/src/scene_model.dart';
 import 'package:vector_math/vector_math.dart';
@@ -84,7 +89,16 @@ enum LookVariant {
 enum LookIbl { none, constant, studio }
 
 /// What a patch shows, which decides the tolerance it is held to.
-enum LookPatchKind { unlit, emissive, sky, lit, sphere, light, shadow }
+enum LookPatchKind {
+  unlit,
+  emissive,
+  texture,
+  sky,
+  lit,
+  sphere,
+  light,
+  shadow,
+}
 
 /// A measured region of the board, in board units (+X right, +Y up).
 final class LookPatch {
@@ -150,7 +164,13 @@ const _emissive = <String, (double, double, double)>{
 };
 const _litGreys = [0.04, 0.18, 0.5, 1.0];
 
+/// sRGB-encoded texel colours of the textured row.
+const _lime = (181, 199, 94);
+const _pink = (250, 96, 166);
+const _midGrey = (128, 128, 128);
+
 /// Row centres, top to bottom.
+const double _yTexture = 6.5;
 const double _yUnlitGrey = 5.5;
 const double _yUnlitHue = 4.5;
 const double _yEmissive = 3.5;
@@ -164,7 +184,7 @@ const double _yShadow = -3.9;
 /// mark it.
 const double kLookBoardLeft = -3.5;
 const double kLookBoardRight = 3.5;
-const double kLookBoardTop = 6.5;
+const double kLookBoardTop = 7.5;
 const double kLookBoardBottom = -5.5;
 const double kLookFiducial = 0.4;
 
@@ -177,6 +197,21 @@ double _col(int i) => _left + i * _cell;
 List<LookPatch> lookReferencePatches() {
   final shift = _shadowShift();
   return [
+    for (final (i, name) in const [
+      'unlit.lime',
+      'unlit.pink',
+      'lit.lime',
+      'emissive.lime',
+      'emissive.pink',
+      'unlit.factor',
+    ].indexed)
+      LookPatch(
+        'texture.$name',
+        LookPatchKind.texture,
+        _col(i),
+        _yTexture,
+        _measure,
+      ),
     for (var i = 0; i < _greys.length; i++)
       LookPatch(
         'unlit.grey${_greys[i]}',
@@ -235,9 +270,17 @@ Vector2 _shadowShift() {
   return Vector2(kLookLightTravel.x * t, kLookLightTravel.y * t);
 }
 
-/// The orthographic half-height that fits the whole board, fiducials
-/// included, into a view of [aspect] (width / height).
-double lookReferenceOrthoScale(double aspect) {
+/// The camera's vertical field of view: narrow, so the spheres and the
+/// shadow's occluder, which stand off the board, shift by about 3% of
+/// their distance from the view axis; not narrower, because Filament
+/// stops lighting with point and spot lights 100 units from the camera
+/// unless told otherwise, and dims them well before that.
+const double kLookFovY = 20 * pi / 180;
+
+/// Half the height of the board plane the camera has to see to fit
+/// the whole board, fiducials included, into a view of [aspect]
+/// (width / height).
+double lookReferenceHalfHeight(double aspect) {
   const margin = 0.3;
   final halfW = (kLookBoardRight - kLookBoardLeft) / 2 + margin;
   final halfH = (kLookBoardTop - kLookBoardBottom) / 2 + margin;
@@ -320,6 +363,67 @@ SceneDocument buildLookReference(LookVariant variant, {required double aspect}) 
       ],
       root: true,
     );
+  }
+
+  // One solid colour as a 4 × 4 sRGB texture.
+  TextureResource texture((int, int, int) c) {
+    final bytes = Uint8List(4 * 4 * 4);
+    for (var i = 0; i < bytes.length; i += 4) {
+      bytes[i] = c.$1;
+      bytes[i + 1] = c.$2;
+      bytes[i + 2] = c.$3;
+      bytes[i + 3] = 255;
+    }
+    final payload = doc.addPayload(
+      PayloadSpec(
+        doc.newId(),
+        encoding: PayloadEncoding.image,
+        format: 'rgba8',
+        width: 4,
+        height: 4,
+        length: bytes.length,
+        bytes: bytes,
+      ),
+    );
+    return doc.addResource(TextureResource(doc.newId(), payload: payload.id));
+  }
+
+  MaterialResource textured(
+    String type,
+    TextureResource tex, {
+    double factor = 1,
+    bool emissive = false,
+  }) => doc.addResource(
+    MaterialResource(
+      doc.newId(),
+      type: type,
+      properties: {
+        if (!emissive) ...{
+          'baseColor': ColorValue(factor, factor, factor, 1),
+          'baseColorTexture': ResourceRefValue(tex.id),
+        },
+        if (emissive) ...{
+          'baseColor': ColorValue(0, 0, 0, 1),
+          'emissive': ColorValue(1, 1, 1, 1),
+          'emissiveTexture': ResourceRefValue(tex.id),
+          'emissiveStrength': DoubleValue(1.3),
+        },
+        if (type != 'unlit') 'roughness': DoubleValue(1),
+      },
+    ),
+  );
+
+  final lime = texture(_lime);
+  final pink = texture(_pink);
+  for (final (i, material) in [
+    textured('unlit', lime),
+    textured('unlit', pink),
+    textured('physicallyBased', lime),
+    textured('physicallyBased', lime, emissive: true),
+    textured('physicallyBased', pink, emissive: true),
+    textured('unlit', texture(_midGrey), factor: 0.5),
+  ].indexed) {
+    mesh('texture.$i', card, material, Vector3(_col(i), _yTexture, 0));
   }
 
   final half = kLookFiducial / 2;
@@ -461,23 +565,24 @@ SceneDocument buildLookReference(LookVariant variant, {required double aspect}) 
     );
   }
 
+  final distance = lookReferenceHalfHeight(aspect) / tan(kLookFovY / 2);
   doc.createNode(
     name: 'look.camera',
     transform: TrsTransform(
       translation: Vector3(
         (kLookBoardLeft + kLookBoardRight) / 2,
         (kLookBoardTop + kLookBoardBottom) / 2,
-        -20,
+        -distance,
       ),
     ),
     components: [
       ComponentSpec(
         'camera',
         properties: {
-          'projection': StringValue('orthographic'),
-          'orthoScale': DoubleValue(lookReferenceOrthoScale(aspect)),
-          'near': DoubleValue(0.5),
-          'far': DoubleValue(60),
+          'projection': StringValue('perspective'),
+          'fovRadiansY': DoubleValue(kLookFovY),
+          'near': DoubleValue(distance - 10),
+          'far': DoubleValue(distance + 10),
         },
       ),
     ],

@@ -62,7 +62,7 @@ void main() {
 
   test('the board fits the view at phone and tablet aspects', () {
     for (final aspect in [0.45, 0.46, 0.625, 1.53]) {
-      final halfH = lookReferenceOrthoScale(aspect);
+      final halfH = lookReferenceHalfHeight(aspect);
       expect(halfH * 2, greaterThan(kLookBoardTop - kLookBoardBottom));
       expect(
         halfH * 2 * aspect,

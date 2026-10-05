@@ -32,6 +32,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 TOLERANCE = {
     'unlit': 8,
     'emissive': 8,
+    'texture': 8,
     'sky': 8,
     'lit': 16,
     'sphere': 16,

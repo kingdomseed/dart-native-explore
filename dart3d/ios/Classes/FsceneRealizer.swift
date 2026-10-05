@@ -2933,7 +2933,8 @@ enum FsceneRealizer {
                     .generateMipmaps: NSNumber(value: true),
                     .SRGB: NSNumber(value: srgb),
                     .textureUsage: NSNumber(
-                        value: MTLTextureUsage.shaderRead.rawValue),
+                        value: MTLTextureUsage.shaderRead.rawValue
+                            | MTLTextureUsage.pixelFormatView.rawValue),
                 ])
             else {
                 host.logOnce("\(logKey).mtl",
@@ -2941,7 +2942,34 @@ enum FsceneRealizer {
                     + "mip chain (sRGB-aware filtering not guaranteed)")
                 return nil
             }
-            return tex
+            return srgb ? srgbTexture(tex, device: device) : tex
+        }
+
+        /// [tex] as an sRGB texture. `MTKTextureLoader` returns
+        /// `rgba8Unorm` for a `CGImage` whatever `.SRGB` says (iOS 27
+        /// and macOS 27 SDKs), so SceneKit sampled every colour
+        /// texture without decoding it: (181, 199, 94) rendered as
+        /// (220, 229, 164). A view with the sRGB format over the same
+        /// storage decodes on sampling, and the mip chain is rebuilt
+        /// through it so each level is filtered in linear light.
+        func srgbTexture(_ tex: MTLTexture, device: MTLDevice) -> MTLTexture {
+            let format: MTLPixelFormat
+            switch tex.pixelFormat {
+            case .rgba8Unorm: format = .rgba8Unorm_srgb
+            case .bgra8Unorm: format = .bgra8Unorm_srgb
+            default: return tex
+            }
+            guard let view = tex.makeTextureView(pixelFormat: format)
+            else { return tex }
+            if view.mipmapLevelCount > 1,
+               let queue = host.commandQueue ?? device.makeCommandQueue(),
+               let buffer = queue.makeCommandBuffer(),
+               let blit = buffer.makeBlitCommandEncoder() {
+                blit.generateMipmaps(for: view)
+                blit.endEncoding()
+                buffer.commit()
+            }
+            return view
         }
 
         /// Level-0 readback of an uncompressed 8-bit MTLTexture into
