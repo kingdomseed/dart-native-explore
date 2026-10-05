@@ -413,10 +413,20 @@ final class SceneViewHost: SCNView {
     }
 
     /// MAIN-THREAD: gives every sibling view (split-screen views) a
-    /// resolve pass of its own with the host's settings.
+    /// resolve pass of its own with the host's settings, its bloom
+    /// chain sized for the sibling's own viewport.
     func applySiblingResolve() {
-        guard let (look, chain) = siblingResolve else { return }
+        guard let (look, hostChain) = siblingResolve else { return }
         for sibling in mainScreenSubviews {
+            let size = sibling.view.bounds.size
+            let chain = hostChain.flatMap { _ in
+                look.bloom.flatMap {
+                    BloomChain(
+                        viewWidth: Int((size.width * 4).rounded()),
+                        viewHeight: Int((size.height * 4).rounded()),
+                        scatter: $0.scatter)
+                }
+            }
             guard let device = sibling.view.device
                     ?? MTLCreateSystemDefaultDevice(),
                   let pass = ToneMapTechnique.make(
@@ -922,6 +932,7 @@ final class SceneViewHost: SCNView {
         if abs(boundsAspect - aspect) > 0.01 {
             enqueueSceneWork { [weak self] in self?.applyToneMap() }
         }
+        applySiblingResolve()
     }
 
     /// A new window can carry a different screen scale — re-snapshot

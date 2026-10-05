@@ -490,6 +490,22 @@ tests incl. determinism, gate, and noise-curl lanes), `dn analyze`
 `swiftc -typecheck` clean on the iPhoneSimulator 27.0 SDK,
 `dn build apk --release` clean (117 MB).
 
+## S0g — look parity (live-verified both platforms)
+
+`docs/android-parity-spec.md` §Light units, `docs/artifacts/s0g-look-parity/README.md`.
+A 12-variant, 48-patch look-reference board (`--dart-define=DART3D_SCENE=lookref`,
+`tool/look_capture.sh`, `tool/look_compare.py`) measures unlit, emissive,
+textured, lit, sphere, light, shadow and sky patches on iOS and Android,
+and all per-platform lighting/stage stopgaps (`kIosDirectionalScale`,
+`DnLogoStage.heroIos` / `heroAndroid`) are removed from the example.
+
+| Lane | iOS sim — observed | Android A142 — observed |
+|---|---|---|
+| Look-reference board (12 variants, 48 patches) | pass — all 8 patch classes within tolerance (≤ 8/255 unlit, emissive, texture, sky; ≤ 16/255 lit, sphere, light, shadow) across all 12 variants (`tables/0-baseline.md` … `tables/10-spot-cone-and-linear-lut.md`) | pass — same (`tables/10-spot-cone-and-linear-lut.md`) |
+| Hero stage (`DnLogoStage.hero`) | pass — logo mean `(156, 145, 106)`, backdrop `(4.4, 10.9, 19.0)` (`img/ios-hero.jpg`, `img/pair-hero4.jpg`) | pass — logo mean `(150, 138, 98)`, backdrop `(5.9, 11.9, 15.4)`, 89.7 fps Vulkan / 83.9 fps GL (`img/a142-vulkan-hero.jpg`) |
+| Dice tray felt + rim | pass — deep indigo felt `(0, 2, 31)`, saturated lime/pink rim `(199, 217, 95)` / `(255, 96, 177)` (`img/ios-dice.jpg`, `img/pair-dice2.jpg`) | pass — felt `(4, 5, 34)`, rim `(199, 221, 96)` / `(255, 97, 179)`, 49.6 fps racked / 50.0 fps rolling on Vulkan (`img/a142-vulkan-dice.jpg`) |
+| T2 smoke + harness (A142 Vulkan + GL, Fire KFTUWI, Wacom DTHA116, iOS sim) | pass — hero, dice, and harness through `w18 lane complete` (incl. `w24` split-screen views and `w25` dice settle), 0 fatal/error lines (`logs/ios-harness.log`) | pass — A142 Vulkan + GL, Fire (57.2 / 44.8 / 44.6 fps), Wacom (58.8 / 51.1 / 43.9 fps), 0 fatal lines (`logs/t2b-*.out`, `logs/h-*.out`) |
+
 ## Notes
 
 - **Runtime-minted payloads need their spec on the op** — the W11

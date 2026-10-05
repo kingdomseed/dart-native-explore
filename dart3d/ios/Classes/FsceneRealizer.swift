@@ -3283,20 +3283,30 @@ enum FsceneRealizer {
             let srgb = tex.content == "color"
             let alphaFold = src.premultiplied ? fa : 1
             let tables: [[UInt8]]? = srgb
-                ? (0..<3).map { srgbScaleTable(fc[$0] * alphaFold) } : nil
+                ? (0..<3).map { srgbScaleTable(fc[$0]) } : nil
             data.withUnsafeMutableBytes { ptr in
                 guard let p = ptr.baseAddress?
                     .assumingMemoryBound(to: UInt8.self) else { return }
                 for i in stride(from: 0, to: src.width * src.height * 4,
                                 by: 4) {
-                    // A premultiplied p.rgb already carries the tex
-                    // alpha; the straight result r·fR·fA comes out as
-                    // pR·fR·fA.
                     if let tables {
-                        p[i]     = tables[0][Int(p[i])]
-                        p[i + 1] = tables[1][Int(p[i + 1])]
-                        p[i + 2] = tables[2][Int(p[i + 2])]
+                        // The tables take a straight encoded colour. A
+                        // premultiplied texel is that colour times its
+                        // alpha, so the alpha comes off first and goes
+                        // back on, with the factor's, afterwards.
+                        let alpha = src.premultiplied ? Double(p[i + 3]) : 255
+                        for c in 0..<3 {
+                            guard alpha > 0 else { p[i + c] = 0; continue }
+                            let straight = min(255, Int(
+                                (Double(p[i + c]) * 255 / alpha).rounded()))
+                            p[i + c] = scaleByte(
+                                tables[c][straight],
+                                alpha / 255 * alphaFold)
+                        }
                     } else {
+                        // A premultiplied p.rgb already carries the tex
+                        // alpha; the straight result r·fR·fA comes out
+                        // as pR·fR·fA.
                         p[i]     = scaleByte(p[i],     fc[0] * alphaFold)
                         p[i + 1] = scaleByte(p[i + 1], fc[1] * alphaFold)
                         p[i + 2] = scaleByte(p[i + 2], fc[2] * alphaFold)

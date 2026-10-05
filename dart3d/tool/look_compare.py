@@ -9,7 +9,8 @@ board (`<variant>.png`, written by tool/look_capture.sh). For every
 variant both directories have, this prints a table of the mean sRGB
 colour of each patch on each side and their difference, then a summary
 per patch kind against the tolerances below. Exits 1 when a kind is
-over its tolerance.
+over its tolerance, and 2 when a variant named with --variants is
+missing from either directory or no variant could be compared at all.
 
 The board carries two magenta squares at its top-left and bottom-right
 corners; their bounding box gives the board-to-pixel map, so the two
@@ -127,11 +128,17 @@ def main():
     wanted = [v for v in args.variants.split(',') if v] or layout['variants']
     kinds = {p['name']: p['kind'] for p in layout['patches']}
     failed = False
+    compared = 0
     for variant in wanted:
         a_path = os.path.join(args.dir_a, variant + '.png')
         b_path = os.path.join(args.dir_b, variant + '.png')
         if not (os.path.exists(a_path) and os.path.exists(b_path)):
+            if args.variants:
+                print(f'{variant}: no capture in both directories',
+                      file=sys.stderr)
+                return 2
             continue
+        compared += 1
         a, b = measure(a_path, layout), measure(b_path, layout)
         print(f'### {variant}\n')
         per_kind = {}
@@ -158,6 +165,9 @@ def main():
                   f' {worst:.1f} ({worst_name}) | {TOLERANCE[kind]} |'
                   f' {"ok" if ok else "over"} |')
         print()
+    if not compared:
+        print('no variant has a capture in both directories', file=sys.stderr)
+        return 2
     return 1 if failed else 0
 
 
