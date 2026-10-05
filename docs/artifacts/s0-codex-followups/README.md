@@ -17,36 +17,39 @@ ones on #45 in the S0g re-realize PR (#52).
 | #48 | 4166383752, the bake reports success with a rejected recipe | **Fixed.** The app logs `bake: fixed set exported (N packages)` only when filamat accepted every recipe; otherwise `bake: fixed set INCOMPLETE (… filamat rejected: <keys>)` at error level. The script copies nothing and exits 1 on that line or on `bake failed`. |
 | #48 | 4166383761, the pull can race a variant compile | **Fixed.** The app logs `bake: variants compiling (n in flight)` when a variant is queued and `bake: variants idle` when the lane is empty; the script waits until the last of those lines is the idle one (up to 5 minutes, then exits 1 without copying). |
 | #48 | 4166383748, stale app variants | **Already fixed** on `main`: the script lists the app's `.filamat` files that the new bake did not produce (`list_stale` over the app directory). It reports and does not delete. |
-| #49 | 4180998566, T2 gaps (Wacom harness, A142 OpenGL) | **Partly closed.** See below. |
+| #49 | 4180998566, T2 gaps (Wacom harness, A142 OpenGL) | **Wacom harness closed; A142 OpenGL hero/dice still owed.** See below. |
 
 ## The T2 gaps from #49
 
 #49 skipped the harness on the Wacom and the A142 on OpenGL. The A142
-and the Wacom were lent to another project while this was being done,
-so:
+was lent to another project while this was being done, so:
 
 | Lane | State |
 |---|---|
 | A142, OpenGL forced, harness | Run on #50's first head (`75e9bbd`, which contains #49): to `w18 lane complete`, 0 FATAL, `GPU: Mali-G610 MC4`, `Filament engine backend: OPENGL (pref=1, tier=STANDARD)`. `docs/artifacts/s0g-android-lifetime/a142-harness-opengl.jpg` in that PR. Not run on `main` itself. |
 | A142, OpenGL forced, boot / hero / dice / roll | **Not run.** |
-| Wacom, harness | **Not run.** |
+| Wacom, harness | Run on this branch: to `w18 lane complete`, 0 FATAL, `GPU: Mali-G57 MC2`, `Filament engine backend: OPENGL (pref=0, tier=LOW)`. `wacom-harness.jpg`. |
 | Fire tablet, harness | Run on this branch: to `w18 lane complete`, 0 FATAL, `GPU: Mali-G52 MC2`, `Filament engine backend: OPENGL (pref=0, tier=LOW)`. `fire-harness.jpg`. |
 
 From here on every native PR runs A142 Vulkan, A142 OpenGL, the Fire
 tablet and the Wacom, each with the harness.
 
-## This branch on the Fire tablet
+## This branch on the tablets
 
-Fresh launch, hero 30 s, dice racked 30 s, 12 rolls 3 s apart, settle;
-0 FATAL. Baseline from `docs/artifacts/s0-three-device-baseline/` in
-brackets.
+Fresh launch, hero 30 s, dice racked 30 s, 12 rolls 3 s apart, settle,
+then the harness to completion; 0 FATAL. fps, baseline from
+`docs/artifacts/s0-three-device-baseline/` in brackets.
 
-| Hero | Dice racked | Dice rolling |
-|---|---|---|
-| 56.0 fps (55.0) | 44.6 fps (44.2) | 44.2 fps (43.7) |
+| Device | Backend, tier | Hero | Dice racked | Dice rolling | Harness |
+|---|---|---|---|---|---|
+| Fire KFTUWI | OPENGL, LOW | 56.0 (55.0) | 44.6 (44.2) | 44.2 (43.7) | complete |
+| Wacom DTHA116 | OPENGL, LOW | 57.8 (57.5) | 51.6 (51.2) | 44.9 (44.1) | complete |
 
-The `submit` column of the perf log, mean of the per-window figures on
-the dice screen, against a run of the old sampling point the same hour
+**Owed: the A142**, Vulkan and OpenGL, each with hero, dice and the
+harness; and one end-to-end run of `bake_materials.sh` there.
+
+The `submit` column of the perf log on the Fire tablet, mean of the
+per-window figures on the dice screen, against a run of the old sampling point the same hour
 (#50's branch, which does not touch it):
 
 | | Old sampling point | This branch |
@@ -57,8 +60,7 @@ the dice screen, against a run of the old sampling point the same hour
 One run each, so the 0.1–0.35 ms difference is an indication of what
 the history read cost, not a measurement of it.
 
-The A142 and the Wacom were not run on this branch.
-`fire-hero.jpg`, `fire-dice.jpg`, `fire-settled.jpg`.
+`fire-*.jpg`, `wacom-*.jpg` (hero, dice, settled, harness).
 
 ## The bake script
 
@@ -76,7 +78,8 @@ The app's side was run on the Fire tablet with the bake tag set
 **The script itself was not run end to end.** On the Fire tablet `adb`
 has no access to the app's external files, so the script stops at its
 first `rm` there, as it did before this change; the A142, where bakes
-have been run, was not available. Not exercised on a device: the
+have been run, was not available, and the Wacom is not a device to
+wipe app files on. Not exercised on a device: the
 `am start` launch from the script, the wait loops, the pull and the
 copy. `sh -n` passes, and the `am start` resolution is the block
 `cold_start.sh` has used since #49. A rejected recipe was not provoked
