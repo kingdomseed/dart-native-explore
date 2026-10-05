@@ -3246,23 +3246,30 @@ enum FsceneRealizer {
             }
             var data = src.data
             let fa = fc[3]
+            // Colour textures hold sRGB bytes; data textures are linear.
+            let srgb = tex.content == "color"
+            let alphaFold = src.premultiplied ? fa : 1
+            let tables: [[UInt8]]? = srgb
+                ? (0..<3).map { srgbScaleTable(fc[$0] * alphaFold) } : nil
             data.withUnsafeMutableBytes { ptr in
                 guard let p = ptr.baseAddress?
                     .assumingMemoryBound(to: UInt8.self) else { return }
                 for i in stride(from: 0, to: src.width * src.height * 4,
                                 by: 4) {
-                    if src.premultiplied {
-                        // p.rgb already carries the tex alpha; the
-                        // straight result r·fR·fA comes out as pR·fR·fA.
-                        p[i]     = scaleByte(p[i],     fc[0] * fa)
-                        p[i + 1] = scaleByte(p[i + 1], fc[1] * fa)
-                        p[i + 2] = scaleByte(p[i + 2], fc[2] * fa)
-                        p[i + 3] = scaleByte(p[i + 3], fa)
+                    // A premultiplied p.rgb already carries the tex
+                    // alpha; the straight result r·fR·fA comes out as
+                    // pR·fR·fA.
+                    if let tables {
+                        p[i]     = tables[0][Int(p[i])]
+                        p[i + 1] = tables[1][Int(p[i + 1])]
+                        p[i + 2] = tables[2][Int(p[i + 2])]
                     } else {
-                        p[i]     = scaleByte(p[i],     fc[0])
-                        p[i + 1] = scaleByte(p[i + 1], fc[1])
-                        p[i + 2] = scaleByte(p[i + 2], fc[2])
-                        if !rgbOnly { p[i + 3] = scaleByte(p[i + 3], fa) }
+                        p[i]     = scaleByte(p[i],     fc[0] * alphaFold)
+                        p[i + 1] = scaleByte(p[i + 1], fc[1] * alphaFold)
+                        p[i + 2] = scaleByte(p[i + 2], fc[2] * alphaFold)
+                    }
+                    if src.premultiplied || !rgbOnly {
+                        p[i + 3] = scaleByte(p[i + 3], fa)
                     }
                 }
             }
@@ -3319,6 +3326,13 @@ enum FsceneRealizer {
         /// Byte channel × unit factor, clamped to 0…255.
         func scaleByte(_ b: UInt8, _ f: Double) -> UInt8 {
             UInt8(clamping: Int((Double(b) * f).rounded()))
+        }
+
+        /// Every sRGB-encoded byte × a linear factor: decode, scale,
+        /// encode. The factor is linear light, so multiplying the
+        /// encoded byte would darken it by about the factor squared.
+        func srgbScaleTable(_ f: Double) -> [UInt8] {
+            (0..<256).map { encodeSrgb(srgbToLinear(Double($0) / 255) * f) }
         }
 
         /// Neutral 1×1 white bound to a shader-modifier `texture2d`
@@ -5134,9 +5148,9 @@ enum FsceneRealizer {
             case "uniform":
                 let a = d3ColorComponents(m["a"]) ?? [1, 1, 1, 1]
                 let b = d3ColorComponents(m["b"]) ?? [1, 1, 1, 1]
-                let mid = UIColor(
-                    red: (a[0] + b[0]) / 2, green: (a[1] + b[1]) / 2,
-                    blue: (a[2] + b[2]) / 2, alpha: (a[3] + b[3]) / 2)
+                let mid = Self.linearColor(
+                    (a[0] + b[0]) / 2, (a[1] + b[1]) / 2,
+                    (a[2] + b[2]) / 2, (a[3] + b[3]) / 2)
                 return .fixed(mid, hsbVariation(a, b))
             case "gradient":
                 let stops = d3GradientStops(m["gradient"])
@@ -7237,7 +7251,23 @@ enum FsceneRealizer {
 
         func d3Color(_ v: Any?) -> UIColor? {
             guard let c = d3ColorComponents(v) else { return nil }
-            return UIColor(red: c[0], green: c[1], blue: c[2], alpha: c[3])
+            return Self.linearColor(c[0], c[1], c[2], c[3])
+        }
+
+        /// A wire colour as SceneKit should read it. Wire colours are
+        /// linear RGB (upstream's `ColorValue`); `UIColor(red:…)` would
+        /// tag the same numbers as sRGB-encoded and SceneKit would
+        /// decode them a second time, so a 0.18 grey rendered as 0.027.
+        static func linearColor(_ r: Double, _ g: Double, _ b: Double,
+                                _ a: Double) -> UIColor {
+            guard let space = CGColorSpace(
+                      name: CGColorSpace.extendedLinearSRGB),
+                  let color = CGColor(
+                      colorSpace: space,
+                      components: [CGFloat(r), CGFloat(g), CGFloat(b),
+                                   CGFloat(a)])
+            else { return UIColor(red: r, green: g, blue: b, alpha: a) }
+            return UIColor(cgColor: color)
         }
 
         func d3Ref(_ v: Any?) -> UInt64? {
