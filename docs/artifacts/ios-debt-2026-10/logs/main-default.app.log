@@ -1,0 +1,43 @@
+dart3d: showcase — dartnative_logo: 6 nodes · 1 geo · 1 mat · 1 tex · 1 anims
+dart3d: hero — frameRadius 1.218 dist 18.474 aspect 0.460 glow 1 mat(s)
+[DN] Launch check ok — app=com.jasonholtdigital.dart3dExample installs=0 tier=free
+dart3d: dice table — background build failed (Invalid argument(s): Illegal argument in isolate message: object is unsendable - Library:'dart:async' Class: _Future@5048458 (see restrictions listed at `SendPort.send()` documentation for more information)
+ <- _physicsEvents in Instance of 'SceneController' (from package:dart3d/src/scene_controller.dart)
+ <- controller in Instance of 'SceneViewLeaf' (from package:dart3d/src/scene_view.dart)
+ <- _widget in Instance of 'SceneViewElement' (from package:dart3d/src/scene_view.dart)
+dart3d: dice table — 7 DartNative dice (logo inside), 31 nodes, 45 payloads, built in 248 ms (dice 236, compose from 246)
+dart3d: dice table ready after 280 ms
+dart3d: dice table handed to the view in 5 ms
+dart3d: dice tray fit 402x874 insets EdgeInsets(l:10.0, t:118.0, r:10.0, b:144.0) → 4.38 px/u, camera 316, play x -42.7..42.7 z -65.9..71.9
+dart3d: dice roll throw — strength 0.80 dir (-1, -1) gates [0, 2]
+dart3d: dice gates closed after 0.26 s
+dart3d: dice cocked d12 (up 0.853) → nudge #1
+dart3d: dice d4 turns 156° to read upright
+dart3d: dice settled — d4=2 (up 1.000 at -22.1,4.4,-13.1) d6=6 (up 1.000 at 29.2,6.9,-55.6) d8=4 (up 1.000 at -4.7,5.3,-48.8) d10t=50 (up 0.997 at -24.2,6.0,-42.8) d10u=4 (up 0.996 at -16.7,6.0,-55.5) d12=3 (up 1.000 at -32.1,7.9,-27.0) d20=11 (up 0.999 at -33.5,7.6,-54.9) [1 nudge]
+dart3d: dice readout d4 2 · d6 6 · d8 4 · d12 3 · d20 11 · d% 50+4 = 80
+dart3d: dice settled — d4=2 (up 1.000 at -17.6,4.4,-11.5) d6=6 (up 1.000 at 29.2,6.9,-55.6) d8=4 (up 1.000 at -4.7,5.3,-48.8) d10t=50 (up 0.997 at -24.2,6.0,-42.8) d10u=4 (up 0.996 at -16.7,6.0,-55.5) d12=3 (up 1.000 at -32.3,7.9,-27.1) d20=11 (up 0.999 at -33.5,7.6,-54.9) [1 nudge]
+dart3d: dice readout d4 2 · d6 6 · d8 4 · d12 3 · d20 11 · d% 50+4 = 80
+dart3d: dice roll throw — strength 0.80 dir (0, -1) gates [1, 2]
+dart3d: dice gates closed after 0.37 s
+dart3d: dice d4 turns -66° to read upright
+dart3d: dice settled — d4=3 (up 1.000 at -32.2,4.4,-9.8) d6=5 (up 1.000 at 21.5,6.9,-56.2) d8=3 (up 1.000 at 33.7,5.3,-26.7) d10t=30 (up 0.997 at 35.3,6.0,-56.9) d10u=3 (up 0.997 at -0.1,6.0,-53.5) d12=10 (up 1.000 at 32.1,7.9,-40.0) d20=17 (up 0.999 at 8.1,7.5,-39.7)
+dart3d: dice readout d4 3 · d6 5 · d8 3 · d12 10 · d20 17 · d% 30+3 = 71
+dart3d: dice settled — d4=3 (up 1.000 at -32.1,4.4,-9.7) d6=5 (up 1.000 at 21.5,6.9,-56.2) d8=3 (up 1.000 at 33.7,5.3,-26.7) d10t=30 (up 0.997 at 35.3,6.0,-56.9) d10u=3 (up 0.997 at -0.1,6.0,-53.5) d12=10 (up 1.000 at 32.1,7.9,-40.0) d20=17 (up 0.999 at 8.1,7.5,-39.8)
+dart3d: dice readout d4 3 · d6 5 · d8 3 · d12 10 · d20 17 · d% 30+3 = 71
+dart3d: dice aim throw — strength 0.80 dir (150, 300) gates [1, 3]
+dart3d: dice gates closed after 0.31 s
+dart3d: dice d4 turns -131° to read upright
+dart3d: dice settled — d4=1 (up 1.000 at 20.0,4.4,42.0) d6=5 (up 1.000 at 34.0,6.9,47.3) d8=4 (up 1.000 at 3.2,5.3,64.2) d10t=50 (up 1.000 at 32.4,6.0,25.8) d10u=9 (up 0.997 at 35.1,6.0,62.6) d12=10 (up 1.000 at 17.5,7.9,57.1) d20=18 (up 0.999 at -1.0,7.6,48.1)
+dart3d: dice readout d4 1 · d6 5 · d8 4 · d12 10 · d20 18 · d% 50+9 = 97
+dart3d: dice settled — d4=1 (up 1.000 at 21.3,4.4,37.6) d6=5 (up 1.000 at 34.0,6.9,47.5) d8=4 (up 1.000 at 3.2,5.3,64.2) d10t=50 (up 0.997 at 32.0,6.0,26.0) d10u=9 (up 0.997 at 35.1,6.0,62.6) d12=10 (up 1.000 at 17.2,7.9,57.7) d20=18 (up 0.999 at -1.0,7.6,48.0)
+dart3d: dice readout d4 1 · d6 5 · d8 4 · d12 10 · d20 18 · d% 50+9 = 97
+dart3d: dice picked up (hover 68)
+dart3d: dice tossed — fling 1803 px/s (tracked, 5 moves, last 0 ms before release) → 15.1 u/s
+dart3d: dice d4 turns -67° to read upright
+dart3d: dice settled — d4=3 (up 1.000 at -25.6,4.4,32.3) d6=4 (up 1.000 at 26.8,6.9,50.6) d8=7 (up 1.000 at -35.4,5.3,24.7) d10t=0 (up 0.997 at -18.0,6.0,56.4) d10u=0 (up 0.997 at -35.2,6.0,62.1) d12=6 (up 0.997 at -14.0,7.7,7.8) d20=19 (up 0.999 at 12.5,7.6,59.8)
+dart3d: dice readout d4 3 · d6 4 · d8 7 · d12 6 · d20 19 · d% 00+0 = 139
+dart3d: dice timeout — d4=3 (up 1.000 at -25.2,4.4,32.5) d6=4 (up 1.000 at 26.8,6.9,50.6) d8=7 (up 1.000 at -35.5,5.3,24.4) d10t=0 (up 0.997 at -18.0,6.0,56.4) d10u=0 (up 0.997 at -35.2,6.0,62.1) d12=6 (up 0.997 at -14.0,7.7,7.8) d20=19 (up 0.999 at 12.5,7.6,59.8)
+dart3d: dice readout d4 3 · d6 4 · d8 7 · d12 6 · d20 19 · d% 00+0 = 139
+dart3d: dice sweep
+dart3d: dice settled — d4=3 (up 1.000 at -19.7,4.4,51.4) d6=4 (up 1.000 at 31.2,6.9,24.3) d8=1 (up 1.000 at -34.9,5.3,43.6) d10t=0 (up 0.997 at -12.5,6.0,62.2) d10u=0 (up 0.997 at -33.7,6.0,63.5) d12=3 (up 1.000 at -23.3,16.6,48.7) d20=5 (up 0.999 at 28.7,7.6,60.3)
+dart3d: dice readout d4 3 · d6 4 · d8 1 · d12 3 · d20 5 · d% 00+0 = 116

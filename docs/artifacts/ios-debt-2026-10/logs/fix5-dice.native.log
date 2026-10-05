@@ -1,0 +1,84 @@
+2026-10-05 17:22:28.525 Df Runner[54441:5f1fb8] [com.jasonholtdigital.dart3d:scene] protocol hello: Dart v1.0
+2026-10-05 17:22:28.788 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] texture 8510600786491736068: awaiting payload
+2026-10-05 17:22:28.788 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] texture 8510600786491736112: awaiting payload
+2026-10-05 17:22:28.789 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] texture 8510600786491736148: awaiting payload
+2026-10-05 17:22:28.789 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] texture 8510600786491736118: awaiting payload
+2026-10-05 17:22:28.789 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] texture 8510600786491736136: awaiting payload
+2026-10-05 17:22:28.789 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] texture 8510600786491736142: awaiting payload
+2026-10-05 17:22:28.789 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] texture 15098553606423291700: awaiting payload
+2026-10-05 17:22:28.789 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] texture 8510600786491736130: awaiting payload
+2026-10-05 17:22:28.789 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] texture 8510600786491736124: awaiting payload
+2026-10-05 17:22:28.797 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736110: awaiting payload
+2026-10-05 17:22:28.797 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736084: awaiting payload
+2026-10-05 17:22:28.807 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736134: awaiting payload
+2026-10-05 17:22:28.807 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736116: awaiting payload
+2026-10-05 17:22:28.807 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 9905876305408183229: awaiting payload
+2026-10-05 17:22:28.807 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736096: awaiting payload
+2026-10-05 17:22:28.807 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736122: awaiting payload
+2026-10-05 17:22:28.807 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736128: awaiting payload
+2026-10-05 17:22:28.807 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736140: awaiting payload
+2026-10-05 17:22:28.807 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736080: awaiting payload
+2026-10-05 17:22:28.807 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736088: awaiting payload
+2026-10-05 17:22:28.807 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736146: awaiting payload
+2026-10-05 17:22:28.807 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736076: awaiting payload
+2026-10-05 17:22:28.808 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736072: awaiting payload
+2026-10-05 17:22:28.808 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736092: awaiting payload
+2026-10-05 17:22:28.808 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736100: awaiting payload
+2026-10-05 17:22:28.811 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] mesh node 'die.d8.logo': geometry unresolved
+2026-10-05 17:22:28.811 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] mesh node 'tray.rim.bar.top': geometry unresolved
+2026-10-05 17:22:28.811 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] mesh node 'die.d20.logo': geometry unresolved
+2026-10-05 17:22:28.811 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] mesh node 'tray.rim.bar.left': geometry unresolved
+2026-10-05 17:22:28.811 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] mesh node 'tray.rim.bar.right': geometry unresolved
+2026-10-05 17:22:28.811 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] mesh node 'die.d10t': geometry unresolved
+2026-10-05 17:22:28.811 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] mesh node 'die.d4.logo': geometry unresolved
+2026-10-05 17:22:28.811 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] mesh node 'tray.rim.corner.br': geometry unresolved
+2026-10-05 17:22:28.811 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] mesh node 'tray.rim.corner.bl': geometry unresolved
+2026-10-05 17:22:28.811 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] mesh node 'die.d10u.logo': geometry unresolved
+2026-10-05 17:22:28.811 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] mesh node 'die.d20': geometry unresolved
+2026-10-05 17:22:28.811 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] mesh node 'die.d4': geometry unresolved
+2026-10-05 17:22:28.811 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] mesh node 'tray.rim.corner.tr': geometry unresolved
+2026-10-05 17:22:28.812 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] mesh node 'die.d12': geometry unresolved
+2026-10-05 17:22:28.812 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] mesh node 'die.d10t.logo': geometry unresolved
+2026-10-05 17:22:28.812 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] mesh node 'die.d6': geometry unresolved
+2026-10-05 17:22:28.812 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] mesh node 'die.d12.logo': geometry unresolved
+2026-10-05 17:22:28.812 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] mesh node 'die.d6.logo': geometry unresolved
+2026-10-05 17:22:28.812 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] mesh node 'tray.rim.corner.tl': geometry unresolved
+2026-10-05 17:22:28.812 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] mesh node 'tray.rim.bar.bottom': geometry unresolved
+2026-10-05 17:22:28.812 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] mesh node 'die.d8': geometry unresolved
+2026-10-05 17:22:28.812 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] mesh node 'die.d10u': geometry unresolved
+2026-10-05 17:22:28.812 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] animation 15499607451436264089: awaiting channel payloads
+2026-10-05 17:22:28.813 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] collider 'convexHull': node has no geometry
+2026-10-05 17:22:28.813 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] collider 'convexHull': node has no geometry
+2026-10-05 17:22:28.813 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] collider 'convexHull': node has no geometry
+2026-10-05 17:22:28.813 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] collider 'convexHull': node has no geometry
+2026-10-05 17:22:28.813 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] collider 'convexHull': node has no geometry
+2026-10-05 17:22:28.813 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] collider 'convexHull': node has no geometry
+2026-10-05 17:22:28.813 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] collider 'convexHull': node has no geometry
+2026-10-05 17:22:28.820 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] toneMapping 'pbrNeutral': iOS keeps SceneKit's filmic operator — approximation
+2026-10-05 17:22:28.872 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] environment 128x64 upscaled to 256x128: below the radiance mip floor
+2026-10-05 17:22:28.908 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] texture 8510600786491736068: 64x1 rgba8 (256 B in 9.42 ms)
+2026-10-05 17:22:28.968 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] texture 8510600786491736112: 519x346 png (10980 B in 59.98 ms)
+2026-10-05 17:22:28.974 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] texture 8510600786491736148: 740x592 png (45368 B in 6.02 ms)
+2026-10-05 17:22:28.981 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] texture 8510600786491736118: 738x492 png (26541 B in 6.86 ms)
+2026-10-05 17:22:28.990 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] texture 8510600786491736136: 888x666 png (36004 B in 8.98 ms)
+2026-10-05 17:22:28.997 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] texture 8510600786491736142: 604x453 png (42662 B in 6.90 ms)
+2026-10-05 17:22:29.005 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] texture 15098553606423291700: 1024x1024 rgba8 (4194304 B in 7.97 ms)
+2026-10-05 17:22:29.013 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] texture 8510600786491736130: 888x666 png (43686 B in 8.28 ms)
+2026-10-05 17:22:29.020 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] texture 8510600786491736124: 561x561 png (29462 B in 6.26 ms)
+2026-10-05 17:22:29.021 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736110: decoded 452 verts in 0.79ms
+2026-10-05 17:22:29.021 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736084: decoded 4 verts in 0.04ms
+2026-10-05 17:22:29.022 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736134: decoded 450 verts in 0.72ms
+2026-10-05 17:22:29.022 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736116: decoded 270 verts in 0.44ms
+2026-10-05 17:22:29.038 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 9905876305408183229: decoded 7685 verts in 15.95ms
+2026-10-05 17:22:29.038 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736096: decoded 22 verts in 0.07ms
+2026-10-05 17:22:29.039 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736122: decoded 272 verts in 0.45ms
+2026-10-05 17:22:29.040 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736128: decoded 450 verts in 0.72ms
+2026-10-05 17:22:29.041 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736140: decoded 672 verts in 1.06ms
+2026-10-05 17:22:29.041 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736080: decoded 4 verts in 0.03ms
+2026-10-05 17:22:29.041 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736088: decoded 22 verts in 0.06ms
+2026-10-05 17:22:29.042 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736146: decoded 680 verts in 1.05ms
+2026-10-05 17:22:29.042 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736076: decoded 4 verts in 0.03ms
+2026-10-05 17:22:29.042 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736072: decoded 4 verts in 0.03ms
+2026-10-05 17:22:29.042 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736092: decoded 22 verts in 0.06ms
+2026-10-05 17:22:29.043 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] geometry 8510600786491736100: decoded 22 verts in 0.06ms
+2026-10-05 17:22:29.111 Df Runner[54441:5f20ce] [com.jasonholtdigital.dart3d:scene] re-realize: restored 28 written transform(s)
