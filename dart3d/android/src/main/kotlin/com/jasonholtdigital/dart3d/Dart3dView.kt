@@ -1269,7 +1269,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             "pbrNeutral" -> ToneMapper.PBRNeutralToneMapper()
             "agx" -> ToneMapper.Agx()
             "filmic" -> ToneMapper.Filmic()
-            "aces" -> ToneMapper.ACES()
+            // Upstream's `aces` is the Hill fit with its 1/0.6 input
+            // gain; Filament's ACESLegacy is its ACES with that gain.
+            "aces" -> ToneMapper.ACESLegacy()
             "linear" -> ToneMapper.Linear()
             else -> {
                 logCommandOnce("stage.toneMapping.$toneMapping",
