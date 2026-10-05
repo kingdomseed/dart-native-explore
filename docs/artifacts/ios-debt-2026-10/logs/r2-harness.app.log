@@ -1,0 +1,103 @@
+dart3d: contact triggerEntered a=87 b=80
+dart3d: contact triggerEntered a=87 b=80
+dart3d: contact triggerExited a=87 b=80
+dart3d: contact triggerEntered a=87 b=80
+dart3d: contact triggerEntered a=87 b=80
+dart3d: contact triggerExited a=87 b=80
+dart3d: contact triggerEntered a=87 b=80
+dart3d: contact triggerEntered a=87 b=80
+dart3d: contact triggerExited a=87 b=80
+dart3d: contact triggerEntered a=87 b=80
+dart3d: contact triggerEntered a=87 b=80
+dart3d: contact triggerExited a=87 b=80
+dart3d: queries: pose:(-1.45,-0.00,0.85) · ray:n79@1.50,n82@2.50,n86@4.50 · overlap:5 · cast:n79@1.20
+dart3d: joint rig landed — 10 joints
+dart3d: joint broke #9 a=57 b=58
+dart3d: w11 phase — flag skin, morph blob, wave+pulse
+dart3d: w11 j1 rot=(-0.00,-0.00,-0.22,0.98) t=0.60 live=(-0.00,-0.00,-0.08,1.00)
+dart3d: w11 j1 rot=(0.00,0.00,0.11,0.99) t=1.20 live=(-0.00,-0.00,0.04,1.00)
+dart3d: w11 j1 rot=(0.00,0.00,0.11,0.99) t=1.80 live=(-0.00,-0.00,0.04,1.00)
+dart3d: w11 j1 rot=(-0.00,-0.00,-0.22,0.98) t=0.40 live=(-0.00,-0.00,-0.04,1.00)
+dart3d: w11 j1 rot=(0.00,0.00,0.00,1.00) t=1.00 live=(-0.00,-0.00,0.00,1.00)
+dart3d: w11 j1 rot=(0.00,0.00,0.22,0.98) t=1.60 live=(-0.00,-0.00,0.04,1.00)
+dart3d: w11 j1 rot=(-0.00,-0.00,-0.03,1.00) t=0.95 live=(-0.00,-0.00,-0.00,1.00)
+dart3d: w11 j1 rot=(0.00,0.00,0.25,0.97) t=1.55 live=(-0.00,-0.00,0.04,1.00)
+dart3d: w11 j1 rot=(-0.00,-0.00,-0.08,1.00) t=0.15 live=(-0.00,-0.00,-0.01,1.00)
+dart3d: w11 j1 rot=(-0.00,-0.00,-0.14,0.99) t=0.75 live=(-0.00,-0.00,-0.02,1.00)
+dart3d: w11 j1 rot=(0.00,0.00,0.19,0.98) t=1.35 live=(-0.00,-0.00,0.03,1.00)
+dart3d: w11 j1 rot=(0.00,0.00,0.03,1.00) t=1.95 live=(-0.00,-0.00,0.00,1.00)
+dart3d: w12 phase — joint components + variants + rectAreaLight
+dart3d: w12 phase — joint components, variants, rectAreaLight, enabled:false
+dart3d: w11 stop-rest switch PASS want=0.50rad live=(-0.000,-0.000,0.247,0.969)
+dart3d: contact triggerEntered a=87 b=80
+dart3d: contact triggerEntered a=87 b=80
+dart3d: contact triggerExited a=87 b=80
+dart3d: w11 stop-rest rest PASS want=0.00rad live=(-0.000,-0.000,0.000,1.000)
+dart3d: w12 poses[3s] anchor=(2.90,1.59,0.20) free=(3.51,-0.35,0.23) linkA=(-3.00,-0.35,0.20) linkB=(-2.40,-0.35,0.20)
+dart3d: w12 poses[11s] anchor=(2.90,1.59,0.20) free=(3.51,-0.35,0.23) linkA=(-3.00,-0.35,0.20) linkB=(-2.40,-0.35,0.20)
+dart3d: w13 phase — environment effects toggles
+dart3d: w13 bloom on
+dart3d: w13 bloom+ao on
+dart3d: w13 bloom+ao+fog on
+dart3d: w13 bloom+ao+fog+dof stack
+dart3d: w13 swap vignette+ca+colorGrading
+dart3d: w13 filmGrain+autoExposure on
+dart3d: w13 effects reset
+dart3d: w13 overridesEffects:false — effects key omitted
+dart3d: w14 phase — render textures + views
+dart3d: w14 rt live
+dart3d: w14 manual view added
+dart3d: w14 manual render
+dart3d: w14 second rt producer
+dart3d: w14 views reduced
+dart3d: w14 stage quality
+dart3d: w14 stage reset
+dart3d: w14 showcase
+dart3d: wloose phase — ccd + bowl + margin + settle latency
+dart3d: wloose probes spawned — ccd drop, bowl drop; margin drop waits for quiet
+dart3d: wloose ccd pose=(3.30,0.37,2.60) PASS rests on slab
+dart3d: wloose bowl pose=(-2.28,-0.31,2.05) PASS contained
+dart3d: wloose margin drop spawned
+dart3d: wloose removed w5NoRest,j9.liftPlate,j9.chainAnchor,j9.chain1,j9.chain2,j9.chain3,j9.chain4,j9.breakBox — settle events live
+dart3d: wloose margin mid=(5.50,0.10,0.50)
+dart3d: wloose margin pose=(5.50,0.10,0.50) PASS gap=0.55 above visual
+dart3d: wloose settle: 4668ms (roll 1 via pose-quiescence, die (-0.00,-0.00,2.51))
+dart3d: wloose settle: 4697ms (roll 2 via pose-quiescence, die (-0.00,-0.00,2.51))
+dart3d: wloose settle: 1798ms (roll 3 via event, die (-0.00,-0.00,2.51))
+dart3d: wloose settled event path: seen
+dart3d: w15 phase — lazy prefab subtree streaming
+dart3d: w15 loadSubtree A#1 sent t=1791218557454
+dart3d: w15 loadSubtree B#1 sent t=1791218558668
+dart3d: w15 deferred peak chunk sent t=1791218559868
+dart3d: w15 unloadSubtree A#1 sent t=1791218561068
+dart3d: w15 loadSubtree A#2 sent t=1791218562268
+dart3d: w15 unloadSubtree A#2 sent t=1791218563468
+dart3d: w15 loadSubtree A#3 sent t=1791218564668
+dart3d: w15 unloadSubtree A#3 sent t=1791218565868
+dart3d: w15 loadSubtree A#4 sent t=1791218567068
+dart3d: w15 lane complete — 5 loads, 3 unloads (3 cycles on streamA; expected final state: both grids live)
+dart3d: w24 phase — split-screen, viewport, cascades, contact shadows, catcher, layerMask
+dart3d: w24 shadow breadth + catcher + layer marker
+dart3d: w24 split-screen views
+dart3d: w24 viewport inset
+dart3d: w24 layerMask 8-bit lane
+dart3d: w24 views restored — lane complete
+dart3d: w16 phase — trail ribbon + screen-size lod drive
+dart3d: w16 mover home — lod/trail lane done
+dart3d: w25 phase — LUT + effects matrix lanes
+dart3d: w25 LUT chunk ref staged — payload deferred
+dart3d: w25 LUT payload landed — deferred grade applies
+dart3d: w25 LUT blend 0.35
+dart3d: w25 LUT asset path (assets/luts/cool.cube)
+dart3d: w25 filmGrain+autoExposure on
+dart3d: w25 ssr+lensFlare on
+dart3d: w25 godRays+standalone CA on
+dart3d: w25 effects reset
+dart3d: w25 lane complete — dice regression PASS: die ESH69F800004Y rolled and settled after the effects sweep; expected final state: all effects off
+dart3d: w18 phase — particle emitters
+dart3d: w18 phase — flipbook fountain, additive streaks, mesh tumble pool, enabled:false gate
+dart3d: w18 gated emitter enabled (components update)
+dart3d: w18 streaks hidden
+dart3d: w18 streaks restored
+dart3d: w18 gated node removed
+dart3d: w18 lane complete — expected: fountain + streaks + mesh pool live, gated ran +6 s…+14 s then removed

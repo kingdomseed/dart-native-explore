@@ -28,9 +28,12 @@ pays that debt on the one simulator the operator re-enabled.
 | `base-harness` | `19a3eff` with main's `dart3d/ios/Classes` | the same, as the baseline for the native changes |
 | `head-showcase` | `19a3eff` | Showcase (materials, glb, playground, cube, prefabs, triangles, fcar, dash) → Back → hero → dice, 2 rolls |
 
+| `r2-harness`, `r2-dice` | `19a3eff` + the review fixes (the head of this branch) | the harness to its last lane; rack, a roll, hold-and-toss |
+
 `32ab307` is main plus the isolate fix and the shadow range and
-samples; `19a3eff` adds the blended shadow casters. The code on this
-branch after `19a3eff` is docs and evidence only.
+samples; `19a3eff` adds the blended shadow casters. After `19a3eff`
+the only code change is the review round (below), which the `r2` runs
+cover; lanes (a)–(i) were not repeated on it.
 
 Per run under `logs/`: `<run>.app.log` (the app's `dart3d:` lines),
 `<run>.native.log` (the plugin's and SceneKit's lines, without the
@@ -61,8 +64,9 @@ Three SceneKit or CoreAnimation lines appear, in the harness only:
 | `coreanimation … deleted thread with uncommitted CATransaction` (W16) | 1 | 0 |
 
 The first two are on main as well. The third appeared once, in one of
-two harness runs; it did not appear in the dice or Showcase runs that
-use the same new code every frame. Not explained.
+three harness runs on the new code (`r2-harness`: 0); it did not appear
+in the dice or Showcase runs that use the same code every frame. Not
+explained.
 
 ## Dice lanes
 
@@ -122,6 +126,27 @@ behind them; fcar's glass still shows its interior; no doubled
 shadows or z-fighting seen. Not covered: a skinned or morphed blended
 mesh (left out of the fix), and any frame-time cost below what a
 60 fps HUD on a simulator shows.
+
+### Review round (Codex on `81b8939`)
+
+Four changes to fixes 2 and 3, then `r2-harness` (every lane, the same
+PASS lines, 0 error lines) and `r2-dice` (a roll, a hold-and-toss with
+the shadows following the held dice: `r2-hold.jpg`):
+
+- The stand-ins were rebuilt on every command, and the dice screen
+  sends a pose query every frame of a roll. Now only the ops that can
+  change a mesh, its materials or the hierarchy rebuild them.
+- Camera-facing meshes (lines, billboards) are left out: their
+  geometry is rebuilt toward the camera every frame, so a stand-in was
+  rebuilt and hidden every frame.
+- Each element of a stand-in keeps its own sidedness.
+- A directional light's authored `shadowMaxDistance` is its shadow
+  range again (the harness authors 60); only a light without one gets
+  the unlimited range.
+
+Known cost, not fixed: the stand-in's depth is in the camera's depth
+buffer once the frame is drawn, so depth of field treats what shows
+through a blended mesh as lying on its surface.
 
 ## #55 (`s0g-ios-dynamic-body-reseat`)
 
@@ -186,5 +211,6 @@ shadows).
 - Landscape → portrait on iOS.
 - A real finger, and the platform's fling velocity.
 - A physical iOS device: frame rate, TAA, a real GPU.
-- Shadows of skinned or morphed blended meshes on iOS.
+- Shadows of skinned, morphed or camera-facing blended meshes on iOS.
+- Depth of field through a blended mesh on iOS (see the review round).
 - Body state across a re-realize on iOS (not built).

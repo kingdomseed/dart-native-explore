@@ -148,8 +148,10 @@ off). Evidence for everything below: `docs/artifacts/ios-debt-2026-10/`.
   real GPU.
 - **#39 on the OpenGL backend** (Android) — unchanged by this run.
 - **Body state across a re-realize on iOS** — not built.
-- **The blended-mesh shadow stand-in on skinned or morphed meshes** —
-  left out of the fix; such a mesh still casts nothing on iOS.
+- **The blended-mesh shadow stand-in on skinned, morphed or
+  camera-facing meshes** — left out of the fix; such a mesh still
+  casts nothing on iOS. The stand-in also writes camera depth, so
+  depth of field through a blended mesh reads the mesh's surface.
 - The S0g appearance items (light units, colour saturation): the felt
   reads grey and the rim pale on iOS; pairs are in the README.
 

@@ -1,0 +1,15 @@
+dart3d: dice table — 7 DartNative dice (logo inside), 31 nodes, 45 payloads, built in 418 ms (dice 399, compose from 413)
+dart3d: dice table ready after 432 ms
+dart3d: dice table handed to the view in 11 ms
+dart3d: dice tray fit 402x874 insets EdgeInsets(l:10.0, t:118.0, r:10.0, b:144.0) → 4.38 px/u, camera 316, play x -42.7..42.7 z -65.9..71.9
+dart3d: dice roll throw — strength 0.66 dir (1, -0) gates [1]
+dart3d: dice gates closed after 0.26 s
+dart3d: dice settled — d4=3 (up 1.000 at 29.6,4.4,12.8) d6=3 (up 1.000 at 30.1,6.9,-8.0) d8=1 (up 1.000 at 5.8,5.3,-57.0) d10t=40 (up 0.996 at 1.2,6.0,-42.6) d10u=8 (up 1.000 at 15.9,6.0,62.4) d12=5 (up 1.000 at 28.0,7.9,-48.8) d20=2 (up 0.999 at 26.9,7.6,-31.7)
+dart3d: dice readout d4 3 · d6 3 · d8 1 · d12 5 · d20 2 · d% 40+8 = 62
+dart3d: dice picked up (hover 68)
+dart3d: dice tossed — fling 1897 px/s (tracked, 5 moves, last 2 ms before release) → 15.9 u/s
+dart3d: dice d4 turns -48° to read upright
+dart3d: dice settled — d4=2 (up 1.000 at 26.9,4.4,-33.1) d6=1 (up 1.000 at 32.2,6.9,-20.9) d8=6 (up 1.000 at 9.9,5.3,-39.5) d10t=80 (up 1.000 at -6.9,6.0,-50.0) d10u=5 (up 0.997 at -5.9,6.0,-25.6) d12=11 (up 1.000 at 18.4,7.9,-12.8) d20=13 (up 0.999 at 24.0,7.6,-56.1)
+dart3d: dice readout d4 2 · d6 1 · d8 6 · d12 11 · d20 13 · d% 80+5 = 118
+dart3d: dice settled — d4=2 (up 1.000 at 27.2,4.4,-33.0) d6=1 (up 1.000 at 32.2,6.9,-20.9) d8=6 (up 1.000 at 9.9,5.3,-39.5) d10t=80 (up 1.000 at -6.9,6.0,-50.0) d10u=5 (up 0.997 at -5.9,6.0,-25.6) d12=11 (up 1.000 at 18.4,7.9,-12.8) d20=13 (up 0.999 at 24.0,7.6,-56.1)
+dart3d: dice readout d4 2 · d6 1 · d8 6 · d12 11 · d20 13 · d% 80+5 = 118
