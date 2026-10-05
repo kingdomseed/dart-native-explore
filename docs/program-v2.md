@@ -93,6 +93,12 @@ evidence only. #39 changed Android culling natively and has no iOS or
 GL-backend run. Owed when iOS is re-enabled: T2 on the simulator plus the
 dice lanes (readout, d4 turn, cocked nudge, gestures, numerals, culling
 parity). The toss gesture has only been driven by scripted swipes.
+From S0g: the two iOS ordering fixes in the re-realize PR are
+type-checked only; `s0g-ios-dynamic-body-reseat` (`resetTransform()`
+for dynamic bodies on restore and on `setTransforms`, whole-pose
+restore) is a draft that must not merge before the dice screen, rolls
+and a rotation refit have run on iOS; body state across a re-realize
+is not built on iOS.
 
 **Review.** Codex code review is out of quota; PRs since #36 were
 reviewed by an Opus reviewer agent, each finding checked against the
@@ -210,12 +216,11 @@ Rules:
       broke, and the close-out used a random throw that can leave the
       slab). Also the #45 review threads: a rejected `addNode` or
       `updateNode` no longer drops a saved transform (both natives),
-      iOS restores in two passes and restores a dynamic body's whole
-      pose. **Open:** the iOS half of the body state (described, not
-      built: iOS is paused) and a device run of the three iOS fixes,
-      which are type-checked only and now include `resetTransform()`
-      for dynamic bodies on the roll path; T2 on the A142 for the
-      final head (Vulkan and OpenGL). Evidence:
+      iOS restores in two passes. T2 on all three devices, A142 on
+      both backends. **Open, all iOS:** the body state (described, not
+      built); a run of the two ordering fixes (type-checked only); and
+      `s0g-ios-dynamic-body-reseat`, which holds the changes to how iOS
+      moves a dynamic body until they have run there. Evidence:
       `docs/artifacts/s0g-physics-rerealize/`
 - [x] S0h Android cold-start material compile — **done** (#48; tablet
       run 2026-10-05). Root cause: filamat's SPIR-V optimizer, 3–6 s

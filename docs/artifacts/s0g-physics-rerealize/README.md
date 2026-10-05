@@ -15,8 +15,10 @@ Release builds, `dn run -d <serial> --release` from `dart3d/example`.
   fallback. Two causes, both in the harness scene, neither in the
   engine.
 - Review threads on #45: the partial-mask snap is fixed on Android by
-  the same change; three more are fixed on both natives (iOS
-  type-checked only).
+  the same change. Two ordering fixes are in for iOS, type-checked
+  only. The iOS changes that alter how a dynamic body is moved are not
+  in this PR; they wait for an iOS run in
+  `s0g-ios-dynamic-body-reseat`.
 
 ## Body state
 
@@ -100,14 +102,14 @@ was added.
 | `w25 lane complete` | FAIL | PASS |
 
 A142 Vulkan: `harness-main-a142-vulkan.log`, `harness-a142-vulkan.log`.
-Fire tablet and Wacom (both OpenGL, LOW): PASS, `harness-fire.log`,
-`harness-wacom.log`.
+A142 OpenGL, Fire tablet and Wacom: PASS, `harness-a142-opengl.log`,
+`harness-fire.log`, `harness-wacom.log`.
 
 ## Review threads on #45
 
 | Thread | Verdict |
 |---|---|
-| 4160436716, partial mask snaps a moving body's unwritten fields | **Fixed, Android**: the whole simulated pose is restored after the written fields. **iOS**: `restoreTransformWrites` restores position and rotation for a dynamic body whatever the mask. Type-checked, not run. |
+| 4160436716, partial mask snaps a moving body's unwritten fields | **Fixed on Android**: the whole simulated pose is restored after the written fields. **iOS: not in this PR.** Restoring a dynamic body's whole pose there changes how dice are placed after a load, so it is in `s0g-ios-dynamic-body-reseat` until it has run on iOS. |
 | 4160325887, iOS resets a child's body before its parent is restored | **Fixed**: fields in one pass, body resets in a second. Type-checked, not run. |
 | 4160325907, a rejected `addNode`/`updateNode` still dropped the saved write | **Fixed on both**: supersession moved into the handlers, after validation. iOS type-checked, not run. |
 | 4160325876, descendants of a removed node stayed tracked | Already fixed on `main`: Android `supersedeAll(doomed)` over the whole removed set, iOS `transformWrites[k] = nil` per removed node in `removeSubtree`. |
@@ -118,11 +120,31 @@ Fire tablet and Wacom (both OpenGL, LOW): PASS, `harness-fire.log`,
 | Thread | Verdict |
 |---|---|
 | 4183372933, a child body synced before its parent is restored | **Real, fixed.** Nothing stops a document putting a body on a node under another body's node, the bodies come out of a `HashMap`, and `syncBody` computes a node's local transform from its parent's current world transform, so a child handled first was placed against the parent's manifest pose; asleep, it stayed there. Now every body is restored first (world space, order-free) and the nodes are synced in depth order (`BodyCarry.parentsFirst`, three new tests). Not reproduced on a device: neither the dice scene nor the harness nests bodies. |
-| 4183372939, iOS restores a dynamic body's node without `resetTransform()` | **Fixed as the documentation asks; unverified on a device.** The exclusion came from #36, which added `resetTransform()` for the tray walls and left dynamic bodies as they were, type-checked only. Before and since, a die teleported by `setTransforms` did move on the simulator (the ROLL runs in `docs/triage/integration.md`), so on that path SceneKit took the node's pose without the call. Nothing in the code makes that reliable for a body created in the same drain, which is the restore's case, and Apple's reference says the call is required. Both paths now go through one `reseat(_:)`, which calls `resetTransform()` for every body type and, for a dynamic body, writes its velocities back, because the reference does not say whether the reset keeps them. `applySetTransforms` had the same exclusion and gets the same call. Type-checked only; the roll on iOS needs a run before this is trusted. |
+| 4183372939, iOS restores a dynamic body's node without `resetTransform()` | **Valid; the fix is not in this PR.** Apple's reference says the call is required after moving a node with a dynamic body, and iOS skips it for dynamic bodies on restore and in `applySetTransforms` (the exclusion dates from #36, type-checked only; die teleports did work on the simulator without it). The fix calls it for every body type and writes a dynamic body's velocities back. It changes the roll path and cannot be judged from Android, so it is in `s0g-ios-dynamic-body-reseat` and must run on a simulator or device first. |
 
 ## iOS
 
-Not changed for the body state, because it cannot be run. The
+**In this PR**, both pure ordering, type-checked only:
+
+- `restoreTransformWrites` restores every written field first and
+  resets the static and kinematic bodies in a second pass (#45 thread
+  4160325887). Same fields, same bodies, same calls as before; only
+  the order differs.
+- A saved transform is superseded inside `applyAddNode` and
+  `applyUpdateNode`, after their validation, instead of before the
+  dispatch (#45 thread 4160325907). `removeNode` already cleared per
+  removed node.
+
+**Moved to `s0g-ios-dynamic-body-reseat`** (draft, based on this
+branch, not to merge before an iOS run of the dice screen, rolls and a
+rotation refit):
+
+- `reseat(_:)`: `resetTransform()` for dynamic bodies too, with their
+  velocities written back, on restore and in `applySetTransforms`.
+- Restoring position and rotation for a dynamic body whatever its
+  write mask.
+
+Not built at all: the body state itself. It was not changed, because it cannot be run. The
 equivalent in `SceneViewHost.drainPendingWork`, beside
 `captureTransformWrites`:
 
@@ -143,12 +165,9 @@ equivalent in `SceneViewHost.drainPendingWork`, beside
 
 ## T2 and frame rate
 
-**Incomplete: the A142 is owed.** It is on loan to another project.
-The two tablets ran the final head. The A142's row is from before the
-review fixes above (its harness from `325cb4f`'s code, its hero and
-dice from three commits earlier), so the whole A142 gate is owed on the
-final head: Vulkan and OpenGL, each with hero, dice and the harness.
-Nothing else.
+Complete on Android. The three devices ran this PR's Android code:
+the tablets on `2958168`, the A142 on the commit after it, which only
+takes the two iOS changes above back out (no Android file differs).
 
 Each device from a fresh launch: hero 30 s, dice racked 30 s, 12 rolls
 3 s apart, settle; then the harness (`DART3D_SCENE=harness`) to `w18
@@ -157,11 +176,18 @@ lane complete`. Frame rates from the `dart3d.perf` log, baseline from
 
 | Device | Backend, tier | Hero | Dice racked | Dice rolling | Harness | FATAL |
 |---|---|---|---|---|---|---|
-| Fire KFTUWI, final head | OPENGL, LOW | 56.0 (55.0) | 44.5 (44.2) | 44.1 (43.7) | complete, W25 PASS | 0 |
-| Wacom DTHA116, final head | OPENGL, LOW | 57.4 (57.5) | 50.6 (51.2) | 45.2 (44.1) | complete, W25 PASS | 0 |
-| Nothing A142, earlier head | VULKAN, STANDARD | 89.8 (89.7) | 49.7 (49.7) | 50.2 (50.3) | complete, W25 PASS | 0 |
-| Nothing A142, OpenGL forced | | not run | | | not run | |
+| Fire KFTUWI | OPENGL, LOW | 56.0 (55.0) | 44.5 (44.2) | 44.1 (43.7) | complete, W25 PASS | 0 |
+| Wacom DTHA116 | OPENGL, LOW | 57.4 (57.5) | 50.6 (51.2) | 45.2 (44.1) | complete, W25 PASS | 0 |
+| Nothing A142 | VULKAN (pref=0), STANDARD | 89.7 (89.7) | 49.7 (49.7) | 50.3 (50.3) | complete, W25 PASS | 0 |
+| Nothing A142, `DART3D_BACKEND=opengl` | OPENGL (pref=1), STANDARD | 80.8 | 31.5 | 32.0 | complete, W25 PASS | 0 |
 
+- **The A142 on forced OpenGL has no baseline.** It was never measured
+  before today. 31.5 fps on the dice screen is 18 fps under the same
+  phone on Vulkan. The lifetime and review-follow-ups branches,
+  neither of which has this PR's code, measure the same 32 fps there
+  (31.9 and 31.7), so it is how the standard pipeline runs on that
+  driver's OpenGL today and not this PR. Not looked into; the A142
+  resolves to Vulkan by default.
 - Both tablets were also run on `325cb4f`, before the review fixes,
   with the same results within 1 fps (Wacom 57.7 / 51.4 / 45.4).
 - One earlier attempt to install on the Wacom failed in `adb install`
@@ -175,8 +201,8 @@ lane complete`. Frame rates from the `dart3d.perf` log, baseline from
   on every later run, with one device at a time, and nothing on the
   tablet was changed to get there.
 
-`fire-*.jpg`, `wacom-*.jpg`, `a142-*.jpg` (hero, dice, settled,
-harness); `harness-wacom.log`.
+`fire-*.jpg`, `wacom-*.jpg`, `a142-vulkan-*.jpg`, `a142-opengl-*.jpg`
+(hero, dice, settled), `*-harness*.jpg`; `harness-*.log`.
 
 ## Checks
 
@@ -189,12 +215,8 @@ harness); `harness-wacom.log`.
 
 ## Open
 
-- T2 on the A142 for the final head.
-- iOS body state, as described above. The iOS changes here (two-pass
-  restore, whole pose for dynamic bodies, supersession after
-  validation, `resetTransform()` for dynamic bodies on restore and on
-  `setTransforms`) are not run on a device or simulator. The last one
-  touches the roll path.
+- iOS: the body state (not built), and a simulator or device run of
+  the two ordering fixes that are in this PR.
 - Joints are rebuilt while their bodies are still at the manifest
   pose, before the body state goes back. A hinge's zero angle and a
   fixed joint's relative orientation are taken at that moment. For a
