@@ -53,6 +53,7 @@ import com.github.stephengold.joltjni.Vec3
 import com.github.stephengold.joltjni.enumerate.EActivation
 import com.github.stephengold.joltjni.enumerate.EAxis
 import com.github.stephengold.joltjni.enumerate.EConstraintSpace
+import com.github.stephengold.joltjni.enumerate.EMotionType
 import com.github.stephengold.joltjni.enumerate.EMotorState
 import com.github.stephengold.joltjni.enumerate.EPhysicsUpdateError
 import com.github.stephengold.joltjni.enumerate.EShapeSubType
@@ -1081,6 +1082,55 @@ class JoltWorld {
             Quat(q[0], q[1], q[2], q[3]),
             EActivation.Activate,
         )
+    }
+
+    /** What [body] is doing right now; null for a fixed body. */
+    internal fun motionOf(body: Body): BodyMotion? {
+        val kind = when (body.motionType) {
+            EMotionType.Dynamic -> BodyMotion.Kind.DYNAMIC
+            EMotionType.Kinematic -> BodyMotion.Kind.KINEMATIC
+            else -> return null
+        }
+        val p = body.position
+        val q = body.rotation
+        val v = body.linearVelocity
+        val w = body.angularVelocity
+        return BodyMotion(
+            kind,
+            doubleArrayOf(p.xx(), p.yy(), p.zz()),
+            floatArrayOf(q.x, q.y, q.z, q.w),
+            floatArrayOf(v.x, v.y, v.z),
+            floatArrayOf(w.x, w.y, w.z),
+            body.isActive,
+        )
+    }
+
+    internal fun kindOf(body: Body): BodyMotion.Kind? = when (body.motionType) {
+        EMotionType.Dynamic -> BodyMotion.Kind.DYNAMIC
+        EMotionType.Kinematic -> BodyMotion.Kind.KINEMATIC
+        else -> null
+    }
+
+    /**
+     * Puts [motion] on [body]: pose, both velocities, then the sleep
+     * state. Sleep goes last because setting a velocity wakes a body.
+     * Jolt's own time-to-sleep counter is not readable through
+     * jolt-jni, so a body that was awake and slowing starts that count
+     * again.
+     */
+    internal fun restoreMotion(body: Body, motion: BodyMotion) {
+        val bi = bodyInterface
+        bi.setPositionAndRotation(
+            body.id,
+            RVec3(motion.position[0], motion.position[1], motion.position[2]),
+            Quat(motion.rotation[0], motion.rotation[1], motion.rotation[2],
+                motion.rotation[3]),
+            EActivation.DontActivate,
+        )
+        bi.setLinearAndAngularVelocity(
+            body.id, Vec3(motion.linearVelocity), Vec3(motion.angularVelocity))
+        if (motion.awake) bi.activateBody(body.id)
+        else bi.deactivateBody(body.id)
     }
 
     // MARK: - W8 physics queries (engine space; the view mirrors)

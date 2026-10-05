@@ -2176,6 +2176,28 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     }
 
     /**
+     * Puts the simulation state captured before a re-realize back on
+     * the rebuilt bodies, after the written transforms: a restored
+     * write teleports its body to where the write put it, and the body
+     * has moved since. The node follows its body here because the
+     * per-frame sync skips sleeping bodies.
+     */
+    private fun restoreBodyMotion(carried: BodyCarry) {
+        val restored = carried.restore(
+            rebuiltKind = { key -> bodies[key]?.let(world::kindOf) },
+        ) { key, motion ->
+            val body = bodies[key] ?: return@restore
+            world.restoreMotion(body, motion)
+            nodesById[key]?.let { syncBody(it, body) }
+        }
+        if (restored.bodies > 0) {
+            Log.i(TAG, "re-realize: restored ${restored.bodies} body " +
+                "state(s), ${restored.awake} awake, fastest " +
+                "${"%.2f".format(java.util.Locale.US, restored.fastest)} u/s")
+        }
+    }
+
+    /**
      * The supersession key of a latest-wins journaled op: ops with the
      * same key replace each other. Null for ops outside that set.
      */
@@ -2336,10 +2358,6 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      */
     private fun applyCommandJson(json: JSONObject) {
         val op = json.optString("op")
-        if (!replayingJournal && (op == "addNode" || op == "removeNode" ||
-                (op == "updateNode" && "transform" in opFlags(json)))) {
-            jsonKey(json)?.let { transformWrites.supersede(it) }
-        }
         when (op) {
             "removeNode" -> {
                 Log.i(TAG, "cmd removeNode")
@@ -3113,6 +3131,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             Log.w(TAG, "addNode: missing spec"); return }
         val parentKey = json.optString("parent")
             .takeIf { it.isNotEmpty() }?.let { D3Wire.localIdKey(it) }
+        // Only an op that gets this far rewrites the node. One rejected
+        // above changes nothing, so the transform written before it
+        // must still carry across a re-realize.
+        if (!replayingJournal) transformWrites.supersede(key)
         val ctx = FsceneRealizer.surgicalContext(this)
         if (nodesById.containsKey(key)) {
             // A re-sent batch lands here — apply the spec as a full
@@ -3143,6 +3165,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         } ?: emptySet()
         val parentKey = json.optString("parent")
             .takeIf { it.isNotEmpty() }?.let { D3Wire.localIdKey(it) }
+        if (!replayingJournal && "transform" in flags) {
+            transformWrites.supersede(key)
+        }
         val ctx = FsceneRealizer.surgicalContext(this)
         ctx.updateNode(key, flags, spec, parentKey)
         adoptCamera(ctx)
@@ -4622,6 +4647,16 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                         arrayOf(it.localPos, it.localQuat, it.localScale)
                     }
                 }
+                val moving = BodyCarry()
+                for ((key, body) in bodies) {
+                    // A clip-driven node is left to the manifest pose
+                    // for the same reason its written transform is:
+                    // the sampler takes the rebuilt pose as the bind
+                    // pose, and re-poses the body on its next sample.
+                    if (animTargets[key]?.drivesTransform == true) continue
+                    moving.capture(key, world.motionOf(body))
+                }
+                val awakeBefore = lastAwakeCount
                 deferJointPrune = true
                 try {
                     FsceneRealizer.realize(manifest, this,
@@ -4631,6 +4666,12 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     // rebuild each from its recorded load batch.
                     replayStreamedSubtrees()
                     restoreTransformWrites(written)
+                    restoreBodyMotion(moving)
+                    // install() zeroes the settle bookkeeping for a new
+                    // scene. This is the same scene: a rebuild is not
+                    // a wake-up, so bodies that were awake must not
+                    // announce it again.
+                    lastAwakeCount = awakeBefore
                 } finally {
                     deferJointPrune = false
                 }
@@ -4749,38 +4790,42 @@ class Dart3dView(context: Context) : FrameLayout(context) {
 
     /** Writes each dynamic body's world pose into its node transform. */
     private fun syncBodies() {
-        val tcm = engine.transformManager
         for (key in dynamicBodyKeys) {
             val rec = nodesById[key] ?: continue
             val body = rec.body ?: continue
             if (!body.isActive) continue
-            val p = body.position
-            val q = body.rotation
-            val wp = floatArrayOf(
-                p.xx().toFloat(), p.yy().toFloat(), p.zz().toFloat())
-            val wq = floatArrayOf(q.x, q.y, q.z, q.w)
-            // World → local: local = inv(parentWorld) × world.
-            var local = D3Wire.trs(wp, wq, rec.localScale)
-            val pk = rec.parentKey
-            if (pk != null) {
-                val pr = nodesById[pk]
-                if (pr != null) {
-                    val pw = FloatArray(16)
-                    tcm.getWorldTransform(tcm.getInstance(pr.entity), pw)
-                    val inv = FloatArray(16)
-                    if (Matrix.invertM(inv, 0, pw, 0)) {
-                        val out = FloatArray(16)
-                        Matrix.multiplyMM(out, 0, inv, 0, local, 0)
-                        local = out
-                    }
+            syncBody(rec, body)
+        }
+    }
+
+    private fun syncBody(rec: FsceneRealizer.NodeRec, body: Body) {
+        val tcm = engine.transformManager
+        val p = body.position
+        val q = body.rotation
+        val wp = floatArrayOf(
+            p.xx().toFloat(), p.yy().toFloat(), p.zz().toFloat())
+        val wq = floatArrayOf(q.x, q.y, q.z, q.w)
+        // World → local: local = inv(parentWorld) × world.
+        var local = D3Wire.trs(wp, wq, rec.localScale)
+        val pk = rec.parentKey
+        if (pk != null) {
+            val pr = nodesById[pk]
+            if (pr != null) {
+                val pw = FloatArray(16)
+                tcm.getWorldTransform(tcm.getInstance(pr.entity), pw)
+                val inv = FloatArray(16)
+                if (Matrix.invertM(inv, 0, pw, 0)) {
+                    val out = FloatArray(16)
+                    Matrix.multiplyMM(out, 0, inv, 0, local, 0)
+                    local = out
                 }
             }
-            tcm.setTransform(tcm.getInstance(rec.entity), local)
-            // Keep the node's local TRS in sync so a later teleport
-            // composes through the parent correctly.
-            val d = FsceneRealizer.decompose(local)
-            rec.localPos = d[0]; rec.localQuat = d[1]; rec.localScale = d[2]
         }
+        tcm.setTransform(tcm.getInstance(rec.entity), local)
+        // Keep the node's local TRS in sync so a later teleport
+        // composes through the parent correctly.
+        val d = FsceneRealizer.decompose(local)
+        rec.localPos = d[0]; rec.localQuat = d[1]; rec.localScale = d[2]
     }
 
     /** Awake/settled transitions — same event shapes as iOS. */

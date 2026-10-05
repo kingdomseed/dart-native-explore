@@ -1,0 +1,12 @@
+10-05 09:44:40.425 21032 21032 I dart3d  : TEMP-DIAG before tick=900 node=79 awake=true p=(0.63,-65.56,5.04) v=(0.00,-33.61,0.92) w=(1.98,-0.00,0.00)
+10-05 09:44:40.467 21032 21032 I dart3d  : re-realize: restored 2 written transform(s)
+10-05 09:44:40.467 21032 21032 I dart3d  : re-realize: restored 6 body state(s), 2 awake, fastest 33.62 u/s
+10-05 09:44:40.469 21032 21032 I dart3d  : TEMP-DIAG after  tick=901 node=79 awake=true p=(0.63,-65.56,5.04) v=(0.00,-33.61,0.92) w=(1.98,-0.00,0.00)
+10-05 09:44:43.832 21032 21032 I dart3d  : TEMP-DIAG before tick=1200 node=79 awake=true p=(0.63,-224.40,7.92) v=(0.00,-58.98,0.78) w=(1.67,-0.00,0.00)
+10-05 09:44:43.875 21032 21032 I dart3d  : re-realize: restored 2 written transform(s)
+10-05 09:44:43.875 21032 21032 I dart3d  : re-realize: restored 17 body state(s), 5 awake, fastest 58.99 u/s
+10-05 09:44:43.896 21032 21032 I dart3d  : TEMP-DIAG after  tick=1201 node=79 awake=true p=(0.63,-225.38,7.93) v=(0.00,-59.09,0.78) w=(1.66,-0.00,0.00)
+10-05 09:44:47.227 21032 21032 I dart3d  : TEMP-DIAG before tick=1500 node=79 awake=true p=(0.63,-462.52,10.34) v=(0.00,-80.38,0.65) w=(1.41,-0.00,0.00)
+10-05 09:44:47.278 21032 21032 I dart3d  : re-realize: restored 2 written transform(s)
+10-05 09:44:47.278 21032 21032 I dart3d  : re-realize: restored 17 body state(s), 4 awake, fastest 80.39 u/s
+10-05 09:44:47.281 21032 21032 I dart3d  : TEMP-DIAG after  tick=1501 node=79 awake=true p=(0.63,-462.52,10.34) v=(0.00,-80.38,0.65) w=(1.41,-0.00,0.00)

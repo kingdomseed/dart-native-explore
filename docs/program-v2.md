@@ -73,6 +73,11 @@ from look-dev — the DartNative set's spec and reference renders — is on
    Open from the tablet run: native lifetime on API 26–32 now that
    jolt-jni's cleaner is off there (#44); dice at an edge can still cover
    the rim line.
+   Physics across a re-realize (S0g, in review, branch
+   `s0g-android-physics-rerealize`): bodies keep their motion and sleep
+   state on Android, and the harness's W25 settle lane passes for the
+   first time (`docs/artifacts/s0g-physics-rerealize/`). The iOS half
+   is owed with the rest of the iOS debt.
 2. **S1 renderer spike**, then **Track E** in its table order (E1 → E12).
 3. **Track V** — the 0.24 delta, re-pinned when upstream publishes.
 4. **Track R** — API pass, consumer build, agent skills, README and
@@ -194,8 +199,22 @@ Rules:
       scale); iOS colour saturation vs Android; root-cause the Mali page
       fault behind the catcher/particle prewarm and restore it; audit the
       remaining Filament builder sites for the GC-reachability hazard;
-      W25 settle lane never passes after wLoose; body poses/velocities
-      across deferred re-realize (M)
+      ~~W25 settle lane never passes after wLoose~~; ~~body
+      poses/velocities across deferred re-realize (M)~~ on Android.
+      *Physics across a re-realize — in review* (2026-10-05, branch
+      `s0g-android-physics-rerealize`). Done on Android: kinematic and
+      dynamic bodies keep pose, linear and angular velocity and sleep
+      state across a payload-arrival re-realize (`BodyCarry`); the
+      harness's W25 dice close-out passes and wLoose settles by event
+      (the breakable joint's box had been in free fall since its joint
+      broke, and the close-out used a random throw that can leave the
+      slab). Also the #45 review threads: a rejected `addNode` or
+      `updateNode` no longer drops a saved transform (both natives),
+      iOS restores in two passes and restores a dynamic body's whole
+      pose. **Open:** the iOS half of the body state (described, not
+      built: iOS is paused) and a device run of the three iOS fixes,
+      which are type-checked only. Evidence:
+      `docs/artifacts/s0g-physics-rerealize/`
 - [x] S0h Android cold-start material compile — **done** (#48; tablet
       run 2026-10-05). Root cause: filamat's SPIR-V optimizer, 3–6 s
       per lit package, run on the device at every cold start. Fix:

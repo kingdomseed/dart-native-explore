@@ -150,7 +150,7 @@ final class FeatureScene {
     void Function() w15Phase,
     void Function(({double w, double h}) Function() targetPx) w24Phase,
     void Function() w16Phase,
-    void Function(void Function() rollDie) w25Phase,
+    void Function() w25Phase,
     void Function() w18Phase,
     PhaseTimers timers,
   })
@@ -3158,6 +3158,32 @@ final class FeatureScene {
       });
     }
 
+    // The settle lanes' throw: the same op sequence as the app's roll
+    // without the rng. A pure vertical toss with no torque, because a
+    // tumble's first-contact lateral kick ejects the die off the slab
+    // edge on Jolt, and even pure-yaw spin turns into lateral drift on
+    // contact. A die that leaves the slab never settles, so a lane
+    // that waits for the settle cannot use the random throw.
+    void tossDieStraightUp(SceneController c) {
+      c.setBodyVelocity(
+        die.id,
+        linear: Vector3.zero(),
+        angularAxis: Vector3(0, 1, 0),
+        angularRate: 0,
+      );
+      c.setNodeTransforms([
+        NodeTransform(
+          die.id,
+          // z=2.5 keeps the throw clear of the margin probe's rest
+          // cell (boundsQuad collider tops z∈[0.7,1.5] around
+          // (0.2,1.1)) — the die would land on it every roll.
+          translation: Vector3(0, 1.4, 2.5),
+          rotation: Quaternion.identity(),
+        ),
+      ]);
+      c.applyImpulse(die.id, Vector3(0, 1.4, 0));
+    }
+
     // Loose-ends phase (+78 s): the live evidence the earlier lanes
     // left to luck, made deterministic. Fired after W14's last inner
     // timer (+50 s + 12 s showcase) with slack for the pose reads
@@ -3453,10 +3479,12 @@ final class FeatureScene {
       // all-asleep event, so every perpetual mover must leave first:
       // `w5NoRest` (the W6 `allowsResting:false` body the +8 s diff
       // adds) never sleeps by design, the W9 elevator's velocity motor
-      // holds its plate awake against the upper stop, and the hanging
-      // j9 chain micro-jitters forever under the constraint solver.
+      // holds its plate awake against the upper stop, the hanging
+      // j9 chain micro-jitters forever under the constraint solver,
+      // and the breakable joint's box was kicked off the slab when its
+      // joint broke and has been falling ever since.
       // The joint lanes finished an hour of scene-time ago, so all
-      // four exit here (the joint breaks log as SceneJointBroke).
+      // five exit here (the joint breaks log as SceneJointBroke).
       // main's _runWLoose also cancels the demo's auto-reroll and
       // rescue watchdog — a foreign throw mid-lane would corrupt the
       // timing. If no `settled` event arrives within 5 s of a throw,
@@ -3494,32 +3522,9 @@ final class FeatureScene {
 
       throwDie = () {
         rollStart = clock.elapsedMilliseconds;
-        // Same op sequence as the app's _roll minus the rng — the
-        // metric is latency, not the up-face. Pure vertical toss: a
-        // tumble's first-contact lateral kick ejects the die off the
-        // slab edge on Jolt (seen twice in this lane), and a body that
-        // falls off the world never settles.
-        c.setBodyVelocity(
-          die.id,
-          linear: Vector3.zero(),
-          angularAxis: Vector3(0, 1, 0),
-          angularRate: 0,
-        );
-        c.setNodeTransforms([
-          NodeTransform(
-            die.id,
-            // z=2.5 keeps the throw clear of the margin probe's rest
-            // cell (boundsQuad collider tops z∈[0.7,1.5] around
-            // (0.2,1.1)) — the die would land on it every roll.
-            translation: Vector3(0, 1.4, 2.5),
-            rotation: Quaternion.identity(),
-          ),
-        ]);
-        c.applyImpulse(die.id, Vector3(0, 1.4, 0));
-        // No torque: Jolt converts even pure-yaw spin into lateral
-        // drift on first contact — a spinning cube slid off the slab
-        // edge twice in this lane. The metric is rest latency, not
-        // tumble realism.
+        // The metric is rest latency, not the up-face or tumble
+        // realism.
+        tossDieStraightUp(c);
         // Fallback arm: three consecutive <2 cm pose reads = rest.
         // Rate-limited pose logging discriminates a die that never
         // rests (real motion) from a query path that keeps failing.
@@ -3562,11 +3567,7 @@ final class FeatureScene {
       timers.after(const Duration(seconds: 4), () {
         final retiring = <String, LocalId>{};
         for (final n in live.nodes.values) {
-          if (n.name == 'w5NoRest' ||
-              n.name == 'j9.liftPlate' ||
-              n.name.startsWith('j9.chain')) {
-            retiring[n.name] = n.id;
-          }
+          if (harnessBodyNeverRests(n.name)) retiring[n.name] = n.id;
         }
         for (final e in retiring.entries) {
           c.removeNode(e.value);
@@ -4031,7 +4032,7 @@ final class FeatureScene {
     // auto-exposure; 6 SSR; 7 lens flare; 8 god rays; 9 standalone
     // chromatic aberration; 10 the dice regression — the reset leaves
     // the table live and the close-out log names the die's token.
-    void addW25Phase(void Function() rollDie) {
+    void addW25Phase() {
       final c = controller;
       if (c == null) return;
       final live = phaseTwoDoc ?? doc;
@@ -4193,7 +4194,7 @@ final class FeatureScene {
           (e) => e is SceneSettledEvent,
           const Duration(seconds: 10),
         );
-        rollDie();
+        tossDieStraightUp(c);
         settled.then((event) {
           if (timers.isCancelled) return;
           dnLog(
