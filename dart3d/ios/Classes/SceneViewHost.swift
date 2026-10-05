@@ -279,6 +279,18 @@ final class SceneViewHost: SCNView {
     /// 'low'→'default' transition restores rather than flattens.
     var shadowAuthored = Set<ObjectIdentifier>()
 
+    /// A blended mesh's stand-in in the shadow pass (see
+    /// `reconcileBlendCasters`). Only touched on the render queue.
+    private struct BlendCaster {
+        weak var source: SCNNode?
+        weak var geometry: SCNGeometry?
+        let proxy: SCNNode
+    }
+    private var blendCasters: [BlendCaster] = []
+    /// Set by every drained message that can add, remove or re-material
+    /// a mesh; cleared by the reconcile at the end of the drain.
+    private var blendCastersDirty = false
+
     /// Settle bookkeeping: SceneKit's `isResting` threshold is a fixed
     /// units/s floor, so contact-solver noise at mm-scale gravity
     /// (±40 u/s of jitter) keeps bodies awake forever. A body whose
@@ -980,7 +992,112 @@ final class SceneViewHost: SCNView {
                     d3Log("deferred re-realize: carried "
                         + "\(carriedClips.count) clip state(s)")
                 }
+                blendCastersDirty = true
             }
+        }
+        if blendCastersDirty {
+            blendCastersDirty = false
+            reconcileBlendCasters()
+        }
+    }
+
+    // MARK: - Shadows of blended meshes
+
+    /// Gives every blended mesh a shadow. A `blend` material leaves
+    /// depth writes off so it doesn't hide what is sorted behind it,
+    /// and SceneKit's shadow pass is a depth pass: the mesh casts
+    /// nothing, where Filament draws a blended caster as a solid one.
+    /// On the dice table that left each translucent die without a
+    /// shadow while the opaque logo inside it cast a logo-shaped one.
+    ///
+    /// Each such mesh gets a stand-in at the scene root with the same
+    /// geometry and a material that writes depth and no colour. Drawn
+    /// after everything else, it changes nothing in the view; in the
+    /// shadow pass it is the caster. `syncBlendCasters` keeps it on its
+    /// mesh. Skinned and morphed meshes are left out (the stand-in
+    /// would need their deformers).
+    private func reconcileBlendCasters() {
+        for caster in blendCasters {
+            caster.proxy.removeFromParentNode()
+            retire(caster.proxy)
+        }
+        blendCasters.removeAll()
+        guard let root = scene?.rootNode else { return }
+        var found: [SCNNode] = []
+        root.enumerateHierarchy { node, _ in
+            guard node.castsShadow, node.skinner == nil,
+                  node.morpher == nil, let geometry = node.geometry,
+                  geometry.materials.contains(where: Self.isBlended)
+            else { return }
+            found.append(node)
+        }
+        for source in found {
+            guard let geometry = source.geometry,
+                  let proxy = Self.blendCasterProxy(for: geometry)
+            else { continue }
+            proxy.categoryBitMask = source.categoryBitMask
+            root.addChildNode(proxy)
+            blendCasters.append(BlendCaster(
+                source: source, geometry: geometry, proxy: proxy))
+        }
+        syncBlendCasters()
+    }
+
+    private static func isBlended(_ material: SCNMaterial) -> Bool {
+        material.blendMode == .alpha && !material.writesToDepthBuffer
+    }
+
+    /// The blended elements of `geometry` (its buffers shared, not
+    /// copied) under a depth-only material.
+    private static func blendCasterProxy(
+        for geometry: SCNGeometry
+    ) -> SCNNode? {
+        let materials = geometry.materials
+        guard !materials.isEmpty else { return nil }
+        var elements: [SCNGeometryElement] = []
+        var doubleSided = false
+        for (i, element) in geometry.elements.enumerated() {
+            let material = materials[i % materials.count]
+            guard isBlended(material) else { continue }
+            elements.append(element)
+            doubleSided = doubleSided || material.isDoubleSided
+        }
+        guard !elements.isEmpty else { return nil }
+        let depthOnly = SCNMaterial()
+        depthOnly.lightingModel = .constant
+        depthOnly.colorBufferWriteMask = []
+        depthOnly.isDoubleSided = doubleSided
+        let stand = SCNGeometry(sources: geometry.sources,
+                                elements: elements)
+        stand.materials = [depthOnly]
+        let proxy = SCNNode(geometry: stand)
+        proxy.name = "d3.blendCaster"
+        // After the blended pass: its depth must not reach anything
+        // the view still has to draw.
+        proxy.renderingOrder = Int(Int32.max)
+        return proxy
+    }
+
+    /// Puts every stand-in where its mesh is this frame, and asks for a
+    /// rebuild when a mesh swapped geometry (a LOD change) or is gone.
+    private func syncBlendCasters() {
+        guard !blendCasters.isEmpty else { return }
+        for caster in blendCasters {
+            guard let source = caster.source, source.parent != nil,
+                  source.geometry === caster.geometry else {
+                caster.proxy.isHidden = true
+                blendCastersDirty = true
+                continue
+            }
+            caster.proxy.simdWorldTransform =
+                source.presentation.simdWorldTransform
+            var hidden = false
+            var up: SCNNode? = source
+            while let node = up, !hidden {
+                hidden = node.isHidden
+                up = node.parent
+            }
+            caster.proxy.isHidden = hidden
         }
     }
 
@@ -1050,6 +1167,7 @@ final class SceneViewHost: SCNView {
 
     func applyLoadScene(_ data: Data) {
         lastManifest = data
+        blendCastersDirty = true
         // Payload ids are document-local — a previous document's bytes
         // would shadow this doc's chunks at colliding keys. The
         // manifest's own chunks arrive next, so the store starts empty
@@ -1076,6 +1194,7 @@ final class SceneViewHost: SCNView {
         let id = D3Wire.readLocalId(data, data.startIndex)
         let bytes = data.subdata(in: data.startIndex + 8..<data.endIndex)
         payloadStore[id] = bytes
+        blendCastersDirty = true
         // W25: a rewritten LUT chunk invalidates its cached strips.
         invalidateLuts(backedBy: id)
         // W7/W25: an env equirect or LUT chunk re-runs `decodeStage`
@@ -1226,6 +1345,11 @@ final class SceneViewHost: SCNView {
         guard let op = json["op"] as? String else { return }
         commandDepth += 1
         defer { commandDepth -= 1 }
+        // Force and velocity ops arrive every frame and touch no mesh.
+        if op != "applyImpulse", op != "applyTorque", op != "setVelocity",
+           op != "clearForces" {
+            blendCastersDirty = true
+        }
         // Declared after the depth defer, so it runs first — the
         // journal step still sees this dispatch's depth.
         let journaled = op == "addNode" || op == "updateNode"
@@ -4774,6 +4898,7 @@ extension SceneViewHost: SCNSceneRendererDelegate {
         // slot (post-camera, pre-render) for the lod half.
         updateLods()
         updateCameraFacing()
+        syncBlendCasters()
         renderDueTargets(at: time)
         syncScreenSubviews()
     }
