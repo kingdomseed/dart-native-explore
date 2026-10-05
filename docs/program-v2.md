@@ -63,8 +63,7 @@ from look-dev — the DartNative set's spec and reference renders — is on
    backfill. Fire tablet baseline: `docs/artifacts/s0-fire-tablet-baseline/`.
    Frame rate (S0j): a third device, the Wacom DTHA116 (Mali-G57 MC2,
    8 GB), ran the dice at 13 fps because the tier was picked by memory.
-   The tier is now picked by GPU name first, then memory (in review,
-   branch `s0-three-device-baseline`): dice racked / rolling are 44 / 44
+   The tier is now picked by GPU name first, then memory (#49): dice racked / rolling are 44 / 44
    fps on the Fire tablet, 51 / 44 on the Wacom and 50 / 50 on the
    A142. Open from that: 60 fps at rest is not reached on either
    tablet, the low profile's shadows are hard, LOW always takes OpenGL
@@ -78,8 +77,15 @@ from look-dev — the DartNative set's spec and reference renders — is on
 4. **Track R** — API pass, consumer build, agent skills, README and
    docs, publish.
 
+Not every open S0 box blocks Track E or R: S0d is folded into R8 (so
+it is exempt from Track R's "after S0"), S0c is
+backfilled as each lane's unit is touched, and the S0g items that need
+iOS (light units, colour saturation) wait for it. The rest of S0 does
+block E.
+
 **Paused until the engine is done.** P3 DR3 and later (notation, audio,
-juice), P5 demos, P7 design pass, and anything in P2. P6 (Dash/fcar
+juice; DR3 needs P1's parser contract first), P5 demos, P7 design pass,
+and anything in P2. P6 (Dash/fcar
 replacements) stays tied to R5 because publishing needs it.
 
 **Verification debt.** iOS simulators and devices are paused by the
@@ -137,6 +143,20 @@ Rules:
   until T2 runs. No merge without T2 for native changes.
 - Every automated review thread (Codex / Devin Review) gets a verdict
   (fixed / won't-fix + reason / deferred + issue) in the PR before merge.
+  Check the **inline** threads (`gh api --paginate …/pulls/<n>/comments`), not only
+  the PR conversation: #43–#49 merged with 30 Codex inline comments
+  unanswered because only the conversation was read. They were triaged
+  afterwards (verdicts on each thread).
+- **While iOS is paused** (operator, 2026-09-30): T2 is the Android half
+  in full — A142 on Vulkan *and* OpenGL, the Fire tablet and the Wacom
+  tablet, each with the harness. A diff that touches `dart3d/ios/**` is
+  type-checked against the simulator SDK. **Every** PR that skips the
+  normal iOS T2 or T3 — an iOS diff, a shared Dart or wire change, or an
+  Android-only change whose parity needs an iOS look, as #39's culling
+  did — says "not run on iOS" in the PR and adds a line to
+  *Verification debt*. All of that debt is paid on
+  device before R5; a change whose iOS behavior cannot be reasoned about
+  from the Android run waits for iOS instead of merging.
 - A new head after verification needs T1 + T2 again, **and T3 again for every lane whose covered behavior the new diff can affect** (when in doubt, re-run it). Only diffs that provably can't touch a lane (docs, unrelated platform) may reuse its evidence, and the PR says which lanes were reused and why.
 - `docs/verification-matrix.md` gets a row per merged unit, pointing at
   its evidence.
@@ -209,8 +229,8 @@ Rules:
       swapping in at 14 s. APK +1.0 MB. Tables and what stays open:
       `docs/artifacts/s0h-cold-start/`,
       `docs/artifacts/s0-three-device-baseline/`
-- [ ] S0j Low-end Android frame rate — #47 landed; the GPU-aware tier
-      is *in review* (branch `s0-three-device-baseline`). Measured with
+- [ ] S0j Low-end Android frame rate — #47 and the GPU-aware tier
+      (#49) landed. Measured with
       the `dart3d.perf` log lane (frame intervals, Filament GPU time,
       physics). #47: the frame log, Jolt stepping on the calling
       thread, and a low-end device profile (PCF shadows, FXAA, dynamic
@@ -607,6 +627,9 @@ glTF sampler wrap modes at runtime import. dart3d's importer parses
 - One PR per unit, branch `s<N>-<slug>` / `e<N>-<slug>` / `p<N>-<slug>` /
   `r<N>-<slug>` / `v<N>-<slug>` (by track),
   base `main`, the operator merges.
+  Legacy exception: the sidelined game rooms keep their original
+  branch name `p3-game-rooms-wip` (tagged `archive/p3-game-rooms-wip`)
+  although they belong to P2.
 - Platform owners keep disjoint file boundaries (`dart3d/ios/**`,
   `dart3d/android/**`, `dart3d/lib/**` + `example/**`, `docs/**`).
   New trees get their own owner when created: `dart3d_audio/**` (E11,
