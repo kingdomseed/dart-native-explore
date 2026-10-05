@@ -299,7 +299,8 @@ Scale: 1 Blender unit = 1 cm. Dice are a standard set × `SIZE_SCALE` 1.3
 
 > This is the Blender pipeline's layout. The example app does not use it:
 > it builds one atlas, texture and material **per die** in Dart
-> (`dice_numerals.dart`, `dice_set.dart`), seven payloads per set.
+> (`dice_numerals.dart`, `dice_set.dart`): seven atlas images per set,
+> and 21 payloads in all for the dice (vertices, indices and image each).
 
 Every face is planar-projected into one cell of a 9×9 atlas (78 of 81 cells
 used), so **all seven dice of a set share one texture**. The bevel strips
