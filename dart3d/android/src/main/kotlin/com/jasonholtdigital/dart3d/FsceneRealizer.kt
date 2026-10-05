@@ -48,27 +48,24 @@ import kotlin.math.ln
 
 private const val TAG = "dart3d"
 
-// W21 light-unit contract. The wire `intensity` is SceneKit-scale — a
-// unitless multiplier — while Filament consumes photometric units, so
-// decode converts rather than passes through:
+// Light units are upstream's (flutter_scene 0.23): `intensity` scales the
+// light's colour into the radiance a surface receives, and the stage's
+// `exposure` is the one linear multiplier before tone mapping. The view
+// camera's exposure is therefore set to the stage value itself
+// (Dart3dView.setCameraExposure), not to a photographic setting, and
+// every intensity passes through unscaled:
 //
-//  * DIRECTIONAL → lux. DIRECTIONAL_LUX_PER_UNIT keeps the value the
-//    retired bare `×10` heuristic was tuned to: a SceneKit intensity
-//    of 1.0 lands at 10 lx and the ~1400 "studio key" lands at
-//    14 000 lx — indoor floodlight range, short of Filament's ~110 000
-//    lx full-sun reference but matching the demos' authored look.
-//  * POINT / FOCUSED_SPOT → candela. The wire value is total luminous
-//    flux in lumens; candela is lumen/sr, and an isotropic emitter
-//    spreads its flux over the 4π sr sphere: candela = lumens / 4π.
-//    (A spot concentrates the same flux inside its cone — Filament's
-//    candela is axial luminous intensity and spotLightCone carries the
-//    shape, so the /4π applies unchanged.)
-//  * environmentIntensity → lux at ENVIRONMENT_LUX_PER_UNIT, Filament's
-//    own IndirectLight/Skybox default baseline (30 000 lx) that the
-//    unitless wire value scales.
-private const val DIRECTIONAL_LUX_PER_UNIT = 10.0
-private const val ENVIRONMENT_LUX_PER_UNIT = 30_000.0
-private const val FOUR_PI_STERADIANS = 4.0 * kotlin.math.PI
+//  * directional → Filament's illuminance: a white Lambert surface
+//    facing the light leaves `intensity / π`.
+//  * point, spot → Filament's luminous intensity (candela): the surface
+//    receives `intensity / d²`. Filament's range window and its spot
+//    cone ramp are the functions upstream uses.
+//  * environmentIntensity and skybox.intensity → the IndirectLight's
+//    and the Skybox's intensity, a plain multiplier on their texels.
+//
+// A light with no `range`, or a range of 0, has no cut-off upstream.
+// Filament needs a radius, so it gets one no scene reaches.
+private const val UNBOUNDED_LIGHT_RANGE = 1.0e5f
 // d3:instances bakes N copies into one vertex buffer on CPU — an
 // unbounded count is a memory/peak-frame hazard, so over the cap the
 // tail is truncated with a warn-once (upstream's GPU instancing has
@@ -3486,23 +3483,25 @@ object FsceneRealizer {
             p.tag("color").d3Color()?.let {
                 builder.color(it[0], it[1], it[2])
             }
-            p.tag("intensity").d3Double()?.let {
-                // SceneKit-scale unitless intensity → photometric units
-                // (see the W21 constants at file top): directional lux,
-                // point/spot lumens→candela.
-                when (type) {
-                    LightManager.Type.DIRECTIONAL -> builder.intensity(
-                        (it * DIRECTIONAL_LUX_PER_UNIT).toFloat())
-                    else -> builder.intensityCandela(
-                        (it / FOUR_PI_STERADIANS).toFloat())
+            // Upstream's defaults: 3 for a directional light, 1 for the
+            // others (see the unit note at the top of the file).
+            val intensity = p.tag("intensity").d3Double()
+            when (type) {
+                LightManager.Type.DIRECTIONAL ->
+                    builder.intensity((intensity ?: 3.0).toFloat())
+                else -> {
+                    builder.intensityCandela((intensity ?: 1.0).toFloat())
+                    val range = p.tag("range").d3Double() ?: 0.0
+                    builder.falloff(
+                        if (range > 0) range.toFloat()
+                        else UNBOUNDED_LIGHT_RANGE)
                 }
             }
-            p.tag("range").d3Double()?.let {
-                builder.falloff(it.toFloat())
-            }
             if (type == LightManager.Type.FOCUSED_SPOT) {
-                val inner = (p.tag("innerConeAngle").d3Double() ?: 0.6)
-                val outer = (p.tag("outerConeAngle").d3Double() ?: 0.8)
+                // Half-angles, radians; upstream's defaults.
+                val inner = (p.tag("innerConeAngle").d3Double() ?: 0.0)
+                val outer = (p.tag("outerConeAngle").d3Double()
+                    ?: (kotlin.math.PI / 4))
                 builder.spotLightCone(inner.toFloat(), outer.toFloat())
             }
             if (p.tag("castsShadow").d3Bool() == true) {
@@ -3703,8 +3702,10 @@ object FsceneRealizer {
          * W12 `rectAreaLight` — Filament exposes no area light type in
          * this path, so the approximation is a cluster of four point
          * lights on child entities at the rectangle's corners
-         * (±w/2, ±h/2 in the light node's local frame), each carrying
-         * a quarter of the declared intensity. The visible emitter is
+         * (±w/2, ±h/2 in the light node's local frame). Upstream's
+         * `intensity` is the panel's radiance, so its luminous
+         * intensity along the normal is `intensity × width × height`;
+         * each point carries a quarter of that. The visible emitter is
          * document-authored (an emissive mesh on the same node) — the
          * approximation covers the lighting contribution only.
          */
@@ -3713,13 +3714,11 @@ object FsceneRealizer {
             val h = (p.tag("height").d3Double() ?: 1.0).toFloat()
             val color = p.tag("color").d3Color()
                 ?: floatArrayOf(1f, 1f, 1f, 1f)
-            // Each cluster member takes a quarter of the declared
-            // lumens, then the same lumens→candela conversion decodeLight
-            // applies to point lights (flux over the 4π sr sphere).
             val intensityCandela =
-                ((p.tag("intensity").d3Double() ?: 1.0) / 4.0 /
-                    FOUR_PI_STERADIANS).toFloat()
-            val range = (p.tag("range").d3Double() ?: 10.0).toFloat()
+                ((p.tag("intensity").d3Double() ?: 1.0) * w * h / 4.0)
+                    .toFloat()
+            val range = (p.tag("range").d3Double() ?: 0.0)
+                .takeIf { it > 0 }?.toFloat() ?: UNBOUNDED_LIGHT_RANGE
             val identQ = floatArrayOf(0f, 0f, 0f, 1f)
             val unitS = floatArrayOf(1f, 1f, 1f)
             for ((sx, sy) in listOf(-1f to -1f, 1f to -1f,
@@ -5123,6 +5122,10 @@ object FsceneRealizer {
             val sky = envRes.optJSONObject("skybox")
             val source = sky?.optJSONObject("source")
             val skyIntensity = sky?.optDouble("intensity", 1.0) ?: 1.0
+            // Whether an IndirectLight will be bound (below). A zero
+            // intensity binds none: it would light nothing and black
+            // out the sky.
+            val lightsScene = sh != null && intensity > 0
             val skyType = source?.optString("type")
             val skyTextures = ArrayList<Texture>()
             var skybox: Skybox? = null
@@ -5162,15 +5165,20 @@ object FsceneRealizer {
                         }
                     }
                     if (cube != null) {
-                        // Filament measures env skybox/IBL intensity
-                        // in lux — upstream's unitless
-                        // environmentIntensity scales Filament's own
-                        // 30 000 lx baseline (ENVIRONMENT_LUX_PER_UNIT)
-                        // or the env renders ~15 stops under.
+                        // Filament draws the skybox at the
+                        // IndirectLight's intensity, which is the
+                        // environment's; its own applies only without
+                        // one.
+                        if (skyIntensity != 1.0 && lightsScene) {
+                            logOnce("skybox.environment.intensity",
+                                "skybox.intensity $skyIntensity on an" +
+                                    " environment sky: Filament draws" +
+                                    " the sky at the environment's" +
+                                    " intensity; ignored")
+                        }
                         skybox = Skybox.Builder()
                             .environment(cube)
-                            .intensity((intensity * skyIntensity *
-                                ENVIRONMENT_LUX_PER_UNIT).toFloat())
+                            .intensity((intensity * skyIntensity).toFloat())
                             .fenced { build(host.engine) }
                     }
                 }
@@ -5179,8 +5187,17 @@ object FsceneRealizer {
                     // rotation don't reach it, but the z-mirror does
                     // (world space). It does NOT light the scene —
                     // skyEnvironment re-lighting is deferred.
+                    // Filament multiplies a skybox by the
+                    // IndirectLight's intensity whenever the scene has
+                    // one, and by the skybox's own only when it has
+                    // none. Upstream's gradient sky is its own source,
+                    // so with an IndirectLight in place the pixels are
+                    // divided by its intensity.
                     val gp = EnvironmentFactory.filamentShifted(
-                        EnvironmentFactory.gradientEquirectPixels(source),
+                        EnvironmentFactory.gradientEquirectPixels(
+                            source,
+                            if (lightsScene) skyIntensity / intensity
+                            else 1.0),
                         0.0)
                     val gt = EnvironmentFactory.equirectTexture(
                         host.engine, gp)
@@ -5190,8 +5207,7 @@ object FsceneRealizer {
                         skyTextures.add(gc)
                         skybox = Skybox.Builder()
                             .environment(gc)
-                            .intensity((skyIntensity *
-                                ENVIRONMENT_LUX_PER_UNIT).toFloat())
+                            .intensity(skyIntensity.toFloat())
                             .fenced { build(host.engine) }
                     } else {
                         host.engine.destroyTexture(gt)
@@ -5213,11 +5229,10 @@ object FsceneRealizer {
             // the payload lands); non-environment skies still apply.
             if (skyboxTouched) host.applySkybox(skybox, skyTextures)
             if (!stageEnvDeferred) {
-                val il = sh?.let {
+                val il = sh?.takeIf { intensity > 0 }?.let {
                     val b = IndirectLight.Builder()
                         .irradiance(3, it)
-                        .intensity((intensity *
-                            ENVIRONMENT_LUX_PER_UNIT).toFloat())
+                        .intensity(intensity.toFloat())
                     if (envCube != null) b.reflections(envCube)
                     b.fenced { build(host.engine) }
                 }
@@ -5513,9 +5528,14 @@ object FsceneRealizer {
                     host.fallbackWhite, consumers)
             }
             if (slotBound(4)) {
+                // Without an emissive texture the factor emits on its
+                // own (upstream: factor × texture-or-white). With one
+                // that has not arrived yet, nothing emits until it does.
                 bindTextureSlot(host, mi, props, textures, samplers,
                     "emissiveTexture", "emissiveMap",
-                    host.fallbackEmissive, consumers)
+                    if (props.has("emissiveTexture")) host.fallbackEmissive
+                    else host.fallbackWhite,
+                    consumers)
             }
 
             // W22: extension writes ride the same registry the

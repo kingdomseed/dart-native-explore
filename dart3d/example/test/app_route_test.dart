@@ -19,6 +19,10 @@ void main() {
       expect(AppRoute.boot(scene: 'gallery').screen, AppScreen.showcase);
       expect(AppRoute.boot(scene: 'harness').screen, AppScreen.harness);
       expect(AppRoute.boot(scene: 'reel').screen, AppScreen.reel);
+      expect(
+        AppRoute.boot(scene: 'lookref').screen,
+        AppScreen.lookReference,
+      );
     });
 
     test('DART3D_MODEL boots the showcase whatever the scene', () {

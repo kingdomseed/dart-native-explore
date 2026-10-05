@@ -517,6 +517,16 @@ internal object MaterialPackages {
                     "materialParams.shadowIntensity);\n" +
                     "}\n"))
 
+    /**
+     * Upstream multiplies everything by the stage's exposure before the
+     * tone map. Filament does that for lit surfaces and, through
+     * `emissive.w = 1`, for emission; an unlit colour is written as it
+     * is, so the unlit bodies multiply it themselves. The camera's
+     * exposure is the stage value (Dart3dView.setCameraExposure).
+     */
+    private const val UNLIT_EXPOSURE =
+        "    material.baseColor.rgb *= getExposure();\n"
+
     /** W16 trail ribbon — vertex-color unlit + blend. */
     fun trailSpec(api: MaterialBuilder.TargetApi): Spec =
         Spec(trailKey(api),
@@ -532,6 +542,7 @@ internal object MaterialPackages {
                     "void material(inout MaterialInputs material) {\n" +
                         "    prepareMaterial(material);\n" +
                         "    material.baseColor = getColor();\n" +
+                        UNLIT_EXPOSURE +
                         "}\n"))
 
     /** W18 sprite billboard material — see Dart3dView.particleMaterial. */
@@ -552,6 +563,7 @@ internal object MaterialPackages {
         } else {
             frag.append("    material.baseColor = c;\n")
         }
+        frag.append(UNLIT_EXPOSURE)
         frag.append("    prepareMaterial(material);\n}\n")
         return Spec("particle|$additive|$api", MaterialRecipe()
             .platform(MaterialBuilder.Platform.MOBILE)
@@ -777,6 +789,7 @@ internal object MaterialPackages {
             body.append("    material.baseColor = materialParams" +
                 ".baseColor * getColor();\n")
         }
+        if (unlit) body.append(UNLIT_EXPOSURE)
         if (!unlit) {
             if (slotBound(2)) {
                 body.append(uvBlock("mr"))
@@ -818,11 +831,12 @@ internal object MaterialPackages {
                         "materialParams.emissiveColor.rgb *" +
                         " texture(materialParams_emissiveMap," +
                         " emissiveUv).rgb *" +
-                        " materialParams.emissiveStrength, 0.0);\n")
+                        " materialParams.emissiveStrength, 1.0);\n")
             } else {
-                // fallbackEmissive is black — a texture-less emissive
-                // reads as off (pre-r3 semantics, preserved).
-                body.append("    material.emissive = vec4(0.0);\n")
+                // Upstream's emissive is factor × (texture or white).
+                body.append("    material.emissive = vec4(" +
+                    "materialParams.emissiveColor.rgb *" +
+                    " materialParams.emissiveStrength, 1.0);\n")
             }
             // W22: extension lobes — one block per feature flag, each
             // factor×texture matching the glTF channel spec. The

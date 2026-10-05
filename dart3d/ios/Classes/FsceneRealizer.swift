@@ -556,6 +556,10 @@ enum FsceneRealizer {
         /// known (after `install`, or live for `updateStage`).
         var stageExposure: Double = 1.0
 
+        /// The decoded environment's tone-mapping operator; the host's
+        /// resolve pass applies it.
+        var stageToneMap = StageToneMap()
+
         /// Set by `decodeStage` when the env's equirect payload hasn't
         /// arrived — the stage application defers env/skybox contents
         /// and re-runs on payload arrival (W4 deferral pattern).
@@ -701,6 +705,7 @@ enum FsceneRealizer {
                          colliderIndices: colliderIndexByKey,
                          formatVersion: formatVersion,
                          stage: (json: stageJSON, exposure: stageExposure,
+                                 toneMap: stageToneMap,
                                  effects: stageEffects,
                                  antiAliasing: stageAntiAliasing,
                                  renderScale: stageRenderScale,
@@ -2928,7 +2933,8 @@ enum FsceneRealizer {
                     .generateMipmaps: NSNumber(value: true),
                     .SRGB: NSNumber(value: srgb),
                     .textureUsage: NSNumber(
-                        value: MTLTextureUsage.shaderRead.rawValue),
+                        value: MTLTextureUsage.shaderRead.rawValue
+                            | MTLTextureUsage.pixelFormatView.rawValue),
                 ])
             else {
                 host.logOnce("\(logKey).mtl",
@@ -2936,7 +2942,34 @@ enum FsceneRealizer {
                     + "mip chain (sRGB-aware filtering not guaranteed)")
                 return nil
             }
-            return tex
+            return srgb ? srgbTexture(tex, device: device) : tex
+        }
+
+        /// [tex] as an sRGB texture. `MTKTextureLoader` returns
+        /// `rgba8Unorm` for a `CGImage` whatever `.SRGB` says (iOS 27
+        /// and macOS 27 SDKs), so SceneKit sampled every colour
+        /// texture without decoding it: (181, 199, 94) rendered as
+        /// (220, 229, 164). A view with the sRGB format over the same
+        /// storage decodes on sampling, and the mip chain is rebuilt
+        /// through it so each level is filtered in linear light.
+        func srgbTexture(_ tex: MTLTexture, device: MTLDevice) -> MTLTexture {
+            let format: MTLPixelFormat
+            switch tex.pixelFormat {
+            case .rgba8Unorm: format = .rgba8Unorm_srgb
+            case .bgra8Unorm: format = .bgra8Unorm_srgb
+            default: return tex
+            }
+            guard let view = tex.makeTextureView(pixelFormat: format)
+            else { return tex }
+            if view.mipmapLevelCount > 1,
+               let queue = host.commandQueue ?? device.makeCommandQueue(),
+               let buffer = queue.makeCommandBuffer(),
+               let blit = buffer.makeBlitCommandEncoder() {
+                blit.generateMipmaps(for: view)
+                blit.endEncoding()
+                buffer.commit()
+            }
+            return view
         }
 
         /// Level-0 readback of an uncompressed 8-bit MTLTexture into
@@ -3246,23 +3279,30 @@ enum FsceneRealizer {
             }
             var data = src.data
             let fa = fc[3]
+            // Colour textures hold sRGB bytes; data textures are linear.
+            let srgb = tex.content == "color"
+            let alphaFold = src.premultiplied ? fa : 1
+            let tables: [[UInt8]]? = srgb
+                ? (0..<3).map { srgbScaleTable(fc[$0] * alphaFold) } : nil
             data.withUnsafeMutableBytes { ptr in
                 guard let p = ptr.baseAddress?
                     .assumingMemoryBound(to: UInt8.self) else { return }
                 for i in stride(from: 0, to: src.width * src.height * 4,
                                 by: 4) {
-                    if src.premultiplied {
-                        // p.rgb already carries the tex alpha; the
-                        // straight result r·fR·fA comes out as pR·fR·fA.
-                        p[i]     = scaleByte(p[i],     fc[0] * fa)
-                        p[i + 1] = scaleByte(p[i + 1], fc[1] * fa)
-                        p[i + 2] = scaleByte(p[i + 2], fc[2] * fa)
-                        p[i + 3] = scaleByte(p[i + 3], fa)
+                    // A premultiplied p.rgb already carries the tex
+                    // alpha; the straight result r·fR·fA comes out as
+                    // pR·fR·fA.
+                    if let tables {
+                        p[i]     = tables[0][Int(p[i])]
+                        p[i + 1] = tables[1][Int(p[i + 1])]
+                        p[i + 2] = tables[2][Int(p[i + 2])]
                     } else {
-                        p[i]     = scaleByte(p[i],     fc[0])
-                        p[i + 1] = scaleByte(p[i + 1], fc[1])
-                        p[i + 2] = scaleByte(p[i + 2], fc[2])
-                        if !rgbOnly { p[i + 3] = scaleByte(p[i + 3], fa) }
+                        p[i]     = scaleByte(p[i],     fc[0] * alphaFold)
+                        p[i + 1] = scaleByte(p[i + 1], fc[1] * alphaFold)
+                        p[i + 2] = scaleByte(p[i + 2], fc[2] * alphaFold)
+                    }
+                    if src.premultiplied || !rgbOnly {
+                        p[i + 3] = scaleByte(p[i + 3], fa)
                     }
                 }
             }
@@ -3319,6 +3359,13 @@ enum FsceneRealizer {
         /// Byte channel × unit factor, clamped to 0…255.
         func scaleByte(_ b: UInt8, _ f: Double) -> UInt8 {
             UInt8(clamping: Int((Double(b) * f).rounded()))
+        }
+
+        /// Every sRGB-encoded byte × a linear factor: decode, scale,
+        /// encode. The factor is linear light, so multiplying the
+        /// encoded byte would darken it by about the factor squared.
+        func srgbScaleTable(_ f: Double) -> [UInt8] {
+            (0..<256).map { encodeSrgb(srgbToLinear(Double($0) / 255) * f) }
         }
 
         /// Neutral 1×1 white bound to a shader-modifier `texture2d`
@@ -4848,23 +4895,102 @@ enum FsceneRealizer {
             if firstCameraNode == nil { firstCameraNode = node }
         }
 
+        /// Light units are upstream's (flutter_scene 0.23): `intensity`
+        /// scales the light's colour into the radiance a surface
+        /// receives. SceneKit's physically based lights, measured:
+        ///
+        ///  * directional — a white Lambert surface facing the light
+        ///    leaves `intensity / 1000`; upstream's leaves
+        ///    `intensity / π`. Hence `× 1000 / π`.
+        ///  * omni and spot — the surface receives `intensity / d²`,
+        ///    which is upstream's definition. No scale.
+        ///  * area — a panel of area A lights like an omni of
+        ///    `A × intensity / 1000`; upstream's `intensity` is the
+        ///    panel's radiance. Hence `× 1000`.
+        ///
+        /// SceneKit windows a light's range with the function upstream
+        /// uses, `(1 − (d / range)⁴)²`, and ignores the falloff
+        /// exponent for these lights. Its cone angles are whole
+        /// angles in degrees; the wire's are half-angles in radians.
+        /// Its ramp between the inner and the outer angle is wider
+        /// than upstream's (0.64 where upstream's is 0.43, a third of
+        /// the way in from the edge of a 15°/30° cone), so the cone is
+        /// made hard at the outer angle and upstream's ramp is
+        /// projected through it as the light's gobo.
+        private static var spotConeImages: [String: CGImage] = [:]
+
+        /// Upstream's (and Filament's) spot cone as an image a spot
+        /// light projects: `sat((cos θ − cos outer) / (cos inner −
+        /// cos outer))²` at the angle θ each texel is seen under, the
+        /// image's edge lying on the outer angle.
+        static func spotConeImage(inner: Double, outer: Double) -> CGImage? {
+            let key = String(format: "%.4f|%.4f", inner, outer)
+            if let image = spotConeImages[key] { return image }
+            let n = 256
+            let tanOuter = tan(outer)
+            let cosOuter = cos(outer)
+            let span = max(cos(inner) - cosOuter, 1.0 / 1024.0)
+            var bytes = [UInt8](repeating: 255, count: n * n * 4)
+            for y in 0..<n {
+                let v = (Double(y) + 0.5) / Double(n) * 2 - 1
+                for x in 0..<n {
+                    let u = (Double(x) + 0.5) / Double(n) * 2 - 1
+                    let angle = atan((u * u + v * v).squareRoot() * tanOuter)
+                    let t = min(max((cos(angle) - cosOuter) / span, 0), 1)
+                    let value = UInt8((t * t * 255).rounded())
+                    let i = (y * n + x) * 4
+                    bytes[i] = value
+                    bytes[i + 1] = value
+                    bytes[i + 2] = value
+                }
+            }
+            guard let provider = CGDataProvider(data: Data(bytes) as CFData),
+                  let space = CGColorSpace(name: CGColorSpace.linearSRGB),
+                  let image = CGImage(
+                      width: n, height: n, bitsPerComponent: 8,
+                      bitsPerPixel: 32, bytesPerRow: n * 4, space: space,
+                      bitmapInfo: CGBitmapInfo(
+                          rawValue: CGImageAlphaInfo.noneSkipLast.rawValue),
+                      provider: provider, decode: nil,
+                      shouldInterpolate: true, intent: .defaultIntent)
+            else { return nil }
+            spotConeImages[key] = image
+            return image
+        }
+
         func decodeLight(_ node: SCNNode, _ p: [String: Any],
                          _ type: SCNLight.LightType) {
             let light = SCNLight()
             light.type = type
             if let c = d3Color(p["color"]) { light.color = c }
-            if let i = d3Double(p["intensity"]) { light.intensity = CGFloat(i) }
-            if let range = d3Double(p["range"]) {
+            let intensity = d3Double(p["intensity"])
+            switch type {
+            case .directional:
+                light.intensity = CGFloat((intensity ?? 3) * 1000 / .pi)
+            case .area:
+                light.intensity = CGFloat((intensity ?? 1) * 1000)
+            default:
+                light.intensity = CGFloat(intensity ?? 1)
+            }
+            if type != .directional {
+                let range = d3Double(p["range"]) ?? 0
                 light.attenuationStartDistance = 0
-                light.attenuationEndDistance = CGFloat(range)
+                light.attenuationEndDistance = CGFloat(max(range, 0))
             }
-            if let inner = d3Double(p["innerConeAngle"]),
-               type == .spot {
-                light.spotInnerAngle = CGFloat(inner * 180.0 / .pi)
-            }
-            if let outer = d3Double(p["outerConeAngle"]),
-               type == .spot {
-                light.spotOuterAngle = CGFloat(outer * 180.0 / .pi)
+            if type == .spot {
+                let outer = min(max(
+                    d3Double(p["outerConeAngle"]) ?? .pi / 4, 0.01), 1.55)
+                let inner = min(max(
+                    d3Double(p["innerConeAngle"]) ?? 0, 0), outer)
+                light.spotInnerAngle = CGFloat(outer * 2 * 180.0 / .pi)
+                light.spotOuterAngle = CGFloat(outer * 2 * 180.0 / .pi)
+                if let gobo = light.gobo {
+                    gobo.contents = Self.spotConeImage(
+                        inner: inner, outer: outer)
+                    gobo.intensity = 1
+                    gobo.wrapS = .clamp
+                    gobo.wrapT = .clamp
+                }
             }
             if type == .area {
                 // rectAreaLight (W12): the emitter's rectangle — the
@@ -5134,9 +5260,9 @@ enum FsceneRealizer {
             case "uniform":
                 let a = d3ColorComponents(m["a"]) ?? [1, 1, 1, 1]
                 let b = d3ColorComponents(m["b"]) ?? [1, 1, 1, 1]
-                let mid = UIColor(
-                    red: (a[0] + b[0]) / 2, green: (a[1] + b[1]) / 2,
-                    blue: (a[2] + b[2]) / 2, alpha: (a[3] + b[3]) / 2)
+                let mid = Self.linearColor(
+                    (a[0] + b[0]) / 2, (a[1] + b[1]) / 2,
+                    (a[2] + b[2]) / 2, (a[3] + b[3]) / 2)
                 return .fixed(mid, hsbVariation(a, b))
             case "gradient":
                 let stops = d3GradientStops(m["gradient"])
@@ -6177,11 +6303,17 @@ enum FsceneRealizer {
             // tagged `{'d': …}` form is only for node/material
             // properties).
             stageExposure = plainDouble(envRes["exposure"]) ?? 1.0
-            if let toneMapping = envRes["toneMapping"] as? String {
-                host.logOnce("stage.toneMapping.\(toneMapping)",
-                    "toneMapping '\(toneMapping)': iOS keeps SceneKit's "
-                    + "filmic operator — approximation")
+            var toneMap = StageToneMap(
+                mode: envRes["toneMapping"] as? String ?? "pbrNeutral",
+                agxWhite: plainDouble(envRes["agxWhite"]) ?? 16.29,
+                agxContrast: plainDouble(envRes["agxContrast"]) ?? 1.25)
+            if toneMap.modeIndex == nil {
+                host.logOnce("stage.toneMapping.\(toneMap.mode)",
+                    "toneMapping '\(toneMap.mode)' unknown; using "
+                    + "pbrNeutral")
+                toneMap.mode = "pbrNeutral"
             }
+            stageToneMap = toneMap
             if envRes["skyEnvironment"] != nil {
                 host.logOnce("stage.skyEnvironment",
                     "skyEnvironment (procedural sky re-lighting) is "
@@ -6199,15 +6331,20 @@ enum FsceneRealizer {
 
             let envPixels = realizeEnvironmentSource(envRes,
                                                      envKey: envKey)
-            // Baked transforms: z-mirror + rotationY are column ops;
-            // intensity is a per-pixel scale. SceneKit has no native
-            // knobs for either, so they live in the pixels.
-            let lighting = envPixels.map {
-                scaledPixels(mirroredRotated($0, rotationY), intensity)
-            }
+            // The z-mirror and rotationY are column ops baked into the
+            // pixels. The intensity is the property's own: SceneKit
+            // clamps an environment image at 1 and stores an 8-bit one
+            // in 8 linear bits, so a scale baked into the pixels
+            // clipped above 1 and lost the dark end below it. A float
+            // source brighter than 1 is divided down to fit and the
+            // divisor goes into the intensity as well.
+            let lighting = envPixels.map { mirroredRotated($0, rotationY) }
             if !stageEnvDeferred {
+                let fitted = lighting.map(unitRange)
                 scene.lightingEnvironment.contents =
-                    lighting.flatMap(envContents)
+                    fitted.flatMap { envContents($0.pixels) }
+                scene.lightingEnvironment.intensity =
+                    CGFloat(intensity * (fitted?.divisor ?? 1))
                 if let envKey { deferredResourceIds.remove(envKey) }
             }
 
@@ -6220,7 +6357,7 @@ enum FsceneRealizer {
             case "environment":
                 guard !stageEnvDeferred else { break }
                 var background = lighting.map {
-                    scaledPixels($0, skyIntensity)
+                    linearPixels($0, scale: intensity * skyIntensity)
                 }
                 let blurriness =
                     plainDouble(source?["blurriness"]) ?? 0.0
@@ -6237,9 +6374,9 @@ enum FsceneRealizer {
             case "gradient":
                 // The sky is its own source — env intensity/rotation
                 // don't reach it, but the z-mirror does (world space).
-                let background = scaledPixels(
+                let background = linearPixels(
                     mirroredRotated(gradientEquirectPixels(source ?? [:]),
-                                    0), skyIntensity)
+                                    0), scale: skyIntensity)
                 scene.background.contents = envContents(background)
             case "fmat", "physical":
                 host.logOnce("skybox.\(source?["type"] ?? "")",
@@ -6955,55 +7092,62 @@ enum FsceneRealizer {
                              data: out)
         }
 
-        /// `environmentIntensity`/`skybox.intensity` baked into pixels —
-        /// sRGB bytes decode to linear, scale, and re-encode (a plain
-        /// byte multiply would mis-darken); float texels multiply in
-        /// place. Alpha passes through.
-        func scaledPixels(_ env: EnvPixels, _ k: Double) -> EnvPixels {
-            if k == 1 { return env }
-            var out = Data(count: env.data.count)
-            if env.isFloat {
-                env.data.withUnsafeBytes { srcBuf in
-                    out.withUnsafeMutableBytes { dstBuf in
-                        guard let sp = srcBuf.baseAddress?
-                            .assumingMemoryBound(to: Float.self),
-                              let dp = dstBuf.baseAddress?
-                            .assumingMemoryBound(to: Float.self)
-                        else { return }
-                        let kf = Float(k)
-                        for i in stride(from: 0,
-                                        to: env.width * env.height * 4,
-                                        by: 4) {
-                            dp[i] = sp[i] * kf
-                            dp[i + 1] = sp[i + 1] * kf
-                            dp[i + 2] = sp[i + 2] * kf
-                            dp[i + 3] = sp[i + 3]
-                        }
+        /// [env] as linear float pixels times [k] — what a sky is
+        /// drawn from. SceneKit stores an 8-bit image in 8 *linear*
+        /// bits, one step being 1/255 of white, so a dark sky came
+        /// out in two or three levels per channel: sRGB (36, 39, 41)
+        /// drew as (34, 38, 43). A float image keeps its values; it is
+        /// still clamped at 1.
+        func linearPixels(_ env: EnvPixels, scale k: Double) -> EnvPixels {
+            let count = env.width * env.height * 4
+            var out = [Float](repeating: 1, count: count)
+            env.data.withUnsafeBytes { src in
+                if env.isFloat {
+                    let sp = src.bindMemory(to: Float.self)
+                    let kf = Float(k)
+                    for i in stride(from: 0, to: count, by: 4) {
+                        out[i] = sp[i] * kf
+                        out[i + 1] = sp[i + 1] * kf
+                        out[i + 2] = sp[i + 2] * kf
                     }
-                }
-            } else {
-                env.data.withUnsafeBytes { srcBuf in
-                    out.withUnsafeMutableBytes { dstBuf in
-                        guard let sp = srcBuf.baseAddress?
-                            .assumingMemoryBound(to: UInt8.self),
-                              let dp = dstBuf.baseAddress?
-                            .assumingMemoryBound(to: UInt8.self)
-                        else { return }
-                        for i in stride(from: 0,
-                                        to: env.width * env.height * 4,
-                                        by: 4) {
-                            for c in 0..<3 {
-                                dp[i + c] = encodeSrgb(
-                                    srgbToLinear(Double(sp[i + c])
-                                                 / 255.0) * k)
-                            }
-                            dp[i + 3] = sp[i + 3]
-                        }
+                } else {
+                    let table = (0..<256).map {
+                        Float(srgbToLinear(Double($0) / 255.0) * k)
+                    }
+                    let sp = src.bindMemory(to: UInt8.self)
+                    for i in stride(from: 0, to: count, by: 4) {
+                        out[i] = table[Int(sp[i])]
+                        out[i + 1] = table[Int(sp[i + 1])]
+                        out[i + 2] = table[Int(sp[i + 2])]
                     }
                 }
             }
-            return EnvPixels(width: env.width, height: env.height,
-                             isFloat: env.isFloat, data: out)
+            return EnvPixels(
+                width: env.width, height: env.height, isFloat: true,
+                data: out.withUnsafeBufferPointer { Data(buffer: $0) })
+        }
+
+        /// [env] with its values inside 0…1, and what they were
+        /// divided by to get there (1 for an 8-bit source). The
+        /// divisor stops at 256: past that the rest of a float image
+        /// would fall below what a half float holds, and only the
+        /// very brightest texels clip instead.
+        func unitRange(_ env: EnvPixels)
+            -> (pixels: EnvPixels, divisor: Double)
+        {
+            guard env.isFloat else { return (env, 1) }
+            var peak: Float = 0
+            env.data.withUnsafeBytes { src in
+                let sp = src.bindMemory(to: Float.self)
+                for i in stride(from: 0, to: env.width * env.height * 4,
+                                by: 4) {
+                    let m = max(sp[i], max(sp[i + 1], sp[i + 2]))
+                    if m.isFinite, m > peak { peak = m }
+                }
+            }
+            guard peak > 1 else { return (env, 1) }
+            let divisor = Double(min(peak, 256))
+            return (linearPixels(env, scale: 1 / divisor), divisor)
         }
 
         /// Cheap separable box blur for `skybox.blurriness` — longitude
@@ -7237,7 +7381,23 @@ enum FsceneRealizer {
 
         func d3Color(_ v: Any?) -> UIColor? {
             guard let c = d3ColorComponents(v) else { return nil }
-            return UIColor(red: c[0], green: c[1], blue: c[2], alpha: c[3])
+            return Self.linearColor(c[0], c[1], c[2], c[3])
+        }
+
+        /// A wire colour as SceneKit should read it. Wire colours are
+        /// linear RGB (upstream's `ColorValue`); `UIColor(red:…)` would
+        /// tag the same numbers as sRGB-encoded and SceneKit would
+        /// decode them a second time, so a 0.18 grey rendered as 0.027.
+        static func linearColor(_ r: Double, _ g: Double, _ b: Double,
+                                _ a: Double) -> UIColor {
+            guard let space = CGColorSpace(
+                      name: CGColorSpace.extendedLinearSRGB),
+                  let color = CGColor(
+                      colorSpace: space,
+                      components: [CGFloat(r), CGFloat(g), CGFloat(b),
+                                   CGFloat(a)])
+            else { return UIColor(red: r, green: g, blue: b, alpha: a) }
+            return UIColor(cgColor: color)
         }
 
         func d3Ref(_ v: Any?) -> UInt64? {

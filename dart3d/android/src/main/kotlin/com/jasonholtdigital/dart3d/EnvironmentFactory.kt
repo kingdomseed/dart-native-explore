@@ -143,11 +143,13 @@ object EnvironmentFactory {
      * `gradient` sky — mirrors upstream's SkyGradientFragment:
      * horizon→zenith / horizon→ground blends on sqrt(|dirY|), the
      * pow(dot(sun), sharpness) HDR sun disk, and its 0.15·s⁸ halo.
-     * Output clips to LDR sRGB — the sun disk saturates white instead
-     * of staying HDR (approximation; backgrounds only).
+     * Float pixels, each multiplied by [scale]: the caller scales a
+     * sky Filament is going to draw at some other intensity than its
+     * own (see FsceneRealizer's gradient sky).
      */
     fun gradientEquirectPixels(
         source: JSONObject?,
+        scale: Double = 1.0,
         width: Int = 128,
         height: Int = 64,
     ): EnvPixels {
@@ -166,7 +168,8 @@ object EnvironmentFactory {
         val sunX = if (sunLen > 0) sun[0] / sunLen else 0.0
         val sunY = if (sunLen > 0) sun[1] / sunLen else 0.0
         val sunZ = if (sunLen > 0) sun[2] / sunLen else 0.0
-        val pixels = ByteArray(width * height * 4)
+        val pixels = ByteBuffer.allocate(width * height * 16)
+            .order(ByteOrder.LITTLE_ENDIAN)
         val twoPi = 2.0 * Math.PI
         for (py in 0 until height) {
             val v = (py + 0.5) / height.toDouble()
@@ -196,14 +199,13 @@ object EnvironmentFactory {
                 r += sunColor[0] * disk
                 g += sunColor[1] * disk
                 b += sunColor[2] * disk
-                val o = (py * width + px) * 4
-                pixels[o] = encodeSrgb(r)
-                pixels[o + 1] = encodeSrgb(g)
-                pixels[o + 2] = encodeSrgb(b)
-                pixels[o + 3] = 255.toByte()
+                pixels.putFloat((max(r, 0.0) * scale).toFloat())
+                pixels.putFloat((max(g, 0.0) * scale).toFloat())
+                pixels.putFloat((max(b, 0.0) * scale).toFloat())
+                pixels.putFloat(1f)
             }
         }
-        return EnvPixels(width, height, isFloat = false, data = pixels)
+        return EnvPixels(width, height, isFloat = true, data = pixels.array())
     }
 
     /** `constant` env — a tiny solid equirect of the linear color,

@@ -14,6 +14,7 @@ import 'feature_scene.dart';
 import 'hero_screen.dart';
 import 'phase_timers.dart';
 import 'imported_scene.dart';
+import 'look_reference_screen.dart';
 import 'reel_scene.dart';
 import 'showcase_scene.dart';
 
@@ -56,10 +57,11 @@ void _applyBackendDefine() {
 /// returns to the hero as well. Routing lives in `app_route.dart`.
 ///
 /// Boot overrides: `--dart-define=DART3D_SCENE=hero|dice|showcase` picks
-/// the screen. Two screens exist only behind that define:
+/// the screen. Three screens exist only behind that define:
 /// `DART3D_SCENE=harness` boots the deterministic verification scene
-/// ([FeatureMatrixScreen]) and `DART3D_SCENE=reel` the chrome-free logo
-/// capture view (`reel_scene.dart`). `--dart-define=DART3D_MODEL=<label>`
+/// ([FeatureMatrixScreen]), `DART3D_SCENE=reel` the chrome-free logo
+/// capture view (`reel_scene.dart`) and `DART3D_SCENE=lookref` the
+/// look-reference board (`look_reference_screen.dart`). `--dart-define=DART3D_MODEL=<label>`
 /// boots the showcase with that item selected (the old single-model
 /// lane); `--dart-define=DART3D_QUALITY=low|medium|high` pins the view
 /// tier. `--dart-define=DART3D_BACKEND=auto|opengl|vulkan` picks the
@@ -116,6 +118,7 @@ class _Dart3dExampleAppState extends State<Dart3dExampleApp> {
       ),
       AppScreen.harness => FeatureMatrixScreen(quality: quality),
       AppScreen.reel => ReelScreen(quality: quality),
+      AppScreen.lookReference => LookReferenceScreen(quality: quality),
     };
   }
 

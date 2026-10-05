@@ -704,5 +704,6 @@ extension SceneViewHost {
                 isTemporalAntialiasingEnabled
             s.view.showsStatistics = i == 0 && showsStatistics
         }
+        applySiblingResolve()
     }
 }
