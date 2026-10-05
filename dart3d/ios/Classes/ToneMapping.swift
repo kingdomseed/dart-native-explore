@@ -42,17 +42,42 @@ struct StageToneMap: Equatable {
     }
 }
 
-/// What the resolve pass applies besides the tone map: upstream's
-/// colour grading (before the tone map), its vignette (after) and the
-/// grading LUT (last, on the encoded colour).
+/// What the resolve pass applies besides the tone map: bloom and
+/// upstream's colour grading (before the tone map), its vignette
+/// (after) and the grading LUT (last, on the encoded colour).
 struct StageResolve {
     var toneMap = StageToneMap()
+    /// Nil adds no bloom.
+    var bloom: StageEffects.Bloom?
     /// Nil leaves the colour ungraded.
     var grading: StageEffects.ColorGrading?
     /// Nil draws no vignette.
     var vignette: StageEffects.Vignette?
     /// The LUT's strip image; its height is the cube's edge length.
     var lut: CGImage?
+}
+
+/// The size of the bloom chain a technique is built for: the pixel
+/// size of its first level and how many levels it has.
+struct BloomChain: Equatable {
+    var width: Int
+    var height: Int
+    var levels: Int
+
+    /// The chain Filament builds on Android for the same view and the
+    /// same `scatter`: its first level is 384 pixels on the view's
+    /// short side, each further level half the one before, and the
+    /// count is `3 + 8 × scatter`, as far as a level stays a pixel
+    /// wide.
+    init?(viewWidth: Int, viewHeight: Int, scatter: Double) {
+        let short = min(viewWidth, viewHeight)
+        guard short > 0 else { return nil }
+        let scale = 384.0 / Double(short)
+        width = max(1, Int((Double(viewWidth) * scale).rounded()))
+        height = max(1, Int((Double(viewHeight) * scale).rounded()))
+        let fit = Int(log2(Double(min(width, height)))) + 1
+        levels = min(max(Int(3 + 8 * scatter), 3), min(11, fit))
+    }
 }
 
 /// The resolve pass that turns SceneKit's image into the display image
@@ -73,6 +98,17 @@ struct StageResolve {
 /// that curve, where they would be inverted along with it; the host
 /// leaves them off and the pass does upstream's instead.
 ///
+/// Bloom is Filament's, because Android's is: the part of each channel
+/// above 1 is kept, compressed toward Filament's highlight limit,
+/// blurred through a chain of half-size levels and added back at
+/// `intensity / levels`. Android passes the stage's `threshold` as
+/// that limit, and Filament raises any limit below 10 to 10, so for
+/// every threshold a scene would use the knee is at 1 and the limit is
+/// 10 on both natives. SceneKit's own bloom gates on luminance at the
+/// threshold and adds the whole colour: a saturated emitter just over
+/// 1 in one channel bloomed on Android and not on iOS, and anything
+/// brighter than a low threshold washed out on iOS only.
+///
 /// `pbrNeutral`, `reinhard` and `linear` are evaluated in Rec. 2020
 /// primaries, not upstream's Rec. 709: that is where Filament's
 /// colour grading runs them on Android, and the two natives have to
@@ -83,6 +119,9 @@ enum ToneMapTechnique {
 
     /// The radiance SceneKit's curve maps to 1. Brighter values clip.
     static let whitePoint = 16.0
+
+    /// The lowest highlight limit Filament's bloom accepts.
+    static let filamentHighlightFloor = 10.0
 
     /// The operators are upstream's `shaders/tone_mapping.glsl`, the
     /// grading, vignette and LUT lookup its
@@ -101,6 +140,11 @@ enum ToneMapTechnique {
         float4 d3Gamma;
         float4 d3Gain;
         float4 d3Vignette;
+        float4 d3Bloom;
+    };
+    struct D3BloomParams {
+        float4 d3Mode;
+        float4 d3Bloom;
     };
 
     vertex D3ResolveOut d3_resolve_vertex(D3ResolveIn in [[stage_in]]) {
@@ -220,16 +264,85 @@ enum ToneMapTechnique {
         return mix(float3(luma), color, params.d3Grade.y);
     }
 
+    // The first bloom level: Filament's threshold on the scene's
+    // radiance (keep what is above 1, compress it toward the highlight
+    // limit), box-filtered down to the level's size.
+    fragment float4 d3_bloom_bright_fragment(
+        D3ResolveOut in [[stage_in]],
+        texture2d<float> colorSampler [[texture(0)]],
+        constant D3BloomParams& params [[buffer(0)]])
+    {
+        constexpr sampler s(filter::linear, address::clamp_to_edge);
+        float2 texel = 1.0 / float2(colorSampler.get_width(),
+                                    colorSampler.get_height());
+        float3 sum = float3(0.0);
+        for (int y = -1; y <= 1; y += 2) {
+            for (int x = -1; x <= 1; x += 2) {
+                float3 packed = colorSampler.sample(
+                    s, in.uv + float2(x, y) * texel).rgb;
+                float3 c = d3_scene_radiance(saturate(packed),
+                                             params.d3Mode.z);
+                c = max(c - 1.0, float3(0.0));
+                float peak = max(c.r, max(c.g, c.b));
+                sum += c / (1.0 + peak * params.d3Bloom.y);
+            }
+        }
+        return float4(sum * 0.25, 1.0);
+    }
+
+    // Half-size copy of a bloom level: four bilinear taps.
+    fragment float4 d3_bloom_down_fragment(
+        D3ResolveOut in [[stage_in]],
+        texture2d<float> d3Source [[texture(0)]])
+    {
+        constexpr sampler s(filter::linear, address::clamp_to_edge);
+        float2 texel = 1.0 / float2(d3Source.get_width(),
+                                    d3Source.get_height());
+        float3 sum = float3(0.0);
+        for (int y = -1; y <= 1; y += 2) {
+            for (int x = -1; x <= 1; x += 2) {
+                sum += d3Source.sample(
+                    s, in.uv + float2(x, y) * texel).rgb;
+            }
+        }
+        return float4(sum * 0.25, 1.0);
+    }
+
+    // The smaller levels' sum, spread with a 3 × 3 tent, plus this
+    // level.
+    fragment float4 d3_bloom_up_fragment(
+        D3ResolveOut in [[stage_in]],
+        texture2d<float> d3Low [[texture(0)]],
+        texture2d<float> d3High [[texture(1)]])
+    {
+        constexpr sampler s(filter::linear, address::clamp_to_edge);
+        float2 texel = 1.0 / float2(d3Low.get_width(), d3Low.get_height());
+        float3 sum = float3(0.0);
+        for (int y = -1; y <= 1; y++) {
+            for (int x = -1; x <= 1; x++) {
+                float weight = (x == 0 ? 2.0 : 1.0) * (y == 0 ? 2.0 : 1.0);
+                sum += weight * d3Low.sample(
+                    s, in.uv + float2(x, y) * texel).rgb;
+            }
+        }
+        return float4(sum / 16.0 + d3High.sample(s, in.uv).rgb, 1.0);
+    }
+
     fragment float4 d3_resolve_fragment(
         D3ResolveOut in [[stage_in]],
         texture2d<float> colorSampler [[texture(0)]],
         texture2d<float> d3Lut [[texture(1)]],
+        texture2d<float> d3BloomSum [[texture(2)]],
         constant D3ResolveParams& params [[buffer(0)]])
     {
         constexpr sampler s(filter::nearest, address::clamp_to_edge);
+        constexpr sampler smooth(filter::linear, address::clamp_to_edge);
         float4 packed = colorSampler.sample(s, in.uv);
         float3 color = d3_scene_radiance(saturate(packed.rgb),
                                          params.d3Mode.z);
+        if (params.d3Bloom.x > 0.0) {
+            color += d3BloomSum.sample(smooth, in.uv).rgb * params.d3Bloom.x;
+        }
         if (params.d3Mode.w > 0.5) {
             color = d3_grade(color, params);
         }
@@ -301,42 +414,100 @@ enum ToneMapTechnique {
 
     private static let vectorSymbols = [
         "d3Mode", "d3Agx", "d3Grade", "d3Lift", "d3Gamma", "d3Gain",
-        "d3Vignette",
+        "d3Vignette", "d3Bloom",
     ]
 
-    /// A technique with the resolve pass; nil when the shader library
-    /// cannot be built on [device].
-    static func make(device: MTLDevice) -> SCNTechnique? {
+    /// A technique with the resolve pass, and before it the passes of
+    /// a bloom chain when [bloom] is given; nil when the shader
+    /// library cannot be built on [device].
+    static func make(device: MTLDevice, bloom: BloomChain? = nil)
+        -> SCNTechnique?
+    {
         guard let lib = library(for: device) else { return nil }
-        var inputs: [String: Any] = [
-            "colorSampler": "COLOR",
-            "d3Lut": "d3LutSymbol",
-        ]
         var symbols: [String: Any] = ["d3LutSymbol": ["type": "sampler2D"]]
         for name in vectorSymbols {
-            inputs[name] = name + "Symbol"
             symbols[name + "Symbol"] = ["type": "vec4"]
         }
-        let pass: [String: Any] = [
-            "draw": "DRAW_QUAD",
-            "metalVertexShader": "d3_resolve_vertex",
-            "metalFragmentShader": "d3_resolve_fragment",
-            "inputs": inputs,
-            "outputs": ["color": "COLOR"],
+        func quad(_ fragment: String, inputs: [String: Any],
+                  output: String) -> [String: Any] {
+            [
+                "draw": "DRAW_QUAD",
+                "metalVertexShader": "d3_resolve_vertex",
+                "metalFragmentShader": fragment,
+                "inputs": inputs,
+                "outputs": ["color": output],
+            ]
+        }
+        var passes: [String: Any] = [:]
+        var sequence: [String] = []
+        var targets: [String: Any] = [:]
+        var resolveInputs: [String: Any] = [
+            "colorSampler": "COLOR",
+            "d3Lut": "d3LutSymbol",
+            // Unread without bloom; the slot still needs a texture.
+            "d3BloomSum": "d3LutSymbol",
         ]
-        let definition: [String: Any] = [
-            "passes": ["d3_resolve": pass],
-            "sequence": ["d3_resolve"],
+        for name in vectorSymbols {
+            resolveInputs[name] = name + "Symbol"
+        }
+        if let bloom {
+            func target(_ name: String, level: Int) {
+                targets[name] = [
+                    "type": "color",
+                    "format": "rgba16f",
+                    "size": "\(max(1, bloom.width >> level))x"
+                        + "\(max(1, bloom.height >> level))",
+                ]
+            }
+            for level in 0..<bloom.levels {
+                target("d3BloomDown\(level)", level: level)
+            }
+            passes["d3_bloom_bright"] = quad(
+                "d3_bloom_bright_fragment",
+                inputs: ["colorSampler": "COLOR",
+                         "d3Mode": "d3ModeSymbol",
+                         "d3Bloom": "d3BloomSymbol"],
+                output: "d3BloomDown0")
+            sequence.append("d3_bloom_bright")
+            for level in 1..<bloom.levels {
+                passes["d3_bloom_down\(level)"] = quad(
+                    "d3_bloom_down_fragment",
+                    inputs: ["d3Source": "d3BloomDown\(level - 1)"],
+                    output: "d3BloomDown\(level)")
+                sequence.append("d3_bloom_down\(level)")
+            }
+            var sum = "d3BloomDown\(bloom.levels - 1)"
+            for level in stride(from: bloom.levels - 2, through: 0, by: -1) {
+                target("d3BloomUp\(level)", level: level)
+                passes["d3_bloom_up\(level)"] = quad(
+                    "d3_bloom_up_fragment",
+                    inputs: ["d3Low": sum,
+                             "d3High": "d3BloomDown\(level)"],
+                    output: "d3BloomUp\(level)")
+                sequence.append("d3_bloom_up\(level)")
+                sum = "d3BloomUp\(level)"
+            }
+            resolveInputs["d3BloomSum"] = sum
+        }
+        passes["d3_resolve"] = quad(
+            "d3_resolve_fragment", inputs: resolveInputs, output: "COLOR")
+        sequence.append("d3_resolve")
+        var definition: [String: Any] = [
+            "passes": passes,
+            "sequence": sequence,
             "symbols": symbols,
         ]
+        if !targets.isEmpty { definition["targets"] = targets }
         guard let technique = SCNTechnique(dictionary: definition)
         else { return nil }
         technique.library = lib
         return technique
     }
 
-    /// Writes [resolve] into [technique].
-    static func configure(_ technique: SCNTechnique, _ resolve: StageResolve) {
+    /// Writes [resolve] into [technique], which was made for [bloom]
+    /// (nil: without a bloom chain, and then no bloom is added).
+    static func configure(_ technique: SCNTechnique, _ resolve: StageResolve,
+                          bloom: BloomChain? = nil) {
         func set(_ name: String, _ x: Double, _ y: Double, _ z: Double,
                  _ w: Double) {
             technique.setObject(
@@ -364,6 +535,12 @@ enum ToneMapTechnique {
         let vignette = resolve.vignette
         set("d3Vignette", vignette?.intensity ?? 0, vignette?.radius ?? 0,
             vignette?.smoothness ?? 0, 0)
+        if let bloom, let fx = resolve.bloom {
+            set("d3Bloom", fx.intensity / Double(bloom.levels),
+                1 / max(fx.threshold, filamentHighlightFloor), 0, 0)
+        } else {
+            set("d3Bloom", 0, 0, 0, 0)
+        }
         let property = SCNMaterialProperty(
             contents: (hasLut ? resolve.lut : noLut) as Any)
         property.minificationFilter = .linear

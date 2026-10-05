@@ -1363,8 +1363,12 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             enabled = fx.bloom.enabled || fx.lensFlare.enabled
             strength = if (fx.bloom.enabled) fx.bloom.intensity.toFloat()
                 else fx.lensFlare.intensity.toFloat().coerceIn(0f, 1f)
-            // Filament's `threshold` is a bool knee toggle; upstream's
-            // 0..1 luminance cutoff lands on `highlight` instead.
+            // Filament's `threshold` is a bool: keep what is above 1.
+            // Upstream's cutoff is passed as `highlight`, the value
+            // bright input is compressed toward — but Filament raises
+            // a highlight below 10 to 10, so an upstream threshold in
+            // its usual 0…2 range changes nothing here. iOS's resolve
+            // pass does the same (ToneMapping.swift).
             threshold = true
             highlight = fx.bloom.threshold.toFloat()
             levels = (3 + 8 * fx.bloom.scatter).toInt().coerceIn(3, 11)

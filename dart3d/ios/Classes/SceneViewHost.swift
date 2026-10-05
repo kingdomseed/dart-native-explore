@@ -173,9 +173,16 @@ final class SceneViewHost: SCNView {
     /// resolve pass (`ToneMapTechnique`).
     private(set) var stageToneMap = StageToneMap()
 
-    /// The resolve pass, built on first use and kept: the operator and
-    /// the LUT are written into it as they change.
+    /// The resolve pass, built on first use and kept: the operator,
+    /// the grading and the LUT are written into it as they change. It
+    /// is rebuilt when the bloom chain it was made for changes
+    /// (bloom on or off, its scatter, the view's aspect).
     private var resolveTechnique: SCNTechnique?
+    private var resolveChain: BloomChain?
+
+    /// MAIN-THREAD: what the sibling views' own resolve passes apply —
+    /// the host's, handed over by `applyToneMap`.
+    private var siblingResolve: (look: StageResolve, chain: BloomChain?)?
 
     /// W13: the last decoded `effects` post stack — retained across
     /// stage re-decodes whose `effects` key is absent (the wire's
@@ -321,6 +328,7 @@ final class SceneViewHost: SCNView {
         let e = exposure * (lastEffects?.colorGrading.brightness ?? 1.0)
         // W14: exposure is per-camera in SceneKit — write every view
         // camera, not just the point of view.
+        let resolved = resolvedCameras()
         for camera in viewCameras() {
             camera.wantsHDR = true
             camera.exposureOffset = CGFloat(e > 0 ? log2(e) : 0)
@@ -331,24 +339,48 @@ final class SceneViewHost: SCNView {
             camera.wantsExposureAdaptation =
                 lastEffects?.autoExposure.enabled ?? false
             // The resolve pass undoes SceneKit's own curve, which this
-            // white point defines (`ToneMapTechnique`).
-            camera.whitePoint = CGFloat(ToneMapTechnique.whitePoint)
+            // white point defines (`ToneMapTechnique`). A camera that
+            // only renders into a texture has no resolve pass and
+            // keeps the identity curve.
+            camera.whitePoint = resolved.contains { $0 === camera }
+                ? CGFloat(ToneMapTechnique.whitePoint) : 1
             camera.averageGray = 0.18
         }
         applyToneMap()
     }
 
-    /// Points the view's resolve pass at the stage's tone-mapping
-    /// operator, colour grading, vignette and LUT. Texture-target
-    /// views render without it, as their Android counterparts do.
-    private func applyToneMap() {
-        if resolveTechnique == nil,
+    /// The cameras whose image goes through a resolve pass: the point
+    /// of view and every screen view's.
+    private func resolvedCameras() -> [SCNCamera] {
+        var cams: [SCNCamera] = []
+        if let c = pointOfView?.camera { cams.append(c) }
+        for v in views where v.targetKey == nil {
+            guard let c = nodesById[v.cameraKey]?.camera,
+                  !cams.contains(where: { $0 === c }) else { continue }
+            cams.append(c)
+        }
+        return cams
+    }
+
+    /// Points the view's resolve pass at the stage's bloom,
+    /// tone-mapping operator, colour grading, vignette and LUT.
+    /// Texture-target views render without it, as their Android
+    /// counterparts do.
+    func applyToneMap() {
+        let bloom = lastEffects.flatMap { $0.bloom.enabled ? $0.bloom : nil }
+        let chain = bloom.flatMap {
+            BloomChain(viewWidth: Int((boundsAspect * 1024).rounded()),
+                       viewHeight: 1024, scatter: $0.scatter)
+        }
+        if resolveTechnique == nil || resolveChain != chain,
            let device = device ?? MTLCreateSystemDefaultDevice() {
-            resolveTechnique = ToneMapTechnique.make(device: device)
+            resolveTechnique =
+                ToneMapTechnique.make(device: device, bloom: chain)
+            resolveChain = chain
             if resolveTechnique == nil {
                 logOnce("stage.toneMapping.technique",
-                    "the tone-mapping pass could not be built; the "
-                    + "image stays linear")
+                    "the resolve pass could not be built; the image "
+                    + "is not tone mapped")
             }
         }
         guard let resolve = resolveTechnique else { return }
@@ -358,15 +390,35 @@ final class SceneViewHost: SCNView {
         // bytes land; an asset path resolves from the main bundle.
         let grading = lastEffects?.colorGrading
         let vignette = lastEffects?.vignette
-        ToneMapTechnique.configure(resolve, StageResolve(
+        let look = StageResolve(
             toneMap: stageToneMap,
+            bloom: bloom,
             grading: grading?.enabled == true ? grading : nil,
             vignette: vignette?.enabled == true ? vignette : nil,
             lut: grading?.lut.flatMap { $0.isEmpty ? nil : $0 }
                 .flatMap {
                     resolveLutImage($0, blend: grading?.lutBlend ?? 1)
-                }))
+                })
+        ToneMapTechnique.configure(resolve, look, bloom: chain)
         if technique !== resolve { technique = resolve }
+        DispatchQueue.main.async { [weak self] in
+            self?.siblingResolve = (look, chain)
+            self?.applySiblingResolve()
+        }
+    }
+
+    /// MAIN-THREAD: gives every sibling view (split-screen views) a
+    /// resolve pass of its own with the host's settings.
+    func applySiblingResolve() {
+        guard let (look, chain) = siblingResolve else { return }
+        for sibling in mainScreenSubviews {
+            guard let device = sibling.view.device
+                    ?? MTLCreateSystemDefaultDevice(),
+                  let pass = ToneMapTechnique.make(
+                      device: device, bloom: chain) else { continue }
+            ToneMapTechnique.configure(pass, look, bloom: chain)
+            sibling.view.technique = pass
+        }
     }
 
     /// Every camera the stage look applies to — the point of view
@@ -397,9 +449,10 @@ final class SceneViewHost: SCNView {
         guard let fx = lastEffects else { return }
 
         for camera in viewCameras() {
+            // Bloom is the resolve pass's (`applyToneMap`). SceneKit's
+            // own stays for the lens-flare approximation below only.
             camera.bloomThreshold = CGFloat(fx.bloom.threshold)
-            camera.bloomIntensity =
-                CGFloat(fx.bloom.enabled ? fx.bloom.intensity : 0)
+            camera.bloomIntensity = 0
             // scatter is a 0..1 spread; SceneKit wants blur pixels.
             camera.bloomBlurRadius = CGFloat(4 + 12 * fx.bloom.scatter)
 
@@ -857,8 +910,13 @@ final class SceneViewHost: SCNView {
     /// view's `viewport` rect re-maps into the new target space.
     override func layoutSubviews() {
         super.layoutSubviews()
+        let aspect = boundsAspect
         refreshUISnapshot()
         layoutScreenSubviews()
+        // The bloom chain is sized for the view's aspect.
+        if abs(boundsAspect - aspect) > 0.01 {
+            enqueueSceneWork { [weak self] in self?.applyToneMap() }
+        }
     }
 
     /// A new window can carry a different screen scale — re-snapshot
