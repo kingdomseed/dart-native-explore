@@ -85,8 +85,17 @@ from look-dev — the DartNative set's spec and reference renders — is on
    Physics across a re-realize (S0g, in review, branch
    `s0g-android-physics-rerealize`): bodies keep their motion and sleep
    state on Android, and the harness's W25 settle lane passes for the
-   first time (`docs/artifacts/s0g-physics-rerealize/`). The iOS half
-   is owed with the rest of the iOS debt.
+   first time (`docs/artifacts/s0g-physics-rerealize/`). On iOS the
+   two ordering fixes have now run (2026-10-05, below); carrying body
+   state across a re-realize is still not built there.
+   iOS debt (2026-10-05, `docs/artifacts/ios-debt-2026-10/`): one
+   simulator is allowed again, and everything merged on Android
+   evidence since 2026-09-29 ran on it — hero, Showcase, the harness
+   to completion, and the dice lanes. Three defects found and fixed:
+   the dice table was built on the UI isolate (the background build
+   threw), the dice cast no shadows on iOS (SceneKit's 100-unit shadow
+   range and single shadow sample), and blended meshes cast none at
+   all (each die showed its logo's shadow instead of its own).
 2. **S1 renderer spike**, then **Track E** in its table order (E1 → E12).
 3. **Track V** — the 0.24 delta, re-pinned when upstream publishes.
 4. **Track R** — API pass, consumer build, agent skills, README and
@@ -103,18 +112,48 @@ juice; DR3 needs P1's parser contract first), P5 demos, P7 design pass,
 and anything in P2. P6 (Dash/fcar
 replacements) stays tied to R5 because publishing needs it.
 
-**Verification debt.** iOS simulators and devices are paused by the
-operator (Mac mini load, 2026-09-30), so #36 and #38–#42 merged on A142
-evidence only. #39 changed Android culling natively and has no iOS or
-GL-backend run. Owed when iOS is re-enabled: T2 on the simulator plus the
-dice lanes (readout, d4 turn, cocked nudge, gestures, numerals, culling
-parity). The toss gesture has only been driven by scripted swipes.
-From S0g: the two iOS ordering fixes in the re-realize PR are
-type-checked only; `s0g-ios-dynamic-body-reseat` (`resetTransform()`
-for dynamic bodies on restore and on `setTransforms`, whole-pose
-restore) is a draft that must not merge before the dice screen, rolls
-and a rotation refit have run on iOS; body state across a re-realize
-is not built on iOS.
+**Verification debt.** The operator re-enabled one iOS simulator on
+2026-10-05 (physical iOS devices, the iPad and Android emulators stay
+off). Evidence for everything below: `docs/artifacts/ios-debt-2026-10/`.
+
+*Paid on the iPhone 17 Pro simulator (iOS 27, debug):*
+
+- T2 for main `63fe903` and for the branch that carries the fixes:
+  hero, dice, Showcase (materials, glb, playground, fcar, dash) and
+  the harness to its last lane, with no crash or exception line.
+- The dice lanes owed by #36 and #38–#42: readout against the face
+  shown (10 rolls, 70 of 70 dice), the d4 turn and re-read, the
+  cocked nudge, numerals, the logo, and culling parity for #39 (no
+  far-side faces through the shells).
+- Gestures: aim, hold-and-toss and sweep, driven by scripted touch
+  paths.
+- #45: the tray refits and the dice are read again on a rotation from
+  portrait to landscape, and a landscape roll reads correctly.
+- #52: both iOS ordering fixes ran — every dice load logs the restore
+  and the first physics tick is at the fitted rack.
+- `s0g-ios-dynamic-body-reseat` (#55): ran with and without it; see
+  the README for the comparison and the verdict.
+
+*Still owed:*
+
+- **Rotation from landscape back to portrait** on iOS. Not run: it
+  needs the operator to rotate the simulator, or a rotation method
+  they have approved (Xcode 27 has no Simulator.app and `simctl`
+  cannot rotate).
+- **A finger.** Every gesture so far, on both platforms, is a scripted
+  path; the fling velocity on iOS came from the app's own estimate,
+  never from the platform.
+- **A physical iOS device.** Everything above is the simulator: no
+  frame-rate number, no TAA (skipped on the simulator by design), no
+  real GPU.
+- **#39 on the OpenGL backend** (Android) — unchanged by this run.
+- **Body state across a re-realize on iOS** — not built.
+- **The blended-mesh shadow stand-in on skinned, morphed or
+  camera-facing meshes** — left out of the fix; such a mesh still
+  casts nothing on iOS. The stand-in also writes camera depth, so
+  depth of field through a blended mesh reads the mesh's surface.
+- The S0g appearance items (light units, colour saturation): the felt
+  reads grey and the rim pale on iOS; pairs are in the README.
 
 **Review.** Codex code review is out of quota; PRs since #36 were
 reviewed by an Opus reviewer agent, each finding checked against the
@@ -153,7 +192,7 @@ stayed empty. The new gate is smaller and mandatory.
 | Tier | When | Required evidence |
 |---|---|---|
 | **T1 — CI** | every PR | `dn analyze` + `dn test` in **every Dart package the PR changes** (`dart3d/`, `dart3d/example/`, and each new package such as `dart3d_audio/` or the dice app gets its own CI step when it is created). Target (R3): add Android `compileReleaseKotlin` and iOS `swiftc -typecheck` jobs. |
-| **T2 — device smoke** | every PR touching `dart3d/android/**`, `dart3d/ios/**`, or the wire vocabulary | On A142 **Vulkan and GL**, on the Fire tablet (KFTUWI, Mali-G52), on the Wacom tablet (DTHA116, Mali-G57, the weak-GPU/large-memory case; baseline in `docs/artifacts/s0-three-device-baseline/`), and on the iOS sim (paused 2026-09-30; see *Verification debt*): app boots, harness (booted with `--dart-define=DART3D_SCENE=harness`; it has no UI entry) runs to completion, dice roll and settle, zero FATAL/crash in logs. One screenshot per surface + log excerpt, committed under `docs/artifacts/<unit>/`. |
+| **T2 — device smoke** | every PR touching `dart3d/android/**`, `dart3d/ios/**`, or the wire vocabulary | On A142 **Vulkan and GL**, on the Fire tablet (KFTUWI, Mali-G52), on the Wacom tablet (DTHA116, Mali-G57, the weak-GPU/large-memory case; baseline in `docs/artifacts/s0-three-device-baseline/`), and on the iOS sim (one simulator, re-enabled 2026-10-05; see *Verification debt*): app boots, harness (booted with `--dart-define=DART3D_SCENE=harness`; it has no UI entry) runs to completion, dice roll and settle, zero FATAL/crash in logs. One screenshot per surface + log excerpt, committed under `docs/artifacts/<unit>/`. |
 | **T3 — feature lanes** | every unit | The unit's own live checks, same evidence rules: the subset of its old "Verify, live" block that exercises new behavior, or for units new in v2, the checks listed under **New-unit T3** below. |
 | **T4 — review** | units that change what users see | Operator reviews screenshots (video optional) in the PR before merge. |
 | **Perf** | only units that claim a perf number | The measured number, device, and method, committed. |
@@ -170,7 +209,11 @@ Rules:
   the PR conversation: #43–#49 merged with 30 Codex inline comments
   unanswered because only the conversation was read. They were triaged
   afterwards (verdicts on each thread).
-- **While iOS is paused** (operator, 2026-09-30): T2 is the Android half
+- **iOS** (operator, 2026-10-05): one simulator is allowed again, one
+  booted on the Mac at a time (`AGENTS.md` §Devices), so the iOS half
+  of T2 is back. **When the simulator is not available** (another
+  project has it, or the operator pauses it as on 2026-09-30): T2 is
+  the Android half
   in full — A142 on Vulkan *and* OpenGL, the Fire tablet and the Wacom
   tablet, each with the harness. A diff that touches `dart3d/ios/**` is
   type-checked against the simulator SDK. **Every** PR that skips the

@@ -1,0 +1,79 @@
+dart3d: dice table — 7 DartNative dice (logo inside), 31 nodes, 45 payloads, built in 563 ms (dice 536, compose from 558)
+dart3d: dice table ready after 571 ms
+dart3d: dice table handed to the view in 14 ms
+dart3d: dice tray fit 402x874 insets EdgeInsets(l:10.0, t:118.0, r:10.0, b:144.0) → 4.38 px/u, camera 316, play x -42.7..42.7 z -65.9..71.9
+dart3d: dice roll throw — strength 0.78 dir (1, 1) gates [1, 3]
+dart3d: dice gates closed after 0.83 s
+dart3d: dice d4 turns -24° to read upright
+dart3d: dice settled — d4=1 (up 1.000 at 6.2,4.4,48.4) d6=4 (up 1.000 at 5.0,6.9,61.2) d8=4 (up 1.000 at -16.7,5.3,47.3) d10t=20 (up 1.000 at -4.3,6.0,36.2) d10u=2 (up 1.000 at 33.6,6.0,46.0) d12=3 (up 1.000 at 31.3,7.9,61.0) d20=19 (up 0.999 at 27.7,7.6,29.4)
+dart3d: dice readout d4 1 · d6 4 · d8 4 · d12 3 · d20 19 · d% 20+2 = 53
+dart3d: dice settled — d4=1 (up 1.000 at 6.2,4.4,48.3) d6=4 (up 1.000 at 5.0,6.9,61.2) d8=4 (up 1.000 at -16.7,5.3,47.3) d10t=20 (up 1.000 at -4.3,6.0,36.2) d10u=2 (up 1.000 at 33.6,6.0,46.0) d12=3 (up 1.000 at 31.2,7.9,61.0) d20=19 (up 0.999 at 27.7,7.6,29.4)
+dart3d: dice readout d4 1 · d6 4 · d8 4 · d12 3 · d20 19 · d% 20+2 = 53
+dart3d: dice roll throw — strength 0.63 dir (1, -1) gates [1, 2]
+dart3d: dice gates closed after 0.35 s
+dart3d: dice d4 turns -166° to read upright
+dart3d: dice settled — d4=4 (up 1.000 at 15.4,4.4,-27.0) d6=2 (up 1.000 at 17.1,6.9,-55.9) d8=2 (up 1.000 at 35.5,5.3,-57.5) d10t=40 (up 0.997 at 10.0,6.0,-39.4) d10u=0 (up 1.000 at 33.5,6.0,-28.4) d12=7 (up 1.000 at 31.1,7.9,-44.6) d20=9 (up 0.999 at 27.5,7.6,-14.5)
+dart3d: dice readout d4 4 · d6 2 · d8 2 · d12 7 · d20 9 · d% 40+0 = 64
+dart3d: dice settled — d4=4 (up 1.000 at 15.1,4.4,-26.3) d6=2 (up 1.000 at 17.1,6.9,-56.0) d8=2 (up 1.000 at 35.5,5.3,-57.5) d10t=40 (up 0.997 at 10.0,6.0,-42.8) d10u=0 (up 1.000 at 33.5,6.0,-28.4) d12=7 (up 1.000 at 31.1,7.9,-44.6) d20=9 (up 0.999 at 26.7,7.6,-11.7)
+dart3d: dice readout d4 4 · d6 2 · d8 2 · d12 7 · d20 9 · d% 40+0 = 64
+dart3d: dice roll throw — strength 0.64 dir (-0, -1) gates [2, 0, 1]
+dart3d: dice gates closed after 0.31 s
+dart3d: dice d4 turns -61° to read upright
+dart3d: dice settled — d4=3 (up 1.000 at -11.3,4.4,-55.1) d6=3 (up 1.000 at -16.9,6.9,-2.7) d8=1 (up 1.000 at -7.4,5.3,-31.0) d10t=80 (up 1.000 at -24.9,6.0,-55.3) d10u=8 (up 1.000 at -33.1,6.0,-33.4) d12=2 (up 1.000 at 2.1,7.9,-51.5) d20=16 (up 0.999 at 27.4,7.6,-50.4)
+dart3d: dice readout d4 3 · d6 3 · d8 1 · d12 2 · d20 16 · d% 80+8 = 113
+dart3d: dice roll throw — strength 0.73 dir (0, 1) gates [1, 3]
+dart3d: dice gates closed after 0.31 s
+dart3d: dice cocked d10t (up 0.962) → nudge #1
+dart3d: dice d4 turns -160° to read upright
+dart3d: dice settled — d4=3 (up 1.000 at 2.9,4.4,48.3) d6=1 (up 1.000 at 34.0,6.9,54.8) d8=2 (up 1.000 at 21.5,5.3,64.7) d10t=90 (up 0.999 at 18.3,6.0,47.2) d10u=7 (up 1.000 at 8.3,6.0,61.1) d12=11 (up 1.000 at 27.2,7.9,34.5) d20=7 (up 0.999 at -8.4,7.6,60.4) [1 nudge]
+dart3d: dice readout d4 3 · d6 1 · d8 2 · d12 11 · d20 7 · d% 90+7 = 121
+dart3d: dice timeout — d4=3 (up 1.000 at 3.9,4.4,40.6) d6=1 (up 1.000 at 34.0,6.9,54.9) d8=2 (up 1.000 at 21.6,5.3,64.7) d10t=90 (up 0.997 at 18.2,6.0,47.3) d10u=7 (up 1.000 at 7.6,6.0,62.7) d12=11 (up 1.000 at 27.2,7.9,34.5) d20=7 (up 0.999 at -8.5,7.6,60.3) [1 nudge]
+dart3d: dice readout d4 3 · d6 1 · d8 2 · d12 11 · d20 7 · d% 90+7 = 121
+dart3d: dice aim throw — strength 0.79 dir (140, -300) gates [1, 2]
+dart3d: dice gates closed after 0.29 s
+dart3d: dice d4 turns 24° to read upright
+dart3d: dice settled — d4=3 (up 1.000 at 17.7,4.4,-58.3) d6=1 (up 1.000 at 34.0,6.9,-56.4) d8=2 (up 1.000 at 28.6,5.3,-7.7) d10t=70 (up 1.000 at -4.9,6.0,-54.2) d10u=8 (up 1.000 at 35.4,6.0,-39.1) d12=7 (up 1.000 at 6.6,7.9,-29.7) d20=3 (up 0.999 at 21.3,7.5,-43.1)
+dart3d: dice readout d4 3 · d6 1 · d8 2 · d12 7 · d20 3 · d% 70+8 = 94
+dart3d: dice settled — d4=3 (up 1.000 at 17.2,4.4,-58.4) d6=1 (up 1.000 at 34.0,6.9,-56.3) d8=2 (up 1.000 at 28.6,5.3,-7.8) d10t=70 (up 1.000 at -4.9,6.0,-54.2) d10u=8 (up 1.000 at 35.4,6.0,-39.1) d12=7 (up 1.000 at 6.6,7.9,-29.7) d20=3 (up 0.999 at 21.3,7.5,-43.1)
+dart3d: dice readout d4 3 · d6 1 · d8 2 · d12 7 · d20 3 · d% 70+8 = 94
+dart3d: dice picked up (hover 68)
+dart3d: dice tossed — fling 1893 px/s (tracked, 5 moves, last 1 ms before release) → 15.9 u/s
+dart3d: dice d4 turns -177° to read upright
+dart3d: dice settled — d4=2 (up 1.000 at 25.3,4.4,-36.5) d6=4 (up 1.000 at 10.6,6.9,3.9) d8=2 (up 1.000 at 20.8,5.3,-22.4) d10t=30 (up 0.997 at 13.7,6.0,-46.3) d10u=7 (up 1.000 at -22.0,6.0,-28.3) d12=8 (up 1.000 at -7.7,7.9,-50.9) d20=15 (up 0.999 at 33.0,7.6,-55.1)
+dart3d: dice readout d4 2 · d6 4 · d8 2 · d12 8 · d20 15 · d% 30+7 = 68
+dart3d: dice settled — d4=2 (up 1.000 at 30.1,4.4,-37.0) d6=4 (up 1.000 at 10.6,6.9,3.9) d8=2 (up 1.000 at 19.6,5.3,-21.8) d10t=30 (up 0.997 at 13.5,6.0,-46.9) d10u=7 (up 1.000 at -22.0,6.0,-28.3) d12=8 (up 1.000 at -7.7,7.9,-50.9) d20=15 (up 0.999 at 33.0,7.6,-55.1)
+dart3d: dice readout d4 2 · d6 4 · d8 2 · d12 8 · d20 15 · d% 30+7 = 68
+dart3d: dice roll throw — strength 0.65 dir (-1, -0) gates [0, 2]
+dart3d: dice gates closed after 0.26 s
+dart3d: dice d4 turns 175° to read upright
+dart3d: dice settled — d4=4 (up 1.000 at -31.2,4.4,20.4) d6=6 (up 1.000 at -26.2,6.9,-56.3) d8=3 (up 1.000 at -10.0,5.3,-49.8) d10t=10 (up 0.997 at -33.0,6.0,-42.3) d10u=3 (up 0.997 at -5.7,6.0,58.8) d12=7 (up 1.000 at -27.4,7.9,-26.0) d20=15 (up 0.999 at -7.7,7.6,-22.4)
+dart3d: dice readout d4 4 · d6 6 · d8 3 · d12 7 · d20 15 · d% 10+3 = 48
+dart3d: dice settled — d4=4 (up 1.000 at -32.1,4.4,20.7) d6=6 (up 1.000 at -26.1,6.9,-56.3) d8=3 (up 1.000 at -10.0,5.3,-49.8) d10t=10 (up 0.997 at -33.0,6.0,-42.3) d10u=3 (up 0.997 at -5.7,6.0,58.8) d12=7 (up 1.000 at -27.5,7.9,-26.0) d20=15 (up 0.999 at -7.7,7.6,-22.4)
+dart3d: dice readout d4 4 · d6 6 · d8 3 · d12 7 · d20 15 · d% 10+3 = 48
+dart3d: dice roll throw — strength 0.60 dir (-1, 1) gates [0, 3]
+dart3d: dice gates closed after 0.35 s
+dart3d: dice cocked d10u (up 0.969) → nudge #1
+dart3d: dice d4 turns 132° to read upright
+dart3d: dice settled — d4=1 (up 1.000 at -34.5,4.4,47.3) d6=4 (up 1.000 at -34.0,6.9,62.0) d8=6 (up 1.000 at -20.0,5.3,64.0) d10t=70 (up 1.000 at -16.6,6.0,52.1) d10u=6 (up 0.997 at 1.3,6.0,57.8) d12=8 (up 1.000 at -10.3,7.9,15.1) d20=8 (up 0.999 at 32.4,7.6,57.8) [1 nudge]
+dart3d: dice readout d4 1 · d6 4 · d8 6 · d12 8 · d20 8 · d% 70+6 = 103
+dart3d: dice settled — d4=1 (up 1.000 at -30.8,4.4,39.6) d6=4 (up 1.000 at -33.8,6.9,62.0) d8=6 (up 1.000 at -19.9,5.3,64.0) d10t=70 (up 1.000 at -16.6,6.0,52.1) d10u=6 (up 0.997 at 1.3,6.0,57.8) d12=8 (up 1.000 at -10.3,7.9,15.1) d20=8 (up 0.999 at 32.4,7.6,57.8) [1 nudge]
+dart3d: dice readout d4 1 · d6 4 · d8 6 · d12 8 · d20 8 · d% 70+6 = 103
+dart3d: dice roll throw — strength 0.84 dir (1, -0) gates [1, 2]
+dart3d: dice gates closed after 0.32 s
+dart3d: dice d4 turns -6° to read upright
+dart3d: dice settled — d4=1 (up 1.000 at 15.0,4.4,-41.0) d6=4 (up 1.000 at -29.6,6.9,-52.2) d8=8 (up 1.000 at 34.2,5.3,-39.4) d10t=40 (up 0.997 at 31.8,6.0,-57.6) d10u=8 (up 1.000 at 30.6,6.0,-7.0) d12=4 (up 1.000 at 8.8,7.9,-54.7) d20=11 (up 0.999 at 29.6,7.6,-21.9)
+dart3d: dice readout d4 1 · d6 4 · d8 8 · d12 4 · d20 11 · d% 40+8 = 76
+dart3d: dice timeout — d4=1 (up 1.000 at 14.9,4.4,-41.0) d6=4 (up 1.000 at -29.6,6.9,-52.2) d8=8 (up 1.000 at 34.2,5.3,-39.4) d10t=40 (up 0.997 at 31.8,6.0,-57.6) d10u=8 (up 1.000 at 30.6,6.0,-7.0) d12=4 (up 1.000 at 8.8,7.9,-54.7) d20=11 (up 0.999 at 29.6,7.6,-21.9)
+dart3d: dice readout d4 1 · d6 4 · d8 8 · d12 4 · d20 11 · d% 40+8 = 76
+dart3d: dice roll throw — strength 0.75 dir (-1, 1) gates [0, 3]
+dart3d: dice gates closed after 0.24 s
+dart3d: dice d4 turns 170° to read upright
+dart3d: dice settled — d4=4 (up 1.000 at -31.1,4.4,64.8) d6=4 (up 1.000 at -32.3,6.9,39.4) d8=5 (up 1.000 at 34.4,5.3,59.5) d10t=0 (up 0.997 at -5.5,6.0,44.7) d10u=4 (up 0.997 at -34.8,6.0,54.3) d12=10 (up 1.000 at -11.1,7.9,59.4) d20=18 (up 0.999 at 18.6,7.6,52.5)
+dart3d: dice readout d4 4 · d6 4 · d8 5 · d12 10 · d20 18 · d% 00+4 = 45
+dart3d: dice settled — d4=4 (up 1.000 at -20.5,4.4,59.3) d6=4 (up 1.000 at -32.3,6.9,37.4) d8=5 (up 1.000 at 34.4,5.3,59.5) d10t=0 (up 0.997 at -4.5,6.0,42.7) d10u=4 (up 0.996 at -35.4,6.0,52.1) d12=10 (up 1.000 at -2.1,7.9,57.8) d20=18 (up 0.999 at 18.6,7.6,52.5)
+dart3d: dice readout d4 4 · d6 4 · d8 5 · d12 10 · d20 18 · d% 00+4 = 45
+dart3d: dice tray fit 874x402 insets EdgeInsets(l:72.0, t:56.0, r:222.0, b:54.0) → 4.38 px/u, camera 145, play x -82.4..48.2 z -32.6..32.2
+dart3d: dice refit moved 7 — reading again
+dart3d: dice cocked d8 (up 0.860) → nudge #1
+dart3d: dice settled — d4=4 (up 1.000 at -20.6,4.4,21.8) d6=5 (up 1.000 at -31.9,6.9,7.3) d8=4 (up 1.000 at 37.7,5.3,9.6) d10t=80 (up 1.000 at -5.6,6.0,22.3) d10u=0 (up 0.997 at -42.5,6.0,23.6) d12=10 (up 1.000 at 4.1,7.9,10.7) d20=11 (up 0.999 at 17.6,7.6,21.3) [1 nudge]
+dart3d: dice readout d4 4 · d6 5 · d8 4 · d12 10 · d20 11 · d% 80+0 = 114

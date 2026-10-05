@@ -29,6 +29,15 @@ Uint8List? bytesFromDisk(String key) {
 
 void main() {
   group('buildDiceTable', () {
+    test('builds on a background isolate', () async {
+      final (scene, log) = await buildDiceTableInBackground(
+        logo: bytesFromDisk(kLogoAsset),
+      );
+      expect(scene!.dice.map((d) => d.label), kDiceOrder);
+      expect(scene.dice.every((d) => d.logo != null), isTrue);
+      expect(log.single, contains('7 DartNative dice (logo inside)'));
+    });
+
     test('composes seven dice with physics', () {
       final scene = buildDiceTable(bytesFor: bytesFromDisk)!;
       final doc = scene.document;

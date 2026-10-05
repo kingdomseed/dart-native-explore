@@ -71,8 +71,25 @@ named `mythic_scene` or anything infringing on `flutter_scene` naming.
 
 ## Devices
 
-- iPhone 17 Pro sim: `9151BBE4-8453-4F3F-8FD6-17535A25A18E` (booted,
-  playground running)
+- iPhone 17 Pro sim: `C24F3C6D-A3A9-4FB7-978E-36E67EF55354` (iOS 27.0,
+  402×874 pt; kept shut down between runs). Check with
+  `xcrun simctl list devices available` — the id changes when
+  simulators are recreated.
+- Simulator on Xcode 27 (found 2026-10-05):
+  - Booting one drives the Mac's 1-minute load to 150–330 for about
+    five minutes. Boot once per session, wait for the load to settle
+    before building or timing, and shut down only when done.
+  - Don't use `xcrun simctl bootstatus -b` (it hung for 18 minutes).
+    Poll `xcrun simctl list devices booted` instead.
+  - There is no Simulator.app. `DeviceHub.app` (inside Xcode.app)
+    replaces it; quitting it shuts down every booted simulator, so
+    don't open it.
+  - `simctl` cannot rotate a device or inject touches. Touches go
+    through the session's iOS-simulator tool (pass the device id on
+    every call; in landscape its coordinates stay the portrait
+    device's: UI point (x, y) is device (y, 874 − x)). Rotation needs
+    the operator or a rotation method they have approved.
+  - `dn run` on the simulator is a debug build.
 - Physical iOS 27 devices: "Jason's iPad", "Holtnet" (wireless)
 - Physical Android: Nothing A142 ("Pacman"), serial `00064149A002033`,
   Mali-G610 / GLES 3.2. `dn devices` doesn't list it; pass
@@ -89,10 +106,13 @@ named `mythic_scene` or anything infringing on `flutter_scene` naming.
   (`accelerometer_rotation=0`, `user_rotation=1`): install and run our
   app, nothing else, and don't launch with `adb shell monkey` — monkey
   switches auto-rotate on (use `am start`, as `tool/cold_start.sh` does).
-- Device policy (operator, 2026-10-01; Wacom added 2026-10-05): dart3d
-  work runs on the A142, the Fire tablet and the Wacom tablet only. No
-  iOS simulators, Android emulators or iPad until the operator
-  re-enables them (Mac mini load). Before launching and before any
+- Device policy (operator, 2026-10-01; Wacom and the simulator added
+  2026-10-05): dart3d work runs on the A142, the Fire tablet, the
+  Wacom tablet and **one** iOS simulator. One simulator booted on the
+  Mac at a time across all projects: if another is booted it is
+  someone else's — leave it and ask. Physical iOS devices and the iPad
+  are still not cleared, and Android emulators stay off (Mac mini
+  load). Before launching and before any
   `adb` input, confirm the foreground is
   `com.jasonholtdigital.dart3d_example` or the launcher.
 - Android emulators: Pixel_Tablet_API36, Tablet_WXGA_API30/36, TomeKeeper_Beta6_Smoke

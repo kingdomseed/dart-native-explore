@@ -16,7 +16,6 @@
 library;
 
 import 'dart:async';
-import 'dart:isolate';
 import 'dart:math';
 
 import 'package:dart3d/dart3d.dart';
@@ -182,15 +181,10 @@ class _DiceTableScreenState extends State<DiceTableScreen>
     var messages = <String>[];
     DiceTableScene? scene;
     try {
-      (scene, messages) = await Isolate.run(() {
-        final log = <String>[];
-        final s = buildDiceTable(
-          bytesFor: (key) => key == kLogoAsset ? logo : null,
-          log: log.add,
-          spec: spec,
-        );
-        return (s, log);
-      });
+      (scene, messages) = await buildDiceTableInBackground(
+        logo: logo,
+        spec: spec,
+      );
     } catch (e) {
       dnLog('dart3d: dice table — background build failed ($e); inline');
       scene = buildDiceTable(bytesFor: loadAssetBytes, log: dnLog, spec: spec);

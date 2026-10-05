@@ -1,0 +1,11 @@
+17:26:26 ticks  31 peak max  522 median  508 min  471
+17:27:04 ticks  31 peak max  448 median  421 min  413
+17:27:15 ticks  31 peak max  475 median  458 min  418
+17:27:22 ticks  31 peak max  499 median  478 min  426
+17:27:45 ticks  31 peak max  529 median  488 min  445
+17:27:59 ticks  31 peak max  645 median  567 min  377
+17:28:22 ticks  31 peak max  464 median  422 min  389
+17:28:44 ticks  31 peak max  446 median  427 min  403
+17:28:57 ticks  31 peak max  530 median  490 min  458
+17:29:03 ticks  31 peak max  515 median  501 min  479
+17:29:31 ticks  31 peak max   68 median   34 min   11
