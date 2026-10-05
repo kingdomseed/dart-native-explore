@@ -129,3 +129,16 @@ final class AutoRerollGate {
   /// Restores the self-running loop (new scene generation).
   void resume() => _suspended = false;
 }
+
+/// The harness bodies that are still awake long after their lanes ended.
+/// A `settled` event needs every dynamic body asleep, so the settle
+/// lanes (wLoose and the W25 close-out) remove these first.
+///
+/// `j9.breakBox` is the one that is easy to miss: its joint breaks under
+/// a 67 m/s kick, which also throws it off the slab, and a body in free
+/// fall never sleeps.
+bool harnessBodyNeverRests(String nodeName) =>
+    nodeName == 'w5NoRest' ||
+    nodeName == 'j9.liftPlate' ||
+    nodeName == 'j9.breakBox' ||
+    nodeName.startsWith('j9.chain');

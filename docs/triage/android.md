@@ -176,7 +176,7 @@ keep only their latest entry per target. Checked:
 | updateStage | no | `realize(…, preserveStage = true)` re-decodes the live stage |
 | upsertPayload | no | `payloadStore` persists; `opPayloadSpecs` merge back in `install()` |
 | addJoint / updateJoint / removeJoint | no | `world.retainJointsForNodes(nodes.keys)` keeps command joints for surviving nodes. Not re-verified in this round |
-| applyImpulse / applyTorque / setVelocity / clearForces | yes (bodies rebuilt at the manifest pose) | **not replayed, by design:** transient impulses against a pose that no longer exists. Losing dynamic body state on a re-realize is the known pre-existing limitation (Devin followups #1: "deferred-payload re-realize destroys live state"). Proper fix: preserve body poses/velocities across install (M) |
+| applyImpulse / applyTorque / setVelocity / clearForces | yes (bodies rebuilt at the manifest pose) | **not replayed, by design:** transient impulses against a pose that no longer exists. Losing dynamic body state on a re-realize is the known pre-existing limitation (Devin followups #1: "deferred-payload re-realize destroys live state"). Proper fix: preserve body poses/velocities across install (M). **Done in S0g** (`BodyCarry`; `docs/artifacts/s0g-physics-rerealize/`): the result of those impulses carries, so they still need no replay |
 | setTransforms (binary message, not a command) | yes (nodes rebuilt at the manifest TRS) | **not replayed, same limitation:** live transform writes revert until the next write. Most producers (physics sync, camera rig) rewrite every frame. Fix together with the body state above (M) |
 | query / render | no (read-only / one-shot) | nothing to replay |
 

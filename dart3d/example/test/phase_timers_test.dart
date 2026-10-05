@@ -159,4 +159,36 @@ void main() {
       await events.close();
     });
   });
+  group('bodies the settle lanes retire', () {
+    test('the box kicked off the slab by its breaking joint', () {
+      expect(harnessBodyNeverRests('j9.breakBox'), isTrue);
+    });
+
+    test('the unsleeping body, the motor plate and the whole chain', () {
+      for (final name in [
+        'w5NoRest',
+        'j9.liftPlate',
+        'j9.chainAnchor',
+        'j9.chain1',
+        'j9.chain4',
+      ]) {
+        expect(harnessBodyNeverRests(name), isTrue, reason: name);
+      }
+    });
+
+    test('bodies that do come to rest stay', () {
+      for (final name in [
+        'die',
+        'ball',
+        'j9.breakAnchor',
+        'j9.pendBob',
+        'j9.doorPanel',
+        'j9.weldA',
+        'j9.genBox',
+        'wlooseCcd',
+      ]) {
+        expect(harnessBodyNeverRests(name), isFalse, reason: name);
+      }
+    });
+  });
 }
