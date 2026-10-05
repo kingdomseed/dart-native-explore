@@ -148,11 +148,15 @@ internal object MaterialPackages {
                         expected++
                         // A package filamat accepted still counts as
                         // missing if its file never reached the export
-                        // directory (a failed write).
-                        if (compile(spec) == null ||
-                            store?.isExported(spec.fingerprint) != true) {
-                            rejected.add(spec.key)
-                        }
+                        // directory (a failed write). The export is
+                        // written under compileLock, so look under it:
+                        // compile() can return another thread's bytes
+                        // from memory before that thread has saved them.
+                        val exported = compile(spec) != null &&
+                            synchronized(compileLock) {
+                                store?.isExported(spec.fingerprint) == true
+                            }
+                        if (!exported) rejected.add(spec.key)
                     }
                 }
                 val line = BakeProgress.fixedSetLine(expected, rejected)
