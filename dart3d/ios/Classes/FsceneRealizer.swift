@@ -4912,6 +4912,52 @@ enum FsceneRealizer {
         /// uses, `(1 − (d / range)⁴)²`, and ignores the falloff
         /// exponent for these lights. Its cone angles are whole
         /// angles in degrees; the wire's are half-angles in radians.
+        /// Its ramp between the inner and the outer angle is wider
+        /// than upstream's (0.64 where upstream's is 0.43, a third of
+        /// the way in from the edge of a 15°/30° cone), so the cone is
+        /// made hard at the outer angle and upstream's ramp is
+        /// projected through it as the light's gobo.
+        private static var spotConeImages: [String: CGImage] = [:]
+
+        /// Upstream's (and Filament's) spot cone as an image a spot
+        /// light projects: `sat((cos θ − cos outer) / (cos inner −
+        /// cos outer))²` at the angle θ each texel is seen under, the
+        /// image's edge lying on the outer angle.
+        static func spotConeImage(inner: Double, outer: Double) -> CGImage? {
+            let key = String(format: "%.4f|%.4f", inner, outer)
+            if let image = spotConeImages[key] { return image }
+            let n = 256
+            let tanOuter = tan(outer)
+            let cosOuter = cos(outer)
+            let span = max(cos(inner) - cosOuter, 1.0 / 1024.0)
+            var bytes = [UInt8](repeating: 255, count: n * n * 4)
+            for y in 0..<n {
+                let v = (Double(y) + 0.5) / Double(n) * 2 - 1
+                for x in 0..<n {
+                    let u = (Double(x) + 0.5) / Double(n) * 2 - 1
+                    let angle = atan((u * u + v * v).squareRoot() * tanOuter)
+                    let t = min(max((cos(angle) - cosOuter) / span, 0), 1)
+                    let value = UInt8((t * t * 255).rounded())
+                    let i = (y * n + x) * 4
+                    bytes[i] = value
+                    bytes[i + 1] = value
+                    bytes[i + 2] = value
+                }
+            }
+            guard let provider = CGDataProvider(data: Data(bytes) as CFData),
+                  let space = CGColorSpace(name: CGColorSpace.linearSRGB),
+                  let image = CGImage(
+                      width: n, height: n, bitsPerComponent: 8,
+                      bitsPerPixel: 32, bytesPerRow: n * 4, space: space,
+                      bitmapInfo: CGBitmapInfo(
+                          rawValue: CGImageAlphaInfo.noneSkipLast.rawValue),
+                      provider: provider, decode: nil,
+                      shouldInterpolate: true, intent: .defaultIntent)
+            else { return nil }
+            spotConeImages[key] = image
+            return image
+        }
+
         func decodeLight(_ node: SCNNode, _ p: [String: Any],
                          _ type: SCNLight.LightType) {
             let light = SCNLight()
@@ -4932,10 +4978,19 @@ enum FsceneRealizer {
                 light.attenuationEndDistance = CGFloat(max(range, 0))
             }
             if type == .spot {
-                let inner = d3Double(p["innerConeAngle"]) ?? 0
-                let outer = d3Double(p["outerConeAngle"]) ?? .pi / 4
-                light.spotInnerAngle = CGFloat(inner * 2 * 180.0 / .pi)
+                let outer = min(max(
+                    d3Double(p["outerConeAngle"]) ?? .pi / 4, 0.01), 1.55)
+                let inner = min(max(
+                    d3Double(p["innerConeAngle"]) ?? 0, 0), outer)
+                light.spotInnerAngle = CGFloat(outer * 2 * 180.0 / .pi)
                 light.spotOuterAngle = CGFloat(outer * 2 * 180.0 / .pi)
+                if let gobo = light.gobo {
+                    gobo.contents = Self.spotConeImage(
+                        inner: inner, outer: outer)
+                    gobo.intensity = 1
+                    gobo.wrapS = .clamp
+                    gobo.wrapT = .clamp
+                }
             }
             if type == .area {
                 // rectAreaLight (W12): the emitter's rectangle — the
