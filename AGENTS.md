@@ -81,11 +81,20 @@ named `mythic_scene` or anything infringing on `flutter_scene` naming.
   Android 11 (API 30), Mali-G52 MC2 / GLES 3.2 / Vulkan 1.1, 1200×1920.
   The low-end floor; shared with other projects, so check with the
   operator before assuming it is free.
-- Device policy (operator, 2026-10-01): dart3d work runs on the A142 and
-  the Fire tablet only. No iOS simulators, Android emulators or iPad
-  until the operator re-enables them (Mac mini load). Before any `adb`
-  input, confirm the foreground package is
-  `com.jasonholtdigital.dart3d_example`.
+- Physical Android tablet: Wacom DTHA116 ("RosePlus"), serial
+  `5FL21V6001199`, Android 14 (API 34), MediaTek MT8781 / Mali-G57 MC2 /
+  GLES 3.2 / Vulkan 1.1, 8 GB, 1440×2200. A weak GPU with plenty of
+  memory: dart3d files it LOW by GPU name. It is a drawing tablet with
+  its owner's content on it and is kept rotation-locked in landscape
+  (`accelerometer_rotation=0`, `user_rotation=1`): install and run our
+  app, nothing else, and don't launch with `adb shell monkey` — monkey
+  switches auto-rotate on (use `am start`, as `tool/cold_start.sh` does).
+- Device policy (operator, 2026-10-01; Wacom added 2026-10-05): dart3d
+  work runs on the A142, the Fire tablet and the Wacom tablet only. No
+  iOS simulators, Android emulators or iPad until the operator
+  re-enables them (Mac mini load). Before launching and before any
+  `adb` input, confirm the foreground is
+  `com.jasonholtdigital.dart3d_example` or the launcher.
 - Android emulators: Pixel_Tablet_API36, Tablet_WXGA_API30/36, TomeKeeper_Beta6_Smoke
 
 ## Android build recipe (dart3d example)

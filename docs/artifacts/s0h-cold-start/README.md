@@ -22,6 +22,11 @@ straight after `adb install` took 11.40–11.82 s before (3 runs) and
 0.73–0.74 s after (2 runs); the extra 0.17 s falls before the engine
 is created.
 
+**Update 2026-10-05:** the Fire tablet was measured afterwards: 1.25 s
+on first launch and 0.89 s on later ones
+(`../s0-three-device-baseline/`). The rest of this section is the
+record of the original run.
+
 **The Fire tablet was not measured.** Prime Video was in the foreground
 from 15:01 to 15:45, every time it was checked. The power service
 reported the last touch 2.5 hours earlier and the screen held on by

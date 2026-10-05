@@ -8,22 +8,28 @@ import android.content.pm.PackageManager
  * The device class a view's defaults are chosen for when the app sets
  * no `SceneQuality`.
  *
- * [LOW] stands for a fill-rate-bound GPU. Memory is the proxy: the GPU
- * can't be named before an engine exists, and the measured case — the
- * Fire tablet KFTUWI, Mali-G52 MC2, 2.9 GB, 1920×1200 — spends about
- * 125 ms of GPU on a dice frame through the standard pipeline
- * (`docs/artifacts/s0-tablet-frame-rate/`).
+ * [LOW] stands for a fill-rate-bound GPU. It is decided from the GPU's
+ * name ([GpuProbe], [FILL_BOUND_GPUS]) and, when the name says nothing,
+ * from memory. Through the standard pipeline a dice frame measured
+ * (`docs/artifacts/s0-three-device-baseline/`):
+ *
+ * | Device | GPU | Memory | Pixels | GPU ms |
+ * |---|---|---|---|---|
+ * | Fire KFTUWI | Mali-G52 MC2 | 2.9 GB | 1200×1920 | 125 |
+ * | Wacom DTHA116 | Mali-G57 MC2 | 8 GB | 1440×2200 | 75 |
+ * | Nothing A142 | Mali-G610 MC4 | 7.6 GB | 1084×2412 | 18 |
  *
  * Two things follow from LOW, and they are decided separately:
  *
  * - The `auto` backend resolves to OpenGL, at engine creation, whatever
  *   `SceneQuality` says. Dynamic resolution needs GPU frame times, and
- *   Filament's Vulkan backend never produced them on that tablet's
+ *   Filament's Vulkan backend never produced them on the Fire tablet's
  *   driver. Only the backend pref (`Dart3dSetBackend`) overrides this.
  * - While no `SceneQuality` is set, the view takes the pipeline in
  *   [DeviceProfile]: hard PCF shadows, FXAA without MSAA, the small HDR
  *   buffer and dynamic resolution. A fast device misfiled as LOW keeps
- *   full resolution — the scale only drops while frames run long.
+ *   full resolution — the scale only drops while frames run long. That
+ *   is also why screen size is not an input.
  */
 internal enum class DeviceTier {
     LOW, STANDARD;
@@ -36,9 +42,30 @@ internal enum class DeviceTier {
         /** The lowest scale dynamic resolution may reach on [LOW]. */
         const val LOW_MIN_RENDER_SCALE = 0.5f
 
-        fun classify(totalMemoryBytes: Long, lowRamDevice: Boolean): DeviceTier =
-            if (lowRamDevice || totalMemoryBytes in 1 until LOW_MEMORY_BYTES) LOW
-            else STANDARD
+        /**
+         * GPU families filed as fill-rate bound, matched against the
+         * `GL_RENDERER` string. Mali-G52 and Mali-G57 are measured (the
+         * table above). The rest are listed by their market class, at
+         * or below those two, and are not measured here. A GPU matching
+         * none of them is decided by memory.
+         */
+        val FILL_BOUND_GPUS: List<Regex> = listOf(
+            Regex("""Mali-(4\d\d|T\d{3})"""),
+            Regex("""Mali-G(31|51|52|57)\b"""),
+            Regex("""Adreno \(TM\) (3\d\d|4\d\d|50\d|51\d|61\d)\b"""),
+            Regex("""PowerVR Rogue GE\d{4}"""),
+        )
+
+        /** [gpuRenderer] is the `GL_RENDERER` string, null if unknown. */
+        fun classify(
+            totalMemoryBytes: Long, lowRamDevice: Boolean, gpuRenderer: String?,
+        ): DeviceTier = when {
+            lowRamDevice -> LOW
+            totalMemoryBytes in 1 until LOW_MEMORY_BYTES -> LOW
+            gpuRenderer != null &&
+                FILL_BOUND_GPUS.any { it.containsMatchIn(gpuRenderer) } -> LOW
+            else -> STANDARD
+        }
 
         @Volatile private var cached: DeviceTier? = null
 
@@ -47,8 +74,8 @@ internal enum class DeviceTier {
                 as? ActivityManager
             val info = ActivityManager.MemoryInfo()
             am?.getMemoryInfo(info)
-            classify(info.totalMem, am?.isLowRamDevice == true)
-                .also { cached = it }
+            classify(info.totalMem, am?.isLowRamDevice == true,
+                GpuProbe.renderer()).also { cached = it }
         }
 
         /** What the `auto` backend pref resolves to on this device. */
