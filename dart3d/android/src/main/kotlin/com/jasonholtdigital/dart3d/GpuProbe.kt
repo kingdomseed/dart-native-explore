@@ -16,9 +16,13 @@ import android.util.Log
  *
  * Null when any EGL step fails (no ES 2 pbuffer config, no context, no
  * surface) or the driver returns no string; [DeviceTier] then decides
- * from memory alone. The process's
- * EGL display is shared with the system's own renderer and is left
- * initialized.
+ * from memory alone.
+ *
+ * The process's EGL display is shared with the system's own renderer
+ * and with Filament's OpenGL backend. Android counts initializations
+ * of it (`egl_display_t::refs` in libEGL): `eglTerminate` only tears
+ * the display down for the last holder, so the probe gives back the
+ * one reference it took and leaves everyone else's alone.
  */
 internal object GpuProbe {
     private const val TAG = "dart3d"
@@ -39,7 +43,14 @@ internal object GpuProbe {
         if (display == EGL14.EGL_NO_DISPLAY) return null
         val version = IntArray(2)
         if (!EGL14.eglInitialize(display, version, 0, version, 1)) return null
+        try {
+            return queryRenderer(display)
+        } finally {
+            EGL14.eglTerminate(display)
+        }
+    }
 
+    private fun queryRenderer(display: android.opengl.EGLDisplay): String? {
         val configs = arrayOfNulls<EGLConfig>(1)
         val count = IntArray(1)
         val configAttribs = intArrayOf(

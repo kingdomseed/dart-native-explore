@@ -1609,7 +1609,7 @@ class SpriteParticleRuntime(
                 .indexCount(count)
                 .bufferType(if (short) IndexBuffer.Builder.IndexType.USHORT
                     else IndexBuffer.Builder.IndexType.UINT)
-                .build(engine)
+                .fenced { build(engine) }
             ib.setBuffer(engine, bytes)
             return ib
         }
@@ -1628,7 +1628,7 @@ class SpriteParticleRuntime(
                     VertexBuffer.AttributeType.FLOAT2, 36, VERTEX_BYTES)
                 .attribute(VertexBuffer.VertexAttribute.CUSTOM0, 0,
                     VertexBuffer.AttributeType.FLOAT, 44, VERTEX_BYTES)
-                .build(engine)
+                .fenced { build(engine) }
         }
     }
 }
@@ -1695,7 +1695,7 @@ class MeshParticleRuntime(
                 .receiveShadows(true)
                 // Particles move per frame — a stale box under-culls.
                 .culling(false)
-                .build(engine, e)
+                .fenced { build(engine, e) }
             // The pool slot consumes the material — register so a
             // material upsert re-attaches it (same (entity, slot)
             // contract mesh components use).

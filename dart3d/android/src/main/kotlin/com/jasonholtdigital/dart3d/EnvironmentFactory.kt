@@ -776,7 +776,7 @@ object EnvironmentFactory {
             .format(if (env.isFloat) Texture.InternalFormat.RGBA16F
                 else Texture.InternalFormat.SRGB8_A8)
             .usage(Texture.Usage.DEFAULT or Texture.Usage.GEN_MIPMAPPABLE)
-            .build(engine)
+            .fenced { build(engine) }
         if (env.isFloat) {
             val floats = env.data.size / 4
             val buf = ByteBuffer.allocateDirect(floats * 2)
