@@ -221,9 +221,9 @@ Rules:
       drops its document. Measured on the Fire tablet (API 30): `main`
       dies of `OutOfMemoryError` at visit 22; the branch completes 50
       visits and 200 rolls; rolls are flat; frame rate unchanged on all
-      three devices. **Open:** T2 on the final head for the A142 and
-      the Wacom (run on the Fire tablet only; the commit before it has
-      all three); per-visit growth in the app from two
+      three devices. **Open:** T2 on the final head for the A142,
+      Vulkan and OpenGL (the tablets are run; the commit before it has
+      all three devices); per-visit growth in the app from two
       causes outside the plugin's native code (the framework's view
       registry holds the hero's view tree; the Dart heap grows about
       7 MB per visit, cause unknown); a native slope under about 0.1 MB

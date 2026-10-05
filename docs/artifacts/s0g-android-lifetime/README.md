@@ -26,8 +26,8 @@ lifetime.
   *What still grows*.
 - Three Filament use-after-destroy or leak paths fixed and all 31
   builder sites fenced; no frame-rate change on the three devices
-  (the follow-up commit's changes are run on the Fire tablet only; see
-  *T2 and frame rate*).
+  (the follow-up commit's changes are run on the two tablets; the
+  A142 is owed, see *T2 and frame rate*).
 
 ## How it was measured
 
@@ -168,11 +168,11 @@ Both show on the A142 too: the same heap-dump path, and Java heap 11 →
 Two heads were run. `75e9bbd` got the three-device run below. The
 final head adds two things on top of it: the GPU probe's
 `eglTerminate`, and the `JoltWorld.update` fences going through
-`Reachability.fence`. **The final head has only been run on the Fire
-tablet**; the A142 and the Wacom were lent to another project before
-their runs. Owed on the final head: A142 Vulkan, A142 OpenGL and the
-Wacom, each with the harness. The probe change matters most on the
-OpenGL devices, which is the Fire tablet (run) and the Wacom (owed).
+`Reachability.fence`. **The final head has been run on the Fire tablet
+and the Wacom**, the two devices that render through OpenGL and so the
+two the probe change matters to. The A142 was on loan to another
+project. Owed on the final head: A142 Vulkan and A142 OpenGL, each with
+the harness. Nothing else.
 
 Each run from a fresh launch: hero 30 s, dice racked 30 s, 12 rolls
 3 s apart, settle. Frame rates from the `dart3d.perf` log, first 2 s
@@ -182,8 +182,9 @@ window dropped; baseline from
 | Head | Device | Backend, tier | Hero | Dice racked | Dice rolling | Harness | FATAL |
 |---|---|---|---|---|---|---|---|
 | final | Fire KFTUWI (Mali-G52 MC2) | OPENGL, LOW | 55.9 (55.0) | 44.6 (44.2) | 43.9 (43.7) | to `w18`, complete | 0 |
+| final | Wacom DTHA116 (Mali-G57 MC2) | OPENGL, LOW | 57.7 (57.5) | 51.6 (51.2) | 45.1 (44.1) | to `w18`, complete | 0 |
 | `75e9bbd` | Fire KFTUWI | OPENGL, LOW | 55.7 (55.0) | 44.5 (44.2) | 43.8 (43.7) | not run | 0 |
-| `75e9bbd` | Wacom DTHA116 (Mali-G57 MC2) | OPENGL, LOW | 54.3, 58.1 (57.5) | 51.4, 50.6 (51.2) | 44.9, 44.0 (44.1) | not run | 0 |
+| `75e9bbd` | Wacom DTHA116 | OPENGL, LOW | 54.3, 58.1 (57.5) | 51.4, 50.6 (51.2) | 44.9, 44.0 (44.1) | not run | 0 |
 | `75e9bbd` | Nothing A142 (Mali-G610 MC4) | VULKAN, STANDARD | 89.1 (89.7) | 49.7 (49.7) | 50.3 (50.3) | to `w18`, complete | 0 |
 | `75e9bbd` | Nothing A142, `DART3D_BACKEND=opengl` | OPENGL (pref=1), STANDARD | not run | not run | not run | to `w18`, complete | 0 |
 
@@ -193,10 +194,15 @@ under the baseline; the second is above it.
 The harness's `w25` dice close-out reports FAIL in every run here, as
 it does on `main`; that is the other S0g unit's subject.
 `a142-harness-vulkan.jpg`, `a142-harness-opengl.jpg`,
-`fire-harness.jpg`.
+`fire-harness.jpg`, `wacom-harness.jpg`.
 
-Screens: `fire-*.jpg` (final head), `wacom-*.jpg`, `a142-*.jpg` (hero,
-dice, settled).
+Screens: `fire-*.jpg` and `wacom-*.jpg` (final head), `a142-*.jpg`
+(`75e9bbd`): hero, dice, settled.
+
+The final head is the commit after `d711581` that makes the soak
+tool's last CSV row numeric; it changes that script and three CSV
+files and no code that ships. The Fire tablet ran `d711581`, the Wacom
+ran that commit's tree.
 
 ## Checks
 
@@ -213,7 +219,8 @@ dice, settled).
 
 - Memory per visit in the real app, both causes above.
 - A residual native slope under about 0.1 MB per load is not excluded.
-- T2 on the final head for the A142 (Vulkan and OpenGL) and the Wacom.
+- T2 on the final head for the A142: Vulkan and OpenGL, each with the
+  harness.
 - API 26 and 27 were not run: the `reachabilityFence` fix in
   `JoltWorld.update` and the fallback fence are verified by the release
   dex and by lint only.

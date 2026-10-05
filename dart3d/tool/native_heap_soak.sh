@@ -123,4 +123,4 @@ while [ "$i" -le "$rolls" ]; do
   i=$((i + 1))
 done
 close_dice
-sample end "$loads+$rolls"
+sample end "$((loads + rolls))"
