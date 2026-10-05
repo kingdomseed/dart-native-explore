@@ -71,8 +71,8 @@ from look-dev — the DartNative set's spec and reference renders — is on
    table are measured.
    Open from the tablet run: dice at an edge can still cover the rim
    line.
-   Native lifetime (S0g, #50): `main` runs out of Java heap after
-   22 visits to the dice screen on the Fire tablet. #50 closes
+   Native lifetime (S0g, #50): before #50 the app ran out of Java heap
+   after 22 visits to the dice screen on the Fire tablet. #50 closes
    every jolt-jni object it creates (22 sites leaked per scene load),
    fences all Filament builders and frees a released view's document;
    50 visits and 200 rolls then complete. **Memory per visit is still
