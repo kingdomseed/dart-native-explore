@@ -79,6 +79,7 @@ while [ "$i" -le "$runs" ]; do
   fi
   sleep 2
   since=$(adb -s "$serial" shell "date +'%m-%d %H:%M:%S.000'" | tr -d '\r')
+  require_free
   adb -s "$serial" shell am start -n "$activity" >/dev/null
   tries=0
   until dart3d_log | grep -q 'first frame rendered'; do

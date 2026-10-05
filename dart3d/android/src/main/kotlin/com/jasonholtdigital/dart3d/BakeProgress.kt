@@ -42,7 +42,7 @@ internal class BakeProgress(private val log: (String) -> Unit) {
         fun fixedSetLine(expected: Int, rejected: List<String>): String =
             if (rejected.isEmpty()) "$EXPORTED ($expected packages)"
             else "$INCOMPLETE (${expected - rejected.size} of $expected" +
-                " packages; filamat rejected: ${rejected.joinToString()})"
+                " packages; missing: ${rejected.joinToString()})"
 
         fun busyLine(inFlight: Int): String = "$BUSY ($inFlight in flight)"
     }

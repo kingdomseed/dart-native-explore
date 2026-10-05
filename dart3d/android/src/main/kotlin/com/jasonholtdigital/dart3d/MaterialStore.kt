@@ -74,6 +74,10 @@ internal class MaterialStore(
         }
     }
 
+    /** True when a bake run has this package's file in [exportDir]. */
+    fun isExported(fingerprint: String): Boolean =
+        exportDir?.let { File(it, fileName(fingerprint)).isFile } ?: false
+
     private fun readCache(fingerprint: String): ByteArray? {
         val file = File(cacheDir ?: return null, fileName(fingerprint))
         val framed = try {

@@ -146,7 +146,13 @@ internal object MaterialPackages {
                 for (api in BAKED_APIS) {
                     for (spec in fixedSet(api)) {
                         expected++
-                        if (compile(spec) == null) rejected.add(spec.key)
+                        // A package filamat accepted still counts as
+                        // missing if its file never reached the export
+                        // directory (a failed write).
+                        if (compile(spec) == null ||
+                            store?.isExported(spec.fingerprint) != true) {
+                            rejected.add(spec.key)
+                        }
                     }
                 }
                 val line = BakeProgress.fixedSetLine(expected, rejected)
