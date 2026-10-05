@@ -118,7 +118,9 @@ is not built on iOS.
 
 **Review.** Codex code review is out of quota; PRs since #36 were
 reviewed by an Opus reviewer agent, each finding checked against the
-code before fixing (verdicts are in the PR comments).
+code before fixing (verdicts are in the PR comments). Codex's inline
+comments on #44–#49 got their verdicts on 2026-10-05, in the two S0g
+PRs and in `docs/artifacts/s0-codex-followups/`.
 
 ## Decisions (made here, change only with the operator)
 

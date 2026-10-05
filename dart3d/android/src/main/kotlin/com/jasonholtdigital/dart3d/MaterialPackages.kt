@@ -136,16 +136,31 @@ internal object MaterialPackages {
     val BAKED_APIS = listOf(MaterialBuilder.TargetApi.OPENGL,
         MaterialBuilder.TargetApi.VULKAN)
 
+    private val bakeProgress = BakeProgress { Log.i(TAG, it) }
+
     private fun startBake() {
         val t = Thread({
             try {
-                var n = 0
+                val rejected = ArrayList<String>()
+                var expected = 0
                 for (api in BAKED_APIS) {
                     for (spec in fixedSet(api)) {
-                        if (compile(spec) != null) n++
+                        expected++
+                        // A package filamat accepted still counts as
+                        // missing if its file never reached the export
+                        // directory (a failed write). The export is
+                        // written under compileLock, so look under it:
+                        // compile() can return another thread's bytes
+                        // from memory before that thread has saved them.
+                        val exported = compile(spec) != null &&
+                            synchronized(compileLock) {
+                                store?.isExported(spec.fingerprint) == true
+                            }
+                        if (!exported) rejected.add(spec.key)
                     }
                 }
-                Log.i(TAG, "bake: fixed set exported ($n packages)")
+                val line = BakeProgress.fixedSetLine(expected, rejected)
+                if (rejected.isEmpty()) Log.i(TAG, line) else Log.e(TAG, line)
             } catch (t: Throwable) {
                 Log.e(TAG, "bake failed", t)
             }
@@ -319,6 +334,7 @@ internal object MaterialPackages {
         extFlags: Int, boundSlots: Int, api: MaterialBuilder.TargetApi,
         done: (ByteArray?) -> Unit,
     ) {
+        if (baking) bakeProgress.started()
         variantExecutor.execute {
             val bytes = try {
                 if (baking) {
@@ -334,6 +350,7 @@ internal object MaterialPackages {
                 Log.w(TAG, "variant compile failed", t)
                 null
             }
+            if (baking) bakeProgress.finished()
             done(bytes)
         }
     }

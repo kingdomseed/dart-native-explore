@@ -12,10 +12,10 @@
 #                    frame, to catch late variant compiles (default 8)
 #
 # The app must already be installed (`dn run -d <serial> --release`).
-# It refuses to launch over another app: the foreground must be this
-# app or the launcher. The dart3d.perf log tag is switched on for the
-# run (the first frame then waits for the driver, giving `first frame
-# rendered`) and off again afterwards.
+# It refuses to launch over another app: before every launch the
+# foreground must be this app or the launcher. The dart3d.perf log tag
+# is switched on for the run (the first frame then waits for the
+# driver, giving `first frame rendered`) and off again afterwards.
 set -eu
 
 serial=${1:?usage: cold_start.sh <adb-serial> [--package id] [--fresh] [--runs n] [--settle s]}
@@ -39,13 +39,18 @@ foreground() {
     grep -m1 -E 'mResumedActivity|topResumedActivity' || true
 }
 
-front=$(foreground)
-case "$front" in
-  *"$package"*|*[Ll]auncher*) ;;
-  *) echo "another app is in the foreground, not launching over it:" >&2
-     echo "$front" >&2
-     exit 3 ;;
-esac
+# Someone can pick the device up between two timed launches, so this
+# runs before each one, not once.
+require_free() {
+  front=$(foreground)
+  case "$front" in
+    *"$package"*|*[Ll]auncher*) ;;
+    *) echo "another app is in the foreground, not launching over it:" >&2
+       echo "$front" >&2
+       exit 3 ;;
+  esac
+}
+require_free
 
 # `monkey -p` would also launch it, but monkey switches auto-rotate on
 # when it exits, which unlocks a rotation-locked device.
@@ -67,12 +72,14 @@ dart3d_log() {
 work=$(mktemp -d)
 i=1
 while [ "$i" -le "$runs" ]; do
+  require_free
   adb -s "$serial" shell am force-stop "$package"
   if [ "$fresh" = 1 ]; then
     adb -s "$serial" shell pm clear "$package" >/dev/null
   fi
   sleep 2
   since=$(adb -s "$serial" shell "date +'%m-%d %H:%M:%S.000'" | tr -d '\r')
+  require_free
   adb -s "$serial" shell am start -n "$activity" >/dev/null
   tries=0
   until dart3d_log | grep -q 'first frame rendered'; do
