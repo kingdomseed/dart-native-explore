@@ -219,6 +219,7 @@ class _DiceTableScreenState extends State<DiceTableScreen>
     _ticker.dispose();
     _settleTimer?.cancel();
     _events?.cancel();
+    _controller.dispose();
     super.dispose();
   }
 

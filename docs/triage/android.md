@@ -315,3 +315,206 @@ Every DEFER row above is tracked: W26 geometry (caps, `widthInPixels`,
 closed sweeps, ribbon scale, iOS parity ports) → #20; per-view camera
 facing → #21; iOS late-binding consumers → #22; particle pause/enabled
 toggles → #23; Vulkan warm relaunch → #18.
+
+# S0g native object lifetime — 2026-10-05
+
+Branch `s0g-android-native-lifetime`. Measurements and device runs:
+`docs/artifacts/s0g-android-lifetime/`.
+
+## jolt-jni ownership audit
+
+Rules, read from the 6.0.0 jar (`JoltPhysicsObject` and each class the
+plugin touches):
+
+- A wrapper owns native memory when it was given a freeing action
+  (`setVirtualAddress(va, action)`). `close()` runs the action once;
+  the Cleaner, where it runs, is a second caller of the same action.
+- A wrapper built with a container (`super(container, va)`) or with a
+  bare address is a view. It frees nothing and needs no `close()`.
+- Ref-counted targets (`Shape`, `ShapeSettings`, `Constraint`,
+  `ConstraintSettings`, `GroupFilter`) are co-owners: constructing the
+  Java wrapper takes a reference, `close()` drops it. The native object
+  dies when the last reference goes, so an unclosed wrapper pins it
+  after the body that used it is destroyed.
+- `ShapeSettings.create()` returns a `ShapeResult` (owner).
+  `ShapeResult.get()` returns a `ShapeRefC` (owner) that carries a
+  second co-owning `Shape` wrapper (`getPtr()`). One `create().get()`
+  therefore makes three owners besides the settings.
+- `Vec3`, `RVec3`, `Quat` and `VertexList` are plain Java.
+  `CombineFunction` and `Body` wrap addresses they do not own.
+- `PhysicsSystem` puts itself in a static map; only `forgetMe()` takes
+  it out.
+
+| Object | Where | Kind | Before | After |
+|---|---|---|---|---|
+| `BroadPhaseLayerInterfaceTable`, `ObjectLayerPairFilterTable`, `ObjectVsBroadPhaseLayerFilterTable` | `JoltWorld` fields | owner | closed in `close()` | same |
+| `GroupFilterTable` | `JoltWorld` field | co-owner | closed in `close()`, but every leaked `CollisionGroup` held another reference | freed with the world |
+| `PhysicsSystem` | `JoltWorld` field | owner | native freed; the Java wrapper stayed in jolt-jni's static map with the listener and the world | `forgetMe()` before `close()` |
+| `TempAllocatorMalloc`, `JobSystemSingleThreaded`, `CustomContactListener` | `JoltWorld` fields | owner | closed in `close()` | same |
+| `CombineFunction` ×2 | `JoltWorld` fields | view | nothing to free | same |
+| `Body`, `ContactManifold`, `SubShapeIdPair` in the contact callbacks | per contact | view | nothing to free | same |
+| `CollisionGroup` | one per body | owner | **never closed** | closed once the settings have copied it |
+| Sub-group id in the group table | one per body | table slot | **never reused**: after 1024 bodies in one view the layer/mask filter was skipped | handed back on `removeBody` (`CollisionSubGroups`) |
+| `BodyCreationSettings` | one per body | owner | **never closed**; also held a shape and a filter reference | scope |
+| `BoxShape` (3 sites), `SphereShape`, `CapsuleShape`, `CylinderShape` | collider decode | co-owner | **never closed** | scope |
+| `ConvexHullShapeSettings` (2 sites) | collider decode | co-owner | **never closed** | scope |
+| `MeshShapeSettings` | collider decode | co-owner | **never closed** | scope |
+| `IndexedTriangleList` | mesh collider | owner | **never closed** | scope |
+| `IndexedTriangle` | one per triangle | owner | **never closed** | closed after `set` copies it |
+| `StaticCompoundShapeSettings` | collider decode | co-owner | **never closed** | scope |
+| `RotatedTranslatedShapeSettings` | collider `localPose` | co-owner | **never closed** | scope |
+| `RotatedTranslatedShape` | `boundingBox` collider | co-owner | **never closed** | scope |
+| `ShapeResult`, `ShapeRefC`, its inner `Shape` | 5 `create().get()` sites | owner ×3 | **never closed** | scope (`shapeOf`) |
+| `MassProperties` from `massPropertiesOverride` | per body with a mass | view | nothing to free | same |
+| `Body` | per body | view | removed and destroyed at node removal, component teardown, scene install; `destroyAllBodies` at release | same |
+| `Fixed`/`Point`/`Hinge`/`Slider`/`SixDof` constraint settings | joint build | co-owner | closed after `create` | same |
+| `MotorSettings` ×3, `SpringSettings` view | joint build | owner, view | closed | same |
+| `Constraint` | per joint | co-owner | closed after `removeConstraint` | same |
+| `Body.sFixedToWorld()` | world-anchored joint | view | nothing to free | same |
+| `RRayCast`, `RayCastSettings`, `AllHitCastRayCollector`, `RayCastResult` | `raycast` | owner | closed | same |
+| Hits from a collector | queries | view | nothing to free | same |
+| `TransformedShape` | raycast normal | owner | closed, except when the leaf lookup threw | scope |
+| Shape from `TransformedShape.getShape()` | raycast normal | co-owner | **never closed**: one pinned shape reference per ray hit | scope |
+| Leaf shape from `getLeafShape` | raycast normal | co-owner | closed | scope |
+| `AaBox`, `GetTrianglesContext` | raycast normal | owner | closed | scope |
+| Probe `SphereShape`, `RMat44`, `CollideShapeSettings`, `AllHitCollideShapeCollector` | `normalProbe`, overlaps | owner | closed | same |
+| `BoxShape`, `SphereShape`, `RShapeCast`, `ShapeCastSettings`, `ClosestHitCastShapeCollector` | overlap and shape cast | owner | closed | same |
+| `Vec3`, `RVec3`, `Quat` in per-frame pose reads, impulses and velocity writes | per frame, per roll | plain Java | nothing to free | same |
+
+Per frame and per roll the plugin creates no owning jolt-jni object,
+before or after. That includes `pollJointBreaks`, which runs every
+physics step and builds a `Vec3` and an `RVec3` per joint anchor in
+`anchorWorld` (review thread 4159700728 on #44): both are final Java
+classes with three number fields and no native peer, and
+`Body.getPosition`/`getRotation` fill them through a thread-local
+buffer. Everything that leaked did so per scene realize, and the dice
+screen realizes twice per visit (the document, then again when its last
+payload lands).
+
+Also found while reading:
+
+- **`JoltWorld.update` could not run on API 26 and 27** (review thread
+  4159700734 on #44). It called `Reference.reachabilityFence`, which is
+  API 28. R8 moves the call into an outline class, so the class loads,
+  and the first physics step throws `NoSuchMethodError` (the release
+  dex has the direct `invoke-static`; there is no backport). The eight
+  calls now go through `Reachability.fence` (`Fenced.kt`), which checks
+  the API level and falls back to a volatile store below 28.
+  `:dart3d:lintRelease` reported exactly those eight `NewApi` errors
+  and nothing else above API 26 in the module; it reports none now. No
+  API 26 or 27 device was available: this is verified by the dex and
+  by lint, not by a run.
+- **`ShapeResult.get()` was called without checking the result.** On a
+  rejected hull or mesh Jolt's `Result::Get()` reads the error string's
+  bytes as a shape reference. `shapeOf` checks `hasError()` and logs
+  Jolt's reason.
+
+## Filament lifetime audit
+
+Two questions per creation site: can the Java object be collected while
+native code still uses its handle, and is the native object destroyed
+on every path.
+
+**Collected too early.** Read from the 1.71.6 jars: the classes with a
+finalizer that frees native memory are every `Builder` (`Engine`,
+`Texture`, `RenderTarget`, `RenderableManager`, `LightManager`,
+`VertexBuffer`, `IndexBuffer`, `BufferObject`, `SkinningBuffer`,
+`MorphTargetBuffer`, `Skybox`, `IndirectLight`, `ColorGrading`,
+`Stream`), `ToneMapper`, filamat's `MaterialBuilder`, and
+filament-utils' `Manipulator` and its builder. `Material.Builder` has
+none. The engine-owned objects themselves (`Texture`, `Material`,
+`MaterialInstance`, buffers, `View`, `Scene`, `Camera`, `Renderer`,
+`SwapChain`, `ColorGrading`, `IndirectLight`, `Skybox`) have no
+finalizer: losing the Java reference never frees them, so for those the
+only question is the leak one.
+
+Every builder's `build()` reads its native handle and then calls into
+native code with nothing left to keep the Java builder alive, which is
+the window the ColorGrading crash came through. How wide the window is
+depends on how long the native call runs: microseconds for a texture or
+a buffer, tens of milliseconds for a color grading LUT, roughly 100 ms
+for `Engine.Builder.build()`, and 3–6 s for a filamat compile on the
+background thread. All 30 remaining `build` calls now go through
+`fenced { }` (`Fenced.kt`):
+
+| Builder | Sites |
+|---|---|
+| `Engine.Builder` | `Dart3dView` ×2 |
+| `Texture.Builder` | `EnvironmentFactory`, `TextureFactory` ×2, `RenderTargets` ×2 |
+| `RenderTarget.Builder` | `RenderTargets` |
+| `RenderableManager.Builder` | `Dart3dView`, `ParticleRuntime`, `FsceneRealizer` ×5 |
+| `LightManager.Builder` | `FsceneRealizer` ×2 |
+| `VertexBuffer.Builder`, `IndexBuffer.Builder` | `ParticleRuntime`, `FsceneRealizer` ×2, each |
+| `SkinningBuffer.Builder`, `MorphTargetBuffer.Builder` | `FsceneRealizer` |
+| `Skybox.Builder` ×2, `IndirectLight.Builder` | `FsceneRealizer` |
+| `Manipulator.Builder` | `Dart3dView` |
+| filamat `MaterialBuilder` | `MaterialPackages.compile` |
+
+`ColorGrading.Builder` keeps the fence it got in #16 (it also has to
+hold its `ToneMapper` and LUT buffer). `ToneMapper` is used nowhere
+else. `Manipulator` stays in a field while attached and is freed by its
+finalizer afterwards. Buffers handed to `setImage`, `setBufferAt` and
+`setBuffer` were not changed: Filament's JNI layer is documented to
+hold the buffer until the upload callback, and that was not re-verified
+against the native library here.
+
+The fence is `Reference.reachabilityFence` from API 28. On API 26 and
+27 it is a volatile store, which no device here could exercise.
+
+**The GPU probe's EGL reference** (review thread 4180998568 on #49).
+`GpuProbe` called `eglInitialize` and never `eglTerminate`. Android's
+libEGL counts initializations of the display
+(`egl_display_t::initialize` does `refs++`, and `terminate` only tears
+the display down for the last holder), so the probe held one reference
+for the life of the process. It now calls `eglTerminate` once, after
+restoring the previous context and destroying its own context and
+surface, on every path past a successful initialize. Filament's OpenGL
+backend and the system renderer hold their own references, and
+Filament's own platform code pairs the two calls the same way when an
+engine is destroyed.
+
+**Never destroyed, or used after destroy.** Every `engine.create…`,
+`Builder.build`, `EntityManager.create`, `MaterialInstance.duplicate`
+and prefilter `run` was traced to its destroy on replacement, on
+removal, on scene install and on view release. One engine exists per
+view and `engine.destroy()` frees what is left, so only growth inside
+one view's life counts. Fixed:
+
+| Hazard | Path | Fix |
+|---|---|---|
+| A `rectAreaLight`'s four cluster entities and lights survived every scene install and the view release; they stayed in the scene, lighting the next document | `loadScene` or a payload re-realize on a document with a rect light | destroyed with their node in both sweeps (`destroyLightCluster`) |
+| Upserting a material that a variant binding had applied left the destroyed instance on the renderable, and the next variant apply adopted it as the binding's default | `upsertResource` on a variant material, or its background variant compile landing, then deselecting the variant | the binding's slot is rebound to the fresh instance before the old one is destroyed |
+| A `doubleSided` `d3:instances` node's duplicated material kept sampling a texture after a texture upsert destroyed it | texture or render-texture upsert, or a texture payload, on a texture that material samples | the duplicate is registered as a consumer of its source's textures and unregistered when destroyed |
+| A released view kept its payload chunks, manifest, op journal and LUT buffers | any release; costs about 4.8 MB of Java heap per hero view for as long as anything references the view | `dropDocumentState()` at the end of `release` |
+
+Traced and clean: the engine, renderer, scene, view, swap chain and
+camera; the three fallback textures; the seven base materials, the
+variant materials, the catcher and particle materials; the IBL
+prefilter helpers; environment textures, skybox, indirect light and
+color grading on re-apply; resource textures, render targets, material
+instances and GPU meshes on upsert, install and release; node entities,
+skinning buffers, trails, LOD renderables, proc and instance meshes;
+sprite and mesh particle runtimes; per-view cameras and offscreen
+views. No Filament object is created per frame.
+
+Reported by the read-through and **not fixed** (each needs a document
+the example does not produce, and none was reproduced):
+
+- An id reused across resource kinds. Texture and render-texture ids
+  share one key space: upserting a `texture` over a live render texture
+  destroys the render target's color texture under it, and the reverse
+  overwrites the plain texture without destroying it.
+- Two components of one type on a node. A second `trail` overwrites the
+  first's entity and buffers; a second `mesh` on a skinned node
+  overwrites its `SkinningBuffer`.
+- One geometry key in two primitive slots of a mesh, then a geometry
+  upsert: only the first slot is rebound before the old buffers go.
+- The camera entity id is not returned to the `EntityManager` when view
+  construction fails.
+- A throw between a create and its registration is not a leak path only
+  because nothing catches it: the frame loop has no handler, so it ends
+  the process.
+- Not a lifetime issue, seen in passing: `install` clears
+  `cameraFacing` after the fresh decode has filled it, so facing shapes
+  declared in a manifest may lose their per-frame re-expansion after a
+  `loadScene`. Not verified on a device.

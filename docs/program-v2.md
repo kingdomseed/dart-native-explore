@@ -69,9 +69,20 @@ from look-dev — the DartNative set's spec and reference renders — is on
    tablet, the low profile's shadows are hard, LOW always takes OpenGL
    although Vulkan is faster on the Wacom, and only two rows of the GPU
    table are measured.
-   Open from the tablet run: native lifetime on API 26–32 now that
-   jolt-jni's cleaner is off there (#44); dice at an edge can still cover
-   the rim line.
+   Open from the tablet run: dice at an edge can still cover the rim
+   line.
+   Native lifetime (S0g, in review, branch
+   `s0g-android-native-lifetime`): `main` runs out of Java heap after
+   22 visits to the dice screen on the Fire tablet. The branch closes
+   every jolt-jni object it creates (22 sites leaked per scene load),
+   fences all Filament builders and frees a released view's document;
+   50 visits and 200 rolls then complete. **Memory per visit is still
+   not flat in the app**: DartNative's view registry keeps the hero
+   screen's view tree (its scroll view's content is never
+   unregistered), and the Dart heap grows about 7 MB per visit for a
+   reason not yet found. With the scroll view out, the native heap
+   ends +4.4 MB after 50 visits against +18.5 MB on `main`
+   (`docs/artifacts/s0g-android-lifetime/`).
 2. **S1 renderer spike**, then **Track E** in its table order (E1 → E12).
 3. **Track V** — the 0.24 delta, re-pinned when upstream publishes.
 4. **Track R** — API pass, consumer build, agent skills, README and
@@ -212,10 +223,33 @@ Rules:
       (inverse quaternion + mirrored face normals — root cause confirmed);
       native light-unit unification (then delete the example's iOS 0.26
       scale); iOS colour saturation vs Android; root-cause the Mali page
-      fault behind the catcher/particle prewarm and restore it; audit the
-      remaining Filament builder sites for the GC-reachability hazard;
+      fault behind the catcher/particle prewarm and restore it; ~~audit the
+      remaining Filament builder sites for the GC-reachability hazard~~;
       W25 settle lane never passes after wLoose; body poses/velocities
-      across deferred re-realize (M)
+      across deferred re-realize (M).
+      *Android native lifetime — in review* (2026-10-05, branch
+      `s0g-android-native-lifetime`). Done: the jolt-jni ownership
+      audit and deterministic close of every owner (`NativeScope`;
+      nothing relies on the Cleaner, which API 26–32 lack); collision
+      sub-group ids reused instead of running out after 1024 bodies;
+      `JoltWorld.update` no longer calls an API 28 method on API 26–27
+      (from the dex and lint, not run); the GPU probe gives back its EGL
+      display reference; all 31 Filament builder sites fenced;
+      three Filament destroy-order hazards fixed (rect-light cluster
+      entities, a variant binding's default after a material upsert, a
+      doubleSided duplicate after a texture upsert); a released view
+      drops its document. Measured on the Fire tablet (API 30): `main`
+      dies of `OutOfMemoryError` at visit 22; the branch completes 50
+      visits and 200 rolls; rolls are flat; frame rate unchanged on all
+      three devices (A142 on Vulkan and on forced OpenGL). **Open:**
+      per-visit growth in the app from two
+      causes outside the plugin's native code (the framework's view
+      registry holds the hero's view tree; the Dart heap grows about
+      7 MB per visit, cause unknown); a native slope under about 0.1 MB
+      per load is not excluded; no API 26/27 device; four Filament
+      hazards that need unusual documents are listed, not fixed
+      (`docs/triage/android.md` §S0g native object lifetime). Evidence:
+      `docs/artifacts/s0g-android-lifetime/`
 - [x] S0h Android cold-start material compile — **done** (#48; tablet
       run 2026-10-05). Root cause: filamat's SPIR-V optimizer, 3–6 s
       per lit package, run on the device at every cold start. Fix:
