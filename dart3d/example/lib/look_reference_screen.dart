@@ -2,6 +2,10 @@
 /// nothing but the board of `look_reference_scene.dart`, stepping through
 /// its variants on a timer and logging each one, so a script can capture
 /// a screenshot per variant without touching the device.
+///
+/// `--dart-define=DART3D_LOOKREF=<variant>` shows that one variant only,
+/// from a cold start — for a difference that depends on what the view
+/// rendered before.
 library;
 
 import 'dart:async';
@@ -14,6 +18,8 @@ import 'look_reference_scene.dart';
 /// How long each variant stays up. Long enough for a reload, an IBL
 /// prefilter and a slow device's screenshot.
 const Duration lookVariantDwell = Duration(seconds: 8);
+
+const _pinned = String.fromEnvironment('DART3D_LOOKREF');
 
 class LookReferenceScreen extends StatefulWidget {
   const LookReferenceScreen({super.key, this.quality});
@@ -45,9 +51,11 @@ class _LookReferenceScreenState extends State<LookReferenceScreen> {
     final aspect = size.width / size.height;
     if ((aspect - _aspect).abs() < 0.01) return;
     _aspect = aspect;
-    _index = 0;
+    final pinned = LookVariant.values.indexWhere((v) => v.label == _pinned);
+    _index = pinned < 0 ? 0 : pinned;
     _show();
     _timer?.cancel();
+    if (pinned >= 0) return;
     _timer = Timer.periodic(lookVariantDwell, (_) {
       _index = (_index + 1) % LookVariant.values.length;
       _show();

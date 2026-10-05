@@ -11,6 +11,8 @@
 # variant's line, lets the frame settle, and saves <out-dir>/<variant>.png.
 # It sends no input to the device. It ends when every variant listed in
 # tool/look_reference_patches.json is captured, or after five minutes.
+# Set LOOK_VARIANTS to a space-separated list to wait for those only
+# (with --dart-define=DART3D_LOOKREF=<variant>, which pins the board).
 #
 # iOS simulator screenshots carry the display's colour profile; they are
 # converted to sRGB so both platforms' files hold the same encoding.
@@ -25,7 +27,7 @@ package=com.jasonholtdigital.dart3d_example
 settle=4
 
 root=$(cd "$(dirname "$0")" && pwd)
-variants=$(python3 -c "import json,sys; print(' '.join(json.load(open(sys.argv[1]))['variants']))" "$root/look_reference_patches.json")
+variants=${LOOK_VARIANTS:-$(python3 -c "import json,sys; print(' '.join(json.load(open(sys.argv[1]))['variants']))" "$root/look_reference_patches.json")}
 mkdir -p "$out"
 
 shot() {

@@ -316,6 +316,12 @@ final class SceneViewHost: SCNView {
         for camera in viewCameras() {
             camera.wantsHDR = true
             camera.exposureOffset = CGFloat(e > 0 ? log2(e) : 0)
+            // SceneKit's exposure adaptation is on unless switched
+            // off, and `applyStageEffects` only writes it when the
+            // stage has an `effects` block: a stage without one used
+            // to meter itself toward mid-grey.
+            camera.wantsExposureAdaptation =
+                lastEffects?.autoExposure.enabled ?? false
         }
     }
 
