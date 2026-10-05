@@ -203,18 +203,18 @@ object RenderTargets {
                 Texture.Usage.COLOR_ATTACHMENT or
                     Texture.Usage.SAMPLEABLE
             )
-            .build(engine)
+            .fenced { build(engine) }
         val depth = Texture.Builder()
             .width(spec.width).height(spec.height)
             .levels(1)
             .sampler(Texture.Sampler.SAMPLER_2D)
             .format(Texture.InternalFormat.DEPTH24)
             .usage(Texture.Usage.DEPTH_ATTACHMENT)
-            .build(engine)
+            .fenced { build(engine) }
         val rt = RenderTarget.Builder()
             .texture(RenderTarget.AttachmentPoint.COLOR, color)
             .texture(RenderTarget.AttachmentPoint.DEPTH, depth)
-            .build(engine)
+            .fenced { build(engine) }
         // Fresh pixels start dirty — even a `manual` rt draws once so
         // the texture holds a frame before the first explicit render.
         return RenderTargetRec(

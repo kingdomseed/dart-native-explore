@@ -1,0 +1,4 @@
+phase,count,native_pss_kb,native_private_dirty_kb,native_heap_size_kb,native_heap_alloc_kb,dalvik_alloc_kb,total_pss_kb
+loads,0,58703,58344,69696,66704,14505,407876
+loads,10,63359,63000,74588,71511,63686,489162
+loads,20,71167,70808,81572,78423,112660,609984

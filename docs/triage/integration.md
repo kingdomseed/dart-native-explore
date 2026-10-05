@@ -230,10 +230,14 @@ so that iOS evidence carries over.
    decode and the tone mapper.
 3. **Mechanism of the materials-lane GPU page fault**: see §Materials
    lane. Then restore the catcher/particle prewarm if it's safe.
-4. **Audit all Filament Java Builders and buffer descriptors for GC
-   reachability.** There are 23 `.Builder()` sites plus
-   `setImage`/`setBufferAt` direct buffers. Two crashes and possibly the
-   page fault come from this class of bug.
+4. ~~**Audit all Filament Java Builders and buffer descriptors for GC
+   reachability.**~~ — done in S0g: all 31 builder `build` calls keep
+   their builder reachable (`Fenced.kt`), including the filamat compile
+   that runs for seconds on the prewarm thread; the upload buffers rely
+   on Filament's own hold and were not changed
+   (`docs/triage/android.md` §Filament lifetime audit). Whether this
+   was the materials-lane page fault (item 3) is not known: the prewarm
+   it would restore was not re-enabled here.
 5. **W25 close-out lane:** settle-event absence (Dart).
 6. ~~**Dice readout:** the fix above (Dart).~~ — done in P3 DR1 (matrix read, z mirrored once on load; per-face unit tests; A142 10-roll check in `docs/artifacts/p3-dr1/`). iOS device check pending.
 7. ~~iOS T2 tab-switch soak and ROLL-button roll~~ — done on main `4e12ef3` (§iOS T2 close-out).

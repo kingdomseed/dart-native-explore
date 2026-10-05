@@ -269,6 +269,7 @@ class _HeroScreenState extends State<HeroScreen>
   void dispose() {
     _ticker.dispose();
     _entrance.dispose();
+    _controller.dispose();
     super.dispose();
   }
 

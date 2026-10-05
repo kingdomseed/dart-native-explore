@@ -169,16 +169,22 @@ class JoltWorld {
 
         private var joltReady = false
 
+        /** True once jolt-jni's Cleaner runs: a wrapper nothing
+         * references can then have its native peer freed by a GC. */
+        private var cleanerStarted = false
+
         /** One-time global init — safe to call per view. */
         @Synchronized
         fun ensureJolt() {
             if (joltReady) return
             System.loadLibrary("joltjni")
             // jolt-jni's automatic native cleanup needs java.lang.ref.Cleaner
-            // (API 33). Below that, natives are freed only by the explicit
-            // close() calls in this file.
+            // (API 33). It is a backstop only: every owning wrapper is
+            // closed explicitly (NativeScope, or close() below), which is
+            // the only release there is below API 33.
             if (android.os.Build.VERSION.SDK_INT >= 33) {
                 JoltPhysicsObject.startCleaner()
+                cleanerStarted = true
             }
             Jolt.registerDefaultAllocator()
             Jolt.installDefaultAssertCallback()
@@ -216,7 +222,7 @@ class JoltWorld {
     // pointers, so the wrappers must stay reachable for the system's
     // lifetime — R8 strips write-only fields in release builds, which
     // lets the cleaner free the native peers mid-run. The fences in
-    // update() keep that contract.
+    // update() keep that contract where a cleaner runs.
     private val bpLayers = BroadPhaseLayerInterfaceTable(
         NUM_OBJ_LAYERS, NUM_BP_LAYERS).apply {
         mapObjectToBroadPhaseLayer(OBJ_NON_MOVING, BP_NON_MOVING)
@@ -240,8 +246,7 @@ class JoltWorld {
     // absent) unconditionally, which would let a missing filter punch
     // through a zero mask.
     private val groupTable = GroupFilterTable(MAX_BODIES)
-    private var nextSubGroup = 0
-    private val subGroupLayerMask = ArrayList<Long>()
+    private val subGroups = CollisionSubGroups(MAX_BODIES)
     private var groupOverflowLogged = false
 
     // Upstream per-material combine rules land on Jolt's per-system
@@ -403,50 +408,43 @@ class JoltWorld {
      */
     fun update(dt: Float, collisionSteps: Int): Boolean {
         val err = physicsSystem.update(dt, collisionSteps, tempAllocator, jobSystem)
-        java.lang.ref.Reference.reachabilityFence(bpLayers)
-        java.lang.ref.Reference.reachabilityFence(objVsBp)
-        java.lang.ref.Reference.reachabilityFence(pairFilter)
-        java.lang.ref.Reference.reachabilityFence(groupTable)
-        java.lang.ref.Reference.reachabilityFence(combineFriction)
-        java.lang.ref.Reference.reachabilityFence(combineRestitution)
-        java.lang.ref.Reference.reachabilityFence(contactListener)
+        // Reference.reachabilityFence is API 28; the cleaner it guards
+        // against is API 33.
+        if (cleanerStarted) {
+            java.lang.ref.Reference.reachabilityFence(bpLayers)
+            java.lang.ref.Reference.reachabilityFence(objVsBp)
+            java.lang.ref.Reference.reachabilityFence(pairFilter)
+            java.lang.ref.Reference.reachabilityFence(groupTable)
+            java.lang.ref.Reference.reachabilityFence(combineFriction)
+            java.lang.ref.Reference.reachabilityFence(combineRestitution)
+            java.lang.ref.Reference.reachabilityFence(contactListener)
+        }
         if (err != EPhysicsUpdateError.None) {
             Log.w(TAG, "jolt update error: $err")
             return false
         }
         pollJointBreaks()
-        java.lang.ref.Reference.reachabilityFence(joints)
+        if (cleanerStarted) java.lang.ref.Reference.reachabilityFence(joints)
         return true
     }
 
     /**
-     * Allocates a sub-group in the shared [GroupFilterTable] for a body
-     * carrying collider [layer]/[mask] bitmasks, disabling it against
-     * every existing sub-group the upstream rule excludes. Returns null
-     * (with a single warning) once the table is full — the body then
-     * collides under the object-layer filters only.
+     * A sub-group of the shared [GroupFilterTable] for a body carrying
+     * collider [layer]/[mask] bitmasks, with its row set against every
+     * live sub-group by the upstream rule. -1 (with a single warning)
+     * while all are held — the body then collides under the
+     * object-layer filters only. [removeBody] hands the id back.
      */
-    fun collisionGroup(layer: Int, mask: Int): CollisionGroup? {
-        val sg = nextSubGroup
-        if (sg >= MAX_BODIES) {
-            if (!groupOverflowLogged) {
-                groupOverflowLogged = true
-                Log.w(TAG, "collision sub-groups exhausted; layer/mask filter skipped")
-            }
-            return null
+    private fun acquireSubGroup(layer: Int, mask: Int): Int {
+        val sg = subGroups.acquire(layer, mask) { id, other, collides ->
+            if (collides) groupTable.enableCollision(id, other)
+            else groupTable.disableCollision(id, other)
         }
-        nextSubGroup++
-        for (j in 0 until subGroupLayerMask.size) {
-            val packed = subGroupLayerMask[j]
-            val otherLayer = (packed ushr 32).toInt()
-            val otherMask = packed.toInt()
-            if ((layer and otherMask) == 0 || (otherLayer and mask) == 0) {
-                groupTable.disableCollision(sg, j)
-            }
+        if (sg < 0 && !groupOverflowLogged) {
+            groupOverflowLogged = true
+            Log.w(TAG, "collision sub-groups exhausted; layer/mask filter skipped")
         }
-        subGroupLayerMask.add(
-            (layer.toLong() shl 32) or (mask.toLong() and 0xFFFFFFFFL))
-        return CollisionGroup(groupTable, 0, sg)
+        return sg
     }
 
     /**
@@ -483,21 +481,35 @@ class JoltWorld {
      * Creates and adds a body for the node keyed [nodeKey] — the
      * single creation point, so the W8 event maps are populated here
      * (the body's userData carries the key too; the id→key map is the
-     * one the removed-pair callback can still reach).
+     * one the removed-pair callback can still reach). Every body joins
+     * the shared [GroupFilterTable] under its collider's [layer]/[mask]
+     * so the upstream rule holds pair-wise. [bcs] stays the caller's to
+     * close.
      */
-    fun addBody(bcs: BodyCreationSettings, activate: Boolean, nodeKey: Long): Body {
+    fun addBody(
+        bcs: BodyCreationSettings, activate: Boolean, nodeKey: Long,
+        layer: Int, mask: Int,
+    ): Body {
         bcs.setUserData(nodeKey)
-        val body = bodyInterface.createBody(bcs)
+        val sg = acquireSubGroup(layer, mask)
+        val body = try {
+            if (sg >= 0) {
+                // setCollisionGroup copies the struct.
+                CollisionGroup(groupTable, 0, sg).use {
+                    bcs.setCollisionGroup(it)
+                }
+            }
+            bodyInterface.createBody(bcs)
+        } catch (t: Throwable) {
+            subGroups.release(sg)
+            throw t
+        }
         bodyInterface.addBody(
             body.id,
             if (activate) EActivation.Activate else EActivation.DontActivate,
         )
         bodyNodeKeys[body.id] = nodeKey
         nodeBodies[nodeKey] = body
-        // The body's group-table sub-group (W9 `collide:false` pair
-        // disables index it). An unset/overflow group reads back as
-        // cInvalidSubGroup (−1) and is skipped.
-        val sg = bcs.collisionGroup.subGroupId
         if (sg >= 0) bodySubGroups[body.id] = sg
         if (body.isSensor) sensorBodyIds.add(body.id)
         // Bodies arriving late realize deferred joints. Snapshot —
@@ -533,7 +545,7 @@ class JoltWorld {
                 }
             }
         }
-        bodySubGroups.remove(body.id)
+        bodySubGroups.remove(body.id)?.let(subGroups::release)
         // Unmap BEFORE the body leaves — removing a live contact makes
         // Jolt fire onContactRemoved, and an unmapped id drops the
         // event (a deleted node shouldn't emit 'ended').
@@ -713,21 +725,12 @@ class JoltWorld {
                     " shared group table; the pair keeps colliding")
             return
         }
-        if (pairExcludedByMask(sgA, sgB)) return
+        if (subGroups.excludes(sgA, sgB)) return
         val pk = (minOf(sgA, sgB).toLong() shl 32) or
             (maxOf(sgA, sgB).toLong() and 0xFFFFFFFFL)
         groupTable.disableCollision(sgA, sgB)
         jointDisabledPairs[pk] = (jointDisabledPairs[pk] ?: 0) + 1
         rec.disabledPair = pk
-    }
-
-    /** The upstream rule for sub-groups [sgA]/[sgB]: excluded when
-     * either side's layer doesn't appear in the other's mask. */
-    private fun pairExcludedByMask(sgA: Int, sgB: Int): Boolean {
-        val pa = subGroupLayerMask[sgA]
-        val pb = subGroupLayerMask[sgB]
-        return ((pa ushr 32).toInt() and pb.toInt()) == 0 ||
-            ((pb ushr 32).toInt() and pa.toInt()) == 0
     }
 
     /**
@@ -1056,6 +1059,10 @@ class JoltWorld {
         bodyNodeKeys.clear()
         sensorBodyIds.clear()
         physicsSystem.destroyAllBodies()
+        // jolt-jni keeps every PhysicsSystem wrapper in a static map
+        // until told otherwise; the wrapper holds the listener, which
+        // holds this world.
+        physicsSystem.forgetMe()
         physicsSystem.close()
         // The system held the listener's raw peer pointer — free the
         // wrapper only now that the system is dead (same rule as the
@@ -1154,35 +1161,35 @@ class JoltWorld {
         px: Double, py: Double, pz: Double,
         dirScaled: Vec3, hitBodyId: Int, subShapeId2: Int,
     ): FloatArray? {
-        val ts = bodyInterface.getTransformedShape(hitBodyId)
-            ?: return null
-        // Resolve the leaf the ray actually hit (subShapeId2 walks
-        // compounds and decorator shapes to it). getLeafShape can
-        // return null for an id it can't resolve — that falls
-        // through to the triangle stream rather than failing.
-        val remainder = IntArray(1)
-        val leaf = ts.shape?.getLeafShape(subShapeId2, remainder)
-        val subType = leaf?.getSubType()
-        (leaf as? JoltPhysicsObject)?.close()
-        if (subType == EShapeSubType.Sphere ||
-            subType == EShapeSubType.Capsule ||
-            subType == EShapeSubType.TaperedCapsule ||
-            subType == EShapeSubType.Cylinder) {
-            ts.close()
-            return null
-        }
-        val base = RVec3(px, py, pz)
-        val box = AaBox(
-            RVec3(px - TRI_BOX_R, py - TRI_BOX_R, pz - TRI_BOX_R),
-            RVec3(px + TRI_BOX_R, py + TRI_BOX_R, pz + TRI_BOX_R))
-        val ctx = GetTrianglesContext()
-        // Vertices come back Float3s relative to `base` — the hit
-        // point is the origin in buffer space.
-        val buf = ByteBuffer
-            .allocateDirect(MAX_RAYCAST_TRIS * 9 * 4)
-            .order(ByteOrder.nativeOrder())
-            .asFloatBuffer()
-        try {
+        nativeScope {
+            val ts = own(bodyInterface.getTransformedShape(hitBodyId)
+                ?: return null)
+            // Resolve the leaf the ray actually hit (subShapeId2 walks
+            // compounds and decorator shapes to it). getLeafShape can
+            // return null for an id it can't resolve — that falls
+            // through to the triangle stream rather than failing.
+            // Each shape wrapper holds a reference on its shape.
+            val remainder = IntArray(1)
+            val leaf = ownIfCloseable(ownIfCloseable(ts.shape)
+                ?.getLeafShape(subShapeId2, remainder))
+            val subType = leaf?.getSubType()
+            if (subType == EShapeSubType.Sphere ||
+                subType == EShapeSubType.Capsule ||
+                subType == EShapeSubType.TaperedCapsule ||
+                subType == EShapeSubType.Cylinder) {
+                return null
+            }
+            val base = RVec3(px, py, pz)
+            val box = own(AaBox(
+                RVec3(px - TRI_BOX_R, py - TRI_BOX_R, pz - TRI_BOX_R),
+                RVec3(px + TRI_BOX_R, py + TRI_BOX_R, pz + TRI_BOX_R)))
+            val ctx = own(GetTrianglesContext())
+            // Vertices come back Float3s relative to `base` — the hit
+            // point is the origin in buffer space.
+            val buf = ByteBuffer
+                .allocateDirect(MAX_RAYCAST_TRIS * 9 * 4)
+                .order(ByteOrder.nativeOrder())
+                .asFloatBuffer()
             ts.getTrianglesStart(ctx, box, base)
             var bestD2 = Float.MAX_VALUE
             var bestN: FloatArray? = null
@@ -1216,10 +1223,6 @@ class JoltWorld {
                 }
             }
             return bestN?.let { opposeDir(it[0], it[1], it[2], dirScaled) }
-        } finally {
-            ctx.close()
-            box.close()
-            ts.close()
         }
     }
 
