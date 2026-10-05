@@ -281,7 +281,9 @@ Scale: 1 Blender unit = 1 cm. Dice are a standard set × `SIZE_SCALE` 1.3
 | d12 | dodecahedron | 2.9 cm | 0.09, 3 segs | 476 | sum 13 |
 | d20 | icosahedron | 2.9 cm | 0.07, 3 segs | 476 | sum 21 |
 
-- 6 and 9 carry a dot ("6." / "9.") on the d10, d12 and d20.
+- The 6 carries a dot ("6.") on the d10, d12 and d20. The 9 is plain: the
+  dot on the 6 is enough to tell them apart (operator, #42). The look-dev
+  renders predate that and still show "9.".
 - All dice are modelled resting on a face (face up = +Z), so they sit flat
   in the tray.
 - Every die is **< 500 triangles**, well under the 2–4k budget. That leaves
@@ -294,6 +296,10 @@ Scale: 1 Blender unit = 1 cm. Dice are a standard set × `SIZE_SCALE` 1.3
   readout works unchanged for every die.
 
 ### 1.2 One RGBA atlas per set
+
+> This is the Blender pipeline's layout. The example app does not use it:
+> it builds one atlas, texture and material **per die** in Dart
+> (`dice_numerals.dart`, `dice_set.dart`), seven payloads per set.
 
 Every face is planar-projected into one cell of a 9×9 atlas (78 of 81 cells
 used), so **all seven dice of a set share one texture**. The bevel strips
@@ -415,7 +421,10 @@ Real-time notes use the capability table in demo-program §3.5. In short:
 **Readability (all sets):** see §0.2. The play area is lower in detail
 than the dice and separated from them in luminance (lighter *or* darker,
 per set). The **long walls sit on the screen edges** in the top-down view
-(frame width = tray + rims + ~1 cm), so a d20 is ~14% of the screen width.
+(frame width = tray + rims + ~1 cm), so a d20 is ~14% of the screen width
+in these renders. The example app draws the DartNative d20 at 21% of the
+screen's short side (`kD20ScreenFraction`, #39); pixel sizes quoted here
+are for the renders, not the app.
 Low props frame the top and bottom edges.
 
 ### 3.1 Emberforged: "a banked fire you can hold"
@@ -934,6 +943,27 @@ to the separate dice-roller app). Operator brief: the 3D DartNative logo
 inside a frosted-glass set, so it appears suspended in the dice, and a nice
 environment for it.
 
+> **As shipped (2026-10-01, #39–#42) — this overrides the text below where
+> they differ.** The operator changed the brief after the first round:
+> **black** frosted glass, not white. The renders in this folder are the
+> black revision; the bullets below still describe the first, white one.
+>
+> - Shell: smoky near-black frost (body `#3E4852` at 92% opacity in the
+>   app), heavier frost than the reference.
+> - Logo: a dim, diffused glow, deliberately subordinate to the numerals.
+> - Numerals: near-white (`#EDF4FF`) with a thin dark keyline, **no**
+>   denser-frost band behind them (#40), scaled to fit inside each face's
+>   inlay line (#41), no dot by the 9 (#42).
+> - d20 at 21% of the screen's short side; deep-indigo felt tray
+>   (`#23264A`) with the gradient rim, not the glossy obsidian floor.
+> - No refraction on either platform: the frost is alpha-blended smoke.
+>
+> Source of truth for the shipped look: `dart3d/example/lib/dice_set.dart`,
+> `dice_numerals.dart`, `dice_obsidian_tray.dart`, and the device captures
+> in `docs/artifacts/p3-dartnative-set/`. Environment options b and c were
+> retired; their renders were removed, and
+> `dartnative-env-options.jpg` now shows option a only.
+
 **Dice**:
 
 - **Shell:** frosted glass, milky white. Reference: 40% rough transmission
@@ -994,8 +1024,10 @@ top-face numeral; frost band not counted):
 
 Renders: `dartnative-a-{topdown,hero,d20,d4}.jpg` (reference),
 `dartnative-a-rt-{topdown,hero,d20,d4}.jpg` (real-time approximation),
-`dartnative-{b,c}-{topdown,hero}.jpg`, and the sheets
-`dartnative-env-options.jpg` and `dartnative-compare-{topdown,hero,d20,d4}.jpg`.
+and the sheets `dartnative-env-options.jpg` (option a only) and
+`dartnative-compare-{topdown,hero,d20,d4}.jpg`. The option b and c
+renders were removed with those options; their rows above are kept as a
+record of why they were rejected.
 
 **Juice**: the logo's emission pulses once on land and swells on a nat 20;
 the rim line runs the gradient around the tray on the total.
