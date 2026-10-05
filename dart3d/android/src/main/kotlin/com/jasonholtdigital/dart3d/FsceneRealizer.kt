@@ -5504,9 +5504,14 @@ object FsceneRealizer {
                     host.fallbackWhite, consumers)
             }
             if (slotBound(4)) {
+                // Without an emissive texture the factor emits on its
+                // own (upstream: factor × texture-or-white). With one
+                // that has not arrived yet, nothing emits until it does.
                 bindTextureSlot(host, mi, props, textures, samplers,
                     "emissiveTexture", "emissiveMap",
-                    host.fallbackEmissive, consumers)
+                    if (props.has("emissiveTexture")) host.fallbackEmissive
+                    else host.fallbackWhite,
+                    consumers)
             }
 
             // W22: extension writes ride the same registry the
