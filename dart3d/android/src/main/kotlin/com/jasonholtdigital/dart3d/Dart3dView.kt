@@ -563,7 +563,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     /** This view's framework viewId — stamped by the mutation router. */
     var viewId: Long = 0
 
-    var clearColor = floatArrayOf(0.06f, 0.06f, 0.08f, 1f)
+    /** Behind a scene with no sky. Black unless the widget sets
+     * `backgroundColor`, as its documentation says and as on iOS. */
+    var clearColor = floatArrayOf(0f, 0f, 0f, 1f)
         set(value) {
             field = value
             applyClearColor()
@@ -1286,6 +1288,13 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     " binding (AgxLook presets only); ignored")
         }
         val cgBuilder = ColorGrading.Builder().toneMapper(mapper)
+        if (toneMapping == "linear") {
+            // The grade is baked into a table and `linear` has a
+            // corner at 1: at the default 32³ a white of 1 came out
+            // at (249, 247, 248) and pure green at (23, 247, 6). At
+            // 64³ they are (253, 253, 253) and (1, 253, 0).
+            cgBuilder.quality(ColorGrading.QualityLevel.ULTRA)
+        }
         // W13 colorGrading block — merged into the same build (a View
         // binds exactly one ColorGrading).
         fx?.colorGrading?.takeIf { it.enabled }?.let { fxCg ->
