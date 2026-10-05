@@ -11,6 +11,7 @@
 // ignore_for_file: implementation_imports
 library;
 
+import 'dart:isolate';
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -204,6 +205,27 @@ final class DiceTableSpec {
   /// The dice's shell material.
   final DiceShellLook shell;
 }
+
+/// [buildDiceTable] on a background isolate, with what it logged.
+///
+/// A top-level function on purpose: an isolate's closure is sent with
+/// everything its enclosing scope holds, and a closure written inside
+/// the screen's state drags the state in with it — its controller's
+/// event stream is unsendable, so the spawn threw and the table was
+/// built on the UI isolate instead. Here the scope holds only [logo]
+/// and [spec].
+Future<(DiceTableScene?, List<String>)> buildDiceTableInBackground({
+  Uint8List? logo,
+  DiceTableSpec spec = const DiceTableSpec(),
+}) => Isolate.run(() {
+  final log = <String>[];
+  final scene = buildDiceTable(
+    bytesFor: (key) => key == kLogoAsset ? logo : null,
+    log: log.add,
+    spec: spec,
+  );
+  return (scene, log);
+});
 
 /// Builds the table document: the Obsidian tray, walls and ceiling
 /// fitted to [layout], the seven DartNative dice with a logo inside
