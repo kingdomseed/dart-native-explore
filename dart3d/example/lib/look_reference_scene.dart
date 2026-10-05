@@ -41,6 +41,12 @@ enum LookVariant {
     spotLight: true,
     ibl: LookIbl.constant,
   ),
+
+  /// The directional light over a document with no environment at all:
+  /// what a scene gets before its author sets anything. It keeps the
+  /// effects of the variant before it (an absent `effects` block
+  /// leaves them alone), so it follows one without bloom.
+  defaultStage('default-stage', directionalLight: true, stage: false),
   allBloom(
     'all-bloom',
     directionalLight: true,
@@ -48,11 +54,7 @@ enum LookVariant {
     spotLight: true,
     ibl: LookIbl.constant,
     bloom: true,
-  ),
-
-  /// The directional light over a document with no environment at all:
-  /// what a scene gets before its author sets anything.
-  defaultStage('default-stage', directionalLight: true, stage: false);
+  );
 
   const LookVariant(
     this.label, {

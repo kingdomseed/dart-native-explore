@@ -42,16 +42,36 @@ struct StageToneMap: Equatable {
     }
 }
 
-/// The resolve pass that turns SceneKit's exposed linear HDR image
-/// into the display image the way upstream does: tone map, then the
-/// grading LUT on the sRGB-encoded colour.
+/// What the resolve pass applies besides the tone map: upstream's
+/// colour grading (before the tone map), its vignette (after) and the
+/// grading LUT (last, on the encoded colour).
+struct StageResolve {
+    var toneMap = StageToneMap()
+    /// Nil leaves the colour ungraded.
+    var grading: StageEffects.ColorGrading?
+    /// Nil draws no vignette.
+    var vignette: StageEffects.Vignette?
+    /// The LUT's strip image; its height is the cube's edge length.
+    var lut: CGImage?
+}
+
+/// The resolve pass that turns SceneKit's image into the display image
+/// the way upstream's resolve shader does: grade, tone map, vignette,
+/// then the grading LUT on the sRGB-encoded colour.
 ///
-/// SceneKit has no tone-mapper choice. With `whitePoint = 1` and
-/// exposure adaptation off its own curve is the identity, and an
-/// `SCNTechnique` quad pass runs after the camera's exposure, bloom
-/// and grading on the unclamped result (measured with an offscreen
-/// `SCNRenderer`) — so the pass below sees what upstream's resolve
-/// shader sees after `color *= exposure`.
+/// SceneKit has no tone-mapper choice, and what it hands an
+/// `SCNTechnique` pass in an `SCNView` is already clamped to 0…1. Its
+/// own curve, though, is an extended Reinhard with the camera's
+/// `whitePoint` as the value that maps to 1 (measured:
+/// `x (1 + x / w²) / (1 + x)`, per channel, after exposure and bloom).
+/// So the camera runs with a white point of [whitePoint], which packs
+/// exposed radiance up to that value into 0…1, and the pass inverts
+/// the curve exactly to recover the linear image upstream's shader
+/// sees after `color *= exposure`.
+///
+/// SceneKit applies its own saturation, contrast and vignette after
+/// that curve, where they would be inverted along with it; the host
+/// leaves them off and the pass does upstream's instead.
 ///
 /// `pbrNeutral`, `reinhard` and `linear` are evaluated in Rec. 2020
 /// primaries, not upstream's Rec. 709: that is where Filament's
@@ -61,8 +81,12 @@ struct StageToneMap: Equatable {
 /// at (0, 0.92, 0), upstream's at (0.016, 0.88, 0.016)).
 enum ToneMapTechnique {
 
-    /// The operators are upstream's `shaders/tone_mapping.glsl` and
-    /// the LUT lookup its `ApplyGradingLut`, ported to Metal.
+    /// The radiance SceneKit's curve maps to 1. Brighter values clip.
+    static let whitePoint = 16.0
+
+    /// The operators are upstream's `shaders/tone_mapping.glsl`, the
+    /// grading, vignette and LUT lookup its
+    /// `flutter_scene_resolve.frag`, ported to Metal.
     private static let source = """
     #include <metal_stdlib>
     using namespace metal;
@@ -72,6 +96,11 @@ enum ToneMapTechnique {
     struct D3ResolveParams {
         float4 d3Mode;
         float4 d3Agx;
+        float4 d3Grade;
+        float4 d3Lift;
+        float4 d3Gamma;
+        float4 d3Gain;
+        float4 d3Vignette;
     };
 
     vertex D3ResolveOut d3_resolve_vertex(D3ResolveIn in [[stage_in]]) {
@@ -168,6 +197,29 @@ enum ToneMapTechnique {
         return mix(tap0, tap1, scaled.z - slice0);
     }
 
+    // y = x (1 + x / w²) / (1 + x), solved for x.
+    static float3 d3_scene_radiance(float3 y, float w) {
+        float3 b = 1.0 - y;
+        float w2 = w * w;
+        return 0.5 * w2 * (sqrt(b * b + 4.0 * y / w2) - b);
+    }
+
+    static float3 d3_grade(float3 color, D3ResolveParams params) {
+        float temperature = params.d3Grade.z;
+        float tint = params.d3Grade.w;
+        color *= float3(1.0 + temperature * 0.2, 1.0 + tint * 0.2,
+                        1.0 - temperature * 0.2);
+        color = params.d3Gain.rgb
+            * (color + params.d3Lift.rgb * (1.0 - color));
+        color = pow(max(color, float3(0.0)),
+                    1.0 / max(params.d3Gamma.rgb, float3(1e-4)));
+        const float midGray = 0.18;
+        color = (color - midGray) * params.d3Grade.x + midGray;
+        color = max(color, float3(0.0));
+        float luma = dot(color, float3(0.2126, 0.7152, 0.0722));
+        return mix(float3(luma), color, params.d3Grade.y);
+    }
+
     fragment float4 d3_resolve_fragment(
         D3ResolveOut in [[stage_in]],
         texture2d<float> colorSampler [[texture(0)]],
@@ -175,8 +227,12 @@ enum ToneMapTechnique {
         constant D3ResolveParams& params [[buffer(0)]])
     {
         constexpr sampler s(filter::nearest, address::clamp_to_edge);
-        float4 hdr = colorSampler.sample(s, in.uv);
-        float3 color = max(hdr.rgb, float3(0.0));
+        float4 packed = colorSampler.sample(s, in.uv);
+        float3 color = d3_scene_radiance(saturate(packed.rgb),
+                                         params.d3Mode.z);
+        if (params.d3Mode.w > 0.5) {
+            color = d3_grade(color, params);
+        }
         const float3x3 toRec2020 = float3x3(
             float3(0.627404, 0.069097, 0.016391),
             float3(0.329283, 0.919540, 0.088013),
@@ -202,11 +258,18 @@ enum ToneMapTechnique {
             }
             mapped = saturate(toRec709 * wide);
         }
+        if (params.d3Vignette.x > 0.0) {
+            float dist = length((in.uv - 0.5) * 2.0);
+            float falloff = smoothstep(
+                params.d3Vignette.y,
+                params.d3Vignette.y + params.d3Vignette.z, dist);
+            mapped *= 1.0 - falloff * params.d3Vignette.x;
+        }
         if (params.d3Mode.y > 0.5) {
             mapped = d3_decode(d3_lut(d3Lut, d3_encode(saturate(mapped)),
                                       params.d3Mode.y));
         }
-        return float4(mapped, hdr.a);
+        return float4(mapped, packed.a);
     }
     """
 
@@ -236,30 +299,35 @@ enum ToneMapTechnique {
             intent: .defaultIntent)
     }()
 
+    private static let vectorSymbols = [
+        "d3Mode", "d3Agx", "d3Grade", "d3Lift", "d3Gamma", "d3Gain",
+        "d3Vignette",
+    ]
+
     /// A technique with the resolve pass; nil when the shader library
     /// cannot be built on [device].
     static func make(device: MTLDevice) -> SCNTechnique? {
         guard let lib = library(for: device) else { return nil }
+        var inputs: [String: Any] = [
+            "colorSampler": "COLOR",
+            "d3Lut": "d3LutSymbol",
+        ]
+        var symbols: [String: Any] = ["d3LutSymbol": ["type": "sampler2D"]]
+        for name in vectorSymbols {
+            inputs[name] = name + "Symbol"
+            symbols[name + "Symbol"] = ["type": "vec4"]
+        }
         let pass: [String: Any] = [
             "draw": "DRAW_QUAD",
             "metalVertexShader": "d3_resolve_vertex",
             "metalFragmentShader": "d3_resolve_fragment",
-            "inputs": [
-                "colorSampler": "COLOR",
-                "d3Lut": "d3LutSymbol",
-                "d3Mode": "d3ModeSymbol",
-                "d3Agx": "d3AgxSymbol",
-            ],
+            "inputs": inputs,
             "outputs": ["color": "COLOR"],
         ]
         let definition: [String: Any] = [
             "passes": ["d3_resolve": pass],
             "sequence": ["d3_resolve"],
-            "symbols": [
-                "d3LutSymbol": ["type": "sampler2D"],
-                "d3ModeSymbol": ["type": "vec4"],
-                "d3AgxSymbol": ["type": "vec4"],
-            ],
+            "symbols": symbols,
         ]
         guard let technique = SCNTechnique(dictionary: definition)
         else { return nil }
@@ -267,21 +335,37 @@ enum ToneMapTechnique {
         return technique
     }
 
-    /// Writes the operator and the LUT into [technique]. [lut] is the
-    /// strip image of a cube with [lutSize] cells per edge, or nil.
-    static func configure(_ technique: SCNTechnique, map: StageToneMap,
-                          lut: CGImage?, lutSize: Int) {
-        let hasLut = lut != nil && lutSize >= 2
+    /// Writes [resolve] into [technique].
+    static func configure(_ technique: SCNTechnique, _ resolve: StageResolve) {
+        func set(_ name: String, _ x: Double, _ y: Double, _ z: Double,
+                 _ w: Double) {
+            technique.setObject(
+                NSValue(scnVector4: SCNVector4(
+                    Float(x), Float(y), Float(z), Float(w))),
+                forKeyedSubscript: (name + "Symbol") as NSCopying)
+        }
+        let lutSize = resolve.lut.map { $0.height } ?? 0
+        let hasLut = lutSize >= 2
+        let grading = resolve.grading
+        set("d3Mode", Double(resolve.toneMap.modeIndex ?? 0),
+            hasLut ? Double(lutSize) : 0, whitePoint,
+            grading == nil ? 0 : 1)
         technique.setObject(
-            NSValue(scnVector4: SCNVector4(
-                Float(map.modeIndex ?? 0),
-                hasLut ? Float(lutSize) : 0, 0, 0)),
-            forKeyedSubscript: "d3ModeSymbol" as NSCopying)
-        technique.setObject(
-            NSValue(scnVector4: map.agxParams),
+            NSValue(scnVector4: resolve.toneMap.agxParams),
             forKeyedSubscript: "d3AgxSymbol" as NSCopying)
+        set("d3Grade", grading?.contrast ?? 1, grading?.saturation ?? 1,
+            grading?.temperature ?? 0, grading?.tint ?? 0)
+        let lift = grading?.lift ?? SIMD3<Float>(0, 0, 0)
+        let gamma = grading?.gamma ?? SIMD3<Float>(1, 1, 1)
+        let gain = grading?.gain ?? SIMD3<Float>(1, 1, 1)
+        set("d3Lift", Double(lift.x), Double(lift.y), Double(lift.z), 0)
+        set("d3Gamma", Double(gamma.x), Double(gamma.y), Double(gamma.z), 0)
+        set("d3Gain", Double(gain.x), Double(gain.y), Double(gain.z), 0)
+        let vignette = resolve.vignette
+        set("d3Vignette", vignette?.intensity ?? 0, vignette?.radius ?? 0,
+            vignette?.smoothness ?? 0, 0)
         let property = SCNMaterialProperty(
-            contents: (hasLut ? lut : noLut) as Any)
+            contents: (hasLut ? resolve.lut : noLut) as Any)
         property.minificationFilter = .linear
         property.magnificationFilter = .linear
         property.mipFilter = .none

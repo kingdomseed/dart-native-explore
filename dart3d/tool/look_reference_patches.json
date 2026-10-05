@@ -16,8 +16,8 @@
     "ibl-constant",
     "ibl-studio",
     "all",
-    "all-bloom",
-    "default-stage"
+    "default-stage",
+    "all-bloom"
   ],
   "patches": [
     {

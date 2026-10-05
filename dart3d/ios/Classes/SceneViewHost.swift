@@ -324,21 +324,23 @@ final class SceneViewHost: SCNView {
         for camera in viewCameras() {
             camera.wantsHDR = true
             camera.exposureOffset = CGFloat(e > 0 ? log2(e) : 0)
-            // SceneKit's own curve is the identity only at its default
-            // white point, and its exposure adaptation is on unless
-            // switched off: a stage without an `effects` block used to
-            // meter itself toward mid-grey.
-            camera.whitePoint = 1
-            camera.averageGray = 0.18
+            // SceneKit's exposure adaptation is on unless switched
+            // off, and `applyStageEffects` only writes it when the
+            // stage has an `effects` block: a stage without one used
+            // to meter itself toward mid-grey.
             camera.wantsExposureAdaptation =
                 lastEffects?.autoExposure.enabled ?? false
+            // The resolve pass undoes SceneKit's own curve, which this
+            // white point defines (`ToneMapTechnique`).
+            camera.whitePoint = CGFloat(ToneMapTechnique.whitePoint)
+            camera.averageGray = 0.18
         }
         applyToneMap()
     }
 
     /// Points the view's resolve pass at the stage's tone-mapping
-    /// operator and grading LUT. Texture-target views render without
-    /// it, as their Android counterparts do.
+    /// operator, colour grading, vignette and LUT. Texture-target
+    /// views render without it, as their Android counterparts do.
     private func applyToneMap() {
         if resolveTechnique == nil,
            let device = device ?? MTLCreateSystemDefaultDevice() {
@@ -355,10 +357,15 @@ final class SceneViewHost: SCNView {
         // store — its decode-time claim re-runs the stage when the
         // bytes land; an asset path resolves from the main bundle.
         let grading = lastEffects?.colorGrading
-        let lut = grading?.lut.flatMap { $0.isEmpty ? nil : $0 }
-            .flatMap { resolveLutImage($0, blend: grading?.lutBlend ?? 1) }
-        ToneMapTechnique.configure(
-            resolve, map: stageToneMap, lut: lut, lutSize: lut?.height ?? 0)
+        let vignette = lastEffects?.vignette
+        ToneMapTechnique.configure(resolve, StageResolve(
+            toneMap: stageToneMap,
+            grading: grading?.enabled == true ? grading : nil,
+            vignette: vignette?.enabled == true ? vignette : nil,
+            lut: grading?.lut.flatMap { $0.isEmpty ? nil : $0 }
+                .flatMap {
+                    resolveLutImage($0, blend: grading?.lutBlend ?? 1)
+                }))
         if technique !== resolve { technique = resolve }
     }
 
@@ -396,13 +403,11 @@ final class SceneViewHost: SCNView {
             // scatter is a 0..1 spread; SceneKit wants blur pixels.
             camera.bloomBlurRadius = CGFloat(4 + 12 * fx.bloom.scatter)
 
-            // vignettingPower is the edge-rolloff exponent (0 = off);
-            // upstream radius has no counterpart — smoothness×2
-            // approximates the rolloff.
-            camera.vignettingIntensity =
-                CGFloat(fx.vignette.enabled ? fx.vignette.intensity : 0)
-            camera.vignettingPower = CGFloat(fx.vignette.enabled
-                ? max(0.1, fx.vignette.smoothness * 2) : 0)
+            // The vignette and the colour grading are the resolve
+            // pass's (`applyToneMap`): SceneKit applies its own after
+            // its tone curve, which that pass inverts.
+            camera.vignettingIntensity = 0
+            camera.vignettingPower = 0
 
             camera.colorFringeStrength =
                 CGFloat(fx.chromaticAberration.enabled
@@ -428,28 +433,11 @@ final class SceneViewHost: SCNView {
                     + "a platform limit")
             }
 
-            let cg = fx.colorGrading
-            camera.saturation =
-                CGFloat(cg.enabled ? cg.saturation : 1.0)
-            // Upstream contrast is 1.0-neutral multiplicative;
-            // SceneKit's is 0.0-neutral additive in [-1, 1].
-            camera.contrast = CGFloat(min(1, max(-1,
-                cg.enabled ? cg.contrast - 1.0 : 0)))
-            camera.whiteBalanceTemperature =
-                CGFloat(cg.enabled ? cg.temperature : 0)
-            camera.whiteBalanceTint = CGFloat(cg.enabled ? cg.tint : 0)
-            // The LUT is sampled by the resolve pass, after the tone
-            // map and on the encoded colour (`applyToneMap`).
+            camera.saturation = 1
+            camera.contrast = 0
+            camera.whiteBalanceTemperature = 0
+            camera.whiteBalanceTint = 0
             camera.colorGrading.contents = nil
-            if cg.enabled {
-                if cg.lift != SIMD3<Float>(0, 0, 0)
-                    || cg.gamma != SIMD3<Float>(1, 1, 1)
-                    || cg.gain != SIMD3<Float>(1, 1, 1) {
-                    logOnce("fx.colorGrading.lgg",
-                        "colorGrading lift/gamma/gain need "
-                        + "SCNTechnique/LUT on SceneKit; ignored")
-                }
-            }
 
             camera.grainIntensity =
                 CGFloat(fx.filmGrain.enabled ? fx.filmGrain.intensity : 0)
