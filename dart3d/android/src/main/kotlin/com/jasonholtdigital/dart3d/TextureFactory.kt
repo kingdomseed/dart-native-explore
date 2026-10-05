@@ -270,7 +270,7 @@ object TextureFactory {
             .sampler(Texture.Sampler.SAMPLER_2D)
             .format(internal)
             .usage(Texture.Usage.DEFAULT or Texture.Usage.GEN_MIPMAPPABLE)
-            .build(engine)
+            .fenced { build(engine) }
         tex.setImage(engine, 0, Texture.PixelBufferDescriptor(
             pixels, format, Texture.Type.UBYTE))
         if (levels > 1) tex.generateMipmaps(engine)
@@ -296,7 +296,7 @@ object TextureFactory {
             .levels(1)
             .sampler(Texture.Sampler.SAMPLER_2D)
             .format(Texture.InternalFormat.RGBA8)
-            .build(engine)
+            .fenced { build(engine) }
         tex.setImage(engine, 0, Texture.PixelBufferDescriptor(
             buf, Texture.Format.RGBA, Texture.Type.UBYTE))
         return tex

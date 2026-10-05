@@ -16,6 +16,7 @@ import com.github.stephengold.joltjni.Quat
 import com.github.stephengold.joltjni.RVec3
 import com.github.stephengold.joltjni.RotatedTranslatedShape
 import com.github.stephengold.joltjni.RotatedTranslatedShapeSettings
+import com.github.stephengold.joltjni.ShapeSettings
 import com.github.stephengold.joltjni.SphereShape
 import com.github.stephengold.joltjni.StaticCompoundShapeSettings
 import com.github.stephengold.joltjni.Vec3
@@ -1495,8 +1496,11 @@ object FsceneRealizer {
                 it.destroy(host.engine)
                 rec.procGpuMesh = null
             }
-            rec.procMaterialInstance?.let {
-                host.engine.destroyMaterialInstance(it)
+            rec.procMaterialInstance?.let { dup ->
+                for ((_, list) in textureConsumers) {
+                    list.removeAll { it.first === dup }
+                }
+                host.engine.destroyMaterialInstance(dup)
                 rec.procMaterialInstance = null
             }
         }
@@ -1580,7 +1584,7 @@ object FsceneRealizer {
                 .geometry(0, gm.primitiveType, gm.vertexBuffer,
                     gm.indexBuffer)
                 .material(0, inst)
-                .build(host.engine, rec.entity)
+                .fenced { build(host.engine, rec.entity) }
             if (fp != null) {
                 host.cameraFacing[key] = FacingSpec(
                     shape, fp.points, fp.colors, fp.widths, fp.width,
@@ -1866,9 +1870,17 @@ object FsceneRealizer {
             // (the payload-geometry contract doc records the
             // limitation). Mirrors the iOS material clone.
             val inst = if (doubleSided) {
-                MaterialInstance.duplicate(shared, "d3ds_$key").also {
-                    it.setDoubleSided(true)
-                    rec.procMaterialInstance = it
+                MaterialInstance.duplicate(shared, "d3ds_$key").also { dup ->
+                    dup.setDoubleSided(true)
+                    rec.procMaterialInstance = dup
+                    // The copy samples the source's textures. A texture
+                    // upsert destroys the old texture, so the copy has
+                    // to be rebound with the source's other consumers.
+                    for ((_, list) in textureConsumers) {
+                        val params = list.filter { it.first === shared }
+                            .map { it.second }
+                        for (param in params) list.add(Pair(dup, param))
+                    }
                 }
             } else shared
             // The snapshot duplicate must not be a shared-material
@@ -1890,7 +1902,7 @@ object FsceneRealizer {
                 .geometry(0, gm.primitiveType, gm.vertexBuffer,
                     gm.indexBuffer)
                 .material(0, inst)
-                .build(host.engine, rec.entity)
+                .fenced { build(host.engine, rec.entity) }
             if (billboard) {
                 val centers = FloatArray(transforms.size * 3)
                 for ((i, m) in transforms.withIndex()) {
@@ -2544,7 +2556,7 @@ object FsceneRealizer {
                         skinBuf = SkinningBuffer.Builder()
                             .boneCount(boneCount)
                             .initialize(true)
-                            .build(host.engine)
+                            .fenced { build(host.engine) }
                     }
                 }
             }
@@ -2567,7 +2579,7 @@ object FsceneRealizer {
                     .skinning(skinBuf, boneCount, 0)
             }
             mesh.morphTargetBuffer?.let { builder.morphing(it) }
-            builder.build(host.engine, rec.entity)
+            builder.fenced { build(host.engine, rec.entity) }
             // The mesh took the slot — suspend a decoded `lod` (the
             // per-frame pass skips it; a components re-decode
             // restores whichever order the wire sends).
@@ -2631,7 +2643,7 @@ object FsceneRealizer {
                     VertexBuffer.AttributeType.FLOAT3, 0, 28)
                 .attribute(VertexBuffer.VertexAttribute.COLOR, 0,
                     VertexBuffer.AttributeType.FLOAT4, 12, 28)
-                .build(host.engine)
+                .fenced { build(host.engine) }
             // Zeroed until the first frame records a path — dead
             // verts collapse to zero width/alpha like upstream's
             // `_TrailGeometry.setTrail`.
@@ -2652,7 +2664,7 @@ object FsceneRealizer {
             val ib = IndexBuffer.Builder()
                 .indexCount(indices.size)
                 .bufferType(IndexBuffer.Builder.IndexType.USHORT)
-                .build(host.engine)
+                .fenced { build(host.engine) }
             ib.setBuffer(host.engine,
                 java.nio.ByteBuffer.allocateDirect(indices.size * 2)
                     .order(java.nio.ByteOrder.nativeOrder())
@@ -2674,7 +2686,7 @@ object FsceneRealizer {
                 .geometry(0, RenderableManager.PrimitiveType.TRIANGLES,
                     vb, ib)
                 .material(0, host.trailMaterial.defaultInstance)
-                .build(host.engine, entity)
+                .fenced { build(host.engine, entity) }
             // Identity world transform — the entity is unparented.
             val ident = FloatArray(16)
             Matrix.setIdentityM(ident, 0)
@@ -2830,7 +2842,7 @@ object FsceneRealizer {
                     .geometry(0, gm.primitiveType, gm.vertexBuffer,
                         gm.indexBuffer)
                     .material(0, mi)
-                    .build(host.engine, rec.entity)
+                    .fenced { build(host.engine, rec.entity) }
             } else {
                 val ri = rm.getInstance(rec.entity)
                 rm.setGeometryAt(ri, 0, gm.primitiveType,
@@ -3357,7 +3369,7 @@ object FsceneRealizer {
                     0, VertexBuffer.AttributeType.FLOAT4, 68,
                     md.vertexStrideBytes)
             }
-            val vb = vbBuilder.build(host.engine)
+            val vb = vbBuilder.fenced { build(host.engine) }
             vb.setBufferAt(host.engine, 0, md.vertices)
             val indexType = if (md.indexWidth == MeshFactory.IndexWidth.UINT32) {
                 IndexBuffer.Builder.IndexType.UINT
@@ -3367,7 +3379,7 @@ object FsceneRealizer {
             val ib = IndexBuffer.Builder()
                 .indexCount(md.indexCount)
                 .bufferType(indexType)
-                .build(host.engine)
+                .fenced { build(host.engine) }
             ib.setBuffer(host.engine, md.indices)
 
             val pos = FloatArray(md.vertexCount * 3)
@@ -3406,7 +3418,7 @@ object FsceneRealizer {
                     .count(morph.targetCount)
                     .withPositions(true)
                 if (morph.tangents != null) bb.withTangents(true)
-                val buf = bb.build(host.engine)
+                val buf = bb.fenced { build(host.engine) }
                 val n = md.vertexCount
                 for (t in 0 until morph.targetCount) {
                     buf.setPositionsAt(host.engine, t,
@@ -3570,7 +3582,7 @@ object FsceneRealizer {
                     }
                 }
             }
-            builder.build(host.engine, rec.entity)
+            builder.fenced { build(host.engine, rec.entity) }
         }
 
         /**
@@ -3717,7 +3729,7 @@ object FsceneRealizer {
                     .color(color[0], color[1], color[2])
                     .intensityCandela(intensityCandela)
                     .falloff(range)
-                    .build(host.engine, child)
+                    .fenced { build(host.engine, child) }
                 tcm.setTransform(
                     tcm.create(child),
                     D3Wire.trs(
@@ -3987,16 +3999,23 @@ object FsceneRealizer {
         )
 
         fun decodePhysicsDeferred() {
-            val colliders = HashMap<Long, ColliderData>()
-            for (item in physicsDeferred) {
-                if (item.type == "collider") {
-                    colliders[item.key] = decodeCollider(item.rec, item.props)
+            // Every shape, settings and result wrapper built here holds
+            // a reference on native memory. A body takes its own
+            // reference on its shape when it is created, so the
+            // wrappers all close once the bodies exist.
+            nativeScope {
+                val colliders = HashMap<Long, ColliderData>()
+                for (item in physicsDeferred) {
+                    if (item.type == "collider") {
+                        colliders[item.key] =
+                            decodeCollider(item.rec, item.props)
+                    }
                 }
-            }
-            for (item in physicsDeferred) {
-                if (item.type == "rigidBody") {
-                    decodeRigidBody(item.key, item.rec, item.props,
-                        colliders[item.key])
+                for (item in physicsDeferred) {
+                    if (item.type == "rigidBody") {
+                        decodeRigidBody(item.key, item.rec, item.props,
+                            colliders[item.key])
+                    }
                 }
             }
             for (item in physicsDeferred) {
@@ -4022,7 +4041,9 @@ object FsceneRealizer {
             }
         }
 
-        private fun decodeCollider(rec: NodeRec, p: JSONObject): ColliderData {
+        private fun NativeScope.decodeCollider(
+            rec: NodeRec, p: JSONObject,
+        ): ColliderData {
             // Surface material: friction/restitution/density plus the
             // combine rules (Jolt applies them per-system — the closest
             // expressible mapping — so they route through JoltWorld).
@@ -4045,10 +4066,10 @@ object FsceneRealizer {
                     val (pos, rot) = localPoseOf(m)
                     if (pos[0] != 0f || pos[1] != 0f || pos[2] != 0f ||
                         rot[0] != 0f || rot[1] != 0f || rot[2] != 0f || rot[3] != 1f) {
-                        shape = RotatedTranslatedShapeSettings(
+                        shape = shapeOf(RotatedTranslatedShapeSettings(
                             Vec3(pos[0], pos[1], pos[2]),
                             Quat(rot[0], rot[1], rot[2], rot[3]), built,
-                        ).create().get()
+                        )) { Log.w(TAG, "collider localPose: $it") }
                     }
                 }
             }
@@ -4079,7 +4100,7 @@ object FsceneRealizer {
          * the shape exposes it (convex shapes; not meshes/compound
          * interiors beyond their children).
          */
-        private fun decodeShape(
+        private fun NativeScope.decodeShape(
             rec: NodeRec, shapeVal: Any?, density: Float,
         ): ConstShape? {
             val map = shapeVal.d3Map()
@@ -4087,31 +4108,31 @@ object FsceneRealizer {
             if (map == null || kind == null) {
                 // Upstream falls back to the unit box on a bad union.
                 Log.w(TAG, "collider 'shape' is missing or malformed; using unit box")
-                return BoxShape(Vec3(0.5f, 0.5f, 0.5f))
+                return own(BoxShape(Vec3(0.5f, 0.5f, 0.5f)))
             }
             return when (kind) {
                 // halfExtents arrive already halved — feed Jolt directly.
                 "box" -> {
                     val e = map.tag("halfExtents").d3Vec3()
                         ?: doubleArrayOf(0.5, 0.5, 0.5)
-                    BoxShape(Vec3(
-                        e[0].toFloat(), e[1].toFloat(), e[2].toFloat()))
+                    own(BoxShape(Vec3(
+                        e[0].toFloat(), e[1].toFloat(), e[2].toFloat())))
                         .apply { setDensity(density) }
                 }
-                "sphere" -> SphereShape(
-                    (map.tag("radius").d3Double() ?: 0.5).toFloat())
+                "sphere" -> own(SphereShape(
+                    (map.tag("radius").d3Double() ?: 0.5).toFloat()))
                         .apply { setDensity(density) }
                 "capsule" -> {
                     val r = (map.tag("radius").d3Double() ?: 0.5).toFloat()
                     // Upstream halfHeight IS Jolt's cylindrical
                     // half-height — no h/2-r reduction.
                     val hh = (map.tag("halfHeight").d3Double() ?: 0.5).toFloat()
-                    CapsuleShape(hh, r).apply { setDensity(density) }
+                    own(CapsuleShape(hh, r)).apply { setDensity(density) }
                 }
                 "cylinder" -> {
                     val r = (map.tag("radius").d3Double() ?: 0.5).toFloat()
                     val hh = (map.tag("halfHeight").d3Double() ?: 0.5).toFloat()
-                    CylinderShape(hh, r).apply { setDensity(density) }
+                    own(CylinderShape(hh, r)).apply { setDensity(density) }
                 }
                 "convexHull" -> {
                     val token = payloadToken(map.tag("vertices"))
@@ -4120,37 +4141,23 @@ object FsceneRealizer {
                         decodeColliderPositions("convexHull", it)
                     }
                     val pos = payloadPositions ?: hullPositions(rec)
-                    if (pos != null) {
-                        try {
-                            ConvexHullShapeSettings(
-                                pos.size / 3, floatBufferOf(pos))
-                                .apply { setDensity(density) }
-                                .create().get()
-                        } catch (e: Exception) {
-                            if (payloadPositions != null) {
-                                warnOnce("collider:convexHull:create:${e.message}",
-                                    "collider 'convexHull': malformed payload (${e.message}); deriving from node geometry")
-                                val fallback = hullPositions(rec)
-                                if (fallback != null && fallback !== payloadPositions) {
-                                    try {
-                                        ConvexHullShapeSettings(
-                                            fallback.size / 3, floatBufferOf(fallback))
-                                            .apply { setDensity(density) }
-                                            .create().get()
-                                    } catch (fallbackError: Exception) {
-                                        warnOnce("collider:convexHull:fallback:${fallbackError.message}",
-                                            "collider 'convexHull': node geometry is not a valid hull: ${fallbackError.message}")
-                                        null
-                                    }
-                                } else null
-                            } else {
-                                Log.w(TAG, "collider 'convexHull': invalid hull: ${e.message}")
-                                null
-                            }
-                        }
-                    } else {
+                    if (pos == null) {
                         Log.w(TAG, "collider 'convexHull': node has no geometry")
                         null
+                    } else if (payloadPositions == null) {
+                        hullShape(pos, density) {
+                            Log.w(TAG, "collider 'convexHull': invalid hull: $it")
+                        }
+                    } else {
+                        hullShape(pos, density) {
+                            warnOnce("collider:convexHull:create:$it",
+                                "collider 'convexHull': malformed payload ($it); deriving from node geometry")
+                        } ?: hullPositions(rec)?.let { fallback ->
+                            hullShape(fallback, density) {
+                                warnOnce("collider:convexHull:fallback:$it",
+                                    "collider 'convexHull': node geometry is not a valid hull: $it")
+                            }
+                        }
                     }
                 }
                 "triMesh" -> {
@@ -4261,8 +4268,41 @@ object FsceneRealizer {
             }
         }
 
+        /**
+         * Builds [settings] into its shape. The settings, the result
+         * and both wrappers the result hands back each own native
+         * memory, so all four go to the scope. Null, after [onError]
+         * with Jolt's reason, when the settings are rejected.
+         */
+        private inline fun NativeScope.shapeOf(
+            settings: ShapeSettings, onError: (String) -> Unit,
+        ): ConstShape? {
+            own(settings)
+            val result = own(settings.create())
+            if (result.hasError()) {
+                onError(result.error)
+                return null
+            }
+            val ref = own(result.get())
+            ownIfCloseable(ref.ptr)
+            return ref
+        }
+
+        private inline fun NativeScope.hullShape(
+            pos: FloatArray, density: Float, onError: (String) -> Unit,
+        ): ConstShape? {
+            val settings = try {
+                ConvexHullShapeSettings(pos.size / 3, floatBufferOf(pos))
+            } catch (e: Exception) {
+                onError(e.message ?: e.javaClass.simpleName)
+                return null
+            }
+            settings.setDensity(density)
+            return shapeOf(settings, onError)
+        }
+
         /** MeshShape from the node's realized geometry (static bodies only). */
-        private fun meshShape(rec: NodeRec, kind: String): ConstShape? {
+        private fun NativeScope.meshShape(rec: NodeRec, kind: String): ConstShape? {
             val pos = rec.lastGeoPositions
             val idx = rec.lastGeoIndices
             if (pos == null || idx == null) {
@@ -4272,7 +4312,9 @@ object FsceneRealizer {
             return meshShape(pos, idx, kind)
         }
 
-        private fun meshShape(pos: FloatArray, idx: IntArray, kind: String): ConstShape? {
+        private fun NativeScope.meshShape(
+            pos: FloatArray, idx: IntArray, kind: String,
+        ): ConstShape? {
             if (pos.isEmpty() || pos.size % 3 != 0 || idx.size < 3 || idx.size % 3 != 0) {
                 warnOnce("collider:$kind:meshCounts:${pos.size}:${idx.size}",
                     "collider '$kind': malformed triangle-list payload; deriving from node geometry")
@@ -4291,14 +4333,19 @@ object FsceneRealizer {
                         set(i, pos[i * 3], pos[i * 3 + 1], pos[i * 3 + 2])
                     }
                 }
-                val tris = IndexedTriangleList().apply {
+                val tris = own(IndexedTriangleList()).apply {
                     resize(idx.size / 3)
                     for (t in 0 until idx.size / 3) {
-                        set(t, IndexedTriangle(
-                            idx[t * 3], idx[t * 3 + 1], idx[t * 3 + 2]))
+                        // set() copies the triangle into the list.
+                        IndexedTriangle(
+                            idx[t * 3], idx[t * 3 + 1], idx[t * 3 + 2],
+                        ).use { set(t, it) }
                     }
                 }
-                MeshShapeSettings(verts, tris).create().get()
+                shapeOf(MeshShapeSettings(verts, tris)) {
+                    warnOnce("collider:$kind:meshCreate:$it",
+                        "collider '$kind': invalid triangle mesh ($it); deriving from node geometry")
+                }
             } catch (e: Exception) {
                 warnOnce("collider:$kind:meshCreate:${e.message}",
                     "collider '$kind': invalid triangle mesh (${e.message}); deriving from node geometry")
@@ -4307,7 +4354,7 @@ object FsceneRealizer {
         }
 
         /** StaticCompoundShape of `{shape, localPose}` children. */
-        private fun compoundShape(
+        private fun NativeScope.compoundShape(
             rec: NodeRec, map: JSONObject, density: Float,
         ): ConstShape? {
             val children = map.tag("children").d3List()
@@ -4315,7 +4362,7 @@ object FsceneRealizer {
                 Log.w(TAG, "collider 'compound': no children")
                 return null
             }
-            val settings = StaticCompoundShapeSettings()
+            val settings = own(StaticCompoundShapeSettings())
             var added = 0
             for (i in 0 until children.length()) {
                 val entry = children.opt(i).d3Map() ?: continue
@@ -4334,7 +4381,9 @@ object FsceneRealizer {
                 Log.w(TAG, "collider 'compound': no children decoded")
                 return null
             }
-            return settings.create().get()
+            return shapeOf(settings) {
+                Log.w(TAG, "collider 'compound': $it")
+            }
         }
 
         /**
@@ -4350,18 +4399,20 @@ object FsceneRealizer {
         private fun hullPositions(rec: NodeRec): FloatArray? =
             rec.lastGeoPositions
 
-        private fun boundingBoxShape(rec: NodeRec, density: Float): ConstShape? {
+        private fun NativeScope.boundingBoxShape(
+            rec: NodeRec, density: Float,
+        ): ConstShape? {
             val b = rec.lastGeoBounds ?: return null
-            val box = BoxShape(Vec3(b[3], b[4], b[5]))
+            val box = own(BoxShape(Vec3(b[3], b[4], b[5])))
             box.setDensity(density)
             // bounds are (center, halfExtents) — an off-center mesh gets
             // its collider translated to the box center.
             if (b[0] == 0f && b[1] == 0f && b[2] == 0f) return box
-            return RotatedTranslatedShape(
-                Vec3(b[0], b[1], b[2]), Quat.sIdentity(), box)
+            return own(RotatedTranslatedShape(
+                Vec3(b[0], b[1], b[2]), Quat.sIdentity(), box))
         }
 
-        private fun decodeRigidBody(
+        private fun NativeScope.decodeRigidBody(
             key: Long, rec: NodeRec, p: JSONObject,
             collider: ColliderData?,
         ) {
@@ -4392,17 +4443,12 @@ object FsceneRealizer {
                 Log.w(TAG, "node $key: collider has no shape yet; body deferred")
                 return
             }
-            val bcs = BodyCreationSettings()
+            val bcs = own(BodyCreationSettings())
             bcs.setShape(shape)
             bcs.setMotionType(motionType)
             bcs.setObjectLayer(
                 if (motionType == EMotionType.Static) JoltWorld.OBJ_NON_MOVING
                 else JoltWorld.OBJ_MOVING)
-            // Every body shares the world's GroupFilterTable so the
-            // upstream layer/mask rule holds pair-wise.
-            host.world.collisionGroup(
-                collider?.layer ?: -1, collider?.mask ?: -1)
-                ?.let { bcs.setCollisionGroup(it) }
             if (collider?.isTrigger == true) bcs.setIsSensor(true)
             val wm = nodeWorld[key] ?: FloatArray(16).also {
                 Matrix.setIdentityM(it, 0)
@@ -4471,7 +4517,8 @@ object FsceneRealizer {
             }
             val body = host.world.addBody(
                 bcs, activate = motionType == EMotionType.Dynamic,
-                nodeKey = key)
+                nodeKey = key,
+                layer = collider?.layer ?: -1, mask = collider?.mask ?: -1)
             rec.body = body
             bodies[key] = body
             if (motionType == EMotionType.Dynamic) dynamicBodyKeys.add(key)
@@ -4805,8 +4852,11 @@ object FsceneRealizer {
                 it.destroy(host.engine)
                 rec.procGpuMesh = null
             }
-            rec.procMaterialInstance?.let {
-                host.engine.destroyMaterialInstance(it)
+            rec.procMaterialInstance?.let { dup ->
+                for ((_, list) in textureConsumers) {
+                    list.removeAll { it.first === dup }
+                }
+                host.engine.destroyMaterialInstance(dup)
                 rec.procMaterialInstance = null
             }
             rec.instancesProps = null
@@ -5121,7 +5171,7 @@ object FsceneRealizer {
                             .environment(cube)
                             .intensity((intensity * skyIntensity *
                                 ENVIRONMENT_LUX_PER_UNIT).toFloat())
-                            .build(host.engine)
+                            .fenced { build(host.engine) }
                     }
                 }
                 "gradient" -> {
@@ -5142,7 +5192,7 @@ object FsceneRealizer {
                             .environment(gc)
                             .intensity((skyIntensity *
                                 ENVIRONMENT_LUX_PER_UNIT).toFloat())
-                            .build(host.engine)
+                            .fenced { build(host.engine) }
                     } else {
                         host.engine.destroyTexture(gt)
                     }
@@ -5169,7 +5219,7 @@ object FsceneRealizer {
                         .intensity((intensity *
                             ENVIRONMENT_LUX_PER_UNIT).toFloat())
                     if (envCube != null) b.reflections(envCube)
-                    b.build(host.engine)
+                    b.fenced { build(host.engine) }
                 }
                 envKey?.let { pendingPayloadRefs.remove(it) }
                 host.applyEnvironment(il, iblTextures)

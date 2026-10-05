@@ -195,7 +195,7 @@ internal object MaterialPackages {
             ensureInit()
             val start = android.os.SystemClock.uptimeMillis()
             val pkg = try {
-                spec.recipe.toBuilder().build()
+                spec.recipe.toBuilder().fenced { build() }
             } catch (e: Exception) {
                 null
             }

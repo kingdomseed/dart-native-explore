@@ -895,18 +895,25 @@ final class SceneViewHost: SCNView {
         return out
     }
 
+    /// Fields first, then the body resets: a reset reads the node's
+    /// world transform, which composes through its parents, and
+    /// `written` comes out of a dictionary in no parent-before-child
+    /// order.
     private func restoreTransformWrites(_ written: [WrittenPose]) {
+        var moved: [SCNNode] = []
         var restored = 0
         for pose in written {
             guard let node = nodesById[pose.id] else { continue }
             if pose.mask & 1 != 0 { node.position = pose.position }
             if pose.mask & 2 != 0 { node.orientation = pose.orientation }
             if pose.mask & 4 != 0 { node.scale = pose.scale }
-            if pose.mask & 3 != 0, let body = node.physicsBody,
-               body.type != .dynamic {
+            if pose.mask & 3 != 0 { moved.append(node) }
+            restored += 1
+        }
+        for node in moved {
+            if let body = node.physicsBody, body.type != .dynamic {
                 body.resetTransform()
             }
-            restored += 1
         }
         if restored > 0 {
             d3Log("re-realize: restored \(restored) written transform(s)")
@@ -1219,15 +1226,6 @@ final class SceneViewHost: SCNView {
         guard let op = json["op"] as? String else { return }
         commandDepth += 1
         defer { commandDepth -= 1 }
-        // A structural rewrite or removal replays from the journal
-        // instead of carrying the node's earlier `setTransforms` state.
-        if !replayingOps,
-           op == "addNode" || op == "removeNode" || (op == "updateNode"
-               && (json["flags"] as? [String] ?? []).contains("transform")),
-           let token = json["node"] as? String,
-           let key = D3Wire.localIdKey(token) {
-            transformWrites[key] = nil
-        }
         // Declared after the depth defer, so it runs first — the
         // journal step still sees this dispatch's depth.
         let journaled = op == "addNode" || op == "updateNode"
@@ -1757,6 +1755,11 @@ final class SceneViewHost: SCNView {
             logOnce("addNode.malformed", "addNode: missing node/spec")
             return
         }
+        // Only an op that gets this far rewrites the node: it replays
+        // from the journal instead of carrying the node's earlier
+        // `setTransforms` state. One rejected above changes nothing,
+        // so the written transform must still carry.
+        if !replayingOps { transformWrites[key] = nil }
         if let existing = nodesById[key] {
             d3Log("addNode on live id; treating as update")
             applyNodeUpdate(key: key, node: existing, spec: spec,
@@ -1798,6 +1801,9 @@ final class SceneViewHost: SCNView {
             return
         }
         let flags = Set(json["flags"] as? [String] ?? [])
+        if !replayingOps, flags.contains("transform") {
+            transformWrites[key] = nil
+        }
         applyNodeUpdate(key: key, node: node, spec: spec,
                         parent: json["parent"], flags: flags)
     }

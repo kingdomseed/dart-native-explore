@@ -69,9 +69,24 @@ from look-dev — the DartNative set's spec and reference renders — is on
    tablet, the low profile's shadows are hard, LOW always takes OpenGL
    although Vulkan is faster on the Wacom, and only two rows of the GPU
    table are measured.
-   Open from the tablet run: native lifetime on API 26–32 now that
-   jolt-jni's cleaner is off there (#44); dice at an edge can still cover
-   the rim line.
+   Open from the tablet run: dice at an edge can still cover the rim
+   line.
+   Native lifetime (S0g, #50): before #50 the app ran out of Java heap
+   after 22 visits to the dice screen on the Fire tablet. #50 closes
+   every jolt-jni object it creates (22 sites leaked per scene load),
+   fences all Filament builders and frees a released view's document;
+   50 visits and 200 rolls then complete. **Memory per visit is still
+   not flat in the app**: DartNative's view registry keeps the hero
+   screen's view tree (its scroll view's content is never
+   unregistered), and the Dart heap grows about 7 MB per visit for a
+   reason not yet found. With the scroll view out, the native heap
+   ends +4.4 MB after 50 visits against +18.5 MB on `main`
+   (`docs/artifacts/s0g-android-lifetime/`).
+   Physics across a re-realize (S0g, in review, branch
+   `s0g-android-physics-rerealize`): bodies keep their motion and sleep
+   state on Android, and the harness's W25 settle lane passes for the
+   first time (`docs/artifacts/s0g-physics-rerealize/`). The iOS half
+   is owed with the rest of the iOS debt.
 2. **S1 renderer spike**, then **Track E** in its table order (E1 → E12).
 3. **Track V** — the 0.24 delta, re-pinned when upstream publishes.
 4. **Track R** — API pass, consumer build, agent skills, README and
@@ -94,6 +109,12 @@ evidence only. #39 changed Android culling natively and has no iOS or
 GL-backend run. Owed when iOS is re-enabled: T2 on the simulator plus the
 dice lanes (readout, d4 turn, cocked nudge, gestures, numerals, culling
 parity). The toss gesture has only been driven by scripted swipes.
+From S0g: the two iOS ordering fixes in the re-realize PR are
+type-checked only; `s0g-ios-dynamic-body-reseat` (`resetTransform()`
+for dynamic bodies on restore and on `setTransforms`, whole-pose
+restore) is a draft that must not merge before the dice screen, rolls
+and a rotation refit have run on iOS; body state across a re-realize
+is not built on iOS.
 
 **Review.** Codex code review is out of quota; PRs since #36 were
 reviewed by an Opus reviewer agent, each finding checked against the
@@ -214,10 +235,47 @@ Rules:
       (inverse quaternion + mirrored face normals — root cause confirmed);
       native light-unit unification (then delete the example's iOS 0.26
       scale); iOS colour saturation vs Android; root-cause the Mali page
-      fault behind the catcher/particle prewarm and restore it; audit the
-      remaining Filament builder sites for the GC-reachability hazard;
-      W25 settle lane never passes after wLoose; body poses/velocities
-      across deferred re-realize (M)
+      fault behind the catcher/particle prewarm and restore it; ~~audit the
+      remaining Filament builder sites for the GC-reachability hazard~~;
+      ~~W25 settle lane never passes after wLoose~~; ~~body
+      poses/velocities across deferred re-realize (M)~~ on Android.
+      *Android native lifetime — landed* (#50, 2026-10-05). Done: the jolt-jni ownership
+      audit and deterministic close of every owner (`NativeScope`;
+      nothing relies on the Cleaner, which API 26–32 lack); collision
+      sub-group ids reused instead of running out after 1024 bodies;
+      `JoltWorld.update` no longer calls an API 28 method on API 26–27
+      (from the dex and lint, not run); the GPU probe gives back its EGL
+      display reference; all 31 Filament builder sites fenced;
+      three Filament destroy-order hazards fixed (rect-light cluster
+      entities, a variant binding's default after a material upsert, a
+      doubleSided duplicate after a texture upsert); a released view
+      drops its document. Measured on the Fire tablet (API 30): `main`
+      dies of `OutOfMemoryError` at visit 22; the branch completes 50
+      visits and 200 rolls; rolls are flat; frame rate unchanged on all
+      three devices (A142 on Vulkan and on forced OpenGL). **Open:**
+      per-visit growth in the app from two
+      causes outside the plugin's native code (the framework's view
+      registry holds the hero's view tree; the Dart heap grows about
+      7 MB per visit, cause unknown); a native slope under about 0.1 MB
+      per load is not excluded; no API 26/27 device; four Filament
+      hazards that need unusual documents are listed, not fixed
+      (`docs/triage/android.md` §S0g native object lifetime). Evidence:
+      `docs/artifacts/s0g-android-lifetime/`
+      *Physics across a re-realize — in review* (2026-10-05, branch
+      `s0g-android-physics-rerealize`). Done on Android: kinematic and
+      dynamic bodies keep pose, linear and angular velocity and sleep
+      state across a payload-arrival re-realize (`BodyCarry`); the
+      harness's W25 dice close-out passes and wLoose settles by event
+      (the breakable joint's box had been in free fall since its joint
+      broke, and the close-out used a random throw that can leave the
+      slab). Also the #45 review threads: a rejected `addNode` or
+      `updateNode` no longer drops a saved transform (both natives),
+      iOS restores in two passes. T2 on all three devices, A142 on
+      both backends. **Open, all iOS:** the body state (described, not
+      built); a run of the two ordering fixes (type-checked only); and
+      `s0g-ios-dynamic-body-reseat`, which holds the changes to how iOS
+      moves a dynamic body until they have run there. Evidence:
+      `docs/artifacts/s0g-physics-rerealize/`
 - [x] S0h Android cold-start material compile — **done** (#48; tablet
       run 2026-10-05). Root cause: filamat's SPIR-V optimizer, 3–6 s
       per lit package, run on the device at every cold start. Fix:

@@ -117,12 +117,12 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             }
         }
         val engine = try {
-            Engine.Builder().backend(backend).build()
+            Engine.Builder().backend(backend).fenced { build() }
         } catch (e: Exception) {
             if (backend == Engine.Backend.OPENGL) throw e
             Log.w(TAG, "Filament $backend engine failed, retrying on OpenGL", e)
             backend = Engine.Backend.OPENGL
-            Engine.Builder().backend(backend).build()
+            Engine.Builder().backend(backend).fenced { build() }
         }
         Log.i(TAG, "Filament engine backend: $backend (pref=$pref," +
             " tier=${DeviceTier.of(context)})")
@@ -1082,7 +1082,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             .castShadows(false)
             .receiveShadows(false)
             .culling(false)
-            .build(engine, entity)
+            .fenced { build(engine, entity) }
         val rt = SpriteParticleRuntime(
             this, system, spec, entity, vb, ib, mi, spec.texture)
         rt.layers = layers
@@ -1726,6 +1726,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 // entry die with the node — the trail's unparented
                 // entity isn't covered by the entity sweep below.
                 sweepCtx.destroyTrailLod(rec)
+                destroyLightCluster(rec)
                 scene.removeEntity(rec.entity)
                 engine.destroyEntity(rec.entity)
                 EntityManager.get().destroy(rec.entity)
@@ -1799,7 +1800,46 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             // inherit it (audit P1: leak + use-after-free).
             TextureFactory.releaseEngine(engine)
             engine.destroy()
+            dropDocumentState()
         }
+    }
+
+    /**
+     * A rectAreaLight's cluster lights are scene entities of their own;
+     * destroying the node's entity does not take them with it.
+     */
+    private fun destroyLightCluster(rec: FsceneRealizer.NodeRec) {
+        for (child in rec.lightEntities) {
+            scene.removeEntity(child)
+            engine.destroyEntity(child)
+            EntityManager.get().destroy(child)
+        }
+        rec.lightEntities.clear()
+    }
+
+    /**
+     * Lets go of the document a released view was showing: payload
+     * chunks, the manifest, the op journal and everything decoded from
+     * them. Nothing can use them once the engine is gone, and the view
+     * object itself can outlive its release for as long as the host
+     * framework keeps a reference to it or to anything above it in the
+     * view tree, so what it still holds is what that costs.
+     */
+    private fun dropDocumentState() {
+        payloadStore.clear()
+        opPayloadSpecs.clear()
+        pendingPayloadRefs.clear()
+        pendingParents.clear()
+        lastManifest = null
+        lastStage = null
+        lutBuffers.clear()
+        pendingWork.clear()
+        surgicalJournal.clear()
+        streamedSubtreeOps.clear()
+        transformWrites.clear()
+        variantWaiters.clear()
+        savedCameraTrs = null
+        manipulator = null
     }
 
     // MARK: - Mutation application (mirrors SceneViewHost)
@@ -2176,6 +2216,37 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     }
 
     /**
+     * Puts the simulation state captured before a re-realize back on
+     * the rebuilt bodies, after the written transforms: a restored
+     * write teleports its body to where the write put it, and the body
+     * has moved since. Every body first, then the nodes follow their
+     * bodies, parents before children: a node's local transform comes
+     * from its parent's world transform, and the per-frame sync skips
+     * sleeping bodies, so a child synced against a parent that has not
+     * moved yet would stay wrong.
+     */
+    private fun restoreBodyMotion(carried: BodyCarry) {
+        val restored = carried.restore(
+            rebuiltKind = { key -> bodies[key]?.let(world::kindOf) },
+        ) { key, motion ->
+            bodies[key]?.let { world.restoreMotion(it, motion) }
+        }
+        val ordered = BodyCarry.parentsFirst(restored.keys) {
+            nodesById[it]?.parentKey
+        }
+        for (key in ordered) {
+            val rec = nodesById[key] ?: continue
+            val body = bodies[key] ?: continue
+            syncBody(rec, body)
+        }
+        if (restored.bodies > 0) {
+            Log.i(TAG, "re-realize: restored ${restored.bodies} body " +
+                "state(s), ${restored.awake} awake, fastest " +
+                "${"%.2f".format(java.util.Locale.US, restored.fastest)} u/s")
+        }
+    }
+
+    /**
      * The supersession key of a latest-wins journaled op: ops with the
      * same key replace each other. Null for ops outside that set.
      */
@@ -2336,10 +2407,6 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      */
     private fun applyCommandJson(json: JSONObject) {
         val op = json.optString("op")
-        if (!replayingJournal && (op == "addNode" || op == "removeNode" ||
-                (op == "updateNode" && "transform" in opFlags(json)))) {
-            jsonKey(json)?.let { transformWrites.supersede(it) }
-        }
         when (op) {
             "removeNode" -> {
                 Log.i(TAG, "cmd removeNode")
@@ -2385,8 +2452,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     cameraFacing.remove(id)
                     rec.procGpuMesh?.destroy(engine)
                     rec.procGpuMesh = null
-                    rec.procMaterialInstance?.let {
-                        engine.destroyMaterialInstance(it)
+                    rec.procMaterialInstance?.let { dup ->
+                        for ((_, list) in resources.textureConsumers) {
+                            list.removeAll { it.first === dup }
+                        }
+                        engine.destroyMaterialInstance(dup)
                     }
                     rec.procMaterialInstance = null
                     // W12: the node's own component-joint registrations
@@ -2405,11 +2475,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     }
                     // W12 rectAreaLight: the cluster's child entities
                     // aren't covered by the parent entity's teardown.
-                    for (child in rec.lightEntities) {
-                        scene.removeEntity(child)
-                        engine.destroyEntity(child)
-                        EntityManager.get().destroy(child)
-                    }
+                    destroyLightCluster(rec)
                 }
                 // Dead entities can't take a re-attached material —
                 // drop them from the upsert consumer maps; node-keyed
@@ -3074,13 +3140,26 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         materialInstances[key] = mi
         resources.materialResources[key] = res
         if (old != null) {
-            // A destroyed MaterialInstance can't re-attach — clear it
-            // from variant binding state; the re-apply below resolves
-            // defaults/selections against the fresh instance.
+            // A destroyed MaterialInstance can't stay bound or
+            // re-attach. A slot showing the old instance as its variant
+            // is not a material consumer (the slot's own material is
+            // another one), so nothing above rebound it: left alone, the
+            // re-apply below would read the dead instance back off the
+            // renderable and adopt it as the binding's default.
+            val oldPtr = old.nativeObject
             for ((_, vc) in resources.variantComponents) {
                 for (b in vc.bindings) {
-                    if (b.applied === old) b.applied = null
-                    if (b.defaultMaterial === old) b.defaultMaterial = null
+                    if (b.applied?.nativeObject == oldPtr) {
+                        val entity = nodesById[b.nodeKey]?.entity
+                        if (entity != null && rm.hasComponent(entity)) {
+                            rm.setMaterialInstanceAt(
+                                rm.getInstance(entity), b.primitive, mi)
+                        }
+                        b.applied = mi
+                    }
+                    if (b.defaultMaterial?.nativeObject == oldPtr) {
+                        b.defaultMaterial = mi
+                    }
                 }
             }
             engine.destroyMaterialInstance(old)
@@ -3113,6 +3192,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             Log.w(TAG, "addNode: missing spec"); return }
         val parentKey = json.optString("parent")
             .takeIf { it.isNotEmpty() }?.let { D3Wire.localIdKey(it) }
+        // Only an op that gets this far rewrites the node. One rejected
+        // above changes nothing, so the transform written before it
+        // must still carry across a re-realize.
+        if (!replayingJournal) transformWrites.supersede(key)
         val ctx = FsceneRealizer.surgicalContext(this)
         if (nodesById.containsKey(key)) {
             // A re-sent batch lands here — apply the spec as a full
@@ -3143,6 +3226,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         } ?: emptySet()
         val parentKey = json.optString("parent")
             .takeIf { it.isNotEmpty() }?.let { D3Wire.localIdKey(it) }
+        if (!replayingJournal && "transform" in flags) {
+            transformWrites.supersede(key)
+        }
         val ctx = FsceneRealizer.surgicalContext(this)
         ctx.updateNode(key, flags, spec, parentKey)
         adoptCamera(ctx)
@@ -3217,7 +3303,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             .orbitHomePosition(eye[0], eye[1], eye[2])
             .targetPosition(target[0], target[1], target[2])
             .upVector(up[0], up[1], up[2])
-            .build(Manipulator.Mode.ORBIT)
+            .fenced { build(Manipulator.Mode.ORBIT) }
         manipulator = m
         lastManipEye = null
         // GestureDetector maps 1-finger drag → orbit grab, 2-finger
@@ -4007,6 +4093,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             // die with the replaced scene — the trail's unparented
             // entity isn't covered by rec.entity's teardown.
             sweepCtx.destroyTrailLod(rec)
+            destroyLightCluster(rec)
             scene.removeEntity(rec.entity)
             engine.destroyEntity(rec.entity)
             EntityManager.get().destroy(rec.entity)
@@ -4622,6 +4709,16 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                         arrayOf(it.localPos, it.localQuat, it.localScale)
                     }
                 }
+                val moving = BodyCarry()
+                for ((key, body) in bodies) {
+                    // A clip-driven node is left to the manifest pose
+                    // for the same reason its written transform is:
+                    // the sampler takes the rebuilt pose as the bind
+                    // pose, and re-poses the body on its next sample.
+                    if (animTargets[key]?.drivesTransform == true) continue
+                    moving.capture(key, world.motionOf(body))
+                }
+                val awakeBefore = lastAwakeCount
                 deferJointPrune = true
                 try {
                     FsceneRealizer.realize(manifest, this,
@@ -4631,6 +4728,12 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     // rebuild each from its recorded load batch.
                     replayStreamedSubtrees()
                     restoreTransformWrites(written)
+                    restoreBodyMotion(moving)
+                    // install() zeroes the settle bookkeeping for a new
+                    // scene. This is the same scene: a rebuild is not
+                    // a wake-up, so bodies that were awake must not
+                    // announce it again.
+                    lastAwakeCount = awakeBefore
                 } finally {
                     deferJointPrune = false
                 }
@@ -4751,38 +4854,42 @@ class Dart3dView(context: Context) : FrameLayout(context) {
 
     /** Writes each dynamic body's world pose into its node transform. */
     private fun syncBodies() {
-        val tcm = engine.transformManager
         for (key in dynamicBodyKeys) {
             val rec = nodesById[key] ?: continue
             val body = rec.body ?: continue
             if (!body.isActive) continue
-            val p = body.position
-            val q = body.rotation
-            val wp = floatArrayOf(
-                p.xx().toFloat(), p.yy().toFloat(), p.zz().toFloat())
-            val wq = floatArrayOf(q.x, q.y, q.z, q.w)
-            // World → local: local = inv(parentWorld) × world.
-            var local = D3Wire.trs(wp, wq, rec.localScale)
-            val pk = rec.parentKey
-            if (pk != null) {
-                val pr = nodesById[pk]
-                if (pr != null) {
-                    val pw = FloatArray(16)
-                    tcm.getWorldTransform(tcm.getInstance(pr.entity), pw)
-                    val inv = FloatArray(16)
-                    if (Matrix.invertM(inv, 0, pw, 0)) {
-                        val out = FloatArray(16)
-                        Matrix.multiplyMM(out, 0, inv, 0, local, 0)
-                        local = out
-                    }
+            syncBody(rec, body)
+        }
+    }
+
+    private fun syncBody(rec: FsceneRealizer.NodeRec, body: Body) {
+        val tcm = engine.transformManager
+        val p = body.position
+        val q = body.rotation
+        val wp = floatArrayOf(
+            p.xx().toFloat(), p.yy().toFloat(), p.zz().toFloat())
+        val wq = floatArrayOf(q.x, q.y, q.z, q.w)
+        // World → local: local = inv(parentWorld) × world.
+        var local = D3Wire.trs(wp, wq, rec.localScale)
+        val pk = rec.parentKey
+        if (pk != null) {
+            val pr = nodesById[pk]
+            if (pr != null) {
+                val pw = FloatArray(16)
+                tcm.getWorldTransform(tcm.getInstance(pr.entity), pw)
+                val inv = FloatArray(16)
+                if (Matrix.invertM(inv, 0, pw, 0)) {
+                    val out = FloatArray(16)
+                    Matrix.multiplyMM(out, 0, inv, 0, local, 0)
+                    local = out
                 }
             }
-            tcm.setTransform(tcm.getInstance(rec.entity), local)
-            // Keep the node's local TRS in sync so a later teleport
-            // composes through the parent correctly.
-            val d = FsceneRealizer.decompose(local)
-            rec.localPos = d[0]; rec.localQuat = d[1]; rec.localScale = d[2]
         }
+        tcm.setTransform(tcm.getInstance(rec.entity), local)
+        // Keep the node's local TRS in sync so a later teleport
+        // composes through the parent correctly.
+        val d = FsceneRealizer.decompose(local)
+        rec.localPos = d[0]; rec.localQuat = d[1]; rec.localScale = d[2]
     }
 
     /** Awake/settled transitions — same event shapes as iOS. */

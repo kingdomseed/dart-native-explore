@@ -170,7 +170,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
   void Function()? _w15Phase;
   void Function(({double w, double h}) Function() targetPx)? _w24Phase;
   void Function()? _w16Phase;
-  void Function(void Function() rollDie)? _w25Phase;
+  void Function()? _w25Phase;
   void Function()? _w18Phase;
   int _animsPlaying = 0;
   LocalId? _die;
@@ -435,7 +435,7 @@ class _FeatureMatrixScreenState extends State<FeatureMatrixScreen> {
   /// dice-regression close-out. The phase logs each step itself.
   void _runW25() {
     dnLog('dart3d: w25 phase — LUT + effects matrix lanes');
-    _w25Phase?.call(_roll);
+    _w25Phase?.call();
   }
 
   /// The W18 particle phase at +192 s — three live emitters (a

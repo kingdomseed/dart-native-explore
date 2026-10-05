@@ -803,8 +803,14 @@ final class SceneController {
     return completer.future;
   }
 
-  /// Drops queued mutations and closes the event stream. The native
-  /// view keeps running; its events stop reaching Dart.
+  /// Drops queued mutations, the retained document and its streamed
+  /// subtrees, and closes the event streams. The native view keeps
+  /// running; its events stop reaching Dart.
+  ///
+  /// Call it from the owning `State.dispose`. The document holds every
+  /// payload the scene was built from (textures, meshes), and until
+  /// this runs it lives as long as anything still references the
+  /// controller.
   void dispose() {
     final element = _element;
     if (element != null) {
@@ -813,6 +819,8 @@ final class SceneController {
       _element = null;
     }
     _pending.clear();
+    _document = null;
+    _streamed.clear();
     d3FailPendingQueries(
       _pendingQueries,
       StateError('dart3d: SceneController disposed'),
