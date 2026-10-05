@@ -38,6 +38,28 @@ class DeviceTierTest {
     }
 
     @Test
+    fun `faster neighbours of the listed families are standard`() {
+        for (gpu in listOf(
+            "Mali-G615 MC6", "Mali-G710 MC10", "Mali-G720 MC8",
+            "Adreno (TM) 620", "Adreno (TM) 630", "Adreno (TM) 640",
+        )) {
+            assertEquals(gpu, DeviceTier.STANDARD, tier(8_000_000L, gpu))
+        }
+    }
+
+    @Test
+    fun `an ANGLE-wrapped renderer string is read by the GPU inside it`() {
+        assertEquals(
+            DeviceTier.LOW,
+            tier(8_000_000L,
+                "ANGLE (ARM, Vulkan 1.3.0 (Mali-G57 MC2 (0x90910010)), Mali-G57 MC2)"))
+        assertEquals(
+            DeviceTier.STANDARD,
+            tier(8_000_000L,
+                "ANGLE (ARM, Vulkan 1.3.0 (Mali-G610 MC4 (0xA8670000)), Mali-G610 MC4)"))
+    }
+
+    @Test
     fun `the listed families are low whatever the memory`() {
         for (gpu in listOf(
             "Mali-G31", "Mali-G51 MP4", "Mali-T860", "Mali-450 MP",

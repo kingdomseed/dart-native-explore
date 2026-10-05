@@ -14,8 +14,9 @@ import android.util.Log
  * destroyed again. The string names the GPU whichever backend the
  * engine then uses. It is read once per process.
  *
- * Null when EGL gives no ES 2 pbuffer config or the driver returns no
- * string; [DeviceTier] then decides from memory alone. The process's
+ * Null when any EGL step fails (no ES 2 pbuffer config, no context, no
+ * surface) or the driver returns no string; [DeviceTier] then decides
+ * from memory alone. The process's
  * EGL display is shared with the system's own renderer and is left
  * initialized.
  */
