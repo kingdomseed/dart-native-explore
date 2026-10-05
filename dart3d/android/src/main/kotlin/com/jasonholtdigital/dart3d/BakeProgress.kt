@@ -1,21 +1,32 @@
 package com.jasonholtdigital.dart3d
 
-import java.util.concurrent.atomic.AtomicInteger
-
 /**
  * What a bake run tells `tool/bake_materials.sh` through the log: that
  * the fixed set is complete, and when the variant lane has nothing in
  * flight. The script pulls the exported packages, so a line that says
  * "done" early or wrongly ships an app without them.
  */
-internal class BakeProgress {
-    private val inFlight = AtomicInteger()
+internal class BakeProgress(private val log: (String) -> Unit) {
+    private var inFlight = 0
 
-    /** A variant compile was queued. Returns how many are in flight. */
-    fun started(): Int = inFlight.incrementAndGet()
+    // The count changes and its line is written under one lock. The
+    // script trusts the last busy-or-idle line, so an "idle" must never
+    // be written after the "compiling" of a compile that is still
+    // running.
 
-    /** A variant compile ended. True when the lane is idle again. */
-    fun finished(): Boolean = inFlight.decrementAndGet() == 0
+    /** A variant compile was queued. */
+    @Synchronized
+    fun started() {
+        inFlight++
+        log(busyLine(inFlight))
+    }
+
+    /** A variant compile ended. */
+    @Synchronized
+    fun finished() {
+        inFlight--
+        if (inFlight == 0) log(IDLE_LINE)
+    }
 
     companion object {
         const val EXPORTED = "bake: fixed set exported"

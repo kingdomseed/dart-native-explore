@@ -19,6 +19,12 @@ ones on #45 in the S0g re-realize PR (#52).
 | #48 | 4166383748, stale app variants | **Already fixed** on `main`: the script lists the app's `.filamat` files that the new bake did not produce (`list_stale` over the app directory). It reports and does not delete. |
 | #49 | 4180998566, T2 gaps (Wacom harness, A142 OpenGL) | **Closed.** See below. |
 
+## Review thread on this PR
+
+| Thread | Verdict |
+|---|---|
+| 4184387488, `variants idle` can be logged after a newer `variants compiling` | **Real, fixed.** The count was decremented and the idle line written in two steps, so a compile queued in between could log `compiling` first and leave `idle` as the last line while it was still running; the script trusts the last line. `BakeProgress` now changes the count and writes its line under one lock, for both transitions. A test runs 400 start/finish pairs on 8 threads with one compile held in flight and checks that `idle` is never written. |
+
 ## The T2 gaps from #49
 
 #49 skipped the harness on the Wacom and the A142 on OpenGL. Both are
@@ -83,14 +89,15 @@ The app's side was run on the Fire tablet with the bake tag set
 10:52:18.520 bake: fixed set exported (20 packages)
 ```
 
-**End to end on the A142** (`bake-run-a142.txt`):
+**End to end on the A142**, twice: on the head before the fix above
+and again on the final head (`bake-run-a142.txt` is the second run):
 
 ```
 tool/bake_materials.sh 00064149A002033 \
   --app-assets example/android/app/src/main/assets --wait 20
 ```
 
-Exit 0. It launched with `am start`, saw `variants compiling` then
+Exit 0 both times. It launched with `am start`, saw `variants compiling` then
 `variants idle` then `fixed set exported (20 packages)`, pulled 23
 files, and wrote 20 plugin packages and the app's 2 variants. **All 22
 `.filamat` files came out byte-identical to the committed ones** (`git
@@ -109,8 +116,13 @@ lines both produce. On the Fire tablet the script cannot run at all:
 
 - `dn analyze` and `dn test`: `dart3d` 277 tests, `dart3d/example` 227
   tests, clean (no Dart changed).
-- `:dart3d:testReleaseUnitTest`: 108 tests pass, 4 new
+- `:dart3d:testReleaseUnitTest`: 109 tests pass, 5 new
   (`BakeProgressTest`).
+- The device runs above are on `0a59fdf`'s code. The final head
+  differs from it only in `BakeProgress` and the two call sites that
+  are behind the bake flag, which is off unless the bake log tag is
+  set, so those runs stand for it; the bake itself was rerun on the
+  final head.
 - `sh -n` on both scripts.
 - `:dart3d:lintRelease` still reports the eight `NewApi` errors `main`
   has in `JoltWorld.update`; #50 fixes those.

@@ -23,13 +23,40 @@ class BakeProgressTest {
 
     @Test
     fun theLaneIsIdleOnlyWhenEveryStartedCompileHasFinished() {
-        val progress = BakeProgress()
-        assertEquals(1, progress.started())
-        assertEquals(2, progress.started())
-        assertFalse(progress.finished())
-        assertTrue(progress.finished())
-        assertEquals(1, progress.started())
-        assertTrue(progress.finished())
+        val lines = ArrayList<String>()
+        val progress = BakeProgress(lines::add)
+        progress.started()
+        progress.started()
+        progress.finished()
+        assertEquals(listOf(
+            "bake: variants compiling (1 in flight)",
+            "bake: variants compiling (2 in flight)"), lines)
+        progress.finished()
+        assertEquals(BakeProgress.IDLE_LINE, lines.last())
+        progress.started()
+        assertEquals("bake: variants compiling (1 in flight)", lines.last())
+    }
+
+    @Test
+    fun theLastLineIsNeverIdleWhileACompileIsInFlight() {
+        // Many threads start and finish compiles; after every line the
+        // log must agree with the count that produced it.
+        val lines = java.util.Collections.synchronizedList(ArrayList<String>())
+        val progress = BakeProgress(lines::add)
+        val pool = java.util.concurrent.Executors.newFixedThreadPool(8)
+        progress.started()   // one compile stays in flight throughout
+        repeat(400) {
+            pool.execute {
+                progress.started()
+                progress.finished()
+            }
+        }
+        pool.shutdown()
+        assertTrue(pool.awaitTermination(20, java.util.concurrent.TimeUnit.SECONDS))
+        assertFalse("idle was logged with a compile still in flight",
+            lines.contains(BakeProgress.IDLE_LINE))
+        progress.finished()
+        assertEquals(BakeProgress.IDLE_LINE, lines.last())
     }
 
     @Test

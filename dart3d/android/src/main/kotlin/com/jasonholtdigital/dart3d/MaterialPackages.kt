@@ -136,7 +136,7 @@ internal object MaterialPackages {
     val BAKED_APIS = listOf(MaterialBuilder.TargetApi.OPENGL,
         MaterialBuilder.TargetApi.VULKAN)
 
-    private val bakeProgress = BakeProgress()
+    private val bakeProgress = BakeProgress { Log.i(TAG, it) }
 
     private fun startBake() {
         val t = Thread({
@@ -324,9 +324,7 @@ internal object MaterialPackages {
         extFlags: Int, boundSlots: Int, api: MaterialBuilder.TargetApi,
         done: (ByteArray?) -> Unit,
     ) {
-        if (baking) {
-            Log.i(TAG, BakeProgress.busyLine(bakeProgress.started()))
-        }
+        if (baking) bakeProgress.started()
         variantExecutor.execute {
             val bytes = try {
                 if (baking) {
@@ -342,9 +340,7 @@ internal object MaterialPackages {
                 Log.w(TAG, "variant compile failed", t)
                 null
             }
-            if (baking && bakeProgress.finished()) {
-                Log.i(TAG, BakeProgress.IDLE_LINE)
-            }
+            if (baking) bakeProgress.finished()
             done(bytes)
         }
     }
