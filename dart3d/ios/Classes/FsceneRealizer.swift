@@ -556,6 +556,10 @@ enum FsceneRealizer {
         /// known (after `install`, or live for `updateStage`).
         var stageExposure: Double = 1.0
 
+        /// The decoded environment's tone-mapping operator; the host's
+        /// resolve pass applies it.
+        var stageToneMap = StageToneMap()
+
         /// Set by `decodeStage` when the env's equirect payload hasn't
         /// arrived — the stage application defers env/skybox contents
         /// and re-runs on payload arrival (W4 deferral pattern).
@@ -701,6 +705,7 @@ enum FsceneRealizer {
                          colliderIndices: colliderIndexByKey,
                          formatVersion: formatVersion,
                          stage: (json: stageJSON, exposure: stageExposure,
+                                 toneMap: stageToneMap,
                                  effects: stageEffects,
                                  antiAliasing: stageAntiAliasing,
                                  renderScale: stageRenderScale,
@@ -6215,11 +6220,17 @@ enum FsceneRealizer {
             // tagged `{'d': …}` form is only for node/material
             // properties).
             stageExposure = plainDouble(envRes["exposure"]) ?? 1.0
-            if let toneMapping = envRes["toneMapping"] as? String {
-                host.logOnce("stage.toneMapping.\(toneMapping)",
-                    "toneMapping '\(toneMapping)': iOS keeps SceneKit's "
-                    + "filmic operator — approximation")
+            var toneMap = StageToneMap(
+                mode: envRes["toneMapping"] as? String ?? "pbrNeutral",
+                agxWhite: plainDouble(envRes["agxWhite"]) ?? 16.29,
+                agxContrast: plainDouble(envRes["agxContrast"]) ?? 1.25)
+            if toneMap.modeIndex == nil {
+                host.logOnce("stage.toneMapping.\(toneMap.mode)",
+                    "toneMapping '\(toneMap.mode)' unknown; using "
+                    + "pbrNeutral")
+                toneMap.mode = "pbrNeutral"
             }
+            stageToneMap = toneMap
             if envRes["skyEnvironment"] != nil {
                 host.logOnce("stage.skyEnvironment",
                     "skyEnvironment (procedural sky re-lighting) is "

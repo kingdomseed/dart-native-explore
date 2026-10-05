@@ -169,6 +169,14 @@ final class SceneViewHost: SCNView {
     /// with `wantsHDR = true` (SceneKit's HDR path is per-camera).
     private(set) var stageExposure: Double = 1.0
 
+    /// The decoded stage's tone-mapping operator, applied by the
+    /// resolve pass (`ToneMapTechnique`).
+    private(set) var stageToneMap = StageToneMap()
+
+    /// The resolve pass, built on first use and kept: the operator and
+    /// the LUT are written into it as they change.
+    private var resolveTechnique: SCNTechnique?
+
     /// W13: the last decoded `effects` post stack — retained across
     /// stage re-decodes whose `effects` key is absent (the wire's
     /// "don't touch" rule), wholesale-replaced when the key is
@@ -316,13 +324,42 @@ final class SceneViewHost: SCNView {
         for camera in viewCameras() {
             camera.wantsHDR = true
             camera.exposureOffset = CGFloat(e > 0 ? log2(e) : 0)
-            // SceneKit's exposure adaptation is on unless switched
-            // off, and `applyStageEffects` only writes it when the
-            // stage has an `effects` block: a stage without one used
-            // to meter itself toward mid-grey.
+            // SceneKit's own curve is the identity only at its default
+            // white point, and its exposure adaptation is on unless
+            // switched off: a stage without an `effects` block used to
+            // meter itself toward mid-grey.
+            camera.whitePoint = 1
+            camera.averageGray = 0.18
             camera.wantsExposureAdaptation =
                 lastEffects?.autoExposure.enabled ?? false
         }
+        applyToneMap()
+    }
+
+    /// Points the view's resolve pass at the stage's tone-mapping
+    /// operator and grading LUT. Texture-target views render without
+    /// it, as their Android counterparts do.
+    private func applyToneMap() {
+        if resolveTechnique == nil,
+           let device = device ?? MTLCreateSystemDefaultDevice() {
+            resolveTechnique = ToneMapTechnique.make(device: device)
+            if resolveTechnique == nil {
+                logOnce("stage.toneMapping.technique",
+                    "the tone-mapping pass could not be built; the "
+                    + "image stays linear")
+            }
+        }
+        guard let resolve = resolveTechnique else { return }
+        // W25: the LUT grades independently of `enabled` (upstream's
+        // rule). A `chunk:`/id-token ref resolves through the payload
+        // store — its decode-time claim re-runs the stage when the
+        // bytes land; an asset path resolves from the main bundle.
+        let grading = lastEffects?.colorGrading
+        let lut = grading?.lut.flatMap { $0.isEmpty ? nil : $0 }
+            .flatMap { resolveLutImage($0, blend: grading?.lutBlend ?? 1) }
+        ToneMapTechnique.configure(
+            resolve, map: stageToneMap, lut: lut, lutSize: lut?.height ?? 0)
+        if technique !== resolve { technique = resolve }
     }
 
     /// Every camera the stage look applies to — the point of view
@@ -401,14 +438,9 @@ final class SceneViewHost: SCNView {
             camera.whiteBalanceTemperature =
                 CGFloat(cg.enabled ? cg.temperature : 0)
             camera.whiteBalanceTint = CGFloat(cg.enabled ? cg.tint : 0)
-            // W25: the LUT grades independently of `enabled`
-            // (upstream's rule). A `chunk:`/id-token ref resolves
-            // through the payload store — its decode-time claim
-            // re-runs the stage when the bytes land; an asset path
-            // resolves from the main bundle.
-            camera.colorGrading.contents =
-                (cg.lut.flatMap { $0.isEmpty ? nil : $0 })
-                    .flatMap { resolveLutImage($0, blend: cg.lutBlend) }
+            // The LUT is sampled by the resolve pass, after the tone
+            // map and on the encoded colour (`applyToneMap`).
+            camera.colorGrading.contents = nil
             if cg.enabled {
                 if cg.lift != SIMD3<Float>(0, 0, 0)
                     || cg.gamma != SIMD3<Float>(1, 1, 1)
@@ -550,10 +582,11 @@ final class SceneViewHost: SCNView {
                 "godRays: platform limit — SceneKit has no "
                 + "light-shaft/volumetric post pass; ignored")
         }
+        applyToneMap()
     }
 
-    /// W25: resolves a `colorGrading.lut` ref to the strip image
-    /// `SCNCamera.colorGrading.contents` samples. `chunk:`/id-token
+    /// W25: resolves a `colorGrading.lut` ref to the strip image the
+    /// resolve pass samples. `chunk:`/id-token
     /// refs read the payload store (nil while deferred — the
     /// realizer's claim re-runs the stage on arrival); other strings
     /// are bundle asset paths. Parses are cached by ref+blend (the
@@ -2230,6 +2263,7 @@ final class SceneViewHost: SCNView {
         lutPayloadKeys = ctx.lutPayloadKeys
         resourceDefs = ctx.resourceDefs
         lastStage = ctx.stageJSON
+        stageToneMap = ctx.stageToneMap
         // W14: rt registry + view list + stage quality fields — a
         // `renderTexture` upsert rebuilds a rec, `updateViews`/
         // `updateStage` rewrite theirs; other ops publish the seeded
@@ -2535,6 +2569,7 @@ final class SceneViewHost: SCNView {
         }
         ctx.stageJSON = lastStage
         ctx.stageExposure = stageExposure
+        ctx.stageToneMap = stageToneMap
         ctx.deferredResourceIds = deferredResourceIds
         ctx.dynamicBodyKeys = dynamicBodyKeys
         ctx.colliderIndexByKey = colliderIndexByKey
@@ -4494,6 +4529,7 @@ final class SceneViewHost: SCNView {
         colliderIndices: [UInt64: Int],
         formatVersion: Int,
         stage: (json: [String: Any]?, exposure: Double,
+                toneMap: StageToneMap,
                 effects: StageEffects?, antiAliasing: String,
                 renderScale: Double, filterQuality: String),
         views: [ViewRec]
@@ -4613,6 +4649,7 @@ final class SceneViewHost: SCNView {
         installViews()
         applyScreenViewCamera()
         applyStageQuality()
+        stageToneMap = stage.toneMap
         applyStageExposure(stage.exposure)
         applyStageEffects()
     }
