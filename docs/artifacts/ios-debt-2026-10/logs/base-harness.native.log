@@ -1,0 +1,725 @@
+2026-10-05 18:10:17.837 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] protocol hello: Dart v1.0
+2026-10-05 18:10:17.840 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826105: awaiting payload
+2026-10-05 18:10:17.840 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826107: awaiting payload
+2026-10-05 18:10:17.840 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826103: awaiting payload
+2026-10-05 18:10:17.840 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826112: awaiting payload
+2026-10-05 18:10:17.841 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826110: awaiting payload
+2026-10-05 18:10:17.841 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826101: awaiting payload
+2026-10-05 18:10:17.841 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826069: awaiting payload
+2026-10-05 18:10:17.843 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826083: awaiting payload
+2026-10-05 18:10:17.843 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826085: awaiting payload
+2026-10-05 18:10:17.843 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826124: awaiting payload
+2026-10-05 18:10:17.843 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826120: awaiting payload
+2026-10-05 18:10:17.843 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826078: awaiting payload
+2026-10-05 18:10:17.844 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826079: awaiting payload
+2026-10-05 18:10:17.844 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826081: awaiting payload
+2026-10-05 18:10:17.844 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826073: awaiting payload
+2026-10-05 18:10:17.844 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826088: awaiting payload
+2026-10-05 18:10:17.845 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] mesh node 'payloadGrid': geometry unresolved
+2026-10-05 18:10:17.845 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] mesh node 'deferredTexQuad': geometry unresolved
+2026-10-05 18:10:17.845 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] mesh node 'payloadQuad': geometry unresolved
+2026-10-05 18:10:17.845 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] mesh node 'uvTexQuad': geometry unresolved
+2026-10-05 18:10:17.845 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] mesh node 'payloadQuadLegacy': geometry unresolved
+2026-10-05 18:10:17.846 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] mesh node 'normalQuad': geometry unresolved
+2026-10-05 18:10:17.846 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] mesh node 'boundsQuad': geometry unresolved
+2026-10-05 18:10:17.846 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] mesh node 'concaveBowl': geometry unresolved
+2026-10-05 18:10:17.846 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] mesh node 'deferredQuad': geometry unresolved
+2026-10-05 18:10:17.846 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] mesh node 'emissiveQuad': geometry unresolved
+2026-10-05 18:10:17.846 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] mesh node 'doubleSidedQuad': geometry unresolved
+2026-10-05 18:10:17.846 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] mesh node 'missingTexQuad': geometry unresolved
+2026-10-05 18:10:17.846 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] mesh node 'malformedPayload': geometry unresolved
+2026-10-05 18:10:17.847 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] mesh node 'payloadTetra': geometry unresolved
+2026-10-05 18:10:17.847 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] collider 'concaveMesh': node has no geometry
+2026-10-05 18:10:17.848 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] collider isTrigger: pass-through via collisionBitMask=0; trigger events land in W8
+2026-10-05 18:10:17.851 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] toneMapping 'pbrNeutral': iOS keeps SceneKit's filmic operator — approximation
+2026-10-05 18:10:17.876 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826105: 64x64 rgba8 (16384 B in 5.39 ms)
+2026-10-05 18:10:17.881 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826107: 64x64 rgba8 (16384 B in 4.65 ms)
+2026-10-05 18:10:17.881 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826103: 16x16 rgba8 (1024 B in 0.02 ms)
+2026-10-05 18:10:17.881 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826101: 64x64 rgba8 (16384 B in 0.01 ms)
+2026-10-05 18:10:17.894 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826069: 64x64 png (204 B in 13.03 ms)
+2026-10-05 18:10:17.897 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826083: layout 'unskinned_uv1_tangent' stride 72 does not divide 10 bytes
+2026-10-05 18:10:17.898 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826085: decoded 4 verts in 0.10ms
+2026-10-05 18:10:17.902 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826124: decoded 20 verts in 0.06ms
+2026-10-05 18:10:17.902 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826120: decoded 4 verts in 0.03ms
+2026-10-05 18:10:17.902 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826078: decoded 4 verts in 0.03ms
+2026-10-05 18:10:17.902 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826079: decoded 4 verts in 0.03ms
+2026-10-05 18:10:17.907 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826073: decoded 4 verts in 0.04ms
+2026-10-05 18:10:17.930 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826088: decoded 10201 verts in 22.72ms
+2026-10-05 18:10:17.931 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] mesh node 'malformedPayload': geometry unresolved
+2026-10-05 18:10:17.932 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] mesh node 'deferredQuad': geometry unresolved
+2026-10-05 18:10:19.727 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826105: 64x64 rgba8 (16384 B in 53.97 ms)
+2026-10-05 18:10:19.729 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826107: 64x64 rgba8 (16384 B in 2.02 ms)
+2026-10-05 18:10:19.729 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826103: 16x16 rgba8 (1024 B in 0.02 ms)
+2026-10-05 18:10:19.729 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826101: 64x64 rgba8 (16384 B in 0.02 ms)
+2026-10-05 18:10:19.733 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826069: 64x64 png (204 B in 4.18 ms)
+2026-10-05 18:10:19.739 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826085: decoded 4 verts in 0.06ms
+2026-10-05 18:10:19.743 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826124: decoded 20 verts in 0.07ms
+2026-10-05 18:10:19.743 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826120: decoded 4 verts in 0.04ms
+2026-10-05 18:10:19.743 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826078: decoded 4 verts in 0.03ms
+2026-10-05 18:10:19.743 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826079: decoded 4 verts in 0.03ms
+2026-10-05 18:10:19.746 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826081: decoded 4 verts in 0.05ms
+2026-10-05 18:10:19.746 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826073: decoded 4 verts in 0.04ms
+2026-10-05 18:10:19.773 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826088: decoded 10201 verts in 25.40ms
+2026-10-05 18:10:19.773 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] mesh node 'malformedPayload': geometry unresolved
+2026-10-05 18:10:20.654 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826105: 64x64 rgba8 (16384 B in 2.55 ms)
+2026-10-05 18:10:20.656 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826107: 64x64 rgba8 (16384 B in 1.60 ms)
+2026-10-05 18:10:20.656 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826103: 16x16 rgba8 (1024 B in 0.05 ms)
+2026-10-05 18:10:20.658 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826110: 64x64 rgba8 (16384 B in 2.24 ms)
+2026-10-05 18:10:20.659 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826101: 64x64 rgba8 (16384 B in 0.05 ms)
+2026-10-05 18:10:20.661 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826069: 64x64 png (204 B in 2.18 ms)
+2026-10-05 18:10:20.670 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826085: decoded 4 verts in 0.14ms
+2026-10-05 18:10:20.676 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826124: decoded 20 verts in 0.18ms
+2026-10-05 18:10:20.677 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826120: decoded 4 verts in 0.09ms
+2026-10-05 18:10:20.677 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826078: decoded 4 verts in 0.08ms
+2026-10-05 18:10:20.677 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826079: decoded 4 verts in 0.07ms
+2026-10-05 18:10:20.686 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826081: decoded 4 verts in 0.19ms
+2026-10-05 18:10:20.687 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826073: decoded 4 verts in 0.09ms
+2026-10-05 18:10:20.730 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826088: decoded 10201 verts in 42.03ms
+2026-10-05 18:10:20.731 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] mesh node 'malformedPayload': geometry unresolved
+2026-10-05 18:10:23.667 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] texture 15972576803629826069: 64x64 rgba8 (16384 B in 1.72 ms)
+2026-10-05 18:10:25.715 Df Runner[81627:62574e] [com.jasonholtdigital.dart3d:scene] command batch: 54 ops applied in one drain
+2026-10-05 18:10:25.715 Df Runner[81627:62574e] [com.jasonholtdigital.dart3d:scene] removeNode on missing node 15972576803629826141; ignoring
+2026-10-05 18:10:25.715 Df Runner[81627:62574e] [com.jasonholtdigital.dart3d:scene] removeNode on missing node 15972576803629826142; ignoring
+2026-10-05 18:10:25.715 Df Runner[81627:62574e] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826073: decoded 4 verts in 0.07ms
+2026-10-05 18:10:25.716 Df Runner[81627:62574e] [com.jasonholtdigital.dart3d:scene] geometry 15972576803629826073: decoded 4 verts in 0.04ms
+2026-10-05 18:10:25.720 Df Runner[81627:62574e] [com.jasonholtdigital.dart3d:scene] updateNode on missing node 15972576803629826141; ignoring
+2026-10-05 18:10:31.682 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] upsertPayload 5571979863306272827: encoding 'vertexBuffer' backs no known texture or geometry
+2026-10-05 18:10:31.682 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] upsertPayload 5571979863306272828: encoding 'indexBuffer' backs no known texture or geometry
+2026-10-05 18:10:31.682 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] upsertPayload 5571979863306272829: encoding 'matrices' backs no known texture or geometry
+2026-10-05 18:10:31.682 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] upsertPayload 5571979863306272830: encoding 'vertexBuffer' backs no known texture or geometry
+2026-10-05 18:10:31.682 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] upsertPayload 5571979863306272831: encoding 'indexBuffer' backs no known texture or geometry
+2026-10-05 18:10:31.682 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] upsertPayload 5571979863306272832: encoding 'floats' backs no known texture or geometry
+2026-10-05 18:10:31.682 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] upsertPayload 5571979863306272833: encoding 'floats' backs no known texture or geometry
+2026-10-05 18:10:31.682 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] upsertPayload 5571979863306272834: encoding 'floats' backs no known texture or geometry
+2026-10-05 18:10:31.682 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] upsertPayload 5571979863306272835: encoding 'floats' backs no known texture or geometry
+2026-10-05 18:10:31.682 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] upsertPayload 5571979863306272836: encoding 'floats' backs no known texture or geometry
+2026-10-05 18:10:31.682 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] upsertPayload 5571979863306272837: encoding 'floats' backs no known texture or geometry
+2026-10-05 18:10:31.683 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] upsertPayload 5571979863306272838: encoding 'floats' backs no known texture or geometry
+2026-10-05 18:10:31.683 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] upsertPayload 5571979863306272839: encoding 'floats' backs no known texture or geometry
+2026-10-05 18:10:31.683 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] geometry 5571979863306272840: decoded 8 verts in 0.19ms
+2026-10-05 18:10:31.683 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] geometry 5571979863306272841: decoded 8 verts in 0.14ms
+2026-10-05 18:10:39.667 Df Runner[81627:625825] [com.jasonholtdigital.dart3d:scene] joint 1073741824: endpoint not a live body yet; deferred
+2026-10-05 18:10:39.669 Df Runner[81627:625825] [com.jasonholtdigital.dart3d:scene] joint 1073741825: endpoint not a live body yet; deferred
+2026-10-05 18:10:39.669 Df Runner[81627:625825] [com.jasonholtdigital.dart3d:scene] materialsVariants on node 5571979863306272860: 2 variants, 1 bindings, selected=cool
+2026-10-05 18:10:39.669 Df Runner[81627:625825] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=0 vkey=5571979863306272854 vmap=2 target=variant
+2026-10-05 18:10:39.670 Df Runner[81627:625825] [com.jasonholtdigital.dart3d:scene] component 'rectAreaLight' on node 5571979863306272861: enabled:false gates upstream component ticks only; dart3d has no tick surface — recorded, not applied
+2026-10-05 18:10:39.670 Df Runner[81627:625825] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=0 vkey=5571979863306272854 vmap=2 target=variant
+2026-10-05 18:10:44.665 Df Runner[81627:625825] [com.jasonholtdigital.dart3d:scene] selectVariant node=5571979863306272860 selected=warm
+2026-10-05 18:10:44.666 Df Runner[81627:625825] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=1 vkey=5571979863306272855 vmap=2 target=variant
+2026-10-05 18:10:48.665 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] selectVariant node=5571979863306272860 selected=null
+2026-10-05 18:10:48.666 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:11:07.666 Df Runner[81627:625825] [com.jasonholtdigital.dart3d:scene] renderTexture 5571979863306272862: 256x256 update=everyFrame
+2026-10-05 18:11:07.667 Df Runner[81627:625825] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:11:07.667 Df Runner[81627:625825] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:11:07.667 Df Runner[81627:625825] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:11:07.668 Df Runner[81627:625825] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:11:09.666 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] renderTexture 5571979863306272867: 256x256 update=manual
+2026-10-05 18:11:09.666 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:11:09.667 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:11:11.664 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:11:19.666 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:11:35.666 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:11:35.666 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:11:35.667 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:11:35.667 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:11:35.667 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:11:35.668 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:11:39.166 Df Runner[81627:625825] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:11:39.167 Df Runner[81627:625825] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:11:39.167 Df Runner[81627:625825] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.683 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] upsertPayload 1065371584016896011: encoding 'indexBuffer' backs no known texture or geometry
+2026-10-05 18:12:09.683 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.683 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.683 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] geometry 15124929287339842304: vertices payload has no spec
+2026-10-05 18:12:09.683 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.684 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.684 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] mesh node 'w15.peak': geometry unresolved
+2026-10-05 18:12:09.684 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.684 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.684 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.684 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.685 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.685 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.685 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.685 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.685 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.685 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.686 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.686 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.686 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.686 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.686 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.686 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.687 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.687 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.687 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.687 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.687 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.687 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.687 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.688 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.688 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.688 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.688 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.688 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.688 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.689 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.689 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.689 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.689 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.689 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.689 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.690 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.690 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.690 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.690 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.690 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.690 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.690 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.691 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.691 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.691 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.691 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.691 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.691 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.692 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.692 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.692 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.692 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.692 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.692 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.692 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.693 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.693 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.693 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.693 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.693 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.693 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.693 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.694 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.694 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.694 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.694 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.694 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.694 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.694 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.695 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.695 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.695 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.695 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.695 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.695 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.695 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.696 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.696 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.696 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.696 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.696 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.696 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.697 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.697 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.697 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.697 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.697 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.697 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.697 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.698 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.698 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.698 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.698 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.698 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.698 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.698 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.699 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.699 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.699 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.699 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.699 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:09.702 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] loadSubtree node=15972576803629826161 ops=107 visible t=257367.22121725001 applyToVisible=2.6378333277534693ms
+2026-10-05 18:12:10.907 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.908 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.908 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.909 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.909 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.909 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] mesh node 'w15.peak': geometry unresolved
+2026-10-05 18:12:10.909 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.910 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.910 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.910 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.910 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.911 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.911 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.911 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.911 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.911 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.912 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.912 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.912 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.912 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.912 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.913 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.913 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.913 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.913 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.913 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.914 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.914 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.914 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.914 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.914 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.915 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.915 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.915 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.915 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.915 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.916 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.916 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.916 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.916 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.916 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.917 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.917 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.917 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.917 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.917 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.917 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.918 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.918 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.918 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.918 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.918 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.918 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.919 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.919 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.919 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.919 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.919 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.920 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.920 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.920 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.920 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.920 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.920 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.921 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.921 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.921 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.921 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.921 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.921 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.922 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.922 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.922 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.922 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.922 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.922 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.923 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.923 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.923 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.923 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.923 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.923 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.924 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.924 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.924 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.924 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.924 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.924 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.925 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.925 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.925 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.925 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.925 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.925 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.926 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.926 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.926 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.926 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.926 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.926 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.927 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.927 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.927 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.927 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.927 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.927 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:10.932 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] loadSubtree node=15972576803629826162 ops=107 visible t=257368.45104979168 applyToVisible=4.044000001158565ms
+2026-10-05 18:12:12.082 Df Runner[81627:625825] [com.jasonholtdigital.dart3d:scene] geometry 15124929287339842304: decoded 4 verts in 0.14ms
+2026-10-05 18:12:12.082 Df Runner[81627:625825] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:13.303 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] unloadSubtree node=15972576803629826161 ops=102 visible t=257370.82233925 applyToVisible=1.4842916571069509ms
+2026-10-05 18:12:14.482 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] geometry 15124929287339842304: decoded 4 verts in 0.11ms
+2026-10-05 18:12:14.482 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.487 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.488 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.488 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] geometry 15124929287339842304: decoded 4 verts in 0.08ms
+2026-10-05 18:12:14.488 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.488 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.489 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.489 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.489 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.489 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.489 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.489 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.490 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.490 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.490 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.490 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.490 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.490 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.491 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.491 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.491 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.491 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.491 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.491 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.491 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.491 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.492 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.492 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.492 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.492 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.492 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.492 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.492 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.492 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.492 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.492 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.493 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.493 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.493 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.493 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.493 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.493 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.493 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.493 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.493 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.494 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.494 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.494 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.494 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.494 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.494 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.494 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.494 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.495 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.495 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.495 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.495 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.495 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.495 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.495 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.495 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.495 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.496 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.496 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.496 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.496 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.496 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.496 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.497 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.497 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.497 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.497 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.497 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.497 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.498 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.498 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.498 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.498 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.498 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.498 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.499 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.499 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.499 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.499 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.499 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.499 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.500 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.500 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.500 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.500 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.500 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.500 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.500 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.501 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.501 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.501 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.501 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.501 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.501 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.501 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.502 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.502 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.502 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.502 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.502 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.502 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.503 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:14.650 Df Runner[81627:625799] [com.jasonholtdigital.dart3d:scene] loadSubtree node=15972576803629826161 ops=107 visible t=257372.16987320836 applyToVisible=147.78220833977684ms
+2026-10-05 18:12:15.692 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] unloadSubtree node=15972576803629826161 ops=102 visible t=257373.21138220836 applyToVisible=1.0879583423957229ms
+2026-10-05 18:12:16.899 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] geometry 15124929287339842304: decoded 4 verts in 0.15ms
+2026-10-05 18:12:16.899 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.905 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.905 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.906 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] geometry 15124929287339842304: decoded 4 verts in 0.08ms
+2026-10-05 18:12:16.906 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.906 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.906 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.906 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.907 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.907 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.907 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.907 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.907 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.908 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.908 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.908 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.908 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.908 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.908 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.909 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.909 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.909 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.909 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.909 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.909 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.910 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.910 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.910 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.910 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.910 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.910 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.911 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.911 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.911 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.911 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.911 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.911 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.912 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.912 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.912 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.912 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.912 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.912 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.912 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.912 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.913 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.913 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.913 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.913 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.913 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.913 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.913 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.913 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.913 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.913 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.914 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.914 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.914 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.914 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.914 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.914 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.914 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.914 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.915 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.915 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.915 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.915 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.916 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.916 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.916 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.916 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.916 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.916 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.917 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.917 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.917 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.917 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.917 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.917 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.917 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.918 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.918 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.918 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.918 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.918 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.918 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.919 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.919 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.919 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.919 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.919 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.919 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.919 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.920 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.920 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.920 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.920 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.920 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.920 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.920 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.921 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.921 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.921 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.921 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.921 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.921 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.922 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:16.926 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] loadSubtree node=15972576803629826161 ops=107 visible t=257374.44571470836 applyToVisible=4.639208345906809ms
+2026-10-05 18:12:18.102 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] unloadSubtree node=15972576803629826161 ops=102 visible t=257375.62156466668 applyToVisible=1.5945416525937617ms
+2026-10-05 18:12:19.300 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15124929287339842304: decoded 4 verts in 0.10ms
+2026-10-05 18:12:19.300 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.306 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.306 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.306 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] geometry 15124929287339842304: decoded 4 verts in 0.06ms
+2026-10-05 18:12:19.306 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.306 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.307 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.307 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.307 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.307 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.307 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.307 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.308 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.308 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.308 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.308 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.308 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.309 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.309 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.309 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.309 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.309 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.309 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.310 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.310 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.310 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.310 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.310 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.310 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.311 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.311 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.311 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.311 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.311 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.311 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.311 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.312 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.312 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.312 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.312 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.312 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.312 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.313 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.313 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.313 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.313 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.313 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.313 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.313 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.314 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.314 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.314 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.314 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.314 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.314 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.315 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.315 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.315 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.315 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.315 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.315 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.316 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.316 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.316 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.316 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.316 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.316 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.316 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.317 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.317 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.317 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.317 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.317 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.317 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.317 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.318 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.318 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.318 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.318 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.318 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.318 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.318 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.319 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.319 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.319 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.319 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.319 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.319 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.319 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.320 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.320 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.320 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.320 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.320 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.320 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.320 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.321 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.321 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.321 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.321 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.321 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.321 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.322 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.322 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.322 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.322 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.322 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:19.327 Df Runner[81627:62574b] [com.jasonholtdigital.dart3d:scene] loadSubtree node=15972576803629826161 ops=107 visible t=257376.846919875 applyToVisible=5.263625003863126ms
+2026-10-05 18:12:23.666 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] directionalLight 'shadowCascadeCount' has no SceneKit equivalent; ignored
+2026-10-05 18:12:23.666 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] directionalLight 'shadowCascadeSplitLambda' has no SceneKit equivalent; ignored
+2026-10-05 18:12:23.666 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] directionalLight 'shadowFadeRange' has no SceneKit equivalent; ignored
+2026-10-05 18:12:23.666 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] directionalLight 'shadowAmbientStrength' has no SceneKit equivalent; ignored
+2026-10-05 18:12:23.666 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] directionalLight 'shadowNormalBias' has no SceneKit equivalent; ignored
+2026-10-05 18:12:23.666 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] directionalLight 'cacheStaticShadows' has no SceneKit equivalent; ignored
+2026-10-05 18:12:23.666 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] directionalLight 'contactShadows' has no SceneKit equivalent; ignored
+2026-10-05 18:12:23.666 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] directionalLight 'contactShadowDistance' has no SceneKit equivalent; ignored
+2026-10-05 18:12:23.666 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] directionalLight 'angularRadius' has no SceneKit equivalent; ignored
+2026-10-05 18:12:23.666 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:23.666 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:23.666 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] shadowCatcher 'shadowColor' unsupported on SceneKit's shadowOnly — the light's shadowColor drives the catch
+2026-10-05 18:12:23.666 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] shadowCatcher 'shadowIntensity' unsupported on SceneKit's shadowOnly — the light's shadowColor drives the catch
+2026-10-05 18:12:23.666 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:23.668 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:23.668 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:23.668 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:23.668 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:23.668 Df Runner[81627:62574d] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:12:39.470 E  Runner[81627:6267d1] [com.apple.scenekit:SceneKit] Error: can not render without programs, using default
+2026-10-05 18:12:45.168 F  Runner[81627:62574c] [com.apple.scenekit:SceneKit] Assertion 'technique' failed. Null argument
+2026-10-05 18:12:45.168 F  Runner[81627:62574c] [com.apple.scenekit:SceneKit] Assertion 'localHash.vertexDescriptorHash' failed. Null argument
+2026-10-05 18:12:45.168 E  Runner[81627:62574c] [com.apple.scenekit:SceneKit] Error: Compiler error while building render pipeline state for node (null):
+2026-10-05 18:12:45.173 E  Runner[81627:62574c] [com.apple.scenekit:SceneKit] Error: _executeProgram - no pipeline state
+2026-10-05 18:13:03.694 Df Runner[81627:625825] [com.jasonholtdigital.dart3d:scene] environment 15972576803629826126: awaiting LUT payload
+2026-10-05 18:13:09.695 Df Runner[81627:62574c] [com.jasonholtdigital.dart3d:scene] autoExposure strength/compensation unsupported on SceneKit; ignored
+2026-10-05 18:13:11.696 Df Runner[81627:6267d1] [com.jasonholtdigital.dart3d:scene] lensFlare approximated on SceneKit as widened bloom + color fringe; ghost/halo geometry is a platform limit
+2026-10-05 18:13:11.696 Df Runner[81627:6267d1] [com.jasonholtdigital.dart3d:scene] screenSpaceReflections: platform limit — SceneKit has no screen-space reflection pass; ignored
+2026-10-05 18:13:13.702 Df Runner[81627:6267d0] [com.jasonholtdigital.dart3d:scene] godRays: platform limit — SceneKit has no light-shaft/volumetric post pass; ignored
+2026-10-05 18:13:29.665 Df Runner[81627:6267d0] [com.jasonholtdigital.dart3d:scene] texture 5571979863306272888: awaiting payload
+2026-10-05 18:13:29.665 Df Runner[81627:6267d0] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:13:29.666 Df Runner[81627:6267d0] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:13:29.666 Df Runner[81627:6267d0] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:13:29.669 Df Runner[81627:6267d0] [com.jasonholtdigital.dart3d:scene] texture 5571979863306272888: 128x128 rgba8 (65536 B in 2.21 ms)
+2026-10-05 18:13:29.669 Df Runner[81627:6267d0] [com.jasonholtdigital.dart3d:scene] particleEmitter: 'randomFlipX' has no SceneKit counterpart — skipped
+2026-10-05 18:13:29.678 Df Runner[81627:6267d0] [com.jasonholtdigital.dart3d:scene] particleEmitter: 'turbulence' module has no SCNParticleSystem counterpart — skipped
+2026-10-05 18:13:29.678 Df Runner[81627:6267d0] [com.jasonholtdigital.dart3d:scene] particleEmitter on node 5571979863306272892: seed/fixedStep/maxFrameTime/maxParticles have no SceneKit counterpart — the render clock drives the sim
+2026-10-05 18:13:29.678 Df Runner[81627:6267d0] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:13:29.679 Df Runner[81627:6267d0] [com.jasonholtdigital.dart3d:scene] particleEmitter on node 5571979863306272893: seed/fixedStep/maxFrameTime/maxParticles have no SceneKit counterpart — the render clock drives the sim
+2026-10-05 18:13:29.679 Df Runner[81627:6267d0] [com.jasonholtdigital.dart3d:scene] particleEmitter: 1 burst(s) emulated with timed SCNParticleSystem copies (approximate counts)
+2026-10-05 18:13:29.679 Df Runner[81627:6267d0] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:13:29.679 Df Runner[81627:6267d0] [com.jasonholtdigital.dart3d:scene] meshParticleEmitter on node 5571979863306272894: realized as a sprite pass (SCNParticleSystem is sprite-only)
+2026-10-05 18:13:29.679 Df Runner[81627:6267d0] [com.jasonholtdigital.dart3d:scene] particleEmitter on node 5571979863306272894: seed/fixedStep/maxFrameTime/maxParticles have no SceneKit counterpart — the render clock drives the sim
+2026-10-05 18:13:29.679 Df Runner[81627:6267d0] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:13:29.679 Df Runner[81627:6267d0] [com.jasonholtdigital.dart3d:scene] component 'particleEmitter' on node 5571979863306272895: enabled:false — emitter not attached (the first component with a real tick gate)
+2026-10-05 18:13:29.680 Df Runner[81627:6267d0] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
+2026-10-05 18:13:35.683 Df Runner[81627:625825] [com.jasonholtdigital.dart3d:scene] particleEmitter on node 5571979863306272895: seed/fixedStep/maxFrameTime/maxParticles have no SceneKit counterpart — the render clock drives the sim
+2026-10-05 18:13:35.683 Df Runner[81627:625825] [com.jasonholtdigital.dart3d:scene] variant apply node=5571979863306272860 prim=0 selIdx=- vkey=- vmap=2 target=default
