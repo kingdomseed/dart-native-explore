@@ -895,6 +895,24 @@ final class SceneViewHost: SCNView {
         return out
     }
 
+    /// Tells the simulation its body's node was moved. SceneKit asks
+    /// for this after any position or orientation change on a node with
+    /// a body: a static or kinematic body otherwise stays where it was,
+    /// and a dynamic one can be put back by the next step. The
+    /// velocities are written back because the documentation does not
+    /// say whether the reset keeps them.
+    private func reseat(_ body: SCNPhysicsBody) {
+        guard body.type == .dynamic else {
+            body.resetTransform()
+            return
+        }
+        let linear = body.velocity
+        let angular = body.angularVelocity
+        body.resetTransform()
+        body.velocity = linear
+        body.angularVelocity = angular
+    }
+
     /// Fields first, then the body resets: a reset reads the node's
     /// world transform, which composes through its parents, and
     /// `written` comes out of a dictionary in no parent-before-child
@@ -904,16 +922,19 @@ final class SceneViewHost: SCNView {
         var restored = 0
         for pose in written {
             guard let node = nodesById[pose.id] else { continue }
-            if pose.mask & 1 != 0 { node.position = pose.position }
-            if pose.mask & 2 != 0 { node.orientation = pose.orientation }
-            if pose.mask & 4 != 0 { node.scale = pose.scale }
-            if pose.mask & 3 != 0 { moved.append(node) }
+            // A dynamic body's captured pose is the simulation's and
+            // goes back whole: with only the written field restored,
+            // the others would snap to the manifest pose.
+            let mask = node.physicsBody?.type == .dynamic
+                ? pose.mask | 3 : pose.mask
+            if mask & 1 != 0 { node.position = pose.position }
+            if mask & 2 != 0 { node.orientation = pose.orientation }
+            if mask & 4 != 0 { node.scale = pose.scale }
+            if mask & 3 != 0 { moved.append(node) }
             restored += 1
         }
         for node in moved {
-            if let body = node.physicsBody, body.type != .dynamic {
-                body.resetTransform()
-            }
+            if let body = node.physicsBody { reseat(body) }
         }
         if restored > 0 {
             d3Log("re-realize: restored \(restored) written transform(s)")
@@ -1178,12 +1199,11 @@ final class SceneViewHost: SCNView {
                 ])
                 off += 12
             }
-            // A static/kinematic body doesn't follow its node on its
-            // own: re-seat it in the physics world (e.g. screen-fitted
-            // tray walls moving on rotation).
-            if mask & 3 != 0, let body = node.physicsBody,
-               body.type != .dynamic {
-                body.resetTransform()
+            // A body doesn't reliably follow its node on its own:
+            // re-seat it in the physics world (e.g. screen-fitted tray
+            // walls moving on rotation, a die teleported for a roll).
+            if mask & 3 != 0, let body = node.physicsBody {
+                reseat(body)
             }
         }
     }
