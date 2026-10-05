@@ -895,6 +895,24 @@ final class SceneViewHost: SCNView {
         return out
     }
 
+    /// Tells the simulation its body's node was moved. SceneKit asks
+    /// for this after any position or orientation change on a node with
+    /// a body: a static or kinematic body otherwise stays where it was,
+    /// and a dynamic one can be put back by the next step. The
+    /// velocities are written back because the documentation does not
+    /// say whether the reset keeps them.
+    private func reseat(_ body: SCNPhysicsBody) {
+        guard body.type == .dynamic else {
+            body.resetTransform()
+            return
+        }
+        let linear = body.velocity
+        let angular = body.angularVelocity
+        body.resetTransform()
+        body.velocity = linear
+        body.angularVelocity = angular
+    }
+
     /// Fields first, then the body resets: a reset reads the node's
     /// world transform, which composes through its parents, and
     /// `written` comes out of a dictionary in no parent-before-child
@@ -916,9 +934,7 @@ final class SceneViewHost: SCNView {
             restored += 1
         }
         for node in moved {
-            if let body = node.physicsBody, body.type != .dynamic {
-                body.resetTransform()
-            }
+            if let body = node.physicsBody { reseat(body) }
         }
         if restored > 0 {
             d3Log("re-realize: restored \(restored) written transform(s)")
@@ -1183,12 +1199,11 @@ final class SceneViewHost: SCNView {
                 ])
                 off += 12
             }
-            // A static/kinematic body doesn't follow its node on its
-            // own: re-seat it in the physics world (e.g. screen-fitted
-            // tray walls moving on rotation).
-            if mask & 3 != 0, let body = node.physicsBody,
-               body.type != .dynamic {
-                body.resetTransform()
+            // A body doesn't reliably follow its node on its own:
+            // re-seat it in the physics world (e.g. screen-fitted tray
+            // walls moving on rotation, a die teleported for a roll).
+            if mask & 3 != 0, let body = node.physicsBody {
+                reseat(body)
             }
         }
     }

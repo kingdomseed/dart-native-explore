@@ -46,25 +46,54 @@ internal class BodyCarry {
 
     /**
      * Calls [apply] for each carried body whose node has a body of the
-     * same kind again ([rebuiltKind]; null for none or fixed), in
-     * capture order. Returns what was restored.
+     * same kind again ([rebuiltKind]; null for none or fixed). Returns
+     * what was restored.
      */
     fun restore(
         rebuiltKind: (Long) -> BodyMotion.Kind?,
         apply: (Long, BodyMotion) -> Unit,
     ): Restored {
-        var bodies = 0
+        val keys = ArrayList<Long>()
         var awake = 0
         var fastest = 0f
         for ((key, motion) in motions) {
             if (rebuiltKind(key) != motion.kind) continue
             apply(key, motion)
-            bodies++
+            keys.add(key)
             if (motion.awake) awake++
             fastest = maxOf(fastest, motion.speed)
         }
-        return Restored(bodies, awake, fastest)
+        return Restored(keys, awake, fastest)
     }
 
-    class Restored(val bodies: Int, val awake: Int, val fastest: Float)
+    class Restored(val keys: List<Long>, val awake: Int, val fastest: Float) {
+        val bodies: Int get() = keys.size
+    }
+
+    companion object {
+        /**
+         * [keys] ordered so that every node comes after its ancestors
+         * ([parentOf]; null at a root). A node's local transform is
+         * derived from its parent's world transform, so a parent has to
+         * be in place before its child is synced, and the bodies come
+         * out of a hash map in no such order.
+         */
+        fun parentsFirst(
+            keys: Collection<Long>, parentOf: (Long) -> Long?,
+        ): List<Long> {
+            fun depth(key: Long): Int {
+                var d = 0
+                var p = parentOf(key)
+                // The bound only guards against a malformed parent loop.
+                while (p != null && d < MAX_DEPTH) {
+                    d++
+                    p = parentOf(p)
+                }
+                return d
+            }
+            return keys.sortedBy(::depth)
+        }
+
+        private const val MAX_DEPTH = 4096
+    }
 }

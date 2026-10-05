@@ -6,10 +6,10 @@ dartnative: dart3d: wloose bowl pose=(-2.15,-0.31,2.05) PASS contained
 dartnative: dart3d: wloose margin drop spawned
 dartnative: dart3d: wloose removed w5NoRest,j9.liftPlate,j9.chainAnchor,j9.chain1,j9.chain2,j9.chain3,j9.chain4,j9.breakBox — settle events live
 dartnative: dart3d: wloose margin mid=(5.50,0.08,0.50)
-dartnative: dart3d: wloose settle: 1923ms (roll 1 via event, die (-0.00,-0.00,2.50))
+dartnative: dart3d: wloose settle: 1976ms (roll 1 via event, die (-0.00,-0.00,2.50))
 dartnative: dart3d: wloose margin pose=(5.50,0.08,0.50) PASS gap=0.53 above visual
-dartnative: dart3d: wloose settle: 1944ms (roll 2 via event, die (-0.00,-0.00,2.50))
-dartnative: dart3d: wloose settle: 1950ms (roll 3 via event, die (-0.00,-0.00,2.50))
+dartnative: dart3d: wloose settle: 1943ms (roll 2 via event, die (-0.00,-0.00,2.50))
+dartnative: dart3d: wloose settle: 1948ms (roll 3 via event, die (-0.00,-0.00,2.50))
 dartnative: dart3d: wloose settled event path: seen
-dartnative: dart3d: w25 lane complete — dice regression PASS: die ZR3B6Q800004Y rolled and settled after the effects sweep; expected final state: all effects off
+dartnative: dart3d: w25 lane complete — dice regression PASS: die 7X9R0Z000004Y rolled and settled after the effects sweep; expected final state: all effects off
 dartnative: dart3d: w18 lane complete — expected: fountain + streaks + mesh pool live, gated ran +6 s…+14 s then removed

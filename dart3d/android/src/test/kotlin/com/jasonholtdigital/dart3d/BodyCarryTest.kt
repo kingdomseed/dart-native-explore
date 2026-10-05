@@ -126,12 +126,42 @@ class BodyCarryTest {
     }
 
     @Test
-    fun restoresInCaptureOrderSoParentsLandBeforeChildren() {
+    fun restoreReportsTheKeysItRestored() {
         val carry = BodyCarry()
         for (key in listOf(7L, 3L, 9L)) carry.capture(key, motion())
-        val order = ArrayList<Long>()
-        carry.restore({ BodyMotion.Kind.DYNAMIC }) { key, _ -> order.add(key) }
-        assertEquals(listOf(7L, 3L, 9L), order)
+        val restored = carry.restore(
+            rebuiltKind = { if (it == 3L) null else BodyMotion.Kind.DYNAMIC },
+        ) { _, _ -> }
+        assertEquals(listOf(7L, 9L), restored.keys)
+        assertEquals(2, restored.bodies)
+    }
+
+    @Test
+    fun aChildIsSyncedAfterItsParentWhateverTheMapOrder() {
+        // cart <- crate <- lid, with the bodies handed over child first.
+        val cart = 10L; val crate = 20L; val lid = 30L; val loose = 40L
+        val parents = mapOf(crate to cart, lid to crate)
+        val order = BodyCarry.parentsFirst(listOf(lid, loose, crate, cart)) {
+            parents[it]
+        }
+        assertTrue(order.indexOf(cart) < order.indexOf(crate))
+        assertTrue(order.indexOf(crate) < order.indexOf(lid))
+        assertEquals(4, order.size)
+    }
+
+    @Test
+    fun aParentWithoutABodyStillCountsTowardsDepth() {
+        // rig (no body) <- arm <- hand; only arm and hand are bodies.
+        val rig = 1L; val arm = 2L; val hand = 3L; val root = 4L
+        val parents = mapOf(arm to rig, hand to arm)
+        assertEquals(listOf(root, arm, hand),
+            BodyCarry.parentsFirst(listOf(hand, arm, root)) { parents[it] })
+    }
+
+    @Test
+    fun aParentLoopDoesNotHang() {
+        val parents = mapOf(1L to 2L, 2L to 1L)
+        assertEquals(2, BodyCarry.parentsFirst(listOf(1L, 2L)) { parents[it] }.size)
     }
 
     @Test

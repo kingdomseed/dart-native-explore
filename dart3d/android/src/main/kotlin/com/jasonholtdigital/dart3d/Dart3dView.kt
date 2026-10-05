@@ -2179,16 +2179,25 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      * Puts the simulation state captured before a re-realize back on
      * the rebuilt bodies, after the written transforms: a restored
      * write teleports its body to where the write put it, and the body
-     * has moved since. The node follows its body here because the
-     * per-frame sync skips sleeping bodies.
+     * has moved since. Every body first, then the nodes follow their
+     * bodies, parents before children: a node's local transform comes
+     * from its parent's world transform, and the per-frame sync skips
+     * sleeping bodies, so a child synced against a parent that has not
+     * moved yet would stay wrong.
      */
     private fun restoreBodyMotion(carried: BodyCarry) {
         val restored = carried.restore(
             rebuiltKind = { key -> bodies[key]?.let(world::kindOf) },
         ) { key, motion ->
-            val body = bodies[key] ?: return@restore
-            world.restoreMotion(body, motion)
-            nodesById[key]?.let { syncBody(it, body) }
+            bodies[key]?.let { world.restoreMotion(it, motion) }
+        }
+        val ordered = BodyCarry.parentsFirst(restored.keys) {
+            nodesById[it]?.parentKey
+        }
+        for (key in ordered) {
+            val rec = nodesById[key] ?: continue
+            val body = bodies[key] ?: continue
+            syncBody(rec, body)
         }
         if (restored.bodies > 0) {
             Log.i(TAG, "re-realize: restored ${restored.bodies} body " +

@@ -26,8 +26,9 @@ captures each kinematic and dynamic body's world pose, linear and
 angular velocity and awake flag before the rebuild and puts them on the
 rebuilt body afterwards, after the written transforms (a restored write
 teleports its body to the written pose, and the body has moved since).
-The node is synced from its body there too, because the per-frame sync
-skips sleeping bodies. The view's awake count carries as well, so the
+The nodes are then synced from their bodies, parents before children,
+because the per-frame sync skips sleeping bodies and a node's local
+transform is derived from its parent's world transform. The view's awake count carries as well, so the
 rebuild does not raise a second `awake` event for bodies that were
 already awake.
 
@@ -112,6 +113,13 @@ Fire tablet and Wacom (both OpenGL, LOW): PASS, `harness-fire.log`,
 | 4160325876, descendants of a removed node stayed tracked | Already fixed on `main`: Android `supersedeAll(doomed)` over the whole removed set, iOS `transformWrites[k] = nil` per removed node in `removeSubtree`. |
 | 4160325894, a clip's output captured as a written transform | Already fixed on `main`: both captures skip nodes whose clip drives the transform. |
 
+## Review threads on this PR
+
+| Thread | Verdict |
+|---|---|
+| 4183372933, a child body synced before its parent is restored | **Real, fixed.** Nothing stops a document putting a body on a node under another body's node, the bodies come out of a `HashMap`, and `syncBody` computes a node's local transform from its parent's current world transform, so a child handled first was placed against the parent's manifest pose; asleep, it stayed there. Now every body is restored first (world space, order-free) and the nodes are synced in depth order (`BodyCarry.parentsFirst`, three new tests). Not reproduced on a device: neither the dice scene nor the harness nests bodies. |
+| 4183372939, iOS restores a dynamic body's node without `resetTransform()` | **Fixed as the documentation asks; unverified on a device.** The exclusion came from #36, which added `resetTransform()` for the tray walls and left dynamic bodies as they were, type-checked only. Before and since, a die teleported by `setTransforms` did move on the simulator (the ROLL runs in `docs/triage/integration.md`), so on that path SceneKit took the node's pose without the call. Nothing in the code makes that reliable for a body created in the same drain, which is the restore's case, and Apple's reference says the call is required. Both paths now go through one `reseat(_:)`, which calls `resetTransform()` for every body type and, for a dynamic body, writes its velocities back, because the reference does not say whether the reset keeps them. `applySetTransforms` had the same exclusion and gets the same call. Type-checked only; the roll on iOS needs a run before this is trusted. |
+
 ## iOS
 
 Not changed for the body state, because it cannot be run. The
@@ -135,11 +143,12 @@ equivalent in `SceneViewHost.drainPendingWork`, beside
 
 ## T2 and frame rate
 
-**Incomplete: the A142 is owed.** It was lent to another project
-partway through. Owed on the final head: A142 Vulkan (hero and dice;
-its harness is run) and A142 OpenGL (hero, dice and harness). The
-A142's hero and dice figures below are from three commits before the
-final head.
+**Incomplete: the A142 is owed.** It is on loan to another project.
+The two tablets ran the final head. The A142's row is from before the
+review fixes above (its harness from `325cb4f`'s code, its hero and
+dice from three commits earlier), so the whole A142 gate is owed on the
+final head: Vulkan and OpenGL, each with hero, dice and the harness.
+Nothing else.
 
 Each device from a fresh launch: hero 30 s, dice racked 30 s, 12 rolls
 3 s apart, settle; then the harness (`DART3D_SCENE=harness`) to `w18
@@ -148,17 +157,13 @@ lane complete`. Frame rates from the `dart3d.perf` log, baseline from
 
 | Device | Backend, tier | Hero | Dice racked | Dice rolling | Harness | FATAL |
 |---|---|---|---|---|---|---|
-| Fire KFTUWI | OPENGL, LOW | 58.5, two windows only (55.0) | 44.2 (44.2) | 44.1 (43.7) | complete, W25 PASS | 0 |
-| Nothing A142 | VULKAN, STANDARD | 89.8 (89.7) | 49.7 (49.7) | 50.2 (50.3) | complete, W25 PASS | 0 |
+| Fire KFTUWI, final head | OPENGL, LOW | 56.0 (55.0) | 44.5 (44.2) | 44.1 (43.7) | complete, W25 PASS | 0 |
+| Wacom DTHA116, final head | OPENGL, LOW | 57.4 (57.5) | 50.6 (51.2) | 45.2 (44.1) | complete, W25 PASS | 0 |
+| Nothing A142, earlier head | VULKAN, STANDARD | 89.8 (89.7) | 49.7 (49.7) | 50.2 (50.3) | complete, W25 PASS | 0 |
 | Nothing A142, OpenGL forced | | not run | | | not run | |
-| Wacom DTHA116 | OPENGL, LOW | 57.7 (57.5) | 51.4 (51.2) | 45.4 (44.1) | complete, W25 PASS | 0 |
 
-- The Fire tablet's hero figure rests on two 2 s windows: the perf log
-  switched on late in that run. Its dice figures have 16 and 22.
-- The A142's hero/dice run was on `a4939aa`. The final head adds the
-  awake-count carry, moves the transform supersession into the
-  add/update handlers and adds a test; none of it runs per frame. Its
-  harness run is on the final head's code.
+- Both tablets were also run on `325cb4f`, before the review fixes,
+  with the same results within 1 fps (Wacom 57.7 / 51.4 / 45.4).
 - One earlier attempt to install on the Wacom failed in `adb install`
   with an empty reason. The tablet's log shows the install session
   opened at 09:56:23 and abandoned 1.7 s later with no
@@ -177,15 +182,19 @@ harness); `harness-wacom.log`.
 
 - `dn analyze` and `dn test`: `dart3d` 277 tests, `dart3d/example` 230
   tests (3 new), clean.
-- `:dart3d:testReleaseUnitTest`: 113 tests pass, 9 new
+- `:dart3d:testReleaseUnitTest`: 116 tests pass, 12 new
   (`BodyCarryTest`).
 - `swiftc -typecheck` of `dart3d/ios/Classes` against the iPhone
   Simulator 27.0 SDK, target iOS 16: clean.
 
 ## Open
 
-- iOS body state, as described above; the three iOS thread fixes are
-  not run on a device or simulator.
+- T2 on the A142 for the final head.
+- iOS body state, as described above. The iOS changes here (two-pass
+  restore, whole pose for dynamic bodies, supersession after
+  validation, `resetTransform()` for dynamic bodies on restore and on
+  `setTransforms`) are not run on a device or simulator. The last one
+  touches the roll path.
 - Joints are rebuilt while their bodies are still at the manifest
   pose, before the body state goes back. A hinge's zero angle and a
   fixed joint's relative orientation are taken at that moment. For a
