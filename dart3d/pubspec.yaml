@@ -37,3 +37,9 @@ dartnative:
 dev_dependencies:
   test: ^1.25.0
   image: ^4.0.0
+
+# DartNative SDK's closed engine platform .dill compiles `archive: 3.6.1`,
+# whereas `scene: ^0.3.0` declares `archive: ^4.0.7`. Override to 3.6.1 so
+# `dn pub get` resolves cleanly against the SDK's bundled archive package.
+dependency_overrides:
+  archive: 3.6.1
