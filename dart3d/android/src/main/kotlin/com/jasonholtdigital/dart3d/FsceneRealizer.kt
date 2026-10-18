@@ -30,6 +30,7 @@ import com.google.android.filament.Box
 import com.google.android.filament.EntityManager
 import com.google.android.filament.IndexBuffer
 import com.google.android.filament.IndirectLight
+import com.google.android.filament.InstanceBuffer
 import com.google.android.filament.LightManager
 import com.google.android.filament.MaterialInstance
 import com.google.android.filament.MorphTargetBuffer
@@ -660,19 +661,44 @@ object FsceneRealizer {
         // the same object the host does (no extra registry).
         var trail: TrailState? = null,
         var lod: LodState? = null,
-        // W26: a `d3:procMesh`/`d3:instances` node's private GpuMesh —
-        // unlike the shared gpuMeshes map (keyed by geometry
-        // resource), component-owned buffers die with the component.
+        // W26: a `d3:procMesh` or inline-shape/billboard `d3:instances`
+        // node's private GpuMesh — unlike the shared gpuMeshes map
+        // (keyed by geometry resource), component-owned buffers die
+        // with the component.
         var procGpuMesh: GpuMesh? = null,
+        // E1: lazily built reflected-tangent VertexBuffer and
+        // reversed-winding IndexBuffer for negative-determinant
+        // GPU-instanced transforms.
+        var procReflectedVertexBuffer: VertexBuffer? = null,
+        var procReversedIndexBuffer: IndexBuffer? = null,
+        var instanceBakedGpuMesh: GpuMesh? = null,
+        // E1: extra chunk entities (parented to `entity` with identity
+        // local transform) when a `d3:instances` node spans >64 GPU
+        // instances or mixes positive/negative-determinant transforms.
+        val instanceEntities: MutableList<Int> = mutableListOf(),
+        // E1: per-chunk Filament InstanceBuffers owned by `d3:instances`.
+        val instanceBuffers: MutableList<InstanceBuffer> = mutableListOf(),
+        // E1: base CPU mesh + instance transforms retained so geometry-
+        // derived colliders (convexHull, triMesh, concaveMesh) lazily
+        // expand transformed instance geometry only when requested.
+        var instanceBasePositions: FloatArray? = null,
+        var instanceBaseIndices: IntArray? = null,
+        var instanceTransforms: List<FloatArray>? = null,
+        // E1: underlying shared MaterialInstance + per-chunk color
+        // uniform arrays for `d3:instances` so `materialsVariants` and
+        // material upserts update all chunks while preserving per-chunk
+        // colors and `doubleSided`.
+        var instanceBaseMaterial: MaterialInstance? = null,
+        val instanceChunkColors: MutableList<FloatArray?> = mutableListOf(),
         // Retained `d3:instances` props — a geometry-ref consumer
-        // re-bakes when the resource upserts (meshPrimGeoKeys' mesh
-        // path can't reproduce transformed copies).
+        // re-realizes when the resource upserts.
         var instancesProps: JSONObject? = null,
-        // W26: a `doubleSided` instances node binds a duplicated
-        // MaterialInstance (the shared instance can't carry a
-        // per-component flag); component-owned, destroyed with the
+        // W26/E1: per-chunk duplicated MaterialInstances when a
+        // `d3:instances` node carries `doubleSided` or per-instance
+        // `color` uniforms; component-owned, destroyed with the
         // renderable.
-        var procMaterialInstance: MaterialInstance? = null,
+        val instanceMaterialInstances: MutableList<MaterialInstance> =
+            mutableListOf(),
     )
 
     /**
@@ -1475,30 +1501,63 @@ object FsceneRealizer {
          *  decoders — unlike mesh nodes (shared gpuMeshes rebound in
          *  place), a proc/instances re-decode replaces its private
          *  buffers wholesale. */
-        private fun destroyProcRenderable(key: Long, rec: NodeRec) {
+        fun destroyProcRenderable(key: Long, rec: NodeRec) {
             // The facing entry points at procGpuMesh's VertexBuffer —
             // drop it with the buffer, or an empty rebake (which
             // returns before re-registering) leaves updateCameraFacing
             // uploading into a destroyed buffer.
             host.cameraFacing.remove(key)
-            // The rebuild re-registers its (entity, 0) consumer pair —
-            // drop the old one first, or repeated payload rebakes grow
+            // The rebuild re-registers its (entity, 0) consumer pairs —
+            // drop the old ones first, or repeated payload rebakes grow
             // the list and a material upsert rebinds the slot N times.
             for ((_, list) in materialConsumers) {
-                list.removeAll { it.first == rec.entity }
+                list.removeAll {
+                    it.first == rec.entity || it.first in rec.instanceEntities
+                }
             }
             val rm = host.engine.renderableManager
             if (rm.hasComponent(rec.entity)) rm.destroy(rec.entity)
+            for (ie in rec.instanceEntities) {
+                host.scene.remove(ie)
+                if (rm.hasComponent(ie)) rm.destroy(ie)
+                tcm.destroy(ie)
+                host.engine.destroyEntity(ie)
+                em.destroy(ie)
+            }
+            rec.instanceEntities.clear()
+            for (ib in rec.instanceBuffers) {
+                host.engine.destroyInstanceBuffer(ib)
+            }
+            rec.instanceBuffers.clear()
             rec.procGpuMesh?.let {
                 it.destroy(host.engine)
                 rec.procGpuMesh = null
             }
-            rec.procMaterialInstance?.let { dup ->
+            rec.procReflectedVertexBuffer?.let {
+                host.engine.destroyVertexBuffer(it)
+                rec.procReflectedVertexBuffer = null
+            }
+            rec.procReversedIndexBuffer?.let {
+                host.engine.destroyIndexBuffer(it)
+                rec.procReversedIndexBuffer = null
+            }
+            rec.instanceBakedGpuMesh?.let {
+                it.destroy(host.engine)
+                rec.instanceBakedGpuMesh = null
+            }
+            rec.instanceBasePositions = null
+            rec.instanceBaseIndices = null
+            rec.instanceTransforms = null
+            rec.instanceBaseMaterial = null
+            rec.instanceChunkColors.clear()
+            if (rec.instanceMaterialInstances.isNotEmpty()) {
                 for ((_, list) in textureConsumers) {
-                    list.removeAll { it.first === dup }
+                    list.removeAll { it.first in rec.instanceMaterialInstances }
                 }
-                host.engine.destroyMaterialInstance(dup)
-                rec.procMaterialInstance = null
+                for (dup in rec.instanceMaterialInstances) {
+                    host.engine.destroyMaterialInstance(dup)
+                }
+                rec.instanceMaterialInstances.clear()
             }
         }
 
@@ -1657,15 +1716,13 @@ object FsceneRealizer {
         }
 
         /**
-         * `d3:instances` — one node, one draw, N copies of a mesh.
-         * Filament 1.71.6's Java binding exposes only
-         * `RenderableManager.Builder.instances(int)` — the native
-         * `InstanceBuffer` overload that carries per-instance
-         * transforms isn't reachable from Java, so the instance data
-         * is baked into a single vertex buffer instead: same one-node/
-         * one-draw contract, per-instance colors stamped into the
-         * COLOR stream. `billboard: true` swaps the mesh for
-         * camera-facing quads re-faced per frame (FacingSpec).
+         * `d3:instances` — one node, N copies of a mesh realized via
+         * Filament 1.77.3 GPU instancing (`InstanceBuffer`, chunked to
+         * `Engine.maxAutomaticInstances` = 64 per renderable with
+         * per-chunk `instanceColors[64]` UBOs and reflected vertex/index
+         * buffers for negative-determinant transforms). `billboard: true`
+         * swaps the mesh for camera-facing quads re-faced per frame
+         * (FacingSpec).
          */
         /**
          * Re-bakes every live `d3:instances` node whose `transforms`
@@ -1702,12 +1759,274 @@ object FsceneRealizer {
             for ((nodeKey, rec) in nodes.entries.toList()) {
                 val p = rec.instancesProps ?: continue
                 if (p.tag("doubleSided").d3Bool() != true) continue
+                if (rec.instanceMaterialInstances.isEmpty()) continue
                 if (p.tag("material").d3Ref() != materialKey) continue
                 decodeInstances(nodeKey, rec, p)
                 applyVisibility(nodeKey)
                 n++
             }
             return n
+        }
+
+        /**
+         * Re-realizes non-`doubleSided` `d3:instances` nodes that bound
+         * per-chunk MaterialInstance duplicates strictly for per-instance
+         * `color` uniforms (not `doubleSided`, which stays a snapshot per
+         * the payload-geometry contract doc). Called from `upsertMaterial`
+         * so surgical material edits propagate to colored instanced nodes.
+         */
+        fun redecodeColoredInstancesForMaterial(materialKey: Long): Int {
+            var n = 0
+            for ((nodeKey, rec) in nodes.entries.toList()) {
+                val p = rec.instancesProps ?: continue
+                if (p.tag("doubleSided").d3Bool() == true) continue
+                val hasColorAttr = p.tag("attributes").d3Map()?.opt("color") != null
+                if (!hasColorAttr && rec.instanceMaterialInstances.isEmpty()) continue
+                if (p.tag("material").d3Ref() != materialKey) continue
+                decodeInstances(nodeKey, rec, p)
+                applyVisibility(nodeKey)
+                n++
+            }
+            return n
+        }
+
+        private fun det3x3(m: FloatArray): Float =
+            m[0] * (m[5] * m[10] - m[6] * m[9]) -
+                m[4] * (m[1] * m[10] - m[2] * m[9]) +
+                m[8] * (m[1] * m[6] - m[2] * m[5])
+
+        /**
+         * Returns true when [m] is finite, invertible (`|det| > 1e-20`), and
+         * its upper 3x3 is conformal (`s * Q` with `Q` orthogonal — uniform
+         * scale + rotation/reflection, no shear). For conformal matrices,
+         * Filament's GPU `InstanceBuffer` normal matrix `cofactor(M)` is
+         * proportional to `M`, so hardware tangent transformation matches
+         * `M * t` re-orthogonalized against `M^-T * n`. Non-conformal
+         * (non-uniform scale / shear) or singular transforms take the CPU
+         * `MeshFactory.bakeInstances` path so tangent orientation and
+         * singular-frame fallback match the payload-geometry contract.
+         */
+        private fun isConformalInvertible3x3(m: FloatArray): Boolean {
+            if (m.size < 16) return false
+            for (i in 0 until 16) {
+                if (!m[i].isFinite()) return false
+            }
+            val det = det3x3(m)
+            if (!det.isFinite() || kotlin.math.abs(det) <= 1e-20f) return false
+            val c0x = m[0]; val c0y = m[1]; val c0z = m[2]
+            val c1x = m[4]; val c1y = m[5]; val c1z = m[6]
+            val c2x = m[8]; val c2y = m[9]; val c2z = m[10]
+            val l0 = c0x * c0x + c0y * c0y + c0z * c0z
+            val l1 = c1x * c1x + c1y * c1y + c1z * c1z
+            val l2 = c2x * c2x + c2y * c2y + c2z * c2z
+            val scale2 = maxOf(l0, maxOf(l1, l2))
+            if (!scale2.isFinite() || scale2 <= 1e-20f) return false
+            val eps = scale2 * 1e-4f
+            if (kotlin.math.abs(l0 - l1) > eps || kotlin.math.abs(l0 - l2) > eps || kotlin.math.abs(l1 - l2) > eps) {
+                return false
+            }
+            val d01 = kotlin.math.abs(c0x * c1x + c0y * c1y + c0z * c1z)
+            val d02 = kotlin.math.abs(c0x * c2x + c0y * c2y + c0z * c2z)
+            val d12 = kotlin.math.abs(c1x * c2x + c1y * c2y + c1z * c2z)
+            return d01 <= eps && d02 <= eps && d12 <= eps
+        }
+
+        private fun unionInstanceBounds(
+            baseBounds: FloatArray,
+            transforms: List<FloatArray>,
+        ): FloatArray {
+            if (transforms.isEmpty()) return baseBounds
+            val cx = baseBounds[0]
+            val cy = baseBounds[1]
+            val cz = baseBounds[2]
+            val hx = baseBounds[3]
+            val hy = baseBounds[4]
+            val hz = baseBounds[5]
+            var minX = Float.POSITIVE_INFINITY
+            var minY = Float.POSITIVE_INFINITY
+            var minZ = Float.POSITIVE_INFINITY
+            var maxX = Float.NEGATIVE_INFINITY
+            var maxY = Float.NEGATIVE_INFINITY
+            var maxZ = Float.NEGATIVE_INFINITY
+            for (m in transforms) {
+                val tcx = m[0] * cx + m[4] * cy + m[8] * cz + m[12]
+                val tcy = m[1] * cx + m[5] * cy + m[9] * cz + m[13]
+                val tcz = m[2] * cx + m[6] * cy + m[10] * cz + m[14]
+                val thx = kotlin.math.abs(m[0]) * hx +
+                    kotlin.math.abs(m[4]) * hy +
+                    kotlin.math.abs(m[8]) * hz
+                val thy = kotlin.math.abs(m[1]) * hx +
+                    kotlin.math.abs(m[5]) * hy +
+                    kotlin.math.abs(m[9]) * hz
+                val thz = kotlin.math.abs(m[2]) * hx +
+                    kotlin.math.abs(m[6]) * hy +
+                    kotlin.math.abs(m[10]) * hz
+                if (tcx - thx < minX) minX = tcx - thx
+                if (tcy - thy < minY) minY = tcy - thy
+                if (tcz - thz < minZ) minZ = tcz - thz
+                if (tcx + thx > maxX) maxX = tcx + thx
+                if (tcy + thy > maxY) maxY = tcy + thy
+                if (tcz + thz > maxZ) maxZ = tcz + thz
+            }
+            return floatArrayOf(
+                (minX + maxX) * 0.5f,
+                (minY + maxY) * 0.5f,
+                (minZ + maxZ) * 0.5f,
+                (maxX - minX) * 0.5f,
+                (maxY - minY) * 0.5f,
+                (maxZ - minZ) * 0.5f,
+            )
+        }
+
+        private fun reflectedVertexBuffer(
+            base: MeshFactory.MeshData, rec: NodeRec,
+        ): VertexBuffer {
+            rec.procReflectedVertexBuffer?.let { return it }
+            val vbBuilder = VertexBuffer.Builder()
+                .vertexCount(base.vertexCount)
+                .bufferCount(1)
+                .attribute(VertexBuffer.VertexAttribute.POSITION, 0,
+                    VertexBuffer.AttributeType.FLOAT3, 0, base.vertexStrideBytes)
+                .attribute(VertexBuffer.VertexAttribute.TANGENTS, 0,
+                    VertexBuffer.AttributeType.FLOAT4, 12, base.vertexStrideBytes)
+            if (base.hasUvColor) {
+                vbBuilder.attribute(VertexBuffer.VertexAttribute.UV0, 0,
+                    VertexBuffer.AttributeType.FLOAT2, 28, base.vertexStrideBytes)
+                vbBuilder.attribute(VertexBuffer.VertexAttribute.COLOR, 0,
+                    VertexBuffer.AttributeType.FLOAT4, 36, base.vertexStrideBytes)
+                vbBuilder.attribute(VertexBuffer.VertexAttribute.UV1, 0,
+                    VertexBuffer.AttributeType.FLOAT2, 52, base.vertexStrideBytes)
+            }
+            val vb = vbBuilder.fenced { build(host.engine) }
+            vb.setBufferAt(host.engine, 0, MeshFactory.reflectedTangentCopy(base))
+            rec.procReflectedVertexBuffer = vb
+            return vb
+        }
+
+        private fun reversedIndexBuffer(gm: GpuMesh, rec: NodeRec): IndexBuffer {
+            rec.procReversedIndexBuffer?.let { return it }
+            val src = gm.indices
+            val n = src.size
+            val triCount = n / 3
+            val use32 = gm.vertexCount > 65535
+            val ib = if (use32) {
+                val rev = IntArray(n)
+                for (t in 0 until triCount) {
+                    val b = t * 3
+                    rev[b] = src[b]
+                    rev[b + 1] = src[b + 2]
+                    rev[b + 2] = src[b + 1]
+                }
+                val buf = ByteBuffer.allocateDirect(n * 4)
+                    .order(ByteOrder.nativeOrder())
+                buf.asIntBuffer().put(rev)
+                buf.rewind()
+                IndexBuffer.Builder()
+                    .indexCount(n)
+                    .bufferType(IndexBuffer.Builder.IndexType.UINT)
+                    .fenced { build(host.engine) }
+                    .also { it.setBuffer(host.engine, buf) }
+            } else {
+                val rev = ShortArray(n)
+                for (t in 0 until triCount) {
+                    val b = t * 3
+                    rev[b] = src[b].toShort()
+                    rev[b + 1] = src[b + 2].toShort()
+                    rev[b + 2] = src[b + 1].toShort()
+                }
+                val buf = ByteBuffer.allocateDirect(n * 2)
+                    .order(ByteOrder.nativeOrder())
+                buf.asShortBuffer().put(rev)
+                buf.rewind()
+                IndexBuffer.Builder()
+                    .indexCount(n)
+                    .bufferType(IndexBuffer.Builder.IndexType.USHORT)
+                    .fenced { build(host.engine) }
+                    .also { it.setBuffer(host.engine, buf) }
+            }
+            rec.procReversedIndexBuffer = ib
+            return ib
+        }
+
+        /**
+         * Applies [target] to [rec] at [primitive], covering multi-chunk
+         * `d3:instances` entities (`rec.entity` + `rec.instanceEntities`)
+         * and preserving per-chunk `doubleSided` + `instanceColors`
+         * duplicates when present.
+         */
+        fun applyMaterialToNode(
+            nodeKey: Long, rec: NodeRec,
+            primitive: Int, target: MaterialInstance,
+        ) {
+            val rm = host.engine.renderableManager
+            val instProps = rec.instancesProps
+            if (instProps != null && primitive == 0) {
+                rec.instanceBaseMaterial = target
+                val chunkEntities = ArrayList<Int>(1 + rec.instanceEntities.size)
+                chunkEntities.add(rec.entity)
+                chunkEntities.addAll(rec.instanceEntities)
+                val doubleSided = instProps.tag("doubleSided").d3Bool() == true
+                val hasColors = rec.instanceChunkColors.any { it != null }
+                if (doubleSided || hasColors) {
+                    val oldDups = rec.instanceMaterialInstances.toList()
+                    rec.instanceMaterialInstances.clear()
+                    for ((chunkIdx, entity) in chunkEntities.withIndex()) {
+                        val cf = rec.instanceChunkColors.getOrNull(chunkIdx)
+                        val chunkMat = if (doubleSided || cf != null) {
+                            MaterialInstance.duplicate(
+                                target, "d3inst_${nodeKey}_$chunkIdx"
+                            ).also { d ->
+                                if (doubleSided) d.setDoubleSided(true)
+                                if (cf != null) {
+                                    d.setParameter("useInstanceColors", 1f)
+                                    d.setParameter(
+                                        "instanceColors",
+                                        MaterialInstance.FloatElement.FLOAT4,
+                                        cf, 0, MaterialPackages.MAX_INSTANCES)
+                                }
+                                rec.instanceMaterialInstances.add(d)
+                                for ((_, list) in textureConsumers) {
+                                    val params = list.filter { it.first === target }
+                                        .map { it.second }
+                                    for (param in params) list.add(Pair(d, param))
+                                }
+                            }
+                        } else {
+                            target
+                        }
+                        if (rm.hasComponent(entity)) {
+                            val ri = rm.getInstance(entity)
+                            if (0 < rm.getPrimitiveCount(ri)) {
+                                rm.setMaterialInstanceAt(ri, 0, chunkMat)
+                            }
+                        }
+                    }
+                    if (oldDups.isNotEmpty()) {
+                        for ((_, list) in textureConsumers) {
+                            list.removeAll { it.first in oldDups }
+                        }
+                        for (oldDup in oldDups) {
+                            host.engine.destroyMaterialInstance(oldDup)
+                        }
+                    }
+                } else {
+                    for (entity in chunkEntities) {
+                        if (rm.hasComponent(entity)) {
+                            val ri = rm.getInstance(entity)
+                            if (0 < rm.getPrimitiveCount(ri)) {
+                                rm.setMaterialInstanceAt(ri, 0, target)
+                            }
+                        }
+                    }
+                }
+                return
+            }
+            if (rm.hasComponent(rec.entity)) {
+                val ri = rm.getInstance(rec.entity)
+                if (primitive < rm.getPrimitiveCount(ri)) {
+                    rm.setMaterialInstanceAt(ri, primitive, target)
+                }
+            }
         }
 
         private fun decodeInstances(key: Long, rec: NodeRec, p: JSONObject) {
@@ -1765,152 +2084,338 @@ object FsceneRealizer {
             val doubleSided = p.tag("doubleSided").d3Bool() == true
             val s = p.tag("size").d3Vec2() ?: doubleArrayOf(1.0, 1.0)
             val rotation = (p.tag("rotation").d3Double() ?: 0.0).toFloat()
+            val matKey = p.tag("material").d3Ref()
+            val shared = matKey?.let { materials[it] }
+                ?: host.litMaterial.defaultInstance
+            rec.instanceBaseMaterial = shared
 
-            val md: MeshFactory.MeshData
             if (billboard) {
                 val centers = transforms.map {
                     MeshFactory.V3(it[12], it[13], it[14])
                 }
-                md = MeshFactory.bakeBillboardInstances(centers,
+                val md = MeshFactory.bakeBillboardInstances(centers,
                     s[0].toFloat(), s[1].toFloat(), rotation, colors,
                     MeshFactory.V3(1f, 0f, 0f), MeshFactory.V3(0f, 1f, 0f),
                     facing = facing)
-            } else {
-                // The repeated mesh — a geometry resource ref or an
-                // inline `shape` + params (same names as d3:procMesh).
-                val shape = p.tag("shape").d3String()
-                var base: MeshFactory.MeshData? = null
-                var geoKey: Long? = null
-                if (shape != null && shape in FACING_SHAPES) {
-                    // Facing geometry inside a non-billboard instances
-                    // bake doesn't make sense — expand once flat.
-                    logOnce("instances.$key.facingShape",
-                        "d3:instances node $key: facing shape '$shape'" +
-                            " bakes once toward +Z")
-                    val fp = parseFacing(key, p)
-                    warnFacingDrops("instances", "d3:instances node",
-                        key, shape, p, fp)
-                    base = facingMesh(shape, fp,
-                        MeshFactory.V3(0f, 0f, 1f),
-                        MeshFactory.V3(1f, 0f, 0f), MeshFactory.V3(0f, 1f, 0f))
-                } else if (shape != null) {
-                    base = procedural(key, shape, p)
-                } else {
-                    geoKey = p.tag("geometry").d3Ref()
-                    if (geoKey == null) {
-                        Log.w(TAG, "d3:instances node $key: needs" +
-                            " geometry or shape")
-                        return
+                if (md.vertexCount == 0) {
+                    Log.w(TAG, "d3:instances node $key: empty bake")
+                    return
+                }
+                val gm = buildGpuMesh(md)
+                rec.procGpuMesh = gm
+                rec.lastGeoPositions = gm.positions
+                rec.lastGeoIndices = gm.indices
+                rec.lastGeoBounds = gm.bounds
+                rec.instanceChunkColors.add(null)
+                val inst = if (doubleSided) {
+                    MaterialInstance.duplicate(shared, "d3ds_$key").also { dup ->
+                        dup.setDoubleSided(true)
+                        rec.instanceMaterialInstances.add(dup)
+                        for ((_, list) in textureConsumers) {
+                            val params = list.filter { it.first === shared }
+                                .map { it.second }
+                            for (param in params) list.add(Pair(dup, param))
+                        }
                     }
-                    geometryConsumers.getOrPut(geoKey) { LinkedHashSet() }
-                        .add(key)
-                    base = geometries[geoKey]
+                } else shared
+                if (!doubleSided) {
+                    matKey?.let {
+                        materialConsumers.getOrPut(it) { ArrayList() }
+                            .add(Pair(rec.entity, 0))
+                    }
                 }
-                if (base == null) {
-                    Log.i(TAG, "d3:instances node $key: geometry" +
-                        " unresolved")
-                    return
+                RenderableManager.Builder(1)
+                    .boundingBox(Box(gm.bounds[0], gm.bounds[1], gm.bounds[2],
+                        gm.bounds[3], gm.bounds[4], gm.bounds[5]))
+                    .layerMask(0xFF, rec.layers and 0xFF)
+                    .castShadows(true)
+                    .receiveShadows(true)
+                    .geometry(0, gm.primitiveType, gm.vertexBuffer,
+                        gm.indexBuffer)
+                    .material(0, inst)
+                    .fenced { build(host.engine, rec.entity) }
+                val flatCenters = FloatArray(transforms.size * 3)
+                for ((i, m) in transforms.withIndex()) {
+                    flatCenters[i * 3] = m[12]
+                    flatCenters[i * 3 + 1] = m[13]
+                    flatCenters[i * 3 + 2] = m[14]
                 }
-                if (base.topology != MeshFactory.Topology.TRIANGLES) {
-                    // The bake emits an indexed triangle list; lines,
-                    // points and strips would be reinterpreted as
-                    // unrelated triangles. iOS rejects them too.
-                    warnOnce("instances.$key.topology",
-                        "d3:instances node $key: ${base.topology}" +
-                            " geometry can't be instanced (triangle" +
-                            " lists only) — not baked")
-                    return
-                }
-                if (base.hasSkinning) {
-                    warnOnce("instances.$key.skinning",
-                        "d3:instances node $key: skinned geometry" +
-                            " bakes unskinned — joint/weight streams" +
-                            " are dropped")
-                }
-                if (base.morph != null) {
-                    warnOnce("instances.$key.morph",
-                        "d3:instances node $key: morphed geometry" +
-                            " bakes unmorphed — morph targets" +
-                            " are dropped")
-                }
-                // d3BakedInstanceCount: a base mesh larger than the
-                // whole budget still keeps one instance (the per-shape
-                // caps already bound it).
-                val maxByVerts = maxOf(1,
-                    MAX_BAKED_VERTICES / maxOf(1, base.vertexCount))
-                if (transforms.size > maxByVerts) {
-                    warnOnce("instances.$key.vertexCap",
-                        "d3:instances node $key: ${transforms.size}" +
-                            " × ${base.vertexCount} vertices exceeds the" +
-                            " $MAX_BAKED_VERTICES-vertex bake budget" +
-                            " — truncated to $maxByVerts instances")
-                    transforms = transforms.take(maxByVerts)
-                }
-                md = MeshFactory.bakeInstances(base, transforms, colors)
+                host.cameraFacing[key] = FacingSpec.billboards(
+                    flatCenters, s[0].toFloat(), s[1].toFloat(), rotation,
+                    colors, gm.vertexBuffer, rec.entity, facing)
+                Log.i(TAG, "d3:instances node $key: realized ${transforms.size} billboard instance(s)")
+                return
             }
-            if (md.vertexCount == 0) {
+
+            // E1 GPU instancing: resolve the single base mesh once, then
+            // submit per-chunk Filament InstanceBuffers (up to 64 instances
+            // per automatic-instancing renderable).
+            val shape = p.tag("shape").d3String()
+            var base: MeshFactory.MeshData? = null
+            var geoKey: Long? = null
+            if (shape != null && shape in FACING_SHAPES) {
+                logOnce("instances.$key.facingShape",
+                    "d3:instances node $key: facing shape '$shape'" +
+                        " bakes once toward +Z")
+                val fp = parseFacing(key, p)
+                warnFacingDrops("instances", "d3:instances node",
+                    key, shape, p, fp)
+                base = facingMesh(shape, fp,
+                    MeshFactory.V3(0f, 0f, 1f),
+                    MeshFactory.V3(1f, 0f, 0f), MeshFactory.V3(0f, 1f, 0f))
+            } else if (shape != null) {
+                base = procedural(key, shape, p)
+            } else {
+                geoKey = p.tag("geometry").d3Ref()
+                if (geoKey == null) {
+                    Log.w(TAG, "d3:instances node $key: needs" +
+                        " geometry or shape")
+                    return
+                }
+                geometryConsumers.getOrPut(geoKey) { LinkedHashSet() }
+                    .add(key)
+                base = geometries[geoKey]
+            }
+            if (base == null) {
+                Log.i(TAG, "d3:instances node $key: geometry" +
+                    " unresolved")
+                return
+            }
+            if (base.topology != MeshFactory.Topology.TRIANGLES) {
+                warnOnce("instances.$key.topology",
+                    "d3:instances node $key: ${base.topology}" +
+                        " geometry can't be instanced (triangle" +
+                        " lists only) — not baked")
+                return
+            }
+            if (base.hasSkinning) {
+                warnOnce("instances.$key.skinning",
+                    "d3:instances node $key: skinned geometry" +
+                        " bakes unskinned — joint/weight streams" +
+                        " are dropped")
+            }
+            if (base.morph != null) {
+                warnOnce("instances.$key.morph",
+                    "d3:instances node $key: morphed geometry" +
+                        " bakes unmorphed — morph targets" +
+                        " are dropped")
+            }
+            val maxByVerts = maxOf(1,
+                MAX_BAKED_VERTICES / maxOf(1, base.vertexCount))
+            if (transforms.size > maxByVerts) {
+                warnOnce("instances.$key.vertexCap",
+                    "d3:instances node $key: ${transforms.size}" +
+                        " × ${base.vertexCount} vertices exceeds the" +
+                        " $MAX_BAKED_VERTICES-vertex bake budget" +
+                        " — truncated to $maxByVerts instances")
+                transforms = transforms.take(maxByVerts)
+            }
+            if (transforms.isEmpty() || base.vertexCount == 0) {
                 Log.w(TAG, "d3:instances node $key: empty bake")
                 return
             }
-            val gm = buildGpuMesh(md)
-            rec.procGpuMesh = gm
-            rec.lastGeoPositions = gm.positions
-            rec.lastGeoIndices = gm.indices
-            rec.lastGeoBounds = gm.bounds
-            val matKey = p.tag("material").d3Ref()
-            val shared = matKey?.let { materials[it] }
-                ?: host.litMaterial.defaultInstance
-            // A component `doubleSided` can't ride the shared
-            // instance (every consumer would turn two-sided), so the
-            // node binds a duplicate — a snapshot: surgical updates
-            // to the source material after this bind don't propagate
-            // (the payload-geometry contract doc records the
-            // limitation). Mirrors the iOS material clone.
-            val inst = if (doubleSided) {
-                MaterialInstance.duplicate(shared, "d3ds_$key").also { dup ->
-                    dup.setDoubleSided(true)
-                    rec.procMaterialInstance = dup
-                    // The copy samples the source's textures. A texture
-                    // upsert destroys the old texture, so the copy has
-                    // to be rebound with the source's other consumers.
-                    for ((_, list) in textureConsumers) {
-                        val params = list.filter { it.first === shared }
-                            .map { it.second }
-                        for (param in params) list.add(Pair(dup, param))
+
+            val unskinnedBase: MeshFactory.MeshData =
+                if (base.hasSkinning || base.morph != null) {
+                    MeshFactory.bakeInstances(base, listOf(identity16()), null)
+                } else {
+                    base
+                }
+            val gm: GpuMesh = when {
+                geoKey != null && !base.hasSkinning && base.morph == null ->
+                    gpuMesh(geoKey) ?: return
+                else -> buildGpuMesh(unskinnedBase).also { rec.procGpuMesh = it }
+            }
+            val unionBounds = unionInstanceBounds(gm.bounds, transforms)
+            // Collider positions/indices are expanded lazily on demand in
+            // ensureInstanceColliderGeometry so pure rendering avoids CPU
+            // vertex expansion across 10k+ instances.
+            rec.lastGeoPositions = null
+            rec.lastGeoIndices = null
+            rec.instanceBasePositions = gm.positions
+            rec.instanceBaseIndices = gm.indices
+            rec.instanceTransforms = transforms
+            rec.lastGeoBounds = unionBounds
+
+            val maxInst = host.engine.maxAutomaticInstances
+                .coerceIn(1, MaterialPackages.MAX_INSTANCES)
+            val posIndices = ArrayList<Int>(transforms.size)
+            val negIndices = ArrayList<Int>()
+            val bakedIndices = ArrayList<Int>()
+            for (i in transforms.indices) {
+                val m = transforms[i]
+                if (!isConformalInvertible3x3(m)) {
+                    bakedIndices.add(i)
+                } else if (det3x3(m) < 0f) {
+                    negIndices.add(i)
+                } else {
+                    posIndices.add(i)
+                }
+            }
+            val chunks = ArrayList<Pair<List<Int>, Boolean>>()
+            var off = 0
+            while (off < posIndices.size) {
+                val end = minOf(off + maxInst, posIndices.size)
+                chunks.add(Pair(posIndices.subList(off, end), false))
+                off = end
+            }
+            off = 0
+            while (off < negIndices.size) {
+                val end = minOf(off + maxInst, negIndices.size)
+                chunks.add(Pair(negIndices.subList(off, end), true))
+                off = end
+            }
+
+            val ident = identity16()
+            val needsDupMat = doubleSided || colors != null
+            var nextSlotIdx = 0
+            for ((chunkIdx, pair) in chunks.withIndex()) {
+                val (indices, negDet) = pair
+                val count = indices.size
+                val flatTransforms = FloatArray(count * 16)
+                for ((slot, srcIdx) in indices.withIndex()) {
+                    System.arraycopy(
+                        transforms[srcIdx], 0, flatTransforms, slot * 16, 16)
+                }
+                val ib = InstanceBuffer.Builder(count)
+                    .fenced { build(host.engine) }
+                ib.setLocalTransforms(flatTransforms, count, 0)
+                rec.instanceBuffers.add(ib)
+
+                val entity = if (nextSlotIdx == 0) {
+                    rec.entity
+                } else {
+                    val ie = em.create()
+                    tcm.create(ie, 0, ident)
+                    tcm.setParent(
+                        tcm.getInstance(ie), tcm.getInstance(rec.entity))
+                    rec.instanceEntities.add(ie)
+                    ie
+                }
+                nextSlotIdx++
+
+                val colorFloats: FloatArray? = if (colors != null) {
+                    FloatArray(MaterialPackages.MAX_INSTANCES * 4) { 1f }.also { cf ->
+                        for ((slot, srcIdx) in indices.withIndex()) {
+                            val c = colors.getOrNull(srcIdx)
+                            if (c != null && c.size >= 4) {
+                                cf[slot * 4] = c[0]
+                                cf[slot * 4 + 1] = c[1]
+                                cf[slot * 4 + 2] = c[2]
+                                cf[slot * 4 + 3] = c[3]
+                            }
+                        }
                     }
+                } else null
+                rec.instanceChunkColors.add(colorFloats)
+
+                val chunkMat = if (needsDupMat) {
+                    MaterialInstance.duplicate(
+                        shared, "d3inst_${key}_$chunkIdx"
+                    ).also { dup ->
+                        if (doubleSided) dup.setDoubleSided(true)
+                        if (colorFloats != null) {
+                            dup.setParameter("useInstanceColors", 1f)
+                            dup.setParameter(
+                                "instanceColors",
+                                MaterialInstance.FloatElement.FLOAT4,
+                                colorFloats, 0,
+                                MaterialPackages.MAX_INSTANCES)
+                        }
+                        rec.instanceMaterialInstances.add(dup)
+                        for ((_, list) in textureConsumers) {
+                            val params = list.filter { it.first === shared }
+                                .map { it.second }
+                            for (param in params) list.add(Pair(dup, param))
+                        }
+                    }
+                } else {
+                    matKey?.let {
+                        materialConsumers.getOrPut(it) { ArrayList() }
+                            .add(Pair(entity, 0))
+                    }
+                    shared
                 }
-            } else shared
-            // The snapshot duplicate must not be a shared-material
-            // consumer: upsertMaterial would rebind slot 0 to the fresh
-            // single-sided instance and silently restore back-face
-            // culling. (It stays a snapshot, per the contract doc.)
-            if (!doubleSided) {
-                matKey?.let {
-                    materialConsumers.getOrPut(it) { ArrayList() }
-                        .add(Pair(rec.entity, 0))
+
+                val vertexBuf = if (negDet) {
+                    reflectedVertexBuffer(unskinnedBase, rec)
+                } else {
+                    gm.vertexBuffer
+                }
+                val indexBuf = if (negDet) {
+                    reversedIndexBuffer(gm, rec)
+                } else {
+                    gm.indexBuffer
+                }
+                val chunkTransforms = indices.map { transforms[it] }
+                val cb = unionInstanceBounds(gm.bounds, chunkTransforms)
+                RenderableManager.Builder(1)
+                    .instances(count, ib)
+                    .boundingBox(Box(cb[0], cb[1], cb[2],
+                        cb[3], cb[4], cb[5]))
+                    .layerMask(0xFF, rec.layers and 0xFF)
+                    .castShadows(true)
+                    .receiveShadows(true)
+                    .geometry(0, gm.primitiveType, vertexBuf, indexBuf)
+                    .material(0, chunkMat)
+                    .fenced { build(host.engine, entity) }
+            }
+
+            if (bakedIndices.isNotEmpty()) {
+                val bakedTransforms = bakedIndices.map { transforms[it] }
+                val bakedColors = colors?.let { cs ->
+                    bakedIndices.map { cs.getOrElse(it) { floatArrayOf(1f, 1f, 1f, 1f) } }
+                }
+                val bakedMd = MeshFactory.bakeInstances(
+                    unskinnedBase, bakedTransforms, bakedColors)
+                if (bakedMd.vertexCount > 0) {
+                    val bakedGm = buildGpuMesh(bakedMd)
+                    rec.instanceBakedGpuMesh = bakedGm
+                    val entity = if (nextSlotIdx == 0) {
+                        rec.entity
+                    } else {
+                        val ie = em.create()
+                        tcm.create(ie, 0, ident)
+                        tcm.setParent(
+                            tcm.getInstance(ie), tcm.getInstance(rec.entity))
+                        rec.instanceEntities.add(ie)
+                        ie
+                    }
+                    nextSlotIdx++
+                    rec.instanceChunkColors.add(null)
+                    val bakedMat = if (doubleSided) {
+                        MaterialInstance.duplicate(
+                            shared, "d3inst_${key}_baked"
+                        ).also { dup ->
+                            dup.setDoubleSided(true)
+                            rec.instanceMaterialInstances.add(dup)
+                            for ((_, list) in textureConsumers) {
+                                val params = list.filter { it.first === shared }
+                                    .map { it.second }
+                                for (param in params) list.add(Pair(dup, param))
+                            }
+                        }
+                    } else {
+                        matKey?.let {
+                            materialConsumers.getOrPut(it) { ArrayList() }
+                                .add(Pair(entity, 0))
+                        }
+                        shared
+                    }
+                    val b = bakedGm.bounds
+                    RenderableManager.Builder(1)
+                        .boundingBox(Box(b[0], b[1], b[2], b[3], b[4], b[5]))
+                        .layerMask(0xFF, rec.layers and 0xFF)
+                        .castShadows(true)
+                        .receiveShadows(true)
+                        .geometry(0, bakedGm.primitiveType,
+                            bakedGm.vertexBuffer, bakedGm.indexBuffer)
+                        .material(0, bakedMat)
+                        .fenced { build(host.engine, entity) }
                 }
             }
-            RenderableManager.Builder(1)
-                .boundingBox(Box(gm.bounds[0], gm.bounds[1], gm.bounds[2],
-                    gm.bounds[3], gm.bounds[4], gm.bounds[5]))
-                .layerMask(0xFF, rec.layers and 0xFF)
-                .castShadows(true)
-                .receiveShadows(true)
-                .geometry(0, gm.primitiveType, gm.vertexBuffer,
-                    gm.indexBuffer)
-                .material(0, inst)
-                .fenced { build(host.engine, rec.entity) }
-            if (billboard) {
-                val centers = FloatArray(transforms.size * 3)
-                for ((i, m) in transforms.withIndex()) {
-                    centers[i * 3] = m[12]
-                    centers[i * 3 + 1] = m[13]
-                    centers[i * 3 + 2] = m[14]
-                }
-                host.cameraFacing[key] = FacingSpec.billboards(
-                    centers, s[0].toFloat(), s[1].toFloat(), rotation,
-                    colors, gm.vertexBuffer, rec.entity, facing)
-            }
+            Log.i(TAG, "d3:instances node $key: realized ${transforms.size} instance(s) in ${chunks.size} InstanceBuffer chunk(s)" +
+                if (bakedIndices.isNotEmpty()) " + ${bakedIndices.size} baked non-conformal" else "")
         }
 
         private fun decodeMaterial(key: Long, r: JSONObject) {
@@ -2152,7 +2657,7 @@ object FsceneRealizer {
             }
             val rm = host.engine.renderableManager
             if (rm.hasComponent(rec.entity)) rm.destroy(rec.entity)
-            host.scene.removeEntity(rec.entity)
+            host.scene.remove(rec.entity)
             for ((_, list) in materialConsumers) {
                 list.removeAll { it.first == rec.entity }
             }
@@ -2214,8 +2719,7 @@ object FsceneRealizer {
         private fun decodeNode(key: Long, spec: JSONObject): NodeRec {
             val entity = em.create()
             val trs = decodeTrs(spec.optJSONObject("transform"))
-            tcm.setTransform(
-                tcm.create(entity), D3Wire.trs(trs[0], trs[1], trs[2]))
+            tcm.create(entity, 0, D3Wire.trs(trs[0], trs[1], trs[2]))
             val rec = NodeRec(
                 entity, null,
                 trs[0], trs[1], trs[2],
@@ -2309,6 +2813,9 @@ object FsceneRealizer {
             val lm = host.engine.lightManager
             if (rm.hasComponent(rec.entity) || lm.hasComponent(rec.entity)) {
                 host.scene.addEntity(rec.entity)
+            }
+            for (ie in rec.instanceEntities) {
+                if (rm.hasComponent(ie)) host.scene.addEntity(ie)
             }
         }
 
@@ -2687,7 +3194,7 @@ object FsceneRealizer {
             // Identity world transform — the entity is unparented.
             val ident = FloatArray(16)
             Matrix.setIdentityM(ident, 0)
-            tcm.setTransform(tcm.create(entity), ident)
+            tcm.create(entity, 0, ident)
             // Upstream curve `{keys:[{t,v}]}`, gradient
             // `{stops:[{t,color}]}` — decoded to flat (t,v) /
             // (t,r,g,b,a) tuples.
@@ -2802,7 +3309,7 @@ object FsceneRealizer {
             if (lod.suspended) return
             if (idx < 0) {
                 if (lod.bound >= 0) {
-                    host.scene.removeEntity(rec.entity)
+                    host.scene.remove(rec.entity)
                     lod.boundMatKey?.let { mk ->
                         materialConsumers[mk]?.removeAll {
                             it.first == rec.entity
@@ -2893,7 +3400,7 @@ object FsceneRealizer {
         fun destroyTrailLod(rec: NodeRec) {
             val rm = host.engine.renderableManager
             rec.trail?.let { tr ->
-                host.scene.removeEntity(tr.entity)
+                host.scene.remove(tr.entity)
                 if (rm.hasComponent(tr.entity)) rm.destroy(tr.entity)
                 host.engine.destroyEntity(tr.entity)
                 em.destroy(tr.entity)
@@ -3154,7 +3661,7 @@ object FsceneRealizer {
                 host.scene.addEntity(tr.entity)
                 tr.inScene = true
             } else if (!want && tr.inScene) {
-                host.scene.removeEntity(tr.entity)
+                host.scene.remove(tr.entity)
                 tr.inScene = false
             }
         }
@@ -3729,8 +4236,8 @@ object FsceneRealizer {
                     .intensityCandela(intensityCandela)
                     .falloff(range)
                     .fenced { build(host.engine, child) }
-                tcm.setTransform(
-                    tcm.create(child),
+                tcm.create(
+                    child, 0,
                     D3Wire.trs(
                         floatArrayOf(sx * w / 2f, sy * h / 2f, 0f),
                         identQ, unitS))
@@ -3846,8 +4353,17 @@ object FsceneRealizer {
                     ?.let { materials[it] }
             }
             // getMaterialInstanceAt wraps the native instance fresh per
-            // call — compare native pointers, not Kotlin identity.
-            val current = rm.getMaterialInstanceAt(ri, b.primitive)
+            // call — compare native pointers, not Kotlin identity. On a
+            // d3:instances node with per-chunk material duplicates,
+            // consult rec.instanceBaseMaterial so the private duplicate
+            // isn't misread as a foreign rebase write.
+            val current = if (rec.instancesProps != null && b.primitive == 0 &&
+                rec.instanceMaterialInstances.isNotEmpty() &&
+                rec.instanceBaseMaterial != null) {
+                rec.instanceBaseMaterial
+            } else {
+                rm.getMaterialInstanceAt(ri, b.primitive)
+            }
             val cur = current?.getNativeObject() ?: 0L
             val variantPtrs = b.materialsByVariant.values
                 .mapNotNullTo(HashSet()) { materials[it]?.getNativeObject() }
@@ -3867,7 +4383,7 @@ object FsceneRealizer {
                         target.getNativeObject() ==
                             (materials[variantKey]?.getNativeObject()
                                 ?: -1L)) "variant" else "current"))
-            rm.setMaterialInstanceAt(ri, b.primitive, target)
+            applyMaterialToNode(b.nodeKey, rec, b.primitive, target)
             b.applied = target
             b.resolved = true
         }
@@ -4300,8 +4816,50 @@ object FsceneRealizer {
             return shapeOf(settings, onError)
         }
 
+        private fun ensureInstanceColliderGeometry(rec: NodeRec) {
+            if (rec.lastGeoPositions != null && rec.lastGeoIndices != null) return
+            val basePos = rec.instanceBasePositions ?: return
+            val baseIdx = rec.instanceBaseIndices ?: return
+            val transforms = rec.instanceTransforms ?: return
+            val vertCount = basePos.size / 3
+            val triCount = baseIdx.size / 3
+            val outPos = FloatArray(transforms.size * basePos.size)
+            val outIdx = IntArray(transforms.size * baseIdx.size)
+            for ((inst, m) in transforms.withIndex()) {
+                val pOff = inst * basePos.size
+                for (v in 0 until vertCount) {
+                    val px = basePos[v * 3]
+                    val py = basePos[v * 3 + 1]
+                    val pz = basePos[v * 3 + 2]
+                    outPos[pOff + v * 3] = m[0] * px + m[4] * py + m[8] * pz + m[12]
+                    outPos[pOff + v * 3 + 1] = m[1] * px + m[5] * py + m[9] * pz + m[13]
+                    outPos[pOff + v * 3 + 2] = m[2] * px + m[6] * py + m[10] * pz + m[14]
+                }
+                val iOff = inst * baseIdx.size
+                val vBase = inst * vertCount
+                val flip = det3x3(m) < 0f
+                for (t in 0 until triCount) {
+                    val b = t * 3
+                    val i0 = baseIdx[b] + vBase
+                    val i1 = baseIdx[b + 1] + vBase
+                    val i2 = baseIdx[b + 2] + vBase
+                    outIdx[iOff + b] = i0
+                    if (flip) {
+                        outIdx[iOff + b + 1] = i2
+                        outIdx[iOff + b + 2] = i1
+                    } else {
+                        outIdx[iOff + b + 1] = i1
+                        outIdx[iOff + b + 2] = i2
+                    }
+                }
+            }
+            rec.lastGeoPositions = outPos
+            rec.lastGeoIndices = outIdx
+        }
+
         /** MeshShape from the node's realized geometry (static bodies only). */
         private fun NativeScope.meshShape(rec: NodeRec, kind: String): ConstShape? {
+            ensureInstanceColliderGeometry(rec)
             val pos = rec.lastGeoPositions
             val idx = rec.lastGeoIndices
             if (pos == null || idx == null) {
@@ -4395,8 +4953,10 @@ object FsceneRealizer {
             return Pair(d[0], d[1])
         }
 
-        private fun hullPositions(rec: NodeRec): FloatArray? =
-            rec.lastGeoPositions
+        private fun hullPositions(rec: NodeRec): FloatArray? {
+            ensureInstanceColliderGeometry(rec)
+            return rec.lastGeoPositions
+        }
 
         private fun NativeScope.boundingBoxShape(
             rec: NodeRec, density: Float,
@@ -4598,6 +5158,12 @@ object FsceneRealizer {
                     rm.setLayerMask(rm.getInstance(rec.entity),
                         0xFF, rec.layers and 0xFF)
                 }
+                for (ie in rec.instanceEntities) {
+                    if (rm.hasComponent(ie)) {
+                        rm.setLayerMask(rm.getInstance(ie),
+                            0xFF, rec.layers and 0xFF)
+                    }
+                }
                 // W18: runtime-owned entities track the node's layers.
                 for (rt in rec.particleRuntimes) rt.applyLayers(rec.layers)
             }
@@ -4795,7 +5361,10 @@ object FsceneRealizer {
             for ((k, rec) in nodes) {
                 if (k != key && !isDescendantOf(k, key)) continue
                 if (isHidden(k)) {
-                    host.scene.removeEntity(rec.entity)
+                    host.scene.remove(rec.entity)
+                    for (ie in rec.instanceEntities) {
+                        host.scene.remove(ie)
+                    }
                     for (rt in rec.particleRuntimes) {
                         rt.setSceneVisible(false)
                     }
@@ -4826,7 +5395,7 @@ object FsceneRealizer {
             val lm = host.engine.lightManager
             if (rm.hasComponent(entity)) rm.destroy(entity)
             if (lm.hasComponent(entity)) lm.destroy(entity)
-            host.scene.removeEntity(entity)
+            host.scene.remove(entity)
             for ((_, list) in materialConsumers) {
                 list.removeAll { it.first == entity }
             }
@@ -4843,21 +5412,11 @@ object FsceneRealizer {
             rec.lastGeoBounds = null
             rec.meshProps = null
             rec.meshPrimGeoKeys = null
-            // W26: the camera-facing re-expansion registration and the
-            // component-owned mesh buffers die with the component
-            // list.
-            host.cameraFacing.remove(key)
-            rec.procGpuMesh?.let {
-                it.destroy(host.engine)
-                rec.procGpuMesh = null
-            }
-            rec.procMaterialInstance?.let { dup ->
-                for ((_, list) in textureConsumers) {
-                    list.removeAll { it.first === dup }
-                }
-                host.engine.destroyMaterialInstance(dup)
-                rec.procMaterialInstance = null
-            }
+            // W26/E1: camera-facing registration, private mesh/index
+            // buffers, GPU InstanceBuffers, extra chunk entities, and
+            // per-chunk MaterialInstance duplicates die with the
+            // component list.
+            destroyProcRenderable(key, rec)
             rec.instancesProps = null
             if (rec.isCamera) {
                 rec.isCamera = false
@@ -4881,7 +5440,7 @@ object FsceneRealizer {
             particleRuntimes.remove(key)?.forEach { it.destroy() }
             rec.particleRuntimes.clear()
             for (child in rec.lightEntities) {
-                host.scene.removeEntity(child)
+                host.scene.remove(child)
                 host.engine.destroyEntity(child)
                 em.destroy(child)
             }

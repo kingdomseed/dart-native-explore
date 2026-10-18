@@ -1,0 +1,78 @@
+--------- beginning of main
+10-18 20:11:12.829 24372 24372 I dart3d  : perf n=142 fps=70.9 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=14.0 p95=16.4 | backend p50=13.9 p95=15.4 | sim p50=0.3 p95=0.4 (physics p50=0.1 p95=0.1) | submit p50=2.2 p95=2.8 | skipped=38/180 physics=120/s
+10-18 20:11:14.828 24372 24372 I dart3d  : perf n=177 fps=88.3 frame p50=11.1 p95=11.1 max=22.3 ms | gpu p50=11.2 p95=12.5 | backend p50=10.5 p95=12.5 | sim p50=0.1 p95=0.2 (physics p50=0.0 p95=0.1) | submit p50=0.4 p95=0.8 | skipped=3/180 physics=120/s
+10-18 20:11:17.070 24617 24617 I dart3d  : start +86ms plugin registered
+10-18 20:11:17.071 24617 24617 I dart3d  : dart3d provider registered (disposeView=true)
+10-18 20:11:17.109 24617 24617 I dart3d  : GPU: Mali-G610 MC4
+10-18 20:11:17.262 24617 24617 I dart3d  : Dart3dSetDispatcher: slot armed
+10-18 20:11:17.262 24617 24617 I dart3d  : Dart3dSetBackend: 2
+10-18 20:11:17.300 24617 24617 I Filament: FEngine (64 bits) created at 0xb400007309289210 (threading is enabled)
+10-18 20:11:17.302 24617 24720 I Filament: FEngine resolved backend: Vulkan
+10-18 20:11:17.304 24617 24720 I Filament: Vulkan device driver: Mali-G610 MC4 v1.r38p1-01eac0.ce623b7dd8f8f92ae690a9a38057e2b5
+10-18 20:11:17.304 24617 24720 I Filament: Selected physical device 'Mali-G610 MC4' from 1 physical devices. (vendor 0x13b5, device 0xa8670000, driver 0x9801000, api 1.3)
+10-18 20:11:17.313 24617 24617 I Filament: Backend feature level: 3
+10-18 20:11:17.314 24617 24617 I Filament: FEngine feature level: 1
+10-18 20:11:17.317 24617 24617 I dart3d  : Filament engine backend: VULKAN (pref=2, tier=STANDARD)
+10-18 20:11:17.317 24617 24617 I dart3d  : start +333ms engine created
+10-18 20:11:17.335 24617 24617 I dart3d  : start +351ms base materials loaded
+10-18 20:11:17.361 24617 24617 I dart3d  : perf view: backend=VULKAN viewport=0x0 msaa=0 aa=FXAA post=true hdr=HIGH bloom=false(levels=6 res=384 q=LOW) ssao=false taa=false ssr=false dsr=false(0.5..1.0) dither=TEMPORAL quality=default physics=60Hzx8 entities=0 bodies=0
+10-18 20:11:17.361 24617 24617 I dart3d  : protocol hello: Dart v1.0
+10-18 20:11:17.362 24617 24617 I dart3d  : antialiasingMode=4 → MSAA enabled=true sampleCount=4 aa=FXAA
+10-18 20:11:17.362 24617 24617 I dart3d  : quality=default → shadows=true aaSrc=4 tier=STANDARD shadowType=DPCF
+10-18 20:11:17.386 24617 24617 I dart3d  : d3:instances node -7567520135448100835: transforms unresolved
+10-18 20:11:17.387 24617 24617 I dart3d  : d3:instances node -7567520135448100834: 'billboard' overrides shape/geometry
+10-18 20:11:17.388 24617 24617 I dart3d  : d3:instances node -7567520135448100834: realized 64 billboard instance(s)
+10-18 20:11:17.389 24617 24617 I dart3d  : shadow options: mapSize=1024 cascades=0 far=0.0 contactDist=0.0 contact=false bias=0.01 normalBias=0.005 bulbRadius=3.0
+10-18 20:11:17.390 24617 24617 I dart3d  : node -7567520135448100863: body=none pos=(-6.0,0.8,-0.0)
+10-18 20:11:17.390 24617 24617 I dart3d  : node -7567520135448100861: body=none pos=(-4.0,0.8,-0.0)
+10-18 20:11:17.390 24617 24617 I dart3d  : node -7567520135448100859: body=none pos=(-2.0,1.0,-0.0)
+10-18 20:11:17.390 24617 24617 I dart3d  : node -7567520135448100857: body=none pos=(0.0,0.8,-0.0)
+10-18 20:11:17.390 24617 24617 I dart3d  : node -7567520135448100855: body=none pos=(2.0,0.8,-0.0)
+10-18 20:11:17.390 24617 24617 I dart3d  : node -7567520135448100853: body=none pos=(4.0,0.8,-0.0)
+10-18 20:11:17.390 24617 24617 I dart3d  : node -7567520135448100851: body=none pos=(6.0,0.6,-0.0)
+10-18 20:11:17.390 24617 24617 I dart3d  : node -7567520135448100849: body=none pos=(0.0,-0.02,-0.0)
+10-18 20:11:17.390 24617 24617 I dart3d  : node -7567520135448100847: body=none pos=(0.0,0.0,-0.0)
+10-18 20:11:17.390 24617 24617 I dart3d  : node -7567520135448100845: body=none pos=(0.0,-0.15,0.9)
+10-18 20:11:17.390 24617 24617 I dart3d  : node -7567520135448100843: body=none pos=(1.6,0.0,2.5)
+10-18 20:11:17.390 24617 24617 I dart3d  : node -7567520135448100841: body=none pos=(5.4,0.0,2.5)
+10-18 20:11:17.390 24617 24617 I dart3d  : node -7567520135448100839: body=none pos=(7.4,0.9,2.5)
+10-18 20:11:17.390 24617 24617 I dart3d  : node -7567520135448100835: body=none pos=(0.0,0.0,-0.0)
+10-18 20:11:17.390 24617 24617 I dart3d  : node -7567520135448100834: body=none pos=(0.0,0.0,-0.0)
+10-18 20:11:17.390 24617 24617 I dart3d  : node -7567520135448100831: body=none pos=(0.518198,-0.20430481,-0.023492336)
+10-18 20:11:17.390 24617 24617 I dart3d  : node -7567520135448100830: body=none pos=(-29.85276,24.189543,44.94889)
+10-18 20:11:17.390 24617 24617 I dart3d  : node -7567520135448100829: body=none pos=(0.0,0.0,-0.0)
+10-18 20:11:17.432 24617 24617 I dart3d  : environment -7567520135448100828: 256×128 equirect → 256² cube + SH3 in 22ms
+10-18 20:11:17.432 24617 24617 I dart3d  : applySkybox: sb=true textures=0
+10-18 20:11:17.433 24617 24617 I dart3d  : applyEnvironment: il=true textures=3
+10-18 20:11:17.435 24617 24617 I dart3d  : start +451ms scene installed
+10-18 20:11:17.436 24617 24617 I dart3d  : views applied: 0 entries (0 screen, 0 rts)
+10-18 20:11:17.436 24617 24617 I dart3d  : realize: 74ms
+10-18 20:11:19.345 24617 24617 I dart3d  : d3:instances node -7567520135448100835: realized 10000 instance(s) in 0 InstanceBuffer chunk(s) + 10000 baked non-conformal
+--------- beginning of crash
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: FATAL EXCEPTION: main
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: Process: com.jasonholtdigital.dart3d_example, PID: 24617
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: java.lang.OutOfMemoryError: Failed to allocate a 9600019 byte allocation with 5466336 free bytes and 5338KB until OOM, target footprint 268435456, growth limit 268435456
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at dalvik.system.VMRuntime.newNonMovableArray(Native Method)
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at java.nio.DirectByteBuffer$MemoryRef.<init>(DirectByteBuffer.java:72)
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at java.nio.ByteBuffer.allocateDirect(ByteBuffer.java:347)
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at n1.i1.w(SourceFile:9)
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at B.j.l(SourceFile:52)
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at n1.i1.b(SourceFile:1108)
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at n1.k0.p(SourceFile:3421)
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at n1.k0.U(SourceFile:108)
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at n1.P.a(SourceFile:1412)
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at n1.w.invoke(SourceFile:8)
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at n1.M.doFrame(SourceFile:3742)
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at android.view.Choreographer$CallbackRecord.run(Choreographer.java:1870)
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at android.view.Choreographer$CallbackRecord.run(Choreographer.java:1881)
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at android.view.Choreographer.doCallbacks(Choreographer.java:1427)
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at android.view.Choreographer.doFrame(Choreographer.java:1305)
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at android.view.Choreographer$FrameDisplayEventReceiver.run(Choreographer.java:1848)
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:995)
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:103)
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at android.os.Looper.loopOnce(Looper.java:283)
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:392)
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at android.app.ActivityThread.main(ActivityThread.java:9231)
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:633)
+10-18 20:11:22.698 24617 24617 E AndroidRuntime: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1026)

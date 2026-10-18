@@ -2,6 +2,7 @@ package com.jasonholtdigital.dart3d
 
 import android.os.Handler
 import android.os.Looper
+import com.google.android.filament.filamat.MaterialBuilder
 
 /**
  * Kotlin face of the dart3d_jni shim (cpp/dart3d_jni.cpp): the stored
@@ -38,6 +39,18 @@ object Dart3dJni {
      */
     @JvmStatic
     external fun nativeFrameInfoHistory(nativeRenderer: Long, out: LongArray): Int
+
+    /**
+     * Enables or disables `filamat::MaterialBuilder::instanced(bool)`
+     * (`MATERIAL_HAS_INSTANCES`), which `filamat-android`'s Java wrapper
+     * omits. Enables hybrid GPU instancing with `InstanceBuffer` and
+     * exposes `getInstanceIndex()` in shaders.
+     */
+    @JvmStatic
+    external fun nativeMaterialBuilderInstanced(
+        builder: MaterialBuilder,
+        enabled: Boolean,
+    )
 
     /**
      * Fires one event frame through the plugin slot. The dispatcher

@@ -46,6 +46,12 @@ internal object MaterialPackages {
 
     private const val TAG = "dart3d"
 
+    /**
+     * Filament's hard per-renderable `InstanceBuffer` ceiling
+     * (`CONFIG_MAX_INSTANCES = 64`, `Engine.getMaxAutomaticInstances`).
+     */
+    const val MAX_INSTANCES = 64
+
     /** Variant packages kept in the process LRU (~100–300 KiB each). */
     private const val MAX_VARIANT_PACKAGES = 12
 
@@ -624,6 +630,10 @@ internal object MaterialPackages {
             // every instance is reset to single-sided at decode unless the
             // resource opts in (glTF/SceneKit default).
             .doubleSided(true)
+            // D3 GPU instancing: hybrid instancing with InstanceBuffer
+            // exposes `getInstanceIndex()` (0..63) in shaders while
+            // Filament transforms positions and normals per instance.
+            .instanced(true)
             .blending(blending)
             // Filament's MaterialBuilder defaults flipUV to TRUE (the
             // vertex shader rewrites v → 1 − v). Wire UVs are glTF
@@ -654,10 +664,10 @@ internal object MaterialPackages {
         // either channel per texture.
         b.require(MaterialBuilder.VertexAttribute.UV0)
             .require(MaterialBuilder.VertexAttribute.UV1)
-            // W26: COLOR rides every wire vertex record (white when
-            // absent upstream); instances bake per-instance colors
-            // into it. Meshes lacking the attribute read Filament's
-            // vec4(1) default, so baseColor stays unchanged there.
+            // W26 + D3: COLOR rides every wire vertex record (white when
+            // absent upstream); GPU-instanced `d3:instances` multiply by
+            // `instanceColors[getInstanceIndex()]` when `useInstanceColors`
+            // is enabled on the chunk's MaterialInstance.
             .require(MaterialBuilder.VertexAttribute.COLOR)
             .uniformParameter(MaterialBuilder.UniformType.FLOAT4, "baseColor")
             .uniformParameter(MaterialBuilder.UniformType.FLOAT4,
@@ -666,6 +676,13 @@ internal object MaterialPackages {
                 "baseColorUVRotation")
             .uniformParameter(MaterialBuilder.UniformType.FLOAT,
                 "baseColorUVSet")
+            .uniformParameterArray(
+                MaterialBuilder.UniformType.FLOAT4,
+                MAX_INSTANCES,
+                "instanceColors",
+            )
+            .uniformParameter(MaterialBuilder.UniformType.FLOAT,
+                "useInstanceColors")
         // W22-r3: one declared sampler per *bound* texture slot —
         // Filament's FL1 cap counts declarations, so an extension
         // flag must not cost the slots the material leaves unbound.
@@ -780,14 +797,17 @@ internal object MaterialPackages {
             .append("void material(inout MaterialInputs material) {\n")
             .append("    vec2 uv0 = getUV0();\n")
             .append("    vec2 uv1 = getUV1();\n")
+            .append("    vec4 instColor = materialParams.useInstanceColors > 0.5\n" +
+                "        ? materialParams.instanceColors[getInstanceIndex()]\n" +
+                "        : vec4(1.0);\n")
         if (slotBound(0)) {
             body.append(uvBlock("baseColor"))
                 .append("    material.baseColor = materialParams.baseColor" +
                     " * texture(materialParams_baseColorMap, baseColorUv)" +
-                    " * getColor();\n")
+                    " * getColor() * instColor;\n")
         } else {
             body.append("    material.baseColor = materialParams" +
-                ".baseColor * getColor();\n")
+                ".baseColor * getColor() * instColor;\n")
         }
         if (unlit) body.append(UNLIT_EXPOSURE)
         if (!unlit) {

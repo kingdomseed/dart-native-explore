@@ -478,6 +478,26 @@ class MeshFactoryTest {
     }
 
     @Test
+    fun `reflectedTangentCopy negates tangent and normal and flips handedness`() {
+        val base = MeshFactory.cuboid(1f, 1f, 1f)
+        val refl = MeshFactory.reflectedTangentCopy(base)
+        for (v in 0 until base.vertexCount) {
+            val r0 = record(base, v)
+            val off = v * base.vertexStrideBytes
+            val r1 = FloatArray(MeshFactory.FLOATS_PER_VERTEX) {
+                refl.getFloat(off + it * 4)
+            }
+            val n0 = normalOf(r0)
+            val n1 = normalOf(r1)
+            assertEquals(-n0[0], n1[0], 1e-4f)
+            assertEquals(-n0[1], n1[1], 1e-4f)
+            assertEquals(-n0[2], n1[2], 1e-4f)
+            // Handedness sign (w) flips under reflection.
+            assertTrue(r0[6] * r1[6] < 0f)
+        }
+    }
+
+    @Test
     fun `degenerate dash patterns render solid instead of looping`() {
         val pts = listOf(MeshFactory.V3(0f, 0f, 0f), MeshFactory.V3(10f, 0f, 0f))
         val view = MeshFactory.V3(0f, 0f, 1f)

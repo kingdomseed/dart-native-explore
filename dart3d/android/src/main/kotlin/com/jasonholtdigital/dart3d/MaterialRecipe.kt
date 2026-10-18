@@ -41,6 +41,8 @@ internal class MaterialRecipe {
         step("culling $v") { it.culling(v) }
     fun doubleSided(v: Boolean) =
         step("doubleSided $v") { it.doubleSided(v) }
+    fun instanced(v: Boolean) =
+        step("instanced $v") { Dart3dJni.nativeMaterialBuilderInstanced(it, v) }
     fun depthWrite(v: Boolean) = step("depthWrite $v") { it.depthWrite(v) }
     fun shadowMultiplier(v: Boolean) =
         step("shadowMultiplier $v") { it.shadowMultiplier(v) }
@@ -59,6 +61,13 @@ internal class MaterialRecipe {
         step("variable $v $name") { it.variable(v, name) }
     fun uniformParameter(type: MaterialBuilder.UniformType, name: String) =
         step("uniform $type $name") { it.uniformParameter(type, name) }
+    fun uniformParameterArray(
+        type: MaterialBuilder.UniformType,
+        size: Int,
+        name: String,
+    ) = step("uniformArray $type $size $name") {
+        it.uniformParameterArray(type, size, name)
+    }
     fun samplerParameter(
         type: MaterialBuilder.SamplerType,
         format: MaterialBuilder.SamplerFormat,

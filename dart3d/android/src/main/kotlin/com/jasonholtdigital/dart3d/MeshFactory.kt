@@ -1588,6 +1588,46 @@ object MeshFactory {
     // MARK: - Instance baking (W26 `d3:instances`)
 
     /**
+     * Returns a copy of [base]'s vertex buffer with every vertex's tangent
+     * quaternion transformed to `(-t, -b, -n)`. Filament's [InstanceBuffer]
+     * transforms normals and tangents by `cofactor(M) = det(M) * M^-T`,
+     * which flips their sign when `det(M) < 0` (mirrored instances);
+     * negating `t` and `n` in the vertex stream cancels the negative
+     * determinant sign so `cofactor(M) * (-n) = |det(M)| * M^-T * n`
+     * points outward, and negating `b` flips the encoded bitangent sign `w`
+     * (`(t' x b') . n' = -(t x b) . n`).
+     */
+    fun reflectedTangentCopy(base: MeshData): ByteBuffer {
+        val src = base.vertices
+        val stride = base.vertexStrideBytes
+        val out = ByteBuffer.allocateDirect(base.vertexCount * stride)
+            .order(ByteOrder.nativeOrder())
+        src.rewind()
+        out.put(src)
+        src.rewind()
+        val frame = FloatArray(9)
+        for (vi in 0 until base.vertexCount) {
+            val off = vi * stride
+            val qx = src.getFloat(off + 12)
+            val qy = src.getFloat(off + 16)
+            val qz = src.getFloat(off + 20)
+            val qw = src.getFloat(off + 24)
+            unpackTangentFrame(qx, qy, qz, qw, frame)
+            val q = packTangentFrame(
+                -frame[0], -frame[1], -frame[2],
+                -frame[3], -frame[4], -frame[5],
+                -frame[6], -frame[7], -frame[8],
+            )
+            out.putFloat(off + 12, q[0])
+            out.putFloat(off + 16, q[1])
+            out.putFloat(off + 20, q[2])
+            out.putFloat(off + 24, q[3])
+        }
+        out.rewind()
+        return out
+    }
+
+    /**
      * Bakes `matrices.size` transformed copies of [base] into one
      * vertex buffer — the Android `d3:instances` realization.
      * Filament 1.71.6's Java binding exposes

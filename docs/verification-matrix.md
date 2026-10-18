@@ -506,6 +506,26 @@ and all per-platform lighting/stage stopgaps (`kIosDirectionalScale`,
 | Dice tray felt + rim | pass — deep indigo felt `(0, 2, 31)`, saturated lime/pink rim `(199, 217, 95)` / `(255, 96, 177)` (`img/ios-dice.jpg`, `img/pair-dice2.jpg`) | pass — felt `(4, 5, 34)`, rim `(199, 221, 96)` / `(255, 97, 179)`, 49.6 fps racked / 50.0 fps rolling on Vulkan (`img/a142-vulkan-dice.jpg`) |
 | T2 smoke + harness (A142 Vulkan + GL, Fire KFTUWI, Wacom DTHA116, iOS sim) | pass — hero, dice, and harness through `w18 lane complete` (incl. `w24` split-screen views and `w25` dice settle), 0 fatal/error lines (`logs/ios-harness.log`) | pass — A142 Vulkan + GL, Fire (57.2 / 44.8 / 44.6 fps), Wacom (58.8 / 51.1 / 43.9 fps), 0 fatal lines (`logs/t2b-*.out`, `logs/h-*.out`) |
 
+## E1 — Filament 1.77.3 upgrade + GPU `InstanceBuffer` instancing (live-verified Android A142 Vulkan + GL)
+
+`docs/artifacts/e1-filament-instancing/README.md`, `docs/payload-geometry-spec.md`.
+Upgrades Android Filament `1.71.6` → `1.77.3` in lockstep (`filament-android`,
+`filament-utils-android`, `filamat-android`, `gltfio-android`), re-bakes all 20
+shipped `.filamat` material packages, updates `D3FrameInfo` JNI struct layout,
+and replaces CPU-baked instancing with GPU `InstanceBuffer` chunks (64 instances
+per chunk, `uniform float4 instanceColors[64]`, reflected-tangent `VertexBuffer`
+for negative-determinant conformal transforms, baked fallback for non-conformal
+transforms, and `InstanceBuffer`-backed `meshParticleEmitter` buckets).
+
+| Lane | iOS sim — observed | Android A142 — observed |
+|---|---|---|
+| W26 instancing (1,000 instances) visual parity | n/a (Android-only unit) | pass — `16 InstanceBuffer chunk(s)` in `4 ms`; viewport MAE vs `android-c679636` baseline is `0.964/255` (`0.38%`, `96.26%` within `2/255`) on Vulkan (`89.8 fps`) and `0.963/255` (`0.38%`, `96.25%` within `2/255`) on OpenGL (`89.8 fps`) (`a142-vk-w26.png`, `a142-gl-w26.png`) |
+| W26 10,000-instance scene (before vs. after) | n/a | pass — **Before (CPU-baked):** pass 1 took `1,909 ms` (VK) / `1,935 ms` (GL) on main thread, pass 2 crashed with `OutOfMemoryError` (268 MB heap exhausted). **After (GPU `InstanceBuffer`, 157 chunks):** pass 1 `27 ms` (~71× faster), pass 2 `16 ms` (VK) / `28 ms` (GL), zero OOM; steady-state `89.8 fps` (`p50=11.1ms`) on OpenGL, `79.8 fps` (`p50=11.1ms`) on Vulkan (`a142-{vk,gl}-w26-10k.{png,log}`) |
+| W22 materials conformance | n/a | pass — `89.8 fps` (`0/180` skipped) on Vulkan and OpenGL; 0 material compile errors (`a142-{vk,gl}-materials.{png,log}`) |
+| T2 harness + W18 particles | n/a | pass — `90 fps` (`11.1 ms`), 75 entities, 13 bodies on Vulkan and OpenGL; `InstanceBuffer` mesh particles + sprite emitters live, 0 errors (`a142-{vk,gl}-harness.{png,log}`) |
+| T2 dice roll & settle | n/a | pass — `89.8 fps` Vulkan / `87.8 fps` OpenGL, 7 dice settled, 0 errors (`a142-{vk,gl}-dice.{png,log}`) |
+| Unit tests | `dn analyze` + `dn test` (`dart3d`: 277, `example`: 224) | `./gradlew :dart3d:testReleaseUnitTest` passes (incl. reflected tangent & `InstanceBuffer` tests) |
+
 ## Notes
 
 - **Runtime-minted payloads need their spec on the op** — the W11
@@ -708,16 +728,15 @@ and all per-platform lighting/stage stopgaps (`kIosDirectionalScale`,
   `rectAreaLight` gets an emissive-quad + point-cluster approximation
   on Android; iOS `.area` is real but its `width`/`height`/
   `areaExtents` decode was never wired — both fixed in W12.
-- **Filament's Java binding has no `InstanceBuffer`** (1.71.6): the
-  AAR exposes `RenderableManager.Builder.instances` but nothing to
-  feed it — true instanced mesh particles are unreachable from Java.
-  `meshParticleEmitter` bakes a lazily-grown pool of per-particle
-  child entities instead (upstream's own `_hiddenTransform` slot
-  pattern); sprites sidestep it entirely — the billboards are
-  CPU-expanded into a world-space `VertexBuffer`, which is also what
-  lets `getCustom0()` carry the flipbook blend factor the upstream
-  shader took from an instance attribute. See
-  `docs/particles-spec.md`.
+- **Filament 1.77.3 `InstanceBuffer` JNI quirks (E1)**:
+  `InstanceBuffer.Builder.localTransforms(FloatArray)` in Filament 1.77.3's
+  JNI wrapper releases its array with `JNI_ABORT` after passing the pointer
+  into `Builder::localTransforms` (which stores only the raw pointer until
+  `build()`), reading freed/unpinned memory. Always build the `InstanceBuffer`
+  uninitialized and upload transforms via
+  `InstanceBuffer.setLocalTransforms(flatTransforms, count, 0)` (note argument
+  order is `(transforms, count, offset)`). Both `d3:instances` and
+  `meshParticleEmitter` use this path now.
 - **All scene/physics mutation must run inside the render loop** —
   Dart deliveries used to apply straight onto SceneKit/Jolt state from
   the plugin delivery thread. iOS crashed twice from it: first in

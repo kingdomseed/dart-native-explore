@@ -42,7 +42,7 @@ object TextureFactory {
 
     /**
      * JNI entry into gltfio's Ktx2Provider (dart3d_jni.cpp). Returns
-     * the native `filament::Texture*` — wrapped by `Texture(ptr)` — or
+     * the native `filament::Texture*` — wrapped by `Texture.wrap(ptr)` — or
      * 0 on failure (reason already logged natively).
      */
     private external fun nKtx2Decode(
@@ -168,7 +168,7 @@ object TextureFactory {
                 "texture $key: ktx2 transcode failed (see native log)")
             return Result.Failed
         }
-        val tex = Texture(ptr)
+        val tex = Texture.wrap(ptr)
         Log.i(TAG, "texture $key: ktx2 ${tex.getWidth(0)}x" +
             "${tex.getHeight(0)} ${tex.getFormat()} " +
             "levels=${tex.getLevels()} in " +

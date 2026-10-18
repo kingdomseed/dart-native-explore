@@ -760,7 +760,13 @@ Uint8List _latticePixels(int w, int h) {
 /// (tube, ribbon, dashed polyline, line segments) and a billboard in
 /// the second, and a 1000-instance icosphere field — one node, one
 /// draw — plus a camera-facing billboard-instance cloud behind them.
-SceneDocument buildGeometryDocument() {
+const int _envW26Instances = int.fromEnvironment(
+  'DART3D_W26_INSTANCES',
+  defaultValue: 1000,
+);
+
+SceneDocument buildGeometryDocument({int? instanceCount}) {
+  final targetInstances = instanceCount ?? _envW26Instances;
   final doc = SceneDocument();
 
   MaterialResource mat(double r, double g, double b, {double rough = 0.55}) =>
@@ -898,18 +904,28 @@ SceneDocument buildGeometryDocument() {
     mat(1.0, 1.0, 1.0),
   );
 
-  // ── The 1000-instance field — one node, one draw ────────────────
-  // 40×25 icospheres on a tilted grid; transforms and per-instance
+  // ── The instance field — one node (1000 default; 10k via DART3D_W26_INSTANCES) ──
+  // 40×25 icospheres by default on a tilted grid; transforms and per-instance
   // colors ride payload chunks (the deferred-path the natives claim
   // against `upsertPayload`).
-  const cols = 40, rows = 25;
+  final int rows = targetInstances == 1000
+      ? 25
+      : max(1, sqrt(targetInstances).round());
+  final int cols = targetInstances == 1000
+      ? 40
+      : max(1, (targetInstances / rows).round());
+  final double dx = targetInstances == 1000 ? 0.9 : 36.0 / cols;
+  final double dz = targetInstances == 1000 ? 0.85 : 21.25 / rows;
+  final double icoRadius = targetInstances == 1000
+      ? 0.16
+      : 0.16 * sqrt(1000.0 / (rows * cols));
   final matrices = <Matrix4>[];
   final colors = <Vector4>[];
   final rng = _Rng(26);
   for (var r = 0; r < rows; r++) {
     for (var c = 0; c < cols; c++) {
-      final x = (c - cols / 2) * 0.9;
-      final z = 4.0 + r * 0.85;
+      final x = (c - cols / 2) * dx;
+      final z = 4.0 + r * dz;
       final y = 0.35 + 0.5 * sin(c * 0.55 + r * 0.7);
       final s = 0.8 + rng.next() * 0.5;
       matrices.add(
@@ -937,7 +953,7 @@ SceneDocument buildGeometryDocument() {
     name: 'w26.instances.field',
     components: [
       D3InstancesSpec(
-        proc: D3IcosphereProc(radius: 0.16, subdivisions: 1),
+        proc: D3IcosphereProc(radius: icoRadius, subdivisions: 1),
         material: instanceMat.id,
         transforms: D3InstanceTransforms.payload(matricesPayload.id),
         attributes: {'color': D3InstanceAttribute.payload(colorsPayload.id)},
