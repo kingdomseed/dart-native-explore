@@ -88,6 +88,16 @@ from look-dev — the DartNative set's spec and reference renders — is on
    first time (`docs/artifacts/s0g-physics-rerealize/`). On iOS the
    two ordering fixes have now run (2026-10-05, below); carrying body
    state across a re-realize is still not built there.
+   Look parity (S0g, in review, #57, branch `s0g-look-parity`): one
+   document now gives the same picture on the iPhone simulator and
+   the A142 within a stated tolerance, measured patch by patch on a
+   reference board, and the example has no per-platform numbers left.
+   Eleven causes were found and fixed, most of them on iOS (linear
+   colours read as sRGB, colour textures sampled undecoded, no tone
+   mapper, a different bloom), two in what the wire's numbers meant
+   (light units, a gradient sky dimmed by the environment on
+   Android). What does not match, and why, is listed for S1 in
+   `docs/artifacts/s0g-look-parity/`.
    iOS debt (2026-10-05, `docs/artifacts/ios-debt-2026-10/`): one
    simulator is allowed again, and everything merged on Android
    evidence since 2026-09-29 ran on it — hero, Showcase, the harness
@@ -103,9 +113,9 @@ from look-dev — the DartNative set's spec and reference renders — is on
 
 Not every open S0 box blocks Track E or R: S0d is folded into R8 (so
 it is exempt from Track R's "after S0"), S0c is
-backfilled as each lane's unit is touched, and the S0g items that need
-iOS (light units, colour saturation) wait for it. The rest of S0 does
-block E.
+backfilled as each lane's unit is touched, and the S0g look-parity
+items (light units, colour saturation) are in review (#57). The rest
+of S0 does block E.
 
 **Paused until the engine is done.** P3 DR3 and later (notation, audio,
 juice; DR3 needs P1's parser contract first), P5 demos, P7 design pass,
@@ -131,8 +141,8 @@ off). Evidence for everything below: `docs/artifacts/ios-debt-2026-10/`.
   portrait to landscape, and a landscape roll reads correctly.
 - #52: both iOS ordering fixes ran — every dice load logs the restore
   and the first physics tick is at the fitted rack.
-- `s0g-ios-dynamic-body-reseat` (#55): ran with and without it; see
-  the README for the comparison and the verdict.
+- `s0g-ios-dynamic-body-reseat` (#55): ran with and without it, with
+  the verdict "merge"; it merged on 2026-10-05.
 
 *Still owed:*
 
@@ -152,8 +162,13 @@ off). Evidence for everything below: `docs/artifacts/ios-debt-2026-10/`.
   camera-facing meshes** — left out of the fix; such a mesh still
   casts nothing on iOS. The stand-in also writes camera depth, so
   depth of field through a blended mesh reads the mesh's surface.
-- The S0g appearance items (light units, colour saturation): the felt
-  reads grey and the rim pale on iOS; pairs are in the README.
+- **The look on a physical iOS device** (#57). Look parity was
+  measured on the simulator only: its screenshots are 8-bit sRGB and
+  its SceneKit hands the resolve pass an 8-bit image. A device with a
+  P3 display and a different drawable format has not been looked at.
+- **KTX2 colour textures on iOS** (#57): they load through a different
+  call than the one found to ignore its sRGB option, and were not
+  measured.
 
 **Review.** Codex code review is out of quota; PRs since #36 were
 reviewed by an Opus reviewer agent, each finding checked against the
@@ -276,8 +291,8 @@ Rules:
 - [ ] S0g Stabilization follow-ups (`docs/triage/integration.md`
       §Follow-ups): **#18 Vulkan warm-relaunch crash (P1)**; dice readout
       (inverse quaternion + mirrored face normals — root cause confirmed);
-      native light-unit unification (then delete the example's iOS 0.26
-      scale); iOS colour saturation vs Android; root-cause the Mali page
+      ~~native light-unit unification (then delete the example's iOS 0.26
+      scale)~~; ~~iOS colour saturation vs Android~~; root-cause the Mali page
       fault behind the catcher/particle prewarm and restore it; ~~audit the
       remaining Filament builder sites for the GC-reachability hazard~~;
       ~~W25 settle lane never passes after wLoose~~; ~~body
@@ -314,11 +329,31 @@ Rules:
       slab). Also the #45 review threads: a rejected `addNode` or
       `updateNode` no longer drops a saved transform (both natives),
       iOS restores in two passes. T2 on all three devices, A142 on
-      both backends. **Open, all iOS:** the body state (described, not
-      built); a run of the two ordering fixes (type-checked only); and
-      `s0g-ios-dynamic-body-reseat`, which holds the changes to how iOS
-      moves a dynamic body until they have run there. Evidence:
-      `docs/artifacts/s0g-physics-rerealize/`
+      both backends. The two iOS ordering fixes ran on 2026-10-05, and
+      `s0g-ios-dynamic-body-reseat` (#55) merged the same day after
+      running there. **Open, iOS:** the body state (described, not
+      built). Evidence: `docs/artifacts/s0g-physics-rerealize/`
+      *Look parity — in review* (#57, 2026-10-05). The wire's light,
+      environment and exposure numbers mean what upstream's do on both
+      natives (`docs/android-parity-spec.md` §Light units); iOS
+      resolves its image in a pass of its own (inverse of SceneKit's
+      curve, Filament's bloom, upstream's grading, tone map, vignette
+      and LUT); the example's iOS light scale, `heroIos` /
+      `heroAndroid` and per-platform environment intensity are
+      deleted. Measured on a reference board
+      (`DART3D_SCENE=lookref`, `tool/look_capture.sh`,
+      `tool/look_compare.py`): every patch class is inside its
+      tolerance (8 of 255 unlit, emissive, textured and sky; 16 lit,
+      spheres, lights and shadow) in all 12 variants, from a baseline
+      of up to 255. **Open:** the residual list in the README (the
+      environment's diffuse term, highlights through Filament's grade
+      table, shadow filtering, `agx` / `reinhard` on Android, colour
+      grading and vignette on Android unmeasured), a physical iOS
+      device, and three Android findings not fixed here: point and
+      spot lights clipped to a cross under an orthographic camera,
+      lights fading out toward 100 units from the camera, and
+      `bloomThreshold` having no effect. Evidence:
+      `docs/artifacts/s0g-look-parity/`
 - [x] S0h Android cold-start material compile — **done** (#48; tablet
       run 2026-10-05). Root cause: filamat's SPIR-V optimizer, 3–6 s
       per lit package, run on the device at every cold start. Fix:
@@ -466,8 +501,8 @@ scaffolding, not the demo.
       `hero_scene.dart`, `hero_motion.dart`; evidence
       `docs/artifacts/p4-hero/`). Interim orbit is Dart-driven (one
       pivot transform per frame) until E2's orbit controller lands.
-      Per-platform `DnLogoStage.heroIos`/`heroAndroid` values are a
-      stopgap for the light-unit / tone-mapper mismatch (S0g).
+      The per-platform `DnLogoStage.heroIos`/`heroAndroid` stopgap is
+      gone (#57): one `DnLogoStage.hero`.
 - [ ] P5 Demo program M2–M18 (demo-program §4 + §8): showroom, physics
       playground, road trip, campfire, explosions, material gallery, …;
       engine-gated demos follow their units. New flagships: **M16 pirate

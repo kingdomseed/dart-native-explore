@@ -103,8 +103,7 @@ class _HeroScreenState extends State<HeroScreen>
           revolutionSeconds: double.infinity,
           initialYaw: _pinnedYawDeg! * pi / 180,
         );
-  late final DnLogoStage _stage =
-      Platform.isIOS ? DnLogoStage.heroIos : DnLogoStage.heroAndroid;
+  static const _stage = DnLogoStage.hero;
   late final AnimationController _entrance = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 1600),

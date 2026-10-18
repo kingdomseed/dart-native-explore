@@ -144,9 +144,11 @@ struct StageLut {
         return Data(bytes)
     }
 
-    /// The strip as a `CGImage` for `SCNCamera.colorGrading.contents`
-    /// — `N*N` × `N` sRGB8, provider-referenced so the image owns its
-    /// bytes (no context copy needed for a static table).
+    /// The strip as a `CGImage` for the resolve pass's LUT sampler —
+    /// `N*N` × `N` RGBA8, provider-referenced so the image owns its
+    /// bytes (no context copy needed for a static table). Tagged
+    /// linear so SceneKit uploads the bytes as they are: the table
+    /// holds encoded colours and the pass does the encoding itself.
     func stripImage(blend: Double = 1.0) -> CGImage? {
         let bytes = stripBytes(blend: blend)
         let n = size
@@ -156,7 +158,8 @@ struct StageLut {
             width: n * n, height: n,
             bitsPerComponent: 8, bitsPerPixel: 32,
             bytesPerRow: n * n * 4,
-            space: CGColorSpaceCreateDeviceRGB(),
+            space: CGColorSpace(name: CGColorSpace.linearSRGB)
+                ?? CGColorSpaceCreateDeviceRGB(),
             bitmapInfo: CGBitmapInfo(
                 rawValue: CGImageAlphaInfo.noneSkipLast.rawValue),
             provider: provider,

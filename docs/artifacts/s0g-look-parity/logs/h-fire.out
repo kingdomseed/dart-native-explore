@@ -1,0 +1,9 @@
+harness complete: True
+lanes complete: w15 w18 w24 w25
+   w11 stop-rest switch PASS want=0.50rad live=(-0.000,-0.000,0.247,0.969)
+   w11 stop-rest rest PASS want=0.00rad live=(-0.000,-0.000,0.000,1.000)
+   wloose ccd pose=(3.30,0.38,2.60) PASS rests on slab
+   wloose bowl pose=(-2.28,-0.31,2.05) PASS contained
+   wloose margin pose=(5.50,0.08,0.50) PASS gap=0.53 above visual
+   w25 lane complete — dice regression PASS: die 70PWHG000004Y rolled and settled after the effects sweep; expected final state: all effects off
+fatal lines since start: 0  E dart3d lines: 0

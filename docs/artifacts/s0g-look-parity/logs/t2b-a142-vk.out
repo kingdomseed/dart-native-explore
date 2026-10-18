@@ -1,0 +1,9 @@
+hero: 89.7 fps over 16 windows (min 88.8), gpu p50 10.0 ms
+dice racked: 49.6 fps over 15 windows (min 48.9), gpu p50 18.4 ms
+dice rolling: 50.0 fps over 18 windows (min 49.4), gpu p50 18.5 ms
+pid 21063 fatal lines since start: 0
+   Filament engine backend: VULKAN (pref=0, tier=STANDARD)
+   perf view: backend=VULKAN viewport=0x0 msaa=0 aa=FXAA post=true hdr=HIGH bloom=false(levels=6 res=384 q=LOW) ssao=false taa=false ssr=false dsr=false(0.5..1.0) 
+roll log lines: 16
+   dartnative: dart3d: dice readout d4 1 · d6 3 · d8 5 · d12 9 · d20 6 · d% 90+1 = 115
+   dartnative: dart3d: dice readout d4 1 · d6 3 · d8 5 · d12 9 · d20 6 · d% 90+1 = 115

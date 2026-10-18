@@ -226,7 +226,7 @@ void main() {
   group('buildHeroScene', () {
     final hero = buildHeroScene(
       bytesFor: bytesFromDisk,
-      stage: DnLogoStage.heroAndroid,
+      stage: DnLogoStage.hero,
       aspect: 402 / 874,
     )!;
     final doc = hero.document;
@@ -303,22 +303,13 @@ void main() {
       expect(m.properties['emissiveTexture'], m.properties['baseColorTexture']);
     });
 
-    test('per-platform stages: flat backdrop, grading only on iOS', () {
+    test('the stage is one look: flat backdrop, no grading', () {
       final env =
           doc.resources[doc.stage.environmentRef]! as EnvironmentResource;
-      expect(env.exposure, DnLogoStage.heroAndroid.exposure);
+      expect(env.exposure, 1.0);
+      expect(env.toneMapping, 'pbrNeutral');
       expect(env.effects.colorGradingEnabled, isFalse);
-      final ios = buildHeroScene(
-        bytesFor: bytesFromDisk,
-        stage: DnLogoStage.heroIos,
-        aspect: 402 / 874,
-      )!;
-      final iosEnv =
-          ios.document.resources[ios.document.stage.environmentRef]!
-              as EnvironmentResource;
-      expect(iosEnv.effects.colorGradingEnabled, isTrue);
-      expect(iosEnv.effects.saturation, DnLogoStage.heroIos.saturation);
-      final sky = iosEnv.skybox!.source as GradientSkySpec;
+      final sky = env.skybox!.source as GradientSkySpec;
       expect(sky.zenithColor, sky.groundColor);
     });
   });

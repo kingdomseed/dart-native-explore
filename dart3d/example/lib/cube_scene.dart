@@ -141,24 +141,8 @@ final class CubeScene {
           'directionalLight',
           properties: {
             'color': ColorValue(1, 1, 1, 1),
-            'intensity': DoubleValue(keyLightIntensity(1400)),
+            'intensity': DoubleValue(0.365),
             'castsShadow': BoolValue(true),
-          },
-        ),
-      ],
-      root: true,
-    );
-
-    doc.createNode(
-      name: 'fill',
-      transform: TrsTransform(translation: Vector3(-2, 2, -1)),
-      components: [
-        ComponentSpec(
-          'pointLight',
-          properties: {
-            'color': ColorValue(0.6, 0.7, 1.0, 1),
-            'intensity': DoubleValue(60),
-            'range': DoubleValue(12),
           },
         ),
       ],

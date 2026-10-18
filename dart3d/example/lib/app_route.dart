@@ -20,6 +20,11 @@ enum AppScreen {
   /// The chrome-free logo capture view. Not user-facing: reachable only
   /// by booting with `--dart-define=DART3D_SCENE=reel`.
   reel,
+
+  /// The look-reference board whose patches are measured per platform.
+  /// Not user-facing: reachable only by booting with
+  /// `--dart-define=DART3D_SCENE=lookref`.
+  lookReference,
 }
 
 /// The current screen and the moves between screens a user can make.
@@ -35,6 +40,7 @@ final class AppRoute {
               'showcase' || 'gallery' => AppScreen.showcase,
               'harness' => AppScreen.harness,
               'reel' => AppScreen.reel,
+              'lookref' => AppScreen.lookReference,
               _ => AppScreen.hero,
             };
 

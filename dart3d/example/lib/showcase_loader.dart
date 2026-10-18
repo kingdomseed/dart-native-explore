@@ -212,11 +212,6 @@ ShowcaseScene? loadShowcaseScene(
         },
       );
     }
-    // W21 light-units contract: upstream `n` fields translate to the
-    // wire `intensity` at decode. `readFsceneb` already normalized the
-    // binary path; this covers `.fscene` documents and prefab grafts —
-    // the pass is idempotent.
-    normalizeLightIntensity(doc);
   } catch (error) {
     log?.call('dart3d: showcase — ${item.assetKey} failed: $error');
     return null;
@@ -321,13 +316,7 @@ ShowcaseScene? loadShowcaseScene(
     root: true,
   );
   if (stage != null) {
-    addDnLogoLights(
-      doc,
-      center: center,
-      radius: radius,
-      cameraDir: cameraDir,
-      stage: stage,
-    );
+    addDnLogoLights(doc, cameraDir: cameraDir, stage: stage);
   } else {
     doc.createNode(
       name: 'showcase.key',
@@ -340,27 +329,10 @@ ShowcaseScene? loadShowcaseScene(
           'directionalLight',
           properties: {
             'color': ColorValue(1.0, 0.95, 0.88, 1),
-            'intensity': DoubleValue(keyLightIntensity(1300)),
+            'intensity': DoubleValue(0.339),
             'castsShadow': BoolValue(true),
             'shadowRadius': DoubleValue(3.0),
             'shadowDepthBias': DoubleValue(0.01),
-          },
-        ),
-      ],
-      root: true,
-    );
-    doc.createNode(
-      name: 'showcase.fill',
-      transform: TrsTransform(
-        translation: center + Vector3(-radius * 2, radius * 1.6, -radius),
-      ),
-      components: [
-        ComponentSpec(
-          'pointLight',
-          properties: {
-            'color': ColorValue(0.62, 0.72, 1.0, 1),
-            'intensity': DoubleValue(keyLightIntensity(700 * radius)),
-            'range': DoubleValue(radius * 24),
           },
         ),
       ],
@@ -374,7 +346,7 @@ ShowcaseScene? loadShowcaseScene(
             : EnvironmentResource(
                 doc.newId(),
                 environment: const StudioEnvironment(),
-                environmentIntensity: 1.0,
+                environmentIntensity: 0.78,
                 exposure: 1.0,
                 toneMapping: 'pbrNeutral',
                 skybox: SkyboxSpec(EnvironmentSkySpec()),
@@ -701,10 +673,9 @@ SceneDocument buildMaterialsDocument({
     // ── HDR environment lane ────────────────────────────────────────
     // iOS gets the EXR file (W21 decode lane); Android the .hdr
     // (pre-existing radiance path). 4×2 RGB is tiny but a real HDR
-    // equirect — the row visibly re-lights under it. The .hdr's
-    // saturated primaries run to 10.0: at Filament's 30 000 lx env
-    // baseline Android authors the intensity down so the material
-    // lanes stay readable under the colored IBL.
+    // equirect — the row visibly re-lights under it. Its saturated
+    // primaries run to 10.0, so the intensity comes down to keep the
+    // material lanes readable under the colored IBL.
     final envBytes = bytesOf(
       Platform.isIOS ? 'assets/rgb_4x2.exr' : 'assets/rgb_4x2.hdr',
     );
@@ -722,7 +693,7 @@ SceneDocument buildMaterialsDocument({
             EnvironmentResource(
               doc.newId(),
               environment: PayloadEnvironment(envPayload.id),
-              environmentIntensity: Platform.isIOS ? 1.0 : 0.08,
+              environmentIntensity: 0.0625,
               exposure: 1.0,
               toneMapping: 'pbrNeutral',
               skybox: SkyboxSpec(EnvironmentSkySpec()),

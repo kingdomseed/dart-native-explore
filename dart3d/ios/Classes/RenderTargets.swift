@@ -311,11 +311,25 @@ extension SceneViewHost {
         // pass then restored: a camera shared with a screen view keeps
         // that view's mask for the drawable draw (SceneKit captures
         // camera state at renderWithViewport encode, so the restore
-        // can't leak into this pass).
+        // can't leak into this pass). Likewise, a shared camera is
+        // packed for the screen view's resolve pass (`applyStageExposure`),
+        // whereas offscreen passes have no resolve pass and need the
+        // unpacked exposure and identity white point during encode.
         let savedMask = cam.categoryBitMask
+        let savedExposure = cam.exposureOffset
+        let savedWhitePoint = cam.whitePoint
+        let unscaledExposure = stageExposure
+            * (lastEffects?.colorGrading.brightness ?? 1.0)
         cam.categoryBitMask = view.layerMask == UInt32.max
             ? Int(bitPattern: UInt.max) : Int(view.layerMask)
-        defer { cam.categoryBitMask = savedMask }
+        cam.exposureOffset = CGFloat(
+            unscaledExposure > 0 ? log2(unscaledExposure) : 0)
+        cam.whitePoint = 1
+        defer {
+            cam.categoryBitMask = savedMask
+            cam.exposureOffset = savedExposure
+            cam.whitePoint = savedWhitePoint
+        }
         if view.renderer == nil {
             let r = SCNRenderer(device: device)
             r.scene = scene
@@ -704,5 +718,6 @@ extension SceneViewHost {
                 isTemporalAntialiasingEnabled
             s.view.showsStatistics = i == 0 && showsStatistics
         }
+        applySiblingResolve()
     }
 }

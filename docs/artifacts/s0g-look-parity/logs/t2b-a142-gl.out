@@ -1,0 +1,9 @@
+hero: 83.9 fps over 15 windows (min 76.4), gpu p50 11.8 ms
+dice racked: 32.1 fps over 16 windows (min 31.9), gpu p50 31.0 ms
+dice rolling: 32.4 fps over 19 windows (min 31.9), gpu p50 30.7 ms
+pid 21570 fatal lines since start: 0
+   Filament engine backend: OPENGL (pref=1, tier=STANDARD)
+   perf view: backend=OPENGL viewport=0x0 msaa=0 aa=FXAA post=true hdr=HIGH bloom=false(levels=6 res=384 q=LOW) ssao=false taa=false ssr=false dsr=false(0.5..1.0) 
+roll log lines: 16
+   dartnative: dart3d: dice readout d4 1 · d6 6 · d8 7 · d12 4 · d20 10 · d% 20+0 = 48
+   dartnative: dart3d: dice readout d4 1 · d6 6 · d8 7 · d12 4 · d20 10 · d% 20+0 = 48

@@ -1,0 +1,360 @@
+{
+  "board": {
+    "left": -3.5,
+    "right": 3.5,
+    "top": 7.5,
+    "bottom": -5.5
+  },
+  "variants": [
+    "unlit-linear",
+    "unlit-neutral",
+    "unlit-aces",
+    "unlit-exposure2",
+    "directional",
+    "point",
+    "spot",
+    "ibl-constant",
+    "ibl-studio",
+    "all",
+    "default-stage",
+    "all-bloom"
+  ],
+  "patches": [
+    {
+      "name": "texture.unlit.lime",
+      "kind": "texture",
+      "x": -2.5,
+      "y": 6.5,
+      "half": 0.2
+    },
+    {
+      "name": "texture.unlit.pink",
+      "kind": "texture",
+      "x": -1.5,
+      "y": 6.5,
+      "half": 0.2
+    },
+    {
+      "name": "texture.lit.lime",
+      "kind": "texture",
+      "x": -0.5,
+      "y": 6.5,
+      "half": 0.2
+    },
+    {
+      "name": "texture.emissive.lime",
+      "kind": "texture",
+      "x": 0.5,
+      "y": 6.5,
+      "half": 0.2
+    },
+    {
+      "name": "texture.emissive.pink",
+      "kind": "texture",
+      "x": 1.5,
+      "y": 6.5,
+      "half": 0.2
+    },
+    {
+      "name": "texture.unlit.factor",
+      "kind": "texture",
+      "x": 2.5,
+      "y": 6.5,
+      "half": 0.2
+    },
+    {
+      "name": "unlit.grey0.02",
+      "kind": "unlit",
+      "x": -2.5,
+      "y": 5.5,
+      "half": 0.2
+    },
+    {
+      "name": "unlit.grey0.05",
+      "kind": "unlit",
+      "x": -1.5,
+      "y": 5.5,
+      "half": 0.2
+    },
+    {
+      "name": "unlit.grey0.18",
+      "kind": "unlit",
+      "x": -0.5,
+      "y": 5.5,
+      "half": 0.2
+    },
+    {
+      "name": "unlit.grey0.5",
+      "kind": "unlit",
+      "x": 0.5,
+      "y": 5.5,
+      "half": 0.2
+    },
+    {
+      "name": "unlit.grey1.0",
+      "kind": "unlit",
+      "x": 1.5,
+      "y": 5.5,
+      "half": 0.2
+    },
+    {
+      "name": "unlit.indigo",
+      "kind": "unlit",
+      "x": 2.5,
+      "y": 5.5,
+      "half": 0.2
+    },
+    {
+      "name": "unlit.red",
+      "kind": "unlit",
+      "x": -2.5,
+      "y": 4.5,
+      "half": 0.2
+    },
+    {
+      "name": "unlit.green",
+      "kind": "unlit",
+      "x": -1.5,
+      "y": 4.5,
+      "half": 0.2
+    },
+    {
+      "name": "unlit.blue",
+      "kind": "unlit",
+      "x": -0.5,
+      "y": 4.5,
+      "half": 0.2
+    },
+    {
+      "name": "unlit.cyan",
+      "kind": "unlit",
+      "x": 0.5,
+      "y": 4.5,
+      "half": 0.2
+    },
+    {
+      "name": "unlit.magenta",
+      "kind": "unlit",
+      "x": 1.5,
+      "y": 4.5,
+      "half": 0.2
+    },
+    {
+      "name": "unlit.yellow",
+      "kind": "unlit",
+      "x": 2.5,
+      "y": 4.5,
+      "half": 0.2
+    },
+    {
+      "name": "emissive.grey0.18",
+      "kind": "emissive",
+      "x": -2.5,
+      "y": 3.5,
+      "half": 0.2
+    },
+    {
+      "name": "emissive.white1",
+      "kind": "emissive",
+      "x": -1.5,
+      "y": 3.5,
+      "half": 0.2
+    },
+    {
+      "name": "emissive.white4",
+      "kind": "emissive",
+      "x": -0.5,
+      "y": 3.5,
+      "half": 0.2
+    },
+    {
+      "name": "emissive.orange1",
+      "kind": "emissive",
+      "x": 0.5,
+      "y": 3.5,
+      "half": 0.2
+    },
+    {
+      "name": "emissive.orange4",
+      "kind": "emissive",
+      "x": 1.5,
+      "y": 3.5,
+      "half": 0.2
+    },
+    {
+      "name": "emissive.blue2",
+      "kind": "emissive",
+      "x": 2.5,
+      "y": 3.5,
+      "half": 0.2
+    },
+    {
+      "name": "lit.grey0.04",
+      "kind": "lit",
+      "x": -2.5,
+      "y": 2.5,
+      "half": 0.2
+    },
+    {
+      "name": "lit.grey0.18",
+      "kind": "lit",
+      "x": -1.5,
+      "y": 2.5,
+      "half": 0.2
+    },
+    {
+      "name": "lit.grey0.5",
+      "kind": "lit",
+      "x": -0.5,
+      "y": 2.5,
+      "half": 0.2
+    },
+    {
+      "name": "lit.grey1.0",
+      "kind": "lit",
+      "x": 0.5,
+      "y": 2.5,
+      "half": 0.2
+    },
+    {
+      "name": "lit.white.rough0.5",
+      "kind": "lit",
+      "x": 1.5,
+      "y": 2.5,
+      "half": 0.2
+    },
+    {
+      "name": "lit.indigo",
+      "kind": "lit",
+      "x": 2.5,
+      "y": 2.5,
+      "half": 0.2
+    },
+    {
+      "name": "lit.red",
+      "kind": "lit",
+      "x": -2.5,
+      "y": 1.5,
+      "half": 0.2
+    },
+    {
+      "name": "lit.green",
+      "kind": "lit",
+      "x": -1.5,
+      "y": 1.5,
+      "half": 0.2
+    },
+    {
+      "name": "lit.blue",
+      "kind": "lit",
+      "x": -0.5,
+      "y": 1.5,
+      "half": 0.2
+    },
+    {
+      "name": "lit.cyan",
+      "kind": "lit",
+      "x": 0.5,
+      "y": 1.5,
+      "half": 0.2
+    },
+    {
+      "name": "lit.magenta",
+      "kind": "lit",
+      "x": 1.5,
+      "y": 1.5,
+      "half": 0.2
+    },
+    {
+      "name": "lit.yellow",
+      "kind": "lit",
+      "x": 2.5,
+      "y": 1.5,
+      "half": 0.2
+    },
+    {
+      "name": "sphere.dielectric",
+      "kind": "sphere",
+      "x": -2.0,
+      "y": 0.3,
+      "half": 0.25
+    },
+    {
+      "name": "sphere.metal",
+      "kind": "sphere",
+      "x": 0.0,
+      "y": 0.3,
+      "half": 0.25
+    },
+    {
+      "name": "sphere.glossy",
+      "kind": "sphere",
+      "x": 2.0,
+      "y": 0.3,
+      "half": 0.25
+    },
+    {
+      "name": "point.centre",
+      "kind": "light",
+      "x": -2.0,
+      "y": -1.3,
+      "half": 0.12
+    },
+    {
+      "name": "point.edge",
+      "kind": "light",
+      "x": -2.7,
+      "y": -1.3,
+      "half": 0.1
+    },
+    {
+      "name": "spot.centre",
+      "kind": "light",
+      "x": 0.0,
+      "y": -1.3,
+      "half": 0.12
+    },
+    {
+      "name": "spot.penumbra",
+      "kind": "light",
+      "x": 0.6,
+      "y": -1.3,
+      "half": 0.08
+    },
+    {
+      "name": "spot.outside",
+      "kind": "light",
+      "x": 0.0,
+      "y": -2.3,
+      "half": 0.08
+    },
+    {
+      "name": "ibl.card",
+      "kind": "lit",
+      "x": 2.0,
+      "y": -1.3,
+      "half": 0.3
+    },
+    {
+      "name": "shadow.lit",
+      "kind": "shadow",
+      "x": 1.5,
+      "y": -3.9,
+      "half": 0.3
+    },
+    {
+      "name": "shadow.umbra",
+      "kind": "shadow",
+      "x": -0.6965517282485962,
+      "y": -4.203448271751404,
+      "half": 0.1
+    },
+    {
+      "name": "sky",
+      "kind": "sky",
+      "x": 3.25,
+      "y": 0.3,
+      "half": 0.12
+    }
+  ]
+}

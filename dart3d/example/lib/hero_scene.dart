@@ -5,7 +5,7 @@
 /// It is the Showcase's DartNative logo on a hero [DnLogoStage], with
 /// the camera and the whole light rig reparented under one
 /// `hero.pivot` node at the logo's centre. Rotating the pivot orbits
-/// the camera *and* carries the key/rim/fill rig with it, so the pink
+/// the camera *and* carries the key and rim lights with it, so the pink
 /// and cyan rims stay behind the subject from every angle of the 360°
 /// orbit — one transform per frame drives the whole move. The studio
 /// IBL stays world-fixed, so reflections still travel over the glossy
@@ -34,7 +34,6 @@ const heroRigNodeNames = {
   'showcase.key',
   'showcase.rim.pink',
   'showcase.rim.cyan',
-  'showcase.fill',
 };
 
 /// The built hero document plus the handles the screen animates.

@@ -563,7 +563,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     /** This view's framework viewId — stamped by the mutation router. */
     var viewId: Long = 0
 
-    var clearColor = floatArrayOf(0.06f, 0.06f, 0.08f, 1f)
+    /** Behind a scene with no sky. Black unless the widget sets
+     * `backgroundColor`, as its documentation says and as on iOS. */
+    var clearColor = floatArrayOf(0f, 0f, 0f, 1f)
         set(value) {
             field = value
             applyClearColor()
@@ -624,6 +626,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
 
             cameraEntity = EntityManager.get().create()
             camera = engine.createCamera(cameraEntity)
+            setCameraExposure(camera, 1.0f)
 
             view.scene = scene
             view.camera = camera
@@ -1219,32 +1222,25 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         envSkyboxTextures.addAll(textures)
     }
 
-    /**
-     * The env resource's look fields — exposure + the tone-mapping
-     * operator. `exposure` is a linear multiplier on Filament's
-     * photometric default (f/16, 1/125 s, ISO 100 — the exposure the
-     * scene's intensities were tuned under): the 3-arg
-     * `setExposure(16, 1/125, 100·exposure)` expresses exactly that —
-     * matching iOS's `exposureOffset = log2(exposure)` EV-offset
-     * semantics. The 1-arg `setExposure(float)` can't express it: its
-     * sensitivity floor of ISO 10 clamps the default exposure
-     * (~1/38400) out of range.
-     */
     /** The last effective stage exposure (exposure × 2^AE comp). */
     private var lastEffExposure = 1.0f
 
     /**
-     * `f/16, 1/125 s, ISO 100·e` — but Filament clamps sensitivity to
-     * [10, 204800], so compensation below ≈ −3.3 EV (or above ≈ +11 EV)
-     * moves into the shutter time instead; EV100 is identical.
+     * Sets the camera's exposure to exactly [e], the stage's linear
+     * multiplier (upstream's `exposure`; lights and the environment are
+     * in upstream's units, see FsceneRealizer's unit note). Filament
+     * computes exposure as `t·S / (1.2·N²·100)`, so `N = 1`,
+     * `t = 1.2 s`, `S = 100·e` gives `e`. It clamps `S` to
+     * [10, 204800]; outside that the remainder moves into the shutter
+     * time.
      */
     private fun setCameraExposure(cam: Camera, e: Float) {
         val iso = 100.0f * e
         when {
-            iso < 10f -> cam.setExposure(16.0f, (1.0f / 125.0f) * (iso / 10f), 10f)
-            iso > 204800f -> cam.setExposure(16.0f,
-                (1.0f / 125.0f) * (iso / 204800f), 204800f)
-            else -> cam.setExposure(16.0f, 1.0f / 125.0f, iso)
+            iso < 10f -> cam.setExposure(1.0f, 1.2f * (iso / 10f), 10f)
+            iso > 204800f -> cam.setExposure(1.0f,
+                1.2f * (iso / 204800f), 204800f)
+            else -> cam.setExposure(1.0f, 1.2f, iso)
         }
     }
 
@@ -1265,8 +1261,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         lastEffExposure = effExposure
         setCameraExposure(camera, effExposure)
         // W14: exposure is a Camera property — every screen-bound view
-        // camera takes it (offscreen views keep Filament's default,
-        // the same policy as the per-View post stack). applyViews
+        // camera takes it (offscreen views stay at exposure 1, the
+        // same policy as the per-View post stack). applyViews
         // re-applies [lastEffExposure] to cameras it creates later.
         for (rec in screenViews) {
             rec.camera?.let { setCameraExposure(it, effExposure) }
@@ -1275,7 +1271,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             "pbrNeutral" -> ToneMapper.PBRNeutralToneMapper()
             "agx" -> ToneMapper.Agx()
             "filmic" -> ToneMapper.Filmic()
-            "aces" -> ToneMapper.ACES()
+            // Upstream's `aces` is the Hill fit with its 1/0.6 input
+            // gain; Filament's ACESLegacy is its ACES with that gain.
+            "aces" -> ToneMapper.ACESLegacy()
             "linear" -> ToneMapper.Linear()
             else -> {
                 logCommandOnce("stage.toneMapping.$toneMapping",
@@ -1290,6 +1288,13 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     " binding (AgxLook presets only); ignored")
         }
         val cgBuilder = ColorGrading.Builder().toneMapper(mapper)
+        if (toneMapping == "linear") {
+            // The grade is baked into a table and `linear` has a
+            // corner at 1: at the default 32³ a white of 1 came out
+            // at (249, 247, 248) and pure green at (23, 247, 6). At
+            // 64³ they are (253, 253, 253) and (1, 253, 0).
+            cgBuilder.quality(ColorGrading.QualityLevel.ULTRA)
+        }
         // W13 colorGrading block — merged into the same build (a View
         // binds exactly one ColorGrading).
         fx?.colorGrading?.takeIf { it.enabled }?.let { fxCg ->
@@ -1367,8 +1372,12 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             enabled = fx.bloom.enabled || fx.lensFlare.enabled
             strength = if (fx.bloom.enabled) fx.bloom.intensity.toFloat()
                 else fx.lensFlare.intensity.toFloat().coerceIn(0f, 1f)
-            // Filament's `threshold` is a bool knee toggle; upstream's
-            // 0..1 luminance cutoff lands on `highlight` instead.
+            // Filament's `threshold` is a bool: keep what is above 1.
+            // Upstream's cutoff is passed as `highlight`, the value
+            // bright input is compressed toward — but Filament raises
+            // a highlight below 10 to 10, so an upstream threshold in
+            // its usual 0…2 range changes nothing here. iOS's resolve
+            // pass does the same (ToneMapping.swift).
             threshold = true
             highlight = fx.bloom.threshold.toFloat()
             levels = (3 + 8 * fx.bloom.scatter).toInt().coerceIn(3, 11)
@@ -2901,7 +2910,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             rec.camera = cam
             // decodeStage may have run before these cameras existed
             // (initial load / re-realize) — carry the stage exposure.
-            if (rec.targetKey == null) setCameraExposure(cam, lastEffExposure)
+            // An offscreen view renders at exposure 1, never at
+            // Filament's photographic default.
+            setCameraExposure(cam,
+                if (rec.targetKey == null) lastEffExposure else 1.0f)
             val tk = rec.targetKey
             if (tk != null) {
                 val rtRec = renderTargets[tk]
