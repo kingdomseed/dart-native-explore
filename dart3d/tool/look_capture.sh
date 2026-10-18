@@ -29,6 +29,9 @@ settle=4
 root=$(cd "$(dirname "$0")" && pwd)
 variants=${LOOK_VARIANTS:-$(python3 -c "import json,sys; print(' '.join(json.load(open(sys.argv[1]))['variants']))" "$root/look_reference_patches.json")}
 mkdir -p "$out"
+for v in $variants; do
+  rm -f "$out/$v.png"
+done
 
 shot() {
   case "$platform" in

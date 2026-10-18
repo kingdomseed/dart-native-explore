@@ -5192,11 +5192,13 @@ object FsceneRealizer {
                     // one, and by the skybox's own only when it has
                     // none. Upstream's gradient sky is its own source,
                     // so with an IndirectLight in place the pixels are
-                    // divided by its intensity.
+                    // divided by its intensity (floored at 1e-3 so tiny
+                    // non-zero IBL intensities cannot overflow the
+                    // RGBA16F equirect texture).
                     val gp = EnvironmentFactory.filamentShifted(
                         EnvironmentFactory.gradientEquirectPixels(
                             source,
-                            if (lightsScene) skyIntensity / intensity
+                            if (lightsScene) skyIntensity / maxOf(intensity, 1e-3)
                             else 1.0),
                         0.0)
                     val gt = EnvironmentFactory.equirectTexture(

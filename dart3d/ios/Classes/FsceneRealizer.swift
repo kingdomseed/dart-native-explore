@@ -4927,6 +4927,7 @@ enum FsceneRealizer {
         /// the way in from the edge of a 15°/30° cone), so the cone is
         /// made hard at the outer angle and upstream's ramp is
         /// projected through it as the light's gobo.
+        private static let spotConeImagesLock = NSLock()
         private static var spotConeImages: [String: CGImage] = [:]
 
         /// Upstream's (and Filament's) spot cone as an image a spot
@@ -4935,6 +4936,8 @@ enum FsceneRealizer {
         /// image's edge lying on the outer angle.
         static func spotConeImage(inner: Double, outer: Double) -> CGImage? {
             let key = String(format: "%.4f|%.4f", inner, outer)
+            spotConeImagesLock.lock()
+            defer { spotConeImagesLock.unlock() }
             if let image = spotConeImages[key] { return image }
             let n = 256
             let tanOuter = tan(outer)
