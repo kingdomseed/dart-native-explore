@@ -399,10 +399,13 @@ enum ToneMapTechnique {
     }
     """
 
+    private static let librariesLock = NSLock()
     private static var libraries: [ObjectIdentifier: MTLLibrary] = [:]
 
     private static func library(for device: MTLDevice) -> MTLLibrary? {
         let id = ObjectIdentifier(device)
+        librariesLock.lock()
+        defer { librariesLock.unlock() }
         if let lib = libraries[id] { return lib }
         guard let lib = try? device.makeLibrary(source: source, options: nil)
         else { return nil }
