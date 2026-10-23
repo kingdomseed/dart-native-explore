@@ -44,7 +44,7 @@ import 'scene_model.dart';
 Map<LocalId, (Vector3 min, Vector3 max)> meshNodeWorldBounds(
   SceneDocument doc,
 ) {
-  final world = _worldTransforms(doc);
+  final world = computeWorldTransforms(doc);
   final perNode = <LocalId, (Vector3, Vector3)>{};
   final corner = Vector3.zero();
   for (final node in doc.nodes.values) {
@@ -131,14 +131,20 @@ Map<LocalId, (Vector3 min, Vector3 max)> meshNodeWorldBounds(
 /// roots; orphans (no parent reference anywhere) render at the scene
 /// root, so they map from identity. A node whose parent is invisible
 /// keeps its subtree hidden, matching the realizers.
-Map<LocalId, Matrix4> _worldTransforms(SceneDocument doc) {
+///
+/// When [includeHidden] is true, transforms are also computed inside
+/// hidden subtrees (used by camera nodes or skin joint hierarchies).
+Map<LocalId, Matrix4> computeWorldTransforms(
+  SceneDocument doc, {
+  bool includeHidden = false,
+}) {
   final world = <LocalId, Matrix4>{};
 
   void walk(NodeSpec node, Matrix4 parent) {
     if (world.containsKey(node.id)) return; // a cycle or shared child
     final w = parent * node.transform.toMatrix4();
     world[node.id] = w;
-    if (!node.visible) return;
+    if (!includeHidden && !node.visible) return;
     for (final childId in node.children) {
       final child = doc.nodes[childId];
       if (child != null) walk(child, w);

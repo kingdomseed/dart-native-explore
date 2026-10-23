@@ -1,0 +1,8 @@
+10-23 08:22:41.377 26842 26842 I dart3d  : Filament engine backend: OPENGL (pref=1, tier=STANDARD)
+10-23 08:26:26.820 26842 26842 I dart3d  : Filament engine backend: OPENGL (pref=1, tier=STANDARD)
+10-23 08:26:56.498 26842 26842 I dart3d  : Filament engine backend: OPENGL (pref=1, tier=STANDARD)
+10-23 08:27:13.404 26842 26842 I dartnative: dart3d: dice roll throw — strength 0.79 dir (-0, -1) gates [2, 0]
+10-23 08:27:16.947 26842 26842 I dartnative: dart3d: dice settled — d4=3 (up 1.000 at -28.6,4.3,49.2) d6=2 (up 1.000 at -18.1,6.9,-35.0) d8=4 (up 1.000 at -5.2,5.2,-21.6) d10t=20 (up 1.000 at 7.6,5.9,-22.8) d10u=4 (up 1.000 at -7.4,6.0,-53.1) d12=8 (up 1.000 at 0.4,7.8,64.2) d20=4 (up 1.000 at -31.5,7.7,-51.5)
+10-23 08:27:16.947 26842 26842 I dartnative: dart3d: dice readout d4 3 · d6 2 · d8 4 · d12 8 · d20 4 · d% 20+4 = 45
+10-23 08:27:19.496 26842 26842 I dartnative: dart3d: dice settled — d4=3 (up 1.000 at -28.6,4.3,49.2) d6=2 (up 1.000 at -18.1,6.9,-35.0) d8=4 (up 1.000 at -5.2,5.2,-21.6) d10t=20 (up 1.000 at 7.6,5.9,-22.8) d10u=4 (up 1.000 at -7.4,6.0,-53.1) d12=8 (up 1.000 at 0.4,7.8,64.2) d20=4 (up 1.000 at -31.5,7.7,-51.5)
+10-23 08:27:19.497 26842 26842 I dartnative: dart3d: dice readout d4 3 · d6 2 · d8 4 · d12 8 · d20 4 · d% 20+4 = 45

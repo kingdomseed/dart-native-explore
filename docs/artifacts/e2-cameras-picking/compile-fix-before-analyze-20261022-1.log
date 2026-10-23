@@ -1,0 +1,6 @@
+Analyzing example...                                            
+
+  error • The named parameter 'filter' isn't defined • lib/showcase_scene.dart:210:7 • undefined_named_parameter
+  error • The named parameter 'filter' isn't defined • lib/showcase_scene.dart:422:7 • undefined_named_parameter
+
+2 issues found. (ran in 4.9s)

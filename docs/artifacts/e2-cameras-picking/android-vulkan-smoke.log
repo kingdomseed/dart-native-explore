@@ -1,0 +1,5 @@
+10-23 08:38:30.579 30554 30554 I dart3d  : Filament engine backend: VULKAN (pref=2, tier=STANDARD)
+10-23 08:39:28.378 30554 30554 I dart3d  : Filament engine backend: VULKAN (pref=2, tier=STANDARD)
+10-23 08:39:31.460 30554 30554 I dartnative: dart3d: dice roll throw — strength 0.76 dir (-1, 1) gates [0, 3]
+10-23 08:39:39.345 30554 30554 I dartnative: dart3d: dice settled — d4=4 (up 1.000 at -5.6,4.3,68.7) d6=1 (up 1.000 at -5.3,6.9,10.0) d8=6 (up 1.000 at -35.7,5.2,55.3) d10t=60 (up 1.000 at -21.3,6.0,49.5) d10u=2 (up 1.000 at 30.8,6.0,64.2) d12=8 (up 0.997 at -3.9,8.1,56.0) d20=13 (up 1.000 at -24.2,7.7,66.9) [3 nudges]
+10-23 08:39:39.345 30554 30554 I dartnative: dart3d: dice readout d4 4 · d6 1 · d8 6 · d12 8 · d20 13 · d% 60+2 = 94

@@ -526,6 +526,23 @@ transforms, and `InstanceBuffer`-backed `meshParticleEmitter` buckets).
 | T2 dice roll & settle | n/a | pass — `89.8 fps` Vulkan / `87.8 fps` OpenGL, 7 dice settled, 0 errors (`a142-{vk,gl}-dice.{png,log}`) |
 | Unit tests | `dn analyze` + `dn test` (`dart3d`: 277, `example`: 224) | `./gradlew :dart3d:testReleaseUnitTest` passes (incl. reflected tangent & `InstanceBuffer` tests) |
 
+## E2 — U1 camera controllers + render-geometry picking (live-verified iOS sim + Android A142 Vulkan + GL)
+
+`docs/artifacts/e2-cameras-picking/README.md`.
+Adds `SceneCamera` (`screenPointToRay`, `worldToScreen`), `OrbitCameraController`,
+`FlyCameraController`, `FollowCameraController`, `CameraControls`, CPU triangle
+`TriangleBvh`, synchronous `raycastDocument` / `SceneController.pick` across
+procedural, payload, `d3:procMesh`, rest-pose skinned, camera-oriented billboard,
+and `d3:instances` draws, and `ScenePointer` gesture picking with drag/pinch
+rejection and tap-cancel forwarding.
+
+| Lane | iOS sim — observed | Android A142 — observed |
+|---|---|---|
+| Five-target tap picking (procedural, payload, `d3:procMesh`, skinned, `d3:instances`) | pass — 5 real taps select all 5 targets incl. skinned mesh and instance 2; drag/pinch emit no picks; recovery tap selects capsule (`ios-five-targets-picked.png`, `ios-final-journey.log`) | pass — same 5 real target taps, drag/pinch rejection, and recovery tap pass on both Vulkan (`android-vulkan-run-transcript.log`, `android-vulkan-native.log`) and OpenGL (`android-opengl-journey.log`, `android-opengl-native.log`) |
+| Orbit / fly / follow gesture-driven camera poses (3 poses per mode) | pass — 3 one-finger drag gestures per mode captured (`ios-final-{orbit,fly,follow}-gesture-{1,2,3}.png`) | pass — 9 gesture poses captured per backend (`android-vulkan-{orbit,fly,follow}-gesture-{1,2,3}.png`, `android-opengl-{orbit,fly,follow}-gesture-{1,2,3}.png`) |
+| T2 app, dice & harness smoke | n/a (pure-Dart unit; iOS U1 feature lane verified above) | pass — Vulkan (`readout=94`) and OpenGL (`readout=45`) dice roll/settle + full harness through `w18 lane complete` and W25 PASS with 0 crashes (`android-{vulkan,opengl}-{smoke,harness-summary}.log`, `android-{vulkan,opengl}-{dice-settled,harness}.png`) |
+| Unit tests | `dn analyze` + `dn test` (`dart3d`: 319, `example`: 225) | same (`package-tests.log`, `example-tests.log`) |
+
 ## Notes
 
 - **Runtime-minted payloads need their spec on the op** — the W11

@@ -1,0 +1,12 @@
+2026-10-22 23:59:18.758 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: u1 tap-pick node=u1.target.procedural id=6DT1MWG000004 instance=null point=(-3.15,0.95,-0.55) PASS
+2026-10-22 23:59:20.301 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: u1 tap-pick node=u1.target.payload id=6DT1MWG00000E instance=null point=(-1.57,0.97,-0.60) PASS
+2026-10-22 23:59:21.768 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: u1 tap-pick node=u1.target.d3proc id=6DT1MWG00000J instance=null point=(-0.00,0.95,-0.46) PASS
+2026-10-22 23:59:23.334 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: u1 tap-pick node=u1.target.skinned id=6DT1MWG000010 instance=null point=(1.62,1.40,-0.50) PASS
+2026-10-22 23:59:24.717 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: u1 tap-pick node=u1.target.instanced id=6DT1MWG000016 instance=2 point=(3.19,1.60,-0.43) PASS
+2026-10-22 23:59:28.350 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: u1 tap-pick node=u1.target.d3proc id=6DT1MWG00000J instance=null point=(-0.10,1.01,-0.45) PASS
+2026-10-22 23:59:35.683 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: u1 controller=orbit pose=orbit2 camPos=(9.37,9.81,-14.39) camTarget=(-0.05,0.85,0.00) PASS
+2026-10-22 23:59:37.083 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: u1 controller=orbit pose=orbit3 camPos=(-6.51,11.12,-12.58) camTarget=(0.55,0.97,-0.25) PASS
+2026-10-22 23:59:38.617 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: u1 controller=fly pose=fly1 camPos=(-1.10,2.21,-15.57) camTarget=(-0.87,1.99,-14.62) PASS
+2026-10-22 23:59:45.816 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: u1 controller=fly pose=fly2 camPos=(0.39,1.44,-13.89) camTarget=(0.31,1.29,-12.90) PASS
+2026-10-22 23:59:47.466 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: u1 controller=fly pose=fly3 camPos=(2.34,2.65,-14.11) camTarget=(2.02,2.37,-13.21) PASS
+2026-10-22 23:59:48.868 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: u1 controller=follow pose=follow1 camPos=(0.00,2.75,-12.57) camTarget=(0.00,0.90,0.00) PASS

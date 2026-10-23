@@ -8,6 +8,7 @@ import 'package:vector_math/vector_math.dart';
 import 'scene_model.dart';
 
 import 'animation.dart';
+import 'camera.dart';
 import 'components.dart';
 import 'compose_extensions.dart';
 import 'diff_apply.dart';
@@ -17,8 +18,12 @@ import 'glb_import.dart';
 import 'lut_assets.dart';
 import 'physics.dart';
 import 'protocol.dart';
+import 'raycast.dart';
 import 'scene_view.dart';
 import 'subtree_stream.dart';
+
+/// Callback registered via [SceneController.addTickListener] (`V6f`).
+typedef SceneTickListener = void Function(double deltaSeconds);
 
 /// One node's transform write in a [SceneController.setNodeTransforms]
 /// batch. `null` fields keep their previous values.
@@ -72,6 +77,7 @@ final class SceneController {
   int _jointSeq = 0;
   int _querySeq = 0;
   final Map<int, Completer<Map<String, Object?>>> _pendingQueries = {};
+  final List<SceneTickListener> _tickListeners = [];
 
   /// The document most recently sent to the view, or null.
   SceneDocument? get document => _document;
@@ -96,6 +102,145 @@ final class SceneController {
   /// separation; the native side has already removed the constraint when
   /// the event lands (a dart3d extension — upstream has no joint events).
   Stream<SceneJointBroke> get jointEvents => _jointEvents.stream;
+
+  // MARK: - Frame tick listeners (V6f)
+
+  /// Registers [listener] to be called once per frame with `deltaSeconds`
+  /// when driven by `CameraControls` or an explicit [notifyTick] call
+  /// (`V6f` — upstream `flutter_scene` 0.24 `SceneViewController.addTickListener`
+  /// parity).
+  void addTickListener(SceneTickListener listener) {
+    if (!_tickListeners.contains(listener)) {
+      _tickListeners.add(listener);
+    }
+  }
+
+  /// Removes a previously registered [listener] (`V6f`).
+  void removeTickListener(SceneTickListener listener) {
+    _tickListeners.remove(listener);
+  }
+
+  /// Invokes all registered tick listeners with [deltaSeconds].
+  void notifyTick(double deltaSeconds) {
+    if (_tickListeners.isEmpty) return;
+    for (final listener in List<SceneTickListener>.of(_tickListeners)) {
+      listener(deltaSeconds);
+    }
+  }
+
+  // MARK: - Camera & render-geometry picking (U1 / E2)
+
+  /// Resolves a [SceneCamera] from the tracked [document] (or returns null
+  /// when no document or camera node exists).
+  SceneCamera? cameraFor({LocalId? cameraNode}) {
+    final doc = _document;
+    if (doc == null) return null;
+    return SceneCamera.fromDocument(doc, cameraNode: cameraNode);
+  }
+
+  /// Unprojects `(screenX, screenY)` within a viewport of
+  /// `(viewWidth, viewHeight)` into a world-space [Ray] using [camera] (or
+  /// [cameraFor] on the tracked [document]).
+  Ray? screenPointToRay(
+    double screenX,
+    double screenY,
+    double viewWidth,
+    double viewHeight, {
+    SceneCamera? camera,
+    LocalId? cameraNode,
+  }) {
+    final cam = camera ?? cameraFor(cameraNode: cameraNode);
+    return cam?.screenPointToRay(screenX, screenY, viewWidth, viewHeight);
+  }
+
+  /// Projects [worldPoint] to 2D viewport coordinates `(x, y)` within
+  /// `(viewWidth, viewHeight)` using [camera] (or [cameraFor] on the tracked
+  /// [document]). Returns null if behind the camera or no camera is available.
+  (double x, double y)? worldToScreen(
+    Vector3 worldPoint,
+    double viewWidth,
+    double viewHeight, {
+    SceneCamera? camera,
+    LocalId? cameraNode,
+  }) {
+    final cam = camera ?? cameraFor(cameraNode: cameraNode);
+    return cam?.worldToScreen(worldPoint, viewWidth, viewHeight);
+  }
+
+  /// Synchronously raycasts the tracked [document]'s renderable meshes along
+  /// [ray] (in `.fscene` world space) and returns the closest
+  /// [SceneRaycastHit], or `null` on a miss.
+  ///
+  /// Unlike [raycast] (which queries the native physics engine's colliders
+  /// asynchronously), [raycastMesh] tests the renderable triangle meshes
+  /// (payload meshes, procedural meshes, skinned meshes, and `d3:instances`
+  /// draws) synchronously via CPU BVHs.
+  SceneRaycastHit? raycastMesh(
+    Ray ray, {
+    SceneCamera? camera,
+    double maxDistance = double.infinity,
+    int layerMask = -1,
+    SceneNodePredicate? where,
+  }) {
+    final doc = _document;
+    if (doc == null) return null;
+    return raycastDocument(
+      doc,
+      ray,
+      camera: camera,
+      maxDistance: maxDistance,
+      layerMask: layerMask,
+      where: where,
+    );
+  }
+
+  /// Synchronously raycasts the tracked [document]'s renderable meshes along
+  /// [ray] and returns all hits sorted nearest-first.
+  List<SceneRaycastHit> raycastMeshAll(
+    Ray ray, {
+    SceneCamera? camera,
+    double maxDistance = double.infinity,
+    int layerMask = -1,
+    SceneNodePredicate? where,
+  }) {
+    final doc = _document;
+    if (doc == null) return const [];
+    return raycastDocumentAll(
+      doc,
+      ray,
+      camera: camera,
+      maxDistance: maxDistance,
+      layerMask: layerMask,
+      where: where,
+    );
+  }
+
+  /// Unprojects `(screenX, screenY)` in `(viewWidth, viewHeight)` and
+  /// raycasts the tracked [document]'s renderable meshes, returning the
+  /// closest picked [SceneRaycastHit] (including `instanceIndex` for
+  /// `d3:instances` nodes) or `null` on a miss.
+  SceneRaycastHit? pick(
+    double screenX,
+    double screenY,
+    double viewWidth,
+    double viewHeight, {
+    SceneCamera? camera,
+    LocalId? cameraNode,
+    double maxDistance = double.infinity,
+    int layerMask = -1,
+    SceneNodePredicate? where,
+  }) {
+    final cam = camera ?? cameraFor(cameraNode: cameraNode);
+    final ray = cam?.screenPointToRay(screenX, screenY, viewWidth, viewHeight);
+    if (ray == null) return null;
+    return raycastMesh(
+      ray,
+      camera: cam,
+      maxDistance: maxDistance,
+      layerMask: layerMask,
+      where: where,
+    );
+  }
 
   /// Replaces the whole scene with [doc]'s contents.
   ///
@@ -821,6 +966,7 @@ final class SceneController {
     _pending.clear();
     _document = null;
     _streamed.clear();
+    _tickListeners.clear();
     d3FailPendingQueries(
       _pendingQueries,
       StateError('dart3d: SceneController disposed'),

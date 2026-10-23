@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-22T21:52:06.829Z",
+  "events": [
+    {
+      "kind": "tap",
+      "tMs": 943.314453125,
+      "x": 83,
+      "y": 439,
+      "referenceWidth": 402,
+      "referenceHeight": 874
+    },
+    {
+      "kind": "tap",
+      "tMs": 2447.50537109375,
+      "x": 143,
+      "y": 439,
+      "referenceWidth": 402,
+      "referenceHeight": 874
+    },
+    {
+      "kind": "tap",
+      "tMs": 3881.773681640625,
+      "x": 203,
+      "y": 438,
+      "referenceWidth": 402,
+      "referenceHeight": 874
+    },
+    {
+      "kind": "tap",
+      "tMs": 5317.03076171875,
+      "x": 265,
+      "y": 422,
+      "referenceWidth": 402,
+      "referenceHeight": 874
+    },
+    {
+      "kind": "tap",
+      "tMs": 6726.45751953125,
+      "x": 325,
+      "y": 414,
+      "referenceWidth": 402,
+      "referenceHeight": 874
+    },
+    {
+      "kind": "swipe",
+      "tMs": 8243.981689453125,
+      "x": 203,
+      "y": 438,
+      "x2": 228,
+      "y2": 453,
+      "referenceWidth": 402,
+      "referenceHeight": 874,
+      "durationMs": 736
+    },
+    {
+      "kind": "pinch",
+      "tMs": 9300.351318359375,
+      "x": 203,
+      "y": 438,
+      "referenceWidth": 402,
+      "referenceHeight": 874,
+      "scale": 1.2,
+      "durationMs": 656
+    },
+    {
+      "kind": "tap",
+      "tMs": 10388.159423828125,
+      "x": 203,
+      "y": 438,
+      "referenceWidth": 402,
+      "referenceHeight": 874
+    }
+  ]
+}

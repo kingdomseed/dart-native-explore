@@ -332,35 +332,69 @@ final class SceneTriggerExited extends SceneCollisionEvent {
   });
 }
 
-/// One collider hit by a `raycast` or `shapecast` query. [worldPoint]
-/// is the hit position and [distance] its distance along the ray or
-/// cast; [worldNormal] is the surface normal where the backend reports
-/// one — Jolt raycasts don't, so it stays null there.
+/// One collider or render-geometry mesh hit by a `raycast`, `shapecast`,
+/// or `raycastDocument` / `ScenePointer` query.
+///
+/// [worldPoint] is the hit position and [distance] its distance along the
+/// ray or cast; [worldNormal] is the surface normal where reported.
+/// Render-geometry raycasts (`raycastDocument`, `SceneController.raycastMesh`,
+/// `ScenePointer`) additionally populate [uv], [barycentrics],
+/// [triangleIndex], [primitiveIndex], and (for `d3:instances` nodes)
+/// [instanceIndex].
 final class SceneRaycastHit {
   /// Creates a hit.
   const SceneRaycastHit({
     required this.node,
-    required this.colliderIndex,
+    this.colliderIndex = 0,
     required this.worldPoint,
     this.worldNormal,
     required this.distance,
+    this.uv,
+    this.barycentrics,
+    this.triangleIndex = 0,
+    this.primitiveIndex = 0,
+    this.instanceIndex,
   });
 
-  /// The node whose collider was hit.
+  /// The node whose collider or render mesh was hit.
   final LocalId node;
 
-  /// The hit collider's index within the node's `components` array.
+  /// The hit collider's index within the node's `components` array (`0` for
+  /// render-geometry hits).
   final int colliderIndex;
 
-  /// Hit position in world space.
+  /// Hit position in world space (also exposed as [point] for upstream
+  /// `SceneRaycastHit` parity).
   final Vector3 worldPoint;
+
+  /// Alias for [worldPoint] matching upstream `flutter_scene` `SceneRaycastHit.point`.
+  Vector3 get point => worldPoint;
 
   /// Surface normal at the hit, or null when the backend doesn't
   /// report one.
   final Vector3? worldNormal;
 
+  /// Alias for [worldNormal] matching upstream `flutter_scene` `SceneRaycastHit.normal`.
+  Vector3? get normal => worldNormal;
+
   /// Distance from the ray origin / cast start to [worldPoint].
   final double distance;
+
+  /// Interpolated texture coordinate at the hit (render-geometry hits).
+  final Vector2? uv;
+
+  /// Barycentric weights `(w0, w1, w2)` of the hit triangle (render-geometry hits).
+  final Vector3? barycentrics;
+
+  /// Index of the hit triangle within the primitive (render-geometry hits).
+  final int triangleIndex;
+
+  /// Index of the hit primitive within the node's mesh component (render-geometry hits).
+  final int primitiveIndex;
+
+  /// Index of the hit instance (`0 .. count-1`) when [node] carries a
+  /// `d3:instances` component, or `null` for non-instanced meshes.
+  final int? instanceIndex;
 }
 
 /// One collider returned by an `overlap` query — the node plus the

@@ -14,6 +14,10 @@
 library;
 
 export 'src/animation.dart';
+export 'src/bvh.dart';
+export 'src/camera.dart';
+export 'src/camera_controllers.dart';
+export 'src/camera_controls.dart';
 export 'src/components.dart';
 export 'src/compose_extensions.dart';
 export 'src/diff_apply.dart';
@@ -27,8 +31,11 @@ export 'src/glb_import.dart';
 export 'src/lut_assets.dart';
 export 'src/particle_sim.dart';
 export 'src/particles.dart';
+export 'src/raycast.dart';
 export 'src/scene_model.dart';
-export 'src/scene_controller.dart' show NodeTransform, SceneController;
+export 'src/scene_controller.dart'
+    show NodeTransform, SceneController, SceneTickListener;
+export 'src/scene_pointer.dart';
 export 'src/scene_view.dart' show SceneQuality, SceneView;
 export 'src/subtree_stream.dart';
 export 'src/ffi_bindings.dart' show Dart3dFFIBindings;
@@ -36,4 +43,8 @@ export 'src/physics.dart';
 export 'src/trail_lod.dart';
 export 'src/vertex_pack.dart' show VertexPack;
 export 'src/world_bounds.dart'
-    show documentContentBounds, documentWorldBounds, meshNodeWorldBounds;
+    show
+        computeWorldTransforms,
+        documentContentBounds,
+        documentWorldBounds,
+        meshNodeWorldBounds;

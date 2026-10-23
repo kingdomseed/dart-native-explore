@@ -1,0 +1,16 @@
+2026-10-22 23:44:55.240 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: touch-probe event=onScaleStart pointerCount=1 tapPending=false
+2026-10-22 23:44:55.246 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: touch-probe event=onTapDown pointerCount=unavailable tapPending=true
+2026-10-22 23:44:55.267 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: touch-probe event=onScaleEnd pointerCount=1 tapPending=true
+2026-10-22 23:44:55.268 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: u1 tap-pick node=u1.target.procedural id=NXEVVC0000004 instance=null point=(-3.15,0.95,-0.55) PASS
+2026-10-22 23:44:55.269 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: touch-probe event=onTapCancel pointerCount=unavailable tapPending=false
+2026-10-22 23:45:01.769 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: touch-probe event=onScaleStart pointerCount=1 tapPending=false
+2026-10-22 23:45:01.770 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: touch-probe event=onTapDown pointerCount=unavailable tapPending=true
+2026-10-22 23:45:01.999 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: touch-probe event=onTapCancel pointerCount=unavailable tapPending=false
+2026-10-22 23:45:02.232 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: touch-probe event=onScaleEnd pointerCount=1 tapPending=false
+2026-10-22 23:45:07.828 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: touch-probe event=onScaleStart pointerCount=2 tapPending=false
+2026-10-22 23:45:08.233 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: touch-probe event=onScaleEnd pointerCount=2 tapPending=false
+2026-10-22 23:45:13.892 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: touch-probe event=onScaleStart pointerCount=1 tapPending=false
+2026-10-22 23:45:13.894 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: touch-probe event=onTapDown pointerCount=unavailable tapPending=true
+2026-10-22 23:45:13.965 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: touch-probe event=onScaleEnd pointerCount=1 tapPending=true
+2026-10-22 23:45:13.966 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: u1 tap-pick node=u1.target.d3proc id=NXEVVC000000J instance=null point=(-0.10,1.01,-0.45) PASS
+2026-10-22 23:45:13.967 Df Runner[50922:4a2229] (Flutter) dartnative: dart3d: touch-probe event=onTapCancel pointerCount=unavailable tapPending=false
