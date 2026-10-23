@@ -173,6 +173,22 @@ class FacingSpec(
  */
 object FsceneRealizer {
 
+    internal fun cascadeSplits(
+        lambda: Float, cascades: Int, shadowFar: Float,
+    ): FloatArray {
+        val f = if (shadowFar > 0f) shadowFar else 100f
+        val n = minOf(0.1f, f * 0.01f)
+        val out = FloatArray(3) { 1.0f }
+        for (i in 1 until cascades.coerceAtMost(4)) {
+            val t = i.toFloat() / cascades
+            val log = n * Math.pow((f / n).toDouble(),
+                t.toDouble()).toFloat()
+            val uni = n + (f - n) * t
+            out[i - 1] = (lambda * log + (1 - lambda) * uni) / f
+        }
+        return out
+    }
+
     // One-shot log dedup for spec-deferred features (payload-backed
     // shapes, heightField, named backends, bad combine rules).
     private val loggedOnce = mutableSetOf<String>()
@@ -4189,21 +4205,9 @@ object FsceneRealizer {
          * light decode) and then divided by it; `n` is a nominal
          * 0.1 near (the view camera's near isn't known either).
          */
-        private fun cascadeSplits(
+        internal fun cascadeSplits(
             lambda: Float, cascades: Int, shadowFar: Float,
-        ): FloatArray {
-            val f = if (shadowFar > 0f) shadowFar else 100f
-            val n = minOf(0.1f, f * 0.01f)
-            val out = FloatArray(3) { 1.0f }
-            for (i in 1 until cascades.coerceAtMost(4)) {
-                val t = i.toFloat() / cascades
-                val log = n * Math.pow((f / n).toDouble(),
-                    t.toDouble()).toFloat()
-                val uni = n + (f - n) * t
-                out[i - 1] = (lambda * log + (1 - lambda) * uni) / f
-            }
-            return out
-        }
+        ): FloatArray = FsceneRealizer.cascadeSplits(lambda, cascades, shadowFar)
 
         /**
          * W12 `rectAreaLight` — Filament exposes no area light type in
@@ -5614,10 +5618,6 @@ object FsceneRealizer {
                 .ifEmpty { "pbrNeutral" }
             val agxWhite = envRes.optDouble("agxWhite", 16.29)
             val agxContrast = envRes.optDouble("agxContrast", 1.25)
-            if (envRes.has("skyEnvironment")) {
-                logOnce("stage.skyEnvironment",
-                    "skyEnvironment (procedural sky re-lighting) is deferred")
-            }
             // W13: the env's `effects` post-stack. Absent keeps the
             // prior decoded stack (retain-on-absent); present — even
             // `{}` — wholesale-replaces it.
@@ -5633,45 +5633,135 @@ object FsceneRealizer {
                         " IBLPrefilterContext (cube is fixed 256²); ignored")
             }
 
-            // Lighting env → CPU pixels → SH3 + prefiltered cube. The
-            // z-mirror + environmentRotationY bake into the equirect as
-            // one column shift (see EnvironmentFactory.filamentShifted)
-            // — Filament's Skybox has no rotation knob, so the bake
-            // keeps the background and the reflections agreeing where
-            // IndirectLight.rotation would rotate lighting alone.
-            val pixels = realizeEnvironmentSource(envRes, envKey)
+            val skyEnv = envRes.optJSONObject("skyEnvironment")
+            val skyEnvSource = skyEnv?.optJSONObject("source")
+            val skyEnvType = skyEnvSource?.optString("type")?.takeIf { it.isNotEmpty() }
+            val hasSkyEnv = skyEnv != null &&
+                (skyEnvType == "physical" || skyEnvType == "gradient")
+            if (skyEnv != null && !hasSkyEnv) {
+                when (skyEnvType) {
+                    "environment" -> warnOnce("stage.skyEnvironment.environment",
+                        "skyEnvironment source 'environment' cannot light itself;" +
+                            " falling back to stage environment")
+                    "fmat" -> logOnce("stage.skyEnvironment.fmat",
+                        "skyEnvironment source 'fmat' is deferred;" +
+                            " falling back to stage environment")
+                    else -> warnOnce("stage.skyEnvironment.${skyEnvType ?: "?"}",
+                        "skyEnvironment source '${skyEnvType ?: "?"}' unknown;" +
+                            " falling back to stage environment")
+                }
+            }
+
+            // W17: stage-owned directional sun light (`skyEnvironment.sunLight`).
+            val sunLightSpec = if (hasSkyEnv) skyEnv?.optJSONObject("sunLight") else null
+            host.applyStageSunLight(skyEnvSource, sunLightSpec)
+
             var sh: FloatArray? = null
             var envCube: Texture? = null
             var skyEnvPixels: EnvironmentFactory.EnvPixels? = null
             val iblTextures = ArrayList<Texture>()
-            if (pixels != null) {
-                val start = System.nanoTime()
-                val shifted =
-                    EnvironmentFactory.filamentShifted(pixels, rotationY)
-                sh = EnvironmentFactory.projectEquirectSH(shifted)
-                val eq = EnvironmentFactory.normalizeEquirect(shifted)
-                val src =
-                    EnvironmentFactory.equirectTexture(host.engine, eq)
-                iblTextures.add(src)
-                // run() can fail (non-2:1, missing mips — both
-                // pre-conditioned above, but the Java return is a
-                // platform type): degrade to SH-only rather than crash.
-                val cube = host.iblEquirect().run(src)
-                if (cube != null) {
-                    iblTextures.add(cube)
-                    envCube = host.iblSpecular().run(cube)
-                    if (envCube != null) iblTextures.add(envCube)
+            var deferIblToProgressiveSweep = false
+
+            if (hasSkyEnv) {
+                val refresh = skyEnv!!.optString("refresh").ifEmpty { "manual" }
+                val intervalSeconds =
+                    skyEnv.optDouble("intervalSeconds", 1.0).coerceAtLeast(0.0)
+                val equirectWidth =
+                    skyEnv.optInt("equirectWidth", 512).coerceIn(64, 512)
+                val forceStep = skyEnv.optInt("d3ProgressiveStep", 0)
+                val sourceSig = listOf(
+                    skyEnvSource.toString(), intensity, rotationY,
+                    equirectWidth, forceStep,
+                ).hashCode()
+                val spec = Dart3dView.PendingSkyEnvSpec(
+                    source = JSONObject(skyEnvSource.toString()),
+                    sourceType = skyEnvType!!,
+                    intensity = intensity,
+                    rotationY = rotationY,
+                    refresh = refresh,
+                    intervalSeconds = intervalSeconds,
+                    equirectWidth = equirectWidth,
+                    sig = sourceSig,
+                )
+                val needsSyncBake = forceStep in 1..3 ||
+                    host.skyEnvBakedSig == null ||
+                    (intensity > 0.0 && host.envIndirectLight == null)
+                if (needsSyncBake) {
+                    // Unbind any old environment-sourced skybox before
+                    // buildSkyEnvPrefilterStep replaces envIblTextures.
+                    if (host.skyboxUsesEnvCube) {
+                        host.scene.skybox = null
+                    }
+                    if (forceStep == 1) {
+                        host.envReflectionCube = null
+                    }
+                    val targetStep = if (forceStep in 1..3) forceStep else 3
+                    host.buildSkyEnvPrefilterStep(
+                        spec, targetStep, updateSkyboxIfEnvSourced = false)
+                    host.activeSkyEnvSpec = spec
+                    host.skyEnvBakedSig = sourceSig
+                    val now = System.nanoTime()
+                    host.skyEnvLastBakeNs = now
+                    host.skyEnvLastStepNs = now
+                    host.skyEnvProgressiveStep = targetStep
+                    host.pendingSkyEnvSpec = null
+                    envCube = host.envReflectionCube
+                    skyEnvPixels = host.envShiftedPixels
+                    deferIblToProgressiveSweep = true
                 } else {
-                    warnOnce("env.cube.${envKey ?: 0}",
-                        "equirect→cubemap conversion failed;" +
-                            " irradiance-only IBL")
+                    // Subsequent skyEnvironment update (e.g. sun sweep):
+                    // queue for rate-limited 3-step progressive prefilter in
+                    // stepFrame so the current frame updates only the skybox
+                    // and directional sunLight (< 1.5 ms total).
+                    if (sourceSig == host.skyEnvBakedSig &&
+                        host.skyEnvProgressiveStep == 3) {
+                        host.pendingSkyEnvSpec = null
+                    } else {
+                        host.pendingSkyEnvSpec = spec
+                    }
+                    envCube = host.envReflectionCube
+                    skyEnvPixels = host.envShiftedPixels
+                    deferIblToProgressiveSweep = true
                 }
-                skyEnvPixels = shifted
-                val elapsedMs = (System.nanoTime() - start) / 1_000_000
-                Log.i(TAG, "environment ${envKey ?: "default"}:" +
-                    " ${eq.width}×${eq.height} equirect →" +
-                    " ${envCube?.getWidth(0) ?: 0}² cube + SH3 in" +
-                    " ${elapsedMs}ms")
+            } else {
+                host.clearSkyEnvState()
+                // Lighting env → CPU pixels → SH3 + prefiltered cube. The
+                // z-mirror + environmentRotationY bake into the equirect as
+                // one column shift (see EnvironmentFactory.filamentShifted)
+                // — Filament's Skybox has no rotation knob, so the bake
+                // keeps the background and the reflections agreeing where
+                // IndirectLight.rotation would rotate lighting alone.
+                val pixels = realizeEnvironmentSource(envRes, envKey)
+                if (pixels != null) {
+                    val start = System.nanoTime()
+                    val shifted =
+                        EnvironmentFactory.filamentShifted(pixels, rotationY)
+                    sh = EnvironmentFactory.projectEquirectSH(shifted)
+                    val eq = EnvironmentFactory.normalizeEquirect(shifted)
+                    val src =
+                        EnvironmentFactory.equirectTexture(host.engine, eq)
+                    iblTextures.add(src)
+                    // run() can fail (non-2:1, missing mips — both
+                    // pre-conditioned above, but the Java return is a
+                    // platform type): degrade to SH-only rather than crash.
+                    val cube = host.iblEquirect().run(src)
+                    if (cube != null) {
+                        iblTextures.add(cube)
+                        envCube = host.iblSpecular().run(cube)
+                        if (envCube != null) iblTextures.add(envCube)
+                    } else {
+                        warnOnce("env.cube.${envKey ?: 0}",
+                            "equirect→cubemap conversion failed;" +
+                                " irradiance-only IBL")
+                    }
+                    skyEnvPixels = shifted
+                    val elapsedMs = (System.nanoTime() - start) / 1_000_000
+                    Log.i(TAG, "environment ${envKey ?: "default"}:" +
+                        " ${eq.width}×${eq.height} equirect →" +
+                        " ${envCube?.getWidth(0) ?: 0}² cube + SH3 in" +
+                        " ${elapsedMs}ms")
+                }
+                host.envReflectionCube = envCube
             }
 
             // --- skybox ------------------------------------------------
@@ -5684,20 +5774,31 @@ object FsceneRealizer {
             // Whether an IndirectLight will be bound (below). A zero
             // intensity binds none: it would light nothing and black
             // out the sky.
-            val lightsScene = sh != null && intensity > 0
+            val lightsScene = (hasSkyEnv || sh != null) && intensity > 0
             val skyType = source?.optString("type")
             val skyTextures = ArrayList<Texture>()
             var skybox: Skybox? = null
+            host.skyboxUsesEnvCube = false
+            host.skyboxSharesSkyEnvCube = false
+            val sharesSkyEnv = hasSkyEnv &&
+                source != null &&
+                skyEnvSource != null &&
+                source.toString() == skyEnvSource.toString() &&
+                kotlin.math.abs(rotationY) < 1e-6 &&
+                kotlin.math.abs(skyIntensity - 1.0) < 1e-6 &&
+                kotlin.math.abs(intensity - 1.0) < 1e-6
             // A deferred env leaves the `environment`-sourced
             // background untouched — its cube is still owned by the
             // previous decode. Every other source applies normally.
-            val skyboxTouched =
+            var skyboxTouched =
                 !stageEnvDeferred || skyType != "environment"
             when (skyType) {
                 "environment" -> if (!stageEnvDeferred) {
                     var cube = envCube
                     val blurriness =
                         source?.optDouble("blurriness", 0.0) ?: 0.0
+                    host.skyboxEnvIntensity = (intensity * skyIntensity).toFloat()
+                    host.skyboxEnvBlurriness = blurriness
                     if (cube != null && blurriness > 0 &&
                         skyEnvPixels != null) {
                         // Filament's Skybox always samples lod 0 (no
@@ -5723,6 +5824,9 @@ object FsceneRealizer {
                             host.engine.destroyTexture(bt)
                         }
                     }
+                    if (envCube != null) {
+                        host.skyboxUsesEnvCube = true
+                    }
                     if (cube != null) {
                         // Filament draws the skybox at the
                         // IndirectLight's intensity, which is the
@@ -5742,39 +5846,66 @@ object FsceneRealizer {
                     }
                 }
                 "gradient" -> {
-                    // The sky is its own source — env intensity/
-                    // rotation don't reach it, but the z-mirror does
-                    // (world space). It does NOT light the scene —
-                    // skyEnvironment re-lighting is deferred.
-                    // Filament multiplies a skybox by the
-                    // IndirectLight's intensity whenever the scene has
-                    // one, and by the skybox's own only when it has
-                    // none. Upstream's gradient sky is its own source,
-                    // so with an IndirectLight in place the pixels are
-                    // divided by its intensity (floored at 1e-3 so tiny
-                    // non-zero IBL intensities cannot overflow the
-                    // RGBA16F equirect texture).
-                    val gp = EnvironmentFactory.filamentShifted(
-                        EnvironmentFactory.gradientEquirectPixels(
-                            source,
-                            if (lightsScene) skyIntensity / maxOf(intensity, 1e-3)
-                            else 1.0),
-                        0.0)
-                    val gt = EnvironmentFactory.equirectTexture(
-                        host.engine, gp)
-                    val gc = host.iblEquirect().run(gt)
-                    if (gc != null) {
-                        skyTextures.add(gt)
+                    if (sharesSkyEnv && host.envUnfilteredCube != null) {
+                        host.skyboxSharesSkyEnvCube = true
+                        host.skyboxEnvIntensity = skyIntensity.toFloat()
+                        if (host.pendingSkyEnvSpec != null) {
+                            skyboxTouched = false
+                        } else {
+                            skybox = Skybox.Builder()
+                                .environment(host.envUnfilteredCube!!)
+                                .intensity(skyIntensity.toFloat())
+                                .fenced { build(host.engine) }
+                        }
+                    } else {
+                        val gp = EnvironmentFactory.filamentShifted(
+                            EnvironmentFactory.gradientEquirectPixels(
+                                source,
+                                if (lightsScene) skyIntensity / maxOf(intensity, 1e-3)
+                                else 1.0),
+                            0.0)
+                        val gc = EnvironmentFactory.cubemapTextureFromEquirect(
+                            host.engine, gp, faceSize = 64, maxMipLevels = 1)
                         skyTextures.add(gc)
                         skybox = Skybox.Builder()
                             .environment(gc)
                             .intensity(skyIntensity.toFloat())
                             .fenced { build(host.engine) }
-                    } else {
-                        host.engine.destroyTexture(gt)
                     }
                 }
-                "fmat", "physical" -> logOnce("skybox.$skyType",
+                "physical" -> {
+                    if (sharesSkyEnv && host.envUnfilteredCube != null) {
+                        host.skyboxSharesSkyEnvCube = true
+                        host.skyboxEnvIntensity = skyIntensity.toFloat()
+                        if (host.pendingSkyEnvSpec != null) {
+                            skyboxTouched = false
+                        } else {
+                            skybox = Skybox.Builder()
+                                .environment(host.envUnfilteredCube!!)
+                                .intensity(skyIntensity.toFloat())
+                                .fenced { build(host.engine) }
+                        }
+                    } else {
+                        val pp = EnvironmentFactory.filamentShifted(
+                            EnvironmentFactory.physicalEquirectPixels(
+                                source,
+                                scale = if (lightsScene)
+                                    skyIntensity / maxOf(intensity, 1e-3)
+                                else 1.0,
+                                width = 256,
+                                height = 128,
+                                conserveSunEnergy = false),
+                            0.0)
+                        val pc = EnvironmentFactory.cubemapTextureFromEquirect(
+                            host.engine, pp, faceSize = 128, maxMipLevels = 1)
+                        skyTextures.add(pc)
+                        skybox = Skybox.Builder()
+                            .environment(pc)
+                            .intensity(skyIntensity.toFloat())
+                            .fenced { build(host.engine) }
+                    }
+                }
+                "fmat" -> logOnce("skybox.$skyType",
                     "skybox source '$skyType' is deferred; background cleared")
                 else -> if (source != null) {
                     logOnce("skybox.${skyType ?: "?"}",
@@ -5789,7 +5920,7 @@ object FsceneRealizer {
             // env leaves both untouched (the old env stays live until
             // the payload lands); non-environment skies still apply.
             if (skyboxTouched) host.applySkybox(skybox, skyTextures)
-            if (!stageEnvDeferred) {
+            if (!stageEnvDeferred && !deferIblToProgressiveSweep) {
                 val il = sh?.takeIf { intensity > 0 }?.let {
                     val b = IndirectLight.Builder()
                         .irradiance(3, it)
@@ -5799,6 +5930,8 @@ object FsceneRealizer {
                 }
                 envKey?.let { pendingPayloadRefs.remove(it) }
                 host.applyEnvironment(il, iblTextures)
+            } else if (!stageEnvDeferred) {
+                envKey?.let { pendingPayloadRefs.remove(it) }
             }
             // Look + effects apply even while an env payload is
             // deferred (outside the !stageEnvDeferred guard) — they're

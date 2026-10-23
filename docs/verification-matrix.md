@@ -543,6 +543,26 @@ rejection and tap-cancel forwarding.
 | T2 app, dice & harness smoke | n/a (pure-Dart unit; iOS U1 feature lane verified above) | pass — Vulkan (`readout=94`) and OpenGL (`readout=45`) dice roll/settle + full harness through `w18 lane complete` and W25 PASS with 0 crashes (`android-{vulkan,opengl}-{smoke,harness-summary}.log`, `android-{vulkan,opengl}-{dice-settled,harness}.png`) |
 | Unit tests | `dn analyze` + `dn test` (`dart3d`: 319, `example`: 225) | same (`package-tests.log`, `example-tests.log`) |
 
+## E3 — W17 physical sky, `skyEnvironment` relighting, `sunLight`, and progressive IBL prefiltering (live-verified iOS sim + Android A142 Vulkan + GL)
+
+`docs/artifacts/e3-w17-sky/README.md`, `docs/environment-ibl-spec.md`.
+Ports upstream's Preetham Rayleigh/Mie `flutter_scene_sky_physical.frag` natively
+to `EnvironmentFactory.kt` and `FsceneRealizer.swift` (plus Dart reference
+`sky_generator.dart`), realizes `skyEnvironment` relighting (`physical` and
+`gradient` sky sources) and `skyEnvironment.sunLight` (`SunLightSpec` shadow-casting
+directional light aimed opposite `sunDirection`), and implements rate-limited
+3-step progressive IBL prefiltering (`64×32` → `128×64` → `256×128`) during sun sweeps.
+
+| Lane | iOS sim — observed | Android A142 — observed |
+|---|---|---|
+| Midday `PhysicalSkySpec` skybox + `skyEnvironment` + `sunLight` (`day`) | pass — Rayleigh/Mie sky background, chrome sphere reflects sky/sun, matte sphere lit by sky SH3, pillar casts directional sun shadow (`ios-sim-day.png`, `ios-sim-w17-run.log`) | pass — identical sky, reflections, diffuse IBL, and cast shadow on both Vulkan and OpenGL; 1k (`1024×512`) equirect generated in `91.51 ms` (VK) / `129.22 ms` (GL), well under the 200 ms budget (`a142-{vulkan,opengl}-day.png`) |
+| Low-sun sunset tint (`lowsun`) | pass — warm sunset horizon & warm `skyEnvironment` diffuse/specular relighting (`ios-sim-lowsun.png`) | pass — warm golden-amber horizon and warm rim/diffuse relighting on both Vulkan and OpenGL (`a142-{vulkan,opengl}-lowsun.png`) |
+| Static environment override precedence (`override`) | pass — when `skyEnvironment` is null, static `ConstantEnvironment` emerald tint overrides IBL while `PhysicalSkySpec` draws the skybox (`ios-sim-override.png`) | pass — same precedence on both Vulkan and OpenGL (`a142-{vulkan,opengl}-override.png`) |
+| 3-step progressive prefilter convergence (`step1` → `step2` → `step3` vs `day` reference) | pass — MAE vs `day` reference converges `0.044/255 (0.02%)` → `0.015/255 (0.01%)` → `0.000/255 (0.00%)` (`ios-sim-step{1,2,3}.png`) | pass — MAE vs `day` reference converges `2.619/255 (1.03%)` → `0.781/255 (0.31%)` → `0.121/255 (0.05%)` on Vulkan and `2.629/255 (1.03%)` → `0.780/255 (0.31%)` → `0.121/255 (0.05%)` on OpenGL (`a142-{vulkan,opengl}-step{1,2,3}.png`) |
+| 60-step sun sweep frame time (`sweep`, budget `<= 33 ms`) | pass — 60-step sweep completes cleanly with 3 checkpoints logged (`ios-sim-sweep-final.png`, `ios-sim-w17-run.log`) | pass — 60-step sweep holds `89.3–89.8 fps` (`p50=11.1 ms, p95=11.2 ms, max=22.3 ms`, `0` skipped frames) on Vulkan and `89.3–89.9 fps` (`p50=11.1 ms, p95=11.2 ms, max=22.3 ms`, `0` skipped frames) on OpenGL (`a142-{vulkan,opengl}-w17-native.log`, `a142-{vulkan,opengl}-sweep-final.png`) |
+| T2 dice smoke | pass — dice rack loads cleanly with 0 errors (`ios-sim-dice.png`, `ios-sim-dice-run.log`) | pass — dice roll & settle (`readout=103` Vulkan, `readout=96` OpenGL), 0 crashes (`a142-{vulkan,opengl}-dice.{png,log}`) |
+| Unit tests | `dn analyze` + `dn test` (`dart3d`: 325, `example`: 227) | `./gradlew :dart3d:testReleaseUnitTest` passes |
+
 ## Notes
 
 - **Runtime-minted payloads need their spec on the op** — the W11

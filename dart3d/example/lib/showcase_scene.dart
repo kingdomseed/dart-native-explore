@@ -6,6 +6,7 @@
 /// physics-slab loader so a single die still rolls.
 library;
 
+import 'dart:async';
 import 'dart:math';
 
 import 'package:dart3d/dart3d.dart';
@@ -21,6 +22,21 @@ const String _kBootU1Pose = String.fromEnvironment(
   'DART3D_U1_POSE',
   defaultValue: 'orbit1',
 );
+
+const String _kBootW17Mode = String.fromEnvironment(
+  'DART3D_W17_MODE',
+  defaultValue: 'day',
+);
+
+const List<String> _kW17ModeSequence = <String>[
+  'day',
+  'lowsun',
+  'override',
+  'step1',
+  'step2',
+  'step3',
+  'sweep',
+];
 
 const List<String> _kU1PoseSequence = <String>[
   'orbit1',
@@ -85,6 +101,11 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
   LocalId? _u1FollowSubjectId;
   LocalId? _u1PickMarkerId;
 
+  /// W17 state: active mode in [_kW17ModeSequence] and optional sun-sweep timer.
+  int _w17ModeIndex = max(0, _kW17ModeSequence.indexOf(_kBootW17Mode));
+  Timer? _w17SweepTimer;
+  int _w17SweepStep = 0;
+
   /// The loaded item's fit radius — feeds the aspect-ratio widening
   /// in the layout pass.
   double _frameRadius = 0;
@@ -136,6 +157,8 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
   }
 
   void _load(ShowcaseItem item) {
+    _w17SweepTimer?.cancel();
+    _w17SweepTimer = null;
     setState(() {
       _status = 'loading ${item.label}…';
       _anims = const [];
@@ -223,7 +246,149 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
 
     if (item.assetKey == kBuiltinU1Key) {
       _verifyU1FiveTargetPicks(scene.document);
+    } else if (item.assetKey == kBuiltinW17SkyKey) {
+      if (_kBootW17Mode == 'auto') {
+        _startW17AutoSequence();
+      } else {
+        final mode = _kW17ModeSequence[_w17ModeIndex];
+        dnLog('dart3d: w17 mode=$mode ready PASS');
+        if (mode == 'sweep') {
+          _startW17SunSweep();
+        }
+      }
     }
+  }
+
+  void _startW17AutoSequence() {
+    const stages = <String>[
+      'day',
+      'lowsun',
+      'override',
+      'step1',
+      'step2',
+      'step3',
+      'sweep',
+    ];
+    var idx = 0;
+    void applyStage(String stage) {
+      if (!mounted) return;
+      final doc = _scene?.document;
+      final envId = doc?.stage.environmentRef;
+      if (doc == null || envId == null) return;
+      _w17ModeIndex = max(0, _kW17ModeSequence.indexOf(stage));
+      final updated = buildW17EnvironmentResource(doc, envId, mode: stage);
+      _upsertW17EnvResource(doc, updated);
+      setState(() {});
+      dnLog('dart3d: w17 auto_stage=$stage ready PASS');
+      if (stage == 'sweep') {
+        _startW17SunSweep();
+      }
+    }
+
+    // Initial stage ('day') is already loaded by buildW17SkyDocument; log
+    // it after 1.5 s so the first frame is settled.
+    _w17SweepTimer = Timer(const Duration(milliseconds: 1500), () {
+      if (!mounted) return;
+      dnLog('dart3d: w17 auto_stage=day ready PASS');
+      _w17SweepTimer = Timer.periodic(const Duration(milliseconds: 3000), (t) {
+        if (!mounted) {
+          t.cancel();
+          return;
+        }
+        idx++;
+        if (idx >= stages.length) {
+          t.cancel();
+          return;
+        }
+        final stage = stages[idx];
+        if (stage == 'sweep') {
+          t.cancel();
+        }
+        applyStage(stage);
+      });
+    });
+  }
+
+  void _upsertW17EnvResource(SceneDocument doc, EnvironmentResource updated) {
+    doc.resources[updated.id] = updated;
+    _controller.applyCommands([
+      {
+        'op': 'upsertResource',
+        'id': updated.id.toToken(),
+        'resource': encodeResource(updated, (id) => id.toToken()),
+      },
+    ]);
+  }
+
+  void _cycleW17Mode() {
+    _w17SweepTimer?.cancel();
+    _w17SweepTimer = null;
+    _w17ModeIndex = (_w17ModeIndex + 1) % _kW17ModeSequence.length;
+    final mode = _kW17ModeSequence[_w17ModeIndex];
+    final doc = _scene?.document;
+    final envId = doc?.stage.environmentRef;
+    if (doc == null || envId == null) return;
+    final updated = buildW17EnvironmentResource(doc, envId, mode: mode);
+    _upsertW17EnvResource(doc, updated);
+    dnLog('dart3d: w17 mode=$mode ready PASS');
+    if (mode == 'sweep') {
+      _startW17SunSweep();
+    }
+    setState(() {});
+  }
+
+  void _startW17SunSweep() {
+    _w17SweepTimer?.cancel();
+    _w17SweepStep = 0;
+    const totalSteps = 60;
+    _w17SweepTimer = Timer.periodic(const Duration(milliseconds: 33), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      final doc = _scene?.document;
+      final envId = doc?.stage.environmentRef;
+      if (doc == null || envId == null) {
+        timer.cancel();
+        return;
+      }
+      _w17SweepStep++;
+      final t = (_w17SweepStep / totalSteps).clamp(0.0, 1.0);
+      // Sweep sun across the sky arc: morning (-0.55, 0.08, 0.83) ->
+      // midday (0.0, 0.45, 0.89) -> low-sun sunset (0.55, 0.04, 0.83).
+      final sx = -0.55 + 1.10 * t;
+      final sy = 0.04 + 0.41 * sin(t * pi);
+      final sz = 0.86;
+      final sunDir = Vector3(sx, sy, sz)..normalize();
+      final updated = buildW17EnvironmentResource(
+        doc,
+        envId,
+        mode: 'sweep',
+        sunDirectionOverride: sunDir,
+      );
+      _upsertW17EnvResource(doc, updated);
+      if (_w17SweepStep == 15 || _w17SweepStep == 30 || _w17SweepStep == 45) {
+        dnLog(
+          'dart3d: w17 sweep checkpoint=${_w17SweepStep ~/ 15} '
+          'step=$_w17SweepStep '
+          'sun=(${sunDir.x.toStringAsFixed(2)},'
+          '${sunDir.y.toStringAsFixed(2)},'
+          '${sunDir.z.toStringAsFixed(2)}) PASS',
+        );
+      }
+      if (_w17SweepStep >= totalSteps) {
+        timer.cancel();
+        _w17SweepTimer = null;
+        dnLog('dart3d: w17 sweep complete steps=$totalSteps PASS');
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _w17SweepTimer?.cancel();
+    _controller.dispose();
+    super.dispose();
   }
 
   void _initU1Controllers(ShowcaseScene scene) {
@@ -696,6 +861,7 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
   Widget build(BuildContext context) {
     final item = _items[_index];
     final isU1 = item.assetKey == kBuiltinU1Key;
+    final isW17 = item.assetKey == kBuiltinW17SkyKey;
     return Scaffold(
       brightness: Brightness.dark,
       body: Stack(
@@ -827,6 +993,31 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
                               ),
                               child: Text(
                                 'Cam: ${_kU1PoseSequence[_u1PoseIndex]} · $_u1PickedLabel',
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xEEFFFFFF),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                        if (isW17) ...[
+                          const SizedBox(height: 8),
+                          GestureDetector(
+                            onTap: _cycleW17Mode,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0x2EFFFFFF),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Text(
+                                'W17 Sky: ${_kW17ModeSequence[_w17ModeIndex]}',
                                 textAlign: TextAlign.center,
                                 maxLines: 1,
                                 style: const TextStyle(

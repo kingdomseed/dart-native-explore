@@ -1,0 +1,35 @@
+Launching lib/main.dart on A142 in release mode...
+Running Gradle task 'assembleRelease'...                           20.4s
+✓ Built build/app/outputs/dn-apk/app-release.apk (110.2MB)
+Installing build/app/outputs/dn-apk/app-release.apk...              3.2s
+
+DartNative run key commands.
+h List all available interactive commands.
+c Clear the screen
+q Quit (terminate the application on the device).
+
+dartnative: [DN-Android] loadSymbols: done
+dartnative: dart3d: showcase — w17: 6 nodes · 3 geo · 5 mat
+dartnative: resolveSkiaCanvasBridgeMethods: DNSkiaCanvasBridge method IDs cached
+dartnative: resolveKotlinMethods: all method IDs cached
+dartnative: JNI_OnLoad: dartnative_android bridge loaded
+dartnative: [DNCoil] installed ImageLoader memCache=50% heap, 16 req/host
+dartnative: [DN-Build] dartnative_android stamp: 2026-10-03-1
+dartnative: DNResetViewRegistry: gen=1, cleared 0 stale callbacks, registry reset
+dartnative: DNResetViewRegistry: callbacks thawed, dropped 0 stale fire(s) during the restart window
+dartnative: DNViewTypeClaim: 'com.jasonholtdigital.dart3d/sceneView' -> 65535
+dartnative: [DNSplash] splash released after 383ms (root has views)
+dartnative: [DNSplash] system splash gone — flushing 1 deferred chrome op(s)
+dartnative: [DN] Licence key exchange completed in the background (1137ms).
+dartnative: dart3d: w17 auto_stage=day ready PASS
+dartnative: dart3d: w17 auto_stage=lowsun ready PASS
+dartnative: dart3d: w17 auto_stage=override ready PASS
+dartnative: dart3d: w17 auto_stage=step1 ready PASS
+dartnative: dart3d: w17 auto_stage=step2 ready PASS
+dartnative: dart3d: w17 auto_stage=step3 ready PASS
+dartnative: dart3d: w17 auto_stage=sweep ready PASS
+dartnative: dart3d: w17 sweep checkpoint=1 step=15 sun=(-0.29,0.34,0.89) PASS
+dartnative: dart3d: w17 sweep checkpoint=2 step=30 sun=(0.00,0.46,0.89) PASS
+dartnative: dart3d: w17 sweep checkpoint=3 step=45 sun=(0.29,0.34,0.89) PASS
+dartnative: dart3d: w17 sweep complete steps=60 PASS
+Application finished.
