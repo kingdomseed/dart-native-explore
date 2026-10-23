@@ -6266,7 +6266,8 @@ enum FsceneRealizer {
         /// env field is re-assigned (or cleared) each run so a re-decode
         /// — `updateStage`, env `upsertResource`, payload arrival —
         /// replaces the previous look without accumulation.
-        func decodeStage(_ stage: [String: Any]?) {
+        func decodeStage(_ stage: [String: Any]?,
+                         progressiveStepOverride: Int = 0) {
             // A ref swap retires the previous env's deferral/claim —
             // otherwise the old key sits in `deferredResourceIds` and
             // every later payload chunk triggers a full re-realize.
@@ -6327,11 +6328,6 @@ enum FsceneRealizer {
                 toneMap.mode = "pbrNeutral"
             }
             stageToneMap = toneMap
-            if envRes["skyEnvironment"] != nil {
-                host.logOnce("stage.skyEnvironment",
-                    "skyEnvironment (procedural sky re-lighting) is "
-                    + "deferred")
-            }
             // W13: absent key → nil ("don't touch"); present (even
             // `{}`) → a wholesale decode the host applies absolutely.
             stageEffects =
@@ -6342,22 +6338,119 @@ enum FsceneRealizer {
             let rotationY = plainDouble(envRes["environmentRotationY"])
                 ?? 0.0
 
-            let envPixels = realizeEnvironmentSource(envRes,
-                                                     envKey: envKey)
-            // The z-mirror and rotationY are column ops baked into the
-            // pixels. The intensity is the property's own: SceneKit
-            // clamps an environment image at 1 and stores an 8-bit one
-            // in 8 linear bits, so a scale baked into the pixels
-            // clipped above 1 and lost the dark end below it. A float
-            // source brighter than 1 is divided down to fit and the
-            // divisor goes into the intensity as well.
-            let lighting = envPixels.map { mirroredRotated($0, rotationY) }
-            if !stageEnvDeferred {
+            let skyEnv = envRes["skyEnvironment"] as? [String: Any]
+            let skyEnvSource = skyEnv?["source"] as? [String: Any]
+            let skyEnvType = skyEnvSource?["type"] as? String
+            let hasSkyEnv = skyEnv != nil
+                && (skyEnvType == "physical" || skyEnvType == "gradient")
+            if skyEnv != nil, !hasSkyEnv {
+                switch skyEnvType {
+                case "environment":
+                    host.logOnce("stage.skyEnvironment.environment",
+                        "skyEnvironment source 'environment' cannot "
+                        + "light itself; falling back to stage environment")
+                case "fmat":
+                    host.logOnce("stage.skyEnvironment.fmat",
+                        "skyEnvironment source 'fmat' is deferred; "
+                        + "falling back to stage environment")
+                default:
+                    host.logOnce("stage.skyEnvironment.\(skyEnvType ?? "?")",
+                        "skyEnvironment source '\(skyEnvType ?? "?")' "
+                        + "unknown; falling back to stage environment")
+                }
+            }
+
+            applyStageSunLight(
+                skySource: hasSkyEnv ? skyEnvSource : nil,
+                sunLightSpec: hasSkyEnv
+                    ? skyEnv?["sunLight"] as? [String: Any] : nil)
+
+            var lighting: EnvPixels? = nil
+            var skipLightingUpdate = false
+            if hasSkyEnv, let skyEnv, let skyEnvSource, let skyEnvType {
+                let refresh = skyEnv["refresh"] as? String ?? "manual"
+                let intervalSeconds = max(
+                    0.0, plainDouble(skyEnv["intervalSeconds"]) ?? 1.0)
+                let eqWidth = min(512, max(64,
+                    (skyEnv["equirectWidth"] as? NSNumber)?.intValue ?? 512))
+                let forceStep = progressiveStepOverride != 0
+                    ? progressiveStepOverride
+                    : ((skyEnv["d3ProgressiveStep"] as? NSNumber)?.intValue ?? 0)
+                let sig = "\(skyEnvSource)|\(intensity)|\(rotationY)|\(eqWidth)"
+                let now = CFAbsoluteTimeGetCurrent()
+                let minInterval = refresh == "interval"
+                    ? max(0.15, intervalSeconds) : 0.15
+                let isFirstBake = host.skyEnvBakedSig == nil
+                    || scene.lightingEnvironment.contents == nil
+                if forceStep >= 1 && forceStep <= 3 || isFirstBake {
+                    let effectiveStep = forceStep >= 1 && forceStep <= 3
+                        ? forceStep : 3
+                    let stepW: Int
+                    switch effectiveStep {
+                    case 1: stepW = 64
+                    case 2: stepW = min(128, eqWidth)
+                    default: stepW = min(256, eqWidth)
+                    }
+                    let stepH = max(32, stepW / 2)
+                    let raw: EnvPixels?
+                    switch skyEnvType {
+                    case "physical":
+                        raw = physicalEquirectPixels(
+                            skyEnvSource, width: stepW, height: stepH,
+                            conserveSunEnergy: true)
+                    case "gradient":
+                        raw = gradientEquirectPixels(
+                            skyEnvSource, width: stepW, height: stepH)
+                    default:
+                        raw = nil
+                    }
+                    lighting = raw.map { mirroredRotated($0, rotationY) }
+                    host.envLightingPixels = lighting
+                    host.skyEnvBakedSig = sig
+                    host.skyEnvLastBakeTime = now
+                    host.skyEnvLastStepTime = now
+                    host.skyEnvProgressiveStep = effectiveStep
+                    host.activeSkyEnvStage = stage
+                    if effectiveStep == 3 {
+                        host.pendingSkyEnvStage = nil
+                    }
+                } else {
+                    skipLightingUpdate = true
+                    lighting = host.envLightingPixels
+                    if sig == host.skyEnvBakedSig
+                        && host.skyEnvProgressiveStep == 3 {
+                        host.pendingSkyEnvStage = nil
+                    } else {
+                        host.pendingSkyEnvStage = stage
+                        host.pendingSkyEnvInterval = minInterval
+                    }
+                }
+            } else {
+                host.skyEnvBakedSig = nil
+                host.skyEnvProgressiveStep = 3
+                host.activeSkyEnvStage = nil
+                host.pendingSkyEnvStage = nil
+                let envPixels = realizeEnvironmentSource(envRes,
+                                                         envKey: envKey)
+                // The z-mirror and rotationY are column ops baked into the
+                // pixels. The intensity is the property's own: SceneKit
+                // clamps an environment image at 1 and stores an 8-bit one
+                // in 8 linear bits, so a scale baked into the pixels
+                // clipped above 1 and lost the dark end below it. A float
+                // source brighter than 1 is divided down to fit and the
+                // divisor goes into the intensity as well.
+                lighting = envPixels.map { mirroredRotated($0, rotationY) }
+                host.envLightingPixels = lighting
+            }
+
+            if !stageEnvDeferred && !skipLightingUpdate {
                 let fitted = lighting.map(unitRange)
                 scene.lightingEnvironment.contents =
                     fitted.flatMap { envContents($0.pixels) }
                 scene.lightingEnvironment.intensity =
                     CGFloat(intensity * (fitted?.divisor ?? 1))
+                if let envKey { deferredResourceIds.remove(envKey) }
+            } else if !stageEnvDeferred {
                 if let envKey { deferredResourceIds.remove(envKey) }
             }
 
@@ -6391,7 +6484,16 @@ enum FsceneRealizer {
                     mirroredRotated(gradientEquirectPixels(source ?? [:]),
                                     0), scale: skyIntensity)
                 scene.background.contents = envContents(background)
-            case "fmat", "physical":
+            case "physical":
+                let background = linearPixels(
+                    mirroredRotated(
+                        physicalEquirectPixels(
+                            source ?? [:], width: 256, height: 128,
+                            conserveSunEnergy: false),
+                        0),
+                    scale: skyIntensity)
+                scene.background.contents = envContents(background)
+            case "fmat":
                 host.logOnce("skybox.\(source?["type"] ?? "")",
                     "skybox source '\(source?["type"] ?? "")' is "
                     + "deferred; background cleared")
@@ -6580,8 +6682,9 @@ enum FsceneRealizer {
         /// `gradient` sky — mirrors upstream's SkyGradientFragment:
         /// horizon→zenith / horizon→ground blends on sqrt(|dirY|), the
         /// pow(dot(sun), sharpness) HDR sun disk, and its 0.15·s⁸ halo.
-        /// Output clips to LDR sRGB — the sun disk saturates white
-        /// instead of staying HDR (approximation; backgrounds only).
+        /// Outputs linear RGBA float32 so HDR sunColor values survive
+        /// `unitRange` normalization for `skyEnvironment` IBL as well
+        /// as `linearPixels` background rendering.
         func gradientEquirectPixels(_ source: [String: Any],
                                     width: Int = 128,
                                     height: Int = 64) -> EnvPixels {
@@ -6599,55 +6702,327 @@ enum FsceneRealizer {
             let sunX = sunLen > 0 ? Double(sun[0]) / sunLen : 0.0
             let sunY = sunLen > 0 ? Double(sun[1]) / sunLen : 0.0
             let sunZ = sunLen > 0 ? Double(sun[2]) / sunLen : 0.0
-            var pixels = Data(count: width * height * 4)
+            var floats = [Float](repeating: 1.0, count: width * height * 4)
             let twoPi = 2.0 * Double.pi
-            pixels.withUnsafeMutableBytes { buf in
-                guard let p = buf.baseAddress?
-                    .assumingMemoryBound(to: UInt8.self) else { return }
-                for py in 0..<height {
-                    let v = (Double(py) + 0.5) / Double(height)
-                    let latitude = (0.5 - v) * Double.pi
-                    let cosLat = cos(latitude)
-                    let dirY = sin(latitude)
-                    for px in 0..<width {
-                        let u = (Double(px) + 0.5) / Double(width)
-                        let longitude = (u - 0.5) * twoPi
-                        let dirX = cosLat * cos(longitude)
-                        let dirZ = cosLat * sin(longitude)
-                        var r: Double, g: Double, b: Double
-                        let t = sqrt(abs(dirY))
-                        if dirY >= 0 {
-                            r = lerp(Double(horizon[0]),
-                                     Double(zenith[0]), t)
-                            g = lerp(Double(horizon[1]),
-                                     Double(zenith[1]), t)
-                            b = lerp(Double(horizon[2]),
-                                     Double(zenith[2]), t)
-                        } else {
-                            r = lerp(Double(horizon[0]),
-                                     Double(ground[0]), t)
-                            g = lerp(Double(horizon[1]),
-                                     Double(ground[1]), t)
-                            b = lerp(Double(horizon[2]),
-                                     Double(ground[2]), t)
-                        }
-                        let s = max(
-                            dirX * sunX + dirY * sunY + dirZ * sunZ, 0.0)
-                        let disk = pow(s, sharpness)
-                            + 0.15 * pow(s, 8.0)
-                        r += Double(sunColor[0]) * disk
-                        g += Double(sunColor[1]) * disk
-                        b += Double(sunColor[2]) * disk
-                        let o = (py * width + px) * 4
-                        p[o] = encodeSrgb(r)
-                        p[o + 1] = encodeSrgb(g)
-                        p[o + 2] = encodeSrgb(b)
-                        p[o + 3] = 255
+            for py in 0..<height {
+                let v = (Double(py) + 0.5) / Double(height)
+                let latitude = (0.5 - v) * Double.pi
+                let cosLat = cos(latitude)
+                let dirY = sin(latitude)
+                for px in 0..<width {
+                    let u = (Double(px) + 0.5) / Double(width)
+                    let longitude = (u - 0.5) * twoPi
+                    let dirX = cosLat * cos(longitude)
+                    let dirZ = cosLat * sin(longitude)
+                    var r: Double, g: Double, b: Double
+                    let t = sqrt(abs(dirY))
+                    if dirY >= 0 {
+                        r = lerp(Double(horizon[0]),
+                                 Double(zenith[0]), t)
+                        g = lerp(Double(horizon[1]),
+                                 Double(zenith[1]), t)
+                        b = lerp(Double(horizon[2]),
+                                 Double(zenith[2]), t)
+                    } else {
+                        r = lerp(Double(horizon[0]),
+                                 Double(ground[0]), t)
+                        g = lerp(Double(horizon[1]),
+                                 Double(ground[1]), t)
+                        b = lerp(Double(horizon[2]),
+                                 Double(ground[2]), t)
                     }
+                    let s = max(
+                        dirX * sunX + dirY * sunY + dirZ * sunZ, 0.0)
+                    let disk = pow(s, sharpness)
+                        + 0.15 * pow(s, 8.0)
+                    r += Double(sunColor[0]) * disk
+                    g += Double(sunColor[1]) * disk
+                    b += Double(sunColor[2]) * disk
+                    let o = (py * width + px) * 4
+                    floats[o] = Float(max(r, 0.0))
+                    floats[o + 1] = Float(max(g, 0.0))
+                    floats[o + 2] = Float(max(b, 0.0))
+                    floats[o + 3] = 1.0
                 }
             }
-            return EnvPixels(width: width, height: height,
-                             isFloat: false, data: pixels)
+            return EnvPixels(
+                width: width, height: height, isFloat: true,
+                data: floats.withUnsafeBufferPointer { Data(buffer: $0) })
+        }
+
+        /// W17 `physical` sky — mirrors upstream's
+        /// `flutter_scene_sky_physical.frag`: analytic Preetham
+        /// single-scattering daylight model with Rayleigh and Mie
+        /// terms, zenith-angle optical mass, low-sun extinction
+        /// re-saturation, ground fade below the horizon, and an
+        /// atmospheric-attenuated HDR sun disk.
+        func physicalEquirectPixels(_ source: [String: Any],
+                                    width: Int = 256,
+                                    height: Int = 128,
+                                    conserveSunEnergy: Bool = false) -> EnvPixels {
+            let sun = rawVec3(source["sunDirection"]) ?? [0.4, 0.5, 0.6]
+            let sunAngularRadius = max(
+                0.0, plainDouble(source["sunAngularRadius"]) ?? 0.0175)
+            let rayleighCoefficient =
+                plainDouble(source["rayleighCoefficient"]) ?? 2.0
+            let rayleighColor = rawVec3(source["rayleighColor"])
+                ?? [0.26, 0.41, 0.58]
+            let mieCoefficient =
+                plainDouble(source["mieCoefficient"]) ?? 0.005
+            let mieEccentricity =
+                plainDouble(source["mieEccentricity"]) ?? 0.8
+            let mieColor = rawVec3(source["mieColor"])
+                ?? [0.69, 0.73, 0.81]
+            let turbidity = plainDouble(source["turbidity"]) ?? 10.0
+            let groundColor = rawVec3(source["groundColor"])
+                ?? [0.12, 0.12, 0.13]
+            let energy = plainDouble(source["energy"]) ?? 1.0
+
+            let sunLen = sqrt(Double(sun[0] * sun[0] + sun[1] * sun[1]
+                                     + sun[2] * sun[2]))
+            let sunX = sunLen > 1e-12 ? Double(sun[0]) / sunLen : 0.0
+            let sunY = sunLen > 1e-12 ? Double(sun[1]) / sunLen : 1.0
+            let sunZ = sunLen > 1e-12 ? Double(sun[2]) / sunLen : 0.0
+
+            let sunZenithCos = min(max(sunY, -1.0), 1.0)
+            let sunEnergy = max(
+                0.0,
+                1.0 - exp(-((Double.pi * 0.5) - acos(sunZenithCos))))
+                * 60.0 * energy
+            let sunFade = 1.0 - min(max(1.0 - exp(sunY), 0.0), 1.0)
+
+            let rayleighScale =
+                max(rayleighCoefficient - (1.0 - sunFade), 0.0) * 0.0001
+            let rayleighBetaR = Double(rayleighColor[0]) * rayleighScale
+            let rayleighBetaG = Double(rayleighColor[1]) * rayleighScale
+            let rayleighBetaB = Double(rayleighColor[2]) * rayleighScale
+
+            let mieScale = turbidity * mieCoefficient * 0.000434
+            let mieBetaR = Double(mieColor[0]) * mieScale
+            let mieBetaG = Double(mieColor[1]) * mieScale
+            let mieBetaB = Double(mieColor[2]) * mieScale
+
+            let denomR = max(rayleighBetaR + mieBetaR, 1e-12)
+            let denomG = max(rayleighBetaG + mieBetaG, 1e-12)
+            let denomB = max(rayleighBetaB + mieBetaB, 1e-12)
+
+            let extCoeffR = rayleighBetaR * 8400.0 + mieBetaR * 1250.0
+            let extCoeffG = rayleighBetaG * 8400.0 + mieBetaG * 1250.0
+            let extCoeffB = rayleighBetaB * 8400.0 + mieBetaB * 1250.0
+
+            let sunsetMix = min(max(pow(1.0 - sunZenithCos, 5.0), 0.0), 1.0)
+            let g2 = mieEccentricity * mieEccentricity
+            let oneMinusG2 = 1.0 - g2
+            let invFourPi = 1.0 / (4.0 * Double.pi)
+            let rayleighConst = 3.0 / (16.0 * Double.pi)
+
+            let minGridRadius = 1.75 * Double.pi / Double(max(1, height))
+            let rEff = (conserveSunEnergy
+                && sunAngularRadius > 0.0 && sunAngularRadius < minGridRadius)
+                ? minGridRadius : sunAngularRadius
+            let directSunScale = (conserveSunEnergy
+                && rEff > sunAngularRadius && rEff > 0.0)
+                ? (sunAngularRadius / rEff) * (sunAngularRadius / rEff) : 1.0
+            let diskOuter = cos(rEff)
+            let diskInner = cos(rEff * 0.5)
+
+            let twoPi = 2.0 * Double.pi
+            var cosLon = [Double](repeating: 0, count: width)
+            var sinLon = [Double](repeating: 0, count: width)
+            for px in 0..<width {
+                let u = (Double(px) + 0.5) / Double(width)
+                let lon = (u - 0.5) * twoPi
+                cosLon[px] = cos(lon)
+                sinLon[px] = sin(lon)
+            }
+
+            var floats = [Float](repeating: 1.0, count: width * height * 4)
+            for py in 0..<height {
+                let v = (Double(py) + 0.5) / Double(height)
+                let latitude = (0.5 - v) * Double.pi
+                let cosLat = cos(latitude)
+                let dirY = sin(latitude)
+
+                let zenith = acos(max(0.0, dirY))
+                let opticalMass = 1.0
+                    / (cos(zenith) + 0.00094 * pow(1.6386 - zenith, -1.253))
+                let extR = exp(-extCoeffR * opticalMass)
+                let extG = exp(-extCoeffG * opticalMass)
+                let extB = exp(-extCoeffB * opticalMass)
+                let oneMinusExtR = 1.0 - extR
+                let oneMinusExtG = 1.0 - extG
+                let oneMinusExtB = 1.0 - extB
+
+                let groundBlend = smoothstep(-0.1, 0.1, dirY)
+                let groundFactorR = lerp(Double(groundColor[0]), 1.0, groundBlend)
+                let groundFactorG = lerp(Double(groundColor[1]), 1.0, groundBlend)
+                let groundFactorB = lerp(Double(groundColor[2]), 1.0, groundBlend)
+
+                let rowDirectR = sunEnergy * extR * directSunScale
+                let rowDirectG = sunEnergy * extG * directSunScale
+                let rowDirectB = sunEnergy * extB * directSunScale
+
+                for px in 0..<width {
+                    let dirX = cosLat * cosLon[px]
+                    let dirZ = cosLat * sinLon[px]
+                    let cosTheta = dirX * sunX + dirY * sunY + dirZ * sunZ
+
+                    let halfCos = cosTheta * 0.5 + 0.5
+                    let rayleighPhase = rayleighConst * (1.0 + halfCos * halfCos)
+                    let d = max(1.0 + g2 - 2.0 * mieEccentricity * cosTheta, 1e-12)
+                    let miePhase = invFourPi * (oneMinusG2 / (d * sqrt(d)))
+
+                    let scatterR =
+                        (rayleighBetaR * rayleighPhase + mieBetaR * miePhase) / denomR
+                    let scatterG =
+                        (rayleighBetaG * rayleighPhase + mieBetaG * miePhase) / denomG
+                    let scatterB =
+                        (rayleighBetaB * rayleighPhase + mieBetaB * miePhase) / denomB
+
+                    let sR = max(sunEnergy * scatterR * oneMinusExtR, 0.0)
+                    let sG = max(sunEnergy * scatterG * oneMinusExtG, 0.0)
+                    let sB = max(sunEnergy * scatterB * oneMinusExtB, 0.0)
+                    var r = sR * sqrt(sR)
+                    var g = sG * sqrt(sG)
+                    var b = sB * sqrt(sB)
+
+                    if sunsetMix > 0.0 {
+                        let seR = sqrt(max(sunEnergy * scatterR * extR, 0.0))
+                        let seG = sqrt(max(sunEnergy * scatterG * extG, 0.0))
+                        let seB = sqrt(max(sunEnergy * scatterB * extB, 0.0))
+                        r *= lerp(1.0, seR, sunsetMix)
+                        g *= lerp(1.0, seG, sunsetMix)
+                        b *= lerp(1.0, seB, sunsetMix)
+                    }
+
+                    r *= groundFactorR
+                    g *= groundFactorG
+                    b *= groundFactorB
+
+                    if cosTheta > diskOuter {
+                        let sunDisk = smoothstep(diskOuter, diskInner, cosTheta)
+                        r += rowDirectR * sunDisk
+                        g += rowDirectG * sunDisk
+                        b += rowDirectB * sunDisk
+                    }
+
+                    let o = (py * width + px) * 4
+                    floats[o] = Float(max(r, 0.0))
+                    floats[o + 1] = Float(max(g, 0.0))
+                    floats[o + 2] = Float(max(b, 0.0))
+                    floats[o + 3] = 1.0
+                }
+            }
+            return EnvPixels(
+                width: width, height: height, isFloat: true,
+                data: floats.withUnsafeBufferPointer { Data(buffer: $0) })
+        }
+
+        func smoothstep(_ edge0: Double, _ edge1: Double, _ x: Double) -> Double {
+            if abs(edge1 - edge0) < 1e-12 { return x >= edge1 ? 1.0 : 0.0 }
+            return smoothstep01((x - edge0) / (edge1 - edge0))
+        }
+
+        /// W17: creates or updates the stage-owned directional sun light
+        /// driven by `skyEnvironment.sunLight` (`SunLightSpec`).
+        func applyStageSunLight(skySource: [String: Any]?,
+                                sunLightSpec: [String: Any]?) {
+            guard let skySource, let sunLightSpec,
+                  let skyType = skySource["type"] as? String,
+                  skyType == "physical" || skyType == "gradient" else {
+                host.stageSunLightNode?.removeFromParentNode()
+                host.stageSunLightNode = nil
+                return
+            }
+            let sun = rawVec3(skySource["sunDirection"]) ?? [0.4, 0.5, 0.6]
+            let sunLen = sqrt(Double(sun[0] * sun[0] + sun[1] * sun[1]
+                                     + sun[2] * sun[2]))
+            let sunX = sunLen > 1e-12 ? Double(sun[0]) / sunLen : 0.0
+            let sunY = sunLen > 1e-12 ? Double(sun[1]) / sunLen : 1.0
+            let sunZ = sunLen > 1e-12 ? Double(sun[2]) / sunLen : 0.0
+
+            let intensityScale = plainDouble(sunLightSpec["intensityScale"]) ?? 1.0
+            let color: UIColor
+            let sunIntensity: Double
+            if skyType == "physical" {
+                let energy = plainDouble(skySource["energy"]) ?? 1.0
+                color = UIColor(red: 1.0, green: 0.98, blue: 0.95, alpha: 1.0)
+                sunIntensity = 3.0 * energy * intensityScale
+            } else {
+                let sc = rawVec3(skySource["sunColor"]) ?? [3.0, 2.7, 2.2]
+                let peak = max(Double(sc[0]), max(Double(sc[1]), Double(sc[2])))
+                if peak > 0 {
+                    color = UIColor(
+                        red: CGFloat(Double(sc[0]) / peak),
+                        green: CGFloat(Double(sc[1]) / peak),
+                        blue: CGFloat(Double(sc[2]) / peak),
+                        alpha: 1.0)
+                } else {
+                    color = UIColor.white
+                }
+                sunIntensity = peak * intensityScale
+            }
+
+            let node: SCNNode
+            let light: SCNLight
+            if let existing = host.stageSunLightNode,
+               let existingLight = existing.light {
+                node = existing
+                light = existingLight
+                if node.parent !== scene.rootNode {
+                    scene.rootNode.addChildNode(node)
+                }
+            } else {
+                node = SCNNode()
+                node.name = "d3.stageSunLight"
+                light = SCNLight()
+                light.type = .directional
+                node.light = light
+                scene.rootNode.addChildNode(node)
+                host.stageSunLightNode = node
+            }
+
+            // SceneKit directional lights shine along the node's local -Z,
+            // so local +Z points toward the sun in SceneKit space:
+            // zAxis = (sunX, sunY, -sunZ).
+            let zAxis = simd_normalize(
+                simd_float3(Float(sunX), Float(sunY), Float(-sunZ)))
+            let refUp = abs(zAxis.y) < 0.99
+                ? simd_float3(0, 1, 0) : simd_float3(1, 0, 0)
+            let right = simd_normalize(simd_cross(refUp, zAxis))
+            let up = simd_cross(zAxis, right)
+            node.simdTransform = simd_float4x4(columns: (
+                simd_float4(right, 0),
+                simd_float4(up, 0),
+                simd_float4(zAxis, 0),
+                simd_float4(0, 0, 0, 1)
+            ))
+
+            light.color = color
+            light.intensity = CGFloat(sunIntensity * 1000.0 / .pi)
+            let castsShadow = (sunLightSpec["castsShadow"] as? Bool) ?? true
+            if castsShadow {
+                host.shadowAuthored.insert(ObjectIdentifier(light))
+                light.castsShadow = host.viewQuality != "low"
+                // Reset SunLightSpec defaults before decodeDirectionalShadow
+                // applies any non-default overrides (fscene_json omits defaults).
+                let defaultRes: CGFloat = host.viewQuality == "high" ? 2048 : 1024
+                light.shadowMapSize = CGSize(width: defaultRes, height: defaultRes)
+                light.shadowBias = CGFloat(
+                    plainDouble(sunLightSpec["shadowDepthBias"]) ?? 0.02)
+                light.shadowRadius = CGFloat(
+                    plainDouble(sunLightSpec["shadowSoftness"]) ?? 0.08)
+                let maxDist = plainDouble(sunLightSpec["shadowMaxDistance"]) ?? 150.0
+                light.automaticallyAdjustsShadowProjection = false
+                light.orthographicScale = CGFloat(maxDist)
+                light.maximumShadowDistance = CGFloat(max(maxDist, 1.0))
+                light.forcesBackFaceCasters = false
+                light.shadowSampleCount = 16
+                decodeDirectionalShadow(light, sunLightSpec)
+            } else {
+                host.shadowAuthored.remove(ObjectIdentifier(light))
+                light.castsShadow = false
+            }
         }
 
         /// `asset` env — bundle bytes sniffed by magic (an asset

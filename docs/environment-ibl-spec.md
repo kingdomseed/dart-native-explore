@@ -38,12 +38,19 @@ ambient, no reflections), `empty`.
 
 `skybox.source.type`: `environment` (draw the IBL env, optional
 `blurriness`), `gradient` (zenith/horizon/ground colors + sun disk —
-built-in stylized sky), `fmat` (asset path), `physical` — defer
-`fmat`/`physical` with warn-once.
+built-in stylized sky), `physical` (analytic Preetham single-scattering
+Rayleigh + Mie daylight sky with attenuated HDR sun disk — W17 / E3),
+`fmat` (asset path — defer `fmat` with warn-once).
 
-`skyEnvironment` (procedural sky regenerating the env) — defer,
-warn-once. `effects` — implemented in W13 (`StageEffects` on both
-platforms; per-block support matrix in `extended-surface-program.md`).
+`skyEnvironment` (W17 / E3): procedural sky (`physical` or `gradient`)
+regenerating the scene's image-based lighting (`IndirectLight` + SH3 on
+Android; `scene.lightingEnvironment` on iOS) with rate-limited,
+3-step progressive prefiltering (`64×32` SH3 → `128×64` cube+SH3 →
+`256×128` converged cube+SH3) during sun sweeps, plus optional
+`sunLight` (`SunLightSpec`) driving a shadow-casting directional sun
+light opposite `sunDirection`. `effects` — implemented in W13
+(`StageEffects` on both platforms; per-block support matrix in
+`extended-surface-program.md`).
 
 ## The studio environment
 

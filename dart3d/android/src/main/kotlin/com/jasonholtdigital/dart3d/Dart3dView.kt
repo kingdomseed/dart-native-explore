@@ -21,6 +21,7 @@ import com.google.android.filament.ColorGrading
 import com.google.android.filament.Engine
 import com.google.android.filament.EntityManager
 import com.google.android.filament.IndirectLight
+import com.google.android.filament.LightManager
 import com.google.android.filament.Material
 import com.google.android.filament.MaterialInstance
 import com.google.android.filament.MorphTargetBuffer
@@ -490,9 +491,55 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         private set
     internal var envSkybox: Skybox? = null
         private set
+    internal var envReflectionCube: Texture? = null
+    internal var envUnfilteredCube: Texture? = null
+    internal var envShiftedPixels: EnvironmentFactory.EnvPixels? = null
+    internal var skyboxUsesEnvCube: Boolean = false
+    internal var skyboxSharesSkyEnvCube: Boolean = false
+    internal var skyboxEnvIntensity: Float = 1.0f
+    internal var skyboxEnvBlurriness: Double = 0.0
     private val envIblTextures = ArrayList<Texture>()
     private val envSkyboxTextures = ArrayList<Texture>()
     private var envColorGrading: ColorGrading? = null
+    private var envFrameCount: Long = 0L
+    private val retiredEnvObjects = java.util.ArrayDeque<Pair<Long, () -> Unit>>()
+    private class PreparedSkyEnvStep(
+        val spec: PendingSkyEnvSpec,
+        val step: Int,
+        val eqWidth: Int,
+        val eqHeight: Int,
+        val faceSize: Int,
+        val shifted: EnvironmentFactory.EnvPixels,
+        val sh: FloatArray,
+        val mips: List<Pair<Int, ByteBuffer>>?,
+        val blurredSkyboxMips: List<Pair<Int, ByteBuffer>>?,
+    )
+    private val skyBakeExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
+    @Volatile private var skyBakeInFlight = false
+    @Volatile private var readySkyEnvStep: PreparedSkyEnvStep? = null
+    private var skyEnvGeneration = java.util.concurrent.atomic.AtomicInteger(0)
+
+    /** W17: stage-owned directional sun light driven by `skyEnvironment.sunLight`. */
+    internal var stageSunEntity: Int = 0
+    private var stageSunShadowSig: Int = 0
+
+    /** W17: rate-limited + 3-step progressive `skyEnvironment` IBL prefilter state. */
+    internal class PendingSkyEnvSpec(
+        val source: JSONObject,
+        val sourceType: String,
+        val intensity: Double,
+        val rotationY: Double,
+        val refresh: String,
+        val intervalSeconds: Double,
+        val equirectWidth: Int,
+        val sig: Int,
+    )
+    internal var skyEnvBakedSig: Int? = null
+    internal var skyEnvLastBakeNs: Long = 0L
+    internal var skyEnvLastStepNs: Long = 0L
+    internal var skyEnvProgressiveStep: Int = 3
+    internal var activeSkyEnvSpec: PendingSkyEnvSpec? = null
+    internal var pendingSkyEnvSpec: PendingSkyEnvSpec? = null
 
     private var iblPrefilter: IBLPrefilterContext? = null
     private var iblEquirect: IBLPrefilterContext.EquirectangularToCubemap? =
@@ -1205,10 +1252,20 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     internal fun applyEnvironment(il: IndirectLight?, textures: List<Texture>) {
         Log.i(TAG, "applyEnvironment: il=${il != null} textures=${textures.size}")
         scene.indirectLight = il
-        envIndirectLight?.let {
-            if (it !== il) engine.destroyIndirectLight(it) }
+        envIndirectLight?.let { oldIl ->
+            if (oldIl !== il) {
+                retiredEnvObjects.addLast(envFrameCount to {
+                    engine.destroyIndirectLight(oldIl)
+                })
+            }
+        }
         for (t in envIblTextures) {
-            if (textures.none { it === t }) engine.destroyTexture(t) }
+            if (textures.none { it === t } && envSkyboxTextures.none { it === t }) {
+                retiredEnvObjects.addLast(envFrameCount to {
+                    engine.destroyTexture(t)
+                })
+            }
+        }
         envIndirectLight = il
         envIblTextures.clear()
         envIblTextures.addAll(textures)
@@ -1219,12 +1276,434 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     internal fun applySkybox(sb: Skybox?, textures: List<Texture>) {
         Log.i(TAG, "applySkybox: sb=${sb != null} textures=${textures.size}")
         scene.skybox = sb
-        envSkybox?.let { if (it !== sb) engine.destroySkybox(it) }
+        envSkybox?.let { oldSb ->
+            if (oldSb !== sb) {
+                retiredEnvObjects.addLast(envFrameCount to {
+                    engine.destroySkybox(oldSb)
+                })
+            }
+        }
         for (t in envSkyboxTextures) {
-            if (textures.none { it === t }) engine.destroyTexture(t) }
+            if (textures.none { it === t } && envIblTextures.none { it === t }) {
+                retiredEnvObjects.addLast(envFrameCount to {
+                    engine.destroyTexture(t)
+                })
+            }
+        }
         envSkybox = sb
         envSkyboxTextures.clear()
         envSkyboxTextures.addAll(textures)
+    }
+
+    private fun drainRetiredEnvObjects(all: Boolean) {
+        while (retiredEnvObjects.isNotEmpty()) {
+            val (frame, action) = retiredEnvObjects.peekFirst() ?: break
+            if (!all && envFrameCount - frame < 4L) break
+            retiredEnvObjects.removeFirst()
+            action()
+        }
+    }
+
+    // MARK: - W17 skyEnvironment + sunLight + progressive IBL prefilter
+
+    internal fun clearSkyEnvState() {
+        skyEnvGeneration.incrementAndGet()
+        readySkyEnvStep = null
+        skyBakeInFlight = false
+        skyEnvBakedSig = null
+        skyEnvLastBakeNs = 0L
+        skyEnvLastStepNs = 0L
+        skyEnvProgressiveStep = 3
+        activeSkyEnvSpec = null
+        pendingSkyEnvSpec = null
+    }
+
+    internal fun clearStageSunLight() {
+        if (stageSunEntity != 0) {
+            scene.remove(stageSunEntity)
+            engine.destroyEntity(stageSunEntity)
+            EntityManager.get().destroy(stageSunEntity)
+            stageSunEntity = 0
+            stageSunShadowSig = 0
+        }
+    }
+
+    internal fun applyStageSunLight(
+        skySource: JSONObject?,
+        sunLightSpec: JSONObject?,
+    ) {
+        if (skySource == null || sunLightSpec == null) {
+            clearStageSunLight()
+            return
+        }
+        val skyType = skySource.optString("type")
+        if (skyType != "physical" && skyType != "gradient") {
+            clearStageSunLight()
+            return
+        }
+        val sun = EnvironmentFactory.rawVec3(
+            skySource.optJSONArray("sunDirection"))
+            ?: doubleArrayOf(0.4, 0.5, 0.6)
+        val sunLen = kotlin.math.sqrt(
+            sun[0] * sun[0] + sun[1] * sun[1] + sun[2] * sun[2])
+        val sunX = if (sunLen > 1e-12) sun[0] / sunLen else 0.0
+        val sunY = if (sunLen > 1e-12) sun[1] / sunLen else 1.0
+        val sunZ = if (sunLen > 1e-12) sun[2] / sunLen else 0.0
+        val d = D3Wire.position(doubleArrayOf(-sunX, -sunY, -sunZ))
+
+        val intensityScale = sunLightSpec.optDouble("intensityScale", 1.0)
+        val color: FloatArray
+        val sunIntensity: Float
+        if (skyType == "physical") {
+            val energy = skySource.optDouble("energy", 1.0)
+            color = floatArrayOf(1.0f, 0.98f, 0.95f)
+            sunIntensity = (3.0 * energy * intensityScale).toFloat()
+        } else {
+            val sc = EnvironmentFactory.rawVec3(
+                skySource.optJSONArray("sunColor"))
+                ?: doubleArrayOf(3.0, 2.7, 2.2)
+            val peak = maxOf(sc[0], maxOf(sc[1], sc[2]))
+            color = if (peak > 0.0) {
+                floatArrayOf(
+                    (sc[0] / peak).toFloat(),
+                    (sc[1] / peak).toFloat(),
+                    (sc[2] / peak).toFloat())
+            } else {
+                floatArrayOf(1f, 1f, 1f)
+            }
+            sunIntensity = (peak * intensityScale).toFloat()
+        }
+
+        val castsShadow = sunLightSpec.optBoolean("castsShadow", true)
+        val mapRes = sunLightSpec.optInt("shadowMapResolution", 1024)
+            .coerceIn(64, 4096)
+        val cascades = sunLightSpec.optInt("shadowCascadeCount", 4)
+            .coerceIn(1, 4)
+        val maxDist = sunLightSpec.optDouble("shadowMaxDistance", 150.0)
+        val depthBias = sunLightSpec.optDouble("shadowDepthBias", 0.02)
+        val normalBias = sunLightSpec.optDouble("shadowNormalBias", 0.02)
+        val softness = sunLightSpec.optDouble("shadowSoftness", 0.08)
+        val splitLambda = sunLightSpec.optDouble("shadowCascadeSplitLambda", 0.6)
+        val contact = sunLightSpec.optBoolean("contactShadows", false)
+        val contactDist = sunLightSpec.optDouble("contactShadowDistance", 0.3)
+        val angularRad = sunLightSpec.optDouble("angularRadius", 0.005)
+
+        val shadowSig = listOf(
+            castsShadow, mapRes, cascades, maxDist, depthBias, normalBias,
+            softness, splitLambda, contact, contactDist, angularRad,
+        ).hashCode()
+
+        if (stageSunEntity != 0 && stageSunShadowSig == shadowSig) {
+            val lm = engine.lightManager
+            val li = lm.getInstance(stageSunEntity)
+            if (li != 0) {
+                lm.setDirection(li, d[0], d[1], d[2])
+                lm.setColor(li, color[0], color[1], color[2])
+                lm.setIntensity(li, sunIntensity)
+                return
+            }
+        }
+
+        clearStageSunLight()
+        val entity = EntityManager.get().create()
+        val builder = LightManager.Builder(LightManager.Type.DIRECTIONAL)
+            .direction(d[0], d[1], d[2])
+            .color(color[0], color[1], color[2])
+            .intensity(sunIntensity)
+            .sunAngularRadius(Math.toDegrees(angularRad).toFloat())
+        if (castsShadow) {
+            builder.castShadows(true)
+            val so = LightManager.ShadowOptions()
+            so.mapSize = mapRes
+            so.shadowCascades = cascades
+            so.shadowFar = maxDist.toFloat()
+            so.constantBias = depthBias.toFloat()
+            so.normalBias = normalBias.toFloat()
+            so.shadowBulbRadius = softness.toFloat()
+            so.screenSpaceContactShadows = contact
+            so.maxShadowDistance = contactDist.toFloat()
+            if (cascades > 1) {
+                so.cascadeSplitPositions = FsceneRealizer.cascadeSplits(
+                    splitLambda.toFloat(), cascades, maxDist.toFloat())
+            }
+            builder.shadowOptions(so)
+        }
+        builder.fenced { build(engine, entity) }
+        scene.addEntity(entity)
+        stageSunEntity = entity
+        stageSunShadowSig = shadowSig
+    }
+
+    /**
+     * Executes one step (`1` = coarse 64×32 SH3, `2` = medium 128×64
+     * cube+SH3, `3` = full reference cube+SH3) of a `skyEnvironment` IBL
+     * prefilter.
+     */
+    internal fun buildSkyEnvPrefilterStep(
+        spec: PendingSkyEnvSpec,
+        step: Int,
+        updateSkyboxIfEnvSourced: Boolean = true,
+    ) {
+        val t0 = System.nanoTime()
+        val fullW = spec.equirectWidth.coerceIn(64, 512)
+        val w = when (step) {
+            1 -> 64
+            2 -> minOf(128, fullW)
+            else -> minOf(256, fullW)
+        }
+        val h = maxOf(32, w / 2)
+        val rawPixels = when (spec.sourceType) {
+            "physical" -> EnvironmentFactory.physicalEquirectPixels(
+                spec.source, scale = 1.0, width = w, height = h,
+                conserveSunEnergy = true)
+            "gradient" -> EnvironmentFactory.gradientEquirectPixels(
+                spec.source, scale = 1.0, width = w, height = h)
+            else -> return
+        }
+        val shifted = EnvironmentFactory.filamentShifted(
+            rawPixels, spec.rotationY)
+        envShiftedPixels = shifted
+        val sh = EnvironmentFactory.projectEquirectSH(shifted)
+
+        // Step 1 during an active sweep reuses the already-built reflection
+        // cubemap when one exists so only SH3 diffuse irradiance is updated
+        // on that frame (~0.4 ms, 0 IBLPrefilterContext passes).
+        if (step == 1 && envReflectionCube != null && envIblTextures.isNotEmpty()) {
+            val il = if (spec.intensity > 0.0) {
+                IndirectLight.Builder()
+                    .irradiance(3, sh)
+                    .intensity(spec.intensity.toFloat())
+                    .reflections(envReflectionCube!!)
+                    .fenced { build(engine) }
+            } else null
+            applyEnvironment(il, ArrayList(envIblTextures))
+            val ms = (System.nanoTime() - t0) / 1_000_000.0
+            Log.i(TAG, String.format(
+                java.util.Locale.US,
+                "w17 skyEnvironment step 1/3 (%dx%d SH3) in %.2f ms",
+                w, h, ms))
+            return
+        }
+
+        val eq = EnvironmentFactory.normalizeEquirect(shifted)
+        val faceSize = (eq.height).coerceIn(32, 128)
+        val envCube = EnvironmentFactory.cubemapTextureFromEquirect(
+            engine, eq, faceSize = faceSize, maxMipLevels = 6)
+        val iblTextures = arrayListOf(envCube)
+        envUnfilteredCube = envCube
+        envReflectionCube = envCube
+
+        if (updateSkyboxIfEnvSourced &&
+            (skyboxUsesEnvCube || skyboxSharesSkyEnvCube)) {
+            if (skyboxUsesEnvCube && skyboxEnvBlurriness > 0.0) {
+                val blurred = EnvironmentFactory.boxBlurredPixels(
+                    shifted,
+                    maxOf(1, Math.round(skyboxEnvBlurriness * shifted.width / 32).toInt()))
+                val bc = EnvironmentFactory.cubemapTextureFromEquirect(
+                    engine,
+                    EnvironmentFactory.normalizeEquirect(blurred),
+                    faceSize = faceSize,
+                    maxMipLevels = 1)
+                val sb = Skybox.Builder()
+                    .environment(bc)
+                    .intensity(skyboxEnvIntensity)
+                    .fenced { build(engine) }
+                applySkybox(sb, listOf(bc))
+            } else {
+                val sb = Skybox.Builder()
+                    .environment(envCube)
+                    .intensity(skyboxEnvIntensity)
+                    .fenced { build(engine) }
+                applySkybox(sb, emptyList())
+            }
+        }
+
+        val il = if (spec.intensity > 0.0) {
+            IndirectLight.Builder()
+                .irradiance(3, sh)
+                .intensity(spec.intensity.toFloat())
+                .reflections(envCube)
+                .fenced { build(engine) }
+        } else null
+        applyEnvironment(il, iblTextures)
+        val ms = (System.nanoTime() - t0) / 1_000_000.0
+        Log.i(TAG, String.format(
+            java.util.Locale.US,
+            "w17 skyEnvironment step %d/3 (%dx%d -> %d^2 cube+SH3) in %.2f ms",
+            step, eq.width, eq.height, faceSize, ms))
+    }
+
+    private fun applyPreparedSkyEnvStep(prepared: PreparedSkyEnvStep) {
+        val t0 = System.nanoTime()
+        val spec = prepared.spec
+        envShiftedPixels = prepared.shifted
+        if (prepared.step == 1 && prepared.mips == null &&
+            envReflectionCube != null && envIblTextures.isNotEmpty()) {
+            val il = if (spec.intensity > 0.0) {
+                IndirectLight.Builder()
+                    .irradiance(3, prepared.sh)
+                    .intensity(spec.intensity.toFloat())
+                    .reflections(envReflectionCube!!)
+                    .fenced { build(engine) }
+            } else null
+            applyEnvironment(il, ArrayList(envIblTextures))
+            val ms = (System.nanoTime() - t0) / 1_000_000.0
+            Log.i(TAG, String.format(
+                java.util.Locale.US,
+                "w17 skyEnvironment step 1/3 (%dx%d SH3 upload) in %.2f ms",
+                prepared.eqWidth, prepared.eqHeight, ms))
+            return
+        }
+
+        val mips = prepared.mips ?: return
+        val envCube = EnvironmentFactory.uploadCubemapTexture(
+            engine, prepared.faceSize, mips)
+        val iblTextures = arrayListOf(envCube)
+        envUnfilteredCube = envCube
+        envReflectionCube = envCube
+
+        if (skyboxUsesEnvCube || skyboxSharesSkyEnvCube) {
+            val blurMips = prepared.blurredSkyboxMips
+            if (skyboxUsesEnvCube && skyboxEnvBlurriness > 0.0 && blurMips != null) {
+                val bc = EnvironmentFactory.uploadCubemapTexture(
+                    engine, prepared.faceSize, blurMips)
+                val sb = Skybox.Builder()
+                    .environment(bc)
+                    .intensity(skyboxEnvIntensity)
+                    .fenced { build(engine) }
+                applySkybox(sb, listOf(bc))
+            } else {
+                val sb = Skybox.Builder()
+                    .environment(envCube)
+                    .intensity(skyboxEnvIntensity)
+                    .fenced { build(engine) }
+                applySkybox(sb, emptyList())
+            }
+        }
+
+        val il = if (spec.intensity > 0.0) {
+            IndirectLight.Builder()
+                .irradiance(3, prepared.sh)
+                .intensity(spec.intensity.toFloat())
+                .reflections(envCube)
+                .fenced { build(engine) }
+        } else null
+        applyEnvironment(il, iblTextures)
+        val ms = (System.nanoTime() - t0) / 1_000_000.0
+        Log.i(TAG, String.format(
+            java.util.Locale.US,
+            "w17 skyEnvironment step %d/3 (%dx%d -> %d^2 upload) in %.2f ms",
+            prepared.step, prepared.eqWidth, prepared.eqHeight,
+            prepared.faceSize, ms))
+    }
+
+    private fun scheduleSkyEnvPrep(spec: PendingSkyEnvSpec, step: Int) {
+        val gen = skyEnvGeneration.get()
+        val hasExistingCube = envReflectionCube != null && envIblTextures.isNotEmpty()
+        val blur = if (skyboxUsesEnvCube) skyboxEnvBlurriness else 0.0
+        skyBakeInFlight = true
+        skyBakeExecutor.execute {
+            try {
+                if (skyEnvGeneration.get() != gen) return@execute
+                val fullW = spec.equirectWidth.coerceIn(64, 512)
+                val w = when (step) {
+                    1 -> 64
+                    2 -> minOf(128, fullW)
+                    else -> minOf(256, fullW)
+                }
+                val h = maxOf(32, w / 2)
+                val rawPixels = when (spec.sourceType) {
+                    "physical" -> EnvironmentFactory.physicalEquirectPixels(
+                        spec.source, scale = 1.0, width = w, height = h,
+                        conserveSunEnergy = true)
+                    "gradient" -> EnvironmentFactory.gradientEquirectPixels(
+                        spec.source, scale = 1.0, width = w, height = h)
+                    else -> return@execute
+                }
+                val shifted = EnvironmentFactory.filamentShifted(
+                    rawPixels, spec.rotationY)
+                val sh = EnvironmentFactory.projectEquirectSH(shifted)
+                val eq = EnvironmentFactory.normalizeEquirect(shifted)
+                val faceSize = eq.height.coerceIn(32, 128)
+                val mips = if (step == 1 && hasExistingCube) null else {
+                    EnvironmentFactory.prepareCubemapMipBuffers(
+                        eq, faceSize = faceSize, maxMipLevels = 6)
+                }
+                val blurMips = if (mips != null && blur > 0.0) {
+                    val blurred = EnvironmentFactory.boxBlurredPixels(
+                        shifted,
+                        maxOf(1, Math.round(blur * shifted.width / 32).toInt()))
+                    EnvironmentFactory.prepareCubemapMipBuffers(
+                        EnvironmentFactory.normalizeEquirect(blurred),
+                        faceSize = faceSize, maxMipLevels = 1)
+                } else null
+                if (skyEnvGeneration.get() == gen) {
+                    readySkyEnvStep = PreparedSkyEnvStep(
+                        spec = spec, step = step,
+                        eqWidth = eq.width, eqHeight = eq.height,
+                        faceSize = faceSize, shifted = shifted,
+                        sh = sh, mips = mips, blurredSkyboxMips = blurMips)
+                }
+            } finally {
+                skyBakeInFlight = false
+            }
+        }
+    }
+
+    /**
+     * Advances rate-limited progressive `skyEnvironment` IBL prefiltering by
+     * preparing CPU equirect/SH3/cubemap mip buffers on [skyBakeExecutor] and
+     * uploading at most one bounded step per frame on the render thread (~0.3 ms)
+     * so sun sweeps stay well below 33 ms per frame on A142 and converge to
+     * Step 3 at rest.
+     */
+    private fun advanceProgressiveSkyEnv() {
+        val now = System.nanoTime()
+        readySkyEnvStep?.let { prepared ->
+            readySkyEnvStep = null
+            applyPreparedSkyEnvStep(prepared)
+            skyEnvProgressiveStep = prepared.step
+            skyEnvLastStepNs = now
+            if (prepared.step == 3) {
+                skyEnvBakedSig = prepared.spec.sig
+                skyEnvLastBakeNs = now
+                if (pendingSkyEnvSpec?.sig == prepared.spec.sig) {
+                    pendingSkyEnvSpec = null
+                }
+            }
+            return
+        }
+        if (skyBakeInFlight) return
+
+        if (skyEnvProgressiveStep in 1..2) {
+            val active = activeSkyEnvSpec ?: run {
+                skyEnvProgressiveStep = 3
+                return
+            }
+            if (now - skyEnvLastStepNs < 45_000_000L) return
+            val nextStep = skyEnvProgressiveStep + 1
+            val specToRun = pendingSkyEnvSpec ?: active
+            activeSkyEnvSpec = specToRun
+            scheduleSkyEnvPrep(specToRun, nextStep)
+            return
+        }
+
+        val pending = pendingSkyEnvSpec ?: return
+        if (pending.sig == skyEnvBakedSig) {
+            pendingSkyEnvSpec = null
+            return
+        }
+        val minIntervalNs = when (pending.refresh) {
+            "interval" -> (pending.intervalSeconds * 1_000_000_000.0)
+                .toLong().coerceAtLeast(150_000_000L)
+            else -> 180_000_000L
+        }
+        if (now - skyEnvLastBakeNs < minIntervalNs) return
+
+        activeSkyEnvSpec = pending
+        skyEnvBakedSig = pending.sig
+        skyEnvLastBakeNs = now
+        scheduleSkyEnvPrep(pending, 1)
     }
 
     /** The last effective stage exposure (exposure × 2^AE comp). */
@@ -1704,6 +2183,16 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             destroySwapChainAndWait("release")
             // W7 env objects — unbind from the scene first, then
             // destroy; the prefilter helpers die last.
+            clearStageSunLight()
+            clearSkyEnvState()
+            skyBakeExecutor.shutdownNow()
+            drainRetiredEnvObjects(all = true)
+            envReflectionCube = null
+            envUnfilteredCube = null
+            envShiftedPixels = null
+            skyboxUsesEnvCube = false
+            skyboxSharesSkyEnvCube = false
+            skyboxEnvBlurriness = 0.0
             scene.setIndirectLight(null)
             scene.setSkybox(null)
             envIndirectLight?.let { engine.destroyIndirectLight(it) }
@@ -4810,6 +5299,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // W26: camera-facing lines/billboards re-expand against this
         // frame's camera pose — after every camera write, before draw.
         updateCameraFacing()
+        envFrameCount++
+        drainRetiredEnvObjects(all = false)
+        // W17: advance rate-limited progressive skyEnvironment IBL
+        // prefilter by at most one bounded step per frame.
+        advanceProgressiveSkyEnv()
         val simEnd = if (perf) System.nanoTime() else 0L
         val didRender = render(tNanos)
         if (perf) {

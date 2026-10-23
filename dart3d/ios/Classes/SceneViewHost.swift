@@ -190,6 +190,18 @@ final class SceneViewHost: SCNView {
     /// present. `applyStageEffects` re-writes every supported knob.
     private(set) var lastEffects: StageEffects? = nil
 
+    /// W17: stage-owned directional sun light node (`skyEnvironment.sunLight`)
+    /// and rate-limited 3-step progressive `skyEnvironment` IBL prefilter state.
+    var stageSunLightNode: SCNNode?
+    var envLightingPixels: FsceneRealizer.EnvPixels?
+    var skyEnvBakedSig: String?
+    var skyEnvLastBakeTime: CFAbsoluteTime = 0
+    var skyEnvLastStepTime: CFAbsoluteTime = 0
+    var skyEnvProgressiveStep: Int = 3
+    var activeSkyEnvStage: [String: Any]?
+    var pendingSkyEnvStage: [String: Any]?
+    var pendingSkyEnvInterval: Double = 0.15
+
     /// W14: the render-target registry — `rt:` key → record (spec,
     /// texture pair, the views targeting it, schedule state). Internal
     /// rather than `private(set)`: the offscreen scheduler in
@@ -4533,6 +4545,14 @@ final class SceneViewHost: SCNView {
         }
         scene.background.contents = nil
         scene.lightingEnvironment.contents = nil
+        stageSunLightNode = nil
+        envLightingPixels = nil
+        skyEnvBakedSig = nil
+        skyEnvLastBakeTime = 0
+        skyEnvLastStepTime = 0
+        skyEnvProgressiveStep = 3
+        activeSkyEnvStage = nil
+        pendingSkyEnvStage = nil
         scene.fogStartDistance = 0
         scene.fogEndDistance = 0
         scene.fogDensityExponent = 1
@@ -4732,6 +4752,7 @@ extension SceneViewHost: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer,
                   updateAtTime time: TimeInterval) {
         drainPendingWork()
+        advanceProgressiveSkyEnv()
         sampleAnimations(at: time)
         // W16: trails record after the sampler — the head follows
         // this frame's sampled pose. LOD selection runs later, in
@@ -4739,6 +4760,52 @@ extension SceneViewHost: SCNSceneRendererDelegate {
         // final after the sim step, and selecting here read the
         // pre-sim pose (a one-frame lag on moving bodies).
         updateTrails(at: time)
+    }
+
+    /// W17: advances rate-limited 3-step progressive `skyEnvironment`
+    /// IBL prefiltering (`64×32` → `128×64` → `256×128`) by at most
+    /// one step per frame.
+    private func advanceProgressiveSkyEnv() {
+        let now = CFAbsoluteTimeGetCurrent()
+        if skyEnvProgressiveStep == 1 || skyEnvProgressiveStep == 2 {
+            guard let stageToRun = pendingSkyEnvStage ?? activeSkyEnvStage
+            else {
+                skyEnvProgressiveStep = 3
+                return
+            }
+            guard now - skyEnvLastStepTime >= 0.045 else { return }
+            let nextStep = skyEnvProgressiveStep + 1
+            skyEnvProgressiveStep = nextStep
+            skyEnvLastStepTime = now
+            activeSkyEnvStage = stageToRun
+            if nextStep == 3 {
+                skyEnvLastBakeTime = now
+                pendingSkyEnvStage = nil
+            }
+            let ctx = surgicalContext()
+            ctx.decodeStage(stageToRun, progressiveStepOverride: nextStep)
+            publish(ctx)
+            applyStageQuality()
+            applyStageExposure(ctx.stageExposure)
+            applyStageEffects()
+            return
+        }
+
+        guard let pendingStage = pendingSkyEnvStage,
+              now - skyEnvLastBakeTime >= pendingSkyEnvInterval else {
+            return
+        }
+        pendingSkyEnvStage = nil
+        activeSkyEnvStage = pendingStage
+        skyEnvProgressiveStep = 1
+        skyEnvLastStepTime = now
+        skyEnvLastBakeTime = now
+        let ctx = surgicalContext()
+        ctx.decodeStage(pendingStage, progressiveStepOverride: 1)
+        publish(ctx)
+        applyStageQuality()
+        applyStageExposure(ctx.stageExposure)
+        applyStageEffects()
     }
 
     /// W16 per-frame trail pass — `TrailComponent.update` ported:

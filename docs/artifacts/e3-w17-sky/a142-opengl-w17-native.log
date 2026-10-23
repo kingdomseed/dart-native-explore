@@ -1,0 +1,152 @@
+--------- beginning of main
+10-23 23:49:49.206 25943 25943 I dart3d  : start +68ms plugin registered
+10-23 23:49:49.207 25943 25943 I dart3d  : dart3d provider registered (disposeView=true)
+10-23 23:49:49.227 25943 25943 I dart3d  : GPU: Mali-G610 MC4
+10-23 23:49:49.349 25943 25943 I dart3d  : Dart3dSetDispatcher: slot armed
+10-23 23:49:49.349 25943 25943 I dart3d  : Dart3dSetBackend: 1
+10-23 23:49:49.350 25943 25943 I dartnative: [DN-Android] loadSymbols: done
+10-23 23:49:49.358 25943 25943 I dartnative: dart3d: showcase — w17: 6 nodes · 3 geo · 5 mat
+10-23 23:49:49.413 25943 25943 I dart3d  : Filament engine backend: OPENGL (pref=1, tier=STANDARD)
+10-23 23:49:49.414 25943 25943 I dart3d  : start +275ms engine created
+10-23 23:49:49.454 25943 25943 I dart3d  : start +316ms base materials loaded
+10-23 23:49:49.484 25943 25943 I dartnative: resolveSkiaCanvasBridgeMethods: DNSkiaCanvasBridge method IDs cached
+10-23 23:49:49.484 25943 25943 I dartnative: resolveKotlinMethods: all method IDs cached
+10-23 23:49:49.484 25943 25943 I dartnative: JNI_OnLoad: dartnative_android bridge loaded
+10-23 23:49:49.484 25943 25943 I dartnative: [DNCoil] installed ImageLoader memCache=50% heap, 16 req/host
+10-23 23:49:49.484 25943 25943 I dartnative: [DN-Build] dartnative_android stamp: 2026-10-03-1
+10-23 23:49:49.484 25943 25943 I dartnative: DNResetViewRegistry: gen=1, cleared 0 stale callbacks, registry reset
+10-23 23:49:49.484 25943 25943 I dartnative: DNResetViewRegistry: callbacks thawed, dropped 0 stale fire(s) during the restart window
+10-23 23:49:49.484 25943 25943 I dartnative: DNViewTypeClaim: 'com.jasonholtdigital.dart3d/sceneView' -> 65535
+10-23 23:49:49.486 25943 25943 I dart3d  : perf view: backend=OPENGL viewport=0x0 msaa=0 aa=FXAA post=true hdr=HIGH bloom=false(levels=6 res=384 q=LOW) ssao=false taa=false ssr=false dsr=false(0.5..1.0) dither=TEMPORAL quality=default physics=60Hzx8 entities=0 bodies=0
+10-23 23:49:49.486 25943 25943 I dart3d  : protocol hello: Dart v1.0
+10-23 23:49:49.487 25943 25943 I dart3d  : antialiasingMode=4 → MSAA enabled=true sampleCount=4 aa=FXAA
+10-23 23:49:49.487 25943 25943 I dart3d  : quality=default → shadows=true aaSrc=4 tier=STANDARD shadowType=DPCF
+10-23 23:49:49.498 25943 25943 I dart3d  : node -5229525851460075517: body=none pos=(-1.85,0.72,-0.0)
+10-23 23:49:49.498 25943 25943 I dart3d  : node -5229525851460075515: body=none pos=(0.0,0.72,-0.0)
+10-23 23:49:49.498 25943 25943 I dart3d  : node -5229525851460075513: body=none pos=(1.85,0.72,-0.0)
+10-23 23:49:49.498 25943 25943 I dart3d  : node -5229525851460075511: body=none pos=(0.0,0.9,-1.45)
+10-23 23:49:49.498 25943 25943 I dart3d  : node -5229525851460075507: body=none pos=(0.0,-0.059434,-0.47000003)
+10-23 23:49:49.498 25943 25943 I dart3d  : node -5229525851460075506: body=none pos=(0.0,3.0475502,21.005505)
+10-23 23:49:49.628 25943 25943 I dart3d  : w17 physicalSky 1k (1024x512) generated in 129.22 ms
+10-23 23:49:49.708 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:49:49.708 25943 25943 I dart3d  : w17 skyEnvironment step 3/3 (256x128 -> 128^2 cube+SH3) in 208.85 ms
+10-23 23:49:49.709 25943 25943 I dart3d  : applySkybox: sb=true textures=0
+10-23 23:49:49.711 25943 25943 I dart3d  : start +573ms scene installed
+10-23 23:49:49.711 25943 25943 I dart3d  : views applied: 0 entries (0 screen, 0 rts)
+10-23 23:49:49.711 25943 25943 I dart3d  : realize: 224ms
+10-23 23:49:49.723 25943 25943 I dart3d  : dart3d view 3 swapchain created
+10-23 23:49:49.723 25943 25943 I dart3d  : start +585ms swapchain created
+10-23 23:49:49.742 25943 25943 I dartnative: [DNSplash] splash released after 425ms (root has views)
+10-23 23:49:49.745 25943 25943 I dart3d  : start +607ms first frame submitted
+10-23 23:49:49.785 25943 25943 I dart3d  : start +647ms first frame rendered
+10-23 23:49:50.001 25943 25943 I dartnative: [DNSplash] system splash gone — flushing 1 deferred chrome op(s)
+10-23 23:49:50.361 25943 25943 I dartnative: [DN] Licence key exchange completed in the background (1009ms).
+10-23 23:49:50.860 25943 25943 I dartnative: dart3d: w17 auto_stage=day ready PASS
+10-23 23:49:51.497 25943 25943 I dart3d  : perf n=154 fps=76.6 frame p50=11.1 p95=11.2 max=55.7 ms | gpu p50=11.0 p95=11.7 | backend p50=1.2 p95=2.5 | sim p50=0.1 p95=0.2 (physics p50=0.0 p95=0.0) | submit p50=0.2 p95=1.1 | skipped=1/156 physics=55/s
+10-23 23:49:53.500 25943 25943 I dart3d  : perf n=180 fps=89.8 frame p50=11.1 p95=11.2 max=11.2 ms | gpu p50=11.1 p95=11.9 | backend p50=1.3 p95=2.7 | sim p50=0.1 p95=0.1 (physics p50=0.0 p95=0.0) | submit p50=0.3 p95=0.9 | skipped=0/180 physics=60/s
+10-23 23:49:53.861 25943 25943 I dartnative: dart3d: w17 auto_stage=lowsun ready PASS
+10-23 23:49:53.877 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:49:53.878 25943 25943 I dart3d  : w17 skyEnvironment step 1/3 (64x32 SH3 upload) in 0.55 ms
+10-23 23:49:53.944 25943 25943 I dart3d  : applySkybox: sb=true textures=0
+10-23 23:49:53.944 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:49:53.944 25943 25943 I dart3d  : w17 skyEnvironment step 2/3 (128x64 -> 64^2 upload) in 0.61 ms
+10-23 23:49:54.021 25943 25943 I dart3d  : applySkybox: sb=true textures=0
+10-23 23:49:54.021 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:49:54.022 25943 25943 I dart3d  : w17 skyEnvironment step 3/3 (256x128 -> 128^2 upload) in 0.36 ms
+10-23 23:49:55.502 25943 25943 I dart3d  : perf n=180 fps=89.8 frame p50=11.1 p95=11.2 max=11.2 ms | gpu p50=11.0 p95=11.8 | backend p50=1.7 p95=3.6 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=0.4 p95=1.3 | skipped=0/180 physics=60/s
+10-23 23:49:56.862 25943 25943 I dartnative: dart3d: w17 auto_stage=override ready PASS
+10-23 23:49:56.894 25943 25943 I dart3d  : environment -5229525851460075510: 16×8 equirect → 256² cube + SH3 in 21ms
+10-23 23:49:56.909 25943 25943 I dart3d  : applySkybox: sb=true textures=1
+10-23 23:49:56.909 25943 25943 I dart3d  : applyEnvironment: il=true textures=3
+10-23 23:49:57.508 25943 25943 I dart3d  : perf n=169 fps=84.4 frame p50=11.1 p95=11.2 max=100.1 ms | gpu p50=11.1 p95=11.7 | backend p50=1.6 p95=2.3 | sim p50=0.1 p95=0.2 (physics p50=0.0 p95=0.1) | submit p50=0.3 p95=1.2 | skipped=8/177 physics=60/s
+10-23 23:49:59.509 25943 25943 I dart3d  : perf n=180 fps=89.8 frame p50=11.1 p95=11.2 max=11.3 ms | gpu p50=11.0 p95=11.8 | backend p50=1.2 p95=2.3 | sim p50=0.1 p95=0.2 (physics p50=0.0 p95=0.0) | submit p50=0.3 p95=0.9 | skipped=0/180 physics=60/s
+10-23 23:49:59.861 25943 25943 I dartnative: dart3d: w17 auto_stage=step1 ready PASS
+10-23 23:49:59.870 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:49:59.871 25943 25943 I dart3d  : w17 skyEnvironment step 3/3 (64x32 -> 32^2 cube+SH3) in 4.58 ms
+10-23 23:49:59.871 25943 25943 I dart3d  : applySkybox: sb=true textures=0
+10-23 23:50:01.513 25943 25943 I dart3d  : perf n=179 fps=89.3 frame p50=11.1 p95=11.2 max=22.2 ms | gpu p50=11.1 p95=11.8 | backend p50=1.8 p95=3.5 | sim p50=0.1 p95=0.2 (physics p50=0.0 p95=0.1) | submit p50=0.4 p95=1.4 | skipped=1/180 physics=60/s
+10-23 23:50:02.861 25943 25943 I dartnative: dart3d: w17 auto_stage=step2 ready PASS
+10-23 23:50:02.881 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:02.881 25943 25943 I dart3d  : w17 skyEnvironment step 1/3 (64x32 SH3 upload) in 0.15 ms
+10-23 23:50:02.947 25943 25943 I dart3d  : applySkybox: sb=true textures=0
+10-23 23:50:02.948 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:02.948 25943 25943 I dart3d  : w17 skyEnvironment step 2/3 (128x64 -> 64^2 upload) in 0.66 ms
+10-23 23:50:03.014 25943 25943 I dart3d  : applySkybox: sb=true textures=0
+10-23 23:50:03.014 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:03.014 25943 25943 I dart3d  : w17 skyEnvironment step 3/3 (128x64 -> 64^2 upload) in 0.37 ms
+10-23 23:50:03.518 25943 25943 I dart3d  : perf n=180 fps=89.9 frame p50=11.1 p95=11.2 max=11.2 ms | gpu p50=11.1 p95=11.9 | backend p50=1.7 p95=2.7 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=0.4 p95=1.5 | skipped=0/180 physics=60/s
+10-23 23:50:05.519 25943 25943 I dart3d  : perf n=180 fps=89.8 frame p50=11.1 p95=11.2 max=11.2 ms | gpu p50=11.1 p95=11.8 | backend p50=1.2 p95=2.2 | sim p50=0.1 p95=0.1 (physics p50=0.0 p95=0.0) | submit p50=0.3 p95=0.8 | skipped=0/180 physics=60/s
+10-23 23:50:05.861 25943 25943 I dartnative: dart3d: w17 auto_stage=step3 ready PASS
+10-23 23:50:05.875 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:05.875 25943 25943 I dart3d  : w17 skyEnvironment step 1/3 (64x32 SH3 upload) in 0.13 ms
+10-23 23:50:05.942 25943 25943 I dart3d  : applySkybox: sb=true textures=0
+10-23 23:50:05.942 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:05.942 25943 25943 I dart3d  : w17 skyEnvironment step 2/3 (128x64 -> 64^2 upload) in 0.39 ms
+10-23 23:50:06.031 25943 25943 I dart3d  : applySkybox: sb=true textures=0
+10-23 23:50:06.032 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:06.032 25943 25943 I dart3d  : w17 skyEnvironment step 3/3 (256x128 -> 128^2 upload) in 0.94 ms
+10-23 23:50:07.523 25943 25943 I dart3d  : perf n=180 fps=89.8 frame p50=11.1 p95=11.2 max=11.3 ms | gpu p50=11.0 p95=12.0 | backend p50=1.7 p95=2.6 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=0.4 p95=1.3 | skipped=0/180 physics=60/s
+10-23 23:50:08.862 25943 25943 I dartnative: dart3d: w17 auto_stage=sweep ready PASS
+10-23 23:50:08.880 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:08.881 25943 25943 I dart3d  : w17 skyEnvironment step 1/3 (64x32 SH3 upload) in 0.13 ms
+10-23 23:50:08.940 25943 25943 I dart3d  : applySkybox: sb=true textures=0
+10-23 23:50:08.940 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:08.940 25943 25943 I dart3d  : w17 skyEnvironment step 2/3 (128x64 -> 64^2 upload) in 0.34 ms
+10-23 23:50:09.014 25943 25943 I dart3d  : applySkybox: sb=true textures=0
+10-23 23:50:09.014 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:09.014 25943 25943 I dart3d  : w17 skyEnvironment step 3/3 (256x128 -> 128^2 upload) in 0.24 ms
+10-23 23:50:09.214 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:09.215 25943 25943 I dart3d  : w17 skyEnvironment step 1/3 (64x32 SH3 upload) in 0.16 ms
+10-23 23:50:09.281 25943 25943 I dart3d  : applySkybox: sb=true textures=0
+10-23 23:50:09.282 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:09.282 25943 25943 I dart3d  : w17 skyEnvironment step 2/3 (128x64 -> 64^2 upload) in 0.56 ms
+10-23 23:50:09.358 25943 25943 I dartnative: dart3d: w17 sweep checkpoint=1 step=15 sun=(-0.29,0.34,0.89) PASS
+10-23 23:50:09.360 25943 25943 I dart3d  : applySkybox: sb=true textures=0
+10-23 23:50:09.360 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:09.360 25943 25943 I dart3d  : w17 skyEnvironment step 3/3 (256x128 -> 128^2 upload) in 0.18 ms
+10-23 23:50:09.531 25943 25943 I dart3d  : perf n=179 fps=89.3 frame p50=11.1 p95=11.2 max=22.3 ms | gpu p50=11.1 p95=11.9 | backend p50=1.7 p95=4.9 | sim p50=0.1 p95=3.3 (physics p50=0.0 p95=0.0) | submit p50=0.4 p95=1.3 | skipped=0/179 physics=60/s
+10-23 23:50:09.563 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:09.563 25943 25943 I dart3d  : w17 skyEnvironment step 1/3 (64x32 SH3 upload) in 0.10 ms
+10-23 23:50:09.629 25943 25943 I dart3d  : applySkybox: sb=true textures=0
+10-23 23:50:09.629 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:09.629 25943 25943 I dart3d  : w17 skyEnvironment step 2/3 (128x64 -> 64^2 upload) in 0.31 ms
+10-23 23:50:09.715 25943 25943 I dart3d  : applySkybox: sb=true textures=0
+10-23 23:50:09.715 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:09.716 25943 25943 I dart3d  : w17 skyEnvironment step 3/3 (256x128 -> 128^2 upload) in 0.29 ms
+10-23 23:50:09.853 25943 25943 I dartnative: dart3d: w17 sweep checkpoint=2 step=30 sun=(0.00,0.46,0.89) PASS
+10-23 23:50:09.905 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:09.905 25943 25943 I dart3d  : w17 skyEnvironment step 1/3 (64x32 SH3 upload) in 0.26 ms
+10-23 23:50:09.971 25943 25943 I dart3d  : applySkybox: sb=true textures=0
+10-23 23:50:09.971 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:09.971 25943 25943 I dart3d  : w17 skyEnvironment step 2/3 (128x64 -> 64^2 upload) in 0.35 ms
+10-23 23:50:10.050 25943 25943 I dart3d  : applySkybox: sb=true textures=0
+10-23 23:50:10.050 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:10.050 25943 25943 I dart3d  : w17 skyEnvironment step 3/3 (256x128 -> 128^2 upload) in 0.76 ms
+10-23 23:50:10.238 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:10.238 25943 25943 I dart3d  : w17 skyEnvironment step 1/3 (64x32 SH3 upload) in 0.14 ms
+10-23 23:50:10.294 25943 25943 I dart3d  : applySkybox: sb=true textures=0
+10-23 23:50:10.294 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:10.294 25943 25943 I dart3d  : w17 skyEnvironment step 2/3 (128x64 -> 64^2 upload) in 0.35 ms
+10-23 23:50:10.348 25943 25943 I dartnative: dart3d: w17 sweep checkpoint=3 step=45 sun=(0.29,0.34,0.89) PASS
+10-23 23:50:10.386 25943 25943 I dart3d  : applySkybox: sb=true textures=0
+10-23 23:50:10.386 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:10.387 25943 25943 I dart3d  : w17 skyEnvironment step 3/3 (256x128 -> 128^2 upload) in 0.31 ms
+10-23 23:50:10.586 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:10.586 25943 25943 I dart3d  : w17 skyEnvironment step 1/3 (64x32 SH3 upload) in 0.12 ms
+10-23 23:50:10.654 25943 25943 I dart3d  : applySkybox: sb=true textures=0
+10-23 23:50:10.654 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:10.654 25943 25943 I dart3d  : w17 skyEnvironment step 2/3 (128x64 -> 64^2 upload) in 0.31 ms
+10-23 23:50:10.728 25943 25943 I dart3d  : applySkybox: sb=true textures=0
+10-23 23:50:10.728 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:10.728 25943 25943 I dart3d  : w17 skyEnvironment step 3/3 (256x128 -> 128^2 upload) in 0.25 ms
+10-23 23:50:10.843 25943 25943 I dartnative: dart3d: w17 sweep complete steps=60 PASS
+10-23 23:50:10.929 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:10.929 25943 25943 I dart3d  : w17 skyEnvironment step 1/3 (64x32 SH3 upload) in 0.20 ms
+10-23 23:50:10.995 25943 25943 I dart3d  : applySkybox: sb=true textures=0
+10-23 23:50:10.995 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:10.996 25943 25943 I dart3d  : w17 skyEnvironment step 2/3 (128x64 -> 64^2 upload) in 0.31 ms
+10-23 23:50:11.073 25943 25943 I dart3d  : applySkybox: sb=true textures=0
+10-23 23:50:11.073 25943 25943 I dart3d  : applyEnvironment: il=true textures=1
+10-23 23:50:11.073 25943 25943 I dart3d  : w17 skyEnvironment step 3/3 (256x128 -> 128^2 upload) in 0.27 ms
+10-23 23:50:11.533 25943 25943 I dart3d  : perf n=180 fps=89.9 frame p50=11.1 p95=11.2 max=11.3 ms | gpu p50=10.4 p95=11.9 | backend p50=2.3 p95=6.5 | sim p50=0.1 p95=3.5 (physics p50=0.0 p95=0.0) | submit p50=0.5 p95=1.8 | skipped=0/180 physics=60/s
+10-23 23:50:13.533 25943 25943 I dart3d  : perf n=180 fps=89.9 frame p50=11.1 p95=11.2 max=11.3 ms | gpu p50=11.1 p95=11.7 | backend p50=1.8 p95=2.3 | sim p50=0.1 p95=0.2 (physics p50=0.0 p95=0.1) | submit p50=0.6 p95=1.4 | skipped=0/180 physics=60/s

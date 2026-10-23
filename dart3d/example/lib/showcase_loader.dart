@@ -122,6 +122,13 @@ const showcaseItems = [
     cameraDir: (0.0, 0.28, -1.0),
     frameMargin: 1.15,
   ),
+  ShowcaseItem(
+    'w17',
+    kBuiltinW17SkyKey,
+    'W17: Rayleigh/Mie physical sky · skyEnvironment IBL · sunLight',
+    cameraDir: (0.0, 0.10, -1.0),
+    frameMargin: 1.15,
+  ),
 ];
 
 /// The synthetic asset key for the W21 materials conformance scene —
@@ -145,6 +152,15 @@ const String kBuiltinGeometryKey = 'builtin:geometry';
 /// The synthetic asset key for the U1 cameras + picking verification
 /// scene — builds [buildU1CamerasPickingDocument].
 const String kBuiltinU1Key = 'builtin:u1';
+
+/// The synthetic asset key for the W17 physical sky + `skyEnvironment`
+/// verification scene — builds [buildW17SkyDocument].
+const String kBuiltinW17SkyKey = 'builtin:w17';
+
+const String _kBootW17Mode = String.fromEnvironment(
+  'DART3D_W17_MODE',
+  defaultValue: 'day',
+);
 
 /// Dice stay in the gallery too — the [DART3D_MODEL] verification lane
 /// and anyone wanting a single die on the physics slab.
@@ -195,6 +211,8 @@ ShowcaseScene? loadShowcaseScene(
       doc = buildGeometryDocument();
     } else if (item.assetKey == kBuiltinU1Key) {
       doc = buildU1CamerasPickingDocument();
+    } else if (item.assetKey == kBuiltinW17SkyKey) {
+      doc = buildW17SkyDocument(mode: _kBootW17Mode);
     } else {
       final bytes = bytesOf(item.assetKey);
       if (bytes == null) {
@@ -330,7 +348,7 @@ ShowcaseScene? loadShowcaseScene(
   );
   if (stage != null) {
     addDnLogoLights(doc, cameraDir: cameraDir, stage: stage);
-  } else {
+  } else if (item.assetKey != kBuiltinW17SkyKey) {
     doc.createNode(
       name: 'showcase.key',
       transform: TrsTransform(
@@ -1317,4 +1335,212 @@ SceneDocument buildU1CamerasPickingDocument() {
   );
 
   return doc;
+}
+
+/// Builds the W17 physical sky + `skyEnvironment` + `sunLight` verification
+/// scene (`builtin:w17`, selected via `--dart-define=DART3D_MODEL=w17`).
+///
+/// Supported [mode]s:
+/// - `'day'` (default): Midday `PhysicalSkySpec` skybox + `SkyEnvironmentSpec`
+///   relighting (`equirectWidth: 256`) + shadow-casting `SunLightSpec`.
+/// - `'lowsun'`: Low-sun sunset `PhysicalSkySpec` (`sunDirection: (-0.22, 0.04, 0.97)`)
+///   warming both the horizon and the `skyEnvironment` IBL.
+/// - `'override'`: Static `ConstantEnvironment` (emerald tint) with
+///   `skyEnvironment: null` and `PhysicalSkySpec` skybox — verifies static
+///   environment precedence when `skyEnvironment` is absent.
+/// - `'step1'`, `'step2'`, `'step3'`: Midday `PhysicalSkySpec` with
+///   `equirectWidth` set to `64`, `128`, and `256` respectively to verify
+///   progressive prefilter convergence against the `'day'` reference.
+/// - `'sweep'`: Starts at the morning pose (`(-0.55, 0.10, 0.83)`) with
+///   `refresh: 'everyFrame'` so `ShowcaseScreen` sweeps `sunDirection` across
+///   frames.
+SceneDocument buildW17SkyDocument({
+  String mode = 'day',
+  Vector3? sunDirectionOverride,
+}) {
+  final doc = SceneDocument();
+
+  MaterialResource pbrMat(
+    double r,
+    double g,
+    double b, {
+    double metallic = 0.0,
+    double roughness = 0.5,
+  }) =>
+      doc.addResource(
+        MaterialResource(
+          doc.newId(),
+          type: 'physicallyBased',
+          properties: {
+            'baseColor': ColorValue(r, g, b, 1.0),
+            'metallic': DoubleValue(metallic),
+            'roughness': DoubleValue(roughness),
+          },
+        ),
+      );
+
+  final sphereGeo = doc.addResource(
+    GeometryResource(
+      doc.newId(),
+      procedural: SphereGeometrySpec(radius: 0.72, segments: 48, rings: 24),
+    ),
+  );
+  final pillarGeo = doc.addResource(
+    GeometryResource(
+      doc.newId(),
+      procedural: CuboidGeometrySpec(extents: Vector3(0.42, 1.8, 0.42)),
+    ),
+  );
+
+  // Left: Chrome mirror sphere (shows crisp sky/sun specular reflection).
+  doc.createNode(
+    name: 'w17.sphere.chrome',
+    transform: TrsTransform(translation: Vector3(-1.85, 0.72, 0.0)),
+    components: [
+      ComponentSpec(
+        'mesh',
+        properties: {
+          'geometry': ResourceRefValue(sphereGeo.id),
+          'material': ResourceRefValue(
+            pbrMat(0.96, 0.97, 0.99, metallic: 1.0, roughness: 0.04).id,
+          ),
+        },
+      ),
+    ],
+    root: true,
+  );
+
+  // Center: Matte white sphere (shows diffuse SH3 skyEnvironment tint).
+  doc.createNode(
+    name: 'w17.sphere.matte',
+    transform: TrsTransform(translation: Vector3(0.0, 0.72, 0.0)),
+    components: [
+      ComponentSpec(
+        'mesh',
+        properties: {
+          'geometry': ResourceRefValue(sphereGeo.id),
+          'material': ResourceRefValue(
+            pbrMat(0.92, 0.92, 0.92, metallic: 0.0, roughness: 0.88).id,
+          ),
+        },
+      ),
+    ],
+    root: true,
+  );
+
+  // Right: Glossy dielectric sphere (shows mid-roughness prefiltered IBL).
+  doc.createNode(
+    name: 'w17.sphere.glossy',
+    transform: TrsTransform(translation: Vector3(1.85, 0.72, 0.0)),
+    components: [
+      ComponentSpec(
+        'mesh',
+        properties: {
+          'geometry': ResourceRefValue(sphereGeo.id),
+          'material': ResourceRefValue(
+            pbrMat(0.84, 0.88, 0.94, metallic: 0.0, roughness: 0.18).id,
+          ),
+        },
+      ),
+    ],
+    root: true,
+  );
+
+  // Rear-center shadow caster pillar (casts a clear sunLight shadow across the slab).
+  doc.createNode(
+    name: 'w17.pillar',
+    transform: TrsTransform(translation: Vector3(0.0, 0.90, 1.45)),
+    components: [
+      ComponentSpec(
+        'mesh',
+        properties: {
+          'geometry': ResourceRefValue(pillarGeo.id),
+          'material': ResourceRefValue(
+            pbrMat(0.85, 0.84, 0.82, metallic: 0.0, roughness: 0.70).id,
+          ),
+        },
+      ),
+    ],
+    root: true,
+  );
+
+  final envRes = buildW17EnvironmentResource(
+    doc,
+    doc.newId(),
+    mode: mode,
+    sunDirectionOverride: sunDirectionOverride,
+  );
+  doc.addResource(envRes);
+  doc.stage.environmentRef = envRes.id;
+
+  return doc;
+}
+
+/// Builds the [EnvironmentResource] for [mode] in the W17 verification lane.
+EnvironmentResource buildW17EnvironmentResource(
+  SceneDocument doc,
+  LocalId envId, {
+  String mode = 'day',
+  Vector3? sunDirectionOverride,
+}) {
+  final sunDir =
+      sunDirectionOverride ??
+      switch (mode) {
+        'lowsun' => Vector3(-0.22, 0.04, 0.97),
+        'sweep' => Vector3(-0.55, 0.10, 0.83),
+        _ => Vector3(0.22, 0.36, 0.90),
+      };
+
+  final physSky = PhysicalSkySpec(
+    sunDirection: sunDir,
+    sunAngularRadius: 0.028,
+    rayleighCoefficient: 2.0,
+    turbidity: mode == 'lowsun' ? 14.0 : 10.0,
+    energy: 1.0,
+  );
+
+  if (mode == 'override') {
+    // Static ConstantEnvironment (bright emerald tint) overrides IBL when
+    // skyEnvironment is null, while PhysicalSkySpec still draws the skybox.
+    return EnvironmentResource(
+      envId,
+      name: 'w17.env.override',
+      environment: ConstantEnvironment(Vector3(0.10, 0.85, 0.30)),
+      environmentIntensity: 1.2,
+      exposure: 1.0,
+      toneMapping: 'pbrNeutral',
+      skybox: SkyboxSpec(physSky, intensity: 1.0),
+      skyEnvironment: null,
+    );
+  }
+
+  final eqWidth = switch (mode) {
+    'step1' => 64,
+    'step2' => 128,
+    'step3' => 256,
+    _ => 256,
+  };
+
+  return EnvironmentResource(
+    envId,
+    name: 'w17.env.$mode',
+    environment: const StudioEnvironment(),
+    environmentIntensity: 1.0,
+    exposure: 1.0,
+    toneMapping: 'pbrNeutral',
+    skybox: SkyboxSpec(physSky, intensity: 1.0),
+    skyEnvironment: SkyEnvironmentSpec(
+      physSky,
+      refresh: mode == 'sweep' ? 'everyFrame' : 'manual',
+      intervalSeconds: 0.18,
+      faceResolution: 128,
+      equirectWidth: eqWidth,
+      sunLight: SunLightSpec(
+        castsShadow: true,
+        intensityScale: 1.0,
+        shadowMapResolution: 1024,
+        shadowMaxDistance: 40.0,
+      ),
+    ),
+  );
 }

@@ -1,0 +1,225 @@
+--------- beginning of main
+10-23 23:52:30.830 26431 26431 I dart3d  : start +45ms plugin registered
+10-23 23:52:30.830 26431 26431 I dart3d  : dart3d provider registered (disposeView=true)
+10-23 23:52:30.850 26431 26431 I dart3d  : GPU: Mali-G610 MC4
+10-23 23:52:30.977 26431 26431 I dart3d  : Dart3dSetDispatcher: slot armed
+10-23 23:52:30.977 26431 26431 I dart3d  : Dart3dSetBackend: 2
+10-23 23:52:30.978 26431 26431 I dartnative: [DN-Android] loadSymbols: done
+10-23 23:52:31.041 26431 26431 I dart3d  : Filament engine backend: VULKAN (pref=2, tier=STANDARD)
+10-23 23:52:31.041 26431 26431 I dart3d  : start +256ms engine created
+10-23 23:52:31.066 26431 26431 I dart3d  : start +281ms base materials loaded
+10-23 23:52:31.098 26431 26431 I dartnative: resolveSkiaCanvasBridgeMethods: DNSkiaCanvasBridge method IDs cached
+10-23 23:52:31.098 26431 26431 I dartnative: resolveKotlinMethods: all method IDs cached
+10-23 23:52:31.098 26431 26431 I dartnative: JNI_OnLoad: dartnative_android bridge loaded
+10-23 23:52:31.098 26431 26431 I dartnative: [DNCoil] installed ImageLoader memCache=50% heap, 16 req/host
+10-23 23:52:31.098 26431 26431 I dartnative: [DN-Build] dartnative_android stamp: 2026-10-03-1
+10-23 23:52:31.098 26431 26431 I dartnative: DNResetViewRegistry: gen=1, cleared 0 stale callbacks, registry reset
+10-23 23:52:31.098 26431 26431 I dartnative: DNResetViewRegistry: callbacks thawed, dropped 0 stale fire(s) during the restart window
+10-23 23:52:31.098 26431 26431 I dartnative: DNViewTypeClaim: 'com.jasonholtdigital.dart3d/sceneView' -> 65535
+10-23 23:52:31.099 26431 26431 I dart3d  : perf view: backend=VULKAN viewport=0x0 msaa=0 aa=FXAA post=true hdr=HIGH bloom=false(levels=6 res=384 q=LOW) ssao=false taa=false ssr=false dsr=false(0.5..1.0) dither=TEMPORAL quality=default physics=60Hzx8 entities=0 bodies=0
+10-23 23:52:31.099 26431 26431 I dart3d  : protocol hello: Dart v1.0
+10-23 23:52:31.100 26431 26431 I dart3d  : antialiasingMode=4 → MSAA enabled=true sampleCount=4 aa=FXAA
+10-23 23:52:31.100 26431 26431 I dart3d  : quality=default → shadows=true aaSrc=4 tier=STANDARD shadowType=DPCF
+10-23 23:52:31.113 26431 26431 I dart3d  : dart3d view 3 swapchain created
+10-23 23:52:31.113 26431 26431 I dart3d  : start +328ms swapchain created
+10-23 23:52:31.134 26431 26431 I dartnative: [DNSplash] splash released after 177ms (root has views)
+10-23 23:52:31.379 26431 26431 I dartnative: [DNSplash] system splash gone — flushing 1 deferred chrome op(s)
+10-23 23:52:31.884 26431 26431 I dartnative: [DN] Licence key exchange completed in the background (904ms).
+10-23 23:52:32.132 26431 26431 I dartnative: dart3d: dice table — 7 DartNative dice (logo inside), 31 nodes, 45 payloads, built in 1140 ms (dice 1121, compose from 1139)
+10-23 23:52:32.132 26431 26431 I dartnative: dart3d: dice table ready after 1142 ms
+10-23 23:52:32.136 26431 26431 I dartnative: dart3d: dice table handed to the view in 4 ms
+10-23 23:52:32.137 26431 26431 I dartnative: dart3d: dice tray fit 413x919 insets EdgeInsets(l:10.0, t:104.0, r:10.0, b:134.0) → 4.50 px/u, camera 324, play x -42.7..42.7 z -71.4..78.0
+10-23 23:52:32.149 26431 26431 I dart3d  : texture -6622133245880303612: awaiting payload
+10-23 23:52:32.149 26431 26431 I dart3d  : texture -6622133245880303568: awaiting payload
+10-23 23:52:32.149 26431 26431 I dart3d  : texture -6622133245880303562: awaiting payload
+10-23 23:52:32.149 26431 26431 I dart3d  : texture -6622133245880303556: awaiting payload
+10-23 23:52:32.149 26431 26431 I dart3d  : texture -6622133245880303550: awaiting payload
+10-23 23:52:32.149 26431 26431 I dart3d  : texture -6622133245880303544: awaiting payload
+10-23 23:52:32.149 26431 26431 I dart3d  : texture -6622133245880303538: awaiting payload
+10-23 23:52:32.149 26431 26431 I dart3d  : texture -6622133245880303532: awaiting payload
+10-23 23:52:32.149 26431 26431 I dart3d  : texture -3348190467286259916: awaiting payload
+10-23 23:52:32.149 26431 26431 I dart3d  : geometry -8540867768301368387: awaiting payload
+10-23 23:52:32.150 26431 26431 W dart3d  : material slot emissiveTexture: texture -6622133245880303612 not realized — binding fallback
+10-23 23:52:32.150 26431 26431 I dart3d  : geometry -6622133245880303608: awaiting payload
+10-23 23:52:32.150 26431 26431 I dart3d  : geometry -6622133245880303604: awaiting payload
+10-23 23:52:32.150 26431 26431 I dart3d  : geometry -6622133245880303600: awaiting payload
+10-23 23:52:32.150 26431 26431 I dart3d  : geometry -6622133245880303596: awaiting payload
+10-23 23:52:32.150 26431 26431 I dart3d  : geometry -6622133245880303592: awaiting payload
+10-23 23:52:32.150 26431 26431 I dart3d  : geometry -6622133245880303588: awaiting payload
+10-23 23:52:32.150 26431 26431 I dart3d  : geometry -6622133245880303584: awaiting payload
+10-23 23:52:32.150 26431 26431 I dart3d  : geometry -6622133245880303580: awaiting payload
+10-23 23:52:32.150 26431 26431 I dart3d  : geometry -6622133245880303570: awaiting payload
+10-23 23:52:32.150 26431 26431 W dart3d  : material slot baseColorTexture: texture -6622133245880303568 not realized — binding fallback
+10-23 23:52:32.150 26431 26431 W dart3d  : material slot emissiveTexture: texture -6622133245880303568 not realized — binding fallback
+10-23 23:52:32.150 26431 26431 I dart3d  : geometry -6622133245880303564: awaiting payload
+10-23 23:52:32.150 26431 26431 W dart3d  : material slot baseColorTexture: texture -6622133245880303562 not realized — binding fallback
+10-23 23:52:32.150 26431 26431 W dart3d  : material slot emissiveTexture: texture -6622133245880303562 not realized — binding fallback
+10-23 23:52:32.150 26431 26431 I dart3d  : geometry -6622133245880303558: awaiting payload
+10-23 23:52:32.150 26431 26431 W dart3d  : material slot baseColorTexture: texture -6622133245880303556 not realized — binding fallback
+10-23 23:52:32.151 26431 26431 W dart3d  : material slot emissiveTexture: texture -6622133245880303556 not realized — binding fallback
+10-23 23:52:32.151 26431 26431 I dart3d  : geometry -6622133245880303552: awaiting payload
+10-23 23:52:32.151 26431 26431 W dart3d  : material slot baseColorTexture: texture -6622133245880303550 not realized — binding fallback
+10-23 23:52:32.151 26431 26431 W dart3d  : material slot emissiveTexture: texture -6622133245880303550 not realized — binding fallback
+10-23 23:52:32.151 26431 26431 I dart3d  : geometry -6622133245880303546: awaiting payload
+10-23 23:52:32.151 26431 26431 W dart3d  : material slot baseColorTexture: texture -6622133245880303544 not realized — binding fallback
+10-23 23:52:32.151 26431 26431 W dart3d  : material slot emissiveTexture: texture -6622133245880303544 not realized — binding fallback
+10-23 23:52:32.151 26431 26431 I dart3d  : geometry -6622133245880303540: awaiting payload
+10-23 23:52:32.151 26431 26431 W dart3d  : material slot baseColorTexture: texture -6622133245880303538 not realized — binding fallback
+10-23 23:52:32.151 26431 26431 W dart3d  : material slot emissiveTexture: texture -6622133245880303538 not realized — binding fallback
+10-23 23:52:32.151 26431 26431 I dart3d  : geometry -6622133245880303534: awaiting payload
+10-23 23:52:32.151 26431 26431 W dart3d  : material slot baseColorTexture: texture -6622133245880303532 not realized — binding fallback
+10-23 23:52:32.151 26431 26431 W dart3d  : material slot emissiveTexture: texture -6622133245880303532 not realized — binding fallback
+10-23 23:52:32.153 26431 26431 W dart3d  : material slot baseColorTexture: texture -3348190467286259916 not realized — binding fallback
+10-23 23:52:32.154 26431 26431 W dart3d  : material slot emissiveTexture: texture -3348190467286259916 not realized — binding fallback
+10-23 23:52:32.154 26431 26431 I dart3d  : animation 7107191555403540850: awaiting channel payloads
+10-23 23:52:32.155 26431 26431 I dart3d  : shadow options: mapSize=1024 cascades=0 far=0.0 contactDist=0.0 contact=false bias=0.01 normalBias=0.005 bulbRadius=2.5
+10-23 23:52:32.157 26431 26431 W dart3d  : mesh node: geometry unresolved
+10-23 23:52:32.157 26431 26431 W dart3d  : mesh node: geometry unresolved
+10-23 23:52:32.157 26431 26431 W dart3d  : mesh node: geometry unresolved
+10-23 23:52:32.157 26431 26431 W dart3d  : mesh node: geometry unresolved
+10-23 23:52:32.157 26431 26431 W dart3d  : mesh node: geometry unresolved
+10-23 23:52:32.157 26431 26431 W dart3d  : mesh node: geometry unresolved
+10-23 23:52:32.157 26431 26431 W dart3d  : mesh node: geometry unresolved
+10-23 23:52:32.157 26431 26431 W dart3d  : mesh node: geometry unresolved
+10-23 23:52:32.157 26431 26431 W dart3d  : mesh node: geometry unresolved
+10-23 23:52:32.157 26431 26431 W dart3d  : mesh node: geometry unresolved
+10-23 23:52:32.157 26431 26431 W dart3d  : mesh node: geometry unresolved
+10-23 23:52:32.157 26431 26431 W dart3d  : mesh node: geometry unresolved
+10-23 23:52:32.157 26431 26431 W dart3d  : mesh node: geometry unresolved
+10-23 23:52:32.157 26431 26431 W dart3d  : mesh node: geometry unresolved
+10-23 23:52:32.157 26431 26431 W dart3d  : mesh node: geometry unresolved
+10-23 23:52:32.157 26431 26431 W dart3d  : mesh node: geometry unresolved
+10-23 23:52:32.157 26431 26431 W dart3d  : mesh node: geometry unresolved
+10-23 23:52:32.157 26431 26431 W dart3d  : mesh node: geometry unresolved
+10-23 23:52:32.157 26431 26431 W dart3d  : mesh node: geometry unresolved
+10-23 23:52:32.157 26431 26431 W dart3d  : mesh node: geometry unresolved
+10-23 23:52:32.157 26431 26431 W dart3d  : mesh node: geometry unresolved
+10-23 23:52:32.157 26431 26431 W dart3d  : mesh node: geometry unresolved
+10-23 23:52:32.160 26431 26431 W dart3d  : collider 'convexHull': node has no geometry
+10-23 23:52:32.160 26431 26431 W dart3d  : collider 'convexHull': node has no geometry
+10-23 23:52:32.160 26431 26431 W dart3d  : collider 'convexHull': node has no geometry
+10-23 23:52:32.160 26431 26431 W dart3d  : collider 'convexHull': node has no geometry
+10-23 23:52:32.160 26431 26431 W dart3d  : collider 'convexHull': node has no geometry
+10-23 23:52:32.160 26431 26431 W dart3d  : collider 'convexHull': node has no geometry
+10-23 23:52:32.160 26431 26431 W dart3d  : collider 'convexHull': node has no geometry
+10-23 23:52:32.163 26431 26431 W dart3d  : node -6622133245880303530: collider has no shape yet; body deferred
+10-23 23:52:32.163 26431 26431 W dart3d  : node -6622133245880303528: collider has no shape yet; body deferred
+10-23 23:52:32.163 26431 26431 W dart3d  : node -6622133245880303526: collider has no shape yet; body deferred
+10-23 23:52:32.163 26431 26431 W dart3d  : node -6622133245880303524: collider has no shape yet; body deferred
+10-23 23:52:32.163 26431 26431 W dart3d  : node -6622133245880303522: collider has no shape yet; body deferred
+10-23 23:52:32.163 26431 26431 W dart3d  : node -6622133245880303520: collider has no shape yet; body deferred
+10-23 23:52:32.163 26431 26431 W dart3d  : node -6622133245880303518: collider has no shape yet; body deferred
+10-23 23:52:32.164 26431 26431 I dart3d  : node 6427899710765268992: body=none pos=(0.0,323.0045,-0.0)
+10-23 23:52:32.164 26431 26431 I dart3d  : node 6427899710765268993: body=none pos=(0.0,0.0,-0.0)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303614: body=Static pos=(0.0,-20.0,-0.0)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303607: body=none pos=(0.0,0.6,-80.92261)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303603: body=none pos=(0.0,0.6,75.580025)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303599: body=none pos=(-46.307144,0.6,-2.67129)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303595: body=none pos=(46.307144,0.6,-2.67129)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303591: body=none pos=(37.307144,0.6,-71.92261)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303587: body=none pos=(-37.307144,0.6,-71.92261)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303583: body=none pos=(-37.307144,0.6,66.580025)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303579: body=none pos=(37.307144,0.6,66.580025)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303578: body=Static pos=(-170.18195,1948.5778,-0.0)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303577: body=Static pos=(170.18195,1948.5778,-0.0)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303576: body=Static pos=(0.0,1915.183,334.8377)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303575: body=Static pos=(0.0,1921.5922,-310.22577)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303574: body=Static pos=(0.0,210.0,-0.0)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303573: body=none pos=(0.0,0.0,-0.0)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303530: body=none pos=(-27.347422,4.4905,-30.018711)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303529: body=none pos=(-27.347422,4.4905,-30.018711)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303528: body=none pos=(0.0,7.0648003,-30.018711)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303527: body=none pos=(0.0,7.0648003,-30.018711)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303526: body=none pos=(27.347422,5.4019556,-30.018711)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303525: body=none pos=(27.347422,5.4019556,-30.018711)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303524: body=none pos=(-27.347422,6.150383,-2.67129)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303523: body=none pos=(-27.347422,6.150383,-2.67129)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303522: body=none pos=(0.0,6.150383,-2.67129)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303521: body=none pos=(0.0,6.150383,-2.67129)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303520: body=none pos=(27.347422,7.9950852,-2.67129)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303519: body=none pos=(27.347422,7.9950852,-2.67129)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303518: body=none pos=(0.0,7.8525224,24.676132)
+10-23 23:52:32.164 26431 26431 I dart3d  : node -6622133245880303517: body=none pos=(0.0,7.8525224,24.676132)
+10-23 23:52:32.207 26431 26431 I dart3d  : environment 6427899710765268994: 256×128 equirect → 256² cube + SH3 in 20ms
+10-23 23:52:32.231 26431 26431 I dart3d  : applySkybox: sb=true textures=1
+10-23 23:52:32.232 26431 26431 I dart3d  : applyEnvironment: il=true textures=3
+10-23 23:52:32.234 26431 26431 I dart3d  : start +1449ms scene installed
+10-23 23:52:32.234 26431 26431 I dart3d  : views applied: 0 entries (0 screen, 0 rts)
+10-23 23:52:32.234 26431 26431 I dart3d  : realize: 87ms
+10-23 23:52:32.239 26431 26431 I dart3d  : texture -6622133245880303612: 64x1 rgba8 in 0ms
+10-23 23:52:32.243 26431 26431 I dart3d  : texture -6622133245880303568: 519x346 encoded in 4ms
+10-23 23:52:32.248 26431 26431 I dart3d  : texture -6622133245880303562: 738x492 encoded in 5ms
+10-23 23:52:32.252 26431 26431 I dart3d  : texture -6622133245880303556: 561x561 encoded in 4ms
+10-23 23:52:32.258 26431 26431 I dart3d  : texture -6622133245880303550: 888x666 encoded in 6ms
+10-23 23:52:32.264 26431 26431 I dart3d  : texture -6622133245880303544: 888x666 encoded in 6ms
+10-23 23:52:32.267 26431 26431 I dart3d  : texture -6622133245880303538: 604x453 encoded in 3ms
+10-23 23:52:32.272 26431 26431 I dart3d  : texture -6622133245880303532: 740x592 encoded in 5ms
+10-23 23:52:32.274 26431 26431 I dart3d  : texture -3348190467286259916: 1024x1024 rgba8 in 1ms
+10-23 23:52:32.292 26431 26431 I dart3d  : geometry -8540867768301368387: decoded 7685 verts in 18ms
+10-23 23:52:32.292 26431 26431 I dart3d  : geometry -6622133245880303608: decoded 4 verts in 0ms
+10-23 23:52:32.292 26431 26431 I dart3d  : geometry -6622133245880303604: decoded 4 verts in 0ms
+10-23 23:52:32.292 26431 26431 I dart3d  : geometry -6622133245880303600: decoded 4 verts in 0ms
+10-23 23:52:32.292 26431 26431 I dart3d  : geometry -6622133245880303596: decoded 4 verts in 0ms
+10-23 23:52:32.292 26431 26431 I dart3d  : geometry -6622133245880303592: decoded 22 verts in 0ms
+10-23 23:52:32.292 26431 26431 I dart3d  : geometry -6622133245880303588: decoded 22 verts in 0ms
+10-23 23:52:32.293 26431 26431 I dart3d  : geometry -6622133245880303584: decoded 22 verts in 0ms
+10-23 23:52:32.293 26431 26431 I dart3d  : geometry -6622133245880303580: decoded 22 verts in 0ms
+10-23 23:52:32.293 26431 26431 I dart3d  : geometry -6622133245880303570: decoded 452 verts in 0ms
+10-23 23:52:32.294 26431 26431 I dart3d  : geometry -6622133245880303564: decoded 270 verts in 0ms
+10-23 23:52:32.294 26431 26431 I dart3d  : geometry -6622133245880303558: decoded 272 verts in 0ms
+10-23 23:52:32.295 26431 26431 I dart3d  : geometry -6622133245880303552: decoded 450 verts in 0ms
+10-23 23:52:32.296 26431 26431 I dart3d  : geometry -6622133245880303546: decoded 450 verts in 0ms
+10-23 23:52:32.297 26431 26431 I dart3d  : geometry -6622133245880303540: decoded 672 verts in 1ms
+10-23 23:52:32.298 26431 26431 I dart3d  : geometry -6622133245880303534: decoded 680 verts in 1ms
+10-23 23:52:32.299 26431 26431 I dart3d  : shadow options: mapSize=1024 cascades=0 far=0.0 contactDist=0.0 contact=false bias=0.01 normalBias=0.005 bulbRadius=2.5
+10-23 23:52:32.316 26431 26431 I dart3d  : node 6427899710765268992: body=none pos=(0.0,323.0045,-0.0)
+10-23 23:52:32.316 26431 26431 I dart3d  : node 6427899710765268993: body=none pos=(0.0,0.0,-0.0)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303614: body=Static pos=(0.0,-20.0,-0.0)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303607: body=none pos=(0.0,0.6,-80.92261)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303603: body=none pos=(0.0,0.6,75.580025)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303599: body=none pos=(-46.307144,0.6,-2.67129)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303595: body=none pos=(46.307144,0.6,-2.67129)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303591: body=none pos=(37.307144,0.6,-71.92261)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303587: body=none pos=(-37.307144,0.6,-71.92261)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303583: body=none pos=(-37.307144,0.6,66.580025)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303579: body=none pos=(37.307144,0.6,66.580025)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303578: body=Static pos=(-170.18195,1948.5778,-0.0)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303577: body=Static pos=(170.18195,1948.5778,-0.0)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303576: body=Static pos=(0.0,1915.183,334.8377)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303575: body=Static pos=(0.0,1921.5922,-310.22577)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303574: body=Static pos=(0.0,210.0,-0.0)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303573: body=none pos=(0.0,0.0,-0.0)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303530: body=Dynamic pos=(-27.347422,4.4905,-30.018711)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303529: body=none pos=(-27.347422,4.4905,-30.018711)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303528: body=Dynamic pos=(0.0,7.0648003,-30.018711)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303527: body=none pos=(0.0,7.0648003,-30.018711)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303526: body=Dynamic pos=(27.347422,5.4019556,-30.018711)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303525: body=none pos=(27.347422,5.4019556,-30.018711)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303524: body=Dynamic pos=(-27.347422,6.150383,-2.67129)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303523: body=none pos=(-27.347422,6.150383,-2.67129)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303522: body=Dynamic pos=(0.0,6.150383,-2.67129)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303521: body=none pos=(0.0,6.150383,-2.67129)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303520: body=Dynamic pos=(27.347422,7.9950852,-2.67129)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303519: body=none pos=(27.347422,7.9950852,-2.67129)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303518: body=Dynamic pos=(0.0,7.8525224,24.676132)
+10-23 23:52:32.316 26431 26431 I dart3d  : node -6622133245880303517: body=none pos=(0.0,7.8525224,24.676132)
+10-23 23:52:32.318 26431 26431 I dart3d  : views applied: 0 entries (0 screen, 0 rts)
+10-23 23:52:32.318 26431 26431 I dart3d  : realize: 80ms
+10-23 23:52:32.318 26431 26431 I dart3d  : re-realize: restored 14 written transform(s)
+10-23 23:52:32.323 26431 26431 I dart3d  : start +1538ms first frame submitted
+10-23 23:52:32.495 26431 26431 I dart3d  : start +1710ms first frame rendered
+10-23 23:52:32.495 26431 26431 W dart3d  : slow frame 348ms on main: ops=47 realize=true
+10-23 23:52:33.106 26431 26431 I dart3d  : perf n=132 fps=65.7 frame p50=11.1 p95=11.2 max=356.2 ms | gpu p50=9.8 p95=10.8 | backend p50=1.3 p95=5.1 | sim p50=0.1 p95=0.8 (physics p50=0.0 p95=0.5) | submit p50=0.2 p95=1.0 | skipped=14/147 physics=70/s
+10-23 23:52:34.546 26431 26431 I dartnative: dart3d: dice roll throw — strength 0.58 dir (0, 1) gates [3, 0, 1]
+10-23 23:52:34.879 26431 26431 I dartnative: dart3d: dice gates closed after 0.33 s
+10-23 23:52:35.110 26431 26431 I dart3d  : perf n=178 fps=88.9 frame p50=11.1 p95=11.2 max=22.3 ms | gpu p50=10.2 p95=10.8 | backend p50=1.7 p95=5.8 | sim p50=0.2 p95=1.3 (physics p50=0.0 p95=0.8) | submit p50=0.6 p95=1.0 | skipped=2/180 physics=120/s
+10-23 23:52:37.114 26431 26431 I dart3d  : perf n=179 fps=89.4 frame p50=11.1 p95=11.2 max=22.3 ms | gpu p50=10.1 p95=10.7 | backend p50=2.2 p95=5.7 | sim p50=0.9 p95=1.6 (physics p50=0.5 p95=1.1) | submit p50=0.5 p95=1.5 | skipped=1/180 physics=120/s
+10-23 23:52:37.279 26431 26431 I dartnative: dart3d: dice cocked d4 (up 0.974) → nudge #1
+10-23 23:52:37.280 26431 26431 I dartnative: dart3d: dice cocked d8 (up 0.978) → nudge #1
+10-23 23:52:38.429 26431 26431 I dartnative: dart3d: dice d4 turns 132° to read upright
+10-23 23:52:38.430 26431 26431 I dartnative: dart3d: dice settled — d4=3 (up 1.000 at -28.7,4.3,62.6) d6=2 (up 0.993 at 6.7,7.5,68.4) d8=3 (up 1.000 at -13.1,5.2,70.5) d10t=70 (up 1.000 at -12.5,6.0,57.2) d10u=2 (up 1.000 at 11.4,6.0,9.9) d12=12 (up 1.000 at 28.2,7.8,60.2) d20=11 (up 1.000 at 5.6,7.7,44.1) [2 nudges]
+10-23 23:52:38.430 26431 26431 I dartnative: dart3d: dice readout d4 3 · d6 2 · d8 3 · d12 12 · d20 11 · d% 70+2 = 103
+10-23 23:52:39.116 26431 26431 I dart3d  : perf n=179 fps=89.4 frame p50=11.1 p95=11.2 max=22.3 ms | gpu p50=10.1 p95=10.7 | backend p50=1.9 p95=3.9 | sim p50=0.4 p95=1.1 (physics p50=0.2 p95=0.5) | submit p50=0.5 p95=0.9 | skipped=0/179 physics=120/s
+10-23 23:52:40.929 26431 26431 I dartnative: dart3d: dice settled — d4=3 (up 1.000 at -28.7,4.3,62.6) d6=2 (up 0.993 at 6.7,7.5,68.4) d8=3 (up 1.000 at -13.1,5.2,70.5) d10t=70 (up 1.000 at -12.5,6.0,57.2) d10u=2 (up 1.000 at 11.4,6.0,9.9) d12=12 (up 1.000 at 28.2,7.8,60.2) d20=11 (up 1.000 at 5.6,7.7,44.1) [2 nudges]
+10-23 23:52:40.929 26431 26431 I dartnative: dart3d: dice readout d4 3 · d6 2 · d8 3 · d12 12 · d20 11 · d% 70+2 = 103
+10-23 23:52:41.117 26431 26431 I dart3d  : perf n=180 fps=89.9 frame p50=11.1 p95=11.2 max=11.2 ms | gpu p50=10.1 p95=10.6 | backend p50=1.8 p95=3.8 | sim p50=0.3 p95=0.9 (physics p50=0.1 p95=0.2) | submit p50=0.5 p95=1.1 | skipped=0/180 physics=120/s
