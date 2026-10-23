@@ -115,6 +115,13 @@ const showcaseItems = [
     kBuiltinGeometryKey,
     'W26: 13 shapes · paths/lines · 1000 instances one draw',
   ),
+  ShowcaseItem(
+    'u1',
+    kBuiltinU1Key,
+    'U1: orbit/fly/follow cameras · 5-target BVH picking',
+    cameraDir: (0.0, 0.28, -1.0),
+    frameMargin: 1.15,
+  ),
 ];
 
 /// The synthetic asset key for the W21 materials conformance scene —
@@ -134,6 +141,10 @@ const String kBuiltinDocRoundtripKey = 'builtin:docroundtrip';
 /// file; [loadShowcaseScene] builds the document procedurally (see
 /// [buildGeometryDocument]).
 const String kBuiltinGeometryKey = 'builtin:geometry';
+
+/// The synthetic asset key for the U1 cameras + picking verification
+/// scene — builds [buildU1CamerasPickingDocument].
+const String kBuiltinU1Key = 'builtin:u1';
 
 /// Dice stay in the gallery too — the [DART3D_MODEL] verification lane
 /// and anyone wanting a single die on the physics slab.
@@ -182,6 +193,8 @@ ShowcaseScene? loadShowcaseScene(
       doc = buildMaterialsDocument(bytesOf: bytesOf);
     } else if (item.assetKey == kBuiltinGeometryKey) {
       doc = buildGeometryDocument();
+    } else if (item.assetKey == kBuiltinU1Key) {
+      doc = buildU1CamerasPickingDocument();
     } else {
       final bytes = bytesOf(item.assetKey);
       if (bytes == null) {
@@ -1005,4 +1018,303 @@ final class _Rng {
     _s = x & 0x7FFFFFFF;
     return _s / 0x7FFFFFFF;
   }
+}
+
+/// The U1 cameras + picking showcase and verification scene:
+/// 5 distinct pickable targets in a row (procedural cuboid, payload
+/// sphere, `d3:procMesh` capsule, skinned mesh deformed by `u1.joint0`,
+/// and 3-instance `d3:instances` column) plus a `u1.pick.marker`
+/// indicator sphere.
+SceneDocument buildU1CamerasPickingDocument() {
+  final doc = SceneDocument();
+
+  MaterialResource mat(
+    double r,
+    double g,
+    double b, {
+    double rough = 0.4,
+    double metal = 0.05,
+  }) =>
+      doc.addResource(
+        MaterialResource(
+          doc.newId(),
+          type: 'physicallyBased',
+          properties: {
+            'baseColor': ColorValue(r, g, b, 1.0),
+            'roughness': DoubleValue(rough),
+            'metallic': DoubleValue(metal),
+          },
+        ),
+      );
+
+  // Target 1: Upstream procedural cuboid at (-3.2, 0.85, 0.0).
+  final procGeo = doc.addResource(
+    GeometryResource(
+      doc.newId(),
+      procedural: CuboidGeometrySpec(extents: Vector3(1.1, 1.1, 1.1)),
+    ),
+  );
+  doc.createNode(
+    name: 'u1.target.procedural',
+    transform: TrsTransform(translation: Vector3(-3.2, 0.85, 0.0)),
+    components: [
+      ComponentSpec(
+        'mesh',
+        properties: {
+          'geometry': ResourceRefValue(procGeo.id),
+          'material': ResourceRefValue(mat(0.92, 0.30, 0.25).id),
+        },
+      ),
+    ],
+    root: true,
+  );
+
+  // Target 2: Payload mesh (`unskinned_uv1_tangent`) sphere at (-1.6, 0.85, 0.0).
+  final sphereMesh = buildSphere(radius: 0.62, rings: 16, segments: 24);
+  final spherePos = <Vector3>[
+    for (var i = 0; i < sphereMesh.vertexCount; i++)
+      Vector3(
+        sphereMesh.positions[i * 3],
+        sphereMesh.positions[i * 3 + 1],
+        sphereMesh.positions[i * 3 + 2],
+      ),
+  ];
+  final sphereNrm = <Vector3>[
+    for (var i = 0; i < sphereMesh.vertexCount; i++)
+      Vector3(
+        sphereMesh.normals[i * 3],
+        sphereMesh.normals[i * 3 + 1],
+        sphereMesh.normals[i * 3 + 2],
+      ),
+  ];
+  final sphereUvs = <Vector2>[
+    for (var i = 0; i < sphereMesh.vertexCount; i++)
+      Vector2(sphereMesh.uvs[i * 2], sphereMesh.uvs[i * 2 + 1]),
+  ];
+  final sphereVtxBytes = VertexPack.unskinned(
+    positions: spherePos,
+    normals: sphereNrm,
+    uvs: sphereUvs,
+  );
+  final sphereIdxBytes = Uint8List(sphereMesh.indices.length * 2);
+  final sphereIdxBd = ByteData.sublistView(sphereIdxBytes);
+  for (var i = 0; i < sphereMesh.indices.length; i++) {
+    sphereIdxBd.setUint16(i * 2, sphereMesh.indices[i], Endian.little);
+  }
+  final sphereVtxPayload = doc.addPayload(
+    PayloadSpec(
+      doc.newId(),
+      encoding: PayloadEncoding.vertexBuffer,
+      layout: 'unskinned_uv1_tangent',
+      length: sphereVtxBytes.length,
+      bytes: sphereVtxBytes,
+    ),
+  );
+  final sphereIdxPayload = doc.addPayload(
+    PayloadSpec(
+      doc.newId(),
+      encoding: PayloadEncoding.indexBuffer,
+      format: 'uint16',
+      length: sphereIdxBytes.length,
+      bytes: sphereIdxBytes,
+    ),
+  );
+  final payloadGeo = doc.addResource(
+    GeometryResource(
+      doc.newId(),
+      vertices: sphereVtxPayload.id,
+      indices: sphereIdxPayload.id,
+      bounds: BoundsSpec(
+        min: Vector3.all(-0.62),
+        max: Vector3.all(0.62),
+      ),
+    ),
+  );
+  doc.createNode(
+    name: 'u1.target.payload',
+    transform: TrsTransform(translation: Vector3(-1.6, 0.85, 0.0)),
+    components: [
+      ComponentSpec(
+        'mesh',
+        properties: {
+          'geometry': ResourceRefValue(payloadGeo.id),
+          'material': ResourceRefValue(mat(0.95, 0.72, 0.18).id),
+        },
+      ),
+    ],
+    root: true,
+  );
+
+  // Target 3: `d3:procMesh` capsule at (0.0, 0.85, 0.0) (also Follow subject).
+  doc.createNode(
+    name: 'u1.target.d3proc',
+    transform: TrsTransform(translation: Vector3(0.0, 0.85, 0.0)),
+    components: [
+      d3ProcMeshComponent(
+        D3CapsuleProc(radius: 0.46, height: 0.75),
+        material: mat(0.22, 0.82, 0.45).id,
+      ),
+    ],
+    root: true,
+  );
+
+  // Target 4: Skinned mesh (`skinned_uv1_tangent`) at bind origin (1.6, 0.85, 0.0),
+  // deformed by `u1.joint0` at (1.6, 1.35, 0.0) (+0.5 Y shift via LBS).
+  final joint0 = doc.createNode(
+    name: 'u1.joint0',
+    transform: TrsTransform(translation: Vector3(1.6, 1.35, 0.0)),
+    root: true,
+  );
+  final ibmFloats = Float32List.fromList(Matrix4.identity().storage);
+  final ibmPayload = doc.addPayload(
+    PayloadSpec(
+      doc.newId(),
+      encoding: PayloadEncoding.matrices,
+      length: 64,
+      bytes: ibmFloats.buffer.asUint8List(),
+    ),
+  );
+  final skin = doc.addSkin(
+    SkinSpec(
+      doc.newId(),
+      joints: [joint0.id],
+      inverseBindMatrices: ibmPayload.id,
+    ),
+  );
+  final boxMesh = buildCuboid(Vector3(1.0, 1.0, 1.0));
+  final boxPos = <Vector3>[
+    for (var i = 0; i < boxMesh.vertexCount; i++)
+      Vector3(
+        boxMesh.positions[i * 3],
+        boxMesh.positions[i * 3 + 1],
+        boxMesh.positions[i * 3 + 2],
+      ),
+  ];
+  final boxNrm = <Vector3>[
+    for (var i = 0; i < boxMesh.vertexCount; i++)
+      Vector3(
+        boxMesh.normals[i * 3],
+        boxMesh.normals[i * 3 + 1],
+        boxMesh.normals[i * 3 + 2],
+      ),
+  ];
+  final boxUvs = <Vector2>[
+    for (var i = 0; i < boxMesh.vertexCount; i++)
+      Vector2(boxMesh.uvs[i * 2], boxMesh.uvs[i * 2 + 1]),
+  ];
+  final skinnedVtxBytes = VertexPack.skinned(
+    positions: boxPos,
+    normals: boxNrm,
+    uvs: boxUvs,
+    joints: List<Vector4>.filled(boxMesh.vertexCount, Vector4.zero()),
+    weights: List<Vector4>.filled(boxMesh.vertexCount, Vector4(1, 0, 0, 0)),
+  );
+  final boxIdxBytes = Uint8List(boxMesh.indices.length * 2);
+  final boxIdxBd = ByteData.sublistView(boxIdxBytes);
+  for (var i = 0; i < boxMesh.indices.length; i++) {
+    boxIdxBd.setUint16(i * 2, boxMesh.indices[i], Endian.little);
+  }
+  final skinnedVtxPayload = doc.addPayload(
+    PayloadSpec(
+      doc.newId(),
+      encoding: PayloadEncoding.vertexBuffer,
+      layout: 'skinned_uv1_tangent',
+      length: skinnedVtxBytes.length,
+      bytes: skinnedVtxBytes,
+    ),
+  );
+  final boxIdxPayload = doc.addPayload(
+    PayloadSpec(
+      doc.newId(),
+      encoding: PayloadEncoding.indexBuffer,
+      format: 'uint16',
+      length: boxIdxBytes.length,
+      bytes: boxIdxBytes,
+    ),
+  );
+  final skinnedGeo = doc.addResource(
+    GeometryResource(
+      doc.newId(),
+      vertices: skinnedVtxPayload.id,
+      indices: boxIdxPayload.id,
+      bounds: BoundsSpec(
+        min: Vector3(-0.5, -0.5, -0.5),
+        max: Vector3(0.5, 1.0, 0.5),
+      ),
+    ),
+  );
+  doc.addNode(
+    NodeSpec(
+      id: doc.newId(),
+      name: 'u1.target.skinned',
+      transform: TrsTransform(translation: Vector3(1.6, 0.85, 0.0)),
+      skin: skin.id,
+      components: [
+        ComponentSpec(
+          'mesh',
+          properties: {
+            'geometry': ResourceRefValue(skinnedGeo.id),
+            'material': ResourceRefValue(mat(0.25, 0.62, 0.96).id),
+          },
+        ),
+      ],
+    ),
+    root: true,
+  );
+
+  // Target 5: `d3:instances` column of 3 spheres at (3.2, 0.85, 0.0).
+  doc.createNode(
+    name: 'u1.target.instanced',
+    transform: TrsTransform(translation: Vector3(3.2, 0.85, 0.0)),
+    components: [
+      D3InstancesSpec(
+        proc: D3SphereProc(radius: 0.44),
+        material: mat(0.75, 0.35, 0.95).id,
+        transforms: D3InstanceTransforms.inline([
+          Matrix4.identity()..setTranslationRaw(0, -0.65, 0),
+          Matrix4.identity()..setTranslationRaw(0, 0.0, 0),
+          Matrix4.identity()..setTranslationRaw(0, 0.65, 0),
+        ]),
+      ).toComponent(),
+    ],
+    root: true,
+  );
+
+  // Pick marker sphere (hidden until a tap hits a target).
+  final markerGeo = doc.addResource(
+    GeometryResource(
+      doc.newId(),
+      procedural: SphereGeometrySpec(radius: 0.18),
+    ),
+  );
+  final markerMat = doc.addResource(
+    MaterialResource(
+      doc.newId(),
+      type: 'physicallyBased',
+      properties: {
+        'baseColor': const ColorValue(1.0, 0.95, 0.2, 1.0),
+        'emissive': const ColorValue(1.0, 0.9, 0.1, 1.0),
+        'roughness': const DoubleValue(0.2),
+      },
+    ),
+  );
+  doc.addNode(
+    NodeSpec(
+      id: doc.newId(),
+      name: 'u1.pick.marker',
+      transform: TrsTransform(translation: Vector3(0, 0.85, 0), scale: Vector3.zero()),
+      components: [
+        ComponentSpec(
+          'mesh',
+          properties: {
+            'geometry': ResourceRefValue(markerGeo.id),
+            'material': ResourceRefValue(markerMat.id),
+          },
+        ),
+      ],
+    ),
+    root: true,
+  );
+
+  return doc;
 }

@@ -1,0 +1,32 @@
+10-23 08:29:21.850 28737 28737 I dart3d  : Filament engine backend: OPENGL (pref=1, tier=STANDARD)
+10-23 08:29:35.805 28737 28737 I dartnative: dart3d: w11 phase — flag skin, morph blob, wave+pulse
+10-23 08:29:43.806 28737 28737 I dartnative: dart3d: w12 phase — joint components + variants + rectAreaLight
+10-23 08:29:43.808 28737 28737 I dartnative: dart3d: w12 phase — joint components, variants, rectAreaLight, enabled:false
+10-23 08:29:43.832 28737 28737 I dartnative: dart3d: w11 stop-rest switch PASS want=0.50rad live=(-0.000,-0.000,0.247,0.969)
+10-23 08:29:44.833 28737 28737 I dartnative: dart3d: w11 stop-rest rest PASS want=0.00rad live=(-0.000,-0.000,0.000,1.000)
+10-23 08:29:55.805 28737 28737 I dartnative: dart3d: w13 phase — environment effects toggles
+10-23 08:30:11.804 28737 28737 I dartnative: dart3d: w14 phase — render textures + views
+10-23 08:30:39.808 28737 28737 I dartnative: dart3d: wloose phase — ccd + bowl + margin + settle latency
+10-23 08:30:39.812 28737 28737 I dartnative: dart3d: wloose probes spawned — ccd drop, bowl drop; margin drop waits for quiet
+10-23 08:30:42.835 28737 28737 I dartnative: dart3d: wloose ccd pose=(3.30,0.38,2.60) PASS rests on slab
+10-23 08:30:42.882 28737 28737 I dartnative: dart3d: wloose bowl pose=(-2.28,-0.31,2.05) PASS contained
+10-23 08:30:43.316 28737 28737 I dartnative: dart3d: wloose margin drop spawned
+10-23 08:30:43.814 28737 28737 I dartnative: dart3d: wloose removed w5NoRest,j9.liftPlate,j9.chainAnchor,j9.chain1,j9.chain2,j9.chain3,j9.chain4,j9.breakBox — settle events live
+10-23 08:30:44.246 28737 28737 I dartnative: dart3d: wloose margin mid=(5.50,0.08,0.50)
+10-23 08:30:46.833 28737 28737 I dartnative: dart3d: wloose margin pose=(5.50,0.08,0.50) PASS gap=0.53 above visual
+10-23 08:30:49.286 28737 28737 I dartnative: dart3d: wloose settle: 4669ms (roll 1 via pose-quiescence, die (-0.00,-0.00,2.50))
+10-23 08:30:52.738 28737 28737 I dartnative: dart3d: wloose settle: 1950ms (roll 2 via event, die (-0.00,-0.00,2.50))
+10-23 08:30:56.194 28737 28737 I dartnative: dart3d: wloose settle: 1948ms (roll 3 via event, die (-0.00,-0.00,2.50))
+10-23 08:31:09.813 28737 28737 I dartnative: dart3d: wloose settled event path: seen
+10-23 08:31:13.804 28737 28737 I dartnative: dart3d: w15 phase — lazy prefab subtree streaming
+10-23 08:31:25.818 28737 28737 I dartnative: dart3d: w15 lane complete — 5 loads, 3 unloads (3 cycles on streamA; expected final state: both grids live)
+10-23 08:31:27.819 28737 28737 I dartnative: dart3d: w24 phase — split-screen, viewport, cascades, contact shadows, catcher, layerMask
+10-23 08:31:36.828 28737 28737 I dartnative: dart3d: w24 layerMask 8-bit lane
+10-23 08:31:39.830 28737 28737 I dartnative: dart3d: w24 views restored — lane complete
+10-23 08:31:41.805 28737 28737 I dartnative: dart3d: w16 phase — trail ribbon + screen-size lod drive
+10-23 08:32:05.813 28737 28737 I dartnative: dart3d: w16 mover home — lod/trail lane done
+10-23 08:32:07.805 28737 28737 I dartnative: dart3d: w25 phase — LUT + effects matrix lanes
+10-23 08:32:23.791 28737 28737 I dartnative: dart3d: w25 lane complete — dice regression PASS: die V1W8KPR00004Y rolled and settled after the effects sweep; expected final state: all effects off
+10-23 08:32:33.805 28737 28737 I dartnative: dart3d: w18 phase — particle emitters
+10-23 08:32:33.818 28737 28737 I dartnative: dart3d: w18 phase — flipbook fountain, additive streaks, mesh tumble pool, enabled:false gate
+10-23 08:32:49.820 28737 28737 I dartnative: dart3d: w18 lane complete — expected: fountain + streaks + mesh pool live, gated ran +6 s…+14 s then removed

@@ -1,0 +1,75 @@
+00:00 +0: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_billboard_picking_test.dart
+00:00 +0: spherical billboard raycast uses its camera-facing basis
+00:00 +0 -1: spherical billboard raycast uses its camera-facing basis [E]
+  Expected: LocalId:<LocalId(CP2Y2DG000002)>
+    Actual: <null>
+  
+  package:matcher                           expect
+  test/u1_billboard_picking_test.dart 53:7  main.<fn>
+  
+00:00 +0 -1: axisY billboard raycast uses its camera-facing basis
+00:00 +0 -2: axisY billboard raycast uses its camera-facing basis [E]
+  Expected: LocalId:<LocalId(VH4SHEG000002)>
+    Actual: <null>
+  
+  package:matcher                           expect
+  test/u1_billboard_picking_test.dart 53:7  main.<fn>
+  
+00:00 +0 -2: screen billboard raycast uses its camera-facing basis
+00:00 +0 -3: screen billboard raycast uses its camera-facing basis [E]
+  Expected: LocalId:<LocalId(VHG2MBG000002)>
+    Actual: <null>
+  
+  package:matcher                           expect
+  test/u1_billboard_picking_test.dart 53:7  main.<fn>
+  
+00:00 +0 -3: no camera keeps the fixed XY billboard raycast
+00:00 +1 -3: camera override replaces the document primary for raycasting
+00:00 +1 -4: camera override replaces the document primary for raycasting [E]
+  Expected: LocalId:<LocalId(4WP7CFG000002)>
+    Actual: <null>
+  
+  package:matcher                           expect
+  test/u1_billboard_picking_test.dart 88:5  main.<fn>
+  
+00:00 +1 -4: billboard raycast is transformed through its parent node
+00:00 +1 -5: billboard raycast is transformed through its parent node [E]
+  Expected: LocalId:<LocalId(2YY61X0000002)>
+    Actual: <null>
+  
+  package:matcher                            expect
+  test/u1_billboard_picking_test.dart 128:5  main.<fn>
+  
+00:00 +1 -5: instanced billboard ignores instance rotation and scale
+00:00 +1 -6: instanced billboard ignores instance rotation and scale [E]
+  Expected: LocalId:<LocalId(J2Q9JP0000000)>
+    Actual: <null>
+  
+  package:matcher                            expect
+  test/u1_billboard_picking_test.dart 152:5  main.<fn>
+  
+00:00 +1 -6: instanced billboard BVH bounds follow the camera-facing plane
+00:00 +1 -7: instanced billboard BVH bounds follow the camera-facing plane [E]
+  Expected: LocalId:<LocalId(YYFBJ6G000000)>
+    Actual: <null>
+  
+  package:matcher                            expect
+  test/u1_billboard_picking_test.dart 178:5  main.<fn>
+  
+00:00 +1 -7: ScenePointer pointAlong and pointAt carry their camera overrides
+00:00 +1 -8: ScenePointer pointAlong and pointAt carry their camera overrides [E]
+  Expected: LocalId:<LocalId(153913R000002)>
+    Actual: <null>
+  
+  package:matcher                            expect
+  test/u1_billboard_picking_test.dart 209:5  main.<fn>
+  
+00:00 +1 -8: SceneController mesh queries and pick pass the effective camera
+00:00 +1 -9: SceneController mesh queries and pick pass the effective camera [E]
+  Expected: LocalId:<LocalId(877JME8000002)>
+    Actual: <null>
+  
+  package:matcher                            expect
+  test/u1_billboard_picking_test.dart 232:5  main.<fn>
+  
+00:00 +1 -9: Some tests failed.

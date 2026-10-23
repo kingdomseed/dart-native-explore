@@ -1,0 +1,18 @@
+00:00 +0: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-de85473d/dart3d/test/u1_raycast_data_regression_test.dart
+00:00 +0: payload BVH cache observes current bytes replacing vertex bytes moves the picked triangle
+00:00 +1: payload BVH cache observes current bytes replacing index bytes selects the current triangle
+00:00 +2: payload BVH cache observes current bytes in-place index byte mutation updates ScenePointer picking
+00:00 +3: payload BVH cache observes current bytes in-place vertex byte mutation updates ScenePointer picking
+00:00 +4: skinned hit normal uses the inverse-transpose of joint scale
+00:00 +5: p3t4 hit normal comes from its packed tangent-frame quaternion
+00:00 +5 -1: p3t4 hit normal comes from its packed tangent-frame quaternion [E]
+  Expected: a numeric value within <0.00001> of <-0.74>
+    Actual: <0.7399999499320984>
+     Which:  differs by <1.4799999499320984>
+  
+  package:matcher                                  expect
+  test/u1_raycast_data_regression_test.dart 174:5  main.<fn>
+  
+00:00 +5 -1: malformed NaN joint index rejects skinned picking
+00:00 +6 -1: malformed infinity joint index rejects skinned picking
+00:00 +7 -1: Some tests failed.

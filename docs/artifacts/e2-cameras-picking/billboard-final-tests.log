@@ -1,0 +1,42 @@
+00:00 +0: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_billboard_picking_test.dart
+00:00 +0: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_billboard_picking_test.dart: spherical billboard raycast uses its camera-facing basis
+00:00 +1: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_billboard_picking_test.dart: spherical billboard raycast uses its camera-facing basis
+00:00 +2: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_billboard_picking_test.dart: spherical billboard raycast uses its camera-facing basis
+00:00 +3: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_billboard_picking_test.dart: spherical billboard raycast uses its camera-facing basis
+00:00 +4: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_raycast_data_regression_test.dart: payload BVH cache observes current bytes replacing vertex bytes moves the picked triangle
+00:00 +5: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_raycast_data_regression_test.dart: payload BVH cache observes current bytes replacing vertex bytes moves the picked triangle
+00:00 +6: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_camera_regression_test.dart: camera regressions toNodeTransform and applyToScene preserve composed forward
+00:00 +7: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_camera_regression_test.dart: camera regressions toNodeTransform and applyToScene preserve composed forward
+00:00 +8: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_camera_regression_test.dart: camera regressions toNodeTransform and applyToScene preserve composed forward
+00:00 +9: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_camera_regression_test.dart: camera regressions toNodeTransform and applyToScene preserve composed forward
+00:00 +10: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_camera_regression_test.dart: camera regressions toNodeTransform and applyToScene preserve composed forward
+00:00 +11: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_camera_regression_test.dart: camera regressions toNodeTransform and applyToScene preserve composed forward
+00:00 +12: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_camera_regression_test.dart: camera regressions toNodeTransform and applyToScene preserve composed forward
+00:00 +13: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_billboard_picking_test.dart: billboard raycast is transformed through its parent node
+00:00 +14: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_raycast_data_regression_test.dart: skinned hit normal uses the inverse-transpose of joint scale
+00:00 +15: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_raycast_data_regression_test.dart: skinned hit normal uses the inverse-transpose of joint scale
+00:00 +16: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_billboard_picking_test.dart: instanced billboard ignores instance rotation and scale
+00:00 +17: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_camera_regression_test.dart: camera regressions damped orbit distance converges and direct writes replace its goal
+00:00 +18: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_raycast_data_regression_test.dart: p3t4 hit normal comes from its packed tangent-frame quaternion
+00:00 +19: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_billboard_picking_test.dart: instanced billboard BVH bounds follow the camera-facing plane
+00:00 +20: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_billboard_picking_test.dart: instanced billboard BVH bounds follow the camera-facing plane
+00:00 +21: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_raycast_data_regression_test.dart: malformed NaN joint index rejects skinned picking
+00:00 +22: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_camera_regression_test.dart: camera regressions parented camera writes representable local TRS and keeps world pose
+00:00 +23: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_camera_regression_test.dart: camera regressions parented camera writes representable local TRS and keeps world pose
+00:00 +24: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_camera_regression_test.dart: camera regressions parented camera writes representable local TRS and keeps world pose
+00:00 +25: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_billboard_picking_test.dart: SceneController mesh queries and pick pass the effective camera
+00:00 +26: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_billboard_picking_test.dart: SceneController mesh queries and pick pass the effective camera
+00:00 +27: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_billboard_picking_test.dart: SceneController mesh queries and pick pass the effective camera
+00:00 +28: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_billboard_picking_test.dart: SceneController mesh queries and pick pass the effective camera
+00:00 +29: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_billboard_picking_test.dart: SceneController mesh queries and pick pass the effective camera
+00:00 +30: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_cameras_picking_test.dart: SceneCamera & lookAt helpers lookAtRotation composes to the literal camera basis
+00:00 +31: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_cameras_picking_test.dart: SceneCamera & lookAt helpers screenPointToRay and worldToScreen round-trip in perspective mode
+00:00 +32: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_cameras_picking_test.dart: SceneCamera & lookAt helpers screenPointToRay and worldToScreen round-trip in orthographic mode
+00:00 +33: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_cameras_picking_test.dart: SceneCamera & lookAt helpers SceneCamera.fromDocument extracts primary view camera
+00:00 +34: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_cameras_picking_test.dart: CameraController implementations OrbitCameraController orbits, pans, zooms, and damps
+00:00 +35: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_cameras_picking_test.dart: CameraController implementations FlyCameraController supports WASD keys and V6f setMoveInput
+00:00 +36: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_cameras_picking_test.dart: CameraController implementations FollowCameraController tracks moving and rotating target node
+00:00 +37: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_cameras_picking_test.dart: BVH & Render-Geometry Raycast + ScenePointer (5 targets) Bvh build, queryRay, and updateBounds refit
+00:00 +38: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_cameras_picking_test.dart: BVH & Render-Geometry Raycast + ScenePointer (5 targets) raycastDocument & ScenePointer pick 5 distinct targets (procedural, payload, d3:procMesh, skinned, d3:instances)
+00:00 +39: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-a2a00a74/dart3d/test/u1_cameras_picking_test.dart: BVH & Render-Geometry Raycast + ScenePointer (5 targets) raycastDocumentAll returns sorted intersections and decodes all 7 vertex layouts
+00:00 +40: All tests passed!

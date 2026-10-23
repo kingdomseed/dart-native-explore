@@ -1,0 +1,222 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-23T06:20:50.667Z",
+  "events": [
+    {
+      "kind": "tap",
+      "tMs": 12872,
+      "x": 220,
+      "y": 1200,
+      "referenceWidth": 1084,
+      "referenceHeight": 2412
+    },
+    {
+      "kind": "tap",
+      "tMs": 14523,
+      "x": 385,
+      "y": 1200,
+      "referenceWidth": 1084,
+      "referenceHeight": 2412
+    },
+    {
+      "kind": "tap",
+      "tMs": 15991,
+      "x": 548,
+      "y": 1200,
+      "referenceWidth": 1084,
+      "referenceHeight": 2412
+    },
+    {
+      "kind": "tap",
+      "tMs": 17388,
+      "x": 710,
+      "y": 1155,
+      "referenceWidth": 1084,
+      "referenceHeight": 2412
+    },
+    {
+      "kind": "tap",
+      "tMs": 18884,
+      "x": 872,
+      "y": 1135,
+      "referenceWidth": 1084,
+      "referenceHeight": 2412
+    },
+    {
+      "kind": "swipe",
+      "tMs": 69462,
+      "x": 548,
+      "y": 1200,
+      "x2": 613,
+      "y2": 1240,
+      "referenceWidth": 1084,
+      "referenceHeight": 2412,
+      "durationMs": 450
+    },
+    {
+      "kind": "pinch",
+      "tMs": 70425,
+      "x": 548,
+      "y": 1200,
+      "referenceWidth": 1084,
+      "referenceHeight": 2412,
+      "scale": 1.2,
+      "durationMs": 300
+    },
+    {
+      "kind": "tap",
+      "tMs": 71223,
+      "x": 548,
+      "y": 1200,
+      "referenceWidth": 1084,
+      "referenceHeight": 2412
+    },
+    {
+      "kind": "swipe",
+      "tMs": 72639,
+      "x": 548,
+      "y": 1200,
+      "x2": 598,
+      "y2": 1225,
+      "referenceWidth": 1084,
+      "referenceHeight": 2412,
+      "durationMs": 450
+    },
+    {
+      "kind": "swipe",
+      "tMs": 77531,
+      "x": 548,
+      "y": 1200,
+      "x2": 483,
+      "y2": 1225,
+      "referenceWidth": 1084,
+      "referenceHeight": 2412,
+      "durationMs": 450
+    },
+    {
+      "kind": "swipe",
+      "tMs": 83183,
+      "x": 548,
+      "y": 1200,
+      "x2": 598,
+      "y2": 1160,
+      "referenceWidth": 1084,
+      "referenceHeight": 2412,
+      "durationMs": 450
+    },
+    {
+      "kind": "tap",
+      "tMs": 89546,
+      "x": 542,
+      "y": 2243,
+      "referenceWidth": 1084,
+      "referenceHeight": 2412
+    },
+    {
+      "kind": "tap",
+      "tMs": 91306,
+      "x": 542,
+      "y": 2243,
+      "referenceWidth": 1084,
+      "referenceHeight": 2412
+    },
+    {
+      "kind": "tap",
+      "tMs": 93069,
+      "x": 542,
+      "y": 2243,
+      "referenceWidth": 1084,
+      "referenceHeight": 2412
+    },
+    {
+      "kind": "swipe",
+      "tMs": 94449,
+      "x": 548,
+      "y": 1200,
+      "x2": 598,
+      "y2": 1225,
+      "referenceWidth": 1084,
+      "referenceHeight": 2412,
+      "durationMs": 450
+    },
+    {
+      "kind": "swipe",
+      "tMs": 99112,
+      "x": 548,
+      "y": 1200,
+      "x2": 483,
+      "y2": 1225,
+      "referenceWidth": 1084,
+      "referenceHeight": 2412,
+      "durationMs": 450
+    },
+    {
+      "kind": "swipe",
+      "tMs": 104282,
+      "x": 548,
+      "y": 1200,
+      "x2": 598,
+      "y2": 1160,
+      "referenceWidth": 1084,
+      "referenceHeight": 2412,
+      "durationMs": 450
+    },
+    {
+      "kind": "tap",
+      "tMs": 110587,
+      "x": 542,
+      "y": 2243,
+      "referenceWidth": 1084,
+      "referenceHeight": 2412
+    },
+    {
+      "kind": "tap",
+      "tMs": 112334,
+      "x": 542,
+      "y": 2243,
+      "referenceWidth": 1084,
+      "referenceHeight": 2412
+    },
+    {
+      "kind": "tap",
+      "tMs": 114109,
+      "x": 542,
+      "y": 2243,
+      "referenceWidth": 1084,
+      "referenceHeight": 2412
+    },
+    {
+      "kind": "swipe",
+      "tMs": 115559,
+      "x": 548,
+      "y": 1200,
+      "x2": 598,
+      "y2": 1225,
+      "referenceWidth": 1084,
+      "referenceHeight": 2412,
+      "durationMs": 450
+    },
+    {
+      "kind": "swipe",
+      "tMs": 120372,
+      "x": 548,
+      "y": 1200,
+      "x2": 483,
+      "y2": 1225,
+      "referenceWidth": 1084,
+      "referenceHeight": 2412,
+      "durationMs": 450
+    },
+    {
+      "kind": "swipe",
+      "tMs": 125528,
+      "x": 548,
+      "y": 1200,
+      "x2": 598,
+      "y2": 1160,
+      "referenceWidth": 1084,
+      "referenceHeight": 2412,
+      "durationMs": 450
+    }
+  ]
+}

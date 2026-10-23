@@ -1,0 +1,47 @@
+$ /bin/zsh -lc '/Users/jasonholt/zero/bin/dn run -d 00064149A002033 --release --no-pub --dart-define=DART3D_MODEL=u1 --dart-define=DART3D_BACKEND=vulkan'
+Launching lib/main.dart on A142 in release mode...
+Running Gradle task 'assembleRelease'...                        
+Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+Running Gradle task 'assembleRelease'...                           82.3s
+✓ Built build/app/outputs/dn-apk/app-release.apk (110.2MB)
+Installing build/app/outputs/dn-apk/app-release.apk...              3.4s
+
+DartNative run key commands.
+h List all available interactive commands.
+c Clear the screen
+q Quit (terminate the application on the device).
+
+dartnative: [DN-Android] loadSymbols: done
+dartnative: dart3d: showcase — u1: 10 nodes · 5 geo · 7 mat · 1 skins
+dartnative: dart3d: u1 controller=orbit pose=orbit1 camPos=(-0.05,8.68,-27.24) camTarget=(-0.05,0.85,0.00) PASS
+dartnative: dart3d: u1 pick target=1 node=u1.target.procedural id=NKQB01R000004 instance=null  PASS
+dartnative: dart3d: u1 pick target=2 node=u1.target.payload id=NKQB01R00000E instance=null  PASS
+dartnative: dart3d: u1 pick target=3 node=u1.target.d3proc id=NKQB01R00000J instance=null  PASS
+dartnative: dart3d: u1 pick target=4 node=u1.target.skinned id=NKQB01R000010 instance=null  PASS
+dartnative: dart3d: u1 pick target=5 node=u1.target.instanced id=NKQB01R000016 instance=2  PASS
+dartnative: dart3d: u1 pick summary 5/5 targets PASS
+dartnative: resolveSkiaCanvasBridgeMethods: DNSkiaCanvasBridge method IDs cached
+dartnative: resolveKotlinMethods: all method IDs cached
+dartnative: JNI_OnLoad: dartnative_android bridge loaded
+dartnative: [DNCoil] installed ImageLoader memCache=50% heap, 16 req/host
+dartnative: [DN-Build] dartnative_android stamp: 2026-10-03-1
+dartnative: DNResetViewRegistry: gen=1, cleared 0 stale callbacks, registry reset
+dartnative: DNResetViewRegistry: callbacks thawed, dropped 0 stale fire(s) during the restart window
+dartnative: DNViewTypeClaim: 'com.jasonholtdigital.dart3d/sceneView' -> 65535
+dartnative: [DNSplash] splash released after 360ms (root has views)
+dartnative: [DNSplash] system splash gone — flushing 1 deferred chrome op(s)
+dartnative: [DN] Licence key exchange completed in the background (1304ms).
+dartnative: dart3d: u1 tap-pick node=u1.target.procedural id=NKQB01R000004 instance=null point=(-3.19,1.07,-0.55) PASS
+dartnative: dart3d: u1 tap-pick node=u1.target.payload id=NKQB01R00000E instance=null point=(-1.58,1.08,-0.57) PASS
+dartnative: dart3d: u1 tap-pick node=u1.target.d3proc id=NKQB01R00000J instance=null point=(0.00,1.04,-0.46) PASS
+dartnative: dart3d: u1 tap-pick node=u1.target.skinned id=NKQB01R000010 instance=null point=(1.58,1.51,-0.50) PASS
+dartnative: dart3d: u1 tap-pick node=u1.target.instanced id=NKQB01R000016 instance=2 point=(3.15,1.68,-0.39) PASS
+dartnative: dart3d: u1 tap-pick node=u1.target.d3proc id=NKQB01R00000J instance=null point=(-0.16,1.10,-0.43) PASS
+dartnative: dart3d: u1 controller=orbit pose=orbit2 camPos=(9.58,10.01,-14.71) camTarget=(-0.05,0.85,0.00) PASS
+dartnative: dart3d: u1 controller=orbit pose=orbit3 camPos=(-6.66,11.34,-12.85) camTarget=(0.55,0.97,-0.25) PASS
+dartnative: dart3d: u1 controller=fly pose=fly1 camPos=(-1.10,2.21,-15.93) camTarget=(-0.87,1.99,-14.98) PASS
+dartnative: dart3d: u1 controller=fly pose=fly2 camPos=(0.39,1.44,-14.24) camTarget=(0.31,1.29,-13.26) PASS
+dartnative: dart3d: u1 controller=fly pose=fly3 camPos=(2.34,2.65,-14.47) camTarget=(2.02,2.37,-13.56) PASS
+dartnative: dart3d: u1 controller=follow pose=follow1 camPos=(0.00,2.75,-12.85) camTarget=(0.00,0.90,0.00) PASS
+
+Application finished.

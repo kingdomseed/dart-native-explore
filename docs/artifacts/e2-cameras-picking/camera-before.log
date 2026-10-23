@@ -1,0 +1,90 @@
+00:00 +0: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_camera_regression_test.dart
+00:00 +0: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_camera_regression_test.dart: camera regressions toNodeTransform and applyToScene preserve composed forward
+00:00 +0 -1: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_camera_regression_test.dart: camera regressions toNodeTransform and applyToScene preserve composed forward
+00:00 +0 -2: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_cameras_picking_test.dart: SceneCamera & lookAt helpers lookAtRotation composes to the literal camera basis [E]
+  Expected: a numeric value within <0.00001> of <0.31622776601683794>
+    Actual: <-0.3162277638912201>
+     Which:  differs by <0.6324555299080581>
+  
+  package:matcher                         expect
+  test/u1_cameras_picking_test.dart 34:7  main.<fn>.<fn>
+  
+00:00 +0 -2: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_camera_regression_test.dart: camera regressions toNodeTransform and applyToScene preserve composed forward [E]
+  Expected: a numeric value within <0.00001> of <-0.3162277638912201>
+    Actual: <0.29552021622657776>
+     Which:  differs by <0.6117479801177979>
+  
+  package:matcher                           expect
+  test/u1_camera_regression_test.dart 39:7  main.<fn>.<fn>
+  
+00:00 +0 -2: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_cameras_picking_test.dart: SceneCamera & lookAt helpers screenPointToRay and worldToScreen round-trip in perspective mode
+00:00 +0 -3: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_cameras_picking_test.dart: SceneCamera & lookAt helpers screenPointToRay and worldToScreen round-trip in perspective mode
+00:00 +1 -3: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_cameras_picking_test.dart: SceneCamera & lookAt helpers screenPointToRay and worldToScreen round-trip in orthographic mode
+00:00 +2 -3: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_cameras_picking_test.dart: SceneCamera & lookAt helpers SceneCamera.fromDocument extracts primary view camera
+00:00 +2 -3: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_camera_regression_test.dart: camera regressions direct orbit distance writes clamp and update the camera [E]
+  Expected: <8>
+    Actual: <20.0>
+  
+  package:matcher                           expect
+  test/u1_camera_regression_test.dart 64:7  main.<fn>.<fn>
+  
+00:00 +3 -3: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_camera_regression_test.dart: camera regressions damped orbit distance converges and direct writes replace its goal
+00:00 +3 -4: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_cameras_picking_test.dart: CameraController implementations OrbitCameraController orbits, pans, zooms, and damps
+00:00 +4 -4: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_cameras_picking_test.dart: CameraController implementations FlyCameraController supports WASD keys and V6f setMoveInput
+00:00 +4 -4: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_camera_regression_test.dart: camera regressions damped orbit distance converges and direct writes replace its goal [E]
+  Expected: a numeric value within <0.001> of <-5>
+    Actual: <-4.776682376861572>
+     Which:  differs by <0.22331762313842773>
+  
+  package:matcher                           expect
+  test/u1_camera_regression_test.dart 88:9  main.<fn>.<fn>
+  
+00:00 +5 -4: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_camera_regression_test.dart: camera regressions follow targetPose offsets use composition-convention rotation
+00:00 +5 -5: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_cameras_picking_test.dart: CameraController implementations FollowCameraController tracks moving and rotating target node
+00:00 +6 -5: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_cameras_picking_test.dart: BVH & Render-Geometry Raycast + ScenePointer (5 targets) Bvh build, queryRay, and updateBounds refit
+00:00 +7 -5: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_cameras_picking_test.dart: BVH & Render-Geometry Raycast + ScenePointer (5 targets) raycastDocument & ScenePointer pick 5 distinct targets (procedural, payload, d3:procMesh, skinned, d3:instances)
+00:00 +7 -5: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_camera_regression_test.dart: camera regressions follow targetPose offsets use composition-convention rotation [E]
+  Expected: a numeric value within <0.00001> of <-6>
+    Actual: <6.0>
+     Which:  differs by <12.0>
+  
+  package:matcher                            expect
+  test/u1_camera_regression_test.dart 113:7  main.<fn>.<fn>
+  
+00:00 +7 -6: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_cameras_picking_test.dart: BVH & Render-Geometry Raycast + ScenePointer (5 targets) raycastDocument & ScenePointer pick 5 distinct targets (procedural, payload, d3:procMesh, skinned, d3:instances)
+00:00 +7 -6: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_camera_regression_test.dart: camera regressions parented camera writes representable local TRS and keeps world pose [E]
+  Expected: a numeric value within <0.00001> of <0.5>
+    Actual: <1.0>
+     Which:  differs by <0.5>
+  
+  package:matcher                            expect
+  test/u1_camera_regression_test.dart 141:9  main.<fn>.<fn>
+  
+00:00 +7 -7: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_cameras_picking_test.dart: BVH & Render-Geometry Raycast + ScenePointer (5 targets) raycastDocument & ScenePointer pick 5 distinct targets (procedural, payload, d3:procMesh, skinned, d3:instances)
+00:00 +7 -7: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_camera_regression_test.dart: camera regressions parented camera refuses a required local shear without mutation [E]
+  Expected: false
+    Actual: <true>
+  
+  package:matcher                            expect
+  test/u1_camera_regression_test.dart 174:7  main.<fn>.<fn>
+  
+00:00 +7 -8: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_cameras_picking_test.dart: BVH & Render-Geometry Raycast + ScenePointer (5 targets) raycastDocument & ScenePointer pick 5 distinct targets (procedural, payload, d3:procMesh, skinned, d3:instances)
+00:00 +7 -8: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_camera_regression_test.dart: camera regressions singular parent rejects camera writes without mutation [E]
+  Expected: false
+    Actual: <true>
+  
+  package:matcher                            expect
+  test/u1_camera_regression_test.dart 195:7  main.<fn>.<fn>
+  
+00:00 +7 -9: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_cameras_picking_test.dart: BVH & Render-Geometry Raycast + ScenePointer (5 targets) raycastDocument & ScenePointer pick 5 distinct targets (procedural, payload, d3:procMesh, skinned, d3:instances)
+00:00 +7 -9: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_camera_regression_test.dart: camera regressions projection defaults and extraction match native camera fields [E]
+  Expected: a numeric value within <0.000001> of <1.0471975511965976>
+    Actual: <0.7853981633974483>
+     Which:  differs by <0.26179938779914935>
+  
+  package:matcher                            expect
+  test/u1_camera_regression_test.dart 203:7  main.<fn>.<fn>
+  
+00:00 +8 -9: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_cameras_picking_test.dart: BVH & Render-Geometry Raycast + ScenePointer (5 targets) raycastDocument & ScenePointer pick 5 distinct targets (procedural, payload, d3:procMesh, skinned, d3:instances)
+00:00 +9 -9: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-2569c3ac/dart3d/test/u1_cameras_picking_test.dart: BVH & Render-Geometry Raycast + ScenePointer (5 targets) raycastDocumentAll returns sorted intersections and decodes all 7 vertex layouts
+00:00 +10 -9: Some tests failed.

@@ -1,0 +1,22 @@
+00:00 +0: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-1be93538/dart3d/test/u1_bvh_endpoint_test.dart
+00:00 +0: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-1be93538/dart3d/test/u1_bvh_endpoint_test.dart: TriangleMeshBvh.raycastClosest includes a hit exactly at maxT and agrees with raycastAll
+00:00 +0 -1: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-1be93538/dart3d/test/u1_bvh_endpoint_test.dart: TriangleMeshBvh.raycastClosest includes a hit exactly at maxT and agrees with raycastAll [E]
+  Expected: <4.0>
+    Actual: <null>
+  
+  package:matcher                      expect
+  test/u1_bvh_endpoint_test.dart 25:7  main.<fn>.<fn>
+  
+00:00 +0 -1: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-1be93538/dart3d/test/u1_bvh_endpoint_test.dart: TriangleMeshBvh.raycastClosest misses when the hit lies beyond maxT
+00:00 +1 -1: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-1be93538/dart3d/test/u1_bvh_endpoint_test.dart: TriangleMeshBvh.raycastClosest keeps the first triangle when hits have equal distance
+00:00 +2 -1: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-1be93538/dart3d/test/u1_cameras_picking_test.dart: SceneCamera & lookAt helpers lookAtRotation produces unit quaternion with local +Z facing target
+00:00 +3 -1: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-1be93538/dart3d/test/u1_cameras_picking_test.dart: SceneCamera & lookAt helpers screenPointToRay and worldToScreen round-trip in perspective mode
+00:00 +4 -1: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-1be93538/dart3d/test/u1_cameras_picking_test.dart: SceneCamera & lookAt helpers screenPointToRay and worldToScreen round-trip in orthographic mode
+00:00 +5 -1: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-1be93538/dart3d/test/u1_cameras_picking_test.dart: SceneCamera & lookAt helpers SceneCamera.fromDocument extracts primary view camera
+00:00 +6 -1: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-1be93538/dart3d/test/u1_cameras_picking_test.dart: CameraController implementations OrbitCameraController orbits, pans, zooms, and damps
+00:00 +7 -1: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-1be93538/dart3d/test/u1_cameras_picking_test.dart: CameraController implementations FlyCameraController supports WASD keys and V6f setMoveInput
+00:00 +8 -1: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-1be93538/dart3d/test/u1_cameras_picking_test.dart: CameraController implementations FollowCameraController tracks moving and rotating target node
+00:00 +9 -1: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-1be93538/dart3d/test/u1_cameras_picking_test.dart: BVH & Render-Geometry Raycast + ScenePointer (5 targets) Bvh build, queryRay, and updateBounds refit
+00:00 +10 -1: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-1be93538/dart3d/test/u1_cameras_picking_test.dart: BVH & Render-Geometry Raycast + ScenePointer (5 targets) raycastDocument & ScenePointer pick 5 distinct targets (procedural, payload, d3:procMesh, skinned, d3:instances)
+00:00 +11 -1: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-1be93538/dart3d/test/u1_cameras_picking_test.dart: BVH & Render-Geometry Raycast + ScenePointer (5 targets) raycastDocumentAll returns sorted intersections and decodes all 7 vertex layouts
+00:00 +12 -1: Some tests failed.

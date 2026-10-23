@@ -1,0 +1,20 @@
+00:00 +0: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/test/u1_camera_regression_test.dart
+00:00 +0: camera regressions follow target node canonicalizes an X-reflected world pose
+00:00 +0 -1: camera regressions follow target node canonicalizes an X-reflected world pose [E]
+  Expected: a numeric value within <0.00001> of <-5>
+    Actual: <0.0>
+     Which:  differs by <5.0>
+  
+  package:matcher                            expect
+  test/u1_camera_regression_test.dart 151:7  main.<fn>.<fn>
+  
+00:00 +0 -1: camera regressions follow target node resolves a reflected parent world pose
+00:00 +0 -2: camera regressions follow target node resolves a reflected parent world pose [E]
+  Expected: a numeric value within <0.00001> of <-4>
+    Actual: <1.0>
+     Which:  differs by <5.0>
+  
+  package:matcher                            expect
+  test/u1_camera_regression_test.dart 193:7  main.<fn>.<fn>
+  
+00:00 +0 -2: Some tests failed.

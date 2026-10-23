@@ -1,0 +1,4 @@
+Running Gradle task 'assembleRelease'...                        
+Font asset "CupertinoIcons.ttf" was tree-shaken, reducing it from 283452 to 1040 bytes (99.6% reduction). Tree-shaking can be disabled by providing the --no-tree-shake-icons flag when building your app.
+Running Gradle task 'assembleRelease'...                           30.0s
+✓ Built build/app/outputs/dn-apk/app-release.apk (121.8MB)

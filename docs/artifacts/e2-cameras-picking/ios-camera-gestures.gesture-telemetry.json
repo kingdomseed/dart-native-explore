@@ -1,0 +1,153 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-22T21:35:50.556Z",
+  "events": [
+    {
+      "kind": "swipe",
+      "tMs": 519.2119140625,
+      "x": 203,
+      "y": 438,
+      "x2": 223,
+      "y2": 448,
+      "referenceWidth": 402,
+      "referenceHeight": 874,
+      "durationMs": 810
+    },
+    {
+      "kind": "swipe",
+      "tMs": 2542.133056640625,
+      "x": 203,
+      "y": 438,
+      "x2": 178,
+      "y2": 448,
+      "referenceWidth": 402,
+      "referenceHeight": 874,
+      "durationMs": 701
+    },
+    {
+      "kind": "swipe",
+      "tMs": 4359.61767578125,
+      "x": 203,
+      "y": 438,
+      "x2": 223,
+      "y2": 423,
+      "referenceWidth": 402,
+      "referenceHeight": 874,
+      "durationMs": 701
+    },
+    {
+      "kind": "tap",
+      "tMs": 6382.883544921875,
+      "x": 201,
+      "y": 812,
+      "referenceWidth": 402,
+      "referenceHeight": 874
+    },
+    {
+      "kind": "tap",
+      "tMs": 7853.527587890625,
+      "x": 201,
+      "y": 812,
+      "referenceWidth": 402,
+      "referenceHeight": 874
+    },
+    {
+      "kind": "tap",
+      "tMs": 9334.847412109375,
+      "x": 201,
+      "y": 812,
+      "referenceWidth": 402,
+      "referenceHeight": 874
+    },
+    {
+      "kind": "swipe",
+      "tMs": 19226.80322265625,
+      "x": 203,
+      "y": 438,
+      "x2": 223,
+      "y2": 448,
+      "referenceWidth": 402,
+      "referenceHeight": 874,
+      "durationMs": 733
+    },
+    {
+      "kind": "swipe",
+      "tMs": 21249.02734375,
+      "x": 203,
+      "y": 438,
+      "x2": 178,
+      "y2": 448,
+      "referenceWidth": 402,
+      "referenceHeight": 874,
+      "durationMs": 706
+    },
+    {
+      "kind": "swipe",
+      "tMs": 23029.0146484375,
+      "x": 203,
+      "y": 438,
+      "x2": 223,
+      "y2": 423,
+      "referenceWidth": 402,
+      "referenceHeight": 874,
+      "durationMs": 704
+    },
+    {
+      "kind": "tap",
+      "tMs": 25032.4970703125,
+      "x": 201,
+      "y": 812,
+      "referenceWidth": 402,
+      "referenceHeight": 874
+    },
+    {
+      "kind": "tap",
+      "tMs": 26463.42431640625,
+      "x": 201,
+      "y": 812,
+      "referenceWidth": 402,
+      "referenceHeight": 874
+    },
+    {
+      "kind": "tap",
+      "tMs": 27888.203369140625,
+      "x": 201,
+      "y": 812,
+      "referenceWidth": 402,
+      "referenceHeight": 874
+    },
+    {
+      "kind": "swipe",
+      "tMs": 29481.244140625,
+      "x": 203,
+      "y": 438,
+      "x2": 223,
+      "y2": 448,
+      "referenceWidth": 402,
+      "referenceHeight": 874,
+      "durationMs": 707
+    },
+    {
+      "kind": "swipe",
+      "tMs": 31409.59033203125,
+      "x": 203,
+      "y": 438,
+      "x2": 178,
+      "y2": 448,
+      "referenceWidth": 402,
+      "referenceHeight": 874,
+      "durationMs": 701
+    },
+    {
+      "kind": "swipe",
+      "tMs": 33237.515380859375,
+      "x": 203,
+      "y": 438,
+      "x2": 223,
+      "y2": 423,
+      "referenceWidth": 402,
+      "referenceHeight": 874,
+      "durationMs": 700
+    }
+  ]
+}

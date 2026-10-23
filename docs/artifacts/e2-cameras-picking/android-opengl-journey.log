@@ -1,0 +1,22 @@
+10-23 08:22:41.299 26842 26842 I dartnative: dart3d: u1 controller=orbit pose=orbit1 camPos=(-0.05,8.68,-27.24) camTarget=(-0.05,0.85,0.00) PASS
+10-23 08:22:41.304 26842 26842 I dartnative: dart3d: u1 pick target=1 node=u1.target.procedural id=9Q5A9X0000004 instance=null  PASS
+10-23 08:22:41.306 26842 26842 I dartnative: dart3d: u1 pick target=2 node=u1.target.payload id=9Q5A9X000000E instance=null  PASS
+10-23 08:22:41.314 26842 26842 I dartnative: dart3d: u1 pick target=3 node=u1.target.d3proc id=9Q5A9X000000J instance=null  PASS
+10-23 08:22:41.316 26842 26842 I dartnative: dart3d: u1 pick target=4 node=u1.target.skinned id=9Q5A9X0000010 instance=null  PASS
+10-23 08:22:41.319 26842 26842 I dartnative: dart3d: u1 pick target=5 node=u1.target.instanced id=9Q5A9X0000016 instance=2  PASS
+10-23 08:22:41.319 26842 26842 I dartnative: dart3d: u1 pick summary 5/5 targets PASS
+10-23 08:22:41.377 26842 26842 I dart3d  : Filament engine backend: OPENGL (pref=1, tier=STANDARD)
+10-23 08:23:48.268 26842 26842 I dartnative: dart3d: u1 tap-pick node=u1.target.procedural id=9Q5A9X0000004 instance=null point=(-3.19,1.07,-0.55) PASS
+10-23 08:23:49.832 26842 26842 I dartnative: dart3d: u1 tap-pick node=u1.target.payload id=9Q5A9X000000E instance=null point=(-1.58,1.08,-0.57) PASS
+10-23 08:23:51.435 26842 26842 I dartnative: dart3d: u1 tap-pick node=u1.target.d3proc id=9Q5A9X000000J instance=null point=(0.00,1.04,-0.46) PASS
+10-23 08:23:52.956 26842 26842 I dartnative: dart3d: u1 tap-pick node=u1.target.skinned id=9Q5A9X0000010 instance=null point=(1.58,1.51,-0.50) PASS
+10-23 08:23:54.462 26842 26842 I dartnative: dart3d: u1 tap-pick node=u1.target.instanced id=9Q5A9X0000016 instance=2 point=(3.15,1.68,-0.39) PASS
+10-23 08:23:58.007 26842 26842 I dartnative: dart3d: u1 tap-pick node=u1.target.d3proc id=9Q5A9X000000J instance=null point=(-0.16,1.11,-0.43) PASS
+10-23 08:24:16.072 26842 26842 I dartnative: dart3d: u1 controller=orbit pose=orbit2 camPos=(9.56,9.99,-14.68) camTarget=(-0.05,0.85,0.00) PASS
+10-23 08:24:17.922 26842 26842 I dartnative: dart3d: u1 controller=orbit pose=orbit3 camPos=(-6.65,11.32,-12.82) camTarget=(0.55,0.97,-0.25) PASS
+10-23 08:24:19.732 26842 26842 I dartnative: dart3d: u1 controller=fly pose=fly1 camPos=(-1.10,2.21,-15.89) camTarget=(-0.87,1.99,-14.94) PASS
+10-23 08:24:37.202 26842 26842 I dartnative: dart3d: u1 controller=fly pose=fly2 camPos=(0.39,1.44,-14.21) camTarget=(0.31,1.29,-13.22) PASS
+10-23 08:24:39.317 26842 26842 I dartnative: dart3d: u1 controller=fly pose=fly3 camPos=(2.34,2.65,-14.43) camTarget=(2.02,2.37,-13.53) PASS
+10-23 08:24:41.154 26842 26842 I dartnative: dart3d: u1 controller=follow pose=follow1 camPos=(0.00,2.75,-12.82) camTarget=(0.00,0.90,0.00) PASS
+10-23 08:26:26.820 26842 26842 I dart3d  : Filament engine backend: OPENGL (pref=1, tier=STANDARD)
+10-23 08:26:56.498 26842 26842 I dart3d  : Filament engine backend: OPENGL (pref=1, tier=STANDARD)

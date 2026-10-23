@@ -1,0 +1,37 @@
+Launching lib/main.dart on A142 in release mode...
+Running Gradle task 'assembleRelease'...                           24.0s
+✓ Built build/app/outputs/dn-apk/app-release.apk (110.2MB)
+Installing build/app/outputs/dn-apk/app-release.apk...              3.1s
+
+DartNative run key commands.
+h List all available interactive commands.
+c Clear the screen
+q Quit (terminate the application on the device).
+
+dartnative: [DN-Android] loadSymbols: done
+dartnative: dart3d: showcase — dartnative_logo: 5 nodes · 1 geo · 1 mat · 1 tex · 1 anims
+dartnative: dart3d: hero — frameRadius 1.218 dist 18.907 aspect 0.449 glow 1 mat(s)
+dartnative: resolveSkiaCanvasBridgeMethods: DNSkiaCanvasBridge method IDs cached
+dartnative: resolveKotlinMethods: all method IDs cached
+dartnative: JNI_OnLoad: dartnative_android bridge loaded
+dartnative: [DNCoil] installed ImageLoader memCache=50% heap, 16 req/host
+dartnative: [DN-Build] dartnative_android stamp: 2026-10-03-1
+dartnative: DNResetViewRegistry: gen=1, cleared 0 stale callbacks, registry reset
+dartnative: DNResetViewRegistry: callbacks thawed, dropped 0 stale fire(s) during the restart window
+dartnative: DNViewTypeClaim: 'com.jasonholtdigital.dart3d/sceneView' -> 65535
+dartnative: [DNSplash] splash released after 331ms (root has views)
+dartnative: [DN] Licence key exchange completed in the background (1083ms).
+dartnative: [DN] _performRebuild: root native view changed 1 → 30, re-emitting grow:1
+dartnative: dart3d: dice table — 7 DartNative dice (logo inside), 31 nodes, 45 payloads, built in 1353 ms (dice 1331, compose from 1352)
+dartnative: dart3d: dice table ready after 1355 ms
+dartnative: dart3d: dice table handed to the view in 18 ms
+dartnative: dart3d: dice tray fit 413x919 insets EdgeInsets(l:10.0, t:104.0, r:10.0, b:134.0) → 4.50 px/u, camera 324, play x -42.7..42.7 z -71.4..78.0
+dartnative: dart3d: dice roll throw — strength 0.76 dir (-1, 1) gates [0, 3]
+dartnative: dart3d: dice gates closed after 0.27 s
+dartnative: dart3d: dice cocked d20 (up 0.952) → nudge #1
+dartnative: dart3d: dice cocked d20 (up 0.919) → nudge #2
+dartnative: dart3d: dice cocked d20 (up 0.983) → nudge #3
+dartnative: dart3d: dice settled — d4=4 (up 1.000 at -5.6,4.3,68.7) d6=1 (up 1.000 at -5.3,6.9,10.0) d8=6 (up 1.000 at -35.7,5.2,55.3) d10t=60 (up 1.000 at -21.3,6.0,49.5) d10u=2 (up 1.000 at 30.8,6.0,64.2) d12=8 (up 0.997 at -3.9,8.1,56.0) d20=13 (up 1.000 at -24.2,7.7,66.9) [3 nudges]
+dartnative: dart3d: dice readout d4 4 · d6 1 · d8 6 · d12 8 · d20 13 · d% 60+2 = 94
+
+Application finished.
