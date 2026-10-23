@@ -213,8 +213,7 @@ geometry resource or a non-billboard `d3:instances` base can't reface
 
 ## d3:instances
 
-N copies of one mesh under one node — one SceneKit geometry / one
-Filament renderable, one draw.
+N copies of one mesh under one node.
 
 | Field | Tag | Default | Notes |
 |---|---|---|---|
@@ -222,29 +221,39 @@ Filament renderable, one draw.
 | `shape` | `s` + params | absent | Inline `d3:procMesh`-style spec — `shape` plus that shape's parameter bag, same names as above. |
 | `material` | `rref` | absent | Material resource; absent → platform default. |
 | `transforms` | `list(m4)` or `rref` | — | Required. Inline column-major matrices, or a `matrices` payload ref (`count` × 64-byte f32 column-major). |
-| `attributes` | `map` | absent | name → per-instance vec4: `list(v4)` inline or `rref` to a `floats`/`bytes` payload (`count` × 4 values). `color` stamps the COLOR stream and multiplies the material base color; `attr1`–`attr3` are carried for future hooks but unread today. |
+| `attributes` | `map` | absent | name → per-instance vec4: `list(v4)` inline or `rref` to a `floats`/`bytes` payload (`count` × 4 values). `color` multiplies the material base color; `attr1`–`attr3` are carried for future hooks but unread today. |
 | `billboard` | `b` | false | Realize each instance as a camera-facing quad instead of the mesh. |
 | `size` | `v2` | (1,1) | Billboard quad size, world units. |
 | `rotation` | `d` | 0 | In-plane billboard rotation, radians. |
 | `facing` | `s` | 'spherical' | Billboard facing mode — `spherical`/`axisY`/`screen`, same semantics as `d3:procMesh`; billboard mode only. |
 | `doubleSided` | `b` | false | Render both faces — binds a per-component material copy (see below). |
 
-### baked instancing
+### instancing realization (iOS baked vs. Android Filament 1.77.3 GPU `InstanceBuffer`)
 
-Both platforms expand instances into a single vertex/index stream:
-positions transform by the instance matrix; **normals transform by the
-exact inverse-transpose of its upper 3×3** (computed in cofactor form
-— exact under non-uniform scale, mirror, and shear, where a
-normalize-the-columns approximation drifts; a non-invertible or
-non-finite transform carries the source frame through unchanged);
-tangents transform by the matrix itself, re-orthogonalized against the
-new normal, with bitangent handedness flipping on a negative
-determinant. `color` stamps the COLOR stream, and one renderable draws
-the result. SceneKit has no instanced draw on `SCNGeometry`; Filament
-1.71.6's Java binding exposes `Builder.instances(int)` but not the
-`InstanceBuffer` overload carrying per-instance data, so the baked
-path is the portable contract. The 1000-instance field in the example
-is one node and one draw.
+- **iOS (SceneKit):** SceneKit has no instanced draw on `SCNGeometry`, so
+  instances expand into a single vertex/index stream: positions transform
+  by the instance matrix; **normals transform by the exact
+  inverse-transpose of its upper 3×3** (computed in cofactor form — exact
+  under non-uniform scale, mirror, and shear; a non-invertible or
+  non-finite transform carries the source frame through unchanged);
+  tangents transform by the matrix itself, re-orthogonalized against the
+  new normal, with bitangent handedness flipping on a negative
+  determinant. `color` stamps the `COLOR` stream, and one geometry draws
+  the result.
+- **Android (Filament 1.77.3, E1):** Conformal invertible transforms
+  (`M₃ = s·Q` with `Q` orthogonal and `|det| > 1e-20`) are realized as
+  GPU `InstanceBuffer` chunks (`MAX_GPU_INSTANCES_PER_CHUNK = 64`,
+  Filament's `CONFIG_MAX_INSTANCES` UBO limit) sharing the base mesh's
+  `VertexBuffer` and `IndexBuffer`, with per-instance `attributes.color`
+  supplied via `uniform float4 instanceColors[64]` (`getInstanceIndex()`).
+  Reflected conformal transforms (`det3x3 < 0`) bind a cached
+  reflected-tangent `VertexBuffer` (`MeshFactory.reflectedTangentCopy`)
+  and `culling(NONE)` so tangent handedness and face culling match baked
+  parity. Non-conformal (non-uniform scale / shear) or singular transforms
+  fall back to `MeshFactory.bakeInstances` on a supplementary child entity
+  so cofactor inverse-transpose normals and re-orthogonalized tangents stay
+  exact. Collider geometry (`convexHull` / `triMesh` / `concaveMesh`) is
+  expanded lazily on demand (`ensureInstanceColliderGeometry`).
 
 Precedence is explicit, each case logging once per node:
 `billboard: true` overrides `shape`/`geometry` entirely; when both
@@ -252,7 +261,7 @@ mesh fields are present `shape` wins. `attr1`–`attr3` log once as
 carried-but-unread (`color` is the only realized attribute). A skinned
 base geometry bakes unskinned — the joint/weight streams drop with a
 warn-once on both platforms; a morphed base likewise bakes unmorphed
-with a warn-once. Baked instance counts cap at 16384 — over it, the
+with a warn-once. Instance counts cap at 16384 — over it, the
 tail truncates with a warn-once (upstream's GPU instancing has no
 equivalent limit).
 
@@ -260,9 +269,7 @@ equivalent limit).
 (transform translation = quad center, `size` = extent, `facing` =
 basis mode). `doubleSided` can't ride the shared material instance —
 the node binds a per-component copy (SceneKit `copy()`, Filament
-`MaterialInstance.duplicate`). The copy is a snapshot: surgical
-updates to the source material resource after the bind don't
-propagate to it.
+`MaterialInstance.duplicate`).
 
 ## Catmull-Rom paths (Dart only)
 

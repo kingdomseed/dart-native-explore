@@ -694,5 +694,13 @@ void main() {
       expect(b.$1.z, closeTo(-1.0, 1e-6));
       expect(b.$2.z, closeTo(10.0, 1e-6));
     });
+
+    test('buildGeometryDocument scales to 10k-instance field', () {
+      final doc = buildGeometryDocument(instanceCount: 10000);
+      final matrices = doc.payloads.values.where(
+        (p) => p.encoding == PayloadEncoding.matrices,
+      );
+      expect(matrices.single.bytes!.length, 10000 * 64);
+    });
   });
 }

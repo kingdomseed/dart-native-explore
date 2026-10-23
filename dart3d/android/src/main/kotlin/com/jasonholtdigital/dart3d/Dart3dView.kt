@@ -556,7 +556,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     private val animTargets = HashMap<Long, AnimTargetState>()
 
     /** Identity mat4 scratch for `updateSkinning`'s missing-joint path. */
-    private val IDENTITY16 = FloatArray(16).also {
+    internal val IDENTITY16 = FloatArray(16).also {
         android.opengl.Matrix.setIdentityM(it, 0)
     }
 
@@ -857,11 +857,15 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         variantInflight.remove(key)
         val waiters = variantWaiters.remove(key) ?: return
         val ctx = FsceneRealizer.surgicalContext(this)
+        var redecodedDoubleSided = 0
         for (mk in waiters) {
             resources.materialResources[mk]?.let { upsertMaterial(mk, it) }
             // doubleSided d3:instances snapshots aren't consumers of
             // the shared instance — re-bake them against the variant.
-            ctx.redecodeDoubleSidedInstancesForMaterial(mk)
+            redecodedDoubleSided += ctx.redecodeDoubleSidedInstancesForMaterial(mk)
+        }
+        if (redecodedDoubleSided > 0) {
+            ctx.applyVariantComponents()
         }
     }
 
@@ -1072,8 +1076,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // Identity transform — every other renderable in this layer
         // owns a TransformManager component; vertex data is already
         // world-space so identity preserves positions.
-        engine.transformManager.setTransform(
-            engine.transformManager.create(entity), IDENTITY16)
+        engine.transformManager.create(entity, 0, IDENTITY16)
         RenderableManager.Builder(1)
             .geometry(0, RenderableManager.PrimitiveType.TRIANGLES,
                 vb, ib, 0, 0)
@@ -1115,8 +1118,10 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      * after the camera pose settles (billboards face it). */
     private fun tickParticles(dt: Double) {
         if (particleRuntimes.isEmpty()) return
-        val camPos = FloatArray(3)
-        camera.getPosition(camPos)
+        val camPosD = DoubleArray(3)
+        camera.getPosition(camPosD)
+        val camPos = floatArrayOf(
+            camPosD[0].toFloat(), camPosD[1].toFloat(), camPosD[2].toFloat())
         val camFwd = FloatArray(3)
         camera.getForwardVector(camFwd)
         val tcm = engine.transformManager
@@ -1268,7 +1273,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             rec.camera?.let { setCameraExposure(it, effExposure) }
         }
         val mapper: ToneMapper = when (toneMapping) {
-            "pbrNeutral" -> ToneMapper.PBRNeutralToneMapper()
+            "pbrNeutral" -> ToneMapper.PBRNeutral()
             "agx" -> ToneMapper.Agx()
             "filmic" -> ToneMapper.Filmic()
             // Upstream's `aces` is the Hill fit with its 1/0.6 input
@@ -1278,7 +1283,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             else -> {
                 logCommandOnce("stage.toneMapping.$toneMapping",
                     "toneMapping '$toneMapping' unknown; using pbrNeutral")
-                ToneMapper.PBRNeutralToneMapper()
+                ToneMapper.PBRNeutral()
             }
         }
         if (toneMapping == "agx" &&
@@ -1730,19 +1735,16 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             }
             particleRuntimes.clear()
             val sweepCtx = FsceneRealizer.surgicalContext(this)
-            for ((_, rec) in nodesById) {
+            for ((id, rec) in nodesById) {
                 // W16: trail entities/buffers and the lod consumer
                 // entry die with the node — the trail's unparented
                 // entity isn't covered by the entity sweep below.
                 sweepCtx.destroyTrailLod(rec)
+                sweepCtx.destroyProcRenderable(id, rec)
                 destroyLightCluster(rec)
-                scene.removeEntity(rec.entity)
+                scene.remove(rec.entity)
                 engine.destroyEntity(rec.entity)
                 EntityManager.get().destroy(rec.entity)
-                rec.procGpuMesh?.destroy(engine)
-                rec.procMaterialInstance?.let {
-                    engine.destroyMaterialInstance(it)
-                }
             }
             nodesById.clear()
             cameraFacing.clear()
@@ -1819,7 +1821,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      */
     private fun destroyLightCluster(rec: FsceneRealizer.NodeRec) {
         for (child in rec.lightEntities) {
-            scene.removeEntity(child)
+            scene.remove(child)
             engine.destroyEntity(child)
             EntityManager.get().destroy(child)
         }
@@ -2449,25 +2451,16 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     // buffers and the lod consumer entry die with the
                     // node — neither rides rec.entity's teardown.
                     rmCtx.destroyTrailLod(rec)
-                    scene.removeEntity(rec.entity)
+                    // W26/E1: component-owned mesh buffers, GPU
+                    // InstanceBuffers, extra chunk entities, MaterialInstance
+                    // duplicates, and facing registration aren't owned by
+                    // rec.entity — route removal through destroyProcRenderable
+                    // before destroying rec.entity.
+                    rmCtx.destroyProcRenderable(id, rec)
+                    scene.remove(rec.entity)
                     engine.destroyEntity(rec.entity)
                     EntityManager.get().destroy(rec.entity)
                     destroyedEntities.add(rec.entity)
-                    // W26: component-owned mesh buffers, a doubleSided
-                    // duplicate instance and the facing registration
-                    // aren't owned by the entity — route removal
-                    // through the same cleanup teardownComponents does
-                    // (repeated subtree streaming leaked them).
-                    cameraFacing.remove(id)
-                    rec.procGpuMesh?.destroy(engine)
-                    rec.procGpuMesh = null
-                    rec.procMaterialInstance?.let { dup ->
-                        for ((_, list) in resources.textureConsumers) {
-                            list.removeAll { it.first === dup }
-                        }
-                        engine.destroyMaterialInstance(dup)
-                    }
-                    rec.procMaterialInstance = null
                     // W12: the node's own component-joint registrations
                     // first — the world sweep below then sees only
                     // command joints and other nodes' component joints
@@ -3159,13 +3152,14 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             // re-apply below would read the dead instance back off the
             // renderable and adopt it as the binding's default.
             val oldPtr = old.nativeObject
+            val vCtx = FsceneRealizer.surgicalContext(this)
             for ((_, vc) in resources.variantComponents) {
                 for (b in vc.bindings) {
                     if (b.applied?.nativeObject == oldPtr) {
-                        val entity = nodesById[b.nodeKey]?.entity
-                        if (entity != null && rm.hasComponent(entity)) {
-                            rm.setMaterialInstanceAt(
-                                rm.getInstance(entity), b.primitive, mi)
+                        val rec = nodesById[b.nodeKey]
+                        if (rec != null) {
+                            vCtx.applyMaterialToNode(
+                                b.nodeKey, rec, b.primitive, mi)
                         }
                         b.applied = mi
                     }
@@ -3174,13 +3168,23 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     }
                 }
             }
+            for (rec in nodesById.values) {
+                if (rec.instanceBaseMaterial?.nativeObject == oldPtr) {
+                    rec.instanceBaseMaterial = mi
+                }
+            }
             engine.destroyMaterialInstance(old)
         }
         Log.i(TAG, "upsertResource material $key: reattached to $n renderable(s)")
+        val ctx = FsceneRealizer.surgicalContext(this)
+        // E1: non-doubleSided colored d3:instances nodes bind per-chunk
+        // MaterialInstance duplicates to carry instanceColors uniforms —
+        // re-realize them against the fresh material.
+        ctx.redecodeColoredInstancesForMaterial(key)
         // W12: variant bindings holding the old instance re-resolve to
         // the fresh one (a rebound slot reads as a foreign write and
         // becomes the new default — the upstream rebase rule).
-        FsceneRealizer.surgicalContext(this).applyVariantComponents()
+        ctx.applyVariantComponents()
     }
 
     private fun upsertGeometry(key: Long, res: JSONObject) {
@@ -4100,20 +4104,19 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             for (rt in list) rt.destroy()
         }
         val sweepCtx = FsceneRealizer.surgicalContext(this)
-        for ((_, rec) in nodesById) {
+        for ((id, rec) in nodesById) {
             // W16: trail entities/buffers + the lod consumer entry
             // die with the replaced scene — the trail's unparented
             // entity isn't covered by rec.entity's teardown.
             sweepCtx.destroyTrailLod(rec)
+            // W26/E1: component-owned proc/instances buffers, GPU
+            // InstanceBuffers, extra chunk entities, and MaterialInstance
+            // duplicates die with their node.
+            sweepCtx.destroyProcRenderable(id, rec)
             destroyLightCluster(rec)
-            scene.removeEntity(rec.entity)
+            scene.remove(rec.entity)
             engine.destroyEntity(rec.entity)
             EntityManager.get().destroy(rec.entity)
-            // W26: component-owned proc/instances buffers aren't in
-            // the shared gpuMeshes map — they die with their node, as
-            // does a doubleSided duplicate material instance.
-            rec.procGpuMesh?.destroy(engine)
-            rec.procMaterialInstance?.let { engine.destroyMaterialInstance(it) }
         }
         // W26: facing-spec VertexBuffers belonged to the old scene's
         // component-owned meshes — the fresh decode re-registers.
@@ -4967,7 +4970,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 center[0].toDouble(), center[1].toDouble(),
                 center[2].toDouble(),
                 up[0].toDouble(), up[1].toDouble(), up[2].toDouble())
-            var local = camera.getModelMatrix(FloatArray(16))
+            val localD = camera.getModelMatrix(DoubleArray(16))
+            var local = FloatArray(16) { localD[it].toFloat() }
             // World → local: local = inv(parentWorld) × world.
             val pk = rec.parentKey
             if (pk != null) {
@@ -5003,7 +5007,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      */
     private fun updateCameraFacing() {
         if (cameraFacing.isEmpty()) return
-        val camWorld = camera.getModelMatrix(FloatArray(16))
+        val camWorldD = camera.getModelMatrix(DoubleArray(16))
+        val camWorld = FloatArray(16) { camWorldD[it].toFloat() }
         // Filament looks down −Z in camera space: forward = −col2.
         val fWorld = floatArrayOf(-camWorld[8], -camWorld[9], -camWorld[10])
         val rWorld = floatArrayOf(camWorld[0], camWorld[1], camWorld[2])

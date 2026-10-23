@@ -90,7 +90,7 @@ Java_com_jasonholtdigital_dart3d_Dart3dJni_nativeFireToDart(
 // ------------------------------------------------------------------
 // W21 KTX2 decode via gltfio's Ktx2Provider.
 //
-// The pinned Filament (1.71.6) ships no Java-side standalone KTX2
+// The pinned Filament (1.77.3) ships no Java-side standalone KTX2
 // reader — filament-utils only exposes KTX1Loader, and gltfio's Java
 // ResourceLoader decodes KTX2 solely into FilamentAsset members. The
 // native side is reachable though: libgltfio-jni.so exports
@@ -103,7 +103,7 @@ Java_com_jasonholtdigital_dart3d_Dart3dJni_nativeFireToDart(
 // Filament thread, and hand the Texture* back to Kotlin, which wraps
 // it in com.google.android.filament.Texture's public (long) ctor.
 //
-// The class declaration below mirrors filament 1.71.6's
+// The class declaration below mirrors filament 1.77.3's
 // libs/gltfio/include/gltfio/TextureProvider.h verbatim — vtable order
 // is contractual. Never instantiate or subclass it; calls go through
 // the provider's own vtable.
@@ -286,14 +286,12 @@ Java_com_jasonholtdigital_dart3d_TextureFactory_nKtx2Release(
 // ------------------------------------------------------------------
 // Frame timing via filament::Renderer::getFrameInfoHistory.
 //
-// Filament 1.71.6 has no Java binding for it, but libfilament-jni.so
-// exports the C++ member. FrameInfo and FixedCapacityVector below
-// mirror that version's filament/Renderer.h and
-// utils/FixedCapacityVector.h, so the path only exists when the build
-// pins exactly that version (D3_FILAMENT_FRAME_INFO, set by
-// CMakeLists.txt from build.gradle's filamentVersion). On any other
-// pin it reports unavailable until the mirror is re-checked. Only the
-// `dart3d.perf` log lane reads this.
+// FrameInfo and FixedCapacityVector below mirror Filament 1.77.3's
+// filament/Renderer.h and utils/FixedCapacityVector.h, so the path
+// only exists when the build pins exactly that version
+// (D3_FILAMENT_FRAME_INFO, set by CMakeLists.txt from build.gradle's
+// filamentVersion). On any other pin it reports unavailable until the
+// mirror is re-checked. Only the `dart3d.perf` log lane reads this.
 
 namespace {
 
@@ -314,8 +312,9 @@ struct D3FrameInfo {
     int64_t displayPresentInterval;
     int64_t compositionToPresentLatency;
     int64_t expectedPresentLatency;
+    int64_t frameScheduleTime;
 };
-static_assert(sizeof(D3FrameInfo) == 112, "FrameInfo mirror: 14 x 8 bytes");
+static_assert(sizeof(D3FrameInfo) == 120, "FrameInfo mirror: 15 x 8 bytes");
 
 typedef void (*OperatorDeleteFn)(void*);
 
@@ -354,7 +353,11 @@ const FrameInfoApi* frameInfoApi() {
         if (!handle) return nullptr;
         void* history = dlsym(handle,
             "_ZNK8filament8Renderer19getFrameInfoHistoryEm");
+        // Filament 1.77.3 hides _ZdlPv in libfilament-jni.so; its
+        // __lcxx_override operator new allocates via Bionic malloc@plt,
+        // so libc free is the matching deallocator when _ZdlPv is hidden.
         void* release = dlsym(handle, "_ZdlPv");
+        if (!release) release = reinterpret_cast<void*>(&::free);
         if (!history || !release) return nullptr;
         static FrameInfoApi resolved;
         resolved.history = (FrameInfoHistoryFn)history;
@@ -412,4 +415,57 @@ extern "C" JNIEXPORT jint JNICALL
 Java_com_jasonholtdigital_dart3d_Dart3dJni_nativeFrameInfoHistory(
         JNIEnv* env, jclass, jlong nativeRenderer, jlongArray out) {
     return copyFrameInfoHistory(env, nativeRenderer, out);
+}
+
+// ------------------------------------------------------------------
+// E1 GPU instancing: filamat::MaterialBuilder::instanced(bool).
+//
+// Filament 1.77.3's Java MaterialBuilder omits the `instanced(boolean)`
+// wrapper, while libfilamat-jni.so exports the C++ method
+// `filamat::MaterialBuilder::instanced(bool)`. Enabling it sets
+// `MATERIAL_HAS_INSTANCES` in the compiled material so `getInstanceIndex()`
+// is available in shaders alongside `InstanceBuffer` transforms (hybrid
+// instancing).
+
+namespace filamat { class MaterialBuilder; }
+typedef filamat::MaterialBuilder& (*MaterialBuilderInstancedFn)(
+    filamat::MaterialBuilder*, bool);
+
+static MaterialBuilderInstancedFn materialBuilderInstanced() {
+    static MaterialBuilderInstancedFn fn = []() -> MaterialBuilderInstancedFn {
+        void* sym = dlsym(RTLD_DEFAULT,
+            "_ZN7filamat15MaterialBuilder9instancedEb");
+        if (!sym) {
+            void* handle = dlopen("libfilamat-jni.so", RTLD_NOW | RTLD_LOCAL);
+            if (handle) {
+                sym = dlsym(handle,
+                    "_ZN7filamat15MaterialBuilder9instancedEb");
+            }
+        }
+        return (MaterialBuilderInstancedFn)sym;
+    }();
+    return fn;
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_jasonholtdigital_dart3d_Dart3dJni_nativeMaterialBuilderInstanced(
+        JNIEnv* env, jclass, jobject builder, jboolean enabled) {
+    if (!builder) return;
+    MaterialBuilderInstancedFn fn = materialBuilderInstanced();
+    if (!fn) {
+        LOGW("filamat: MaterialBuilder::instanced(bool) symbol not found");
+        return;
+    }
+    jclass cls = env->GetObjectClass(builder);
+    jfieldID fid = env->GetFieldID(cls, "mNativeObject", "J");
+    if (!fid) {
+        if (env->ExceptionCheck()) env->ExceptionClear();
+        LOGW("filamat: MaterialBuilder.mNativeObject field not found");
+        return;
+    }
+    jlong nativeObj = env->GetLongField(builder, fid);
+    if (nativeObj != 0) {
+        fn(reinterpret_cast<filamat::MaterialBuilder*>(nativeObj),
+           enabled == JNI_TRUE);
+    }
 }

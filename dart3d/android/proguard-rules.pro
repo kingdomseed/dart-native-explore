@@ -12,3 +12,9 @@
 -keepclassmembers class * extends com.github.stephengold.joltjni.CustomContactListener {
     public *;
 }
+
+# dart3d_jni's nativeMaterialBuilderInstanced reads MaterialBuilder's
+# private mNativeObject pointer via JNI GetFieldID.
+-keepclassmembers class com.google.android.filament.filamat.MaterialBuilder {
+    long mNativeObject;
+}

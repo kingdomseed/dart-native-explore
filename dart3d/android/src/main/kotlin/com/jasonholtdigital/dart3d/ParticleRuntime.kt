@@ -4,6 +4,7 @@ import com.google.android.filament.Box
 import com.google.android.filament.Engine
 import com.google.android.filament.EntityManager
 import com.google.android.filament.IndexBuffer
+import com.google.android.filament.InstanceBuffer
 import com.google.android.filament.MaterialInstance
 import com.google.android.filament.RenderableManager
 import com.google.android.filament.Scene
@@ -48,12 +49,12 @@ import kotlin.math.sqrt
  *    `BillboardGeometry` + `flutter_scene_billboard.vert` expansion
  *    math (verbatim, with the camera basis taken from the view's
  *    camera instead of a FrameInfo uniform).
- *  - `meshParticleEmitter` → [MeshParticleRuntime]: a baked pool of
- *    per-particle renderables. Filament's Java binding exposes
- *    `RenderableManager.Builder.instances` but no `InstanceBuffer`, so
- *    true instancing is unreachable — each live slot is a child entity
- *    of the emitter node with a per-frame TRS (docs/particles-spec.md
- *    carries the deviation).
+ *  - `meshParticleEmitter` → [MeshParticleRuntime]: GPU-instanced chunks
+ *    of up to 64 particles per renderable via Filament's `InstanceBuffer`.
+ *    Each chunk is a child entity of the emitter node whose
+ *    `InstanceBuffer` localTransforms carry the per-particle local
+ *    pos / facing rotation / uniform size scale (unused slots collapse to
+ *    upstream's `_hiddenTransform`).
  */
 
 // ---------------------------------------------------------------------------
@@ -1547,7 +1548,7 @@ class SpriteParticleRuntime(
     }
 
     override fun detach(scene: Scene) {
-        scene.removeEntity(entity)
+        scene.remove(entity)
     }
 
     override fun applyLayers(layers: Int) {
@@ -1558,7 +1559,7 @@ class SpriteParticleRuntime(
     }
 
     override fun destroy() {
-        host.scene.removeEntity(entity)
+        host.scene.remove(entity)
         // destroyEntity cascades to the renderable component.
         engine.destroyEntity(entity)
         EntityManager.get().destroy(entity)
@@ -1634,12 +1635,12 @@ class SpriteParticleRuntime(
 }
 
 /**
- * `meshParticleEmitter` — a baked pool of per-particle renderables
- * (Filament's Java binding has no InstanceBuffer — see the file
- * header). Each live slot is a child entity of the emitter node whose
- * TRS is the particle's local pos / facing rotation / uniform size
- * scale. Pool slots are created lazily and collapsed to a degenerate
- * transform when unused — upstream's `_hiddenTransform` approach.
+ * `meshParticleEmitter` — GPU-instanced chunks of up to 64 particles
+ * per renderable via Filament's [InstanceBuffer] (D3). Each chunk is a
+ * child entity of the emitter node whose `InstanceBuffer` carries the
+ * per-particle local TRS (pos / facing rotation / uniform size scale).
+ * Chunks are allocated lazily and unused slots collapse to upstream's
+ * `_hiddenTransform`.
  */
 class MeshParticleRuntime(
     host: Dart3dView,
@@ -1654,39 +1655,56 @@ class MeshParticleRuntime(
 
     private val engine get() = host.engine
 
+    private val chunkSize = engine.maxAutomaticInstances
+        .coerceIn(1, MaterialPackages.MAX_INSTANCES)
+
+    private class Chunk(
+        val entity: Int,
+        val instanceBuffer: InstanceBuffer,
+        val transforms: FloatArray,
+    )
+
     init {
         this.layers = layers
     }
 
-    /** Lazily-grown entity pool per geometry bucket. */
-    private val pool = Array(buckets.size) { ArrayList<Int>() }
+    /** Lazily-grown InstanceBuffer chunk pool per geometry bucket. */
+    private val chunks = Array(buckets.size) { ArrayList<Chunk>() }
     private val liveCounts = IntArray(buckets.size)
 
     // Collapsed to nothing far below any plausible scene — upstream's
-    // _hiddenTransform (a zero-scale renderable never rasterizes, but
-    // Filament still walks it, so keep the count tight via liveCounts).
+    // _hiddenTransform (a zero-scale instance never rasterizes, and
+    // only chunks touched by liveCounts/counts upload per frame).
     private val hiddenTransform = floatArrayOf(
         1e-6f, 0f, 0f, 0f,
         0f, 1e-6f, 0f, 0f,
         0f, 0f, 1e-6f, 0f,
         0f, -1e5f, 0f, 1f)
 
-    /** The material a fresh slot binds — resolved lazily so a slot
+    /** The material a fresh chunk binds — resolved lazily so a chunk
      *  created after a material upsert binds the current instance. */
     private fun materialFor(): MaterialInstance =
         materialKey?.let { host.materialInstances[it] }
             ?: host.litMaterial.defaultInstance
 
-    private fun ensureSlot(bucket: Int, slot: Int): Int {
-        val list = pool[bucket]
-        val mesh = buckets[bucket] ?: return -1
-        while (list.size <= slot) {
+    private fun ensureChunk(bucket: Int, chunkIdx: Int): Chunk? {
+        val list = chunks[bucket]
+        val mesh = buckets[bucket] ?: return null
+        while (list.size <= chunkIdx) {
+            val transforms = FloatArray(chunkSize * 16)
+            for (i in 0 until chunkSize) {
+                System.arraycopy(hiddenTransform, 0, transforms, i * 16, 16)
+            }
+            val ib = InstanceBuffer.Builder(chunkSize)
+                .fenced { build(engine) }
+            ib.setLocalTransforms(transforms, chunkSize, 0)
             val e = EntityManager.get().create()
             val mi = materialFor()
             RenderableManager.Builder(1)
                 .geometry(0, mesh.primitiveType,
                     mesh.vertexBuffer, mesh.indexBuffer)
                 .material(0, mi)
+                .instances(chunkSize, ib)
                 .boundingBox(Box(
                     mesh.bounds[0], mesh.bounds[1], mesh.bounds[2],
                     mesh.bounds[3], mesh.bounds[4], mesh.bounds[5]))
@@ -1696,7 +1714,7 @@ class MeshParticleRuntime(
                 // Particles move per frame — a stale box under-culls.
                 .culling(false)
                 .fenced { build(engine, e) }
-            // The pool slot consumes the material — register so a
+            // The chunk consumes the material — register so a
             // material upsert re-attaches it (same (entity, slot)
             // contract mesh components use).
             materialKey?.let { mk ->
@@ -1705,21 +1723,22 @@ class MeshParticleRuntime(
                     .add(Pair(e, 0))
             }
             val tcm = engine.transformManager
-            tcm.setTransform(tcm.create(e), hiddenTransform)
-            // Child of the emitter node — particle transforms are
-            // node-local, the node's world pose carries them.
+            tcm.create(e, 0, host.IDENTITY16)
+            // Child of the emitter node — particle transforms in the
+            // InstanceBuffer are node-local; the node's world pose
+            // serves as the InstanceBuffer's root transform.
             tcm.setParent(tcm.getInstance(e),
                 tcm.getInstance(parentEntity))
             if (attached) host.scene.addEntity(e)
-            list.add(e)
+            list.add(Chunk(e, ib, transforms))
         }
-        return list[slot]
+        return list[chunkIdx]
     }
 
     /**
      * Geometry rebind — a `upsertResource`/`upsertPayload` re-decode
      * swapped this key's GpuMesh: buckets referencing it re-point, and
-     * pooled slots take the new buffers (mirrors redecodeGeometry's
+     * pooled chunks take the new buffers (mirrors redecodeGeometry's
      * consumer loop; the old mesh is destroyed after all consumers
      * swap).
      */
@@ -1729,11 +1748,11 @@ class MeshParticleRuntime(
             val prev = buckets[b]
             buckets[b] = gm
             if (prev != null) {
-                // Live slots rebind; a null→mesh landing only feeds
-                // slots created from here on.
+                // Live chunks rebind; a null→mesh landing only feeds
+                // chunks created from here on.
                 val rm = engine.renderableManager
-                for (e in pool[b]) {
-                    val ri = rm.getInstance(e)
+                for (c in chunks[b]) {
+                    val ri = rm.getInstance(c.entity)
                     if (ri != 0) {
                         rm.setGeometryAt(ri, 0, gm.primitiveType,
                             gm.vertexBuffer, gm.indexBuffer)
@@ -1749,7 +1768,6 @@ class MeshParticleRuntime(
     override fun repack(camPos: FloatArray, nodeWorld: FloatArray) {
         if (buckets.isEmpty()) return   // spec declared no geometries
         val s = system.storage
-        val tcm = engine.transformManager
         val counts = IntArray(buckets.size)
         val m = FloatArray(16)
         for (i in 0 until s.aliveCount) {
@@ -1757,24 +1775,31 @@ class MeshParticleRuntime(
             if (bucket >= buckets.size) bucket = buckets.size - 1
             if (buckets[bucket] == null) continue   // geometry pending
             val slot = counts[bucket]++
-            val e = ensureSlot(bucket, slot)
-            if (e <= 0) continue
+            val chunk = ensureChunk(bucket, slot / chunkSize) ?: continue
             val q = orient(s, i)
             val size = s.size[i]
             composeTrs(m, s.posX[i], s.posY[i], s.posZ[i],
                 q[0], q[1], q[2], q[3], size, size, size)
-            tcm.setTransform(tcm.getInstance(e), m)
+            System.arraycopy(
+                m, 0, chunk.transforms, (slot % chunkSize) * 16, 16)
         }
         // Hide only the slots that were live last frame and no longer
-        // are — upstream's repack verbatim.
+        // are, then upload each touched chunk's InstanceBuffer.
         for (b in 0 until buckets.size) {
             for (slot in counts[b] until liveCounts[b]) {
-                val e = pool[b][slot]
-                tcm.setTransform(tcm.getInstance(e), hiddenTransform)
+                val chunk = chunks[b][slot / chunkSize]
+                System.arraycopy(hiddenTransform, 0,
+                    chunk.transforms, (slot % chunkSize) * 16, 16)
             }
+            val touchedSlots = max(counts[b], liveCounts[b])
+            val touchedChunks = (touchedSlots + chunkSize - 1) / chunkSize
+            for (c in 0 until touchedChunks) {
+                val chunk = chunks[b][c]
+                chunk.instanceBuffer.setLocalTransforms(
+                    chunk.transforms, chunkSize, 0)
+            }
+            liveCounts[b] = counts[b]
         }
-        liveCounts.fill(0)
-        for (b in 0 until buckets.size) liveCounts[b] = counts[b]
     }
 
     /** The particle's local rotation — upstream `_orient` verbatim. */
@@ -1819,37 +1844,39 @@ class MeshParticleRuntime(
     }
 
     override fun attach(scene: Scene) {
-        for (list in pool) for (e in list) scene.addEntity(e)
+        for (list in chunks) for (c in list) scene.addEntity(c.entity)
     }
 
     override fun detach(scene: Scene) {
-        for (list in pool) for (e in list) scene.removeEntity(e)
+        for (list in chunks) for (c in list) scene.remove(c.entity)
     }
 
     override fun applyLayers(layers: Int) {
         super.applyLayers(layers)
         val rm = engine.renderableManager
-        for (list in pool) for (e in list) {
-            val ri = rm.getInstance(e)
+        for (list in chunks) for (c in list) {
+            val ri = rm.getInstance(c.entity)
             if (ri != 0) rm.setLayerMask(ri, 0xFF, layers and 0xFF)
         }
     }
 
     override fun destroy() {
         val poolIds = HashSet<Int>()
-        for (list in pool) {
-            for (e in list) {
-                host.scene.removeEntity(e)
+        for (list in chunks) {
+            for (c in list) {
+                host.scene.remove(c.entity)
                 // destroyEntity cascades to the renderable + transform
-                // components (same contract as removeNode's teardown).
-                engine.destroyEntity(e)
-                EntityManager.get().destroy(e)
-                poolIds.add(e)
+                // components (same contract as removeNode's teardown);
+                // the InstanceBuffer is an independent engine object.
+                engine.destroyEntity(c.entity)
+                EntityManager.get().destroy(c.entity)
+                engine.destroyInstanceBuffer(c.instanceBuffer)
+                poolIds.add(c.entity)
             }
             list.clear()
         }
         liveCounts.fill(0)
-        // Prune the slot consumer entries — a dead entity can't take a
+        // Prune the chunk consumer entries — a dead entity can't take a
         // re-attached material on the next upsert.
         materialKey?.let { mk ->
             host.resources.materialConsumers[mk]

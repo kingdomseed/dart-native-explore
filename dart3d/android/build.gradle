@@ -20,7 +20,7 @@ apply plugin: 'kotlin-android'
 
 // One pin for the four Filament artifacts and for dart3d_jni.cpp, which
 // mirrors structs of this exact version (see CMakeLists.txt).
-def filamentVersion = '1.71.6'
+def filamentVersion = '1.77.3'
 
 android {
     ndkVersion = "28.2.13676358" // 16 KB page-size compliance (Play/Android 15+)
@@ -34,6 +34,10 @@ android {
 
     kotlinOptions {
         jvmTarget = '17'
+        // filament-utils-android 1.77.3 was built with Kotlin '+' (2.4.0
+        // metadata), while host apps (and DartNative's template) run
+        // Kotlin 2.1/2.2.
+        freeCompilerArgs += ['-Xskip-metadata-version-check']
     }
 
     sourceSets {
@@ -71,6 +75,38 @@ android {
     }
 }
 
+// Upstream Filament 1.77.x AARs record `minCompileSdk=37` in their
+// aar-metadata.properties (inherited from the preview SDK installed on
+// upstream's CI runner) even though their bytecode only uses API 26+.
+// Normalize `minCompileSdk=37` -> `minCompileSdk=26` only in those four
+// Filament AAR metadata files before `CheckAarMetadataTask` runs so all
+// other dependency metadata checks remain active.
+def filamentAarPrefixes = [
+    "filament-android-${filamentVersion}",
+    "filament-utils-android-${filamentVersion}",
+    "filamat-android-${filamentVersion}",
+    "gltfio-android-${filamentVersion}",
+]
+gradle.projectsEvaluated {
+    rootProject.allprojects { proj ->
+        proj.tasks.matching {
+            it.name.startsWith('check') && it.name.endsWith('AarMetadata')
+        }.configureEach { task ->
+            task.doFirst {
+                task.inputs.files.files.each { f ->
+                    if (f.name == 'aar-metadata.properties' && f.exists() &&
+                        filamentAarPrefixes.any { f.absolutePath.contains(it) }) {
+                        def text = f.getText('UTF-8')
+                        if (text.contains('minCompileSdk=37')) {
+                            f.write(text.replace('minCompileSdk=37', 'minCompileSdk=26'), 'UTF-8')
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 dependencies {
     implementation 'androidx.core:core-ktx:1.12.0'
 
@@ -78,9 +114,19 @@ dependencies {
     // (surface/swapchain lifecycle) and math types; filamat compiles the
     // lit material from a source string at startup — self-contained, no
     // matc toolchain step.
-    implementation "com.google.android.filament:filament-android:${filamentVersion}"
-    implementation "com.google.android.filament:filament-utils-android:${filamentVersion}"
-    implementation "com.google.android.filament:filamat-android:${filamentVersion}"
+    // Filament 1.77.3 publishes POMs with `kotlin-stdlib:2.4.0` (from an
+    // unpinned `+` range in upstream's build.gradle); exclude its
+    // transitive stdlib so the consuming app's Kotlin plugin owns the
+    // stdlib version on the compile classpath.
+    implementation("com.google.android.filament:filament-android:${filamentVersion}") {
+        exclude group: 'org.jetbrains.kotlin'
+    }
+    implementation("com.google.android.filament:filament-utils-android:${filamentVersion}") {
+        exclude group: 'org.jetbrains.kotlin'
+    }
+    implementation("com.google.android.filament:filamat-android:${filamentVersion}") {
+        exclude group: 'org.jetbrains.kotlin'
+    }
     // W21 KTX2: no Java-side standalone KTX2 decoder exists in the
     // pinned Filament (filament-utils ships KTX1Loader only). gltfio's
     // AAR carries libgltfio-jni.so, whose exported createKtx2Provider
@@ -88,7 +134,9 @@ dependencies {
     // TextureFactory reaches it through a dlsym shim in dart3d_jni.cpp.
     // None of gltfio's Java API is referenced; the dep only needs to
     // package the .so.
-    implementation "com.google.android.filament:gltfio-android:${filamentVersion}"
+    implementation("com.google.android.filament:gltfio-android:${filamentVersion}") {
+        exclude group: 'org.jetbrains.kotlin'
+    }
 
     // Physics: Jolt via stephengold's JNI bindings (plan-locked).
     // The upstream Android AARs split oddly: SpDebug carries the JVM
