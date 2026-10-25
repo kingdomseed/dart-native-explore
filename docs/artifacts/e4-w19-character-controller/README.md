@@ -112,6 +112,7 @@ Each then returns to the hero and completes a real dice roll and settle.
 | A142 Vulkan | `android-vulkan-teardown-fixed-run.log` | `android-vulkan-hero-fixed.png`, `android-vulkan-dice-fixed.png` | 119 |
 | A142 OpenGL | `android-opengl-final-run.log` | `android-opengl-hero.png`, `android-opengl-dice.png` | 41 |
 | Fire OpenGL | `fire-character-final-run.log` | `fire-hero-final.png`, `fire-dice-final.png` | 39 |
+| Wacom OpenGL | `wacom-character-run.log` | `wacom-hero.png`, `wacom-dice.png` | 103 |
 
 The corresponding process-scoped native logs confirm the requested backends and
 contain no fatal crash markers. The Fire log includes a deferred licence-server
@@ -119,10 +120,29 @@ lookup failure; the app remains running and completes the checks.
 Vulkan and Fire recordings remain in `/private/tmp/dart3d-e4-resume-20261025/`
 as `android-vulkan-teardown-fixed.mp4` and `fire-character-final.mp4`.
 
-## Remaining gates
+[The published A142 review clip](https://github.com/kingdomseed/dart-native-explore/releases/download/media-e4-character-controller/e4-character-review.mp4)
+covers source seconds 22–82, from character movement through navigation and
+dice settling. Only recorder letterboxing is cropped; timing is unchanged.
+`review-video.json` records the source and output hashes and the crop.
+
+## Device matrix
 
 - A142 Vulkan and OpenGL, Fire, and current-source iOS harnesses reach W25 PASS and W18 completion in their `*-harness-final-run.log` files, with matching screenshots.
-- Wacom verification is NOT_RUN. The finished Fire's port can now be reused; the operator has been asked to swap devices.
-- CI at the submitted head and operator review of the screenshots remain pending.
+- The repeated Vulkan run also reaches both completion markers in `android-vulkan-harness-live-run.log`; its live native capture retains `VULKAN (pref=2)` selection and has no fatal markers.
+- Wacom completes W25 PASS and W18 in `wacom-harness-run.log`. Its live native log confirms `OPENGL (pref=1, tier=LOW)` and contains no fatal markers. `wacom-harness.png` shows the final fixture.
 
-No E4 PR or merge has been created.
+The Wacom reports Android 16 / API 36. Before app launch, its rotation values
+were `accelerometer_rotation=1` and `user_rotation=0`, differing from the older
+device guide. Matching before/after files confirm those values were preserved.
+The optional Wacom recording did not export. After the failed stop/close
+attempts, a close retry succeeded. The recording resource and both owned
+native paths were verified absent. `wacom-recording-export.txt` records that
+limit; its screenshots and complete run logs remain the tablet evidence.
+
+## Remaining gates
+
+- `ci-implementation-head.json` records passing Dart, Android unit, and security checks at implementation commit `6a63b24`. Current-head checks are shown on the PR.
+- Operator review of the screenshots remains pending.
+
+[PR #64](https://github.com/kingdomseed/dart-native-explore/pull/64) is draft.
+E4 has not merged.

@@ -576,7 +576,7 @@ character-reference release. No new wire operation is introduced.
 | A142 Vulkan | pass — all stages, including disposal back to hero (`android-vulkan-teardown-fixed-run.log`) | pass — readout 119 | pass — W25 dice regression and `w18 lane complete` (`android-vulkan-harness-final-run.log`) |
 | A142 OpenGL | pass — all stages and navigation (`android-opengl-final-run.log`) | pass — readout 41 | pass — W25 dice regression and `w18 lane complete` (`android-opengl-harness-final-run.log`) |
 | Fire OpenGL | pass — all stages and navigation (`fire-character-final-run.log`) | pass — readout 39 | pass — W25 dice regression and `w18 lane complete` (`fire-harness-final-run.log`) |
-| Wacom | NOT_RUN — awaiting the Fire's freed port | NOT_RUN | NOT_RUN |
+| Wacom OpenGL | pass — all stages and navigation (`wacom-character-run.log`) | pass — readout 103 | pass — W25 dice regression and `w18 lane complete` (`wacom-harness-run.log`) |
 
 Package and example analyses are clean; 328 package and 228 example tests pass.
 The parent native task passes 151 tests with no skips and passes duplicate-class
