@@ -581,7 +581,7 @@ character-reference release. No new wire operation is introduced.
 Package and example analyses are clean; 328 package and 228 example tests pass.
 The parent native task passes 151 tests with no skips and passes duplicate-class
 checking. Independent Codex source reviews report no material findings.
-E4 remains open until the required device matrix and operator review are complete.
+The required device matrix is complete. Operator visual review remains before E4 merges.
 
 ## Notes
 
