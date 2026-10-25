@@ -1,0 +1,58 @@
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/Users/jasonholt/.gradle/wrapper/dists/gradle-9.3.1-all/9ot9r568e8zfvvd4mn8rbu1j0/gradle-9.3.1/lib/native-platform-0.22-milestone-29.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+Starting a Gradle Daemon (subsequent builds will be faster)
+> Task :gradle:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle:compileKotlin UP-TO-DATE
+> Task :gradle:compileJava NO-SOURCE
+> Task :gradle:compileGroovy NO-SOURCE
+> Task :gradle:pluginDescriptors UP-TO-DATE
+> Task :gradle:processResources UP-TO-DATE
+> Task :gradle:classes UP-TO-DATE
+> Task :gradle:jar UP-TO-DATE
+Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+> Task :dart3d:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :dart3d:preBuild UP-TO-DATE
+> Task :dart3d:preReleaseBuild UP-TO-DATE
+> Task :dart3d:generateReleaseBuildConfig
+> Task :dart3d:generateReleaseResValues
+> Task :dart3d:generateReleaseResources
+> Task :dart3d:packageReleaseResources
+> Task :dart3d:preReleaseUnitTestBuild UP-TO-DATE
+> Task :dart3d:javaPreCompileRelease
+> Task :dart3d:javaPreCompileReleaseUnitTest
+> Task :dart3d:parseReleaseLocalResources
+> Task :dart3d:generateReleaseRFile
+> Task :dart3d:generateReleaseUnitTestStubRFile
+
+> Task :dart3d:compileReleaseKotlin FAILED
+e: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/JoltWorld.kt:1664:33 Unresolved reference 'cInvalidBodyId'.
+e: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/JoltWorld.kt:1678:29 Unresolved reference 'cInvalidBodyId'.
+e: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/JoltWorld.kt:1695:33 Unresolved reference 'cInvalidBodyId'.
+e: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/JoltWorld.kt:1735:33 Unresolved reference 'cInvalidBodyId'.
+
+[Incubating] Problems report is available at: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':dart3d:compileReleaseKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.3.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 18s
+14 actionable tasks: 10 executed, 4 up-to-date

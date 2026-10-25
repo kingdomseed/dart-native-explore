@@ -44,6 +44,7 @@ const kRealizedFeatures = {
   'd3ProcGeometry',
   'd3Instances',
   'd3Billboards',
+  'characterController',
 };
 
 /// Feature names with a named follow-on workstream — the warning names

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.jasonholtdigital.dart3d.MaterialPackagesTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-10-25T20:56:06.910Z" hostname="Jasons-Mac-mini" time="0.022">
+  <properties/>
+  <testcase name="a stored package the engine refuses is dropped and not served again" classname="com.jasonholtdigital.dart3d.MaterialPackagesTest" time="0.012"/>
+  <testcase name="every fixed package has its own key and fingerprint" classname="com.jasonholtdigital.dart3d.MaterialPackagesTest" time="0.005"/>
+  <testcase name="packages are baked for OpenGL and Vulkan" classname="com.jasonholtdigital.dart3d.MaterialPackagesTest" time="0.0"/>
+  <testcase name="the fixed set adds the catcher and both particle blends" classname="com.jasonholtdigital.dart3d.MaterialPackagesTest" time="0.001"/>
+  <testcase name="the base set is lit x3, unlit x3 and the trail, in bind order" classname="com.jasonholtdigital.dart3d.MaterialPackagesTest" time="0.0"/>
+  <testcase name="the fingerprint follows every builder input" classname="com.jasonholtdigital.dart3d.MaterialPackagesTest" time="0.0"/>
+  <testcase name="a variant key carries extension flags, bound slots and the API" classname="com.jasonholtdigital.dart3d.MaterialPackagesTest" time="0.001"/>
+  <testcase name="bound slots and extension flags change the package" classname="com.jasonholtdigital.dart3d.MaterialPackagesTest" time="0.0"/>
+  <testcase name="a package that did not come from the store cannot be rejected" classname="com.jasonholtdigital.dart3d.MaterialPackagesTest" time="0.001"/>
+  <testcase name="the fingerprint is stable for equal inputs" classname="com.jasonholtdigital.dart3d.MaterialPackagesTest" time="0.001"/>
+  <testcase name="the fingerprint follows the Filament version" classname="com.jasonholtdigital.dart3d.MaterialPackagesTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

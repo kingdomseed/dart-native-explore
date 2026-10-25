@@ -1,0 +1,230 @@
+00:00 +0: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/fsceneb_reader_test.dart
+00:00 +0: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/fsceneb_reader_test.dart: round-trip: manifest + BLOB + GZBL payloads land on the doc
+00:00 +1: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/fsceneb_reader_test.dart: BLOB chunk lands uncompressed bytes
+00:00 +2: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/fsceneb_reader_test.dart: unknown chunk types are skipped
+00:00 +3: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/fsceneb_reader_test.dart: rejects bad magic, truncation, and newer versions
+00:00 +4: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/fsceneb_reader_test.dart: real importer artifact: d4 .fsceneb decodes with payloads
+00:00 +5: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_feel_test.dart: d4 shard reads upright numerals read along the crystal: up across it, right to +X
+00:00 +6: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_feel_test.dart: d4 shard reads upright numerals read along the crystal: up across it, right to +X
+00:00 +7: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +8: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +9: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +10: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +11: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +12: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +13: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +14: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +15: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +16: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +17: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +18: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +19: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +20: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +21: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +22: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +23: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +24: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +25: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +26: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +27: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_feel_test.dart: aim throw spawns off-screen behind the arrow and flies in: diagonal
+00:00 +28: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: after cancelAll, new timers are inert
+00:00 +29: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: after cancelAll, new timers are inert
+00:00 +30: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: after cancelAll, new timers are inert
+00:00 +31: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: after cancelAll, new timers are inert
+00:00 +32: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: after cancelAll, new timers are inert
+00:00 +33: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: after cancelAll, new timers are inert
+00:00 +34: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +35: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +36: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +37: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +38: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +39: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +40: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +41: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +42: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +43: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +44: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +45: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +46: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +47: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +48: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +49: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +50: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +51: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +52: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +53: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +54: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +55: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +56: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +57: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +58: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +59: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +60: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +61: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +62: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +63: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +64: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +65: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +66: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +67: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +68: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +69: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +70: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +71: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/phase_timers_test.dart: firstWithin (PR #14 4123065174) firstWhere+timeout leaks its listener (the reported bug)
+00:00 +72: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/w26_geometry_test.dart: bounds the w26 showcase loads procedurally with the instance field
+00:00 +73: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/w26_geometry_test.dart: bounds the w26 showcase loads procedurally with the instance field
+00:00 +74: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/w26_geometry_test.dart: bounds the w26 showcase loads procedurally with the instance field
+00:00 +75: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/w26_geometry_test.dart: bounds the w26 showcase loads procedurally with the instance field
+00:00 +76: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/w26_geometry_test.dart: bounds the w26 showcase loads procedurally with the instance field
+00:00 +77: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: serializeScene snapshot serializes byte-identically to the live document
+00:00 +78: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: serializeScene snapshot serializes byte-identically to the live document
+00:00 +79: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: serializeScene snapshot serializes byte-identically to the live document
+00:00 +80: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: serializeScene snapshot serializes byte-identically to the live document
+00:00 +81: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: serializeScene snapshot serializes byte-identically to the live document
+00:00 +82: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: serializeScene snapshot keeps chunk bytes so it can re-realize
+00:00 +83: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: serializeScene snapshot is detached from later live edits
+00:00 +84: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: serializeScene snapshot payload bytes survive in-place live-chunk mutation
+00:00 +85: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: command-op fold a diff batch folded into the old doc reproduces the new doc
+00:00 +86: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: command-op fold updateNode applies only flagged fields
+00:00 +87: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: command-op fold addNode attaches via the parent edge; spec children stay inert
+00:00 +88: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: command-op fold removeNode drops the subtree and the root membership
+00:00 +89: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: command-op fold updateNode without flags no-ops, matching both natives
+00:00 +90: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: command-op fold reparented moves the node between roots and children
+00:00 +91: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: command-op fold upsertPayload registers the spec and decodes both byte forms
+00:00 +92: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: command-op fold upsertPayload without decodable bytes no-ops entirely
+00:00 +93: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: command-op fold upsertPayload without encoding resends bytes under the spec
+00:00 +94: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: command-op fold upsertPayload with encoding replaces the spec wholesale
+00:00 +95: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: command-op fold an unrepresentable encoding degrades to opaque bytes
+00:00 +96: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_polyhedra_test.dart: d4 faces, values and opposite sums
+00:00 +97: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_polyhedra_test.dart: d4 faces, values and opposite sums
+00:00 +98: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_polyhedra_test.dart: d4 faces, values and opposite sums
+00:00 +99: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_polyhedra_test.dart: d4 faces, values and opposite sums
+00:00 +100: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_polyhedra_test.dart: d4 a convex solid around the origin
+00:00 +101: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: migrateFscene the real v2 showcase document upgrades to v5 on load
+00:00 +102: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_polyhedra_test.dart: d4 numeral frames lie in the face, right = n × up
+00:00 +103: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: migrateFscene v4 geometry gains legacyWinding on the way to v5
+00:00 +104: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_polyhedra_test.dart: d6 faces, values and opposite sums
+00:00 +105: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: migrateFscene v1 left-handed documents migrate; right-handed refuse
+00:00 +106: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: migrateFscene v1 left-handed documents migrate; right-handed refuse
+00:00 +107: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_polyhedra_test.dart: d6 numeral frames lie in the face, right = n × up
+00:00 +108: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_polyhedra_test.dart: d6 numeral frames lie in the face, right = n × up
+00:00 +109: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: migrateFscene readFscene accepts JSONC comments and trailing commas
+00:00 +110: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_polyhedra_test.dart: d8 faces, values and opposite sums
+00:00 +111: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: feature negotiation decode refuses a required feature outside supportedFeatures
+00:00 +112: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_polyhedra_test.dart: d8 a convex solid around the origin
+00:00 +113: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: feature negotiation missingRequiredFeatures names only the unrealized required set
+00:00 +114: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: feature negotiation missingRequiredFeatures names only the unrealized required set
+00:00 +115: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_polyhedra_test.dart: d10t faces, values and opposite sums
+00:00 +116: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: runtime glTF/GLB import a single-file .glb imports to a realizable document
+00:00 +117: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: runtime glTF/GLB import a single-file .glb imports to a realizable document
+00:00 +118: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: runtime glTF/GLB import a single-file .glb imports to a realizable document
+00:00 +119: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: runtime glTF/GLB import a single-file .glb imports to a realizable document
+00:00 +120: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: runtime glTF/GLB import a single-file .glb imports to a realizable document
+00:00 +121: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: runtime glTF/GLB import a single-file .glb imports to a realizable document
+00:00 +122: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: runtime glTF/GLB import a single-file .glb imports to a realizable document
+00:00 +123: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_polyhedra_test.dart: d12 a convex solid around the origin
+00:00 +124: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: runtime glTF/GLB import a multi-file .gltf resolves external resources
+00:00 +125: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_polyhedra_test.dart: d12 numeral frames lie in the face, right = n × up
+00:00 +126: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: runtime glTF/GLB import the bundled cube.glb imports: textured mesh + punctual light
+00:00 +127: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: runtime glTF/GLB import the bundled cube.glb imports: textured mesh + punctual light
+00:00 +128: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: runtime glTF/GLB import the bundled cube.glb imports: textured mesh + punctual light
+00:00 +129: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: runtime glTF/GLB import the bundled cube.glb imports: textured mesh + punctual light
+00:00 +130: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_polyhedra_test.dart: sized to the d20 span; the shard reads along its crystal
+00:00 +131: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: runtime glTF/GLB import a data-uri buffer decodes without the resolver
+00:00 +132: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_polyhedra_test.dart: labels: 00 on the tens die, a dot by the 6 only
+00:00 +133: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_polyhedra_test.dart: labels: 00 on the tens die, a dot by the 6 only
+00:00 +134: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: runtime glTF/GLB import extensionsRequired the importer lacks refuse loudly
+00:00 +135: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_polyhedra_test.dart: hull of a cube: six square faces
+00:00 +136: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_polyhedra_test.dart: hull of a cube: six square faces
+00:00 +137: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: runtime glTF/GLB import import warnings reach the callback instead of printing
+00:00 +138: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/doc_layer_test.dart: runtime glTF/GLB import sheen/specular parse per the glTF extension spec
+00:00 +139: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/w17_sky_showcase_test.dart: W17 showcase scene loader w17 showcase item builds physical sky + skyEnvironment + sunLight and round-trips
+00:00 +140: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/w17_sky_showcase_test.dart: W17 showcase scene loader w17 modes (lowsun, override, step1..3, sweep) build expected specs
+00:00 +141: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/light_aim_test.dart: aimAlong points node-local +Z along the travel direction
+00:00 +142: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/light_aim_test.dart: example key lights all travel downward
+00:00 +143: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/light_aim_test.dart: example keys travel with the camera (front-lit, not back-lit)
+00:00 +144: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/light_aim_test.dart: zero vector falls back to identity
+00:00 +145: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/hero_test.dart: heroEase pins the ends and is monotonic expo-out
+00:00 +146: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/hero_test.dart: heroBreath raised cosine low → high → low over the period
+00:00 +147: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/hero_test.dart: HeroOrbit drifts one full turn per revolution at constant speed
+00:00 +148: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/hero_test.dart: HeroOrbit pitch bobs ±3° around +8° with a 13 s period
+00:00 +149: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: extension property encoding every extension property survives the manifest encode
+00:00 +150: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: extension property encoding every extension property survives the manifest encode
+00:00 +151: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: extension property encoding every extension property survives the manifest encode
+00:00 +152: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: extension property encoding every extension property survives the manifest encode
+00:00 +153: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: extension property encoding every extension property survives the manifest encode
+00:00 +154: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: extension property encoding every extension property survives the manifest encode
+00:00 +155: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: extension property encoding every extension property survives the manifest encode
+00:00 +156: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: extension property encoding every extension property survives the manifest encode
+00:00 +157: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: extension property encoding every extension property survives the manifest encode
+00:00 +158: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: extension property encoding every extension property survives the manifest encode
+00:00 +159: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: extension property encoding every extension property survives the manifest encode
+00:00 +160: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: extension property encoding every extension property survives the manifest encode
+00:00 +161: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: extension property encoding every extension property survives the manifest encode
+00:00 +162: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: extension property encoding every extension property survives the manifest encode
+00:00 +163: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: extension property encoding every extension property survives the manifest encode
+00:00 +164: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/hero_test.dart: buildHeroScene camera sits on the pivot −Z at the framed distance, hero lens
+00:00 +165: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: extension property encoding the physical type and tagged values land
+00:00 +166: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: extension property encoding the physical type and tagged values land
+00:00 +167: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/hero_test.dart: buildHeroScene glow ops re-send the textured material with a new factor
+00:00 +168: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance the vendored catalog covers the spec minimum
+00:00 +169: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance the vendored catalog covers the spec minimum
+00:00 +170: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance the vendored catalog covers the spec minimum
+00:00 +171: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance the vendored catalog covers the spec minimum
+00:00 +172: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance the vendored catalog covers the spec minimum
+00:00 +173: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_readout_test.dart: face normals are flat faces of the drawn meshes
+00:00 +174: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_readout_test.dart: face normals are flat faces of the drawn meshes
+00:00 +175: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_readout_test.dart: face normals are flat faces of the drawn meshes
+00:00 +176: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_readout_test.dart: face normals are flat faces of the drawn meshes
+00:00 +177: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_readout_test.dart: face normals are flat faces of the drawn meshes
+00:00 +178: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_readout_test.dart: face normals are flat faces of the drawn meshes
+00:00 +179: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_readout_test.dart: face normals are flat faces of the drawn meshes
+00:00 +180: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_readout_test.dart: face normals are flat faces of the drawn meshes
+00:00 +181: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_readout_test.dart: face normals are flat faces of the drawn meshes
+00:00 +182: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_readout_test.dart: face normals are flat faces of the drawn meshes
+00:01 +183: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_readout_test.dart: face normals are flat faces of the drawn meshes
+00:01 +184: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_readout_test.dart: face normals are flat faces of the drawn meshes
+00:01 +185: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_readout_test.dart: face normals are flat faces of the drawn meshes
+00:01 +186: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_readout_test.dart: face normals are flat faces of the drawn meshes
+00:01 +187: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_table_test.dart: buildDiceTable builds on a background isolate
+00:01 +188: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_table_test.dart: buildDiceTable builds on a background isolate
+00:01 +189: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_table_test.dart: buildDiceTable builds on a background isolate
+00:01 +190: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_table_test.dart: buildDiceTable builds on a background isolate
+00:01 +191: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_table_test.dart: buildDiceTable builds on a background isolate
+00:01 +192: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_table_test.dart: buildDiceTable builds on a background isolate
+00:01 +193: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance every catalog material round-trips through the manifest
+00:01 +194: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance every catalog material round-trips through the manifest
+00:01 +195: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance every catalog material round-trips through the manifest
+00:01 +196: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance every catalog material round-trips through the manifest
+00:01 +197: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance every catalog material round-trips through the manifest
+00:01 +198: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance every catalog material round-trips through the manifest
+00:01 +199: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance every catalog material round-trips through the manifest
+00:01 +200: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance every catalog material round-trips through the manifest
+00:01 +201: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance every catalog material round-trips through the manifest
+00:01 +202: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance every catalog material round-trips through the manifest
+00:01 +203: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance every catalog material round-trips through the manifest
+00:01 +204: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance every catalog material round-trips through the manifest
+00:01 +205: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance every catalog material round-trips through the manifest
+00:01 +206: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_table_test.dart: buildDiceTable composes seven dice with physics
+00:01 +207: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/dice_table_test.dart: buildDiceTable composes seven dice with physics
+00:01 +208: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance no asset produces an unhandled property on either platform
+00:01 +209: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance no asset produces an unhandled property on either platform
+00:01 +210: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance no asset produces an unhandled property on either platform
+00:01 +211: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance no asset produces an unhandled property on either platform
+00:01 +212: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance no asset produces an unhandled property on either platform
+00:01 +213: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance no asset produces an unhandled property on either platform
+00:01 +214: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance no asset produces an unhandled property on either platform
+00:01 +215: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance no asset produces an unhandled property on either platform
+00:01 +216: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance no asset produces an unhandled property on either platform
+00:01 +217: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance no asset produces an unhandled property on either platform
+00:01 +218: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance no asset produces an unhandled property on either platform
+00:01 +219: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance the approximation set matches the per-platform contract
+00:02 +220: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance volume props without transmission classify as the inert drop
+00:02 +221: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: catalog conformance the support table covers every catalog property name
+00:02 +222: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: android sampler budget (W22-r3) flag space: emitted declarations never exceed the FL1 cap
+00:02 +223: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: android sampler budget (W22-r3) the on-device crash variants now fit their bound sets
+00:02 +224: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: android sampler budget (W22-r3) every catalog material fits the cap under bound-only emission
+00:02 +225: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: android sampler budget (W22-r3) a bound set over the cap takes the degrade path
+00:02 +226: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: golden manifest classifies the upstream smoke scenes and generates fixtures
+00:02 +227: /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/material_extensions_test.dart: golden manifest writes the matrix and golden artifacts
+00:03 +228: All tests passed!

@@ -1,0 +1,181 @@
+{
+  "baseCommit": "6366c07ad805fc97baf785449a9b38c111cbf1e4",
+  "baselineImport": [
+    "tracked.patch",
+    "untracked.tgz",
+    "compile-only.patch",
+    "android-six-fix.patch",
+    "JoltWorld.current.kt",
+    "CharacterControllerNativeTest.current.kt"
+  ],
+  "apply": "From the parent repository root after matching the imported baseline, git apply native-width-extension.patch then tar -xzf native-width-extension-binaries.tgz. The archive includes the MacARM test library in the ignored build directory.",
+  "vendor": {
+    "joltJni": "27e7e81b4cba126699878241c247141cd385dc92",
+    "joltPhysics": "16960dd9f41d3d13bd87df152a24c17b057ad384",
+    "vhacd": "4.1.0; archive ce3c43193ef28f14003a0e9546829ce0fa140a983222ee4f00dc27ca0ae8ec6d"
+  },
+  "tools": {
+    "ndk": "28.2.13676358",
+    "ndkClang": "19.0.1 r530567e",
+    "macClang": "21.0.0 clang-2100.3.34.2",
+    "cmake": "4.4.4",
+    "gradle": "9.3.1",
+    "jdk": "25.0.5",
+    "dartNative": "1.4.0 framework 75bc07e9b49"
+  },
+  "flags": "Release -O3, C++17, single precision, no RTTI, JPH_OBJECT_STREAM, JPH_USE_CPU_COMPUTE, JPH_CROSS_PLATFORM_DETERMINISTIC, JPH_NO_DEBUG, JOLT_JNI_VERSION_STRING=6.0.0. Android API26, c++_static, max-page-size=16384. Mac arm64.",
+  "baseline": [
+    {
+      "file": "JoltWorld.kt",
+      "bytes": 80732,
+      "sha256": "03edcb4d418b576e12f17cfa2327ad885659b68a2a5d1614cef9efd864f4f4fc"
+    },
+    {
+      "file": "CharacterControllerNativeTest.kt",
+      "bytes": 8374,
+      "sha256": "dbd8e2dac8350b2f16a866b853d2e3f2bb250e8d9fcf2abab1bf5ac12a5b1818"
+    },
+    {
+      "file": "proguard-rules.pro",
+      "bytes": 1053,
+      "sha256": "5c4573f8675264d471c5446c23d1a31f795fba20b83f4ba56a3924db3658c1c2"
+    },
+    {
+      "file": "build.gradle",
+      "bytes": 6499,
+      "sha256": "6ad5514b51e9d9a926dd51ddf8746f01fa5e31e9a85273551baadb3316ceefed"
+    }
+  ],
+  "files": [
+    {
+      "path": "dart3d/android/build.gradle",
+      "bytes": 6022,
+      "sha256": "23bb403c73d29006fa260eb41a066b7643db52935b07eed344834bb79df4595e"
+    },
+    {
+      "path": "dart3d/android/native-width/CMakeLists.txt",
+      "bytes": 1009,
+      "sha256": "1ebdf51b90463cf8e24b422def74f7905b468b31c3666ccd50f72ac7be4b9de3"
+    },
+    {
+      "path": "dart3d/android/native-width/JoltStairWidth.cpp",
+      "bytes": 380,
+      "sha256": "5ed55b7508548749c035f8a2dead4e9d986640f6a0a5f9628fdcfe284ca8ebf3"
+    },
+    {
+      "path": "dart3d/android/native-width/LICENSE-JoltPhysics",
+      "bytes": 1052,
+      "sha256": "800abe35d64ad9defd636ff1ee8c961e06f0ebca3ef8d10083e8aa0e8ef86ac3"
+    },
+    {
+      "path": "dart3d/android/native-width/LICENSE-Perlin",
+      "bytes": 2437,
+      "sha256": "323eac668c422203f3c54a24e077fd2e999ac6d79ac1872e619830cb3bcb34fe"
+    },
+    {
+      "path": "dart3d/android/native-width/LICENSE-VHACD",
+      "bytes": 1487,
+      "sha256": "889f5bfbe0c5ce0f2528551f9a266d4df78fe0b3e5f7497c302703b28f8a6d31"
+    },
+    {
+      "path": "dart3d/android/native-width/LICENSE-jolt-jni",
+      "bytes": 1074,
+      "sha256": "4a2a6edc79934fd2b80982c8e15e70e372f406887662bb26d872858344318941"
+    },
+    {
+      "path": "dart3d/android/native-width/README.md",
+      "bytes": 4282,
+      "sha256": "b8c69263bd16830fd511b8f838ef8c7bd7106482b95d63adb5d6f4a819d9e41c"
+    },
+    {
+      "path": "dart3d/android/native-width/build.sh",
+      "bytes": 2096,
+      "sha256": "a2bf98af6828baaef1051be99ba4fa356405e2ea42e1b3e9681f713b120eebed"
+    },
+    {
+      "path": "dart3d/android/native-width/jolt-width.patch",
+      "bytes": 7368,
+      "sha256": "c0855474b722d485ef148255586401a608efcdb1c8d539e20fb1e37444643885"
+    },
+    {
+      "path": "dart3d/android/native-width/native-tests.init.gradle",
+      "bytes": 503,
+      "sha256": "49b93ddb3b4a90b72d354085ad0d49ea5d07991daefd9a5034d40dee60ea46e6"
+    },
+    {
+      "path": "dart3d/android/proguard-rules.pro",
+      "bytes": 1135,
+      "sha256": "511fb7e8f2ab14d1586e3e5f4d4203829adae7d97115ca8dfbf52665700b1744"
+    },
+    {
+      "path": "dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/JoltStairWidth.kt",
+      "bytes": 150,
+      "sha256": "a13f532ed6664266793988850b582120ef9b8044de3f3c0d201bfc2fc7f129f4"
+    },
+    {
+      "path": "dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/JoltWorld.kt",
+      "bytes": 80807,
+      "sha256": "20aa229008a5206355cf448328e465f774c58b6ee88a3a3a7e289c91522b1c05"
+    },
+    {
+      "path": "dart3d/android/src/test/kotlin/com/jasonholtdigital/dart3d/CharacterControllerNativeTest.kt",
+      "bytes": 11408,
+      "sha256": "426119f2ed2dfa2788cf025be0e59e9938e586ef1f7cae0d2c4e7af1c8abae3a"
+    },
+    {
+      "path": "dart3d/android/native-width/libs/arm64-v8a/libjoltjni.so",
+      "bytes": 4565584,
+      "sha256": "4e8a299d89a66e2f25ede2d15e0c92251d962a4151e2c6382691ac95d9b46838"
+    },
+    {
+      "path": "dart3d/android/native-width/libs/x86_64/libjoltjni.so",
+      "bytes": 4643840,
+      "sha256": "1b51e4de344cdc7c2222acd82909d17f0355f7b2ef198a35f7ed2cc914e5fbf4"
+    },
+    {
+      "path": "dart3d/android/build/native-width/mac/libjoltjni.dylib",
+      "bytes": 3536496,
+      "sha256": "b82c68cc9d2f5d454f87d10f81b2b53094ea60cd43a6f76d5bb0919055710eca"
+    }
+  ],
+  "packages": [
+    {
+      "file": "native-width-extension.patch",
+      "bytes": 31288,
+      "sha256": "7701214d01cd0c0b6be1845dbd8979e6312b959b62773030ba3fbf13ee5fe2f7"
+    },
+    {
+      "file": "native-width-extension-binaries.tgz",
+      "bytes": 4378015,
+      "sha256": "3a6e748ae16fd3912ebc265586c53a2b3ad454ad144bae15b202500e785993e5"
+    }
+  ],
+  "verification": {
+    "originalTests": 10,
+    "originalFailures": 1,
+    "expandedBeforeTests": 14,
+    "expandedBeforeFailures": 3,
+    "afterTests": 14,
+    "afterFailures": 0,
+    "allUnitTests": 150,
+    "allUnitFailures": 0,
+    "skipped": 0,
+    "androidJniExportsBefore": 3421,
+    "androidJniExportsAfter": 3422,
+    "releaseApk": {
+      "result": "PASS",
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-398b6972/dart3d/example/build/app/outputs/dn-apk/app-release.apk",
+      "bytes": 122571010,
+      "sha256": "d9c82187b8849825622341dc28a145f7e36981cc0dc2fc02ec2adf39179e0cd7",
+      "joltEntries": [
+        "lib/arm64-v8a/libjoltjni.so",
+        "lib/x86_64/libjoltjni.so"
+      ],
+      "packagedLibraryHashesMatchManifest": true,
+      "r8SeedsContainNativeSetter": true
+    },
+    "importCheck": "PASS; 18 paths match native-width-files.sha256 after patch and tar import into a baseline copy",
+    "device": "NOT_RUN; parent-owned",
+    "ios": "NOT_RUN; excluded from scope"
+  }
+}

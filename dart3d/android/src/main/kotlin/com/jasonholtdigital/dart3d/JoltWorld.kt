@@ -7,8 +7,14 @@ import com.github.stephengold.joltjni.AllHitCollideShapeCollector
 import com.github.stephengold.joltjni.Body
 import com.github.stephengold.joltjni.BodyCreationSettings
 import com.github.stephengold.joltjni.BodyInterface
+import com.github.stephengold.joltjni.BodyLockWrite
 import com.github.stephengold.joltjni.BoxShape
 import com.github.stephengold.joltjni.BroadPhaseLayerInterfaceTable
+import com.github.stephengold.joltjni.CharacterContact
+import com.github.stephengold.joltjni.CharacterContactSettings
+import com.github.stephengold.joltjni.CharacterVirtual
+import com.github.stephengold.joltjni.CharacterVirtualSettings
+import com.github.stephengold.joltjni.CharacterVsCharacterCollisionSimple
 import com.github.stephengold.joltjni.ClosestHitCastShapeCollector
 import com.github.stephengold.joltjni.ClosestHitCollideShapeCollector
 import com.github.stephengold.joltjni.CollideShapeSettings
@@ -16,12 +22,15 @@ import com.github.stephengold.joltjni.CollisionGroup
 import com.github.stephengold.joltjni.CombineFunction
 import com.github.stephengold.joltjni.Constraint
 import com.github.stephengold.joltjni.ContactManifold
+import com.github.stephengold.joltjni.CustomCharacterContactListener
 import com.github.stephengold.joltjni.CustomContactListener
+import com.github.stephengold.joltjni.ExtendedUpdateSettings
 import com.github.stephengold.joltjni.FixedConstraintSettings
 import com.github.stephengold.joltjni.GetTrianglesContext
 import com.github.stephengold.joltjni.GroupFilterTable
 import com.github.stephengold.joltjni.HingeConstraint
 import com.github.stephengold.joltjni.HingeConstraintSettings
+import com.github.stephengold.joltjni.IgnoreMultipleBodiesFilter
 import com.github.stephengold.joltjni.JobSystem
 import com.github.stephengold.joltjni.JobSystemSingleThreaded
 import com.github.stephengold.joltjni.Jolt
@@ -39,6 +48,7 @@ import com.github.stephengold.joltjni.RVec3
 import com.github.stephengold.joltjni.RayCastResult
 import com.github.stephengold.joltjni.RayCastSettings
 import com.github.stephengold.joltjni.ShapeCastSettings
+import com.github.stephengold.joltjni.ShapeFilter
 import com.github.stephengold.joltjni.SixDofConstraint
 import com.github.stephengold.joltjni.SixDofConstraintSettings
 import com.github.stephengold.joltjni.SliderConstraint
@@ -53,6 +63,7 @@ import com.github.stephengold.joltjni.Vec3
 import com.github.stephengold.joltjni.enumerate.EActivation
 import com.github.stephengold.joltjni.enumerate.EAxis
 import com.github.stephengold.joltjni.enumerate.EConstraintSpace
+import com.github.stephengold.joltjni.enumerate.EGroundState
 import com.github.stephengold.joltjni.enumerate.EMotionType
 import com.github.stephengold.joltjni.enumerate.EMotorState
 import com.github.stephengold.joltjni.enumerate.EPhysicsUpdateError
@@ -153,6 +164,36 @@ class JointBrokeEvent(
     val id: Int,
     val nodeKeyA: Long,
     val nodeKeyB: Long?,
+)
+
+/**
+ * W19 / E4: decoded `characterController` component configuration in
+ * engine (RH) space. Mirrors upstream `KinematicCharacterControllerCodec`.
+ */
+class CharacterSpec(
+    val up: FloatArray,
+    val offset: Float,
+    val slide: Boolean,
+    val maxSlopeClimbAngle: Float,
+    val minSlopeSlideAngle: Float,
+    val snapToGround: Float?,
+    val autostep: Boolean,
+    val autostepMaxHeight: Float,
+    val autostepMinWidth: Float,
+    val autostepIncludeDynamicBodies: Boolean,
+    val mass: Float,
+    val layer: Int = -1,
+    val mask: Int = -1,
+)
+
+/**
+ * W19 / E4: result of one `moveCharacter` step in engine (RH) space.
+ */
+class CharacterMoveResult(
+    val translation: FloatArray,
+    val position: FloatArray,
+    val grounded: Boolean,
+    val slidingDownSlope: Boolean,
 )
 
 /**
@@ -300,8 +341,165 @@ class JoltWorld {
     private val joints = LinkedHashMap<Int, JointRecord>()
     private val nodeBodies = HashMap<Long, Body>()
     private val bodySubGroups = HashMap<Int, Int>()
+    private val bodyLayerMasks = HashMap<Int, Pair<Int, Int>>()
     private val jointDisabledPairs = HashMap<Long, Int>()
     private val jointLoggedOnce = HashSet<String>()
+
+    private class CharacterRecord(
+        val nodeKey: Long,
+        val character: CharacterVirtual,
+        var spec: CharacterSpec,
+        var move: CharacterMove? = null,
+    )
+    private class CharacterMove(
+        val settings: ExtendedUpdateSettings,
+        val horizontalVelocity: Vec3,
+        val groundBodyId: Int,
+        val groundSubShapeId: Int,
+    )
+    private val characters = LinkedHashMap<Long, CharacterRecord>()
+    private val charactersByVa =
+        java.util.concurrent.ConcurrentHashMap<Long, CharacterRecord>()
+    private val charVsChar = CharacterVsCharacterCollisionSimple()
+
+    private val characterContactListener = object : CustomCharacterContactListener() {
+        override fun onCharacterContactValidate(characterVa: Long, contactVa: Long): Boolean {
+            val rec = charactersByVa.getValue(characterVa)
+            val contact = CharacterContact(contactVa, false, physicsSystem)
+            val other = (contact.characterB as CharacterVirtual).use { otherCharacter ->
+                charactersByVa.getValue(otherCharacter.targetVa())
+            }
+            return (rec.spec.layer and other.spec.mask) != 0 &&
+                (other.spec.layer and rec.spec.mask) != 0
+        }
+
+        override fun onCharacterContactAdded(
+            characterVa: Long, contactVa: Long, settingsVa: Long,
+        ) = onContactAdded(characterVa, contactVa, settingsVa)
+
+        override fun onCharacterContactPersisted(
+            characterVa: Long, contactVa: Long, settingsVa: Long,
+        ) = onContactPersisted(characterVa, contactVa, settingsVa)
+
+        override fun onCharacterContactSolve(
+            characterVa: Long,
+            otherCharacterVa: Long,
+            subShapeId2: Int,
+            contactLocationX: Double,
+            contactLocationY: Double,
+            contactLocationZ: Double,
+            contactNormalX: Float,
+            contactNormalY: Float,
+            contactNormalZ: Float,
+            contactVelocityX: Float,
+            contactVelocityY: Float,
+            contactVelocityZ: Float,
+            materialVa: Long,
+            characterVelocityX: Float,
+            characterVelocityY: Float,
+            characterVelocityZ: Float,
+            newCharacterVelocity: FloatArray,
+        ) = onContactSolve(
+            characterVa, Jolt.cInvalidBodyId, subShapeId2,
+            contactLocationX, contactLocationY, contactLocationZ,
+            contactNormalX, contactNormalY, contactNormalZ,
+            contactVelocityX, contactVelocityY, contactVelocityZ,
+            materialVa, characterVelocityX, characterVelocityY,
+            characterVelocityZ, newCharacterVelocity)
+
+        override fun onContactAdded(
+            characterVa: Long,
+            contactVa: Long,
+            settingsVa: Long,
+        ) {
+            val rec = charactersByVa[characterVa] ?: return
+            if (rec.spec.mass <= 0f) {
+                CharacterContactSettings(settingsVa).setCanReceiveImpulses(false)
+            }
+            val move = rec.move ?: return
+            if (rec.spec.autostepIncludeDynamicBodies) return
+            val contact = CharacterContact(contactVa, false, physicsSystem)
+            if (contact.motionTypeB != EMotionType.Dynamic || contact.isSensorB) return
+            if (contact.bodyB == move.groundBodyId &&
+                contact.subShapeIdB == move.groundSubShapeId) return
+            val normal = contact.surfaceNormal
+            val up = rec.spec.up
+            val dotUp = normal.x * up[0] + normal.y * up[1] + normal.z * up[2]
+            val velocity = contact.linearVelocity
+            val v = move.horizontalVelocity
+            if (dotUp < kotlin.math.cos(maxOf(rec.spec.maxSlopeClimbAngle, 0.015f)) &&
+                normal.x * (v.x - velocity.x) + normal.y * (v.y - velocity.y) +
+                normal.z * (v.z - velocity.z) < -1e-4f) {
+                // ExtendedUpdate reads step-up after Update's contact callbacks.
+                move.settings.setWalkStairsStepUp(Vec3(0f, 0f, 0f))
+            }
+        }
+
+        override fun onContactPersisted(
+            characterVa: Long,
+            contactVa: Long,
+            settingsVa: Long,
+        ) {
+            onContactAdded(characterVa, contactVa, settingsVa)
+        }
+
+        override fun onContactSolve(
+            characterVa: Long,
+            bodyId2: Int,
+            subShapeId2: Int,
+            contactLocationX: Double,
+            contactLocationY: Double,
+            contactLocationZ: Double,
+            contactNormalX: Float,
+            contactNormalY: Float,
+            contactNormalZ: Float,
+            contactVelocityX: Float,
+            contactVelocityY: Float,
+            contactVelocityZ: Float,
+            materialVa: Long,
+            characterVelocityX: Float,
+            characterVelocityY: Float,
+            characterVelocityZ: Float,
+            newCharacterVelocity: FloatArray,
+        ) {
+            val rec = charactersByVa[characterVa] ?: return
+            val up = rec.spec.up
+            val cosSlope = contactNormalX * up[0] +
+                contactNormalY * up[1] +
+                contactNormalZ * up[2]
+            val minSlideCos = kotlin.math.cos(
+                rec.spec.minSlopeSlideAngle.toDouble()).toFloat()
+            val charVUp = characterVelocityX * up[0] +
+                characterVelocityY * up[1] +
+                characterVelocityZ * up[2]
+            val hx = characterVelocityX - up[0] * charVUp
+            val hy = characterVelocityY - up[1] * charVUp
+            val hz = characterVelocityZ - up[2] * charVUp
+            val horizDotN = hx * contactNormalX +
+                hy * contactNormalY +
+                hz * contactNormalZ
+            if (!rec.spec.slide) {
+                if (horizDotN < -1e-4f || cosSlope < 0.999f) {
+                    val vUp = newCharacterVelocity[0] * up[0] +
+                        newCharacterVelocity[1] * up[1] +
+                        newCharacterVelocity[2] * up[2]
+                    val clampedUp = minOf(0f, vUp)
+                    newCharacterVelocity[0] = up[0] * clampedUp
+                    newCharacterVelocity[1] = up[1] * clampedUp
+                    newCharacterVelocity[2] = up[2] * clampedUp
+                }
+            } else if (cosSlope >= minSlideCos - 1e-4f && cosSlope < 0.9999f) {
+                if (charVUp < 0f) {
+                    newCharacterVelocity[0] =
+                        hx - contactNormalX * horizDotN + contactVelocityX
+                    newCharacterVelocity[1] =
+                        hy - contactNormalY * horizDotN + contactVelocityY
+                    newCharacterVelocity[2] =
+                        hz - contactNormalZ * horizDotN + contactVelocityZ
+                }
+            }
+        }
+    }
 
     /** Sink for joint `broke` events — the view sets it, mirroring
      * the [onContact] contract. Invoked inside [update]. */
@@ -413,6 +611,9 @@ class JoltWorld {
         Reachability.fence(combineFriction)
         Reachability.fence(combineRestitution)
         Reachability.fence(contactListener)
+        Reachability.fence(characterContactListener)
+        Reachability.fence(charVsChar)
+        Reachability.fence(characters)
         if (err != EPhysicsUpdateError.None) {
             Log.w(TAG, "jolt update error: $err")
             return false
@@ -505,6 +706,7 @@ class JoltWorld {
         bodyNodeKeys[body.id] = nodeKey
         nodeBodies[nodeKey] = body
         if (sg >= 0) bodySubGroups[body.id] = sg
+        bodyLayerMasks[body.id] = layer to mask
         if (body.isSensor) sensorBodyIds.add(body.id)
         // Bodies arriving late realize deferred joints. Snapshot —
         // realizeJoint may drop a malformed record mid-iteration.
@@ -540,6 +742,7 @@ class JoltWorld {
             }
         }
         bodySubGroups.remove(body.id)?.let(subGroups::release)
+        bodyLayerMasks.remove(body.id)
         // Unmap BEFORE the body leaves — removing a live contact makes
         // Jolt fire onContactRemoved, and an unmapped id drops the
         // event (a deleted node shouldn't emit 'ended').
@@ -1046,9 +1249,11 @@ class JoltWorld {
         closed = true
         onContact = null
         onJointBroke = null
+        clearCharacters()
         clearJoints()
         nodeBodies.clear()
         bodySubGroups.clear()
+        bodyLayerMasks.clear()
         jointDisabledPairs.clear()
         bodyNodeKeys.clear()
         sensorBodyIds.clear()
@@ -1062,6 +1267,8 @@ class JoltWorld {
         // wrapper only now that the system is dead (same rule as the
         // filter tables below).
         contactListener.close()
+        characterContactListener.close()
+        charVsChar.close()
         jobSystem.close()
         tempAllocator.close()
         bpLayers.close()
@@ -1479,5 +1686,255 @@ class JoltWorld {
         val uz = nz * inv
         val s = if (ux * dir.x + uy * dir.y + uz * dir.z > 0f) -1f else 1f
         return floatArrayOf(ux * s, uy * s, uz * s)
+    }
+
+
+    fun hasCharacter(nodeKey: Long): Boolean = characters.containsKey(nodeKey)
+
+    fun addCharacter(
+        nodeKey: Long,
+        shape: ConstShape,
+        pos: FloatArray,
+        rot: FloatArray,
+        spec: CharacterSpec,
+    ) {
+        removeCharacter(nodeKey)
+        nativeScope {
+            val settings = own(CharacterVirtualSettings())
+            settings.setShape(shape)
+            settings.setInnerBodyShape(shape)
+            settings.setInnerBodyLayer(OBJ_MOVING)
+            settings.setUp(Vec3(spec.up[0], spec.up[1], spec.up[2]))
+            // Jolt treats cos(angle) > 0.9999f (~0.0141 rad) as its
+            // cNoMaxSlopeAngle sentinel (unlimited climbing); floor at
+            // 0.015f so maxSlopeClimbAngle = 0 enforces a near-flat limit.
+            settings.setMaxSlopeAngle(maxOf(spec.maxSlopeClimbAngle, 0.015f))
+            settings.setCharacterPadding(spec.offset)
+            settings.setMass(spec.mass)
+            settings.setMaxStrength(
+                if (spec.mass > 0f) maxOf(spec.mass * 100f, 100f) else 0f)
+
+            val rPos = RVec3(pos[0].toDouble(), pos[1].toDouble(), pos[2].toDouble())
+            val qRot = Quat(rot[0], rot[1], rot[2], rot[3])
+            val cv = CharacterVirtual(settings, rPos, qRot, nodeKey, physicsSystem)
+            JoltStairWidth.setMinimumWidth(cv.va(), spec.autostepMinWidth)
+            cv.setListener(characterContactListener)
+            cv.setCharacterVsCharacterCollision(charVsChar)
+            charVsChar.add(cv)
+            val innerId = cv.innerBodyId
+            if (innerId != Jolt.cInvalidBodyId) {
+                val sg = acquireSubGroup(spec.layer, spec.mask)
+                if (sg >= 0) {
+                    BodyLockWrite(physicsSystem.bodyLockInterface, innerId).use { lock ->
+                        check(lock.succeeded())
+                        CollisionGroup(groupTable, 0, sg).use {
+                            lock.body.setCollisionGroup(it)
+                        }
+                    }
+                    bodySubGroups[innerId] = sg
+                }
+                bodyNodeKeys[innerId] = nodeKey
+                bodyLayerMasks[innerId] = spec.layer to spec.mask
+            }
+            val rec = CharacterRecord(nodeKey, cv, spec)
+            characters[nodeKey] = rec
+            charactersByVa[cv.va()] = rec
+        }
+    }
+
+    fun removeCharacter(nodeKey: Long) {
+        val rec = characters.remove(nodeKey) ?: return
+        charactersByVa.remove(rec.character.va())
+        val innerId = rec.character.innerBodyId
+        if (innerId != Jolt.cInvalidBodyId) {
+            bodySubGroups.remove(innerId)?.let(subGroups::release)
+            bodyNodeKeys.remove(innerId)
+            bodyLayerMasks.remove(innerId)
+        }
+        charVsChar.remove(rec.character)
+        rec.character.close()
+    }
+
+    fun retainCharactersForNodes(liveKeys: Set<Long>) {
+        val dead = characters.keys.filter { it !in liveKeys }
+        for (k in dead) removeCharacter(k)
+    }
+
+    fun clearCharacters() {
+        charactersByVa.clear()
+        for (rec in characters.values) {
+            val innerId = rec.character.innerBodyId
+            if (innerId != Jolt.cInvalidBodyId) {
+                bodySubGroups.remove(innerId)?.let(subGroups::release)
+                bodyNodeKeys.remove(innerId)
+                bodyLayerMasks.remove(innerId)
+            }
+            charVsChar.remove(rec.character)
+            rec.character.close()
+        }
+        characters.clear()
+    }
+
+    fun syncCharacterTransform(nodeKey: Long, pos: FloatArray, rot: FloatArray) {
+        val cv = characters.getValue(nodeKey).character
+        cv.setPosition(RVec3(pos[0].toDouble(), pos[1].toDouble(), pos[2].toDouble()))
+        cv.setRotation(Quat(rot[0], rot[1], rot[2], rot[3]))
+    }
+
+    /**
+     * Resolves one kinematic character move-and-slide for [nodeKey]
+     * using Jolt's `CharacterVirtual.extendedUpdate` (`WalkStairs` +
+     * `StickToFloor`).
+     */
+    fun moveCharacter(
+        nodeKey: Long,
+        startPos: FloatArray,
+        startRot: FloatArray,
+        desiredDisp: FloatArray,
+        dt: Float,
+    ): CharacterMoveResult? {
+        val rec = characters[nodeKey] ?: return null
+        val safeDt = if (dt > 1e-5f) dt else fixedTimestep
+        val up = rec.spec.up
+        val cv = rec.character
+        return nativeScope {
+            val rStart = RVec3(
+                startPos[0].toDouble(),
+                startPos[1].toDouble(),
+                startPos[2].toDouble())
+            val qStart = Quat(startRot[0], startRot[1], startRot[2], startRot[3])
+            cv.setPosition(rStart)
+            cv.setRotation(qStart)
+
+            val bpFilter = own(physicsSystem.getDefaultBroadPhaseLayerFilter(OBJ_MOVING))
+            val objFilter = own(physicsSystem.getDefaultLayerFilter(OBJ_MOVING))
+            val bodyFilter = own(IgnoreMultipleBodiesFilter())
+            nodeBodies[nodeKey]?.let { bodyFilter.ignoreBody(it.id) }
+            val innerId = cv.innerBodyId
+            if (innerId != Jolt.cInvalidBodyId) {
+                bodyFilter.ignoreBody(innerId)
+            }
+            for (sid in sensorBodyIds) bodyFilter.ignoreBody(sid)
+            val charLayer = rec.spec.layer
+            val charMask = rec.spec.mask
+            for ((bid, pair) in bodyLayerMasks) {
+                val (bLayer, bMask) = pair
+                if ((charLayer and bMask) == 0 || (bLayer and charMask) == 0) {
+                    bodyFilter.ignoreBody(bid)
+                }
+            }
+            val shapeFilter = own(ShapeFilter())
+
+            val vx = desiredDisp[0] / safeDt
+            val vy = desiredDisp[1] / safeDt
+            val vz = desiredDisp[2] / safeDt
+            cv.setLinearVelocity(vx, vy, vz)
+
+            val ext = own(ExtendedUpdateSettings())
+            val desiredUp = desiredDisp[0] * up[0] +
+                desiredDisp[1] * up[1] +
+                desiredDisp[2] * up[2]
+            val snap = rec.spec.snapToGround
+            if (snap != null && snap >= 0f && desiredUp <= 1e-4f) {
+                ext.setStickToFloorStepDown(Vec3(
+                    -up[0] * snap, -up[1] * snap, -up[2] * snap))
+            } else {
+                ext.setStickToFloorStepDown(Vec3(0f, 0f, 0f))
+            }
+
+            val dLenSq = desiredDisp[0] * desiredDisp[0] +
+                desiredDisp[1] * desiredDisp[1] +
+                desiredDisp[2] * desiredDisp[2]
+            val desiredHorizSq = maxOf(0f, dLenSq - desiredUp * desiredUp)
+            val desiredHorizLen = kotlin.math.sqrt(desiredHorizSq.toDouble()).toFloat()
+            // ExtendedUpdate adds the stair correction after ordinary movement.
+            // A zero minimum lets Jolt use only the remaining requested distance.
+            val minStepFwd = 0f
+            val testStepFwd = maxOf(rec.spec.autostepMinWidth, minOf(desiredHorizLen, 0.15f))
+
+            val grav = physicsSystem.gravity
+            if (rec.spec.autostep) {
+                ext.setWalkStairsStepUp(Vec3(
+                    up[0] * rec.spec.autostepMaxHeight,
+                    up[1] * rec.spec.autostepMaxHeight,
+                    up[2] * rec.spec.autostepMaxHeight))
+                ext.setWalkStairsMinStepForward(minStepFwd)
+                ext.setWalkStairsStepForwardTest(testStepFwd)
+            } else {
+                ext.setWalkStairsStepUp(Vec3(0f, 0f, 0f))
+            }
+            rec.move = CharacterMove(
+                ext,
+                Vec3(
+                    (desiredDisp[0] - up[0] * desiredUp) / safeDt,
+                    (desiredDisp[1] - up[1] * desiredUp) / safeDt,
+                    (desiredDisp[2] - up[2] * desiredUp) / safeDt),
+                cv.groundBodyId, cv.groundSubShapeId)
+            try {
+                cv.extendedUpdate(
+                    safeDt, grav, ext, bpFilter, objFilter,
+                    bodyFilter, shapeFilter, tempAllocator)
+            } finally {
+                rec.move = null
+            }
+
+            val gs = cv.groundState
+            val gn = cv.groundNormal
+            val nDotU = gn.x * up[0] + gn.y * up[1] + gn.z * up[2]
+            val onSurface = gs == EGroundState.OnGround ||
+                gs == EGroundState.OnSteepGround
+            val minSlideCos = kotlin.math.cos(
+                rec.spec.minSlopeSlideAngle.toDouble()).toFloat()
+            val isSliding = onSurface &&
+                nDotU < minSlideCos - 1e-4f &&
+                nDotU > 0.05f
+
+            if (isSliding && rec.spec.slide) {
+                val tx = gn.x * nDotU - up[0]
+                val ty = gn.y * nDotU - up[1]
+                val tz = gn.z * nDotU - up[2]
+                val tLen = kotlin.math.sqrt(
+                    (tx * tx + ty * ty + tz * tz).toDouble()).toFloat()
+                if (tLen > 1e-5f) {
+                    val midPos = cv.position
+                    val movedAlongSlide =
+                        (midPos.xx().toFloat() - startPos[0]) * (tx / tLen) +
+                        (midPos.yy().toFloat() - startPos[1]) * (ty / tLen) +
+                        (midPos.zz().toFloat() - startPos[2]) * (tz / tLen)
+                    if (movedAlongSlide < 1e-3f) {
+                        val slideSpeed = maxOf(
+                            kotlin.math.abs(desiredUp) / safeDt,
+                            3.0f * (1f - nDotU))
+                        cv.setLinearVelocity(
+                            (tx / tLen) * slideSpeed,
+                            (ty / tLen) * slideSpeed,
+                            (tz / tLen) * slideSpeed)
+                        val slideExt = own(ExtendedUpdateSettings())
+                        slideExt.setStickToFloorStepDown(Vec3(0f, 0f, 0f))
+                        slideExt.setWalkStairsStepUp(Vec3(0f, 0f, 0f))
+                        cv.extendedUpdate(
+                            safeDt, grav, slideExt, bpFilter, objFilter,
+                            bodyFilter, shapeFilter, tempAllocator)
+                    }
+                }
+            }
+
+            val endR = cv.position
+            val endX = endR.xx().toFloat()
+            val endY = endR.yy().toFloat()
+            val endZ = endR.zz().toFloat()
+            nodeBodies[nodeKey]?.let { b ->
+                bodyInterface.setPosition(b.id, endR, EActivation.Activate)
+            }
+            CharacterMoveResult(
+                translation = floatArrayOf(
+                    endX - startPos[0],
+                    endY - startPos[1],
+                    endZ - startPos[2]),
+                position = floatArrayOf(endX, endY, endZ),
+                grounded = onSurface && !isSliding,
+                slidingDownSlope = isSliding,
+            )
+        }
     }
 }

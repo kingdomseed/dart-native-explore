@@ -1,0 +1,520 @@
+--------- beginning of system
+10-25 22:00:25.427 18475 18475 D NtScrollerManagerImpl: init NtScrollerManagerImpl
+10-25 22:00:25.461 18475 18496 D MbrainDebugManagerImpl: getService failed
+10-25 22:00:25.620 18475 18518 I DisplayManager: Choreographer implicitly registered for the refresh rate.
+10-25 22:00:25.691 18475 18475 D NtViewImpl: init NtViewImpl
+10-25 22:00:26.240 18475 18475 D NtViewRootImpl: mPopUpViewOffsets: offset=(0.0, 0.0), scale=(1.0, 1.0)
+10-25 22:00:26.497 18475 18475 D NtViewRootImpl: mPopUpViewOffsets: offset=(0.0, 0.0), scale=(1.0, 1.0)
+--------- beginning of main
+10-25 22:02:46.649 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:02:46.901 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:02:47.162 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  309 entities  33 bodies
+10-25 22:02:47.430 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  309 entities  33 bodies
+10-25 22:02:47.697 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  309 entities  33 bodies
+10-25 22:02:47.951 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:02:48.207 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  309 entities  33 bodies
+10-25 22:02:48.374 18475 18475 I dart3d  : perf n=127 fps=63.4 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=11.9 p95=13.0 | backend p50=7.8 p95=11.0 | sim p50=1.0 p95=1.5 (physics p50=0.0 p95=0.1) | submit p50=5.1 p95=9.3 | skipped=39/166 physics=60/s
+10-25 22:02:48.474 18475 18475 I dart3d  : stats 67 fps  14.8 ms/frame  309 entities  33 bodies
+10-25 22:02:48.735 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:02:48.987 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:02:49.240 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:02:49.503 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:02:49.766 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  309 entities  33 bodies
+10-25 22:02:50.030 18475 18475 I dart3d  : stats 67 fps  14.8 ms/frame  309 entities  33 bodies
+10-25 22:02:50.303 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  309 entities  33 bodies
+10-25 22:02:50.376 18475 18475 I dart3d  : perf n=129 fps=64.4 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=11.9 p95=12.7 | backend p50=7.7 p95=11.7 | sim p50=0.9 p95=1.7 (physics p50=0.0 p95=0.1) | submit p50=5.5 p95=9.7 | skipped=36/165 physics=60/s
+10-25 22:02:50.554 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:02:50.814 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:02:51.079 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  309 entities  33 bodies
+10-25 22:02:51.339 18475 18475 I dart3d  : stats 70 fps  14.2 ms/frame  309 entities  33 bodies
+10-25 22:02:51.593 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:02:51.846 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:02:52.104 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:02:52.371 18475 18475 I dart3d  : stats 67 fps  14.8 ms/frame  309 entities  33 bodies
+10-25 22:02:52.382 18475 18475 I dart3d  : perf n=132 fps=65.9 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=11.9 p95=12.9 | backend p50=7.4 p95=11.7 | sim p50=1.0 p95=1.6 (physics p50=0.0 p95=0.1) | submit p50=5.0 p95=8.9 | skipped=43/175 physics=60/s
+10-25 22:02:52.627 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:02:52.883 18475 18475 I dart3d  : stats 70 fps  14.2 ms/frame  309 entities  33 bodies
+10-25 22:02:53.139 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:02:53.393 18475 18475 I dart3d  : stats 55 fps  18.3 ms/frame  309 entities  33 bodies
+10-25 22:02:53.650 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  309 entities  33 bodies
+10-25 22:02:53.912 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:02:54.165 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:02:54.380 18475 18475 I dart3d  : perf n=126 fps=62.9 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=11.9 p95=12.6 | backend p50=7.6 p95=11.9 | sim p50=1.0 p95=1.7 (physics p50=0.0 p95=0.1) | submit p50=5.8 p95=10.0 | skipped=34/160 physics=60/s
+10-25 22:02:54.421 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:02:54.687 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  309 entities  33 bodies
+10-25 22:02:54.929 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:02:55.187 18475 18475 I dart3d  : stats 70 fps  14.2 ms/frame  309 entities  33 bodies
+10-25 22:02:55.444 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:02:55.712 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  309 entities  33 bodies
+10-25 22:02:55.968 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:02:56.221 18475 18475 I dart3d  : stats 70 fps  14.2 ms/frame  309 entities  33 bodies
+10-25 22:02:56.391 18475 18475 I dart3d  : perf n=131 fps=65.4 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=11.7 p95=12.5 | backend p50=7.6 p95=11.2 | sim p50=0.9 p95=1.6 (physics p50=0.0 p95=0.1) | submit p50=5.4 p95=8.6 | skipped=43/174 physics=60/s
+10-25 22:02:56.487 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:02:56.733 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:02:56.990 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:02:57.246 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:02:57.505 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:02:57.767 18475 18475 I dart3d  : stats 67 fps  14.8 ms/frame  309 entities  33 bodies
+10-25 22:02:58.040 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  309 entities  33 bodies
+10-25 22:02:58.293 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:02:58.395 18475 18475 I dart3d  : perf n=130 fps=64.9 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=11.8 p95=12.7 | backend p50=7.3 p95=11.5 | sim p50=0.9 p95=1.6 (physics p50=0.0 p95=0.1) | submit p50=5.4 p95=9.4 | skipped=38/168 physics=60/s
+10-25 22:02:58.561 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  309 entities  33 bodies
+10-25 22:02:58.833 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  309 entities  33 bodies
+10-25 22:02:59.095 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  309 entities  33 bodies
+10-25 22:02:59.349 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:02:59.608 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:02:59.860 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:00.121 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:00.375 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:00.390 18475 18475 I dart3d  : perf n=127 fps=63.4 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=11.8 p95=12.7 | backend p50=7.8 p95=11.7 | sim p50=0.9 p95=1.6 (physics p50=0.0 p95=0.1) | submit p50=5.8 p95=9.7 | skipped=38/165 physics=60/s
+10-25 22:03:00.639 18475 18475 I dart3d  : stats 55 fps  18.3 ms/frame  309 entities  33 bodies
+10-25 22:03:00.894 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  309 entities  33 bodies
+10-25 22:03:01.152 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:01.409 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:01.675 18475 18475 I dart3d  : stats 67 fps  14.8 ms/frame  309 entities  33 bodies
+10-25 22:03:01.931 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:02.193 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:02.398 18475 18475 I dart3d  : perf n=127 fps=63.4 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=11.8 p95=12.8 | backend p50=8.0 p95=12.4 | sim p50=0.9 p95=1.7 (physics p50=0.0 p95=0.1) | submit p50=5.7 p95=10.3 | skipped=35/162 physics=60/s
+10-25 22:03:02.457 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  309 entities  33 bodies
+10-25 22:03:02.715 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:02.968 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  309 entities  33 bodies
+10-25 22:03:03.226 18475 18475 I dart3d  : stats 70 fps  14.2 ms/frame  309 entities  33 bodies
+10-25 22:03:03.478 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:03.742 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:03.991 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:04.261 18475 18475 I dart3d  : stats 67 fps  14.8 ms/frame  309 entities  33 bodies
+10-25 22:03:04.420 18475 18475 I dart3d  : perf n=131 fps=65.0 frame p50=11.1 p95=22.3 max=22.4 ms | gpu p50=11.9 p95=12.7 | backend p50=7.5 p95=11.2 | sim p50=1.0 p95=1.5 (physics p50=0.0 p95=0.1) | submit p50=5.8 p95=9.7 | skipped=35/166 physics=60/s
+10-25 22:03:04.515 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  309 entities  33 bodies
+10-25 22:03:04.785 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  309 entities  33 bodies
+10-25 22:03:05.040 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:05.312 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  309 entities  33 bodies
+10-25 22:03:05.562 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  309 entities  33 bodies
+10-25 22:03:05.818 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:06.075 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:06.328 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:06.412 18475 18475 I dart3d  : perf n=126 fps=62.9 frame p50=11.1 p95=22.3 max=22.4 ms | gpu p50=11.9 p95=12.9 | backend p50=7.3 p95=12.0 | sim p50=0.9 p95=1.4 (physics p50=0.0 p95=0.1) | submit p50=6.0 p95=9.9 | skipped=37/163 physics=60/s
+10-25 22:03:06.584 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:06.846 18475 18475 I dart3d  : stats 55 fps  18.3 ms/frame  309 entities  33 bodies
+10-25 22:03:07.110 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  309 entities  33 bodies
+10-25 22:03:07.364 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:07.617 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:07.875 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:08.132 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  309 entities  33 bodies
+10-25 22:03:08.388 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:08.416 18475 18475 I dart3d  : perf n=126 fps=62.9 frame p50=11.1 p95=22.3 max=22.4 ms | gpu p50=11.9 p95=12.8 | backend p50=7.9 p95=11.9 | sim p50=0.9 p95=1.6 (physics p50=0.0 p95=0.1) | submit p50=5.3 p95=9.8 | skipped=39/165 physics=60/s
+10-25 22:03:08.642 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:08.899 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:09.154 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:09.416 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  309 entities  33 bodies
+10-25 22:03:09.670 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:09.926 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  309 entities  33 bodies
+10-25 22:03:09.943 18475 18475 I dartnative: dart3d: w16 mover home — lod/trail lane done
+10-25 22:03:10.184 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:10.425 18475 18475 I dart3d  : perf n=125 fps=62.4 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=12.2 p95=12.9 | backend p50=8.0 p95=11.6 | sim p50=0.9 p95=1.6 (physics p50=0.0 p95=0.1) | submit p50=5.8 p95=10.1 | skipped=33/158 physics=60/s
+10-25 22:03:10.449 18475 18475 I dart3d  : stats 56 fps  17.8 ms/frame  309 entities  33 bodies
+10-25 22:03:10.716 18475 18475 I dart3d  : stats 67 fps  14.8 ms/frame  309 entities  33 bodies
+10-25 22:03:10.969 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:11.229 18475 18475 I dart3d  : stats 55 fps  18.3 ms/frame  309 entities  33 bodies
+10-25 22:03:11.493 18475 18475 I dart3d  : stats 56 fps  17.8 ms/frame  309 entities  33 bodies
+10-25 22:03:11.749 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:11.932 18475 18475 I dartnative: dart3d: w25 phase — LUT + effects matrix lanes
+10-25 22:03:11.957 18475 18475 I dartnative: dart3d: w25 LUT chunk ref staged — payload deferred
+10-25 22:03:11.984 18475 18475 I dart3d  : environment 7502536979611910222: 256×128 equirect → 256² cube + SH3 in 8ms
+10-25 22:03:11.984 18475 18475 I dart3d  : applySkybox: sb=true textures=0
+10-25 22:03:11.984 18475 18475 I dart3d  : applyEnvironment: il=true textures=3
+10-25 22:03:12.006 18475 18475 I dart3d  : stats 55 fps  18.3 ms/frame  309 entities  33 bodies
+10-25 22:03:12.277 18475 18475 I dart3d  : stats 45 fps  22.3 ms/frame  309 entities  33 bodies
+10-25 22:03:12.445 18475 18475 I dart3d  : perf n=118 fps=58.6 frame p50=11.1 p95=22.3 max=77.9 ms | gpu p50=12.3 p95=13.0 | backend p50=8.0 p95=11.6 | sim p50=1.0 p95=1.6 (physics p50=0.0 p95=0.1) | submit p50=5.8 p95=10.5 | skipped=39/157 physics=60/s
+10-25 22:03:12.545 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  309 entities  33 bodies
+10-25 22:03:12.773 18475 18475 I dartnative: dart3d: w25 LUT payload landed — deferred grade applies
+10-25 22:03:12.790 18475 18475 I dart3d  : environment 7502536979611910222: 256×128 equirect → 256² cube + SH3 in 5ms
+10-25 22:03:12.791 18475 18475 I dart3d  : applySkybox: sb=true textures=0
+10-25 22:03:12.791 18475 18475 I dart3d  : applyEnvironment: il=true textures=3
+10-25 22:03:12.873 18475 18475 I dart3d  : stats 48 fps  20.9 ms/frame  309 entities  33 bodies
+10-25 22:03:13.130 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:13.390 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  309 entities  33 bodies
+10-25 22:03:13.643 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:13.896 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:13.967 18475 18475 I dartnative: dart3d: w25 LUT blend 0.35
+10-25 22:03:13.993 18475 18475 I dart3d  : environment 7502536979611910222: 256×128 equirect → 256² cube + SH3 in 7ms
+10-25 22:03:13.993 18475 18475 I dart3d  : applySkybox: sb=true textures=0
+10-25 22:03:13.993 18475 18475 I dart3d  : applyEnvironment: il=true textures=3
+10-25 22:03:14.154 18475 18475 I dart3d  : stats 43 fps  23.3 ms/frame  309 entities  33 bodies
+10-25 22:03:14.407 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:14.444 18475 18475 I dart3d  : perf n=114 fps=56.9 frame p50=11.1 p95=22.3 max=100.2 ms | gpu p50=12.2 p95=13.2 | backend p50=8.0 p95=12.1 | sim p50=1.0 p95=1.6 (physics p50=0.0 p95=0.1) | submit p50=5.8 p95=9.5 | skipped=33/147 physics=60/s
+10-25 22:03:14.673 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:14.921 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:15.191 18475 18475 I dart3d  : stats 56 fps  17.8 ms/frame  309 entities  33 bodies
+10-25 22:03:15.450 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:15.713 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  309 entities  33 bodies
+10-25 22:03:15.960 18475 18475 I dartnative: dart3d: w25 LUT asset path (assets/luts/cool.cube)
+10-25 22:03:15.987 18475 18475 I dart3d  : environment 7502536979611910222: 256×128 equirect → 256² cube + SH3 in 8ms
+10-25 22:03:15.987 18475 18475 I dart3d  : applySkybox: sb=true textures=0
+10-25 22:03:15.987 18475 18475 I dart3d  : applyEnvironment: il=true textures=3
+10-25 22:03:16.049 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:16.240 18475 18475 I dart3d  : stats 41 fps  24.3 ms/frame  309 entities  33 bodies
+10-25 22:03:16.445 18475 18475 I dart3d  : perf n=117 fps=58.4 frame p50=11.2 p95=22.3 max=89.1 ms | gpu p50=12.3 p95=13.2 | backend p50=8.0 p95=12.0 | sim p50=0.9 p95=1.6 (physics p50=0.0 p95=0.1) | submit p50=5.5 p95=10.5 | skipped=35/152 physics=60/s
+10-25 22:03:16.493 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  309 entities  33 bodies
+10-25 22:03:16.765 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  309 entities  33 bodies
+10-25 22:03:17.014 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  309 entities  33 bodies
+10-25 22:03:17.275 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:17.526 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:17.785 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:17.963 18475 18475 I dartnative: dart3d: w25 filmGrain+autoExposure on
+10-25 22:03:17.988 18475 18475 I dart3d  : environment 7502536979611910222: 256×128 equirect → 256² cube + SH3 in 8ms
+10-25 22:03:17.988 18475 18475 I dart3d  : applySkybox: sb=true textures=0
+10-25 22:03:17.988 18475 18475 I dart3d  : applyEnvironment: il=true textures=3
+10-25 22:03:18.092 18475 18475 I dart3d  : stats 50 fps  20.0 ms/frame  309 entities  33 bodies
+10-25 22:03:18.349 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  309 entities  33 bodies
+10-25 22:03:18.454 18475 18475 I dart3d  : perf n=122 fps=60.9 frame p50=11.1 p95=22.3 max=78.0 ms | gpu p50=12.3 p95=13.2 | backend p50=8.3 p95=12.2 | sim p50=1.0 p95=1.5 (physics p50=0.0 p95=0.1) | submit p50=5.5 p95=9.9 | skipped=43/165 physics=60/s
+10-25 22:03:18.607 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:18.868 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  309 entities  33 bodies
+10-25 22:03:19.136 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  309 entities  33 bodies
+10-25 22:03:19.397 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  309 entities  33 bodies
+10-25 22:03:19.652 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:19.925 18475 18475 I dart3d  : stats 67 fps  14.8 ms/frame  309 entities  33 bodies
+10-25 22:03:19.959 18475 18475 I dartnative: dart3d: w25 ssr+lensFlare on
+10-25 22:03:20.000 18475 18475 I dart3d  : environment 7502536979611910222: 256×128 equirect → 256² cube + SH3 in 9ms
+10-25 22:03:20.000 18475 18475 I dart3d  : applySkybox: sb=true textures=0
+10-25 22:03:20.000 18475 18475 I dart3d  : applyEnvironment: il=true textures=3
+10-25 22:03:20.002 18475 18475 I dart3d  : lensFlare without bloom: Filament's flare rides the bloom pass — enabled at lensFlare.intensity strength, so a mild bloom halo comes with the ghosts (flare gain is not separable)
+10-25 22:03:20.002 18475 18475 I dart3d  : screenSpaceReflections: applies to lit materials; off-screen/rough surfaces keep IBL specular
+10-25 22:03:20.002 18475 18475 I dart3d  : some SSR fields unmapped on Filament 1.71.6 (thickness/maxDistance/stride only)
+10-25 22:03:20.241 18475 18475 I dart3d  : stats 19 fps  53.8 ms/frame  309 entities  33 bodies
+10-25 22:03:20.448 18475 18475 I dart3d  : perf n=100 fps=49.9 frame p50=11.1 p95=22.3 max=144.7 ms | gpu p50=12.2 p95=13.4 | backend p50=7.9 p95=11.4 | sim p50=0.9 p95=1.5 (physics p50=0.0 p95=0.1) | submit p50=5.5 p95=9.8 | skipped=60/160 physics=60/s
+10-25 22:03:20.511 18475 18475 I dart3d  : stats 11 fps  89.0 ms/frame  309 entities  33 bodies
+10-25 22:03:20.775 18475 18475 I dart3d  : stats 12 fps  85.3 ms/frame  309 entities  33 bodies
+10-25 22:03:21.039 18475 18475 I dart3d  : stats 11 fps  89.1 ms/frame  309 entities  33 bodies
+10-25 22:03:21.291 18475 18475 I dart3d  : stats 12 fps  85.4 ms/frame  309 entities  33 bodies
+10-25 22:03:21.551 18475 18475 I dart3d  : stats 12 fps  85.3 ms/frame  309 entities  33 bodies
+10-25 22:03:21.820 18475 18475 I dart3d  : stats 11 fps  89.1 ms/frame  309 entities  33 bodies
+10-25 22:03:21.959 18475 18475 I dartnative: dart3d: w25 godRays+standalone CA on
+10-25 22:03:21.989 18475 18475 I dart3d  : environment 7502536979611910222: 256×128 equirect → 256² cube + SH3 in 7ms
+10-25 22:03:21.989 18475 18475 I dart3d  : applySkybox: sb=true textures=0
+10-25 22:03:21.989 18475 18475 I dart3d  : applyEnvironment: il=true textures=3
+10-25 22:03:21.992 18475 18475 I dart3d  : godRays: platform limit — no light-shaft/volumetric post pass in the Java bindings; ignored
+10-25 22:03:22.073 18475 18475 I dart3d  : stats 12 fps  85.3 ms/frame  309 entities  33 bodies
+10-25 22:03:22.337 18475 18475 I dart3d  : stats 37 fps  26.7 ms/frame  309 entities  33 bodies
+10-25 22:03:22.455 18475 18475 I dart3d  : perf n=37 fps=18.5 frame p50=77.9 p95=100.2 max=100.2 ms | gpu p50=80.2 p95=86.5 | backend p50=73.5 p95=84.4 | sim p50=1.2 p95=1.9 (physics p50=0.0 p95=0.1) | submit p50=7.3 p95=13.9 | skipped=127/164 physics=60/s
+10-25 22:03:22.594 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:22.849 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:23.114 18475 18475 I dart3d  : stats 67 fps  14.8 ms/frame  309 entities  33 bodies
+10-25 22:03:23.383 18475 18475 I dart3d  : stats 67 fps  14.8 ms/frame  309 entities  33 bodies
+10-25 22:03:23.650 18475 18475 I dart3d  : stats 67 fps  14.8 ms/frame  309 entities  33 bodies
+10-25 22:03:23.904 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:23.967 18475 18475 I dartnative: dart3d: w25 effects reset
+10-25 22:03:24.004 18475 18475 I dart3d  : environment 7502536979611910222: 256×128 equirect → 256² cube + SH3 in 8ms
+10-25 22:03:24.004 18475 18475 I dart3d  : applySkybox: sb=true textures=0
+10-25 22:03:24.004 18475 18475 I dart3d  : applyEnvironment: il=true textures=3
+10-25 22:03:24.164 18475 18475 I dart3d  : stats 35 fps  28.4 ms/frame  309 entities  33 bodies
+10-25 22:03:24.429 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  309 entities  33 bodies
+10-25 22:03:24.461 18475 18475 I dart3d  : perf n=123 fps=61.4 frame p50=11.1 p95=22.3 max=77.9 ms | gpu p50=12.3 p95=13.1 | backend p50=7.5 p95=11.8 | sim p50=0.9 p95=1.6 (physics p50=0.0 p95=0.1) | submit p50=5.5 p95=8.8 | skipped=45/168 physics=60/s
+10-25 22:03:24.687 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:24.955 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  309 entities  33 bodies
+10-25 22:03:25.223 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  309 entities  33 bodies
+10-25 22:03:25.475 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:25.742 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  309 entities  33 bodies
+10-25 22:03:25.997 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:26.252 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:26.482 18475 18475 I dart3d  : perf n=128 fps=63.5 frame p50=11.1 p95=22.3 max=22.4 ms | gpu p50=12.2 p95=13.1 | backend p50=7.6 p95=11.0 | sim p50=0.9 p95=1.7 (physics p50=0.0 p95=0.3) | submit p50=5.6 p95=9.4 | skipped=41/169 physics=60/s
+10-25 22:03:26.526 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  309 entities  33 bodies
+10-25 22:03:26.783 18475 18475 I dart3d  : stats 70 fps  14.2 ms/frame  309 entities  33 bodies
+10-25 22:03:26.853 18475 18475 I dartnative: dart3d: contact began a=79 b=82 pts=1
+10-25 22:03:26.893 18475 18475 I dartnative: dart3d: contact ended a=79 b=82
+10-25 22:03:27.033 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:27.236 18475 18475 I dartnative: dart3d: contact began a=79 b=82 pts=1
+10-25 22:03:27.252 18475 18475 I dartnative: dart3d: contact ended a=79 b=82
+10-25 22:03:27.289 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:27.356 18475 18475 I dartnative: dart3d: contact began a=79 b=82 pts=1
+10-25 22:03:27.564 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  309 entities  33 bodies
+10-25 22:03:27.825 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  309 entities  33 bodies
+10-25 22:03:27.924 18475 18475 I dartnative: dart3d: w25 lane complete — dice regression PASS: die D0F5V8G00004Y rolled and settled after the effects sweep; expected final state: all effects off
+10-25 22:03:27.938 18475 18475 I dartnative: dart3d: contact ended a=79 b=82
+10-25 22:03:28.079 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:28.335 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:28.475 18475 18475 I dart3d  : perf n=127 fps=63.4 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=12.3 p95=13.1 | backend p50=8.2 p95=11.8 | sim p50=1.0 p95=2.1 (physics p50=0.1 p95=0.4) | submit p50=5.7 p95=9.2 | skipped=41/168 physics=60/s
+10-25 22:03:28.596 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  309 entities  33 bodies
+10-25 22:03:28.848 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:29.104 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:29.374 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  309 entities  33 bodies
+10-25 22:03:29.631 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:29.890 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:30.147 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  309 entities  33 bodies
+10-25 22:03:30.408 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  309 entities  33 bodies
+10-25 22:03:30.482 18475 18475 I dart3d  : perf n=127 fps=63.4 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=12.4 p95=13.2 | backend p50=7.5 p95=10.8 | sim p50=0.9 p95=1.5 (physics p50=0.0 p95=0.1) | submit p50=5.7 p95=9.7 | skipped=44/171 physics=60/s
+10-25 22:03:30.664 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:30.923 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  309 entities  33 bodies
+10-25 22:03:31.173 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:31.431 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:31.700 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  309 entities  33 bodies
+10-25 22:03:31.954 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:32.210 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:32.466 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:32.483 18475 18475 I dart3d  : perf n=126 fps=62.9 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=12.3 p95=13.1 | backend p50=7.2 p95=11.5 | sim p50=0.9 p95=1.5 (physics p50=0.0 p95=0.1) | submit p50=5.8 p95=9.4 | skipped=41/167 physics=60/s
+10-25 22:03:32.724 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:32.990 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  309 entities  33 bodies
+10-25 22:03:33.256 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  309 entities  33 bodies
+10-25 22:03:33.511 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:33.776 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:34.023 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:34.290 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  309 entities  33 bodies
+10-25 22:03:34.492 18475 18475 I dart3d  : perf n=126 fps=62.9 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=12.2 p95=13.1 | backend p50=7.6 p95=12.3 | sim p50=1.0 p95=1.6 (physics p50=0.0 p95=0.1) | submit p50=5.1 p95=10.1 | skipped=34/160 physics=60/s
+10-25 22:03:34.550 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:34.816 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  309 entities  33 bodies
+10-25 22:03:35.082 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  309 entities  33 bodies
+10-25 22:03:35.342 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:35.599 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:35.851 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:36.105 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:36.367 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:36.497 18475 18475 I dart3d  : perf n=126 fps=62.9 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=12.2 p95=12.9 | backend p50=7.7 p95=10.8 | sim p50=0.9 p95=1.5 (physics p50=0.0 p95=0.1) | submit p50=5.4 p95=10.3 | skipped=41/167 physics=60/s
+10-25 22:03:36.617 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  309 entities  33 bodies
+10-25 22:03:36.873 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:37.141 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  309 entities  33 bodies
+10-25 22:03:37.410 18475 18475 I dart3d  : stats 56 fps  17.8 ms/frame  309 entities  33 bodies
+10-25 22:03:37.678 18475 18475 I dart3d  : stats 67 fps  14.8 ms/frame  309 entities  33 bodies
+10-25 22:03:37.933 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  309 entities  33 bodies
+10-25 22:03:37.936 18475 18475 I dartnative: dart3d: w18 phase — particle emitters
+10-25 22:03:37.950 18475 18475 I dartnative: dart3d: w18 phase — flipbook fountain, additive streaks, mesh tumble pool, enabled:false gate
+10-25 22:03:37.953 18475 18475 I dart3d  : texture 2078989283384885368: awaiting payload
+10-25 22:03:37.954 18475 18475 I dart3d  : geometry 2078989283384885369: rebuilt, rebound 0 consumer(s)
+10-25 22:03:37.954 18475 18475 I dart3d  : variant apply node=2078989283384885340 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:03:37.956 18475 18475 I dart3d  : geometry 2078989283384885370: rebuilt, rebound 0 consumer(s)
+10-25 22:03:37.956 18475 18475 I dart3d  : variant apply node=2078989283384885340 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:03:37.956 18475 18475 I dart3d  : upsertResource material 2078989283384885371: reattached to 0 renderable(s)
+10-25 22:03:37.957 18475 18475 I dart3d  : variant apply node=2078989283384885340 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:03:37.957 18475 18475 I dart3d  : texture 2078989283384885368: 128x128 rgba8 in 0ms
+10-25 22:03:37.957 18475 18475 I dart3d  : upsertPayload 2078989283384885367: texture 2078989283384885368 re-uploaded, rebound 0 consumer(s)
+10-25 22:03:37.969 18475 18475 I dart3d  : node 2078989283384885372: body=none pos=(-1.7,0.7,-1.4)
+10-25 22:03:37.969 18475 18475 I dart3d  : variant apply node=2078989283384885340 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:03:37.971 18475 18475 I dart3d  : node 2078989283384885373: body=none pos=(1.7,1.0,-1.4)
+10-25 22:03:37.971 18475 18475 I dart3d  : variant apply node=2078989283384885340 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:03:37.971 18475 18475 I dart3d  : node 2078989283384885374: body=none pos=(0.0,0.9,-2.7)
+10-25 22:03:37.971 18475 18475 I dart3d  : variant apply node=2078989283384885340 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:03:37.971 18475 18475 I dart3d  : component 'particleEmitter' on node 2078989283384885375: enabled:false — particle runtime not created
+10-25 22:03:37.971 18475 18475 I dart3d  : node 2078989283384885375: body=none pos=(0.0,1.1,-0.2)
+10-25 22:03:37.971 18475 18475 I dart3d  : variant apply node=2078989283384885340 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:03:38.190 18475 18475 I dart3d  : stats 51 fps  19.7 ms/frame  313 entities  33 bodies
+10-25 22:03:38.457 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  313 entities  33 bodies
+10-25 22:03:38.505 18475 18475 I dart3d  : perf n=122 fps=60.9 frame p50=11.1 p95=22.3 max=44.5 ms | gpu p50=12.3 p95=13.1 | backend p50=8.1 p95=12.6 | sim p50=1.1 p95=2.5 (physics p50=0.0 p95=0.1) | submit p50=5.9 p95=10.1 | skipped=41/163 physics=60/s
+10-25 22:03:38.716 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  313 entities  33 bodies
+10-25 22:03:38.978 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  313 entities  33 bodies
+10-25 22:03:39.235 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  313 entities  33 bodies
+10-25 22:03:39.489 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  313 entities  33 bodies
+10-25 22:03:39.751 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  313 entities  33 bodies
+10-25 22:03:40.002 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  313 entities  33 bodies
+10-25 22:03:40.272 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  313 entities  33 bodies
+10-25 22:03:40.501 18475 18475 I dart3d  : perf n=125 fps=62.4 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=12.5 p95=13.4 | backend p50=7.7 p95=11.8 | sim p50=2.0 p95=4.3 (physics p50=0.0 p95=0.1) | submit p50=5.2 p95=9.2 | skipped=30/155 physics=60/s
+10-25 22:03:40.528 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  313 entities  33 bodies
+10-25 22:03:40.782 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  313 entities  33 bodies
+10-25 22:03:41.039 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  313 entities  33 bodies
+10-25 22:03:41.295 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  313 entities  33 bodies
+10-25 22:03:41.561 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  313 entities  33 bodies
+10-25 22:03:41.830 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  313 entities  33 bodies
+10-25 22:03:42.098 18475 18475 I dart3d  : stats 56 fps  17.8 ms/frame  313 entities  33 bodies
+10-25 22:03:42.362 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  313 entities  33 bodies
+10-25 22:03:42.509 18475 18475 I dart3d  : perf n=123 fps=61.4 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=12.6 p95=13.3 | backend p50=7.7 p95=11.7 | sim p50=1.6 p95=4.2 (physics p50=0.0 p95=0.1) | submit p50=5.4 p95=9.1 | skipped=36/159 physics=60/s
+10-25 22:03:42.629 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  313 entities  33 bodies
+10-25 22:03:42.885 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  313 entities  33 bodies
+10-25 22:03:43.145 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  313 entities  33 bodies
+10-25 22:03:43.397 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  313 entities  33 bodies
+10-25 22:03:43.665 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  313 entities  33 bodies
+10-25 22:03:43.921 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  313 entities  33 bodies
+10-25 22:03:43.954 18475 18475 I dartnative: dart3d: w18 gated emitter enabled (components update)
+10-25 22:03:43.961 18475 18475 I dart3d  : node 2078989283384885375: body=none pos=(0.0,1.1,-0.2)
+10-25 22:03:43.961 18475 18475 I dart3d  : variant apply node=2078989283384885340 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:03:44.187 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  313 entities  33 bodies
+10-25 22:03:44.445 18475 18475 I dart3d  : stats 55 fps  18.3 ms/frame  313 entities  33 bodies
+10-25 22:03:44.511 18475 18475 I dart3d  : perf n=122 fps=60.9 frame p50=11.2 p95=22.3 max=22.3 ms | gpu p50=12.5 p95=13.5 | backend p50=7.9 p95=11.7 | sim p50=1.6 p95=3.7 (physics p50=0.0 p95=0.1) | submit p50=5.6 p95=9.1 | skipped=37/159 physics=60/s
+10-25 22:03:44.711 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  313 entities  33 bodies
+10-25 22:03:44.966 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  313 entities  33 bodies
+10-25 22:03:45.234 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  313 entities  33 bodies
+10-25 22:03:45.492 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  313 entities  33 bodies
+10-25 22:03:45.751 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  313 entities  33 bodies
+10-25 22:03:46.003 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  313 entities  33 bodies
+10-25 22:03:46.272 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  313 entities  33 bodies
+10-25 22:03:46.515 18475 18475 I dart3d  : perf n=127 fps=63.4 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=12.6 p95=13.5 | backend p50=7.7 p95=10.7 | sim p50=1.7 p95=3.9 (physics p50=0.0 p95=0.1) | submit p50=5.6 p95=9.6 | skipped=37/164 physics=60/s
+10-25 22:03:46.537 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  313 entities  33 bodies
+10-25 22:03:46.792 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  313 entities  33 bodies
+10-25 22:03:46.952 18475 18475 I dartnative: dart3d: w18 streaks hidden
+10-25 22:03:47.048 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  313 entities  33 bodies
+10-25 22:03:47.319 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  313 entities  33 bodies
+10-25 22:03:47.577 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  313 entities  33 bodies
+10-25 22:03:47.830 18475 18475 I dart3d  : stats 55 fps  18.3 ms/frame  313 entities  33 bodies
+10-25 22:03:48.099 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  313 entities  33 bodies
+10-25 22:03:48.353 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  313 entities  33 bodies
+10-25 22:03:48.513 18475 18475 I dart3d  : perf n=124 fps=61.9 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=12.5 p95=13.3 | backend p50=7.3 p95=11.9 | sim p50=1.8 p95=3.7 (physics p50=0.0 p95=0.1) | submit p50=5.2 p95=8.6 | skipped=43/167 physics=60/s
+10-25 22:03:48.612 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  313 entities  33 bodies
+10-25 22:03:48.881 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  313 entities  33 bodies
+10-25 22:03:48.953 18475 18475 I dartnative: dart3d: w18 streaks restored
+10-25 22:03:49.142 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  313 entities  33 bodies
+10-25 22:03:49.399 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  313 entities  33 bodies
+10-25 22:03:49.652 18475 18475 I dart3d  : stats 70 fps  14.2 ms/frame  313 entities  33 bodies
+10-25 22:03:49.909 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  313 entities  33 bodies
+10-25 22:03:50.168 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  313 entities  33 bodies
+10-25 22:03:50.426 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  313 entities  33 bodies
+10-25 22:03:50.523 18475 18475 I dart3d  : perf n=127 fps=63.4 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=12.6 p95=13.6 | backend p50=7.8 p95=12.2 | sim p50=1.6 p95=3.0 (physics p50=0.0 p95=0.1) | submit p50=4.4 p95=8.7 | skipped=44/171 physics=60/s
+10-25 22:03:50.691 18475 18475 I dart3d  : stats 56 fps  17.8 ms/frame  313 entities  33 bodies
+10-25 22:03:50.958 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  313 entities  33 bodies
+10-25 22:03:51.230 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  313 entities  33 bodies
+10-25 22:03:51.484 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  313 entities  33 bodies
+10-25 22:03:51.740 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  313 entities  33 bodies
+10-25 22:03:51.957 18475 18475 I dartnative: dart3d: w18 gated node removed
+10-25 22:03:51.962 18475 18475 I dart3d  : cmd removeNode
+10-25 22:03:51.995 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:03:52.247 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:03:52.502 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:03:52.520 18475 18475 I dart3d  : perf n=125 fps=62.4 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=12.5 p95=13.3 | backend p50=7.6 p95=12.0 | sim p50=1.6 p95=3.7 (physics p50=0.0 p95=0.1) | submit p50=5.1 p95=9.4 | skipped=38/163 physics=60/s
+10-25 22:03:52.759 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:03:53.026 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  312 entities  33 bodies
+10-25 22:03:53.280 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:03:53.538 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:03:53.792 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  312 entities  33 bodies
+10-25 22:03:53.952 18475 18475 I dartnative: dart3d: w18 lane complete — expected: fountain + streaks + mesh pool live, gated ran +6 s…+14 s then removed
+10-25 22:03:54.058 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:03:54.307 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:03:54.528 18475 18475 I dart3d  : perf n=125 fps=62.4 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=12.6 p95=13.4 | backend p50=7.6 p95=11.3 | sim p50=1.3 p95=3.5 (physics p50=0.0 p95=0.1) | submit p50=5.2 p95=9.0 | skipped=39/164 physics=60/s
+10-25 22:03:54.562 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:03:54.823 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:03:55.089 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  312 entities  33 bodies
+10-25 22:03:55.344 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:03:55.600 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:03:55.869 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  312 entities  33 bodies
+10-25 22:03:56.121 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:03:56.378 18475 18475 I dart3d  : stats 55 fps  18.3 ms/frame  312 entities  33 bodies
+10-25 22:03:56.534 18475 18475 I dart3d  : perf n=123 fps=61.4 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=12.6 p95=13.7 | backend p50=7.8 p95=11.9 | sim p50=1.5 p95=2.9 (physics p50=0.0 p95=0.1) | submit p50=5.4 p95=9.0 | skipped=40/163 physics=60/s
+10-25 22:03:56.633 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  312 entities  33 bodies
+10-25 22:03:56.899 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  312 entities  33 bodies
+10-25 22:03:57.156 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:03:57.421 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  312 entities  33 bodies
+10-25 22:03:57.678 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:03:57.948 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  312 entities  33 bodies
+10-25 22:03:58.202 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:03:58.455 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:03:58.530 18475 18475 I dart3d  : perf n=129 fps=64.4 frame p50=11.1 p95=22.3 max=22.4 ms | gpu p50=12.5 p95=13.3 | backend p50=7.7 p95=10.9 | sim p50=1.3 p95=2.6 (physics p50=0.0 p95=0.1) | submit p50=5.5 p95=8.4 | skipped=47/176 physics=60/s
+10-25 22:03:58.711 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:03:58.985 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  312 entities  33 bodies
+10-25 22:03:59.251 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  312 entities  33 bodies
+10-25 22:03:59.520 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  312 entities  33 bodies
+10-25 22:03:59.782 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  312 entities  33 bodies
+10-25 22:04:00.043 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:00.301 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  312 entities  33 bodies
+10-25 22:04:00.543 18475 18475 I dart3d  : perf n=125 fps=62.4 frame p50=11.1 p95=22.3 max=33.4 ms | gpu p50=12.6 p95=13.4 | backend p50=8.1 p95=11.6 | sim p50=1.5 p95=2.9 (physics p50=0.0 p95=0.1) | submit p50=4.8 p95=9.1 | skipped=43/168 physics=60/s
+10-25 22:04:00.562 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  312 entities  33 bodies
+10-25 22:04:00.829 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  312 entities  33 bodies
+10-25 22:04:01.099 18475 18475 I dart3d  : stats 67 fps  14.8 ms/frame  312 entities  33 bodies
+10-25 22:04:01.362 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  312 entities  33 bodies
+10-25 22:04:01.618 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:04:01.880 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:02.146 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  312 entities  33 bodies
+10-25 22:04:02.398 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:02.542 18475 18475 I dart3d  : perf n=127 fps=63.4 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=12.5 p95=13.3 | backend p50=8.0 p95=12.8 | sim p50=1.4 p95=2.8 (physics p50=0.0 p95=0.1) | submit p50=5.1 p95=9.8 | skipped=40/167 physics=60/s
+10-25 22:04:02.654 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:02.911 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:04:03.177 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  312 entities  33 bodies
+10-25 22:04:03.437 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:04:03.694 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:03.950 18475 18475 I dart3d  : stats 55 fps  18.3 ms/frame  312 entities  33 bodies
+10-25 22:04:04.213 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  312 entities  33 bodies
+10-25 22:04:04.476 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  312 entities  33 bodies
+10-25 22:04:04.546 18475 18475 I dart3d  : perf n=122 fps=60.9 frame p50=11.2 p95=22.3 max=22.3 ms | gpu p50=12.6 p95=13.3 | backend p50=8.4 p95=11.4 | sim p50=1.4 p95=3.2 (physics p50=0.0 p95=0.1) | submit p50=5.3 p95=9.5 | skipped=41/163 physics=60/s
+10-25 22:04:04.723 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:04.980 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:05.240 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:05.493 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  312 entities  33 bodies
+10-25 22:04:05.748 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:04:06.017 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  312 entities  33 bodies
+10-25 22:04:06.282 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  312 entities  33 bodies
+10-25 22:04:06.540 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  312 entities  33 bodies
+10-25 22:04:06.559 18475 18475 I dart3d  : perf n=124 fps=61.9 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=12.5 p95=13.5 | backend p50=7.7 p95=12.0 | sim p50=1.3 p95=3.2 (physics p50=0.0 p95=0.1) | submit p50=5.8 p95=9.1 | skipped=39/163 physics=60/s
+10-25 22:04:06.796 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:04:07.062 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  312 entities  33 bodies
+10-25 22:04:07.316 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:04:07.574 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:07.841 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  312 entities  33 bodies
+10-25 22:04:08.101 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:08.353 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  312 entities  33 bodies
+10-25 22:04:08.550 18475 18475 I dart3d  : perf n=125 fps=62.4 frame p50=11.1 p95=22.3 max=22.4 ms | gpu p50=12.5 p95=13.4 | backend p50=8.1 p95=11.8 | sim p50=1.5 p95=3.0 (physics p50=0.0 p95=0.1) | submit p50=4.9 p95=9.8 | skipped=44/169 physics=60/s
+10-25 22:04:08.609 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:08.864 18475 18475 I dart3d  : stats 55 fps  18.3 ms/frame  312 entities  33 bodies
+10-25 22:04:09.126 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:04:09.382 18475 18475 I dart3d  : stats 55 fps  18.3 ms/frame  312 entities  33 bodies
+10-25 22:04:09.638 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:09.903 18475 18475 I dart3d  : stats 56 fps  17.8 ms/frame  312 entities  33 bodies
+10-25 22:04:10.156 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:04:10.412 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:10.552 18475 18475 I dart3d  : perf n=122 fps=60.9 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=12.5 p95=13.3 | backend p50=7.9 p95=10.7 | sim p50=1.5 p95=3.3 (physics p50=0.0 p95=0.1) | submit p50=5.1 p95=9.0 | skipped=33/155 physics=60/s
+10-25 22:04:10.668 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:04:10.936 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  312 entities  33 bodies
+10-25 22:04:11.193 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:04:11.456 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:11.702 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  312 entities  33 bodies
+10-25 22:04:11.971 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  312 entities  33 bodies
+10-25 22:04:12.224 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:04:12.484 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:12.560 18475 18475 I dart3d  : perf n=127 fps=63.4 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=12.6 p95=14.6 | backend p50=8.0 p95=12.0 | sim p50=1.3 p95=2.7 (physics p50=0.0 p95=0.1) | submit p50=4.7 p95=8.8 | skipped=42/169 physics=60/s
+10-25 22:04:12.740 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:12.997 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:04:13.267 18475 18475 I dart3d  : stats 56 fps  17.8 ms/frame  312 entities  33 bodies
+10-25 22:04:13.521 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:13.790 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  312 entities  33 bodies
+10-25 22:04:14.046 18475 18475 I dart3d  : stats 55 fps  18.3 ms/frame  312 entities  33 bodies
+10-25 22:04:14.298 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:14.564 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  312 entities  33 bodies
+10-25 22:04:14.565 18475 18475 I dart3d  : perf n=122 fps=60.9 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=12.6 p95=13.4 | backend p50=7.8 p95=11.9 | sim p50=1.5 p95=3.2 (physics p50=0.0 p95=0.1) | submit p50=5.4 p95=9.4 | skipped=36/158 physics=60/s
+10-25 22:04:14.839 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  312 entities  33 bodies
+10-25 22:04:15.088 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:15.344 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:15.610 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  312 entities  33 bodies
+10-25 22:04:15.870 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:16.134 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  312 entities  33 bodies
+10-25 22:04:16.393 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:04:16.573 18475 18475 I dart3d  : perf n=124 fps=61.9 frame p50=11.1 p95=22.3 max=22.4 ms | gpu p50=12.5 p95=13.4 | backend p50=7.6 p95=11.8 | sim p50=1.3 p95=3.0 (physics p50=0.0 p95=0.1) | submit p50=5.4 p95=9.6 | skipped=45/169 physics=60/s
+10-25 22:04:16.653 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:16.915 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  312 entities  33 bodies
+10-25 22:04:17.170 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:04:17.443 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  312 entities  33 bodies
+10-25 22:04:17.694 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:17.949 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  312 entities  33 bodies
+10-25 22:04:18.206 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:18.459 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:04:18.573 18475 18475 I dart3d  : perf n=126 fps=62.9 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=12.6 p95=13.4 | backend p50=7.7 p95=12.7 | sim p50=1.5 p95=3.0 (physics p50=0.0 p95=0.1) | submit p50=5.2 p95=9.8 | skipped=38/164 physics=60/s
+10-25 22:04:18.732 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  312 entities  33 bodies
+10-25 22:04:19.001 18475 18475 I dart3d  : stats 56 fps  17.8 ms/frame  312 entities  33 bodies
+10-25 22:04:19.251 18475 18475 I dart3d  : stats 63 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:19.509 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:19.778 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  312 entities  33 bodies
+10-25 22:04:20.042 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  312 entities  33 bodies
+10-25 22:04:20.298 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:20.558 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  312 entities  33 bodies
+10-25 22:04:20.570 18475 18475 I dart3d  : perf n=122 fps=60.9 frame p50=11.2 p95=22.3 max=22.3 ms | gpu p50=12.6 p95=13.3 | backend p50=8.0 p95=12.0 | sim p50=1.4 p95=3.2 (physics p50=0.0 p95=0.1) | submit p50=5.1 p95=9.2 | skipped=46/168 physics=60/s
+10-25 22:04:20.810 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  312 entities  33 bodies
+10-25 22:04:21.068 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:21.326 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  312 entities  33 bodies
+10-25 22:04:21.581 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:04:21.839 18475 18475 I dart3d  : stats 59 fps  17.1 ms/frame  312 entities  33 bodies
+10-25 22:04:22.088 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:22.363 18475 18475 I dart3d  : stats 56 fps  17.8 ms/frame  312 entities  33 bodies
+10-25 22:04:22.585 18475 18475 I dart3d  : perf n=121 fps=60.4 frame p50=11.2 p95=22.3 max=22.3 ms | gpu p50=12.6 p95=13.3 | backend p50=8.1 p95=11.2 | sim p50=1.5 p95=3.5 (physics p50=0.0 p95=0.1) | submit p50=5.5 p95=9.4 | skipped=39/160 physics=60/s
+10-25 22:04:22.623 18475 18475 I dart3d  : stats 56 fps  17.8 ms/frame  312 entities  33 bodies
+10-25 22:04:22.893 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  312 entities  33 bodies
+10-25 22:04:23.160 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  312 entities  33 bodies
+10-25 22:04:23.427 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  312 entities  33 bodies
+10-25 22:04:23.695 18475 18475 I dart3d  : stats 56 fps  17.8 ms/frame  312 entities  33 bodies
+10-25 22:04:23.951 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:04:24.212 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:24.463 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:24.584 18475 18475 I dart3d  : perf n=125 fps=62.4 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=12.6 p95=13.7 | backend p50=7.9 p95=11.5 | sim p50=1.5 p95=2.9 (physics p50=0.0 p95=0.1) | submit p50=5.0 p95=9.8 | skipped=36/161 physics=60/s
+10-25 22:04:24.730 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  312 entities  33 bodies
+10-25 22:04:24.995 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  312 entities  33 bodies
+10-25 22:04:25.011 18475 18475 I PowerHalMgrImpl: perfLockAcq is supported. 
+10-25 22:04:25.012 18475 18475 D ActivityThread: handleResumeActivity#3 r.window=com.android.internal.policy.PhoneWindow@c36f53fa.mFinished = falsewillBeVisible = true
+10-25 22:04:25.260 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  312 entities  33 bodies
+10-25 22:04:25.527 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  312 entities  33 bodies
+10-25 22:04:25.786 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:04:26.041 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:04:26.297 18475 18475 I dart3d  : stats 62 fps  16.0 ms/frame  312 entities  33 bodies
+10-25 22:04:26.567 18475 18475 I dart3d  : stats 64 fps  15.7 ms/frame  312 entities  33 bodies
+10-25 22:04:26.582 18475 18475 I dart3d  : perf n=126 fps=62.9 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=12.8 p95=14.4 | backend p50=7.3 p95=12.8 | sim p50=0.9 p95=2.5 (physics p50=0.0 p95=0.1) | submit p50=4.0 p95=8.8 | skipped=43/169 physics=60/s
+10-25 22:04:26.827 18475 18475 I dart3d  : stats 66 fps  15.1 ms/frame  312 entities  33 bodies
+10-25 22:04:27.092 18475 18475 I dart3d  : stats 60 fps  16.7 ms/frame  312 entities  33 bodies

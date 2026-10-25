@@ -563,6 +563,26 @@ directional light aimed opposite `sunDirection`), and implements rate-limited
 | T2 dice smoke | pass — dice rack loads cleanly with 0 errors (`ios-sim-dice.png`, `ios-sim-dice-run.log`) | pass — dice roll & settle (`readout=103` Vulkan, `readout=96` OpenGL), 0 crashes (`a142-{vulkan,opengl}-dice.{png,log}`) |
 | Unit tests | `dn analyze` + `dn test` (`dart3d`: 325, `example`: 227) | `./gradlew :dart3d:testReleaseUnitTest` passes |
 
+## E4 — W19 character controller (verification in progress)
+
+Evidence is in `docs/artifacts/e4-w19-character-controller/README.md`.
+The upstream codec drives Android `CharacterVirtual` and iOS sweep-and-slide.
+The pinned Android binding adds landing-width acceptance and synchronous
+character-reference release. No new wire operation is introduced.
+
+| Platform | Character journey | Hero and real dice roll | Full harness |
+|---|---|---|---|
+| iPhone 17 Pro simulator | pass — cold launch and hot restart, step/push/slide/jump, public transform write, ten-second grounding (`ios-curb-fixed-run.log`) | observed settled readout 48, then a later timeout readout 48 (`ios-smoke-final-run.log`) | pass — W25 dice regression and `w18 lane complete` (`ios-harness-final-run.log`) |
+| A142 Vulkan | pass — all stages, including disposal back to hero (`android-vulkan-teardown-fixed-run.log`) | pass — readout 119 | pass — W25 dice regression and `w18 lane complete` (`android-vulkan-harness-final-run.log`) |
+| A142 OpenGL | pass — all stages and navigation (`android-opengl-final-run.log`) | pass — readout 41 | pass — W25 dice regression and `w18 lane complete` (`android-opengl-harness-final-run.log`) |
+| Fire OpenGL | pass — all stages and navigation (`fire-character-final-run.log`) | pass — readout 39 | pass — W25 dice regression and `w18 lane complete` (`fire-harness-final-run.log`) |
+| Wacom | NOT_RUN — awaiting the Fire's freed port | NOT_RUN | NOT_RUN |
+
+Package and example analyses are clean; 328 package and 228 example tests pass.
+The parent native task passes 151 tests with no skips and passes duplicate-class
+checking. Independent Codex source reviews report no material findings.
+E4 remains open until the required device matrix and operator review are complete.
+
 ## Notes
 
 - **Runtime-minted payloads need their spec on the op** — the W11

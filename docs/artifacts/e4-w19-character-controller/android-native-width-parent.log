@@ -1,0 +1,383 @@
+> Task :gradle:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle:pluginDescriptors
+> Task :gradle:processResources
+
+> Task :gradle:compileKotlin
+w: file:///Users/jasonholt/zero/packages/flutter_tools/gradle/src/main/kotlin/Deeplink.kt:13:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+- To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+- To keep applying to the value parameter only, use the '@param:' annotation target.
+
+See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+w: file:///Users/jasonholt/zero/packages/flutter_tools/gradle/src/main/kotlin/Deeplink.kt:15:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+- To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+- To keep applying to the value parameter only, use the '@param:' annotation target.
+
+See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+w: file:///Users/jasonholt/zero/packages/flutter_tools/gradle/src/main/kotlin/Deeplink.kt:17:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+- To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+- To keep applying to the value parameter only, use the '@param:' annotation target.
+
+See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+w: file:///Users/jasonholt/zero/packages/flutter_tools/gradle/src/main/kotlin/Deeplink.kt:19:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+- To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+- To keep applying to the value parameter only, use the '@param:' annotation target.
+
+See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+w: file:///Users/jasonholt/zero/packages/flutter_tools/gradle/src/main/kotlin/FlutterPlugin.kt:11:8 'interface ApkVariant : Any, BaseVariant, InstallableVariant, AndroidArtifactVariant, InternalBaseVariant' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/zero/packages/flutter_tools/gradle/src/main/kotlin/FlutterPlugin.kt:628:69 'interface ApkVariant : Any, BaseVariant, InstallableVariant, AndroidArtifactVariant, InternalBaseVariant' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/zero/packages/flutter_tools/gradle/src/main/kotlin/plugins/PluginHandler.kt:194:64 Unchecked cast of 'NamedDomainObjectContainer<out BuildType>' to 'NamedDomainObjectContainer<BuildType>'.
+w: file:///Users/jasonholt/zero/packages/flutter_tools/gradle/src/main/kotlin/plugins/PluginHandler.kt:195:69 Unchecked cast of 'NamedDomainObjectContainer<out BuildType>' to 'NamedDomainObjectContainer<BuildType>'.
+
+> Task :gradle:compileJava NO-SOURCE
+> Task :gradle:compileGroovy NO-SOURCE
+> Task :gradle:classes
+> Task :gradle:jar
+> Task :dart3d:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :dart3d:preBuild UP-TO-DATE
+> Task :dart3d:preReleaseBuild UP-TO-DATE
+> Task :dart3d:generateReleaseBuildConfig
+> Task :dart3d:generateReleaseResValues
+> Task :dart3d:generateReleaseResources
+> Task :dart3d:packageReleaseResources
+> Task :dart3d:preReleaseUnitTestBuild UP-TO-DATE
+> Task :dart3d:javaPreCompileRelease
+> Task :dart3d:javaPreCompileReleaseUnitTest
+> Task :dart3d:parseReleaseLocalResources
+> Task :dart3d:generateReleaseRFile
+> Task :dart3d:generateReleaseUnitTestStubRFile
+
+> Task :dart3d:compileReleaseKotlin
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/Dart3dView.kt:2003:17 'field filterWidth: Float' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/EnvironmentFactory.kt:1023:45 'constructor(p0: Buffer, p1: Texture.Format, p2: Texture.Type): Texture.PixelBufferDescriptor' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/EnvironmentFactory.kt:1030:45 'constructor(p0: Buffer, p1: Texture.Format, p2: Texture.Type): Texture.PixelBufferDescriptor' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/EnvironmentFactory.kt:1231:25 'constructor(p0: Buffer, p1: Texture.Format, p2: Texture.Type): Texture.PixelBufferDescriptor' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/FsceneRealizer.kt:5845:17 Condition is always 'true'.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/TextureFactory.kt:274:41 'constructor(p0: Buffer, p1: Texture.Format, p2: Texture.Type): Texture.PixelBufferDescriptor' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/TextureFactory.kt:300:41 'constructor(p0: Buffer, p1: Texture.Format, p2: Texture.Type): Texture.PixelBufferDescriptor' is deprecated. Deprecated in Java.
+
+> Task :dart3d:compileReleaseJavaWithJavac
+> Task :dart3d:processReleaseJavaRes
+> Task :dart3d:bundleLibCompileToJarRelease
+> Task :dart3d:bundleLibRuntimeToJarRelease
+> Task :dart3d:compileReleaseUnitTestKotlin
+> Task :dart3d:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :dart3d:processReleaseUnitTestJavaRes
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::loadLibrary has been called by com.jasonholtdigital.dart3d.JoltWorld$Companion in an unnamed module (file:/Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/build/dart3d/intermediates/runtime_library_classes_jar/release/bundleLibRuntimeToJarRelease/classes.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+
+> Task :dart3d:testReleaseUnitTest
+
+CharacterControllerNativeTest > rejectedWidthPreservesOrdinaryMovementAndGroundImpulse PASSED
+
+CharacterControllerNativeTest > clippedStepUpStillAcceptsWideLanding PASSED
+
+CharacterControllerNativeTest > stairCorrectionUsesOnlyRemainingRequestedDistance PASSED
+
+CharacterControllerNativeTest > matchingCharacterMasksStillBlockMovement PASSED
+
+CharacterControllerNativeTest > actualDynamicBlockerStillDisablesAutostep PASSED
+
+CharacterControllerNativeTest > clippedStepUpStillRejectsNarrowLanding PASSED
+
+CharacterControllerNativeTest > characterContactHonorsSlideFalse PASSED
+
+CharacterControllerNativeTest > syncingColliderOnlyPoseMovesItsQueryableInnerBody PASSED
+
+CharacterControllerNativeTest > dynamicSupportingFloorDoesNotDisableStaticCurbStep PASSED
+
+CharacterControllerNativeTest > sameLandingAcceptsSmallerMinimumWidth PASSED
+
+CharacterControllerNativeTest > flatStairLandingRequiresMinimumForwardClearance PASSED
+
+CharacterControllerNativeTest > stairAttemptDoesNotRepeatTheGroundWeightImpulse PASSED
+
+CharacterControllerNativeTest > zeroMaskInnerBodyDoesNotBlockDynamicBodies PASSED
+
+CharacterControllerNativeTest > characterMasksApplyInBothDirections PASSED
+
+AnimClipsTest > stop pauses and rewinds but keeps blending at its weight PASSED
+
+AnimClipsTest > a 9-clip switch cycle via weight 0 leaves only the current clip PASSED
+
+AnimClipsTest > a stop-only cycle dilutes the current clip (the #33 shape) PASSED
+
+AnimClipsTest > a weight-0 clip contributes nothing PASSED
+
+AnimClipsTest > play trumps stop and seeks clamp to endTime PASSED
+
+BakeProgressTest > aRejectedRecipeNeverReportsExported PASSED
+
+BakeProgressTest > aCompleteFixedSetReportsExported PASSED
+
+BakeProgressTest > theScriptsSentinelsDoNotContainEachOther PASSED
+
+BakeProgressTest > theLastLineIsNeverIdleWhileACompileIsInFlight PASSED
+
+BakeProgressTest > theLaneIsIdleOnlyWhenEveryStartedCompileHasFinished PASSED
+
+BodyCarryTest > aParentWithoutABodyStillCountsTowardsDepth PASSED
+
+BodyCarryTest > kinematicBodiesCarryToo PASSED
+
+BodyCarryTest > fixedBodiesAreNotCarried PASSED
+
+BodyCarryTest > aParentLoopDoesNotHang PASSED
+
+BodyCarryTest > aSleepingBodyComesBackAsleep PASSED
+
+BodyCarryTest > nothingCapturedRestoresNothing PASSED
+
+BodyCarryTest > aRollingDieKeepsItsPoseVelocitiesAndWakefulness PASSED
+
+BodyCarryTest > theWholePoseCarriesWhateverSetTransformsWrote PASSED
+
+BodyCarryTest > aBodyThatDidNotComeBackIsSkipped PASSED
+
+BodyCarryTest > aBodyRebuiltAsAnotherKindKeepsItsRebuiltState PASSED
+
+BodyCarryTest > aChildIsSyncedAfterItsParentWhateverTheMapOrder PASSED
+
+BodyCarryTest > restoreReportsTheKeysItRestored PASSED
+
+CollisionSubGroupsTest > aRowAgainstAFreeIdIsRewrittenWhenThatIdReturns PASSED
+
+CollisionSubGroupsTest > rebuildingEveryBodyManyTimesNeverRunsOut PASSED
+
+CollisionSubGroupsTest > reportsFullInsteadOfOverrunningTheTable PASSED
+
+CollisionSubGroupsTest > appliesTheLayerMaskRuleBothWays PASSED
+
+CollisionSubGroupsTest > aReusedIdDoesNotInheritItsPreviousRow PASSED
+
+CollisionSubGroupsTest > aReleasedIdIsHandedOutAgain PASSED
+
+DeviceProfileTest > the profile is on only for a low device with no quality tier PASSED
+
+DeviceProfileTest > off the low profile the widget's mode passes through PASSED
+
+DeviceProfileTest > the low profile turns requested MSAA into FXAA alone PASSED
+
+DeviceProfileTest > an invalid authored scale means full resolution, not dynamic PASSED
+
+DeviceProfileTest > an authored 1_0 stays fixed at full resolution PASSED
+
+DeviceProfileTest > nothing authored - dynamic on the low profile, off otherwise PASSED
+
+DeviceProfileTest > an authored scale is fixed on either tier, the entry's first PASSED
+
+DeviceProfileTest > a quality tier owns AA whatever the widget asked for PASSED
+
+DeviceProfileTest > the low profile keeps an explicit no-AA and an unsent mode PASSED
+
+DeviceTierTest > the Fire tablet is low, by memory and by GPU PASSED
+
+DeviceTierTest > the boundary itself is standard, one byte under is low PASSED
+
+DeviceTierTest > the A142's Mali-G610 is standard PASSED
+
+DeviceTierTest > the system's low-RAM flag wins PASSED
+
+DeviceTierTest > the listed families are low whatever the memory PASSED
+
+DeviceTierTest > faster neighbours of the listed families are standard PASSED
+
+DeviceTierTest > the Wacom tablet's 8 GB doesn't hide its Mali-G57 PASSED
+
+DeviceTierTest > an unlisted or unknown GPU is decided by memory PASSED
+
+DeviceTierTest > an unreadable memory size doesn't demote the device PASSED
+
+DeviceTierTest > an ANGLE-wrapped renderer string is read by the GPU inside it PASSED
+
+DeviceTierTest > a 4 GB device and up is standard PASSED
+
+DeviceTierTest > a three-digit Mali-G model is not its two-digit prefix PASSED
+
+FencedTest > aFailingBuildStillPropagates PASSED
+
+FencedTest > runsTheBlockOnTheReceiverAndReturnsItsResult PASSED
+
+FramePerfTest > nearest-rank percentiles PASSED
+
+FramePerfTest > gpu times count once each and wait for a pending frame PASSED
+
+FramePerfTest > skipped callbacks lengthen the interval and are counted PASSED
+
+FramePerfTest > a window reports once it has run its length PASSED
+
+FramePerfTest > a window with nothing drawn says so PASSED
+
+MaterialPackagesTest > a stored package the engine refuses is dropped and not served again PASSED
+
+MaterialPackagesTest > every fixed package has its own key and fingerprint PASSED
+
+MaterialPackagesTest > packages are baked for OpenGL and Vulkan PASSED
+
+MaterialPackagesTest > the fixed set adds the catcher and both particle blends PASSED
+
+MaterialPackagesTest > the base set is lit x3, unlit x3 and the trail, in bind order PASSED
+
+MaterialPackagesTest > the fingerprint follows every builder input PASSED
+
+MaterialPackagesTest > a variant key carries extension flags, bound slots and the API PASSED
+
+MaterialPackagesTest > bound slots and extension flags change the package PASSED
+
+MaterialPackagesTest > a package that did not come from the store cannot be rejected PASSED
+
+MaterialPackagesTest > the fingerprint is stable for equal inputs PASSED
+
+MaterialPackagesTest > the fingerprint follows the Filament version PASSED
+
+MaterialStoreTest > a rejected package is no longer served from the shipped set or the cache PASSED
+
+MaterialStoreTest > parseIndex skips blank, malformed and comment lines PASSED
+
+MaterialStoreTest > the export gets the raw package and an index line PASSED
+
+MaterialStoreTest > after a rejection the recompiled package is served, also to a later process PASSED
+
+MaterialStoreTest > exporting a package twice leaves one index line PASSED
+
+MaterialStoreTest > a failed write leaves no temp file PASSED
+
+MaterialStoreTest > a save clears orphaned temp files but not a fresh one PASSED
+
+MaterialStoreTest > a truncated cache file reads as a miss PASSED
+
+MaterialStoreTest > the cache directory is created on first save PASSED
+
+MaterialStoreTest > a saved package is found by a later store on the same directory PASSED
+
+MaterialStoreTest > a shipped package wins over the cache and is asked for by file name PASSED
+
+MaterialStoreTest > no temp file is left behind PASSED
+
+MaterialStoreTest > a rejection holds without a cache directory PASSED
+
+MaterialStoreTest > the cache keeps only the most recently used packages PASSED
+
+MaterialStoreTest > an unknown fingerprint is a miss PASSED
+
+MaterialStoreTest > a damaged cache file reads as a miss and is removed PASSED
+
+MeshFactoryTest > procedural generators emit the shared record PASSED
+
+MeshFactoryTest > stride constants match the 15-float record PASSED
+
+MeshFactoryTest > mirrored instances are rewound to face outward PASSED
+
+MeshFactoryTest > swapTriangleWinding reverses each triangle PASSED
+
+MeshFactoryTest > cuboid debugColors keys vertex color to corner sign bits PASSED
+
+MeshFactoryTest > interleaved payload decodes channels at the declared offsets PASSED
+
+MeshFactoryTest > indicesFromPayload decodes little-endian widths PASSED
+
+MeshFactoryTest > malformed payloads fail loudly PASSED
+
+MeshFactoryTest > tube tolerates zero subdivision counts PASSED
+
+MeshFactoryTest > reflectedTangentCopy negates tangent and normal and flips handedness PASSED
+
+MeshFactoryTest > uv1 layouts carry the second UV channel into the record tail PASSED
+
+MeshFactoryTest > bakeInstances transforms normals by the exact inverse-transpose PASSED
+
+MeshFactoryTest > sphere and torus wind outward PASSED
+
+MeshFactoryTest > cuboid winds every face outward including -Y PASSED
+
+MeshFactoryTest > large spheres and tori switch to 32-bit indices PASSED
+
+MeshFactoryTest > skinned payload appends the joints and weights tail PASSED
+
+MeshFactoryTest > icosphere subdivisions are capped PASSED
+
+MeshFactoryTest > p3t4 payload expands into the shared record PASSED
+
+MeshFactoryTest > degenerate dash patterns render solid instead of looping PASSED
+
+MeshFactoryTest > positionsFromPayload mirrors z except on p3t4 PASSED
+
+MeshFactoryTest > plane lies in XZ and winds facing +Y PASSED
+
+MeshPrimitivesTest > multi-primitive mesh unwraps tagged map entries PASSED
+
+MeshPrimitivesTest > material-less primitive keeps a null slot PASSED
+
+MeshPrimitivesTest > mesh with neither form resolves empty PASSED
+
+MeshPrimitivesTest > single-primitive mesh reads direct geometry and material refs PASSED
+
+MeshPrimitivesTest > primitive entry missing geometry is skipped PASSED
+
+NativeScopeTest > closesEverythingInReverseOrderOnReturn PASSED
+
+NativeScopeTest > ownReturnsItsArgumentAndClosesOnlyOnce PASSED
+
+NativeScopeTest > closesOnEarlyReturn PASSED
+
+NativeScopeTest > oneFailingCloseDoesNotSkipTheRest PASSED
+
+NativeScopeTest > closesOnThrow PASSED
+
+NativeScopeTest > ownIfCloseableTakesWrappersAndPassesEverythingElse PASSED
+
+PendingClaimsTest > skin and animation claims never arm PASSED
+
+PendingClaimsTest > an unclaimed chunk never arms regardless of the pending set PASSED
+
+PendingClaimsTest > a chunk claimed by a non-pending ref does not arm PASSED
+
+PendingClaimsTest > a chunk awaited by a deferred geometry arms the re-realize PASSED
+
+PendingClaimsTest > a chunk awaited by a deferred texture arms the re-realize PASSED
+
+PendingClaimsTest > an env or LUT claim served surgically never arms PASSED
+
+ShippedMaterialsTest > the shipped index names each package's key PASSED
+
+ShippedMaterialsTest > the plugin ships every fixed package for the pinned Filament PASSED
+
+ShippedMaterialsTest > the plugin ships nothing but the fixed set PASSED
+
+TransformWritesTest > a clip-driven node is left to the manifest pose PASSED
+
+TransformWritesTest > a structural rewrite supersedes earlier writes PASSED
+
+TransformWritesTest > written fields accumulate per node PASSED
+
+TransformWritesTest > capture reads the node's current pose, not the written one PASSED
+
+TransformWritesTest > a removed subtree drops every doomed node's writes PASSED
+
+TransformWritesTest > capture copies, so the rebuild can't alias the old node PASSED
+
+TransformWritesTest > an untouched node is not carried PASSED
+
+TransformWritesTest > an empty mask records nothing and clear forgets everything PASSED
+
+TransformWritesTest > a removed node is skipped PASSED
+
+TurbulenceGradientsTest > table is 64 stride-4 vectors PASSED
+
+TurbulenceGradientsTest > every vector is an edge gradient with a zero pad PASSED
+
+TurbulenceGradientsTest > known entries match the Dart reference PASSED
+
+[Incubating] Problems report is available at: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.3.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 15s
+21 actionable tasks: 21 executed
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.3.1/userguide/configuration_cache_enabling.html

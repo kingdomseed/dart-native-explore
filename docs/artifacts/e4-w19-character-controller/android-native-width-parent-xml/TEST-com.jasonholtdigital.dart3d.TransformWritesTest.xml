@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.jasonholtdigital.dart3d.TransformWritesTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-10-25T20:25:27.509Z" hostname="Jasons-Mac-mini" time="0.002">
+  <properties/>
+  <testcase name="a clip-driven node is left to the manifest pose" classname="com.jasonholtdigital.dart3d.TransformWritesTest" time="0.001"/>
+  <testcase name="a structural rewrite supersedes earlier writes" classname="com.jasonholtdigital.dart3d.TransformWritesTest" time="0.0"/>
+  <testcase name="written fields accumulate per node" classname="com.jasonholtdigital.dart3d.TransformWritesTest" time="0.0"/>
+  <testcase name="capture reads the node's current pose, not the written one" classname="com.jasonholtdigital.dart3d.TransformWritesTest" time="0.0"/>
+  <testcase name="a removed subtree drops every doomed node's writes" classname="com.jasonholtdigital.dart3d.TransformWritesTest" time="0.001"/>
+  <testcase name="capture copies, so the rebuild can't alias the old node" classname="com.jasonholtdigital.dart3d.TransformWritesTest" time="0.0"/>
+  <testcase name="an untouched node is not carried" classname="com.jasonholtdigital.dart3d.TransformWritesTest" time="0.0"/>
+  <testcase name="an empty mask records nothing and clear forgets everything" classname="com.jasonholtdigital.dart3d.TransformWritesTest" time="0.0"/>
+  <testcase name="a removed node is skipped" classname="com.jasonholtdigital.dart3d.TransformWritesTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

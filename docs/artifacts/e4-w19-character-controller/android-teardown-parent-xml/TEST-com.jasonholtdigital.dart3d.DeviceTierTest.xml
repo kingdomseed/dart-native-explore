@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.jasonholtdigital.dart3d.DeviceTierTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-10-25T20:56:06.898Z" hostname="Jasons-Mac-mini" time="0.001">
+  <properties/>
+  <testcase name="the Fire tablet is low, by memory and by GPU" classname="com.jasonholtdigital.dart3d.DeviceTierTest" time="0.0"/>
+  <testcase name="the boundary itself is standard, one byte under is low" classname="com.jasonholtdigital.dart3d.DeviceTierTest" time="0.0"/>
+  <testcase name="the A142's Mali-G610 is standard" classname="com.jasonholtdigital.dart3d.DeviceTierTest" time="0.001"/>
+  <testcase name="the system's low-RAM flag wins" classname="com.jasonholtdigital.dart3d.DeviceTierTest" time="0.0"/>
+  <testcase name="the listed families are low whatever the memory" classname="com.jasonholtdigital.dart3d.DeviceTierTest" time="0.0"/>
+  <testcase name="faster neighbours of the listed families are standard" classname="com.jasonholtdigital.dart3d.DeviceTierTest" time="0.0"/>
+  <testcase name="the Wacom tablet's 8 GB doesn't hide its Mali-G57" classname="com.jasonholtdigital.dart3d.DeviceTierTest" time="0.0"/>
+  <testcase name="an unlisted or unknown GPU is decided by memory" classname="com.jasonholtdigital.dart3d.DeviceTierTest" time="0.0"/>
+  <testcase name="an unreadable memory size doesn't demote the device" classname="com.jasonholtdigital.dart3d.DeviceTierTest" time="0.0"/>
+  <testcase name="an ANGLE-wrapped renderer string is read by the GPU inside it" classname="com.jasonholtdigital.dart3d.DeviceTierTest" time="0.0"/>
+  <testcase name="a 4 GB device and up is standard" classname="com.jasonholtdigital.dart3d.DeviceTierTest" time="0.0"/>
+  <testcase name="a three-digit Mali-G model is not its two-digit prefix" classname="com.jasonholtdigital.dart3d.DeviceTierTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

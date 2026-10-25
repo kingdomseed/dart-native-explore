@@ -1,0 +1,30 @@
+Launching lib/main.dart on iPhone 17 Pro in debug mode...
+Running Xcode build...                                          
+Xcode build done.                                           14.1s
+dartnative: [DN] Licence valid (community), expires 2027-09-14
+dartnative: [DN] lifecycle → AppLifecycleState.inactive
+dartnative: dart3d: showcase — w19: 10 nodes · 5 geo · 7 mat
+Syncing files to device iPhone 17 Pro...                            69ms
+
+DartNative run key commands.
+r Hot reload. 🔥🔥🔥
+R Hot restart.
+h List all available interactive commands.
+d Detach (terminate "dn run" but leave application running).
+c Clear the screen
+q Quit (terminate the application on the device).
+
+A Dart VM Service on iPhone 17 Pro is available at: http://127.0.0.1:61764/q0DFxzzrBjs=/
+The DartNative DevTools debugger and profiler on iPhone 17 Pro is available at: http://127.0.0.1:61764/q0DFxzzrBjs=/devtools/?uri=ws://127.0.0.1:61764/q0DFxzzrBjs=/ws
+dartnative: [DN] lifecycle → AppLifecycleState.resumed
+dartnative: dart3d: w19 stage=init ready PASS
+dartnative: dart3d: w19 stage=walk pos=(-1.52,0.67,-0.40) grounded=false PASS
+dartnative: dart3d: w19 stage=step pos=(-1.52,0.67,-0.40) grounded=false FAIL
+dartnative: dart3d: w19 stage=push charPos=(-1.52,0.67) crateX=0.45 grounded=false FAIL
+dartnative: dart3d: w19 stage=slope pos=(1.16,0.62,1.35) sliding=false observedSlide=true PASS
+dartnative: dart3d: w19 stage=gravity pos=(-0.88,0.93,-0.40) grounded=true peakY=1.47 PASS
+dartnative: dart3d: w19 stage=transform PASS
+dartnative: dart3d: w19 stage=stable seconds=10 pos=(-3.00,0.67,-0.40) PASS
+dartnative: dart3d: w19 complete FAIL
+
+Application finished.

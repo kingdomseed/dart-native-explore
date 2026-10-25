@@ -178,6 +178,38 @@ ComponentSpec physicsWorldComponent({
   );
 }
 
+/// Creates an upstream `characterController` component for a collider node.
+ComponentSpec characterControllerComponent({
+  Vector3? up,
+  double offset = 0.01,
+  bool slide = true,
+  double maxSlopeClimbAngle = 0.7853981633974483,
+  double minSlopeSlideAngle = 0.7853981633974483,
+  double? snapToGround = 0.1,
+  bool autostep = false,
+  double autostepMaxHeight = 0.3,
+  double autostepMinWidth = 0.1,
+  bool autostepIncludeDynamicBodies = true,
+  double mass = 0.0,
+}) {
+  return ComponentSpec(
+    'characterController',
+    properties: {
+      'up': Vec3Value((up ?? Vector3(0, 1, 0)).normalized()),
+      'offset': DoubleValue(offset),
+      'slide': BoolValue(slide),
+      'maxSlopeClimbAngle': DoubleValue(maxSlopeClimbAngle),
+      'minSlopeSlideAngle': DoubleValue(minSlopeSlideAngle),
+      if (snapToGround != null) 'snapToGround': DoubleValue(snapToGround),
+      'autostep': BoolValue(autostep),
+      'autostepMaxHeight': DoubleValue(autostepMaxHeight),
+      'autostepMinWidth': DoubleValue(autostepMinWidth),
+      'autostepIncludeDynamicBodies': BoolValue(autostepIncludeDynamicBodies),
+      'mass': DoubleValue(mass),
+    },
+  );
+}
+
 /// A node's world-space pose read back from native, delivered in
 /// `.fscene` coordinates (left-handed, +Y up, +Z forward) — the inverse
 /// conversion is applied on the native side.
@@ -503,6 +535,19 @@ List<SceneOverlapHit> decodeOverlapReply(Map<String, Object?> reply) => [
           colliderIndex: (h['collider'] as num?)?.toInt() ?? 0,
         ),
 ];
+
+/// Decodes a `moveCharacter` `queryReply` into upstream's [CharacterMovement]
+/// (`W19` / `E4`).
+CharacterMovement decodeCharacterMovementReply(Map<String, Object?> reply) {
+  final t = _wireVec3(reply['translation']) ?? Vector3.zero();
+  final grounded = reply['grounded'] == true;
+  final sliding = reply['slidingDownSlope'] == true;
+  return CharacterMovement(
+    translation: t,
+    grounded: grounded,
+    slidingDownSlope: sliding,
+  );
+}
 
 LocalId? _wireLocalId(Object? json) => switch (json) {
   {'s': num s, 'i': num i} => LocalId(s.toInt(), i.toInt()),

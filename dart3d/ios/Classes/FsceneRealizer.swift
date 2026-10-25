@@ -53,6 +53,9 @@ enum FsceneRealizer {
         // joints — drop the previous document's registrations so a
         // re-install never duplicates them.
         host.beginComponentJointRegistration()
+        host.characterControllers.removeAll()
+        host.pendingCharacterControllers.removeAll()
+        host.colliderLayerMaskByKey.removeAll()
         ctx.decodePayloadSpecs(json["payloads"] as? [String: Any] ?? [:])
         ctx.decodeResources(json["resources"] as? [String: Any] ?? [:])
         if preserveStage {
@@ -1795,8 +1798,16 @@ enum FsceneRealizer {
             }
             node.geometry = geometry
             if let t = host.pendingColliderShapes.removeValue(forKey: key) {
+                let s = derivedShape(node, t, "deferred")
                 if let body = node.physicsBody, body.physicsShape == nil {
-                    body.physicsShape = derivedShape(node, t, "deferred")
+                    body.physicsShape = s
+                }
+                if let ccProps = host.pendingCharacterControllers.removeValue(forKey: key) {
+                    let lm = host.colliderLayerMaskByKey[key]
+                    decodeCharacterController(
+                        key, node, ccProps,
+                        collider: (shape: s, friction: nil, restitution: nil,
+                                   layer: lm?.layer, mask: lm?.mask, trigger: false))
                 }
             }
             if let fp {
@@ -3789,7 +3800,7 @@ enum FsceneRealizer {
             case "meshParticleEmitter":
                 decodeParticleEmitter(key: key, node: node, index: index,
                                       props: props, mesh: true)
-            case "rigidBody", "collider", "physicsWorld":
+            case "rigidBody", "collider", "physicsWorld", "characterController":
                 physicsDeferred.append((key, node, type, props))
             case "fixedJoint", "sphericalJoint", "revoluteJoint",
                  "prismaticJoint", "genericJoint":
@@ -4026,7 +4037,12 @@ enum FsceneRealizer {
                  restitution: Double?, layer: Int?, mask: Int?,
                  trigger: Bool)] = [:]
             for item in physicsDeferred where item.type == "collider" {
-                colliders[item.key] = decodeCollider(item.node, item.props)
+                let c = decodeCollider(item.node, item.props)
+                colliders[item.key] = c
+                host.colliderLayerMaskByKey[item.key] = (
+                    layer: c.layer ?? -1,
+                    mask: c.mask ?? -1
+                )
                 // Geometry-derived kinds return a nil shape while the
                 // node's geometry is still payload-deferred — the body
                 // then attaches shapeless and SceneKit never re-derives
@@ -4053,6 +4069,10 @@ enum FsceneRealizer {
             for item in physicsDeferred where item.type == "rigidBody" {
                 decodeRigidBody(item.key, item.node, item.props,
                                 collider: colliders[item.key])
+            }
+            for item in physicsDeferred where item.type == "characterController" {
+                decodeCharacterController(item.key, item.node, item.props,
+                                          collider: colliders[item.key])
             }
             for item in physicsDeferred where item.type == "physicsWorld" {
                 if let g = d3Vec3(item.props["gravity"]), g.count >= 3 {
@@ -4099,6 +4119,57 @@ enum FsceneRealizer {
                     + " cat=\(b.map { String($0.categoryBitMask, radix: 16) } ?? "-")"
                     + " mask=\(b.map { String($0.collisionBitMask, radix: 16) } ?? "-")")
             }
+        }
+
+        func decodeCharacterController(
+            _ key: UInt64,
+            _ node: SCNNode,
+            _ p: [String: Any],
+            collider: (shape: SCNPhysicsShape?, friction: Double?,
+                       restitution: Double?, layer: Int?, mask: Int?,
+                       trigger: Bool)?
+        ) {
+            guard let shape = collider?.shape else {
+                host.pendingCharacterControllers[key] = p
+                host.logOnce("character.\(key).noshape",
+                    "node \(key): characterController has no sibling collider shape; deferred")
+                return
+            }
+            host.pendingCharacterControllers.removeValue(forKey: key)
+            if node.physicsBody == nil {
+                let kb = SCNPhysicsBody(type: .kinematic, shape: shape)
+                let layer = collider?.layer ?? 1
+                let mask = collider?.mask ?? -1
+                kb.categoryBitMask = (layer >= 0 ? (layer << 2) : (1 << 2))
+                kb.collisionBitMask = (mask >= 0 ? (mask << 2) : ~0)
+                node.physicsBody = kb
+            }
+            let rawUp = d3Vec3(p["up"]) ?? [0, 1, 0]
+            let scnUp = D3Wire.position(rawUp)
+            let upVec = simd_float3(Float(scnUp.x), Float(scnUp.y), Float(scnUp.z))
+            let upLen = simd_length(upVec)
+            let normUp = upLen > 1e-6 ? (upVec / upLen) : simd_float3(0, 1, 0)
+            let halfPi = Float.pi / 2.0
+            let quarterPi = Float.pi / 4.0
+            let maxClimb = min(max(Float(d3Double(p["maxSlopeClimbAngle"]) ?? Double(quarterPi)), 0), halfPi)
+            let minSlide = min(max(Float(d3Double(p["minSlopeSlideAngle"]) ?? Double(quarterPi)), 0), halfPi)
+            let snap = d3Double(p["snapToGround"]).flatMap { $0 >= 0 ? Float($0) : nil }
+            host.characterControllers[key] = SceneViewHost.CharacterControllerState(
+                shape: shape,
+                up: normUp,
+                offset: max(0, Float(d3Double(p["offset"]) ?? 0.01)),
+                slide: d3Bool(p["slide"]) ?? true,
+                maxSlopeClimbAngle: maxClimb,
+                minSlopeSlideAngle: minSlide,
+                snapToGround: snap,
+                autostep: d3Bool(p["autostep"]) ?? false,
+                autostepMaxHeight: max(0, Float(d3Double(p["autostepMaxHeight"]) ?? 0.3)),
+                autostepMinWidth: max(0, Float(d3Double(p["autostepMinWidth"]) ?? 0.1)),
+                autostepIncludeDynamicBodies: d3Bool(p["autostepIncludeDynamicBodies"]) ?? true,
+                mass: max(0, Float(d3Double(p["mass"]) ?? 0.0)),
+                layer: collider?.layer ?? -1,
+                mask: collider?.mask ?? -1
+            )
         }
 
         /// Decodes one collider component: the `shape` tagged union, the
@@ -4704,8 +4775,16 @@ enum FsceneRealizer {
             // payload-deferred, so the body attached shapeless. Refit
             // the recorded derivation now that the geometry exists.
             if let t = host.pendingColliderShapes.removeValue(forKey: key) {
+                let s = derivedShape(node, t, "deferred")
                 if let body = node.physicsBody, body.physicsShape == nil {
-                    body.physicsShape = derivedShape(node, t, "deferred")
+                    body.physicsShape = s
+                }
+                if let ccProps = host.pendingCharacterControllers.removeValue(forKey: key) {
+                    let lm = host.colliderLayerMaskByKey[key]
+                    decodeCharacterController(
+                        key, node, ccProps,
+                        collider: (shape: s, friction: nil, restitution: nil,
+                                   layer: lm?.layer, mask: lm?.mask, trigger: false))
                 }
             }
             // W11: the geometry may carry morph targets; the node may

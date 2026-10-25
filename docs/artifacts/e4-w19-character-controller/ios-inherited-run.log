@@ -1,0 +1,30 @@
+Downloading ios tools...                                         2,872ms
+Downloading ios-profile tools...                                 2,522ms
+Downloading ios-release tools...                                    3.3s
+Launching lib/main.dart on iPhone 17 Pro in debug mode...
+Running Xcode build...                                          
+Xcode build done.                                           27.9s
+dartnative: [DN] Licence valid (community), expires 2027-09-14
+dartnative: [DN] lifecycle → AppLifecycleState.inactive
+dartnative: dart3d: showcase — w19: 10 nodes · 5 geo · 7 mat
+Syncing files to device iPhone 17 Pro...                            83ms
+
+DartNative run key commands.
+r Hot reload. 🔥🔥🔥
+R Hot restart.
+h List all available interactive commands.
+d Detach (terminate "dn run" but leave application running).
+c Clear the screen
+q Quit (terminate the application on the device).
+
+A Dart VM Service on iPhone 17 Pro is available at: http://127.0.0.1:57663/x8s1vkZXPc4=/
+The DartNative DevTools debugger and profiler on iPhone 17 Pro is available at: http://127.0.0.1:57663/x8s1vkZXPc4=/devtools/?uri=ws://127.0.0.1:57663/x8s1vkZXPc4=/ws
+dartnative: [DN] lifecycle → AppLifecycleState.resumed
+dartnative: [DN] Launch check ok — app=com.jasonholtdigital.dart3dExample installs=0 tier=free
+dartnative: dart3d: w19 stage=init ready PASS
+dartnative: dart3d: w19 stage=walk pos=(-1.45,0.69,-0.40) grounded=true PASS
+dartnative: dart3d: w19 stage=step pos=(-0.51,0.91,-0.40) grounded=true PASS
+dartnative: dart3d: w19 stage=push charPos=(0.52,0.91) crateX=1.21 grounded=false PASS
+dartnative: dart3d: w19 stage=slope pos=(1.20,0.62,1.35) sliding=true PASS
+dartnative: dart3d: w19 stage=gravity pos=(0.92,0.93,-0.40) grounded=true PASS
+dartnative: dart3d: w19 complete PASS

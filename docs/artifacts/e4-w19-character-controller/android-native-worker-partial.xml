@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" tests="10" skipped="1" failures="0" errors="0" timestamp="2026-10-25T19:32:51.191Z" hostname="Jasons-Mac-mini" time="0.032">
+  <properties/>
+  <testcase name="stairCorrectionUsesOnlyRemainingRequestedDistance" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.026"/>
+  <testcase name="matchingCharacterMasksStillBlockMovement" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.001"/>
+  <testcase name="actualDynamicBlockerStillDisablesAutostep" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.0"/>
+  <testcase name="characterContactHonorsSlideFalse" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.0"/>
+  <testcase name="syncingColliderOnlyPoseMovesItsQueryableInnerBody" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.002"/>
+  <testcase name="dynamicSupportingFloorDoesNotDisableStaticCurbStep" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.0"/>
+  <testcase name="flatStairLandingRequiresMinimumForwardClearance" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.0">
+    <skipped/>
+  </testcase>
+  <testcase name="stairAttemptDoesNotRepeatTheGroundWeightImpulse" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.001"/>
+  <testcase name="zeroMaskInnerBodyDoesNotBlockDynamicBodies" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.001"/>
+  <testcase name="characterMasksApplyInBothDirections" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

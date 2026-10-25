@@ -202,6 +202,26 @@ final class SceneViewHost: SCNView {
     var pendingSkyEnvStage: [String: Any]?
     var pendingSkyEnvInterval: Double = 0.15
 
+    struct CharacterControllerState {
+        var shape: SCNPhysicsShape
+        var up: simd_float3
+        var offset: Float
+        var slide: Bool
+        var maxSlopeClimbAngle: Float
+        var minSlopeSlideAngle: Float
+        var snapToGround: Float?
+        var autostep: Bool
+        var autostepMaxHeight: Float
+        var autostepMinWidth: Float
+        var autostepIncludeDynamicBodies: Bool
+        var mass: Float
+        var layer: Int
+        var mask: Int
+    }
+    var characterControllers: [UInt64: CharacterControllerState] = [:]
+    var pendingCharacterControllers: [UInt64: [String: Any]] = [:]
+    var colliderLayerMaskByKey: [UInt64: (layer: Int, mask: Int)] = [:]
+
     /// W14: the render-target registry — `rt:` key → record (spec,
     /// texture pair, the views targeting it, schedule state). Internal
     /// rather than `private(set)`: the offscreen scheduler in
@@ -1950,6 +1970,9 @@ final class SceneViewHost: SCNView {
             // node — a recycled id re-registers on re-decode.
             cameraFacing.removeValue(forKey: k)
             instancesProps.removeValue(forKey: k)
+            characterControllers.removeValue(forKey: k)
+            pendingCharacterControllers.removeValue(forKey: k)
+            colliderLayerMaskByKey.removeValue(forKey: k)
         }
         for (lk, spec) in lodSpecs where doomed.contains(lk) {
             for copy in spec.geoCopies {
@@ -2219,6 +2242,9 @@ final class SceneViewHost: SCNView {
         node.skinner = nil
         node.morpher = nil
         ctx.dynamicBodyKeys.remove(key)
+        characterControllers.removeValue(forKey: key)
+        pendingCharacterControllers.removeValue(forKey: key)
+        colliderLayerMaskByKey.removeValue(forKey: key)
         // A joint holding the dropped body re-defers — the post-decode
         // retry rebinds it to the rebuilt body. Component-declared
         // joints drop outright: the re-decode re-registers the ones
@@ -3144,6 +3170,7 @@ final class SceneViewHost: SCNView {
         case "raycast":   queryRaycast(q, json)
         case "overlap":   queryOverlap(q, json)
         case "shapecast": queryShapecast(q, json)
+        case "moveCharacter": queryMoveCharacter(q, json)
         default:
             queryError(q, "unknown query type '\(type)'")
         }
@@ -3319,6 +3346,323 @@ final class SceneViewHost: SCNView {
         hits.sort { $0.d < $1.d }
         fireEvent(type: 4, payload: "{\"q\":\(q),\"type\":\"shapecast\","
             + "\"hits\":[\(hits.map(\.json).joined(separator: ","))]}")
+    }
+
+    /// W19 / E4: `{"type":"moveCharacter","node":"<tok>","desiredTranslation":[dx,dy,dz],"deltaSeconds":dt}`
+    /// — kinematic move-and-slide over `convexSweepTest` with slope
+    /// classification, optional autostep, optional snap-to-ground, and
+    /// impulse transfer to dynamic bodies when `mass > 0`.
+    private func queryMoveCharacter(_ q: Int, _ json: [String: Any]) {
+        guard let token = json["node"] as? String,
+              let key = D3Wire.localIdKey(token) else {
+            queryError(q, "moveCharacter: invalid node")
+            return
+        }
+        guard let dWire = vec(json["desiredTranslation"]), dWire.count >= 3 else {
+            queryError(q, "moveCharacter: invalid desiredTranslation")
+            return
+        }
+        guard let node = nodesById[key],
+              let st = characterControllers[key],
+              let world = scene?.physicsWorld else {
+            fireEvent(type: 4, payload:
+                "{\"q\":\(q),\"type\":\"moveCharacter\","
+                + "\"translation\":[0.0,0.0,0.0],"
+                + "\"grounded\":false,\"slidingDownSlope\":false}")
+            return
+        }
+
+        world.updateCollisionPairs()
+        let queryBody = node.physicsBody
+        let queryCategory = queryBody?.categoryBitMask
+        // SceneKit uses body categories for sweep filtering. This synchronous
+        // query runs in the pre-step drain and restores the authored category
+        // before collision solving.
+        queryBody?.categoryBitMask = 0
+        defer {
+            if let queryCategory { queryBody?.categoryBitMask = queryCategory }
+        }
+        let dt = max(Float((json["deltaSeconds"] as? NSNumber)?.doubleValue
+            ?? world.timeStep), 1e-4)
+        let startPos = node.simdWorldPosition
+        var curPos = startPos
+        let rot = node.simdWorldOrientation
+        let initialDisp = simd_float3(
+            Float(dWire[0]), Float(dWire[1]), Float(-dWire[2]))
+        var rem = initialDisp
+        let up = st.up
+        let maxClimbCos = cos(st.maxSlopeClimbAngle)
+        let minSlideCos = cos(st.minSlopeSlideAngle)
+
+        func poseMatrix(_ p: simd_float3) -> SCNMatrix4 {
+            var m = simd_matrix4x4(rot)
+            m.columns.3 = simd_float4(p.x, p.y, p.z, 1.0)
+            return SCNMatrix4(m)
+        }
+
+        func sweep(_ from: simd_float3, _ delta: simd_float3,
+                   allowDynamic: Bool = true)
+            -> (contact: SCNPhysicsContact, other: SCNNode,
+                fraction: Float, normal: simd_float3)?
+        {
+            let dist = simd_length(delta)
+            guard dist > 1e-6 else { return nil }
+            let dir = delta / dist
+            let contacts = world.convexSweepTest(
+                with: st.shape,
+                from: poseMatrix(from),
+                to: poseMatrix(from + delta),
+                options: [.searchMode: SCNPhysicsWorld.TestSearchMode.all])
+            var best: (SCNPhysicsContact, SCNNode, Float, simd_float3)? = nil
+            for c in contacts {
+                let candidates = [c.nodeA, c.nodeB].compactMap { $0 }
+                guard let other = candidates.first(where: { $0 !== node })
+                else { continue }
+                if other.physicsBody?.collisionBitMask == 0 {
+                    continue
+                }
+                if let otherKey = nodeToKey[ObjectIdentifier(other)],
+                   let lm = colliderLayerMaskByKey[otherKey] {
+                    if (st.layer & lm.mask) == 0 || (lm.layer & st.mask) == 0 {
+                        continue
+                    }
+                }
+                if !allowDynamic && other.physicsBody?.type == .dynamic {
+                    continue
+                }
+                let rawN = simd_float3(
+                    Float(c.contactNormal.x),
+                    Float(c.contactNormal.y),
+                    Float(c.contactNormal.z))
+                let nLen = simd_length(rawN)
+                guard nLen > 1e-6 else { continue }
+                var n = rawN / nLen
+                if simd_dot(n, dir) > 0 { n = -n }
+                let frac = Float(c.sweepTestFraction)
+                if best == nil || frac < best!.2 {
+                    best = (c, other, frac, n)
+                }
+            }
+            return best
+        }
+
+        var grounded = false
+        var slidingDownSlope = false
+        var startedGrounded = false
+        var autostepSupport: SCNNode?
+
+        let preProbeDist = max(st.offset * 3.0, 0.08)
+        if let gHit = sweep(curPos, -up * preProbeDist) {
+            let hitDist = preProbeDist * gHit.fraction
+            let gap = max(0, hitDist - st.offset)
+            let cosG = simd_dot(gHit.normal, up)
+            if gap <= st.offset + 0.015 && cosG >= maxClimbCos - 1e-4 {
+                startedGrounded = true
+            }
+            if cosG < minSlideCos - 1e-4 && cosG > 0.05 {
+                slidingDownSlope = true
+                if st.slide {
+                    let tDownRaw = gHit.normal * cosG - up
+                    let tLen = simd_length(tDownRaw)
+                    if tLen > 1e-5 {
+                        let tDown = tDownRaw / tLen
+                        let climb = simd_dot(rem, -tDown)
+                        if climb > 0 { rem += tDown * climb }
+                        let slideMag = max(abs(simd_dot(rem, up)),
+                                           Float(worldGravityScale) * dt * dt * 2.5)
+                        if simd_dot(rem, tDown) < slideMag {
+                            rem += tDown * slideMag
+                        }
+                    }
+                }
+            }
+        }
+
+        for _ in 0..<3 {
+            let dist = simd_length(rem)
+            if dist <= 1e-5 { break }
+            guard let hit = sweep(curPos, rem) else {
+                curPos += rem
+                rem = .zero
+                break
+            }
+
+            let advance = max(0, dist * hit.fraction - st.offset)
+            if advance > 0 {
+                curPos += (rem / dist) * advance
+            }
+            let leftover = rem * (1.0 - hit.fraction)
+
+            if st.mass > 0, let body = hit.other.physicsBody,
+               body.type == .dynamic {
+                let vel = initialDisp / dt
+                let bv = body.velocity
+                let bodyVel = simd_float3(Float(bv.x), Float(bv.y), Float(bv.z))
+                let pushDir = -hit.normal
+                let vRelInto = simd_dot(vel - bodyVel, pushDir)
+                if vRelInto > 0 {
+                    let bMass = max(Float(body.mass), 0.1)
+                    let effMass = (st.mass * bMass) / max(st.mass + bMass, 1e-4)
+                    let jMag = min(effMass * vRelInto, bMass * 4.0)
+                    let imp = pushDir * jMag
+                    let localContact = hit.other.convertPosition(
+                        hit.contact.contactPoint, from: nil)
+                    body.applyForce(
+                        SCNVector3(imp.x, imp.y, imp.z),
+                        at: localContact,
+                        asImpulse: true)
+                }
+            }
+
+            let cosSlope = simd_dot(hit.normal, up)
+            let isSteep = cosSlope < maxClimbCos - 1e-4
+
+            if st.autostep && isSteep
+                && (st.autostepIncludeDynamicBodies
+                    || hit.other.physicsBody?.type != .dynamic) {
+                let horizRem = leftover - up * simd_dot(leftover, up)
+                let horizLen = simd_length(horizRem)
+                let initialHoriz = initialDisp - up * simd_dot(initialDisp, up)
+                let initialHorizLen = simd_length(initialHoriz)
+                if initialHorizLen > 1e-5 {
+                    let hDir = initialHoriz / initialHorizLen
+                    let stepUpVec = up * st.autostepMaxHeight
+                    let upHit = sweep(curPos, stepUpVec)
+                    let upDist = upHit.map {
+                        max(0, st.autostepMaxHeight * $0.fraction - st.offset)
+                    } ?? st.autostepMaxHeight
+                    if upDist > 1e-3 {
+                        let highPos = curPos + up * upDist
+                        let testFwdDist = max(horizLen, st.autostepMinWidth)
+                        let testFwdVec = hDir * testFwdDist
+                        let fwdHit = sweep(highPos, testFwdVec)
+                        let actualTestFwd = fwdHit.map {
+                            max(0, testFwdDist * $0.fraction - st.offset)
+                        } ?? testFwdDist
+                        if actualTestFwd >= st.autostepMinWidth - 1e-3 {
+                            let minWidthPos = highPos + hDir * st.autostepMinWidth
+                            let commitFwdDist = min(horizLen, actualTestFwd)
+                            let overPos = highPos + hDir * commitFwdDist
+                            let downSweepVec = -up * (upDist + st.offset * 2.0)
+                            if let minHit = sweep(minWidthPos, downSweepVec),
+                               simd_dot(minHit.normal, up) >= maxClimbCos - 1e-4,
+                               (st.autostepIncludeDynamicBodies
+                                || minHit.other.physicsBody?.type != .dynamic),
+                               let downHit = sweep(overPos, downSweepVec),
+                               (st.autostepIncludeDynamicBodies
+                                || downHit.other.physicsBody?.type != .dynamic) {
+                                let drop = max(0,
+                                    (upDist + st.offset * 2.0) * downHit.fraction
+                                    - st.offset)
+                                let landedPos = overPos - up * drop
+                                let climbed = simd_dot(landedPos - curPos, up)
+                                if climbed > 1e-3
+                                    && climbed <= st.autostepMaxHeight + 1e-3 {
+                                    curPos = landedPos
+                                    autostepSupport = minHit.other
+                                    grounded = true
+                                    rem = .zero
+                                    break
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if !st.slide {
+                rem = .zero
+                break
+            }
+
+            let canSlideDownhill = cosSlope < minSlideCos - 1e-4
+            let baseLeftover: simd_float3
+            if !canSlideDownhill && cosSlope > 0.05 && simd_dot(leftover, up) < 0 {
+                baseLeftover = leftover - up * simd_dot(leftover, up)
+            } else {
+                baseLeftover = leftover
+            }
+
+            if !isSteep {
+                rem = baseLeftover
+                    - hit.normal * simd_dot(baseLeftover, hit.normal)
+                grounded = true
+            } else {
+                let maxAllowedUp = max(0, simd_dot(baseLeftover, up))
+                var slideVec = baseLeftover
+                    - hit.normal * simd_dot(baseLeftover, hit.normal)
+                let upComp = simd_dot(slideVec, up)
+                if upComp > maxAllowedUp {
+                    let wallNRaw = hit.normal - up * cosSlope
+                    let wallNLen = simd_length(wallNRaw)
+                    if wallNLen > 1e-5 {
+                        let wallN = wallNRaw / wallNLen
+                        slideVec = baseLeftover - wallN * simd_dot(baseLeftover, wallN)
+                        let remUp = simd_dot(slideVec, up)
+                        if remUp > maxAllowedUp {
+                            slideVec -= up * (remUp - maxAllowedUp)
+                        }
+                    } else {
+                        slideVec -= up * (upComp - maxAllowedUp)
+                    }
+                }
+                if cosSlope > 0.05 && cosSlope < minSlideCos - 1e-4 {
+                    slidingDownSlope = true
+                }
+                rem = slideVec
+            }
+        }
+
+        let movingUpward = simd_dot(initialDisp, up) > 1e-4
+        let movingDownward = simd_dot(initialDisp, up) < -1e-5
+        let snapDist = max(0, st.snapToGround ?? 0)
+        let probeLen = max(snapDist, st.offset * 2.0) + 0.03
+        grounded = false
+        if let gHit = sweep(curPos, -up * probeLen) {
+            let hitDist = probeLen * gHit.fraction
+            let gap = max(0, hitDist - st.offset)
+            let cosG = simd_dot(gHit.normal, up)
+            let isSteep = cosG < minSlideCos - 1e-4 && cosG > 0.05
+            let isAutostepSupport = gHit.other === autostepSupport
+                && cosG > 0.05
+            if gap <= st.offset + 1e-3 {
+                if isSteep && !isAutostepSupport {
+                    slidingDownSlope = true
+                } else if !movingUpward
+                    && (isAutostepSupport || cosG >= maxClimbCos - 1e-4) {
+                    grounded = true
+                }
+            } else if let snap = st.snapToGround, snap >= 0,
+                      gap <= snap + 1e-3,
+                      startedGrounded && !movingUpward,
+                      (movingDownward || simd_length(initialDisp - up * simd_dot(initialDisp, up)) > 1e-5),
+                      !isSteep, cosG >= maxClimbCos - 1e-4 {
+                curPos -= up * gap
+                grounded = true
+            }
+        }
+        if slidingDownSlope { grounded = false }
+
+        if let parent = node.parent, parent !== scene?.rootNode {
+            let localPt = parent.simdConvertPosition(curPos, from: nil)
+            node.simdPosition = localPt
+        } else {
+            node.simdPosition = curPos
+        }
+        if let body = node.physicsBody {
+            body.resetTransform()
+        }
+        transformWrites[key, default: 0] |= 1
+
+        let actualDisp = curPos - startPos
+        let lp = node.simdPosition
+        fireEvent(type: 4, payload:
+            "{\"q\":\(q),\"type\":\"moveCharacter\","
+            + "\"translation\":[\(actualDisp.x),\(actualDisp.y),\(-actualDisp.z)],"
+            + "\"p\":[\(curPos.x),\(curPos.y),\(-curPos.z)],"
+            + "\"localPos\":[\(lp.x),\(lp.y),\(-lp.z)],"
+            + "\"grounded\":\(grounded),"
+            + "\"slidingDownSlope\":\(slidingDownSlope)}")
     }
 
     /// Wire `shape` → `SCNPhysicsShape` for the overlap/shapecast
@@ -4553,6 +4897,9 @@ final class SceneViewHost: SCNView {
         skyEnvProgressiveStep = 3
         activeSkyEnvStage = nil
         pendingSkyEnvStage = nil
+        characterControllers.removeAll()
+        pendingCharacterControllers.removeAll()
+        colliderLayerMaskByKey.removeAll()
         scene.fogStartDistance = 0
         scene.fogEndDistance = 0
         scene.fogDensityExponent = 1

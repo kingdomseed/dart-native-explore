@@ -1,0 +1,28 @@
+Launching lib/main.dart on A142 in release mode...
+Running Gradle task 'assembleRelease'...                        
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/Users/jasonholt/.gradle/wrapper/dists/gradle-9.3.1-all/9ot9r568e8zfvvd4mn8rbu1j0/gradle-9.3.1/lib/native-platform-0.22-milestone-29.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+Running Gradle task 'assembleRelease'...                           77.1s
+✓ Built build/app/outputs/dn-apk/app-release.apk (110.5MB)
+Installing build/app/outputs/dn-apk/app-release.apk...              3.3s
+
+DartNative run key commands.
+h List all available interactive commands.
+c Clear the screen
+q Quit (terminate the application on the device).
+
+dartnative: dart3d: showcase — w19: 10 nodes · 5 geo · 7 mat
+dartnative: dart3d: w19 stage=init ready PASS
+dartnative: dart3d: w19 stage=walk pos=(-1.47,0.74,-0.40) grounded=false PASS
+dartnative: dart3d: w19 stage=step pos=(-0.28,0.91,-0.40) grounded=true PASS
+dartnative: dart3d: w19 stage=push charPos=(0.96,0.91) crateX=1.57 grounded=true PASS
+dartnative: dart3d: w19 stage=slope pos=(1.48,1.02,1.35) sliding=true PASS
+dartnative: dart3d: w19 stage=gravity pos=(1.38,0.84,-0.40) grounded=true peakY=1.71 PASS
+dartnative: dart3d: w19 stage=transform PASS
+dartnative: dart3d: w19 stage=stable seconds=10 pos=(-3.00,0.67,-0.40) PASS
+dartnative: dart3d: w19 complete PASS
+
+Application finished.
