@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.jasonholtdigital.dart3d.NativeScopeTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-25T20:56:07.160Z" hostname="Jasons-Mac-mini" time="0.0">
+  <properties/>
+  <testcase name="closesEverythingInReverseOrderOnReturn" classname="com.jasonholtdigital.dart3d.NativeScopeTest" time="0.0"/>
+  <testcase name="ownReturnsItsArgumentAndClosesOnlyOnce" classname="com.jasonholtdigital.dart3d.NativeScopeTest" time="0.0"/>
+  <testcase name="closesOnEarlyReturn" classname="com.jasonholtdigital.dart3d.NativeScopeTest" time="0.0"/>
+  <testcase name="oneFailingCloseDoesNotSkipTheRest" classname="com.jasonholtdigital.dart3d.NativeScopeTest" time="0.0"/>
+  <testcase name="closesOnThrow" classname="com.jasonholtdigital.dart3d.NativeScopeTest" time="0.0"/>
+  <testcase name="ownIfCloseableTakesWrappersAndPassesEverythingElse" classname="com.jasonholtdigital.dart3d.NativeScopeTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

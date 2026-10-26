@@ -256,7 +256,205 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
           _startW17SunSweep();
         }
       }
+    } else if (item.assetKey == kBuiltinW19CharacterKey) {
+      _startW19CharacterSequence(scene.document);
     }
+  }
+
+  void _startW19CharacterSequence(SceneDocument doc) {
+    LocalId? mainId;
+    LocalId? slopeId;
+    LocalId? crateId;
+    for (final n in doc.nodes.values) {
+      if (n.name == 'w19.character.main') mainId = n.id;
+      if (n.name == 'w19.character.slope') slopeId = n.id;
+      if (n.name == 'w19.crate') crateId = n.id;
+    }
+    if (mainId == null || slopeId == null) return;
+    final mainNodeId = mainId;
+    final slopeNodeId = slopeId;
+    final crateNodeId = crateId;
+
+    var tick = 0;
+    var jumpVy = 0.0;
+    var busy = false;
+    var passed = true;
+    var slopeSlid = false;
+    var jumpStartY = 0.0;
+    var jumpPeakY = 0.0;
+    _w17SweepTimer = Timer(const Duration(milliseconds: 1500), () {
+      if (!mounted) return;
+      dnLog('dart3d: w19 stage=init ready PASS');
+      _w17SweepTimer = Timer.periodic(const Duration(milliseconds: 50), (
+        t,
+      ) async {
+        if (!mounted) {
+          t.cancel();
+          return;
+        }
+        if (busy) return;
+        busy = true;
+        try {
+          tick++;
+          const dt = 0.05;
+          if (tick <= 12) {
+            final res = await _controller.moveCharacter(
+              mainNodeId,
+              Vector3(0.08, -0.02, 0.0),
+              deltaSeconds: dt,
+            );
+            if (tick == 12) {
+              final pos =
+                  (doc.nodes[mainNodeId]?.transform as TrsTransform?)
+                      ?.translation ??
+                  Vector3.zero();
+              final stagePassed = pos.x > -1.9 && pos.y > 0.60;
+              passed = passed && stagePassed;
+              dnLog(
+                'dart3d: w19 stage=walk pos=(${pos.x.toStringAsFixed(2)},'
+                '${pos.y.toStringAsFixed(2)},${pos.z.toStringAsFixed(2)}) '
+                'grounded=${res.grounded} ${stagePassed ? "PASS" : "FAIL"}',
+              );
+            }
+          } else if (tick <= 26) {
+            final res = await _controller.moveCharacter(
+              mainNodeId,
+              Vector3(0.09, -0.02, 0.0),
+              deltaSeconds: dt,
+            );
+            if (tick == 26) {
+              final pos =
+                  (doc.nodes[mainNodeId]?.transform as TrsTransform?)
+                      ?.translation ??
+                  Vector3.zero();
+              final stagePassed = pos.x > -1.3 && pos.y > 0.84 && res.grounded;
+              passed = passed && stagePassed;
+              dnLog(
+                'dart3d: w19 stage=step pos=(${pos.x.toStringAsFixed(2)},'
+                '${pos.y.toStringAsFixed(2)},${pos.z.toStringAsFixed(2)}) '
+                'grounded=${res.grounded} ${stagePassed ? "PASS" : "FAIL"}',
+              );
+            }
+          } else if (tick <= 42) {
+            final res = await _controller.moveCharacter(
+              mainNodeId,
+              Vector3(0.09, -0.02, 0.0),
+              deltaSeconds: dt,
+            );
+            if (tick == 42) {
+              final pos =
+                  (doc.nodes[mainNodeId]?.transform as TrsTransform?)
+                      ?.translation ??
+                  Vector3.zero();
+              final cratePose = crateNodeId != null
+                  ? await _controller.poseOf(crateNodeId)
+                  : null;
+              final stagePassed =
+                  cratePose != null && cratePose.position.x > 0.65;
+              passed = passed && stagePassed;
+              dnLog(
+                'dart3d: w19 stage=push charPos=(${pos.x.toStringAsFixed(2)},'
+                '${pos.y.toStringAsFixed(2)}) '
+                'crateX=${cratePose?.position.x.toStringAsFixed(2) ?? "?"} '
+                'grounded=${res.grounded} ${stagePassed ? "PASS" : "FAIL"}',
+              );
+            }
+          } else if (tick <= 58) {
+            final res = await _controller.moveCharacter(
+              slopeNodeId,
+              Vector3(0.0, -0.08, 0.0),
+              deltaSeconds: dt,
+            );
+            slopeSlid = slopeSlid || res.slidingDownSlope;
+            if (tick == 58) {
+              final pos =
+                  (doc.nodes[slopeNodeId]?.transform as TrsTransform?)
+                      ?.translation ??
+                  Vector3.zero();
+              final stagePassed =
+                  pos.x < 2.0 && pos.y < 1.65 && slopeSlid;
+              passed = passed && stagePassed;
+              dnLog(
+                'dart3d: w19 stage=slope pos=(${pos.x.toStringAsFixed(2)},'
+                '${pos.y.toStringAsFixed(2)},${pos.z.toStringAsFixed(2)}) '
+                'sliding=${res.slidingDownSlope} observedSlide=$slopeSlid '
+                '${stagePassed ? "PASS" : "FAIL"}',
+              );
+            }
+          } else if (tick <= 100) {
+            if (tick == 59) {
+              jumpVy = 4.2;
+              jumpStartY = doc.nodes[mainNodeId]!.transform
+                  .toMatrix4()
+                  .getTranslation()
+                  .y;
+              jumpPeakY = jumpStartY;
+            }
+            jumpVy -= 9.8 * dt;
+            final res = await _controller.moveCharacter(
+              mainNodeId,
+              Vector3(0.02, jumpVy * dt, 0.0),
+              deltaSeconds: dt,
+            );
+            final pos = doc.nodes[mainNodeId]!.transform
+                .toMatrix4()
+                .getTranslation();
+            if (pos.y > jumpPeakY) jumpPeakY = pos.y;
+            if (res.grounded && jumpVy < 0) jumpVy = -0.5;
+            if (tick == 100) {
+              final stagePassed =
+                  res.grounded &&
+                  pos.y > 0.60 &&
+                  pos.y < 1.0 &&
+                  jumpPeakY > jumpStartY + 0.1;
+              passed = passed && stagePassed;
+              dnLog(
+                'dart3d: w19 stage=gravity pos=(${pos.x.toStringAsFixed(2)},'
+                '${pos.y.toStringAsFixed(2)},${pos.z.toStringAsFixed(2)}) '
+                'grounded=${res.grounded} peakY=${jumpPeakY.toStringAsFixed(2)} '
+                '${stagePassed ? "PASS" : "FAIL"}',
+              );
+            }
+          } else if (tick == 101) {
+            final oldPosition = doc.nodes[mainNodeId]!.transform
+                .toMatrix4().getTranslation();
+            final newPosition = Vector3(-3.0, 0.69, -0.4);
+            _controller.setNodeTransforms([
+              NodeTransform(mainNodeId, translation: newPosition),
+            ]);
+            final oldHits = await _controller.overlapBox(
+              oldPosition, Vector3.all(0.1),
+            );
+            final newHits = await _controller.overlapBox(
+              newPosition, Vector3.all(0.1),
+            );
+            final stagePassed =
+                !oldHits.any((hit) => hit.node == mainNodeId) &&
+                newHits.any((hit) => hit.node == mainNodeId);
+            passed = passed && stagePassed;
+            dnLog('dart3d: w19 stage=transform ${stagePassed ? "PASS" : "FAIL"}');
+          } else if (tick <= 301) {
+            final res = await _controller.moveCharacter(
+              mainNodeId, Vector3(0, -0.01, 0), deltaSeconds: dt,
+            );
+            final pos = doc.nodes[mainNodeId]!.transform
+                .toMatrix4().getTranslation();
+            final stable = res.grounded && pos.y > 0.60 && pos.y < 0.76 &&
+                (pos.x + 3.0).abs() < 0.03;
+            passed = passed && stable;
+            if (tick == 301) {
+              dnLog('dart3d: w19 stage=stable seconds=10 '
+                  'pos=(${pos.x.toStringAsFixed(2)},${pos.y.toStringAsFixed(2)},'
+                  '${pos.z.toStringAsFixed(2)}) ${stable ? "PASS" : "FAIL"}');
+              dnLog('dart3d: w19 complete ${passed ? "PASS" : "FAIL"}');
+              t.cancel();
+            }
+          }
+        } finally {
+          busy = false;
+        }
+      });
+    });
   }
 
   void _startW17AutoSequence() {

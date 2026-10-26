@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" tests="15" skipped="0" failures="0" errors="0" timestamp="2026-10-25T20:56:06.843Z" hostname="Jasons-Mac-mini" time="0.041">
+  <properties/>
+  <testcase name="rejectedWidthPreservesOrdinaryMovementAndGroundImpulse" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.033"/>
+  <testcase name="clippedStepUpStillAcceptsWideLanding" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.001"/>
+  <testcase name="stairCorrectionUsesOnlyRemainingRequestedDistance" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.0"/>
+  <testcase name="matchingCharacterMasksStillBlockMovement" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.001"/>
+  <testcase name="clearingCharactersReleasesNativeBodiesWhileSystemIsLive" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.0"/>
+  <testcase name="actualDynamicBlockerStillDisablesAutostep" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.0"/>
+  <testcase name="clippedStepUpStillRejectsNarrowLanding" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.001"/>
+  <testcase name="characterContactHonorsSlideFalse" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.0"/>
+  <testcase name="syncingColliderOnlyPoseMovesItsQueryableInnerBody" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.002"/>
+  <testcase name="dynamicSupportingFloorDoesNotDisableStaticCurbStep" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.0"/>
+  <testcase name="sameLandingAcceptsSmallerMinimumWidth" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.0"/>
+  <testcase name="flatStairLandingRequiresMinimumForwardClearance" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.001"/>
+  <testcase name="stairAttemptDoesNotRepeatTheGroundWeightImpulse" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.0"/>
+  <testcase name="zeroMaskInnerBodyDoesNotBlockDynamicBodies" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.001"/>
+  <testcase name="characterMasksApplyInBothDirections" classname="com.jasonholtdigital.dart3d.CharacterControllerNativeTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

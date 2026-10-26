@@ -479,6 +479,7 @@ object FsceneRealizer {
         // re-registers (a same-session re-realize keeps command joints
         // whose bodies come back; component joints always re-decode).
         host.beginComponentJointRegistration()
+        host.world.clearCharacters()
         ctx.decodeNodes(json.optJSONObject("nodes"))
         ctx.attachToScene()
         ctx.decodePhysicsDeferred()
@@ -2904,7 +2905,7 @@ object FsceneRealizer {
                 "rectAreaLight" -> decodeRectAreaLight(key, rec, props)
                 "particleEmitter", "meshParticleEmitter" ->
                     decodeParticleEmitter(key, rec, type, props)
-                "rigidBody", "collider", "physicsWorld" ->
+                "rigidBody", "collider", "physicsWorld", "characterController" ->
                     physicsDeferred.add(PhysicsItem(key, rec, type, props))
                 "fixedJoint", "sphericalJoint", "revoluteJoint",
                 "prismaticJoint", "genericJoint" ->
@@ -4536,6 +4537,12 @@ object FsceneRealizer {
                             colliders[item.key])
                     }
                 }
+                for (item in physicsDeferred) {
+                    if (item.type == "characterController") {
+                        decodeCharacterController(item.key, item.rec, item.props,
+                            colliders[item.key])
+                    }
+                }
             }
             for (item in physicsDeferred) {
                 if (item.type == "physicsWorld") {
@@ -5087,6 +5094,58 @@ object FsceneRealizer {
             if (motionType == EMotionType.Dynamic) dynamicBodyKeys.add(key)
         }
 
+        private fun decodeCharacterController(
+            key: Long,
+            rec: NodeRec,
+            p: JSONObject,
+            collider: ColliderData?,
+        ) {
+            val shape = collider?.shape
+            if (shape == null) {
+                logOnce("character:$key:noshape",
+                    "node $key: characterController has no sibling collider shape yet; deferred")
+                return
+            }
+            val w = nodeWorld[key] ?: identity16()
+            val (pos, rot) = worldPoseOf(w)
+            val rawUp = p.tag("up").d3Vec3() ?: doubleArrayOf(0.0, 1.0, 0.0)
+            val rhUp = D3Wire.position(rawUp)
+            val upLen = kotlin.math.sqrt(
+                (rhUp[0] * rhUp[0] + rhUp[1] * rhUp[1] + rhUp[2] * rhUp[2]).toDouble()
+            ).toFloat()
+            val normUp = if (upLen > 1e-6f) {
+                floatArrayOf(rhUp[0] / upLen, rhUp[1] / upLen, rhUp[2] / upLen)
+            } else {
+                floatArrayOf(0f, 1f, 0f)
+            }
+            val halfPi = (Math.PI / 2.0).toFloat()
+            val quarterPi = (Math.PI / 4.0).toFloat()
+            val spec = CharacterSpec(
+                up = normUp,
+                offset = (p.tag("offset").d3Double() ?: 0.01)
+                    .toFloat().coerceAtLeast(0f),
+                slide = p.tag("slide").d3Bool() ?: true,
+                maxSlopeClimbAngle = (p.tag("maxSlopeClimbAngle").d3Double()?.toFloat()
+                    ?: quarterPi).coerceIn(0f, halfPi),
+                minSlopeSlideAngle = (p.tag("minSlopeSlideAngle").d3Double()?.toFloat()
+                    ?: quarterPi).coerceIn(0f, halfPi),
+                snapToGround = p.tag("snapToGround").d3Double()?.toFloat()
+                    ?.takeIf { it >= 0f },
+                autostep = p.tag("autostep").d3Bool() ?: false,
+                autostepMaxHeight = (p.tag("autostepMaxHeight").d3Double() ?: 0.3)
+                    .toFloat().coerceAtLeast(0f),
+                autostepMinWidth = (p.tag("autostepMinWidth").d3Double() ?: 0.1)
+                    .toFloat().coerceAtLeast(0f),
+                autostepIncludeDynamicBodies =
+                    p.tag("autostepIncludeDynamicBodies").d3Bool() ?: true,
+                mass = (p.tag("mass").d3Double() ?: 0.0)
+                    .toFloat().coerceAtLeast(0f),
+                layer = collider.layer,
+                mask = collider.mask,
+            )
+            host.world.addCharacter(key, shape, pos, rot, spec)
+        }
+
         private fun decodePhysicsWorld(p: JSONObject) {
             p.tag("backend").d3String()?.let {
                 logOnce("backend:$it",
@@ -5453,6 +5512,7 @@ object FsceneRealizer {
             // list — the re-decode rebuilds both (the trail's path
             // is runtime state that never persists, upstream's rule).
             destroyTrailLod(rec)
+            host.world.removeCharacter(key)
         }
 
         /**

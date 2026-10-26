@@ -1,0 +1,56 @@
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/Users/jasonholt/.gradle/wrapper/dists/gradle-9.3.1-all/9ot9r568e8zfvvd4mn8rbu1j0/gradle-9.3.1/lib/native-platform-0.22-milestone-29.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+> Task :gradle:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle:compileKotlin UP-TO-DATE
+> Task :gradle:compileJava NO-SOURCE
+> Task :gradle:compileGroovy NO-SOURCE
+> Task :gradle:pluginDescriptors UP-TO-DATE
+> Task :gradle:processResources UP-TO-DATE
+> Task :gradle:classes UP-TO-DATE
+> Task :gradle:jar UP-TO-DATE
+> Task :dart3d:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :dart3d:preBuild UP-TO-DATE
+> Task :dart3d:preReleaseBuild UP-TO-DATE
+> Task :dart3d:generateReleaseBuildConfig UP-TO-DATE
+> Task :dart3d:generateReleaseResValues UP-TO-DATE
+> Task :dart3d:generateReleaseResources UP-TO-DATE
+> Task :dart3d:packageReleaseResources UP-TO-DATE
+> Task :dart3d:parseReleaseLocalResources UP-TO-DATE
+> Task :dart3d:generateReleaseRFile UP-TO-DATE
+> Task :dart3d:javaPreCompileRelease UP-TO-DATE
+> Task :dart3d:preReleaseUnitTestBuild UP-TO-DATE
+> Task :dart3d:generateReleaseUnitTestStubRFile UP-TO-DATE
+> Task :dart3d:javaPreCompileReleaseUnitTest UP-TO-DATE
+
+> Task :dart3d:compileReleaseKotlin
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/Dart3dView.kt:2003:17 'field filterWidth: Float' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/EnvironmentFactory.kt:1023:45 'constructor(p0: Buffer, p1: Texture.Format, p2: Texture.Type): Texture.PixelBufferDescriptor' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/EnvironmentFactory.kt:1030:45 'constructor(p0: Buffer, p1: Texture.Format, p2: Texture.Type): Texture.PixelBufferDescriptor' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/EnvironmentFactory.kt:1231:25 'constructor(p0: Buffer, p1: Texture.Format, p2: Texture.Type): Texture.PixelBufferDescriptor' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/FsceneRealizer.kt:5845:17 Condition is always 'true'.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/TextureFactory.kt:274:41 'constructor(p0: Buffer, p1: Texture.Format, p2: Texture.Type): Texture.PixelBufferDescriptor' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/TextureFactory.kt:300:41 'constructor(p0: Buffer, p1: Texture.Format, p2: Texture.Type): Texture.PixelBufferDescriptor' is deprecated. Deprecated in Java.
+
+> Task :dart3d:compileReleaseJavaWithJavac
+> Task :dart3d:processReleaseJavaRes
+> Task :dart3d:bundleLibRuntimeToJarRelease
+> Task :dart3d:bundleLibCompileToJarRelease
+> Task :dart3d:compileReleaseUnitTestKotlin
+> Task :dart3d:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :dart3d:processReleaseUnitTestJavaRes
+> Task :dart3d:testReleaseUnitTest
+
+[Incubating] Problems report is available at: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.3.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 8s
+21 actionable tasks: 8 executed, 13 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.3.1/userguide/configuration_cache_enabling.html

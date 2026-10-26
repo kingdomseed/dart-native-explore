@@ -1,0 +1,563 @@
+--------- beginning of main
+10-25 21:59:44.893  8385  8385 I chatty  : uid=10212(com.jasonholtdigital.dart3d_example) expire 336 lines
+10-25 21:59:48.405  8385  8474 I chatty  : uid=10212(com.jasonholtdigital.dart3d_example) expire 1 line
+10-25 22:00:06.005  8385  8385 I chatty  : uid=10212(com.jasonholtdigital.dart3d_example) expire 103 lines
+10-25 22:00:26.675  8385  8385 I chatty  : uid=10212(com.jasonholtdigital.dart3d_example) expire 130 lines
+10-25 22:00:48.723  8385  8385 I chatty  : uid=10212(com.jasonholtdigital.dart3d_example) expire 135 lines
+10-25 22:01:09.666  8385  8385 I chatty  : uid=10212(com.jasonholtdigital.dart3d_example) expire 52 lines
+10-25 22:01:19.852  8385  8385 I chatty  : uid=10212(com.jasonholtdigital.dart3d_example) expire 38 lines
+10-25 22:01:30.015  8385  8385 I chatty  : uid=10212(com.jasonholtdigital.dart3d_example) expire 786 lines
+10-25 22:01:40.105  8385  8385 I chatty  : uid=10212(com.jasonholtdigital.dart3d_example) expire 587 lines
+10-25 22:01:44.570  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.570  8385  8385 I dart3d  : node 4791023255232339491: body=none pos=(-3.8100002,-0.33999997,-1.11)
+10-25 22:01:44.570  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.571  8385  8385 I dart3d  : node -8105714006632110990: body=none pos=(-4.07,-0.33999997,-1.11)
+10-25 22:01:44.571  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.571  8385  8385 I dart3d  : node 3474794077691080181: body=none pos=(-1.7300001,-0.33999997,-0.85)
+10-25 22:01:44.571  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.571  8385  8385 I dart3d  : node 8381680637394873815: body=none pos=(-1.99,-0.33999997,-0.85)
+10-25 22:01:44.571  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.572  8385  8385 I dart3d  : node -2995590851877254840: body=none pos=(-2.25,-0.33999997,-0.85)
+10-25 22:01:44.572  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.572  8385  8385 I dart3d  : node -3056929152580570288: body=none pos=(-2.5100002,-0.33999997,-0.85)
+10-25 22:01:44.572  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.572  8385  8385 I dart3d  : node 3009227295033720717: body=none pos=(-2.77,-0.33999997,-0.85)
+10-25 22:01:44.572  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.573  8385  8385 I dart3d  : node 2492597788721193759: body=none pos=(-3.0300002,-0.33999997,-0.85)
+10-25 22:01:44.573  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.573  8385  8385 I dart3d  : node -8967632803932769385: body=none pos=(-3.29,-0.33999997,-0.85)
+10-25 22:01:44.573  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.575  8385  8385 I dart3d  : node -6092176244937374520: body=none pos=(-3.5500002,-0.33999997,-0.85)
+10-25 22:01:44.575  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.575  8385  8385 I dart3d  : node -2280408904932288814: body=none pos=(-3.8100002,-0.33999997,-0.85)
+10-25 22:01:44.575  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.576  8385  8385 I dart3d  : node 5642991563139260654: body=none pos=(-4.07,-0.33999997,-0.85)
+10-25 22:01:44.576  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.576  8385  8385 I dart3d  : node 1144715623118945037: body=none pos=(-1.7300001,-0.33999997,-0.59)
+10-25 22:01:44.576  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.576  8385  8385 I dart3d  : node -4409598336586967595: body=none pos=(-1.99,-0.33999997,-0.59)
+10-25 22:01:44.576  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.576  8385  8385 I dart3d  : node 4237065693895632378: body=none pos=(-2.25,-0.33999997,-0.59)
+10-25 22:01:44.576  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.577  8385  8385 I dart3d  : node -6354226216921247905: body=none pos=(-2.5100002,-0.33999997,-0.59)
+10-25 22:01:44.577  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.577  8385  8385 I dart3d  : node 6758044300639112574: body=none pos=(-2.77,-0.33999997,-0.59)
+10-25 22:01:44.577  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.578  8385  8385 I dart3d  : node -4815414192476230968: body=none pos=(-3.0300002,-0.33999997,-0.59)
+10-25 22:01:44.578  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.579  8385  8385 I dart3d  : node 7319576656872319477: body=none pos=(-3.29,-0.33999997,-0.59)
+10-25 22:01:44.579  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.579  8385  8385 I dart3d  : node -1873252651239865819: body=none pos=(-3.5500002,-0.33999997,-0.59)
+10-25 22:01:44.579  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.580  8385  8385 I dart3d  : node 4773400282262237060: body=none pos=(-3.8100002,-0.33999997,-0.59)
+10-25 22:01:44.580  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.580  8385  8385 I dart3d  : node 1276919344327498021: body=none pos=(-4.07,-0.33999997,-0.59)
+10-25 22:01:44.580  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.580  8385  8385 I dart3d  : node 5870268904604855667: body=none pos=(-1.7300001,-0.33999997,-0.33000004)
+10-25 22:01:44.580  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.580  8385  8385 I dart3d  : node 4823346581553618414: body=none pos=(-1.99,-0.33999997,-0.33000004)
+10-25 22:01:44.580  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.581  8385  8385 I dart3d  : node 3346800230402183749: body=none pos=(-2.25,-0.33999997,-0.33000004)
+10-25 22:01:44.581  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.581  8385  8385 I dart3d  : node 2469347454395215308: body=none pos=(-2.5100002,-0.33999997,-0.33000004)
+10-25 22:01:44.581  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.581  8385  8385 I dart3d  : node 7615939285949393194: body=none pos=(-2.77,-0.33999997,-0.33000004)
+10-25 22:01:44.582  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.583  8385  8385 I dart3d  : node -2837618189914378330: body=none pos=(-3.0300002,-0.33999997,-0.33000004)
+10-25 22:01:44.583  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.583  8385  8385 I dart3d  : node -6259654344908371764: body=none pos=(-3.29,-0.33999997,-0.33000004)
+10-25 22:01:44.583  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.583  8385  8385 I dart3d  : node -3165643714286585723: body=none pos=(-3.5500002,-0.33999997,-0.33000004)
+10-25 22:01:44.583  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.584  8385  8385 I dart3d  : node -5286226081028084878: body=none pos=(-3.8100002,-0.33999997,-0.33000004)
+10-25 22:01:44.584  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.584  8385  8385 I dart3d  : node -6889268564799566986: body=none pos=(-4.07,-0.33999997,-0.33000004)
+10-25 22:01:44.584  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:44.598  8385  8385 I dart3d  : loadSubtree:107 node=2095223619813638257 visible t=115480.324917411s applyToVisible=14.350077ms
+10-25 22:01:44.727  8385  8385 I dart3d  : stats 15 fps  66.5 ms/frame  306 entities  33 bodies
+10-25 22:01:45.017  8385  8385 I dart3d  : stats 46 fps  21.8 ms/frame  306 entities  33 bodies
+10-25 22:01:45.285  8385  8385 I dart3d  : stats 45 fps  22.2 ms/frame  306 entities  33 bodies
+10-25 22:01:45.567  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  306 entities  33 bodies
+10-25 22:01:45.849  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  306 entities  33 bodies
+10-25 22:01:46.131  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  306 entities  33 bodies
+10-25 22:01:46.398  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  306 entities  33 bodies
+10-25 22:01:46.666  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  306 entities  33 bodies
+10-25 22:01:46.876  8385  8385 I dartnative: dart3d: w15 lane complete — 5 loads, 3 unloads (3 cycles on streamA; expected final state: both grids live)
+10-25 22:01:46.930  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  306 entities  33 bodies
+10-25 22:01:47.198  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  306 entities  33 bodies
+10-25 22:01:47.463  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  306 entities  33 bodies
+10-25 22:01:47.745  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  306 entities  33 bodies
+10-25 22:01:48.009  8385  8385 I dart3d  : stats 45 fps  22.2 ms/frame  306 entities  33 bodies
+10-25 22:01:48.295  8385  8385 I dart3d  : stats 46 fps  21.8 ms/frame  306 entities  33 bodies
+10-25 22:01:48.575  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  306 entities  33 bodies
+10-25 22:01:48.824  8385  8385 I dartnative: dart3d: w24 phase — split-screen, viewport, cascades, contact shadows, catcher, layerMask
+10-25 22:01:48.832  8385  8385 I dartnative: dart3d: w24 shadow breadth + catcher + layer marker
+10-25 22:01:48.840  8385  8385 W dart3d  : directionalLight 'shadowFadeRange' has no Filament equivalent; ignored
+10-25 22:01:48.840  8385  8385 W dart3d  : directionalLight 'shadowAmbientStrength' has no Filament equivalent; ignored
+10-25 22:01:48.840  8385  8385 W dart3d  : directionalLight 'shadowCasterFaces' has no Filament equivalent; ignored
+10-25 22:01:48.840  8385  8385 W dart3d  : directionalLight 'cacheStaticShadows' has no Filament equivalent; ignored
+10-25 22:01:48.840  8385  8385 I dart3d  : shadow options: mapSize=1024 cascades=4 far=60.0 contactDist=0.3 contact=true bias=0.005 normalBias=0.02 bulbRadius=0.08
+10-25 22:01:48.841  8385  8385 W dart3d  : angularRadius has no effect on a Filament DIRECTIONAL light (SUN-only); shadow softness follows shadowSoftness
+10-25 22:01:48.842  8385  8385 I dart3d  : node 2095223619813638234: body=none pos=(0.0,0.0,-0.0)
+10-25 22:01:48.842  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:48.844  8385  8385 I dart3d  : geometry -5588793586528288657: rebuilt, rebound 0 consumer(s)
+10-25 22:01:48.844  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:48.851  8385  8385 I dart3d  : upsertResource material -5588793586528288656: reattached to 0 renderable(s)
+10-25 22:01:48.852  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:48.860  8385  8385 I dart3d  : geometry -5588793586528288653: rebuilt, rebound 0 consumer(s)
+10-25 22:01:48.860  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:48.861  8385  8385 I dart3d  : upsertResource material -5588793586528288652: reattached to 0 renderable(s)
+10-25 22:01:48.861  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:48.863  8385  8385 I dart3d  : node -5588793586528288655: body=none pos=(0.0,0.02,-1.5)
+10-25 22:01:48.864  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:48.864  8385  8385 I dart3d  : node -5588793586528288654: body=none pos=(-4.0,2.4,3.0)
+10-25 22:01:48.864  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:48.865  8385  8385 W dart3d  : node -5588793586528288651 layers 256: Filament layer masks are 8-bit; high bits ignored
+10-25 22:01:48.866  8385  8385 I dart3d  : node -5588793586528288651: body=none pos=(1.6,1.2,0.5)
+10-25 22:01:48.866  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:01:48.873  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:01:49.626  8385  8385 I dart3d  : stats 3 fps  391.1 ms/frame  309 entities  33 bodies
+10-25 22:01:49.893  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  309 entities  33 bodies
+10-25 22:01:50.158  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  309 entities  33 bodies
+10-25 22:01:50.423  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:01:50.703  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:01:50.842  8385  8385 I dartnative: dart3d: w24 split-screen views
+10-25 22:01:50.846  8385  8385 I dart3d  : views applied: 3 entries (2 screen, 1 rts)
+10-25 22:01:50.978  8385  8385 I dart3d  : stats 45 fps  22.2 ms/frame  309 entities  33 bodies
+10-25 22:01:51.262  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:01:51.555  8385  8385 I dart3d  : stats 32 fps  31.4 ms/frame  309 entities  33 bodies
+10-25 22:01:51.827  8385  8385 I dart3d  : stats 32 fps  31.4 ms/frame  309 entities  33 bodies
+10-25 22:01:52.112  8385  8385 I dart3d  : stats 35 fps  28.3 ms/frame  309 entities  33 bodies
+10-25 22:01:52.395  8385  8385 I dart3d  : stats 32 fps  31.4 ms/frame  309 entities  33 bodies
+10-25 22:01:52.664  8385  8385 I dart3d  : stats 30 fps  33.3 ms/frame  309 entities  33 bodies
+10-25 22:01:52.926  8385  8385 I dart3d  : stats 30 fps  33.3 ms/frame  309 entities  33 bodies
+10-25 22:01:53.198  8385  8385 I chatty  : uid=10212(com.jasonholtdigital.dart3d_example) identical 4 lines
+10-25 22:01:53.459  8385  8385 I dart3d  : stats 30 fps  33.3 ms/frame  309 entities  33 bodies
+10-25 22:01:53.725  8385  8385 I dart3d  : stats 30 fps  33.3 ms/frame  309 entities  33 bodies
+10-25 22:01:53.992  8385  8385 I dart3d  : stats 30 fps  33.3 ms/frame  309 entities  33 bodies
+10-25 22:01:54.530  8385  8385 I dart3d  : stats 30 fps  33.3 ms/frame  309 entities  33 bodies
+10-25 22:01:54.790  8385  8385 I dart3d  : stats 30 fps  33.3 ms/frame  309 entities  33 bodies
+10-25 22:01:54.836  8385  8385 I dartnative: dart3d: w24 viewport inset
+10-25 22:01:54.843  8385  8385 I dart3d  : views applied: 2 entries (1 screen, 1 rts)
+10-25 22:01:55.048  8385  8385 I dart3d  : stats 45 fps  22.2 ms/frame  309 entities  33 bodies
+10-25 22:01:55.318  8385  8385 I dart3d  : stats 56 fps  17.7 ms/frame  309 entities  33 bodies
+10-25 22:01:55.598  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:01:55.870  8385  8385 I dart3d  : stats 45 fps  22.2 ms/frame  309 entities  33 bodies
+10-25 22:01:56.152  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:01:56.419  8385  8385 I dart3d  : stats 45 fps  22.2 ms/frame  309 entities  33 bodies
+10-25 22:01:56.698  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:01:56.983  8385  8385 I dart3d  : stats 46 fps  21.8 ms/frame  309 entities  33 bodies
+10-25 22:01:57.250  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:01:57.782  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:01:57.837  8385  8385 I dartnative: dart3d: w24 layerMask 8-bit lane
+10-25 22:01:57.839  8385  8385 I dart3d  : layerMask is 8-bit on Filament; high bits ignored
+10-25 22:01:57.842  8385  8385 I dart3d  : views applied: 3 entries (2 screen, 1 rts)
+10-25 22:01:58.069  8385  8385 I dart3d  : stats 28 fps  35.4 ms/frame  309 entities  33 bodies
+10-25 22:01:58.335  8385  8385 I dart3d  : stats 34 fps  29.6 ms/frame  309 entities  33 bodies
+10-25 22:01:58.621  8385  8385 I dart3d  : stats 35 fps  28.3 ms/frame  309 entities  33 bodies
+10-25 22:01:58.902  8385  8385 I dart3d  : stats 35 fps  28.3 ms/frame  309 entities  33 bodies
+10-25 22:01:59.170  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  309 entities  33 bodies
+10-25 22:01:59.434  8385  8385 I dart3d  : stats 30 fps  33.3 ms/frame  309 entities  33 bodies
+10-25 22:01:59.701  8385  8385 I dart3d  : stats 30 fps  33.3 ms/frame  309 entities  33 bodies
+10-25 22:01:59.996  8385  8385 I dart3d  : stats 32 fps  31.4 ms/frame  309 entities  33 bodies
+10-25 22:02:00.249  8385  8385 I dart3d  : stats 34 fps  29.6 ms/frame  309 entities  33 bodies
+10-25 22:02:00.530  8385  8385 I dart3d  : stats 32 fps  31.4 ms/frame  309 entities  33 bodies
+10-25 22:02:00.800  8385  8385 I dart3d  : stats 34 fps  29.6 ms/frame  309 entities  33 bodies
+10-25 22:02:00.835  8385  8385 I dartnative: dart3d: w24 views restored — lane complete
+10-25 22:02:00.851  8385  8385 I dart3d  : views applied: 1 entries (0 screen, 1 rts)
+10-25 22:02:01.072  8385  8385 I dart3d  : stats 32 fps  31.5 ms/frame  309 entities  33 bodies
+10-25 22:02:01.350  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  309 entities  33 bodies
+10-25 22:02:01.609  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  309 entities  33 bodies
+10-25 22:02:01.879  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:02.144  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:02.422  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:02.686  8385  8385 I dart3d  : stats 38 fps  26.7 ms/frame  309 entities  33 bodies
+10-25 22:02:02.818  8385  8385 I dartnative: dart3d: w16 phase — trail ribbon + screen-size lod drive
+10-25 22:02:02.960  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:03.227  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  309 entities  33 bodies
+10-25 22:02:03.475  8385  8385 I dart3d  : stats 40 fps  25.0 ms/frame  309 entities  33 bodies
+10-25 22:02:03.742  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:04.023  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:04.289  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:04.816  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:05.089  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  309 entities  33 bodies
+10-25 22:02:05.370  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:05.638  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  309 entities  33 bodies
+10-25 22:02:05.904  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:06.168  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:06.438  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:06.720  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:06.985  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:07.252  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:07.525  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  309 entities  33 bodies
+10-25 22:02:07.785  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  309 entities  33 bodies
+10-25 22:02:08.063  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:08.335  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:08.602  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:08.870  8385  8385 I dart3d  : stats 41 fps  24.3 ms/frame  309 entities  33 bodies
+10-25 22:02:09.155  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:09.415  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  309 entities  33 bodies
+10-25 22:02:09.691  8385  8385 I dart3d  : stats 42 fps  23.5 ms/frame  309 entities  33 bodies
+10-25 22:02:09.969  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:10.232  8385  8385 I dart3d  : stats 38 fps  26.7 ms/frame  309 entities  33 bodies
+10-25 22:02:10.518  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:10.785  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:11.061  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:11.326  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:11.594  8385  8385 I chatty  : uid=10212(com.jasonholtdigital.dart3d_example) identical 1 line
+10-25 22:02:11.870  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:12.118  8385  8385 I dart3d  : stats 40 fps  25.0 ms/frame  309 entities  33 bodies
+10-25 22:02:12.377  8385  8385 I dart3d  : stats 41 fps  24.1 ms/frame  309 entities  33 bodies
+10-25 22:02:12.627  8385  8385 I dart3d  : stats 40 fps  25.0 ms/frame  309 entities  33 bodies
+10-25 22:02:12.893  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:13.179  8385  8385 I dart3d  : stats 42 fps  23.6 ms/frame  309 entities  33 bodies
+10-25 22:02:13.459  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:13.725  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:14.004  8385  8385 I dart3d  : stats 42 fps  23.6 ms/frame  309 entities  33 bodies
+10-25 22:02:14.275  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:14.543  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:14.814  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:15.077  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  309 entities  33 bodies
+10-25 22:02:15.345  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:15.618  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:15.891  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:16.154  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:16.422  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:16.704  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:16.966  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:17.239  8385  8385 I dart3d  : stats 45 fps  22.2 ms/frame  309 entities  33 bodies
+10-25 22:02:17.520  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:17.788  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:18.053  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:18.316  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:18.585  8385  8385 I dart3d  : stats 45 fps  22.2 ms/frame  309 entities  33 bodies
+10-25 22:02:18.850  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:19.118  8385  8385 I dart3d  : stats 45 fps  22.2 ms/frame  309 entities  33 bodies
+10-25 22:02:19.385  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:19.669  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:19.935  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:20.201  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:20.468  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:20.752  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:21.029  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:21.299  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:21.566  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:21.832  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:22.098  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:22.356  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  309 entities  33 bodies
+10-25 22:02:22.613  8385  8385 I dart3d  : stats 40 fps  25.0 ms/frame  309 entities  33 bodies
+10-25 22:02:22.884  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:23.158  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:23.423  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:23.695  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:23.961  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:24.246  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:24.513  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:24.775  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  309 entities  33 bodies
+10-25 22:02:25.045  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:25.309  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:25.576  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:25.843  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:26.110  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:26.393  8385  8385 I dart3d  : stats 39 fps  25.8 ms/frame  309 entities  33 bodies
+10-25 22:02:26.657  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:26.824  8385  8385 I dartnative: dart3d: w16 mover home — lod/trail lane done
+10-25 22:02:26.927  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:27.201  8385  8385 I dart3d  : stats 42 fps  23.6 ms/frame  309 entities  33 bodies
+10-25 22:02:27.471  8385  8385 I dart3d  : stats 45 fps  22.2 ms/frame  309 entities  33 bodies
+10-25 22:02:27.743  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:28.003  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  309 entities  33 bodies
+10-25 22:02:28.273  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:28.535  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:28.821  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:28.828  8385  8385 I dartnative: dart3d: w25 phase — LUT + effects matrix lanes
+10-25 22:02:28.879  8385  8385 I dartnative: dart3d: w25 LUT chunk ref staged — payload deferred
+10-25 22:02:28.942  8385  8385 I dart3d  : environment 2095223619813638222: 256×128 equirect → 256² cube + SH3 in 18ms
+10-25 22:02:28.942  8385  8385 I dart3d  : applySkybox: sb=true textures=0
+10-25 22:02:28.942  8385  8385 I dart3d  : applyEnvironment: il=true textures=3
+10-25 22:02:29.397  8385  8385 I dart3d  : stats 5 fps  194.0 ms/frame  309 entities  33 bodies
+10-25 22:02:29.669  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:29.729  8385  8385 I dartnative: dart3d: w25 LUT payload landed — deferred grade applies
+10-25 22:02:29.789  8385  8385 I dart3d  : environment 2095223619813638222: 256×128 equirect → 256² cube + SH3 in 17ms
+10-25 22:02:29.789  8385  8385 I dart3d  : applySkybox: sb=true textures=0
+10-25 22:02:29.789  8385  8385 I dart3d  : applyEnvironment: il=true textures=3
+10-25 22:02:29.959  8385  8385 I dart3d  : stats 10 fps  99.9 ms/frame  309 entities  33 bodies
+10-25 22:02:30.262  8385  8385 I dart3d  : stats 3 fps  299.5 ms/frame  309 entities  33 bodies
+10-25 22:02:30.519  8385  8385 I dart3d  : stats 40 fps  25.0 ms/frame  309 entities  33 bodies
+10-25 22:02:30.785  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:30.885  8385  8385 I dartnative: dart3d: w25 LUT blend 0.35
+10-25 22:02:30.946  8385  8385 I dart3d  : environment 2095223619813638222: 256×128 equirect → 256² cube + SH3 in 18ms
+10-25 22:02:30.946  8385  8385 I dart3d  : applySkybox: sb=true textures=0
+10-25 22:02:30.946  8385  8385 I dart3d  : applyEnvironment: il=true textures=3
+10-25 22:02:31.076  8385  8385 I dart3d  : stats 20 fps  49.9 ms/frame  309 entities  33 bodies
+10-25 22:02:31.365  8385  8385 I dart3d  : stats 4 fps  282.9 ms/frame  309 entities  33 bodies
+10-25 22:02:31.634  8385  8385 I dart3d  : stats 38 fps  26.7 ms/frame  309 entities  33 bodies
+10-25 22:02:31.903  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:32.162  8385  8385 I chatty  : uid=10212(com.jasonholtdigital.dart3d_example) identical 1 line
+10-25 22:02:32.428  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:32.710  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:32.893  8385  8385 I dartnative: dart3d: w25 LUT asset path (assets/luts/cool.cube)
+10-25 22:02:32.982  8385  8385 I dart3d  : environment 2095223619813638222: 256×128 equirect → 256² cube + SH3 in 19ms
+10-25 22:02:32.983  8385  8385 I dart3d  : applySkybox: sb=true textures=0
+10-25 22:02:32.983  8385  8385 I dart3d  : applyEnvironment: il=true textures=3
+10-25 22:02:33.156  8385  8385 I dart3d  : stats 20 fps  50.0 ms/frame  309 entities  33 bodies
+10-25 22:02:33.441  8385  8385 I dart3d  : stats 4 fps  282.8 ms/frame  309 entities  33 bodies
+10-25 22:02:33.699  8385  8385 I dart3d  : stats 44 fps  22.7 ms/frame  309 entities  33 bodies
+10-25 22:02:33.964  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:34.238  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:34.511  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:34.779  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:34.881  8385  8385 I dartnative: dart3d: w25 filmGrain+autoExposure on
+10-25 22:02:34.961  8385  8385 I dart3d  : environment 2095223619813638222: 256×128 equirect → 256² cube + SH3 in 18ms
+10-25 22:02:34.962  8385  8385 I dart3d  : applySkybox: sb=true textures=0
+10-25 22:02:34.962  8385  8385 I dart3d  : applyEnvironment: il=true textures=3
+10-25 22:02:35.421  8385  8385 I dart3d  : stats 11 fps  90.4 ms/frame  309 entities  33 bodies
+10-25 22:02:35.696  8385  8385 I dart3d  : stats 35 fps  28.3 ms/frame  309 entities  33 bodies
+10-25 22:02:35.963  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  309 entities  33 bodies
+10-25 22:02:36.245  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:36.523  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:36.805  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:36.881  8385  8385 I dartnative: dart3d: w25 ssr+lensFlare on
+10-25 22:02:36.962  8385  8385 I dart3d  : environment 2095223619813638222: 256×128 equirect → 256² cube + SH3 in 20ms
+10-25 22:02:36.962  8385  8385 I dart3d  : applySkybox: sb=true textures=0
+10-25 22:02:36.962  8385  8385 I dart3d  : applyEnvironment: il=true textures=3
+10-25 22:02:36.965  8385  8385 I dart3d  : lensFlare without bloom: Filament's flare rides the bloom pass — enabled at lensFlare.intensity strength, so a mild bloom halo comes with the ghosts (flare gain is not separable)
+10-25 22:02:36.965  8385  8385 I dart3d  : screenSpaceReflections: applies to lit materials; off-screen/rough surfaces keep IBL specular
+10-25 22:02:36.965  8385  8385 I dart3d  : some SSR fields unmapped on Filament 1.71.6 (thickness/maxDistance/stride only)
+10-25 22:02:37.408  8385  8385 I dart3d  : stats 10 fps  99.8 ms/frame  309 entities  33 bodies
+10-25 22:02:37.734  8385  8385 I dart3d  : stats 3 fps  332.7 ms/frame  309 entities  33 bodies
+10-25 22:02:38.057  8385  8385 I dart3d  : stats 13 fps  79.1 ms/frame  309 entities  33 bodies
+10-25 22:02:38.390  8385  8385 I dart3d  : stats 12 fps  83.2 ms/frame  309 entities  33 bodies
+10-25 22:02:38.721  8385  8385 I dart3d  : stats 12 fps  83.2 ms/frame  309 entities  33 bodies
+10-25 22:02:38.893  8385  8385 I dartnative: dart3d: w25 godRays+standalone CA on
+10-25 22:02:38.978  8385  8385 I dart3d  : environment 2095223619813638222: 256×128 equirect → 256² cube + SH3 in 22ms
+10-25 22:02:38.978  8385  8385 I dart3d  : applySkybox: sb=true textures=0
+10-25 22:02:38.978  8385  8385 I dart3d  : applyEnvironment: il=true textures=3
+10-25 22:02:38.981  8385  8385 I dart3d  : godRays: platform limit — no light-shaft/volumetric post pass in the Java bindings; ignored
+10-25 22:02:39.052  8385  8385 I dart3d  : stats 12 fps  83.2 ms/frame  309 entities  33 bodies
+10-25 22:02:39.424  8385  8385 I dart3d  : stats 3 fps  366.2 ms/frame  309 entities  33 bodies
+10-25 22:02:39.689  8385  8385 I dart3d  : stats 45 fps  22.2 ms/frame  309 entities  33 bodies
+10-25 22:02:39.941  8385  8385 I dart3d  : stats 36 fps  27.8 ms/frame  309 entities  33 bodies
+10-25 22:02:40.203  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  309 entities  33 bodies
+10-25 22:02:40.472  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:40.754  8385  8385 I dart3d  : stats 35 fps  28.3 ms/frame  309 entities  33 bodies
+10-25 22:02:40.885  8385  8385 I dartnative: dart3d: w25 effects reset
+10-25 22:02:40.928  8385  8385 I dart3d  : environment 2095223619813638222: 256×128 equirect → 256² cube + SH3 in 15ms
+10-25 22:02:40.928  8385  8385 I dart3d  : applySkybox: sb=true textures=0
+10-25 22:02:40.928  8385  8385 I dart3d  : applyEnvironment: il=true textures=3
+10-25 22:02:41.306  8385  8385 I dart3d  : stats 15 fps  68.7 ms/frame  309 entities  33 bodies
+10-25 22:02:41.570  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:41.830  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:42.120  8385  8385 I dart3d  : stats 42 fps  23.6 ms/frame  309 entities  33 bodies
+10-25 22:02:42.385  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:42.626  8385  8385 I dart3d  : stats 40 fps  25.0 ms/frame  309 entities  33 bodies
+10-25 22:02:42.901  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:43.171  8385  8385 I dart3d  : stats 38 fps  26.7 ms/frame  309 entities  33 bodies
+10-25 22:02:43.442  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:43.714  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:43.774  8385  8385 I dartnative: dart3d: contact began a=79 b=82 pts=1
+10-25 22:02:43.815  8385  8385 I dartnative: dart3d: contact ended a=79 b=82
+10-25 22:02:43.985  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:44.158  8385  8385 I dartnative: dart3d: contact began a=79 b=82 pts=1
+10-25 22:02:44.181  8385  8385 I dartnative: dart3d: contact ended a=79 b=82
+10-25 22:02:44.245  8385  8385 I dart3d  : stats 45 fps  22.2 ms/frame  309 entities  33 bodies
+10-25 22:02:44.276  8385  8385 I dartnative: dart3d: contact began a=79 b=82 pts=1
+10-25 22:02:44.509  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:44.779  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:44.833  8385  8385 I dartnative: dart3d: w25 lane complete — dice regression PASS: die 3M9VNJ000004Y rolled and settled after the effects sweep; expected final state: all effects off
+10-25 22:02:44.852  8385  8385 I dartnative: dart3d: contact ended a=79 b=82
+10-25 22:02:45.045  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:45.314  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:45.583  8385  8385 I chatty  : uid=10212(com.jasonholtdigital.dart3d_example) identical 3 lines
+10-25 22:02:45.847  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:46.112  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  309 entities  33 bodies
+10-25 22:02:46.380  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:46.644  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:46.912  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:47.178  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:47.445  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:47.713  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:47.993  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:48.265  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:48.799  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:49.051  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  309 entities  33 bodies
+10-25 22:02:49.329  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:49.854  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:50.128  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:50.388  8385  8385 I dart3d  : stats 38 fps  26.7 ms/frame  309 entities  33 bodies
+10-25 22:02:50.673  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:50.938  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:51.206  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:51.470  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:51.744  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:52.006  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  309 entities  33 bodies
+10-25 22:02:52.273  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:52.537  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  309 entities  33 bodies
+10-25 22:02:52.786  8385  8385 I dart3d  : stats 40 fps  25.0 ms/frame  309 entities  33 bodies
+10-25 22:02:53.054  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:53.317  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:53.572  8385  8385 I dart3d  : stats 40 fps  25.0 ms/frame  309 entities  33 bodies
+10-25 22:02:53.837  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:54.102  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:54.369  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  309 entities  33 bodies
+10-25 22:02:54.655  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  309 entities  33 bodies
+10-25 22:02:54.818  8385  8385 I dartnative: dart3d: w18 phase — particle emitters
+10-25 22:02:54.863  8385  8385 I dartnative: dart3d: w18 phase — flipbook fountain, additive streaks, mesh tumble pool, enabled:false gate
+10-25 22:02:54.873  8385  8385 I dart3d  : texture -5588793586528288648: awaiting payload
+10-25 22:02:54.874  8385  8385 I dart3d  : geometry -5588793586528288647: rebuilt, rebound 0 consumer(s)
+10-25 22:02:54.874  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:02:54.879  8385  8385 I dart3d  : geometry -5588793586528288646: rebuilt, rebound 0 consumer(s)
+10-25 22:02:54.879  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:02:54.880  8385  8385 I dart3d  : upsertResource material -5588793586528288645: reattached to 0 renderable(s)
+10-25 22:02:54.880  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:02:54.884  8385  8385 I dart3d  : texture -5588793586528288648: 128x128 rgba8 in 1ms
+10-25 22:02:54.884  8385  8385 I dart3d  : upsertPayload -5588793586528288649: texture -5588793586528288648 re-uploaded, rebound 0 consumer(s)
+10-25 22:02:54.899  8385  8385 I dart3d  : node -5588793586528288644: body=none pos=(-1.7,0.7,-1.4)
+10-25 22:02:54.899  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:02:54.905  8385  8385 I dart3d  : node -5588793586528288643: body=none pos=(1.7,1.0,-1.4)
+10-25 22:02:54.905  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:02:54.907  8385  8385 I dart3d  : node -5588793586528288642: body=none pos=(0.0,0.9,-2.7)
+10-25 22:02:54.907  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:02:54.907  8385  8385 I dart3d  : component 'particleEmitter' on node -5588793586528288641: enabled:false — particle runtime not created
+10-25 22:02:54.908  8385  8385 I dart3d  : node -5588793586528288641: body=none pos=(0.0,1.1,-0.2)
+10-25 22:02:54.908  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:02:54.948  8385  8385 I dart3d  : stats 27 fps  37.4 ms/frame  313 entities  33 bodies
+10-25 22:02:55.216  8385  8385 I dart3d  : stats 19 fps  53.2 ms/frame  313 entities  33 bodies
+10-25 22:02:55.481  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  313 entities  33 bodies
+10-25 22:02:55.748  8385  8385 I chatty  : uid=10212(com.jasonholtdigital.dart3d_example) identical 1 line
+10-25 22:02:56.020  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  313 entities  33 bodies
+10-25 22:02:56.278  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  313 entities  33 bodies
+10-25 22:02:56.547  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  313 entities  33 bodies
+10-25 22:02:56.833  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  313 entities  33 bodies
+10-25 22:02:57.106  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  313 entities  33 bodies
+10-25 22:02:57.364  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  313 entities  33 bodies
+10-25 22:02:57.658  8385  8385 I dart3d  : stats 35 fps  28.3 ms/frame  313 entities  33 bodies
+10-25 22:02:57.936  8385  8385 I dart3d  : stats 35 fps  28.3 ms/frame  313 entities  33 bodies
+10-25 22:02:58.215  8385  8385 I dart3d  : stats 35 fps  28.3 ms/frame  313 entities  33 bodies
+10-25 22:02:58.482  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  313 entities  33 bodies
+10-25 22:02:58.753  8385  8385 I dart3d  : stats 38 fps  26.7 ms/frame  313 entities  33 bodies
+10-25 22:02:59.011  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  313 entities  33 bodies
+10-25 22:02:59.278  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  313 entities  33 bodies
+10-25 22:02:59.547  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  313 entities  33 bodies
+10-25 22:02:59.828  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  313 entities  33 bodies
+10-25 22:03:00.111  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  313 entities  33 bodies
+10-25 22:03:00.373  8385  8385 I dart3d  : stats 45 fps  22.2 ms/frame  313 entities  33 bodies
+10-25 22:03:00.643  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  313 entities  33 bodies
+10-25 22:03:00.879  8385  8385 I dartnative: dart3d: w18 gated emitter enabled (components update)
+10-25 22:03:00.887  8385  8385 I dart3d  : node -5588793586528288641: body=none pos=(0.0,1.1,-0.2)
+10-25 22:03:00.887  8385  8385 I dart3d  : variant apply node=-5588793586528288676 prim=0 selIdx=null vkey=null vmap=2 target=default
+10-25 22:03:00.899  8385  8385 I dart3d  : stats 40 fps  25.0 ms/frame  313 entities  33 bodies
+10-25 22:03:01.179  8385  8385 I dart3d  : stats 32 fps  31.4 ms/frame  313 entities  33 bodies
+10-25 22:03:01.458  8385  8385 I dart3d  : stats 35 fps  28.3 ms/frame  313 entities  33 bodies
+10-25 22:03:01.743  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  313 entities  33 bodies
+10-25 22:03:02.015  8385  8385 I dart3d  : stats 34 fps  29.6 ms/frame  313 entities  33 bodies
+10-25 22:03:02.282  8385  8385 I dart3d  : stats 32 fps  31.4 ms/frame  313 entities  33 bodies
+10-25 22:03:02.566  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  313 entities  33 bodies
+10-25 22:03:02.818  8385  8385 I dart3d  : stats 38 fps  26.7 ms/frame  313 entities  33 bodies
+10-25 22:03:03.106  8385  8385 I dart3d  : stats 42 fps  23.6 ms/frame  313 entities  33 bodies
+10-25 22:03:03.392  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  313 entities  33 bodies
+10-25 22:03:03.654  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  313 entities  33 bodies
+10-25 22:03:03.873  8385  8385 I dartnative: dart3d: w18 streaks hidden
+10-25 22:03:03.920  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  313 entities  33 bodies
+10-25 22:03:04.192  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  313 entities  33 bodies
+10-25 22:03:04.466  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  313 entities  33 bodies
+10-25 22:03:04.717  8385  8385 I dart3d  : stats 36 fps  27.8 ms/frame  313 entities  33 bodies
+10-25 22:03:04.996  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  313 entities  33 bodies
+10-25 22:03:05.290  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  313 entities  33 bodies
+10-25 22:03:05.565  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  313 entities  33 bodies
+10-25 22:03:05.835  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  313 entities  33 bodies
+10-25 22:03:05.865  8385  8385 I dartnative: dart3d: w18 streaks restored
+10-25 22:03:06.104  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  313 entities  33 bodies
+10-25 22:03:06.381  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  313 entities  33 bodies
+10-25 22:03:06.650  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  313 entities  33 bodies
+10-25 22:03:06.771  8385  8385 W Choreographer: Frame time is 0.005689 ms in the future!  Check that graphics HAL is generating vsync timestamps using the correct timebase.
+10-25 22:03:06.915  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  313 entities  33 bodies
+10-25 22:03:07.198  8385  8385 I dart3d  : stats 42 fps  23.6 ms/frame  313 entities  33 bodies
+10-25 22:03:07.479  8385  8385 I dart3d  : stats 42 fps  23.6 ms/frame  313 entities  33 bodies
+10-25 22:03:07.748  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  313 entities  33 bodies
+10-25 22:03:08.029  8385  8385 I dart3d  : stats 42 fps  23.6 ms/frame  313 entities  33 bodies
+10-25 22:03:08.314  8385  8385 I dart3d  : stats 42 fps  23.6 ms/frame  313 entities  33 bodies
+10-25 22:03:08.575  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  313 entities  33 bodies
+10-25 22:03:08.842  8385  8385 I dart3d  : stats 45 fps  22.2 ms/frame  313 entities  33 bodies
+10-25 22:03:08.864  8385  8385 I dartnative: dart3d: w18 gated node removed
+10-25 22:03:08.868  8385  8385 I dart3d  : cmd removeNode
+10-25 22:03:09.118  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  312 entities  33 bodies
+10-25 22:03:09.401  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  312 entities  33 bodies
+10-25 22:03:09.664  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  312 entities  33 bodies
+10-25 22:03:09.938  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  312 entities  33 bodies
+10-25 22:03:10.215  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  312 entities  33 bodies
+10-25 22:03:10.480  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  312 entities  33 bodies
+10-25 22:03:10.752  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  312 entities  33 bodies
+10-25 22:03:10.864  8385  8385 I dartnative: dart3d: w18 lane complete — expected: fountain + streaks + mesh pool live, gated ran +6 s…+14 s then removed
+10-25 22:03:11.007  8385  8385 I dart3d  : stats 34 fps  29.6 ms/frame  312 entities  33 bodies
+10-25 22:03:11.278  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  312 entities  33 bodies
+10-25 22:03:11.552  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  312 entities  33 bodies
+10-25 22:03:11.842  8385  8385 I dart3d  : stats 42 fps  23.5 ms/frame  312 entities  33 bodies
+10-25 22:03:12.123  8385  8385 I dart3d  : stats 42 fps  23.6 ms/frame  312 entities  33 bodies
+10-25 22:03:12.388  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  312 entities  33 bodies
+10-25 22:03:12.660  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  312 entities  33 bodies
+10-25 22:03:12.928  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  312 entities  33 bodies
+10-25 22:03:13.195  8385  8385 I chatty  : uid=10212(com.jasonholtdigital.dart3d_example) identical 1 line
+10-25 22:03:13.460  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  312 entities  33 bodies
+10-25 22:03:13.728  8385  8385 I dart3d  : stats 37 fps  26.7 ms/frame  312 entities  33 bodies
+10-25 22:03:13.992  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  312 entities  33 bodies
+10-25 22:03:14.270  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  312 entities  33 bodies
+10-25 22:03:14.526  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  312 entities  33 bodies
+10-25 22:03:14.793  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  312 entities  33 bodies
+10-25 22:03:15.058  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  312 entities  33 bodies
+10-25 22:03:15.344  8385  8385 I dart3d  : stats 42 fps  23.6 ms/frame  312 entities  33 bodies
+10-25 22:03:15.625  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  312 entities  33 bodies
+10-25 22:03:15.890  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  312 entities  33 bodies
+10-25 22:03:16.156  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  312 entities  33 bodies
+10-25 22:03:16.424  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  312 entities  33 bodies
+10-25 22:03:16.689  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  312 entities  33 bodies
+10-25 22:03:16.965  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  312 entities  33 bodies
+10-25 22:03:17.237  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  312 entities  33 bodies
+10-25 22:03:17.527  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  312 entities  33 bodies
+10-25 22:03:17.784  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  312 entities  33 bodies
+10-25 22:03:18.070  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  312 entities  33 bodies
+10-25 22:03:18.333  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  312 entities  33 bodies
+10-25 22:03:18.619  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  312 entities  33 bodies
+10-25 22:03:18.877  8385  8385 I dart3d  : stats 37 fps  26.7 ms/frame  312 entities  33 bodies
+10-25 22:03:19.175  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  312 entities  33 bodies
+10-25 22:03:19.452  8385  8385 I dart3d  : stats 28 fps  35.4 ms/frame  312 entities  33 bodies
+10-25 22:03:19.734  8385  8385 I dart3d  : stats 35 fps  28.2 ms/frame  312 entities  33 bodies
+10-25 22:03:20.016  8385  8385 I dart3d  : stats 42 fps  23.6 ms/frame  312 entities  33 bodies
+10-25 22:03:20.285  8385  8385 I dart3d  : stats 34 fps  29.6 ms/frame  312 entities  33 bodies
+10-25 22:03:20.568  8385  8385 I dart3d  : stats 35 fps  28.3 ms/frame  312 entities  33 bodies
+10-25 22:03:20.834  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  312 entities  33 bodies
+10-25 22:03:21.110  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  312 entities  33 bodies
+10-25 22:03:21.396  8385  8385 I dart3d  : stats 42 fps  23.6 ms/frame  312 entities  33 bodies
+10-25 22:03:21.663  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  312 entities  33 bodies
+10-25 22:03:21.948  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  312 entities  33 bodies
+10-25 22:03:22.233  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  312 entities  33 bodies
+10-25 22:03:22.497  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  312 entities  33 bodies
+10-25 22:03:22.769  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  312 entities  33 bodies
+10-25 22:03:23.047  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  312 entities  33 bodies
+10-25 22:03:23.311  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  312 entities  33 bodies
+10-25 22:03:23.590  8385  8385 I dart3d  : stats 42 fps  23.6 ms/frame  312 entities  33 bodies
+10-25 22:03:23.858  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  312 entities  33 bodies
+10-25 22:03:24.145  8385  8385 I dart3d  : stats 42 fps  23.6 ms/frame  312 entities  33 bodies
+10-25 22:03:24.416  8385  8385 I dart3d  : stats 45 fps  22.2 ms/frame  312 entities  33 bodies
+10-25 22:03:24.678  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  312 entities  33 bodies
+10-25 22:03:24.942  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  312 entities  33 bodies
+10-25 22:03:25.226  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  312 entities  33 bodies
+10-25 22:03:25.493  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  312 entities  33 bodies
+10-25 22:03:25.754  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  312 entities  33 bodies
+10-25 22:03:26.025  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  312 entities  33 bodies
+10-25 22:03:26.301  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  312 entities  33 bodies
+10-25 22:03:26.574  8385  8385 I dart3d  : stats 35 fps  28.3 ms/frame  312 entities  33 bodies
+10-25 22:03:26.833  8385  8385 I dart3d  : stats 38 fps  26.6 ms/frame  312 entities  33 bodies
+10-25 22:03:27.106  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  312 entities  33 bodies
+10-25 22:03:27.371  8385  8385 I dart3d  : stats 41 fps  24.2 ms/frame  312 entities  33 bodies
+10-25 22:03:27.647  8385  8385 I dart3d  : stats 42 fps  23.6 ms/frame  312 entities  33 bodies
+10-25 22:03:27.897  8385  8385 I dart3d  : stats 44 fps  22.7 ms/frame  312 entities  33 bodies
+10-25 22:03:28.167  8385  8385 I dart3d  : stats 45 fps  22.2 ms/frame  312 entities  33 bodies
+10-25 22:03:28.432  8385  8385 I dart3d  : stats 45 fps  22.2 ms/frame  312 entities  33 bodies
+10-25 22:03:28.713  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  312 entities  33 bodies
+10-25 22:03:28.997  8385  8385 I dart3d  : stats 39 fps  25.7 ms/frame  312 entities  33 bodies
+10-25 22:03:29.282  8385  8385 I dart3d  : stats 42 fps  23.6 ms/frame  312 entities  33 bodies
+10-25 22:03:29.550  8385  8385 I dart3d  : stats 45 fps  22.2 ms/frame  312 entities  33 bodies
+10-25 22:03:29.811  8385  8385 I dart3d  : stats 45 fps  22.2 ms/frame  312 entities  33 bodies
+10-25 22:03:30.084  8385  8385 I dart3d  : stats 45 fps  22.2 ms/frame  312 entities  33 bodies
+10-25 22:03:30.329  8385  8385 I dart3d  : stats 44 fps  22.7 ms/frame  312 entities  33 bodies

@@ -1,0 +1,2 @@
+  public static final int cInvalidBodyId = -1;
+8e9f2d5bdade2d3e693cfbc410d87cbc1242affab6ee7b6fe83ef3eb43e0aae3  /Users/jasonholt/.gradle/caches/modules-2/files-2.1/com.github.stephengold/jolt-jni-Windows64/6.0.0/fcfdffe813f7c579b7eceb515f7df73a294056f5/jolt-jni-Windows64-6.0.0.jar

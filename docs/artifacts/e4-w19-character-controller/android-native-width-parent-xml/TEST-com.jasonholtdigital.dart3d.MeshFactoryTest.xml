@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.jasonholtdigital.dart3d.MeshFactoryTest" tests="21" skipped="0" failures="0" errors="0" timestamp="2026-10-25T20:25:27.320Z" hostname="Jasons-Mac-mini" time="0.177">
+  <properties/>
+  <testcase name="procedural generators emit the shared record" classname="com.jasonholtdigital.dart3d.MeshFactoryTest" time="0.005"/>
+  <testcase name="stride constants match the 15-float record" classname="com.jasonholtdigital.dart3d.MeshFactoryTest" time="0.0"/>
+  <testcase name="mirrored instances are rewound to face outward" classname="com.jasonholtdigital.dart3d.MeshFactoryTest" time="0.001"/>
+  <testcase name="swapTriangleWinding reverses each triangle" classname="com.jasonholtdigital.dart3d.MeshFactoryTest" time="0.0"/>
+  <testcase name="cuboid debugColors keys vertex color to corner sign bits" classname="com.jasonholtdigital.dart3d.MeshFactoryTest" time="0.0"/>
+  <testcase name="interleaved payload decodes channels at the declared offsets" classname="com.jasonholtdigital.dart3d.MeshFactoryTest" time="0.0"/>
+  <testcase name="indicesFromPayload decodes little-endian widths" classname="com.jasonholtdigital.dart3d.MeshFactoryTest" time="0.0"/>
+  <testcase name="malformed payloads fail loudly" classname="com.jasonholtdigital.dart3d.MeshFactoryTest" time="0.002"/>
+  <testcase name="tube tolerates zero subdivision counts" classname="com.jasonholtdigital.dart3d.MeshFactoryTest" time="0.001"/>
+  <testcase name="reflectedTangentCopy negates tangent and normal and flips handedness" classname="com.jasonholtdigital.dart3d.MeshFactoryTest" time="0.0"/>
+  <testcase name="uv1 layouts carry the second UV channel into the record tail" classname="com.jasonholtdigital.dart3d.MeshFactoryTest" time="0.0"/>
+  <testcase name="bakeInstances transforms normals by the exact inverse-transpose" classname="com.jasonholtdigital.dart3d.MeshFactoryTest" time="0.0"/>
+  <testcase name="sphere and torus wind outward" classname="com.jasonholtdigital.dart3d.MeshFactoryTest" time="0.001"/>
+  <testcase name="cuboid winds every face outward including -Y" classname="com.jasonholtdigital.dart3d.MeshFactoryTest" time="0.0"/>
+  <testcase name="large spheres and tori switch to 32-bit indices" classname="com.jasonholtdigital.dart3d.MeshFactoryTest" time="0.119"/>
+  <testcase name="skinned payload appends the joints and weights tail" classname="com.jasonholtdigital.dart3d.MeshFactoryTest" time="0.001"/>
+  <testcase name="icosphere subdivisions are capped" classname="com.jasonholtdigital.dart3d.MeshFactoryTest" time="0.042"/>
+  <testcase name="p3t4 payload expands into the shared record" classname="com.jasonholtdigital.dart3d.MeshFactoryTest" time="0.0"/>
+  <testcase name="degenerate dash patterns render solid instead of looping" classname="com.jasonholtdigital.dart3d.MeshFactoryTest" time="0.004"/>
+  <testcase name="positionsFromPayload mirrors z except on p3t4" classname="com.jasonholtdigital.dart3d.MeshFactoryTest" time="0.0"/>
+  <testcase name="plane lies in XZ and winds facing +Y" classname="com.jasonholtdigital.dart3d.MeshFactoryTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

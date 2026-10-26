@@ -1,0 +1,208 @@
+Launching lib/main.dart on A142 in release mode...
+Running Gradle task 'assembleRelease'...                        
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/Users/jasonholt/.gradle/wrapper/dists/gradle-9.3.1-all/9ot9r568e8zfvvd4mn8rbu1j0/gradle-9.3.1/lib/native-platform-0.22-milestone-29.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+Running Gradle task 'assembleRelease'...                           18.8s
+✓ Built build/app/outputs/dn-apk/app-release.apk (110.9MB)
+Installing build/app/outputs/dn-apk/app-release.apk...              3.2s
+
+DartNative run key commands.
+h List all available interactive commands.
+c Clear the screen
+q Quit (terminate the application on the device).
+
+dartnative: dart3d: contact began a=82 b=84 pts=1
+dartnative: dart3d: contact triggerEntered a=80 b=87
+dartnative: dart3d: contact triggerExited a=80 b=87
+dartnative: dart3d: contact began a=80 b=82 pts=1
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact ended a=80 b=82
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: contact ended a=82 b=84
+dartnative: dart3d: contact began a=85 b=86 pts=1
+dartnative: dart3d: contact began a=80 b=82 pts=1
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact ended a=80 b=82
+dartnative: dart3d: contact ended a=85 b=86
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: contact began a=96 b=79 pts=1
+dartnative: dart3d: contact ended a=96 b=79
+dartnative: dart3d: contact began a=96 b=79 pts=1
+dartnative: dart3d: contact began a=102 b=79 pts=1
+dartnative: dart3d: contact ended a=96 b=79
+dartnative: dart3d: contact ended a=102 b=79
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact began a=93 b=79 pts=1
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: contact ended a=93 b=79
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: contact began a=82 b=80 pts=1
+dartnative: dart3d: contact began a=82 b=41 pts=1
+dartnative: dart3d: contact ended a=82 b=80
+dartnative: dart3d: queries: pose:(-0.20,-50.37,-5.36) · ray:n79@1.97 · overlap:4 · cast:n79@2.68
+dartnative: dart3d: joint rig landed — 10 joints
+dartnative: dart3d: joint broke #9 a=57 b=58
+dartnative: dart3d: contact began a=82 b=48 pts=1
+dartnative: dart3d: contact ended a=82 b=48
+dartnative: dart3d: contact began a=82 b=48 pts=1
+dartnative: dart3d: contact ended a=82 b=48
+dartnative: dart3d: w11 phase — flag skin, morph blob, wave+pulse
+dartnative: dart3d: w11 j1 rot=(-0.00,-0.00,-0.22,0.98) t=0.60 live=(-0.00,-0.00,-0.08,1.00)
+dartnative: dart3d: contact triggerEntered a=87 b=80
+dartnative: dart3d: contact triggerExited a=87 b=80
+dartnative: dart3d: contact began a=82 b=80 pts=1
+dartnative: dart3d: contact ended a=82 b=80
+dartnative: dart3d: w11 j1 rot=(0.00,0.00,0.11,0.99) t=1.20 live=(-0.00,-0.00,0.04,1.00)
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: contact triggerEntered a=87 b=80
+dartnative: dart3d: contact triggerExited a=87 b=80
+dartnative: dart3d: contact began a=82 b=80 pts=1
+dartnative: dart3d: contact ended a=82 b=80
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: contact began a=82 b=80 pts=1
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: w11 j1 rot=(0.00,0.00,0.11,0.99) t=1.80 live=(-0.00,-0.00,0.04,1.00)
+dartnative: dart3d: contact ended a=82 b=80
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: w11 j1 rot=(-0.00,-0.00,-0.22,0.98) t=0.40 live=(-0.00,-0.00,-0.04,1.00)
+dartnative: dart3d: w11 j1 rot=(0.00,0.00,0.00,1.00) t=1.00 live=(-0.00,-0.00,0.00,1.00)
+dartnative: dart3d: w11 j1 rot=(0.00,0.00,0.22,0.98) t=1.60 live=(-0.00,-0.00,0.04,1.00)
+dartnative: dart3d: w11 j1 rot=(-0.00,-0.00,-0.03,1.00) t=0.95 live=(-0.00,-0.00,-0.00,1.00)
+dartnative: dart3d: w11 j1 rot=(0.00,0.00,0.25,0.97) t=1.55 live=(-0.00,-0.00,0.05,1.00)
+dartnative: dart3d: w11 j1 rot=(-0.00,-0.00,-0.08,1.00) t=0.15 live=(-0.00,-0.00,-0.01,1.00)
+dartnative: dart3d: w11 j1 rot=(-0.00,-0.00,-0.14,0.99) t=0.75 live=(-0.00,-0.00,-0.03,1.00)
+dartnative: dart3d: w11 j1 rot=(0.00,0.00,0.19,0.98) t=1.35 live=(-0.00,-0.00,0.03,1.00)
+dartnative: dart3d: w11 j1 rot=(0.00,0.00,0.03,1.00) t=1.95 live=(-0.00,-0.00,0.01,1.00)
+dartnative: dart3d: w12 phase — joint components + variants + rectAreaLight
+dartnative: dart3d: w12 phase — joint components, variants, rectAreaLight, enabled:false
+dartnative: dart3d: w11 stop-rest switch PASS want=0.50rad live=(-0.000,-0.000,0.247,0.969)
+dartnative: dart3d: contact began a=91 b=82 pts=1
+dartnative: dart3d: contact began a=89 b=82 pts=1
+dartnative: dart3d: contact began a=90 b=82 pts=1
+dartnative: dart3d: w11 stop-rest rest PASS want=0.00rad live=(-0.000,-0.000,0.000,1.000)
+dartnative: dart3d: contact ended a=91 b=82
+dartnative: dart3d: contact ended a=89 b=82
+dartnative: dart3d: contact ended a=90 b=82
+dartnative: dart3d: w12 poses[3s] anchor=(2.90,1.60,0.20) free=(3.50,-0.35,0.20) linkA=(-3.00,-0.35,0.20) linkB=(-2.40,-0.35,0.20)
+dartnative: dart3d: w13 phase — environment effects toggles
+dartnative: dart3d: w13 bloom on
+dartnative: dart3d: w13 bloom+ao on
+dartnative: dart3d: w13 bloom+ao+fog on
+dartnative: dart3d: w13 bloom+ao+fog+dof stack
+dartnative: dart3d: w13 swap vignette+ca+colorGrading
+dartnative: dart3d: w13 filmGrain+autoExposure on
+dartnative: dart3d: w13 effects reset
+dartnative: dart3d: w13 overridesEffects:false — effects key omitted
+dartnative: dart3d: w14 phase — render textures + views
+dartnative: dart3d: w14 rt live
+dartnative: dart3d: w14 manual view added
+dartnative: dart3d: w14 manual render
+dartnative: dart3d: w14 second rt producer
+dartnative: dart3d: w14 views reduced
+dartnative: dart3d: w14 stage quality
+dartnative: dart3d: w14 stage reset
+dartnative: dart3d: w14 showcase
+dartnative: dart3d: wloose phase — ccd + bowl + margin + settle latency
+dartnative: dart3d: wloose probes spawned — ccd drop, bowl drop; margin drop waits for quiet
+dartnative: dart3d: contact began a=104 b=106 pts=1
+dartnative: dart3d: contact ended a=104 b=106
+dartnative: dart3d: contact began a=107 b=82 pts=1
+dartnative: dart3d: contact began a=107 b=111 pts=1
+dartnative: dart3d: contact began a=107 b=111 pts=1
+dartnative: dart3d: contact began a=107 b=111 pts=1
+dartnative: dart3d: contact ended a=107 b=111
+dartnative: dart3d: contact ended a=107 b=82
+dartnative: dart3d: contact began a=104 b=106 pts=1
+dartnative: dart3d: contact began a=107 b=111 pts=1
+dartnative: dart3d: contact ended a=104 b=106
+dartnative: dart3d: contact ended a=107 b=111
+dartnative: dart3d: contact ended a=107 b=111
+dartnative: dart3d: contact ended a=107 b=111
+dartnative: dart3d: wloose ccd pose=(3.30,0.38,2.60) PASS rests on slab
+dartnative: dart3d: wloose bowl pose=(-2.15,-0.31,2.05) PASS contained
+dartnative: dart3d: wloose margin drop spawned
+dartnative: dart3d: contact began a=108 b=110 pts=1
+dartnative: dart3d: wloose removed w5NoRest,j9.liftPlate,j9.chainAnchor,j9.chain1,j9.chain2,j9.chain3,j9.chain4,j9.breakBox — settle events live
+dartnative: dart3d: wloose margin mid=(5.50,0.08,0.50)
+dartnative: dart3d: contact ended a=108 b=110
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: wloose settle: 1951ms (roll 1 via event, die (-0.00,-0.00,2.50))
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: wloose margin pose=(5.50,0.08,0.50) PASS gap=0.53 above visual
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: wloose settle: 1959ms (roll 2 via event, die (-0.00,-0.00,2.50))
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: wloose settle: 1911ms (roll 3 via event, die (-0.00,-0.00,2.50))
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: wloose settled event path: seen
+dartnative: dart3d: w15 phase — lazy prefab subtree streaming
+dartnative: dart3d: w15 loadSubtree A#1 sent t=1792962137934
+dartnative: dart3d: w15 loadSubtree B#1 sent t=1792962139153
+dartnative: dart3d: w15 deferred peak chunk sent t=1792962140350
+dartnative: dart3d: w15 unloadSubtree A#1 sent t=1792962141552
+dartnative: dart3d: w15 loadSubtree A#2 sent t=1792962142750
+dartnative: dart3d: w15 unloadSubtree A#2 sent t=1792962143953
+dartnative: dart3d: w15 loadSubtree A#3 sent t=1792962145154
+dartnative: dart3d: w15 unloadSubtree A#3 sent t=1792962146356
+dartnative: dart3d: w15 loadSubtree A#4 sent t=1792962147550
+dartnative: dart3d: w15 lane complete — 5 loads, 3 unloads (3 cycles on streamA; expected final state: both grids live)
+dartnative: dart3d: w24 phase — split-screen, viewport, cascades, contact shadows, catcher, layerMask
+dartnative: dart3d: w24 shadow breadth + catcher + layer marker
+dartnative: dart3d: w24 split-screen views
+dartnative: dart3d: w24 viewport inset
+dartnative: dart3d: w24 layerMask 8-bit lane
+dartnative: dart3d: w24 views restored — lane complete
+dartnative: dart3d: w16 phase — trail ribbon + screen-size lod drive
+dartnative: dart3d: w16 mover home — lod/trail lane done
+dartnative: dart3d: w25 phase — LUT + effects matrix lanes
+dartnative: dart3d: w25 LUT chunk ref staged — payload deferred
+dartnative: dart3d: w25 LUT payload landed — deferred grade applies
+dartnative: dart3d: w25 LUT blend 0.35
+dartnative: dart3d: w25 LUT asset path (assets/luts/cool.cube)
+dartnative: dart3d: w25 filmGrain+autoExposure on
+dartnative: dart3d: w25 ssr+lensFlare on
+dartnative: dart3d: w25 godRays+standalone CA on
+dartnative: dart3d: w25 effects reset
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: contact began a=79 b=82 pts=1
+dartnative: dart3d: w25 lane complete — dice regression PASS: die D0F5V8G00004Y rolled and settled after the effects sweep; expected final state: all effects off
+dartnative: dart3d: contact ended a=79 b=82
+dartnative: dart3d: w18 phase — particle emitters
+dartnative: dart3d: w18 phase — flipbook fountain, additive streaks, mesh tumble pool, enabled:false gate
+dartnative: dart3d: w18 gated emitter enabled (components update)
+dartnative: dart3d: w18 streaks hidden
+dartnative: dart3d: w18 streaks restored
+dartnative: dart3d: w18 gated node removed
+dartnative: dart3d: w18 lane complete — expected: fountain + streaks + mesh pool live, gated ran +6 s…+14 s then removed
+
+Application finished.

@@ -1,0 +1,95 @@
+diff --git a/Jolt/Physics/Character/CharacterVirtual.cpp b/Jolt/Physics/Character/CharacterVirtual.cpp
+index 8b7644e..6096867 100644
+--- a/Jolt/Physics/Character/CharacterVirtual.cpp
++++ b/Jolt/Physics/Character/CharacterVirtual.cpp
+@@ -371,6 +371,9 @@ void CharacterVirtual::ContactCastCollector<IgnoreInitialOverlap>::AddHit(const
+ 			sFillContactProperties(mCharacter, contact, body, mUp, mBaseOffset, *this, inResult);
+ 		}
+ 
++		if (mIgnoreWalkable && !mCharacter->IsSlopeTooSteep(contact.mSurfaceNormal))
++			return;
++
+ 		contact.mFraction = inResult.mFraction;
+ 
+ 		// Check if the contact that will make us penetrate more than the allowed tolerance
+@@ -659,7 +662,7 @@ bool CharacterVirtual::ValidateMovement(RVec3Arg inPosition, Vec3Arg inDisplacem
+ 	return true;
+ }
+ 
+-bool CharacterVirtual::GetFirstContactForSweep(RVec3Arg inPosition, Vec3Arg inDisplacement, CharacterContact &outContact, const IgnoredContactList &inIgnoredContacts, const BroadPhaseLayerFilter &inBroadPhaseLayerFilter, const ObjectLayerFilter &inObjectLayerFilter, const BodyFilter &inBodyFilter, const ShapeFilter &inShapeFilter) const
++bool CharacterVirtual::GetFirstContactForSweep(RVec3Arg inPosition, Vec3Arg inDisplacement, CharacterContact &outContact, const IgnoredContactList &inIgnoredContacts, const BroadPhaseLayerFilter &inBroadPhaseLayerFilter, const ObjectLayerFilter &inObjectLayerFilter, const BodyFilter &inBodyFilter, const ShapeFilter &inShapeFilter, bool inIgnoreWalkable) const
+ {
+ 	// Calculate start transform
+ 	RMat44 start = GetCenterOfMassTransform(inPosition, mRotation, mShape);
+@@ -680,7 +683,7 @@ bool CharacterVirtual::GetFirstContactForSweep(RVec3Arg inPosition, Vec3Arg inDi
+ 	CharacterContact contact;
+ 	contact.mFraction = 1.0f + FLT_MIN;
+ 	RVec3 base_offset = start.GetTranslation();
+-	ContactCastCollector<false> collector(mSystem, this, inDisplacement, mUp, inIgnoredContacts, base_offset, contact);
++	ContactCastCollector<false> collector(mSystem, this, inDisplacement, mUp, inIgnoredContacts, base_offset, contact, inIgnoreWalkable);
+ 	RShapeCast shape_cast(mShape, Vec3::sOne(), start, inDisplacement);
+ 	mSystem->GetNarrowPhaseQuery().CastShape(shape_cast, settings, base_offset, collector, inBroadPhaseLayerFilter, inObjectLayerFilter, body_filter, inShapeFilter);
+ 
+@@ -1756,6 +1759,16 @@ bool CharacterVirtual::WalkStairs(float inDeltaTime, Vec3Arg inStepUp, Vec3Arg i
+ 	if (Vec3(final_position - mPosition).Dot(surface_normal) < 1.0e-4f)
+ 		return false;
+ 
++	// Probe the actual landing before committing. Walkable support is not blocked clearance,
++	// including the rounded edge that produced this landing contact. The query applies no impulses.
++	if (mWalkStairsMinimumWidth > 0.0f)
++	{
++		CharacterContact width_contact;
++		if (GetFirstContactForSweep(final_position, step_forward_normalized * mWalkStairsMinimumWidth,
++			width_contact, dummy_ignored_contacts, inBroadPhaseLayerFilter, inObjectLayerFilter, inBodyFilter, inShapeFilter, true))
++			return false;
++	}
++
+ 	// Move the character to the new location
+ 	MoveToContact(final_position, contact, inBroadPhaseLayerFilter, inObjectLayerFilter, inBodyFilter, inShapeFilter, inAllocator);
+ 
+diff --git a/Jolt/Physics/Character/CharacterVirtual.h b/Jolt/Physics/Character/CharacterVirtual.h
+index 64a22ed..a273356 100644
+--- a/Jolt/Physics/Character/CharacterVirtual.h
++++ b/Jolt/Physics/Character/CharacterVirtual.h
+@@ -342,6 +342,9 @@ public:
+ 	/// Character padding
+ 	float								GetCharacterPadding() const								{ return mCharacterPadding; }
+ 
++	/// Minimum forward clearance at a stair landing. Zero disables the additional check.
++	void								SetWalkStairsMinimumWidth(float inWidth)				{ mWalkStairsMinimumWidth = inWidth; }
++
+ 	/// Max num hits to collect in order to avoid excess of contact points collection
+ 	uint								GetMaxNumHits() const									{ return mMaxNumHits; }
+ 	void								SetMaxNumHits(uint inMaxHits)							{ mMaxNumHits = inMaxHits; }
+@@ -591,12 +594,13 @@ private:
+ 	class ContactCastCollector : public CastShapeCollector
+ 	{
+ 	public:
+-										ContactCastCollector(PhysicsSystem *inSystem, const CharacterVirtual *inCharacter, Vec3Arg inDisplacement, Vec3Arg inUp, const IgnoredContactList &inIgnoredContacts, RVec3Arg inBaseOffset, CharacterContact &outContact) : mBaseOffset(inBaseOffset), mDisplacement(inDisplacement), mUp(inUp), mSystem(inSystem), mCharacter(inCharacter), mIgnoredContacts(inIgnoredContacts), mContact(outContact) { }
++										ContactCastCollector(PhysicsSystem *inSystem, const CharacterVirtual *inCharacter, Vec3Arg inDisplacement, Vec3Arg inUp, const IgnoredContactList &inIgnoredContacts, RVec3Arg inBaseOffset, CharacterContact &outContact, bool inIgnoreWalkable = false) : mIgnoreWalkable(inIgnoreWalkable), mBaseOffset(inBaseOffset), mDisplacement(inDisplacement), mUp(inUp), mSystem(inSystem), mCharacter(inCharacter), mIgnoredContacts(inIgnoredContacts), mContact(outContact) { }
+ 
+ 		virtual void					SetUserData(uint64 inUserData) override					{ mOtherCharacter = reinterpret_cast<CharacterVirtual *>(inUserData); }
+ 
+ 		virtual void					AddHit(const ShapeCastResult &inResult) override;
+ 
++		bool							mIgnoreWalkable;
+ 		RVec3							mBaseOffset;
+ 		Vec3							mDisplacement;
+ 		Vec3							mUp;
+@@ -660,7 +664,7 @@ private:
+ 	// Does a swept test of the shape from inPosition with displacement inDisplacement, returns true if there was a collision.
+ 	// This does a full sweep of character including character padding.
+ 	// Includes collisions when they already exist at the start of the movement.
+-	bool								GetFirstContactForSweep(RVec3Arg inPosition, Vec3Arg inDisplacement, CharacterContact &outContact, const IgnoredContactList &inIgnoredContacts, const BroadPhaseLayerFilter &inBroadPhaseLayerFilter, const ObjectLayerFilter &inObjectLayerFilter, const BodyFilter &inBodyFilter, const ShapeFilter &inShapeFilter) const;
++	bool								GetFirstContactForSweep(RVec3Arg inPosition, Vec3Arg inDisplacement, CharacterContact &outContact, const IgnoredContactList &inIgnoredContacts, const BroadPhaseLayerFilter &inBroadPhaseLayerFilter, const ObjectLayerFilter &inObjectLayerFilter, const BodyFilter &inBodyFilter, const ShapeFilter &inShapeFilter, bool inIgnoreWalkable = false) const;
+ 
+ 	// Store contacts so that we have proper ground information
+ 	void								StoreActiveContacts(const TempContactList &inContacts, TempAllocator &inAllocator);
+@@ -702,6 +706,7 @@ private:
+ 	uint								mMaxConstraintIterations;								// How often to try stepping in the constraint solving
+ 	float								mMinTimeRemaining;										// Early out condition: If this much time is left to simulate we are done
+ 	float								mCollisionTolerance;									// How far we're willing to penetrate geometry
++	float								mWalkStairsMinimumWidth = 0.0f;
+ 	float								mCharacterPadding;										// How far we try to stay away from the geometry, this ensures that the sweep will hit as little as possible lowering the collision cost and reducing the risk of getting stuck
+ 	uint								mMaxNumHits;											// Max num hits to collect in order to avoid excess of contact points collection
+ 	float								mHitReductionCosMaxAngle;								// Cos(angle) where angle is the maximum angle between two hits contact normals that are allowed to be merged during hit reduction. Default is around 2.5 degrees. Set to -1 to turn off.

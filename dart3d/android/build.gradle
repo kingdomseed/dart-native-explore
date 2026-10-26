@@ -42,6 +42,7 @@ android {
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+        main.jniLibs.srcDirs += 'native-width/libs'
     }
 
     buildFeatures {
@@ -138,22 +139,7 @@ dependencies {
         exclude group: 'org.jetbrains.kotlin'
     }
 
-    // Physics: Jolt via stephengold's JNI bindings (plan-locked).
-    // The upstream Android AARs split oddly: SpDebug carries the JVM
-    // library + debug natives; SpRelease carries release natives ONLY
-    // (its classes.jar holds compute shaders, no .class files — checked
-    // on 6.0.0 and 5.2.0). The JVM API is platform-independent and also
-    // published under the eight desktop artifact names, so we pair the
-    // Windows64-named API jar with the SpRelease natives AAR — release
-    // physics without hauling debug .so files into the APK.
-    implementation 'com.github.stephengold:jolt-jni-Windows64:6.0.0'
-    implementation(
-        group: "com.github.stephengold",
-        name: "jolt-jni-Android",
-        version: "6.0.0",
-        classifier: "SpRelease",
-        ext: "aar"
-    )
+    implementation files('native-width/jolt-jni-Windows64-6.0.0.jar')
 
     compileOnly project(':dartnative_android')
 

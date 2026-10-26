@@ -1,0 +1,56 @@
+--------- beginning of crash
+10-25 21:26:52.108 15114 15226 F libc    : FORTIFY: pthread_mutex_lock called on a destroyed mutex (0xb400007149712040)
+10-25 21:26:52.109 15114 15226 F libc    : Fatal signal 6 (SIGABRT), code -1 (SI_QUEUE) in tid 15226 (Cleaner-0), pid 15114 (.dart3d_example)
+10-25 21:26:52.840 15515 15515 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+10-25 21:26:52.840 15515 15515 F DEBUG   : Build fingerprint: 'Nothing/PacmanEEA/Pacman:16/BP2A.250605.031.A3/2608130941:user/release-keys'
+10-25 21:26:52.840 15515 15515 F DEBUG   : Revision: '0'
+10-25 21:26:52.840 15515 15515 F DEBUG   : ABI: 'arm64'
+10-25 21:26:52.840 15515 15515 F DEBUG   : Timestamp: 2026-10-25 21:26:52.281316548+0100
+10-25 21:26:52.840 15515 15515 F DEBUG   : Process uptime: 41s
+10-25 21:26:52.840 15515 15515 F DEBUG   : Cmdline: com.jasonholtdigital.dart3d_example
+10-25 21:26:52.840 15515 15515 F DEBUG   : pid: 15114, tid: 15226, name: Cleaner-0  >>> com.jasonholtdigital.dart3d_example <<<
+10-25 21:26:52.840 15515 15515 F DEBUG   : uid: 10798
+10-25 21:26:52.840 15515 15515 F DEBUG   : tagged_addr_ctrl: 0000000000000001 (PR_TAGGED_ADDR_ENABLE)
+10-25 21:26:52.840 15515 15515 F DEBUG   : pac_enabled_keys: 000000000000000f (PR_PAC_APIAKEY, PR_PAC_APIBKEY, PR_PAC_APDAKEY, PR_PAC_APDBKEY)
+10-25 21:26:52.840 15515 15515 F DEBUG   : signal 6 (SIGABRT), code -1 (SI_QUEUE), fault addr --------
+10-25 21:26:52.840 15515 15515 F DEBUG   : Abort message: 'FORTIFY: pthread_mutex_lock called on a destroyed mutex (0xb400007149712040)'
+10-25 21:26:52.840 15515 15515 F DEBUG   :     x0  0000000000000000  x1  0000000000003b7a  x2  0000000000000006  x3  0000006fe4ec2a90
+10-25 21:26:52.840 15515 15515 F DEBUG   :     x4  6b6b60621f6a626e  x5  6b6b60621f6a626e  x6  6b6b60621f6a626e  x7  7f7f7f7f7f7f7f7f
+10-25 21:26:52.840 15515 15515 F DEBUG   :     x8  00000000000000f0  x9  c7c53f466ecefaad  x10 0000000000000001  x11 00000073e2f3d1e0
+10-25 21:26:52.840 15515 15515 F DEBUG   :     x12 000000740a2dd020  x13 000000007fffffff  x14 0000000020a1fac6  x15 000019d32c1a1b7b
+10-25 21:26:52.840 15515 15515 F DEBUG   :     x16 00000073e2fab0f8  x17 00000073e2f90c40  x18 0000006fdcc04000  x19 0000000000003b0a
+10-25 21:26:52.840 15515 15515 F DEBUG   :     x20 0000000000003b7a  x21 00000000ffffffff  x22 0000006fe4ec3840  x23 b4000071792a4208
+10-25 21:26:52.840 15515 15515 F DEBUG   :     x24 0000000000000000  x25 0000006fe4ec2e98  x26 b400007269298550  x27 b4000073392aff90
+10-25 21:26:52.840 15515 15515 F DEBUG   :     x28 0000000000000056  x29 0000006fe4ec2b10
+10-25 21:26:52.840 15515 15515 F DEBUG   :     lr  00000073e2f269d8  sp  0000006fe4ec2a90  pc  00000073e2f269fc  pst 0000000000001000
+10-25 21:26:52.840 15515 15515 F DEBUG   : 29 total frames
+10-25 21:26:52.840 15515 15515 F DEBUG   : backtrace:
+10-25 21:26:52.840 15515 15515 F DEBUG   :       #00 pc 00000000000729fc  /apex/com.android.runtime/lib64/bionic/libc.so (abort+156) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+10-25 21:26:52.840 15515 15515 F DEBUG   :       #01 pc 00000000000767bc  /apex/com.android.runtime/lib64/bionic/libc.so (__fortify_fatal(char const*, ...)+124) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+10-25 21:26:52.840 15515 15515 F DEBUG   :       #02 pc 000000000008565c  /apex/com.android.runtime/lib64/bionic/libc.so (HandleUsingDestroyedMutex(pthread_mutex_t*, char const*)+60) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+10-25 21:26:52.840 15515 15515 F DEBUG   :       #03 pc 00000000000854a4  /apex/com.android.runtime/lib64/bionic/libc.so (pthread_mutex_lock+132) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #04 pc 00000000003dc398  /data/app/~~UDMhnKXplMwuytyUA2zjAw==/com.jasonholtdigital.dart3d_example-5k812tx-6NpiYL7MZ54Biw==/base.apk!libjoltjni.so (offset 0x2d18000) (std::__ndk1::mutex::lock()+12) (BuildId: 092a5813808bf2bd33ef7f156cb2b4d2e02e32d4)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #05 pc 00000000003dc984  /data/app/~~UDMhnKXplMwuytyUA2zjAw==/com.jasonholtdigital.dart3d_example-5k812tx-6NpiYL7MZ54Biw==/base.apk!libjoltjni.so (offset 0x2d18000) (std::__ndk1::__shared_mutex_base::lock()+36) (BuildId: 092a5813808bf2bd33ef7f156cb2b4d2e02e32d4)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #06 pc 00000000003b5720  /data/app/~~UDMhnKXplMwuytyUA2zjAw==/com.jasonholtdigital.dart3d_example-5k812tx-6NpiYL7MZ54Biw==/base.apk!libjoltjni.so (offset 0x2d18000) (JPH::BodyLockInterfaceLocking::LockWrite(JPH::BodyID const&) const+104) (BuildId: 092a5813808bf2bd33ef7f156cb2b4d2e02e32d4)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #07 pc 000000000021a10c  /data/app/~~UDMhnKXplMwuytyUA2zjAw==/com.jasonholtdigital.dart3d_example-5k812tx-6NpiYL7MZ54Biw==/base.apk!libjoltjni.so (offset 0x2d18000) (JPH::BodyInterface::RemoveBody(JPH::BodyID const&)+76) (BuildId: 092a5813808bf2bd33ef7f156cb2b4d2e02e32d4)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #08 pc 0000000000227f38  /data/app/~~UDMhnKXplMwuytyUA2zjAw==/com.jasonholtdigital.dart3d_example-5k812tx-6NpiYL7MZ54Biw==/base.apk!libjoltjni.so (offset 0x2d18000) (JPH::CharacterVirtual::~CharacterVirtual()+56) (BuildId: 092a5813808bf2bd33ef7f156cb2b4d2e02e32d4)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #09 pc 000000000022802c  /data/app/~~UDMhnKXplMwuytyUA2zjAw==/com.jasonholtdigital.dart3d_example-5k812tx-6NpiYL7MZ54Biw==/base.apk!libjoltjni.so (offset 0x2d18000) (JPH::CharacterVirtual::~CharacterVirtual()+16) (BuildId: 092a5813808bf2bd33ef7f156cb2b4d2e02e32d4)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #10 pc 000000000036c2e4  /data/app/~~UDMhnKXplMwuytyUA2zjAw==/com.jasonholtdigital.dart3d_example-5k812tx-6NpiYL7MZ54Biw==/base.apk!libjoltjni.so (offset 0x2d18000) (Java_com_github_stephengold_joltjni_CharacterVirtualRef_freeWithSystem+64) (BuildId: 092a5813808bf2bd33ef7f156cb2b4d2e02e32d4)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #11 pc 0000000000e619d8  /data/misc/apexdata/com.android.art/dalvik-cache/arm64/boot.oat (art_jni_trampoline+120)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #12 pc 00000000006bf3fc  /apex/com.android.art/lib64/libart.so (nterp_helper+780) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #13 pc 000000000025cf7c  /data/app/~~UDMhnKXplMwuytyUA2zjAw==/com.jasonholtdigital.dart3d_example-5k812tx-6NpiYL7MZ54Biw==/oat/arm64/base.vdex (t0.a.run+24)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #14 pc 00000000006bf8e4  /apex/com.android.art/lib64/libart.so (nterp_helper+2036) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #15 pc 0000000000093c5c  /data/app/~~UDMhnKXplMwuytyUA2zjAw==/com.jasonholtdigital.dart3d_example-5k812tx-6NpiYL7MZ54Biw==/oat/arm64/base.vdex (E0.f.run+232)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #16 pc 000000000052c31c  /data/misc/apexdata/com.android.art/dalvik-cache/arm64/boot.oat (jdk.internal.ref.CleanerImpl$PhantomCleanableRef.performCleanup+60)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #17 pc 000000000052c250  /data/misc/apexdata/com.android.art/dalvik-cache/arm64/boot.oat (jdk.internal.ref.PhantomCleanable.clean+80)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #18 pc 00000000006bf93c  /apex/com.android.art/lib64/libart.so (nterp_helper+2124) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #19 pc 00000000002c8e1e  /apex/com.android.art/javalib/core-oj.jar (jdk.internal.ref.CleanerImpl.run+86)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #20 pc 00000000003719d0  /data/misc/apexdata/com.android.art/dalvik-cache/arm64/boot.oat (java.lang.Thread.run+64)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #21 pc 00000000006bf93c  /apex/com.android.art/lib64/libart.so (nterp_helper+2124) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #22 pc 00000000002c6eb8  /apex/com.android.art/javalib/core-oj.jar (jdk.internal.misc.InnocuousThread.run+32)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #23 pc 0000000000270cf4  /apex/com.android.art/lib64/libart.so (art_quick_invoke_stub+612) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #24 pc 000000000023ba68  /apex/com.android.art/lib64/libart.so (art::ArtMethod::Invoke(art::Thread*, unsigned int*, unsigned int, art::JValue*, char const*)+224) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #25 pc 000000000055c204  /apex/com.android.art/lib64/libart.so (art::Thread::CreateCallback(void*)+1400) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #26 pc 000000000055bc78  /apex/com.android.art/lib64/libart.so (art::Thread::CreateCallbackWithUffdGc(void*)+12) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #27 pc 0000000000083c8c  /apex/com.android.runtime/lib64/bionic/libc.so (__pthread_start(void*)+236) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+10-25 21:26:52.841 15515 15515 F DEBUG   :       #28 pc 0000000000076190  /apex/com.android.runtime/lib64/bionic/libc.so (__start_thread+64) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)

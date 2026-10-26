@@ -62,12 +62,10 @@ jobs:
       # gradle/wrapper/gradle-wrapper.properties.
       - uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: "8.14"
+          gradle-version: "9.3.1"
       - name: Example — resolve plugins
         working-directory: dart3d/example
         run: dn pub get
-      # gradle.properties pins org.gradle.java.home to the Mac's JDK 21;
-      # the command line overrides it with the runner's.
       - name: Plugin — JVM unit tests
         working-directory: dart3d/example/android
         env:

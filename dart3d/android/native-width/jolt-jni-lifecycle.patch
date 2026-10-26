@@ -1,0 +1,14 @@
+diff --git a/src/main/java/com/github/stephengold/joltjni/CharacterVsCharacterCollisionSimple.java b/src/main/java/com/github/stephengold/joltjni/CharacterVsCharacterCollisionSimple.java
+index f02be81..9956da6 100644
+--- a/src/main/java/com/github/stephengold/joltjni/CharacterVsCharacterCollisionSimple.java
++++ b/src/main/java/com/github/stephengold/joltjni/CharacterVsCharacterCollisionSimple.java
+@@ -97,7 +97,8 @@ public class CharacterVsCharacterCollisionSimple
+         for (int i = 0; i < numCharacters; ++i) {
+             long tmpVa = collisionList.get(i).targetVa();
+             if (tmpVa == characterVa) {
+-                collisionList.remove(i);
++                CharacterVirtualRef removed = collisionList.remove(i);
++                removed.close();
+                 break;
+             }
+         }

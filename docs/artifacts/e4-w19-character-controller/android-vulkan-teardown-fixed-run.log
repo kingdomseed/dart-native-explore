@@ -1,0 +1,42 @@
+Launching lib/main.dart on A142 in release mode...
+Running Gradle task 'assembleRelease'...                        
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/Users/jasonholt/.gradle/wrapper/dists/gradle-9.3.1-all/9ot9r568e8zfvvd4mn8rbu1j0/gradle-9.3.1/lib/native-platform-0.22-milestone-29.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+Running Gradle task 'assembleRelease'...                           25.2s
+✓ Built build/app/outputs/dn-apk/app-release.apk (110.9MB)
+Installing build/app/outputs/dn-apk/app-release.apk...              3.2s
+
+DartNative run key commands.
+h List all available interactive commands.
+c Clear the screen
+q Quit (terminate the application on the device).
+
+dartnative: dart3d: showcase — w19: 10 nodes · 5 geo · 7 mat
+dartnative: dart3d: w19 stage=init ready PASS
+dartnative: dart3d: w19 stage=walk pos=(-1.51,0.67,-0.40) grounded=true PASS
+dartnative: dart3d: w19 stage=step pos=(-0.34,0.91,-0.40) grounded=true PASS
+dartnative: dart3d: w19 stage=push charPos=(0.98,0.91) crateX=1.59 grounded=true PASS
+dartnative: dart3d: w19 stage=slope pos=(1.48,1.02,1.35) sliding=true observedSlide=true PASS
+dartnative: dart3d: w19 stage=gravity pos=(1.42,0.80,-0.40) grounded=true peakY=1.71 PASS
+dartnative: dart3d: w19 stage=transform PASS
+dartnative: dart3d: w19 stage=stable seconds=10 pos=(-3.00,0.67,-0.40) PASS
+dartnative: dart3d: w19 complete PASS
+dartnative: dart3d: showcase — dartnative_logo: 5 nodes · 1 geo · 1 mat · 1 tex · 1 anims
+dartnative: dart3d: hero — frameRadius 1.218 dist 12.496 aspect 2.109 glow 1 mat(s)
+dartnative: [DN] _performRebuild: root native view changed 1 → 16, re-emitting grow:1
+dartnative: [DN] _performRebuild: root native view changed 16 → 39, re-emitting grow:1
+dartnative: dart3d: dice table — 7 DartNative dice (logo inside), 31 nodes, 45 payloads, built in 1569 ms (dice 1540, compose from 1569)
+dartnative: dart3d: dice table ready after 1571 ms
+dartnative: dart3d: dice table handed to the view in 19 ms
+dartnative: dart3d: dice tray fit 871x413 insets EdgeInsets(l:34.0, t:80.0, r:184.0, b:58.0) → 4.50 px/u, camera 145, play x -88.3..54.9 z -32.1..27.2
+dartnative: dart3d: dice roll throw — strength 0.67 dir (1, -0) gates [1, 2]
+dartnative: dart3d: dice gates closed after 0.37 s
+dartnative: dart3d: dice cocked d4 (up 0.651) → nudge #1
+dartnative: dart3d: dice cocked d4 (up 0.524) → nudge #2
+dartnative: dart3d: dice settled — d4=3 (up 0.611 at 26.5,8.1,11.8 cocked) d6=6 (up 1.000 at 39.1,6.9,-22.2) d8=8 (up 1.000 at 46.6,5.2,-6.1) d10t=80 (up 1.000 at 30.6,6.0,0.3) d10u=0 (up 1.000 at 35.8,6.0,18.8) d12=9 (up 1.000 at 12.1,7.8,8.1) d20=13 (up 1.000 at 10.3,7.7,-18.7) [3 nudges]
+dartnative: dart3d: dice readout d4 3 · d6 6 · d8 8 · d12 9 · d20 13 · d% 80+0 = 119
+
+Application finished.

@@ -15,6 +15,7 @@ import 'package:dart3d/src/fsceneb_reader.dart';
 import 'package:dart3d/src/geometry/instances.dart';
 import 'package:dart3d/src/geometry/proc.dart';
 import 'package:dart3d/src/glb_import.dart';
+import 'package:dart3d/src/physics.dart';
 import 'package:dart3d/src/scene_model.dart';
 import 'package:dart3d/src/vertex_pack.dart';
 import 'package:dart3d/src/world_bounds.dart';
@@ -129,6 +130,13 @@ const showcaseItems = [
     cameraDir: (0.0, 0.10, -1.0),
     frameMargin: 1.15,
   ),
+  ShowcaseItem(
+    'w19',
+    kBuiltinW19CharacterKey,
+    'W19: characterController · autostep · slope slide · dynamic push',
+    cameraDir: (0.0, 0.25, -1.0),
+    frameMargin: 1.15,
+  ),
 ];
 
 /// The synthetic asset key for the W21 materials conformance scene —
@@ -156,6 +164,10 @@ const String kBuiltinU1Key = 'builtin:u1';
 /// The synthetic asset key for the W17 physical sky + `skyEnvironment`
 /// verification scene — builds [buildW17SkyDocument].
 const String kBuiltinW17SkyKey = 'builtin:w17';
+
+/// The synthetic asset key for the W19 character controller verification
+/// scene — builds [buildW19CharacterDocument].
+const String kBuiltinW19CharacterKey = 'builtin:w19';
 
 const String _kBootW17Mode = String.fromEnvironment(
   'DART3D_W17_MODE',
@@ -213,6 +225,8 @@ ShowcaseScene? loadShowcaseScene(
       doc = buildU1CamerasPickingDocument();
     } else if (item.assetKey == kBuiltinW17SkyKey) {
       doc = buildW17SkyDocument(mode: _kBootW17Mode);
+    } else if (item.assetKey == kBuiltinW19CharacterKey) {
+      doc = buildW19CharacterDocument();
     } else {
       final bytes = bytesOf(item.assetKey);
       if (bytes == null) {
@@ -1543,4 +1557,190 @@ EnvironmentResource buildW17EnvironmentResource(
       ),
     ),
   );
+}
+
+/// Builds the W19 character controller verification scene (`builtin:w19`,
+/// selected via `--dart-define=DART3D_MODEL=w19`):
+/// - Physics ground slab (`w19.ground`)
+/// - Step platform of height `0.24` (`w19.step`)
+/// - Pushable dynamic box on the step (`w19.crate`)
+/// - Steep `55°` slope ramp (`w19.slope`)
+/// - Primary walking/stepping/jumping character capsule (`w19.character.main`)
+/// - Steep-slope sliding character capsule (`w19.character.slope`)
+SceneDocument buildW19CharacterDocument() {
+  final doc = SceneDocument();
+
+  MaterialResource mat(double r, double g, double b, {double roughness = 0.5}) =>
+      doc.addResource(
+        MaterialResource(
+          doc.newId(),
+          type: 'physicallyBased',
+          properties: {
+            'baseColor': ColorValue(r, g, b, 1.0),
+            'roughness': DoubleValue(roughness),
+          },
+        ),
+      );
+
+  doc.createNode(
+    name: 'w19.world',
+    components: [
+      ComponentSpec(
+        'physicsWorld',
+        properties: {
+          'gravity': Vec3Value(Vector3(0, -9.8, 0)),
+          'fixedTimestep': const DoubleValue(1.0 / 60.0),
+        },
+      ),
+    ],
+    root: true,
+  );
+
+  final groundGeo = doc.addResource(
+    GeometryResource(
+      doc.newId(),
+      procedural: CuboidGeometrySpec(extents: Vector3(10.0, 0.5, 6.0)),
+    ),
+  );
+  doc.createNode(
+    name: 'w19.ground',
+    transform: TrsTransform(translation: Vector3(0.0, -0.25, 0.0)),
+    components: [
+      ComponentSpec(
+        'mesh',
+        properties: {
+          'geometry': ResourceRefValue(groundGeo.id),
+          'material': ResourceRefValue(mat(0.22, 0.25, 0.30, roughness: 0.85).id),
+        },
+      ),
+      rigidBodyComponent(type: 'fixed'),
+      colliderComponent(shape: 'box', extents: Vector3(10.0, 0.5, 6.0)),
+    ],
+    root: true,
+  );
+
+  final stepGeo = doc.addResource(
+    GeometryResource(
+      doc.newId(),
+      procedural: CuboidGeometrySpec(extents: Vector3(2.4, 0.24, 1.8)),
+    ),
+  );
+  doc.createNode(
+    name: 'w19.step',
+    transform: TrsTransform(translation: Vector3(0.0, 0.12, -0.4)),
+    components: [
+      ComponentSpec(
+        'mesh',
+        properties: {
+          'geometry': ResourceRefValue(stepGeo.id),
+          'material': ResourceRefValue(mat(0.35, 0.58, 0.85, roughness: 0.6).id),
+        },
+      ),
+      rigidBodyComponent(type: 'fixed'),
+      colliderComponent(shape: 'box', extents: Vector3(2.4, 0.24, 1.8)),
+    ],
+    root: true,
+  );
+
+  final crateGeo = doc.addResource(
+    GeometryResource(
+      doc.newId(),
+      procedural: CuboidGeometrySpec(extents: Vector3(0.55, 0.55, 0.55)),
+    ),
+  );
+  doc.createNode(
+    name: 'w19.crate',
+    transform: TrsTransform(translation: Vector3(0.45, 0.54, -0.4)),
+    components: [
+      ComponentSpec(
+        'mesh',
+        properties: {
+          'geometry': ResourceRefValue(crateGeo.id),
+          'material': ResourceRefValue(mat(0.95, 0.62, 0.18, roughness: 0.4).id),
+        },
+      ),
+      rigidBodyComponent(type: 'dynamic', mass: 1.5),
+      colliderComponent(
+        shape: 'box',
+        extents: Vector3(0.55, 0.55, 0.55),
+        friction: 0.25,
+      ),
+    ],
+    root: true,
+  );
+
+  final slopeGeo = doc.addResource(
+    GeometryResource(
+      doc.newId(),
+      procedural: CuboidGeometrySpec(extents: Vector3(2.4, 0.25, 1.4)),
+    ),
+  );
+  doc.createNode(
+    name: 'w19.slope',
+    transform: TrsTransform(
+      translation: Vector3(2.1, 0.85, 1.35),
+      rotation: Quaternion.axisAngle(Vector3(0, 0, 1), 0.96),
+    ),
+    components: [
+      ComponentSpec(
+        'mesh',
+        properties: {
+          'geometry': ResourceRefValue(slopeGeo.id),
+          'material': ResourceRefValue(mat(0.78, 0.34, 0.38, roughness: 0.5).id),
+        },
+      ),
+      rigidBodyComponent(type: 'fixed'),
+      colliderComponent(shape: 'box', extents: Vector3(2.4, 0.25, 1.4)),
+    ],
+    root: true,
+  );
+
+  doc.createNode(
+    name: 'w19.character.main',
+    transform: TrsTransform(translation: Vector3(-2.4, 0.69, -0.4)),
+    components: [
+      d3ProcMeshComponent(
+        D3CapsuleProc(radius: 0.32, height: 0.70),
+        material: mat(0.24, 0.88, 0.52, roughness: 0.3).id,
+      ),
+      colliderComponent(shape: 'capsule', radius: 0.32, height: 0.70),
+      characterControllerComponent(
+        offset: 0.02,
+        slide: true,
+        maxSlopeClimbAngle: pi / 4,
+        minSlopeSlideAngle: pi / 4,
+        snapToGround: 0.15,
+        autostep: true,
+        autostepMaxHeight: 0.32,
+        autostepMinWidth: 0.10,
+        autostepIncludeDynamicBodies: false,
+        mass: 25.0,
+      ),
+    ],
+    root: true,
+  );
+
+  doc.createNode(
+    name: 'w19.character.slope',
+    transform: TrsTransform(translation: Vector3(2.25, 1.85, 1.35)),
+    components: [
+      d3ProcMeshComponent(
+        D3CapsuleProc(radius: 0.30, height: 0.60),
+        material: mat(0.92, 0.38, 0.82, roughness: 0.3).id,
+      ),
+      colliderComponent(shape: 'capsule', radius: 0.30, height: 0.60),
+      characterControllerComponent(
+        offset: 0.02,
+        slide: true,
+        maxSlopeClimbAngle: pi / 4,
+        minSlopeSlideAngle: pi / 4,
+        snapToGround: null,
+        autostep: false,
+        mass: 0.0,
+      ),
+    ],
+    root: true,
+  );
+
+  return doc;
 }

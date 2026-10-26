@@ -1,0 +1,19 @@
+{
+  "sourceFile": "/private/tmp/dart3d-e4-resume-20261025/android-vulkan-teardown-fixed.mp4",
+  "sourceSha256": "cf9107fb24448cf9ea0d9cad95eb3ba06c16bd6e49442c21eec644e49b52b98d",
+  "sourceStartSeconds": 22,
+  "sourceEndSeconds": 82,
+  "crop": {"x": 0, "y": 962, "width": 1084, "height": 488},
+  "output": {
+    "name": "e4-character-review.mp4",
+    "width": 960,
+    "height": 432,
+    "framesPerSecond": 30,
+    "durationSeconds": 60,
+    "bytes": 754984,
+    "sha256": "1a69bbb7d3ce42b0a26531ff85d6a725c8cd7a0ca06799059e82ca144286c8a3",
+    "url": "https://github.com/kingdomseed/dart-native-explore/releases/download/media-e4-character-controller/e4-character-review.mp4"
+  },
+  "timing": "unchanged",
+  "inspection": "source contact sheet and first and last output frames viewed"
+}

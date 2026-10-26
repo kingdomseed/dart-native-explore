@@ -12,6 +12,13 @@
 -keepclassmembers class * extends com.github.stephengold.joltjni.CustomContactListener {
     public *;
 }
+-keepclassmembers class * extends com.github.stephengold.joltjni.CustomCharacterContactListener {
+    public *;
+}
+
+-keep class com.jasonholtdigital.dart3d.JoltStairWidth {
+    native <methods>;
+}
 
 # dart3d_jni's nativeMaterialBuilderInstanced reads MaterialBuilder's
 # private mNativeObject pointer via JNI GetFieldID.

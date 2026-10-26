@@ -1,0 +1,10 @@
+gradle.projectsEvaluated {
+    def plugin = rootProject.findProject(':dart3d')
+    plugin?.tasks?.withType(Test)?.configureEach {
+        def nativeDirectory = new File(plugin.projectDir, 'build/native-width/mac')
+        inputs.file(new File(nativeDirectory, 'libjoltjni.dylib'))
+        systemProperty 'dart3d.nativeTests', 'true'
+        systemProperty 'java.library.path', nativeDirectory.absolutePath
+        testLogging { events 'passed', 'failed', 'skipped'; showStandardStreams = true }
+    }
+}

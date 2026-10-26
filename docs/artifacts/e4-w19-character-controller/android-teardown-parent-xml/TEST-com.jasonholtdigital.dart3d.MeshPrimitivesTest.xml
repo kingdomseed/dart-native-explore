@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.jasonholtdigital.dart3d.MeshPrimitivesTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-25T20:56:07.155Z" hostname="Jasons-Mac-mini" time="0.004">
+  <properties/>
+  <testcase name="multi-primitive mesh unwraps tagged map entries" classname="com.jasonholtdigital.dart3d.MeshPrimitivesTest" time="0.003"/>
+  <testcase name="material-less primitive keeps a null slot" classname="com.jasonholtdigital.dart3d.MeshPrimitivesTest" time="0.0"/>
+  <testcase name="mesh with neither form resolves empty" classname="com.jasonholtdigital.dart3d.MeshPrimitivesTest" time="0.0"/>
+  <testcase name="single-primitive mesh reads direct geometry and material refs" classname="com.jasonholtdigital.dart3d.MeshPrimitivesTest" time="0.0"/>
+  <testcase name="primitive entry missing geometry is skipped" classname="com.jasonholtdigital.dart3d.MeshPrimitivesTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

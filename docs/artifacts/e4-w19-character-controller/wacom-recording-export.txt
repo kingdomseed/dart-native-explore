@@ -1,0 +1,13 @@
+Optional Wacom recording: NOT_EXPORTED.
+
+Two agent-device record stop attempts returned:
+Android recording artifact is not stable: /sdcard/agent-device-recording-1792963656129.mp4
+
+Diagnostic IDs:
+mvocaiaq-c4b4cc4a
+mvocb4hz-f0402725
+
+The first close attempt reported an unreleased recording resource.
+A subsequent close succeeded. The host recording resource and both owned
+native paths were then verified absent, and no screenrecord process remained.
+The Wacom screenshots and complete app/native logs remain the device evidence.

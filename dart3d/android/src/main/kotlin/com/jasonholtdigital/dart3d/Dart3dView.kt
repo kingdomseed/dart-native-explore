@@ -2606,19 +2606,19 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         }
     }
 
-    /** Pushes a node's local TRS into the transform manager; teleports
-     * its physics body if it carries one (the `setNodeTransforms` →
-     * body write the watchdog uses). */
     internal fun applyLocalTransform(rec: FsceneRealizer.NodeRec) {
         val local = D3Wire.trs(rec.localPos, rec.localQuat, rec.localScale)
         // Instance handles go stale when another transform component is
         // destroyed (storage compacts) — resolve per use.
         engine.transformManager.setTransform(
             engine.transformManager.getInstance(rec.entity), local)
-        val body = rec.body ?: return
+        val characterKey = nodesById.entries.firstOrNull { it.value === rec }
+            ?.key?.takeIf(world::hasCharacter)
+        if (rec.body == null && characterKey == null) return
         val wm = worldMatOf(rec)
         val (wp, wq) = FsceneRealizer.worldPoseOf(wm)
-        world.teleport(body, wp, wq)
+        rec.body?.let { world.teleport(it, wp, wq) }
+        characterKey?.let { world.syncCharacterTransform(it, wp, wq) }
     }
 
     private fun worldMatOf(rec: FsceneRealizer.NodeRec): FloatArray {
@@ -2956,6 +2956,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     // that reference this node.
                     dropComponentJointsForNode(id)
                     world.removeJointsForNode(id)
+                    world.removeCharacter(id)
                     rec.body?.let { world.removeBody(it) }
                     bodies.remove(id)
                     dynamicBodyKeys.remove(id)
@@ -4075,6 +4076,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             "raycast" -> queryRaycast(q, json)
             "overlap" -> queryOverlap(q, json)
             "shapecast" -> queryShapecast(q, json)
+            "moveCharacter" -> queryMoveCharacter(q, json)
             else -> fireQueryError(q, "unknown query type '$type'")
         }
     }
@@ -4259,6 +4261,69 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             RVec3(tc[0].toDouble(), tc[1].toDouble(), tc[2].toDouble()),
             radius.toFloat())
         fireQueryHits(q, "shapecast", listOfNotNull(hit))
+    }
+
+    private fun queryMoveCharacter(q: Long, json: JSONObject) {
+        val token = json.optString("node")
+        val key = D3Wire.localIdKey(token) ?: run {
+            fireQueryError(q, "moveCharacter: invalid node '$token'"); return
+        }
+        val dWire = vec(json.optJSONArray("desiredTranslation"))
+        if (dWire == null || dWire.size < 3) {
+            fireQueryError(q, "moveCharacter: invalid 'desiredTranslation'"); return
+        }
+        val rec = nodesById[key]
+        if (rec == null || !world.hasCharacter(key)) {
+            fireEvent(D3Event.QUERY_REPLY,
+                "{\"q\":$q,\"type\":\"moveCharacter\"," +
+                    "\"translation\":[0.0,0.0,0.0]," +
+                    "\"grounded\":false,\"slidingDownSlope\":false}")
+            return
+        }
+        val dt = json.optDouble(
+            "deltaSeconds", world.fixedTimestep.toDouble()).toFloat()
+        val disp = D3Wire.position(dWire)
+        val wm = worldMatOf(rec)
+        val (startPos, startRot) = FsceneRealizer.worldPoseOf(wm)
+        val res = world.moveCharacter(key, startPos, startRot, disp, dt) ?: run {
+            fireEvent(D3Event.QUERY_REPLY,
+                "{\"q\":$q,\"type\":\"moveCharacter\"," +
+                    "\"translation\":[0.0,0.0,0.0]," +
+                    "\"grounded\":false,\"slidingDownSlope\":false}")
+            return
+        }
+        val parentKey = rec.parentKey
+        if (parentKey == null) {
+            rec.localPos = floatArrayOf(
+                res.position[0], res.position[1], res.position[2])
+        } else {
+            val parentRec = nodesById[parentKey]
+            if (parentRec != null) {
+                val pm = worldMatOf(parentRec)
+                val invPm = FloatArray(16)
+                if (Matrix.invertM(invPm, 0, pm, 0)) {
+                    val worldPt = floatArrayOf(
+                        res.position[0], res.position[1], res.position[2], 1f)
+                    val localPt = FloatArray(4)
+                    Matrix.multiplyMV(localPt, 0, invPm, 0, worldPt, 0)
+                    rec.localPos = floatArrayOf(localPt[0], localPt[1], localPt[2])
+                } else {
+                    rec.localPos = floatArrayOf(
+                        rec.localPos[0] + res.translation[0],
+                        rec.localPos[1] + res.translation[1],
+                        rec.localPos[2] + res.translation[2])
+                }
+            }
+        }
+        transformWrites.record(key, TransformWrites.TRANSLATION)
+        applyLocalTransform(rec)
+        fireEvent(D3Event.QUERY_REPLY,
+            "{\"q\":$q,\"type\":\"moveCharacter\"," +
+                "\"translation\":[${res.translation[0]},${res.translation[1]},${-res.translation[2]}]," +
+                "\"p\":[${res.position[0]},${res.position[1]},${-res.position[2]}]," +
+                "\"localPos\":[${rec.localPos[0]},${rec.localPos[1]},${-rec.localPos[2]}]," +
+                "\"grounded\":${res.grounded}," +
+                "\"slidingDownSlope\":${res.slidingDownSlope}}")
     }
 
     // MARK: - W9 joints

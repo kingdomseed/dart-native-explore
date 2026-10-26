@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.22)
+project(dart3d_jolt_width LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+file(GLOB_RECURSE JOLT_SOURCES "${JOLT_SOURCE}/Jolt/*.cpp")
+file(GLOB_RECURSE JNI_SOURCES "${JNI_SOURCE}/src/main/native/glue/*.cpp")
+add_library(joltjni SHARED ${JOLT_SOURCES} ${JNI_SOURCES}
+    "${JOLT_SOURCE}/TestFramework/External/Perlin.cpp" JoltStairWidth.cpp)
+target_include_directories(joltjni PRIVATE "${JOLT_SOURCE}"
+    "${JOLT_SOURCE}/TestFramework" "${JNI_SOURCE}/src/main/native")
+target_compile_definitions(joltjni PRIVATE JOLT_JNI_VERSION_STRING=6.0.0
+    JPH_OBJECT_STREAM JPH_USE_CPU_COMPUTE JPH_CROSS_PLATFORM_DETERMINISTIC JPH_NO_DEBUG)
+target_compile_options(joltjni PRIVATE -fno-rtti -Werror=return-type)
+if(ANDROID)
+    target_link_libraries(joltjni PRIVATE log)
+    target_link_options(joltjni PRIVATE -Wl,-z,max-page-size=16384)
+else()
+    find_package(JNI REQUIRED)
+    target_include_directories(joltjni PRIVATE ${JNI_INCLUDE_DIRS})
+endif()

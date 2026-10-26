@@ -919,6 +919,48 @@ final class SceneController {
     return decodeRaycastReply(reply);
   }
 
+  /// Resolves one kinematic character move-and-slide for [node] (which
+  /// must carry a `characterController` and sibling `collider` component),
+  /// applying the resolved movement natively and syncing the tracked
+  /// [document] node's translation (`W19` / `E4` — mirrors upstream
+  /// `KinematicCharacterController.move`).
+  Future<CharacterMovement> moveCharacter(
+    LocalId node,
+    Vector3 desiredTranslation, {
+    double? deltaSeconds,
+  }) async {
+    final reply = await _query({
+      'type': 'moveCharacter',
+      'node': node.toToken(),
+      'desiredTranslation': [
+        desiredTranslation.x,
+        desiredTranslation.y,
+        desiredTranslation.z,
+      ],
+      if (deltaSeconds != null) 'deltaSeconds': deltaSeconds,
+    });
+    final movement = decodeCharacterMovementReply(reply);
+    final doc = _document;
+    final docNode = doc?.nodes[node];
+    if (doc != null && docNode != null) {
+      Vector3? nextLocal;
+      if (reply['localPos'] case [num lx, num ly, num lz]) {
+        nextLocal = Vector3(lx.toDouble(), ly.toDouble(), lz.toDouble());
+      } else if (reply['p'] case [num px, num py, num pz]) {
+        nextLocal = Vector3(px.toDouble(), py.toDouble(), pz.toDouble());
+      } else {
+        final curPos = docNode.transform.toMatrix4().getTranslation();
+        nextLocal = curPos + movement.translation;
+      }
+      doc_layer.foldTransformIntoDocument(
+        doc,
+        node,
+        translation: nextLocal,
+      );
+    }
+    return movement;
+  }
+
   Future<List<SceneOverlapHit>> _overlap(
     Map<String, Object?> shape,
     Vector3 position,

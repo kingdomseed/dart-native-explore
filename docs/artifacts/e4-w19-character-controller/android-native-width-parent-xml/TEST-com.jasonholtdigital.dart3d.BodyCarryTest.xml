@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.jasonholtdigital.dart3d.BodyCarryTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-10-25T20:25:27.261Z" hostname="Jasons-Mac-mini" time="0.005">
+  <properties/>
+  <testcase name="aParentWithoutABodyStillCountsTowardsDepth" classname="com.jasonholtdigital.dart3d.BodyCarryTest" time="0.001"/>
+  <testcase name="kinematicBodiesCarryToo" classname="com.jasonholtdigital.dart3d.BodyCarryTest" time="0.001"/>
+  <testcase name="fixedBodiesAreNotCarried" classname="com.jasonholtdigital.dart3d.BodyCarryTest" time="0.0"/>
+  <testcase name="aParentLoopDoesNotHang" classname="com.jasonholtdigital.dart3d.BodyCarryTest" time="0.001"/>
+  <testcase name="aSleepingBodyComesBackAsleep" classname="com.jasonholtdigital.dart3d.BodyCarryTest" time="0.0"/>
+  <testcase name="nothingCapturedRestoresNothing" classname="com.jasonholtdigital.dart3d.BodyCarryTest" time="0.0"/>
+  <testcase name="aRollingDieKeepsItsPoseVelocitiesAndWakefulness" classname="com.jasonholtdigital.dart3d.BodyCarryTest" time="0.0"/>
+  <testcase name="theWholePoseCarriesWhateverSetTransformsWrote" classname="com.jasonholtdigital.dart3d.BodyCarryTest" time="0.0"/>
+  <testcase name="aBodyThatDidNotComeBackIsSkipped" classname="com.jasonholtdigital.dart3d.BodyCarryTest" time="0.0"/>
+  <testcase name="aBodyRebuiltAsAnotherKindKeepsItsRebuiltState" classname="com.jasonholtdigital.dart3d.BodyCarryTest" time="0.001"/>
+  <testcase name="aChildIsSyncedAfterItsParentWhateverTheMapOrder" classname="com.jasonholtdigital.dart3d.BodyCarryTest" time="0.0"/>
+  <testcase name="restoreReportsTheKeysItRestored" classname="com.jasonholtdigital.dart3d.BodyCarryTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

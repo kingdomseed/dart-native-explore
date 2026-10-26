@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.jasonholtdigital.dart3d.BakeProgressTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-25T20:25:27.252Z" hostname="Jasons-Mac-mini" time="0.008">
+  <properties/>
+  <testcase name="aRejectedRecipeNeverReportsExported" classname="com.jasonholtdigital.dart3d.BakeProgressTest" time="0.003"/>
+  <testcase name="aCompleteFixedSetReportsExported" classname="com.jasonholtdigital.dart3d.BakeProgressTest" time="0.0"/>
+  <testcase name="theScriptsSentinelsDoNotContainEachOther" classname="com.jasonholtdigital.dart3d.BakeProgressTest" time="0.001"/>
+  <testcase name="theLastLineIsNeverIdleWhileACompileIsInFlight" classname="com.jasonholtdigital.dart3d.BakeProgressTest" time="0.003"/>
+  <testcase name="theLaneIsIdleOnlyWhenEveryStartedCompileHasFinished" classname="com.jasonholtdigital.dart3d.BakeProgressTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
