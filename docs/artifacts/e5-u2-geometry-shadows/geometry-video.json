@@ -4,6 +4,7 @@
   "bytes": 4240050,
   "durationSeconds": 26.163333,
   "exported": true,
-  "published": false,
-  "content": "iOS U2 geometry left and right light with unchanged camera; full device recording, timing unchanged"
+  "published": true,
+  "content": "iOS U2 geometry left and right light with unchanged camera; full device recording, timing unchanged",
+  "url": "https://github.com/kingdomseed/dart-native-explore/releases/download/media-e5-u2/u2-ios-geometry.mp4"
 }

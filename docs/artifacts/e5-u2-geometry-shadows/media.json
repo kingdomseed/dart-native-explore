@@ -1,0 +1,36 @@
+{
+  "release": "https://github.com/kingdomseed/dart-native-explore/releases/tag/media-e5-u2",
+  "implementationCommit": "412c902a8e4c6e4eae34f3a2d6819228d4a7ba63",
+  "assets": [
+    {
+      "name": "facing-journey.mp4",
+      "url": "https://github.com/kingdomseed/dart-native-explore/releases/download/media-e5-u2/facing-journey.mp4",
+      "sha256": "870d8bfedcfdc4d39ac4b517c429d29f4398a24dd4ce54dfc23771e0956174d4",
+      "bytes": 3012874
+    },
+    {
+      "name": "ios-directional-auto-fit-journey.mp4",
+      "url": "https://github.com/kingdomseed/dart-native-explore/releases/download/media-e5-u2/ios-directional-auto-fit-journey.mp4",
+      "sha256": "4e2eda292dc27170a4909d7d72a7b22a868bd6ff01c60331049c2cace7235ec2",
+      "bytes": 1966927
+    },
+    {
+      "name": "ios-spot-cache-journey.mp4",
+      "url": "https://github.com/kingdomseed/dart-native-explore/releases/download/media-e5-u2/ios-spot-cache-journey.mp4",
+      "sha256": "d4c5bfc62c64d853fabb40ba3de8100abd718fc3c5e226ff57ec36087c4d29a0",
+      "bytes": 2983645
+    },
+    {
+      "name": "opengl-corrected-journey.mp4",
+      "url": "https://github.com/kingdomseed/dart-native-explore/releases/download/media-e5-u2/opengl-corrected-journey.mp4",
+      "sha256": "72d7acfe540c0e429d81d29ebee0644ac0205d39d4860544a9a85c77f5717134",
+      "bytes": 10387003
+    },
+    {
+      "name": "u2-ios-geometry.mp4",
+      "url": "https://github.com/kingdomseed/dart-native-explore/releases/download/media-e5-u2/u2-ios-geometry.mp4",
+      "sha256": "30df03359902258e6850f6148acc807a08a430b35b869292d16b07eaad104dec",
+      "bytes": 4240050
+    }
+  ]
+}

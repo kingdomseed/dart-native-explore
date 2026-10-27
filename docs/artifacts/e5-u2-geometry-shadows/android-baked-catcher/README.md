@@ -138,7 +138,7 @@ The parent inspected these matched captures and the recording.
 - [Live](stage-readbacks-after/bounds-live.png) and [return to baked](stage-readbacks-after/bounds-baked-return.png).
   The existing live Filament shadowMultiplier path does not show spot shadows;
   this check proves switching and return to the cached patch, not live spot parity.
-- [The recording](stage-readbacks-after/opengl-corrected-journey.mp4) is 31.2 seconds.
+- [The recording](https://github.com/kingdomseed/dart-native-explore/releases/download/media-e5-u2/opengl-corrected-journey.mp4) is 31.2 seconds.
   [Its contact sheet](stage-readbacks-after/opengl-contact-sheet.png) samples the
   light, refresh, softness, and mode sequence. Caster movement preceded recording
   and is covered by the matched screenshots and native log.

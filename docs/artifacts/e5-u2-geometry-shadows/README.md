@@ -85,9 +85,14 @@ retaining the public pointer-ray checks. The failing and passing focused
 logs are `fixture-parent-framing-test*.log`. Final example analysis is clean
 and all 236 example tests pass after the adjustment.
 
-The exported iOS recording is 26.163333 seconds and remains local until PR
-media publication. `geometry-video.json` records its path and hash.
+The [published iOS recording](https://github.com/kingdomseed/dart-native-explore/releases/download/media-e5-u2/u2-ios-geometry.mp4)
+is 26.163333 seconds. `geometry-video.json` records its URL and hash.
 All app runs, the recording, and native log captures are stopped.
+
+The [review-media release](https://github.com/kingdomseed/dart-native-explore/releases/tag/media-e5-u2)
+also contains the iOS spot/directional cache journeys and Android cache and
+camera-facing journeys. `media.json` records all five asset URLs, byte counts,
+and SHA-256 values verified against GitHub's uploaded digests.
 The geometry feature checks do not complete E5. Spot-light shadows and
 shadow-catcher baking are not yet verified; the full E5 T2 device matrix
 and operator visual review remain open.

@@ -45,7 +45,8 @@ records exactly two 256-pixel captures, on load and explicit refresh, and no
 fatal marker. The 11.5-second local recording decodes. Its
 [24-cell contact sheet](facing-contact-sheet.png) shows movement followed by
 refresh. [The receipt](video-receipt.json) records its local path and hash.
-The video is not published yet.
+The [video is published](https://github.com/kingdomseed/dart-native-explore/releases/download/media-e5-u2/facing-journey.mp4)
+as review media; its uploaded digest matches the local receipt.
 
 The parent stopped the app after recording export, confirmed no app PID and
 the Nothing launcher in front, then stopped its logcat process.

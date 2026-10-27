@@ -4,13 +4,15 @@
     "sha256": "d4c5bfc62c64d853fabb40ba3de8100abd718fc3c5e226ff57ec36087c4d29a0",
     "durationSeconds": 54.733333,
     "bytes": 2983645,
-    "published": false
+    "published": true,
+    "url": "https://github.com/kingdomseed/dart-native-explore/releases/download/media-e5-u2/ios-spot-cache-journey.mp4"
   },
   {
     "path": "/private/tmp/dart3d-e5-geometry-20261026/ios-baked-catcher-r1/ios-directional-auto-fit-journey.mp4",
     "sha256": "4e2eda292dc27170a4909d7d72a7b22a868bd6ff01c60331049c2cace7235ec2",
     "durationSeconds": 44.066667,
     "bytes": 1966927,
-    "published": false
+    "published": true,
+    "url": "https://github.com/kingdomseed/dart-native-explore/releases/download/media-e5-u2/ios-directional-auto-fit-journey.mp4"
   }
 ]

@@ -79,7 +79,8 @@ in `../catcher-prototype/ios/`. Material-local AO strength, contact shadows,
 shadow color/intensity, fade, live softness, arbitrary shear, and per-instance
 footprint caches remain outside this implementation's parity claim.
 
-Local videos are listed in `videos.json`. The successful spot recording is
+Published videos and hashes are listed in `videos.json` and the parent
+`media.json`. The successful spot recording is
 54.733333 seconds. The successful directional recording is 44.066667 seconds.
 The earlier directional recording is an unsuccessful control, not final proof.
 
