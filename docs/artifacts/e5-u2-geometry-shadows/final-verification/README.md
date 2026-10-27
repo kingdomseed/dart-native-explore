@@ -30,8 +30,9 @@ Fire and Wacom final smoke checks remain NOT_RUN. Only the A142 is connected
 to the mini at this checkpoint. The MacBook Pro did not answer SSH, and
 Tailscale reports it offline. Tablet connection was requested.
 
-Final operator screenshot approval remains open. No E5 PR or merge exists
-at this checkpoint.
+Final operator screenshot approval remains open. [PR #65](https://github.com/kingdomseed/dart-native-explore/pull/65)
+is open as a draft; E5 is not merged. Five review videos are published in
+the linked media release and their uploaded hashes match the local receipts.
 
 ## Final Android feature checks
 

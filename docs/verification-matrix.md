@@ -605,6 +605,10 @@ Evidence: [E5 manifest](artifacts/e5-u2-geometry-shadows/README.md) and
 | Independent Codex review | Scoped geometry, iOS cache/consumer, Android defaults, instancing, directional-group, and facing corrections report PASS. Reviews distinguish source/artifact inspection from independent runtime. |
 | T4 | Operator screenshot approval pending; E5 remains open. |
 
+[PR #65](https://github.com/kingdomseed/dart-native-explore/pull/65) is draft
+pending the tablet and operator gates. Review videos are published in
+[the E5 media release](https://github.com/kingdomseed/dart-native-explore/releases/tag/media-e5-u2).
+
 ## Notes
 
 - **Runtime-minted payloads need their spec on the op** — the W11
