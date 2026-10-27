@@ -30,8 +30,11 @@ Fire and Wacom final smoke checks remain NOT_RUN. Only the A142 is connected
 to the mini at this checkpoint. The MacBook Pro did not answer SSH, and
 Tailscale reports it offline. Tablet connection was requested.
 
-Final operator screenshot approval remains open. [PR #65](https://github.com/kingdomseed/dart-native-explore/pull/65)
-is open as a draft; E5 is not merged. Five review videos are published in
+The operator approved the PR's before/after screenshots and cache-movement
+videos on 2026-10-27 (“Looks correct”), including the disclosed OpenGL image
+caveat. This clears T4 without establishing numeric image parity.
+[PR #65](https://github.com/kingdomseed/dart-native-explore/pull/65) remains
+draft pending Fire/Wacom checks; E5 is not merged. Five review videos are published in
 the linked media release and their uploaded hashes match the local receipts.
 
 ## Final Android feature checks

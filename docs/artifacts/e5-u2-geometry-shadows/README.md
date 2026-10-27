@@ -6,8 +6,9 @@ and A142 Vulkan/OpenGL. Matched spot-shadow off/on views pass on those same
 three lanes. The bounded iOS shadow-catcher bake has parent runtime evidence
 and an independent source-review PASS. Android baking and its corrected
 directional-light and camera-facing consumer paths have scoped Codex
-source/evidence review PASS verdicts. Final E5 device smoke and operator
-review remain open. Its
+source/evidence review PASS verdicts. The operator approved the PR's
+before/after screenshots and cache-movement videos on 2026-10-27
+(“Looks correct”). Final Fire/Wacom device smoke remains open. Its
 [raw-mask calibration](android-raw-mask/README.md) passes on A142 OpenGL and
 Vulkan for directional and spot lights, including border values, transparent
 display, and render-target texture orientation.

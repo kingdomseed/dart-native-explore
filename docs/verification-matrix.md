@@ -603,10 +603,10 @@ Evidence: [E5 manifest](artifacts/e5-u2-geometry-shadows/README.md) and
 | Fire / Wacom T2 | NOT_RUN on final E5 source; tablets are not connected. |
 | U2 T3 | Geometry under two lights and spot shadows on all three feature lanes; baked cache load/freeze/refresh/softness and consumer proof in the platform manifests. Final Android spot-on captures and Vulkan tied-light/facing replay pass. |
 | Independent Codex review | Scoped geometry, iOS cache/consumer, Android defaults, instancing, directional-group, and facing corrections report PASS. Reviews distinguish source/artifact inspection from independent runtime. |
-| T4 | Operator screenshot approval pending; E5 remains open. |
+| T4 | Operator approved the PR's before/after screenshots and cache-movement videos on 2026-10-27 (“Looks correct”); E5 remains open for tablet checks. |
 
 [PR #65](https://github.com/kingdomseed/dart-native-explore/pull/65) is draft
-pending the tablet and operator gates. Review videos are published in
+pending the tablet gate. Review videos are published in
 [the E5 media release](https://github.com/kingdomseed/dart-native-explore/releases/tag/media-e5-u2).
 
 ## Notes
