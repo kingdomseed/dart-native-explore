@@ -1,0 +1,152 @@
+--- a/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/Dart3dView.kt
++++ b/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/Dart3dView.kt
+@@ -398,7 +398,7 @@
+      * `d3:instances` billboard quads. Filament's line primitives are
+      * thin; thick lines ride camera-facing ribbon quads instead.
+      */
+-    internal val cameraFacing = HashMap<Long, FacingSpec>()
++    internal var cameraFacing: MutableMap<Long, FacingSpec> = HashMap()
+ 
+     // MARK: - W14 render targets + views
+ 
+@@ -4677,6 +4677,7 @@
+         materials: MutableMap<Long, MaterialInstance>,
+         resources: FsceneRealizer.Context.InstalledResources,
+         nodeSkins: MutableMap<Long, NodeSkin>,
++        cameraFacingSpecs: MutableMap<Long, FacingSpec>,
+         particles: MutableMap<Long, MutableList<ParticleRuntime>>,
+         pending: MutableSet<Long>,
+         cameraKey: Long?,
+@@ -4719,8 +4720,6 @@
+             engine.destroyEntity(rec.entity)
+             EntityManager.get().destroy(rec.entity)
+         }
+-        // W26: facing-spec VertexBuffers belonged to the old scene's
+-        // component-owned meshes — the fresh decode re-registers.
+         cameraFacing.clear()
+         for ((_, b) in this.bodies) world.removeBody(b)
+         // W11: skinning buffers are host-owned GPU objects — the
+@@ -4762,6 +4761,7 @@
+         nodesById = nodes
+         if (nodes.isNotEmpty()) ColdStart.mark("scene installed")
+         nodeSkinning = nodeSkins
++        cameraFacing = cameraFacingSpecs
+         particleRuntimes = particles
+         this.gpuMeshes = gpuMeshes
+         materialInstances = materials
+--- a/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/FsceneRealizer.kt
++++ b/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/FsceneRealizer.kt
+@@ -576,6 +576,7 @@
+             disabledComponents = res.disabledComponents,
+             renderTargets = host.renderTargets,
+             nodeCameraProps = host.nodeCameraProps,
++            cameraFacing = host.cameraFacing,
+         )
+     }
+ 
+@@ -905,6 +906,7 @@
+         // install teardown from destroying buffers decoded in the
+         // same pass.
+         val nodeSkinning: MutableMap<Long, Dart3dView.NodeSkin> = HashMap(),
++        val cameraFacing: MutableMap<Long, FacingSpec> = HashMap(),
+         // W18: nodeKey → live particle runtimes. Same ownership as
+         // nodeSkinning — a manifest Context's fresh map swaps onto the
+         // host at install; a surgical Context aliases the live one.
+@@ -1599,7 +1601,7 @@
+             // drop it with the buffer, or an empty rebake (which
+             // returns before re-registering) leaves updateCameraFacing
+             // uploading into a destroyed buffer.
+-            host.cameraFacing.remove(key)
++            cameraFacing.remove(key)
+             // The rebuild re-registers its (entity, 0) consumer pairs —
+             // drop the old ones first, or repeated payload rebakes grow
+             // the list and a material upsert rebinds the slot N times.
+@@ -1735,7 +1737,7 @@
+                 .material(0, inst)
+                 .fenced { build(host.engine, rec.entity) }
+             if (fp != null) {
+-                host.cameraFacing[key] = FacingSpec(
++                cameraFacing[key] = FacingSpec(
+                     shape, fp.points, fp.colors, fp.widths, fp.width,
+                     fp.dashes, fp.closed, fp.sizeX, fp.sizeY,
+                     fp.rotation, fp.tint, gm.vertexBuffer, rec.entity,
+@@ -2184,18 +2186,36 @@
+                         owner.instancesProps!!.tag("geometry").d3Ref()
+                     else -> owner.meshPrimGeoKeys?.getOrNull(primitive)
+                 }
+-                val bounds = if (owner.instancesProps != null &&
+-                    owner.instanceBuffers.isEmpty()
+-                ) {
+-                    owner.instanceBakedGpuMesh?.bounds
+-                        ?: owner.procGpuMesh?.bounds
+-                        ?: owner.lastGeoBounds
++                val minMaxBounds = if (cameraFacing.containsKey(ownerKey)) {
++                    val box = rm.getAxisAlignedBoundingBox(ri)
++                    val min = box.getMin(FloatArray(3))
++                    val max = box.getMax(FloatArray(3))
++                    floatArrayOf(
++                        min[0], min[1], min[2],
++                        max[0], max[1], max[2],
++                    )
+                 } else {
+-                    geometryKey?.let { gpuMeshes[it]?.bounds }
+-                        ?: owner.procGpuMesh?.bounds
+-                        ?: owner.instanceBakedGpuMesh?.bounds
+-                        ?: owner.lastGeoBounds
+-                } ?: continue
++                    val bounds = if (owner.instancesProps != null &&
++                        owner.instanceBuffers.isEmpty()
++                    ) {
++                        owner.instanceBakedGpuMesh?.bounds
++                            ?: owner.procGpuMesh?.bounds
++                            ?: owner.lastGeoBounds
++                    } else {
++                        geometryKey?.let { gpuMeshes[it]?.bounds }
++                            ?: owner.procGpuMesh?.bounds
++                            ?: owner.instanceBakedGpuMesh?.bounds
++                            ?: owner.lastGeoBounds
++                    } ?: continue
++                    floatArrayOf(
++                        bounds[0] - bounds[3],
++                        bounds[1] - bounds[4],
++                        bounds[2] - bounds[5],
++                        bounds[0] + bounds[3],
++                        bounds[1] + bounds[4],
++                        bounds[2] + bounds[5],
++                    )
++                }
+                 val world = FloatArray(16)
+                 tcm.getWorldTransform(tcm.getInstance(entity), world)
+                 if (owner.instancesProps != null && primitive == 0) {
+@@ -2209,13 +2229,7 @@
+                     }
+                 }
+                 return BakedCatcherReceiver(
+-                    entity, primitive, world, floatArrayOf(
+-                        bounds[0] - bounds[3],
+-                        bounds[1] - bounds[4],
+-                        bounds[2] - bounds[5],
+-                        bounds[0] + bounds[3],
+-                        bounds[1] + bounds[4],
+-                        bounds[2] + bounds[5]), ownerKey, owner)
++                    entity, primitive, world, minMaxBounds, ownerKey, owner)
+             }
+             return null
+         }
+@@ -2368,7 +2382,7 @@
+                     flatCenters[i * 3 + 1] = m[13]
+                     flatCenters[i * 3 + 2] = m[14]
+                 }
+-                host.cameraFacing[key] = FacingSpec.billboards(
++                cameraFacing[key] = FacingSpec.billboards(
+                     flatCenters, s[0].toFloat(), s[1].toFloat(), rotation,
+                     colors, gm.vertexBuffer, rec.entity, facing)
+                 Log.i(TAG, "d3:instances node $key: realized ${transforms.size} billboard instance(s)")
+@@ -6324,6 +6338,7 @@
+                     disabledComponents = disabledComponents,
+                 ),
+                 nodeSkins = nodeSkinning,
++                cameraFacingSpecs = cameraFacing,
+                 particles = particleRuntimes,
+                 pending = pendingPayloadRefs,
+                 cameraKey = firstCameraKey,

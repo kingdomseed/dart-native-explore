@@ -1,0 +1,277 @@
+--- a/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/BakedShadowCatcherPass.kt
++++ b/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/BakedShadowCatcherPass.kt
+@@ -1,6 +1,10 @@
+ package com.jasonholtdigital.dart3d
+ 
+ import android.opengl.Matrix
++import android.os.Handler
++import android.os.Looper
++import android.os.Process
++import android.os.SystemClock
+ import android.util.Log
+ import com.google.android.filament.Camera
+ import com.google.android.filament.Engine
+@@ -9,6 +13,7 @@
+ import com.google.android.filament.LightManager
+ import com.google.android.filament.Material
+ import com.google.android.filament.MaterialInstance
++import com.google.android.filament.PixelBufferDescriptor
+ import com.google.android.filament.RenderTarget
+ import com.google.android.filament.RenderableManager
+ import com.google.android.filament.Renderer
+@@ -72,6 +77,45 @@
+ 
+     private val cache = LinkedHashMap<Long, Entry>()
+ 
++    private class DiagnosticStage(
++        val target: Target,
++        val name: String,
++        val metadata: String,
++        val buffer: ByteBuffer = ByteBuffer.allocateDirect(
++            target.texture.width * target.texture.height * 4),
++        var submitted: Boolean = false,
++        var retire: Boolean = false,
++    )
++
++    private val diagnosticStages = ArrayList<DiagnosticStage>()
++    private val diagnosticHandler = Handler(Looper.getMainLooper())
++    private val diagnosticRun = "${Process.myPid()}-${SystemClock.elapsedRealtimeNanos()}"
++    private var diagnosticBake = 0
++
++    // Called only inside a successful screen frame. Private draws stay standalone.
++    fun readDiagnosticStages(renderer: Renderer) {
++        for (stage in diagnosticStages.filter { !it.submitted }) {
++            val size = stage.target.texture.width
++            val descriptor = PixelBufferDescriptor(stage.buffer,
++                Texture.Format.RGBA, Texture.Type.UBYTE, 1, 0, 0, size,
++                diagnosticHandler, Runnable {
++                    if (diagnosticStages.remove(stage) && stage.retire) {
++                        destroyTarget(stage.target)
++                    }
++                    Thread({
++                        val directory = host.context.getExternalFilesDir(
++                            "dart3d-baked-stages/$diagnosticRun")
++                        exportBakedCatcherStage(directory, stage.name,
++                            size, stage.buffer, stage.metadata)
++                    }, "dart3d-baked-stage-export").start()
++                })
++            renderer.readPixels(stage.target.renderTarget,
++                0, 0, size, size, descriptor)
++            stage.submitted = true
++            Log.i("dart3d", "baked stage submitted run=$diagnosticRun stage=${stage.name}")
++        }
++    }
++
+     fun install(settings: Map<Long, FsceneRealizer.ShadowCatcherSettings>) {
+         clear()
+         for ((key, value) in settings) {
+@@ -97,7 +141,7 @@
+             if (entry.state !is CacheState.Pending) continue
+             val receiver = context.firstBakedCatcherReceiver(materialId)
+                 ?: continue
+-            val ready = capture(renderer, receiver, entry.settings)
++            val ready = capture(renderer, receiver, entry.settings, materialId)
+                 ?: continue
+             context.bindBakedCatcher(materialId, ready.target.texture,
+                 ready.region)
+@@ -112,7 +156,14 @@
+         cache.clear()
+     }
+ 
+-    fun dispose() = clear()
++    fun dispose() {
++        clear()
++        // Host teardown has already drained the driver. Posted callbacks keep buffers,
++        // but must not touch the Engine after it is destroyed below this owner.
++        val stages = diagnosticStages.toList()
++        diagnosticStages.clear()
++        for (stage in stages) destroyTarget(stage.target)
++    }
+ 
+     private fun destroyReady(entry: Entry) {
+         val state = entry.state as? CacheState.Ready ?: return
+@@ -123,6 +174,7 @@
+         renderer: Renderer,
+         receiver: FsceneRealizer.BakedCatcherReceiver,
+         settings: FsceneRealizer.ShadowCatcherSettings,
++        materialId: Long,
+     ): CacheState.Ready? {
+         val bounds = receiver.bounds
+         val minX = bounds[0]
+@@ -168,6 +220,7 @@
+         try {
+             helper.fill(renderer, aggregateA, 0)
+             val lights = shadowLights()
++            val diagnose = lights.size == 1 && diagnosticBake < 2
+             var aggregate = aggregateA
+             var next = aggregateB
+             val camera = createCaptureCamera(receiver, cameraOffset,
+@@ -195,6 +248,51 @@
+                     resolution, horizontal = true)
+                 helper.blur(renderer, blurTarget, finalTarget,
+                     resolution, horizontal = false)
++                if (diagnose) {
++                    diagnosticBake++
++                    val label = if (diagnosticBake == 1) "load" else "refresh"
++                    val prefix = "bake${diagnosticBake.toString().padStart(3, '0')}-$label"
++                    val light = lights.single()
++                    val lm = engine.lightManager
++                    val li = lm.getInstance(light.entity)
++                    val metadata = buildString {
++                        appendLine("run=$diagnosticRun bake=$diagnosticBake label=$label")
++                        appendLine("backend=${engine.backend} materialId=$materialId")
++                        appendLine("matrixLayout=column-major; native coordinates; no CPU flip")
++                        appendLine("receiverEntity=${receiver.entity} primitive=${receiver.primitive} owner=${receiver.ownerKey}")
++                        appendLine("receiverBounds=${bounds.joinToString()}")
++                        appendLine("receiverWorld=${receiver.worldMatrix.joinToString()}")
++                        appendLine("bakedRegion=${region.joinToString()}")
++                        appendLine("softness=${settings.softness} targetSize=$resolution")
++                        appendLine("casterDepth=$casterDepth cameraOffset=$cameraOffset near=$near far=$far")
++                        appendLine("cameraWorld=${camera.camera.getModelMatrix(DoubleArray(16)).joinToString()}")
++                        appendLine("captureView=${camera.camera.getViewMatrix(DoubleArray(16)).joinToString()}")
++                        appendLine("captureProjection=${camera.camera.getProjectionMatrix(DoubleArray(16)).joinToString()}")
++                        appendLine("cullingProjection=${camera.camera.getCullingProjectionMatrix(DoubleArray(16)).joinToString()}")
++                        appendLine("lightEntity=${light.entity} type=${light.type}")
++                        appendLine("lightWorldPosition=${light.position.joinToString()}")
++                        appendLine("lightWorldDirection=${light.direction.joinToString()}")
++                        appendLine("lightInverseRange=${light.inverseRange} coneScale=${light.coneScale} coneOffset=${light.coneOffset}")
++                        if (light.type != LightManager.Type.DIRECTIONAL) {
++                            appendLine("lightRange=${lm.getFalloff(li)} innerConeRadians=${lm.getSpotLightInnerCone(li)} outerConeRadians=${lm.getSpotLightOuterCone(li)}")
++                        }
++                        appendLine("finalBoundTexture=${finalTarget.texture.nativeObject} region=${region.joinToString()}")
++                        appendLine("displayUv=((localX-region.x)*region.z,(region.y-localZ)*region.w); uvToRenderTargetUV at sampler")
++                        appendLine("stages=zero-aggregate,raw-light,aggregate,horizontal-blur,final-bound")
++                    }
++                    for ((name, target) in listOf(
++                        "zero-aggregate" to aggregateA,
++                        "raw-light-${light.entity}" to captureTarget,
++                        "aggregate" to aggregate,
++                        "horizontal-blur" to blurTarget,
++                        "final-bound" to finalTarget,
++                    )) {
++                        diagnosticStages += DiagnosticStage(target,
++                            "$prefix-$name", metadata +
++                                "stageTexture=${target.texture.nativeObject}\n")
++                    }
++                    Log.i("dart3d", "baked stage queued run=$diagnosticRun bake=$diagnosticBake label=$label stages=5")
++                }
+             } finally {
+                 captureView.setRenderTarget(null)
+                 engine.destroyView(captureView)
+@@ -505,7 +603,8 @@
+             .width(size).height(size).levels(1)
+             .sampler(Texture.Sampler.SAMPLER_2D)
+             .format(Texture.InternalFormat.RGBA8)
+-            .usage(Texture.Usage.COLOR_ATTACHMENT or Texture.Usage.SAMPLEABLE)
++            .usage(Texture.Usage.COLOR_ATTACHMENT or Texture.Usage.SAMPLEABLE or
++                Texture.Usage.BLIT_SRC)
+             .fenced { build(engine) }
+         val depthTexture = if (depth) {
+             Texture.Builder()
+@@ -524,6 +623,10 @@
+     }
+ 
+     private fun destroyTarget(target: Target) {
++        diagnosticStages.firstOrNull { it.target === target }?.let {
++            it.retire = true
++            return
++        }
+         host.engine.destroyRenderTarget(target.renderTarget)
+         host.engine.destroyTexture(target.texture)
+         target.depth?.let(host.engine::destroyTexture)
+--- a/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/Dart3dView.kt
++++ b/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/Dart3dView.kt
+@@ -5697,6 +5697,7 @@
+         bakedShadowCatchers.renderDirty(
+             renderer, FsceneRealizer.surgicalContext(this))
+         if (renderer.beginFrame(sc, tNanos)) {
++            bakedShadowCatchers.readDiagnosticStages(renderer)
+             // W14: due offscreen passes first — a material sampling an
+             // rt reads this frame's output in the screen passes below.
+             // An rt's views render in `order` (sorted at apply).
+--- /dev/null
++++ b/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/BakedCatcherStageExport.kt
+@@ -0,0 +1,83 @@
++package com.jasonholtdigital.dart3d
++
++import android.util.Log
++import java.io.File
++import java.io.IOException
++import java.nio.ByteBuffer
++import java.security.MessageDigest
++
++internal fun exportBakedCatcherStage(
++    directory: File?,
++    name: String,
++    size: Int,
++    buffer: ByteBuffer,
++    metadata: String,
++) {
++    try {
++        if (directory == null) {
++            throw IOException("baked stage external files directory unavailable")
++        }
++        directory.mkdirs()
++        if (!directory.isDirectory) {
++            throw IOException("baked stage directory could not be created")
++        }
++        val bytes = ByteArray(size * size * 4)
++        buffer.rewind()
++        buffer.get(bytes)
++        val summary = buildString {
++            for (channel in 0..3) {
++                var min = 255
++                var max = 0
++                var zeros = 0
++                var full = 0
++                for (pixel in 0 until size * size) {
++                    val value = bytes[pixel * 4 + channel].toInt() and 255
++                    min = minOf(min, value)
++                    max = maxOf(max, value)
++                    if (value == 0) zeros++
++                    if (value == 255) full++
++                }
++                appendLine("${"RGBA"[channel]} min=$min max=$max zeros=$zeros full=$full pixels=${size * size}")
++            }
++        }
++        val samples = buildString {
++            for ((label, xy) in listOf(
++                "topLeft" to (0 to 0),
++                "topMiddle" to (size / 2 to 0),
++                "topRight" to (size - 1 to 0),
++                "leftMiddle" to (0 to size / 2),
++                "center" to (size / 2 to size / 2),
++                "rightMiddle" to (size - 1 to size / 2),
++                "bottomLeft" to (0 to size - 1),
++                "bottomMiddle" to (size / 2 to size - 1),
++                "bottomRight" to (size - 1 to size - 1),
++                "quarter" to (size / 4 to size / 4),
++                "threeQuarter" to (3 * size / 4 to 3 * size / 4),
++            )) {
++                val offset = (xy.second * size + xy.first) * 4
++                appendLine("sample.$label x=${xy.first} y=${xy.second} rgba=" +
++                    (0..3).joinToString(",") {
++                        (bytes[offset + it].toInt() and 255).toString()
++                    })
++            }
++        }
++        val digest = MessageDigest.getInstance("SHA-256").digest(bytes)
++            .joinToString("") { "%02x".format(it.toInt() and 255) }
++        File(directory, "$name.rgba").writeBytes(bytes)
++        File(directory, "$name.txt").writeText(buildString {
++            append(metadata)
++            appendLine("stage=$name width=$size height=$size format=RGBA/UBYTE alignment=1 stridePixels=$size")
++            appendLine("rowStrideBytes=${size * 4} byteCount=${bytes.size} sha256=$digest")
++            appendLine("bufferRowOrigin=top-left per pinned Renderer contract; bytes unmodified")
++            appendLine("readPixelsOffsetOrigin=bottom-left x=0 y=0")
++            appendLine("maskChannel=R; shadow amount; 0=unshadowed 255=full; capture A is independent opaque material alpha")
++            append(summary)
++            append(samples)
++        })
++        // The completion marker follows both writes, so the parent can pull safely.
++        Log.i("dart3d", "baked stage files complete stage=$name directory=${directory.absolutePath} sha256=$digest " +
++            summary.trim().replace('\n', ';'))
++    } catch (error: IOException) {
++        Log.e("dart3d", "baked stage export failed stage=$name", error)
++    }
++}

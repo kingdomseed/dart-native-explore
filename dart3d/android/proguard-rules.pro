@@ -25,3 +25,24 @@
 -keepclassmembers class com.google.android.filament.filamat.MaterialBuilder {
     long mNativeObject;
 }
+
+# Filament's nGetShadowOptions resolves ShadowOptions fields by name.
+-keep class com.google.android.filament.LightManager$ShadowOptions { *; }
+
+# Filament's nForEach resolves accept(int) by name on the callback object.
+-keep interface com.google.android.filament.Scene$ForEachCallback {
+    public void accept(int);
+}
+-keepclassmembers class * implements com.google.android.filament.Scene$ForEachCallback {
+    public void accept(int);
+}
+
+# Filament's bounding-box getter writes these fields through JNI.
+-keepclassmembers class com.google.android.filament.Box {
+    float mCenterX;
+    float mCenterY;
+    float mCenterZ;
+    float mHalfExtentX;
+    float mHalfExtentY;
+    float mHalfExtentZ;
+}

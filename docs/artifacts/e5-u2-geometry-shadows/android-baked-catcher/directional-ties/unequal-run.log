@@ -1,0 +1,27 @@
+Launching lib/main.dart on A142 in release mode...
+Installing build/app/outputs/dn-apk/app-release.apk...              3.2s
+
+DartNative run key commands.
+h List all available interactive commands.
+c Clear the screen
+q Quit (terminate the application on the device).
+
+dartnative: dart3d: u2-catcher light=directional-primary-unshadowed mode=baked softness=0
+dartnative: dart3d: showcase — u2-catcher: Baked shadow footprint · explicit refresh · live shadowOnly mode
+dartnative: main start
+dartnative: initFirebase Google
+D/FlutterGeolocator(30785): Creating service.
+D/FlutterGeolocator(30785): Binding to location service.
+D/FlutterGeolocator(30785): DartNative engine connected. Connected engine count 1
+dartnative: [IMPORTANT:dartnative/shell/platform/android/android_context_vk_impeller.cc(62)] Using the Impeller rendering backend (Vulkan).
+dartnative: [NtDataCollectionService][updateRuntimeOptions] uploadEnabled=true projectName=null
+dartnative: [NtDataCollectionService][initialize] uploadEnabled=true projectName=NothingAccount baseUrl=https://dc-api.nothingtech.link
+dartnative: NtLifecycle->registerObserver observer:Instance of 'BluetoothHelper',length:1
+dartnative: main end
+dartnative: NtLifecycle->registerObserver observer:Instance of 'NtWatchWorker',length:2
+dartnative: NtLifecycle->registerObserver observer:Instance of 'NtWatchWorker',length:2
+dartnative: NtQueueManager: Start queue, isActive: false
+dartnative: NtQueueManager: No more tasks to execute
+dartnative: channel  reconnect device dartVMReady
+
+Application finished.

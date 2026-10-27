@@ -23,6 +23,8 @@ import 'package:vector_math/vector_math.dart';
 
 import 'dn_logo_stage.dart';
 import 'light_aim.dart';
+import 'u2_catcher_scene.dart';
+import 'u2_geometry_scene.dart';
 
 /// One showcase entry: the cycler label, its bundle key, and the
 /// capability line shown under it.
@@ -137,6 +139,27 @@ const showcaseItems = [
     cameraDir: (0.0, 0.25, -1.0),
     frameMargin: 1.15,
   ),
+  ShowcaseItem(
+    'u2',
+    kBuiltinU2Key,
+    'U2: wedge · annulus ring · bent extrude CCW/CW · 2 inline wedges',
+    cameraDir: (-0.4, 0.9, -1.0),
+    frameMargin: 1.15,
+  ),
+  ShowcaseItem(
+    'u2-shadow',
+    kBuiltinU2ShadowKey,
+    'U2: spot shadow · elevated cuboid · neutral receiver',
+    cameraDir: (-0.4, 0.9, -1.0),
+    frameMargin: 1.05,
+  ),
+  ShowcaseItem(
+    'u2-catcher',
+    kBuiltinU2CatcherKey,
+    'E5: baked footprint · explicit refresh · move caster/light to compare',
+    cameraDir: (-0.4, 0.9, -1.0),
+    frameMargin: 1.6,
+  ),
 ];
 
 /// The synthetic asset key for the W21 materials conformance scene —
@@ -169,9 +192,32 @@ const String kBuiltinW17SkyKey = 'builtin:w17';
 /// scene — builds [buildW19CharacterDocument].
 const String kBuiltinW19CharacterKey = 'builtin:w19';
 
+/// The synthetic asset key for the U2 live-geometry scene.
+const String kBuiltinU2Key = 'builtin:u2';
+
+/// The synthetic asset key for the U2 spot-shadow fixture.
+const String kBuiltinU2ShadowKey = 'builtin:u2-shadow';
+
+const String kBuiltinU2CatcherKey = 'builtin:u2-catcher';
+
 const String _kBootW17Mode = String.fromEnvironment(
   'DART3D_W17_MODE',
   defaultValue: 'day',
+);
+
+const bool _kBootU2CastShadows = bool.fromEnvironment(
+  'DART3D_U2_CAST_SHADOWS',
+  defaultValue: true,
+);
+
+const String _kBootU2CatcherLight = String.fromEnvironment(
+  'DART3D_CATCHER_LIGHT',
+  defaultValue: 'spot',
+);
+
+const String kBootU2CatcherPath = String.fromEnvironment(
+  'DART3D_CATCHER_PATH',
+  defaultValue: u2CatcherPathDirect,
 );
 
 /// Dice stay in the gallery too — the [DART3D_MODEL] verification lane
@@ -227,6 +273,24 @@ ShowcaseScene? loadShowcaseScene(
       doc = buildW17SkyDocument(mode: _kBootW17Mode);
     } else if (item.assetKey == kBuiltinW19CharacterKey) {
       doc = buildW19CharacterDocument();
+    } else if (item.assetKey == kBuiltinU2Key) {
+      doc = buildU2GeometryDocument();
+    } else if (item.assetKey == kBuiltinU2ShadowKey) {
+      doc = buildU2ShadowDocument(castsShadow: _kBootU2CastShadows);
+      log?.call('dart3d: u2-shadow castsShadow=$_kBootU2CastShadows');
+    } else if (item.assetKey == kBuiltinU2CatcherKey) {
+      final light = switch (_kBootU2CatcherLight) {
+        'directional' => 'directional',
+        u2CatcherLightUnshadowedPrimary => u2CatcherLightUnshadowedPrimary,
+        u2CatcherLightTied => u2CatcherLightTied,
+        _ => 'spot',
+      };
+      doc = buildU2CatcherDocument(light: light, path: kBootU2CatcherPath);
+      if (kBootU2CatcherPath == u2CatcherPathDirect) {
+        log?.call('dart3d: u2-catcher light=$light mode=baked softness=0');
+      } else {
+        log?.call('dart3d: u2-catcher path=$kBootU2CatcherPath light=$light');
+      }
     } else {
       final bytes = bytesOf(item.assetKey);
       if (bytes == null) {
@@ -279,10 +343,16 @@ ShowcaseScene? loadShowcaseScene(
   // The framed radius: bounds plus the item's breathing room (the
   // camera boom and the screen's aspect fit both scale off it).
   final frameRadius = radius * item.frameMargin;
+  if (item.assetKey == kBuiltinU2Key) center.y -= radius * 0.55;
+  if (item.assetKey == kBuiltinU2ShadowKey) center.y -= radius * 0.55;
+  if (item.assetKey == kBuiltinU2CatcherKey) center.y -= radius * 0.55;
 
   // A slab under the lowest bound gives the key light something to
   // throw shadows onto; visual only, no physics in the gallery.
-  if (stage?.groundSlab ?? true) {
+  if ((stage?.groundSlab ?? true) &&
+      item.assetKey != kBuiltinU2Key &&
+      item.assetKey != kBuiltinU2ShadowKey &&
+      item.assetKey != kBuiltinU2CatcherKey) {
     final slabMat = doc.addResource(
       stage != null
           ? dnLogoSlabMaterial(doc)
@@ -362,7 +432,10 @@ ShowcaseScene? loadShowcaseScene(
   );
   if (stage != null) {
     addDnLogoLights(doc, cameraDir: cameraDir, stage: stage);
-  } else if (item.assetKey != kBuiltinW17SkyKey) {
+  } else if (item.assetKey != kBuiltinW17SkyKey &&
+      item.assetKey != kBuiltinU2Key &&
+      item.assetKey != kBuiltinU2ShadowKey &&
+      item.assetKey != kBuiltinU2CatcherKey) {
     doc.createNode(
       name: 'showcase.key',
       transform: TrsTransform(
@@ -405,11 +478,18 @@ ShowcaseScene? loadShowcaseScene(
     if (r is MaterialResource) materials++;
     if (r is GeometryResource) geometries++;
   }
-  final summary =
+  final inventorySummary =
       '${doc.nodes.length} nodes · $geometries geo · $materials mat'
       '${textures == 0 ? '' : ' · $textures tex'}'
       '${doc.skins.isEmpty ? '' : ' · ${doc.skins.length} skins'}'
       '${doc.animations.isEmpty ? '' : ' · ${doc.animations.length} anims'}';
+  final summary = item.assetKey == kBuiltinU2Key
+      ? 'Wedge · annulus ring · bent extrude CCW/CW · 2 inline wedges'
+      : item.assetKey == kBuiltinU2ShadowKey
+      ? 'Spot shadow · elevated cuboid · neutral receiver'
+      : item.assetKey == kBuiltinU2CatcherKey
+      ? 'Baked shadow footprint · explicit refresh · live shadowOnly mode'
+      : inventorySummary;
   log?.call('dart3d: showcase — ${item.label}: $summary');
   return ShowcaseScene(
     document: doc,

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.jasonholtdigital.dart3d.TurbulenceGradientsTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-27T01:44:13.868Z" hostname="Jasons-Mac-mini" time="0.001">
+  <properties/>
+  <testcase name="table is 64 stride-4 vectors" classname="com.jasonholtdigital.dart3d.TurbulenceGradientsTest" time="0.0"/>
+  <testcase name="every vector is an edge gradient with a zero pad" classname="com.jasonholtdigital.dart3d.TurbulenceGradientsTest" time="0.0"/>
+  <testcase name="known entries match the Dart reference" classname="com.jasonholtdigital.dart3d.TurbulenceGradientsTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

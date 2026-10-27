@@ -1,0 +1,163 @@
+{
+  "totals": {
+    "tests": 162,
+    "skipped": 15,
+    "failures": 0,
+    "errors": 0,
+    "passed": 147
+  },
+  "suites": [
+    {
+      "file": "TEST-com.jasonholtdigital.dart3d.AnimClipsTest.xml",
+      "sha256": "04dde066a35eabaca8e3f66eb03d8f49a7ba26e7f79bfbfb68322785c5a27b6d",
+      "tests": 5,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "file": "TEST-com.jasonholtdigital.dart3d.BakeProgressTest.xml",
+      "sha256": "70e31af2583a42ca5ca0d206f5a275314499df3c3f828dff595d56182c9b521b",
+      "tests": 5,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "file": "TEST-com.jasonholtdigital.dart3d.BodyCarryTest.xml",
+      "sha256": "28bcb1425bcd58ea77a7e7b8e59f0fed422c9b85376d56d46b4cbdfc47691763",
+      "tests": 12,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "file": "TEST-com.jasonholtdigital.dart3d.CharacterControllerNativeTest.xml",
+      "sha256": "090af6a54ef80ae424e74d4a176af137218e87262ca624fcb0094a4bd1a148a0",
+      "tests": 15,
+      "skipped": 15,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "file": "TEST-com.jasonholtdigital.dart3d.CollisionSubGroupsTest.xml",
+      "sha256": "569e1f14a654038a9e479cd4107f04ef8d1e8d5b3c804f653b9e0da06a63fe27",
+      "tests": 6,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "file": "TEST-com.jasonholtdigital.dart3d.DeviceProfileTest.xml",
+      "sha256": "cd86b37603a41171a181e2df3c4ec0cd7a64aa877711da4741bf28987defc8a1",
+      "tests": 9,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "file": "TEST-com.jasonholtdigital.dart3d.DeviceTierTest.xml",
+      "sha256": "572cc1336231b67f94c5738693b337d56a4b62e216e1bc75168468049e884103",
+      "tests": 12,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "file": "TEST-com.jasonholtdigital.dart3d.FencedTest.xml",
+      "sha256": "52df8992c71177c2cab26cdcd9d51dd6ec3904ba238888c8bc955aadb2a70ca1",
+      "tests": 2,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "file": "TEST-com.jasonholtdigital.dart3d.FramePerfTest.xml",
+      "sha256": "668fd41b2d44ea40af0d0e3054bc2bd1ab74c10e46001ecf780a304dabc1b972",
+      "tests": 5,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "file": "TEST-com.jasonholtdigital.dart3d.MaterialPackagesTest.xml",
+      "sha256": "d4d4abca18ae8cbcc851ec759b18af9604b6942e343197dde252f0cc36d59e5e",
+      "tests": 11,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "file": "TEST-com.jasonholtdigital.dart3d.MaterialStoreTest.xml",
+      "sha256": "6412c4c6e69043558e87c86718dd582c0eb8cd436257899dbd9fef529cb987e7",
+      "tests": 16,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "file": "TEST-com.jasonholtdigital.dart3d.MeshFactoryTest.xml",
+      "sha256": "8b605940aec502a739e8b7b8cb282532687d2191784f9aa047ea7792b6b60a50",
+      "tests": 29,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "file": "TEST-com.jasonholtdigital.dart3d.MeshPrimitivesTest.xml",
+      "sha256": "a15956328db3527019fc516dccaec308062e94b07f84dbbed6027e970086dd08",
+      "tests": 5,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "file": "TEST-com.jasonholtdigital.dart3d.NativeScopeTest.xml",
+      "sha256": "704a8624fd8c17df99b4d46c9eca94b00c199df6a60be696698fbbed27763622",
+      "tests": 6,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "file": "TEST-com.jasonholtdigital.dart3d.PendingClaimsTest.xml",
+      "sha256": "9f9a95013338b96ae4794f2a21900ce02439c0c396b216c4ed6b5ad3329b91ad",
+      "tests": 6,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "file": "TEST-com.jasonholtdigital.dart3d.ShadowCatcherSettingsTest.xml",
+      "sha256": "464f575965ff7d5e58c06256913c781a1c8fd9ff656bc34b2352f3d17f9e9d91",
+      "tests": 3,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "file": "TEST-com.jasonholtdigital.dart3d.ShippedMaterialsTest.xml",
+      "sha256": "07c04ec1d5e3372f15dc67313322c2b6a44bd4818752409176117711c2f0a838",
+      "tests": 3,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "file": "TEST-com.jasonholtdigital.dart3d.TransformWritesTest.xml",
+      "sha256": "26dccec0548e6c332272212e7b0b425b4dd2b6c99ef615157ba932da1fbafceb",
+      "tests": 9,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "file": "TEST-com.jasonholtdigital.dart3d.TurbulenceGradientsTest.xml",
+      "sha256": "a2bdc1bc21ad6ebacb7e7f164064ba272b0cb293ec86fb6347a0834dae440c11",
+      "tests": 3,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0
+    }
+  ]
+}

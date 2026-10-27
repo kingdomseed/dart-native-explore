@@ -1,0 +1,73 @@
+
+Welcome to Gradle 9.3.1!
+
+Here are the highlights of this release:
+ - Test reporting improvements
+ - Error and warning improvements
+ - Build authoring improvements
+
+For more details see https://docs.gradle.org/9.3.1/release-notes.html
+
+Starting a Gradle Daemon (subsequent builds will be faster)
+> Task :gradle:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle:pluginDescriptors UP-TO-DATE
+> Task :gradle:processResources UP-TO-DATE
+> Task :gradle:compileKotlin
+> Task :gradle:compileJava NO-SOURCE
+> Task :gradle:compileGroovy NO-SOURCE
+> Task :gradle:classes UP-TO-DATE
+> Task :gradle:jar UP-TO-DATE
+
+> Configure project :app
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/android/app/build.gradle.kts:19:5: 'fun BaseAppModuleExtension.kotlinOptions(configure: Action<DeprecatedKotlinJvmOptions>): Unit' is deprecated. Please migrate to the compilerOptions DSL. More details are here: https://kotl.in/u1r8ln.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/android/app/build.gradle.kts:20:9: 'var jvmTarget: String' is deprecated. Please migrate to the compilerOptions DSL. More details are here: https://kotl.in/u1r8ln.
+Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+
+> Task :dart3d:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :dart3d:preBuild UP-TO-DATE
+> Task :dart3d:preReleaseBuild UP-TO-DATE
+> Task :dart3d:generateReleaseBuildConfig UP-TO-DATE
+> Task :dart3d:generateReleaseResValues UP-TO-DATE
+> Task :dart3d:generateReleaseResources UP-TO-DATE
+> Task :dart3d:packageReleaseResources UP-TO-DATE
+> Task :dart3d:parseReleaseLocalResources UP-TO-DATE
+> Task :dart3d:generateReleaseRFile UP-TO-DATE
+> Task :dart3d:compileReleaseKotlin UP-TO-DATE
+> Task :dart3d:javaPreCompileRelease UP-TO-DATE
+> Task :dart3d:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :dart3d:bundleLibCompileToJarRelease
+> Task :dart3d:preReleaseUnitTestBuild UP-TO-DATE
+> Task :dart3d:bundleLibRuntimeToJarRelease
+> Task :dart3d:generateReleaseUnitTestStubRFile UP-TO-DATE
+> Task :dart3d:javaPreCompileReleaseUnitTest UP-TO-DATE
+> Task :dart3d:processReleaseJavaRes UP-TO-DATE
+> Task :dart3d:compileReleaseUnitTestKotlin
+> Task :dart3d:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :dart3d:processReleaseUnitTestJavaRes UP-TO-DATE
+
+> Task :dart3d:testReleaseUnitTest FAILED
+
+MeshFactoryTest > wedge ring and extrude match geometry contracts and mirrored winding FAILED
+    java.lang.AssertionError at MeshFactoryTest.kt:695
+
+153 tests completed, 1 failed, 15 skipped
+
+[Incubating] Problems report is available at: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':dart3d:testReleaseUnitTest'.
+> There were failing tests. See the report at: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/build/dart3d/reports/tests/testReleaseUnitTest/index.html
+
+* Try:
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.3.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 38s
+21 actionable tasks: 5 executed, 16 up-to-date

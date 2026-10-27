@@ -72,10 +72,13 @@ const kD3ProcShapes = {
   'sphere',
   'torus',
   'icosphere',
+  'wedge',
+  'ring',
   'cylinder',
   'cone',
   'capsule',
   'disc',
+  'extrude',
   'tube',
   'ribbon',
   'polyline',
@@ -483,6 +486,130 @@ final class D3DiscProc extends D3Proc {
 
   @override
   D3MeshData build() => buildDisc(radius: radius, segments: segments);
+}
+
+/// A triangular-prism ramp rising from the low -Z edge to the high +Z edge.
+final class D3WedgeProc extends D3Proc {
+  /// Creates a wedge with X width, Y height, and Z run.
+  D3WedgeProc({required this.size});
+
+  /// Width, height, and run in local X/Y/Z.
+  final Vector3 size;
+
+  @override
+  String get shape => 'wedge';
+
+  @override
+  Map<String, PropertyValue> get props => {'size': Vec3Value(size)};
+
+  @override
+  BoundsSpec get bounds => BoundsSpec(
+    min: Vector3(-size.x / 2, 0, -size.z / 2),
+    max: Vector3(size.x / 2, size.y, size.z / 2),
+  );
+
+  @override
+  D3MeshData build() => buildWedge(size);
+}
+
+/// A flat annulus in the XZ plane facing +Y.
+final class D3RingProc extends D3Proc {
+  /// Creates a ring with [innerRadius] and [outerRadius].
+  D3RingProc({
+    this.innerRadius = 0.25,
+    this.outerRadius = 0.5,
+    this.segments = 32,
+  });
+
+  /// Radius of the open center.
+  final double innerRadius;
+
+  /// Radius of the outside rim.
+  final double outerRadius;
+
+  /// Divisions around the annulus.
+  final int segments;
+
+  @override
+  String get shape => 'ring';
+
+  @override
+  Map<String, PropertyValue> get props => {
+    'innerRadius': DoubleValue(innerRadius),
+    'outerRadius': DoubleValue(outerRadius),
+    'segments': IntValue(segments),
+  };
+
+  @override
+  BoundsSpec get bounds => BoundsSpec(
+    min: Vector3(-outerRadius, 0, -outerRadius),
+    max: Vector3(outerRadius, 0, outerRadius),
+  );
+
+  @override
+  D3MeshData build() => buildRing(
+    innerRadius: innerRadius,
+    outerRadius: outerRadius,
+    segments: segments,
+  );
+}
+
+/// A closed 2D profile swept along a Catmull-Rom path through [points].
+/// End caps use a triangle fan and therefore assume a convex profile.
+final class D3ExtrudeProc extends D3Proc {
+  /// Creates an extrusion with [profile] swept along [points].
+  D3ExtrudeProc({
+    required List<Vector3> points,
+    required List<Vector2> profile,
+    this.stations = 64,
+    this.caps = true,
+  }) : points = <Vector3>[for (final point in points) point.clone()],
+       profile = <Vector2>[for (final point in profile) point.clone()] {
+    if (this.points.length < 2) {
+      throw ArgumentError('An extrusion needs at least two path points');
+    }
+    if (this.profile.length < 3) {
+      throw ArgumentError('An extrusion profile needs at least three points');
+    }
+  }
+
+  /// Path control points (copied).
+  final List<Vector3> points;
+
+  /// Closed profile in the path normal/binormal plane (copied).
+  final List<Vector2> profile;
+
+  /// Cross-sections sampled along the path.
+  final int stations;
+
+  /// Whether both ends close with convex triangle fans.
+  final bool caps;
+
+  /// The path the extrusion follows.
+  ScenePath get path => CatmullRomPath(points);
+
+  @override
+  String get shape => 'extrude';
+
+  @override
+  Map<String, PropertyValue> get props => {
+    'points': ListValue([for (final point in points) Vec3Value(point)]),
+    'profile': ListValue([for (final point in profile) Vec2Value(point)]),
+    'stations': IntValue(stations),
+    if (!caps) 'caps': const BoolValue(false),
+  };
+
+  @override
+  BoundsSpec get bounds =>
+      _padded(d3CatmullRomBounds(points, false), _profileRadius(profile));
+
+  @override
+  D3MeshData build() => buildExtrude(
+    path,
+    profile: profile,
+    stations: stations,
+    caps: caps,
+  );
 }
 
 /// A round cross-section swept along a Catmull-Rom path through
@@ -898,6 +1025,23 @@ BoundsSpec? d3ProcShapeBounds(String shape, Map<String, PropertyValue> props) {
       Vec3Value(:final value) => BoundsSpec(min: -value / 2, max: value / 2),
       _ => _cubeBounds(0.5),
     },
+    'wedge' => () {
+      final size = switch (props['size']) {
+        Vec3Value(:final value) => value,
+        _ => Vector3.all(1),
+      };
+      return BoundsSpec(
+        min: Vector3(-size.x / 2, 0, -size.z / 2),
+        max: Vector3(size.x / 2, size.y, size.z / 2),
+      );
+    }(),
+    'ring' => () {
+      final r = d('outerRadius', 0.5);
+      return BoundsSpec(
+        min: Vector3(-r, 0, -r),
+        max: Vector3(r, 0, r),
+      );
+    }(),
     'plane' => BoundsSpec(
       min: Vector3(-d('width', 1) / 2, 0, -d('depth', 1) / 2),
       max: Vector3(d('width', 1) / 2, 0, d('depth', 1) / 2),
@@ -929,6 +1073,19 @@ BoundsSpec? d3ProcShapeBounds(String shape, Map<String, PropertyValue> props) {
       final r = d('radius', 0.5);
       return BoundsSpec(min: Vector3(-r, 0, -r), max: Vector3(r, 0, r));
     }(),
+    'extrude' => () {
+      final profile = switch (props['profile']) {
+        ListValue(:final values) => [
+          for (final value in values)
+            if (value is Vec2Value) value.value,
+        ],
+        _ => const <Vector2>[],
+      };
+      return _padded(
+        d3CatmullRomBounds(points(), false),
+        _profileRadius(profile),
+      );
+    }(),
     'tube' => curveBounds(d('radius', 0.5)),
     'ribbon' => curveBounds(d('width', 1.0) / 2),
     'polyline' => pointBounds(width() / 2),
@@ -949,6 +1106,14 @@ BoundsSpec _cubeBounds(double r) =>
 
 BoundsSpec _padded(BoundsSpec b, double pad) =>
     BoundsSpec(min: b.min - Vector3.all(pad), max: b.max + Vector3.all(pad));
+
+double _profileRadius(Iterable<Vector2> profile) {
+  var radius = 0.0;
+  for (final point in profile) {
+    radius = math.max(radius, point.length);
+  }
+  return radius;
+}
 
 /// The conservative radius of a camera-facing `w × h` quad centered on
 /// its anchor: half its diagonal, which covers every facing and
@@ -1347,6 +1512,93 @@ D3MeshData buildDisc({required double radius, required int segments}) {
   return b.build();
 }
 
+/// A flat-sided triangular-prism ramp, matching upstream WedgeGeometry.
+D3MeshData buildWedge(Vector3 size) {
+  final hx = size.x / 2;
+  final hz = size.z / 2;
+  final l0 = Vector3(-hx, 0, -hz);
+  final l1 = Vector3(hx, 0, -hz);
+  final b0 = Vector3(-hx, 0, hz);
+  final b1 = Vector3(hx, 0, hz);
+  final t0 = Vector3(-hx, size.y, hz);
+  final t1 = Vector3(hx, size.y, hz);
+  final slopeNormal = Vector3(0, size.z, -size.y).normalized();
+  final b = D3MeshBuilder();
+
+  void quad(Vector3 a, Vector3 bv, Vector3 c, Vector3 d, Vector3 normal) {
+    final base = b.vertexCount;
+    b.emit(a, n: normal, uv: Vector2(0, 1));
+    b.emit(bv, n: normal, uv: Vector2(1, 1));
+    b.emit(c, n: normal, uv: Vector2(1, 0));
+    b.emit(d, n: normal, uv: Vector2(0, 0));
+    b
+      ..tri(base, base + 3, base + 1)
+      ..tri(base + 3, base + 2, base + 1);
+  }
+
+  void triangle(Vector3 a, Vector3 bv, Vector3 c, Vector3 normal) {
+    final base = b.vertexCount;
+    b
+      ..emit(a, n: normal, uv: Vector2(0, 0))
+      ..emit(bv, n: normal, uv: Vector2(1, 0))
+      ..emit(c, n: normal, uv: Vector2(0, 1))
+      ..tri(base, base + 1, base + 2);
+  }
+
+  quad(l0, l1, t1, t0, slopeNormal);
+  quad(l0, b0, b1, l1, Vector3(0, -1, 0));
+  quad(b0, t0, t1, b1, Vector3(0, 0, 1));
+  triangle(l0, b0, t0, Vector3(-1, 0, 0));
+  triangle(l1, t1, b1, Vector3(1, 0, 0));
+  return b.build();
+}
+
+/// A flat annulus in XZ with an open center, matching upstream RingGeometry.
+D3MeshData buildRing({
+  required double innerRadius,
+  required double outerRadius,
+  required int segments,
+}) {
+  if (segments < 3) {
+    throw ArgumentError('A ring needs at least three segments');
+  }
+  if (innerRadius < 0 || outerRadius <= 0) {
+    throw ArgumentError('A ring needs a positive outer radius');
+  }
+  if (innerRadius >= outerRadius) {
+    throw ArgumentError('A ring needs innerRadius < outerRadius');
+  }
+  segments = d3ClampSegments(segments, 3);
+  final b = D3MeshBuilder();
+  for (var s = 0; s <= segments; s++) {
+    final theta = 2 * math.pi * s / segments;
+    b.emit(
+      Vector3(outerRadius * math.cos(theta), 0, outerRadius * math.sin(theta)),
+      n: Vector3(0, 1, 0),
+      uv: Vector2(s / segments, 1),
+    );
+  }
+  final innerBase = b.vertexCount;
+  for (var s = 0; s <= segments; s++) {
+    final theta = 2 * math.pi * s / segments;
+    b.emit(
+      Vector3(innerRadius * math.cos(theta), 0, innerRadius * math.sin(theta)),
+      n: Vector3(0, 1, 0),
+      uv: Vector2(s / segments, 0),
+    );
+  }
+  for (var s = 0; s < segments; s++) {
+    final o0 = s;
+    final o1 = s + 1;
+    final i0 = innerBase + s;
+    final i1 = innerBase + s + 1;
+    b
+      ..tri(o0, i1, o1)
+      ..tri(o0, i0, i1);
+  }
+  return b.build();
+}
+
 /// A real subdivided icosahedron projected to [radius] — the W26
 /// icosphere, ported from upstream `buildIcosphereArrays` (midpoint
 /// edge cache, spherical UVs, outward winding).
@@ -1576,14 +1828,151 @@ D3MeshData buildRibbon(
   return b.build();
 }
 
-void _stitchRings(D3MeshBuilder b, List<int> ringBases, int ringSize) {
+void _stitchRings(
+  D3MeshBuilder b,
+  List<int> ringBases,
+  int ringSize, {
+  bool reverseWinding = false,
+}) {
   for (var s = 0; s < ringBases.length - 1; s++) {
     final base = ringBases[s];
     final nextBase = ringBases[s + 1];
     for (var j = 0; j < ringSize - 1; j++) {
-      b.quad(base + j, base + j + 1, nextBase + j, nextBase + j + 1);
+      if (reverseWinding) {
+        b
+          ..tri(base + j, nextBase + j, base + j + 1)
+          ..tri(base + j + 1, nextBase + j, nextBase + j + 1);
+      } else {
+        b.quad(base + j, base + j + 1, nextBase + j, nextBase + j + 1);
+      }
     }
   }
+}
+
+/// Sweeps a closed profile along [path], with arc-length V coordinates.
+D3MeshData buildExtrude(
+  ScenePath path, {
+  required List<Vector2> profile,
+  required int stations,
+  required bool caps,
+}) {
+  if (stations < 2) {
+    throw ArgumentError.value(stations, 'stations', 'must be at least two');
+  }
+  if (profile.length < 3) {
+    throw ArgumentError.value(
+      profile.length,
+      'profile',
+      'needs at least three points',
+    );
+  }
+  stations = d3ClampSegments(stations, 2);
+  final frames = path.evenlySpacedFrames(stations);
+  final length = path.length;
+  final clockwise = _profileSignedArea(profile) < 0;
+  final normals = _profileNormals(profile);
+  final b = D3MeshBuilder();
+  final ringBases = <int>[];
+
+  for (var i = 0; i < stations; i++) {
+    final frame = frames[i];
+    final v = length * i / (stations - 1);
+    ringBases.add(b.vertexCount);
+    for (var k = 0; k <= profile.length; k++) {
+      final index = k % profile.length;
+      final point = profile[index];
+      final profileNormal = normals[index];
+      final position =
+          frame.position + frame.normal * point.x + frame.binormal * point.y;
+      final normal =
+          (frame.normal * profileNormal.x + frame.binormal * profileNormal.y)
+              .normalized();
+      b.emit(position, n: normal, uv: Vector2(k / profile.length, v));
+    }
+  }
+
+  _stitchRings(
+    b,
+    ringBases,
+    profile.length + 1,
+    reverseWinding: clockwise,
+  );
+  if (caps) {
+    _extrudeCap(b, frames.first, profile, atEnd: false, clockwise: clockwise);
+    _extrudeCap(b, frames.last, profile, atEnd: true, clockwise: clockwise);
+  }
+  return b.build();
+}
+
+void _extrudeCap(
+  D3MeshBuilder b,
+  ScenePathFrame frame,
+  List<Vector2> profile, {
+  required bool atEnd,
+  required bool clockwise,
+}) {
+  var centerX = 0.0;
+  var centerY = 0.0;
+  for (final point in profile) {
+    centerX += point.x;
+    centerY += point.y;
+  }
+  centerX /= profile.length;
+  centerY /= profile.length;
+
+  Vector3 lift(double x, double y) =>
+      frame.position + frame.normal * x + frame.binormal * y;
+
+  final normal = atEnd ? frame.tangent : -frame.tangent;
+  final center = b.emit(
+    lift(centerX, centerY),
+    n: normal,
+    uv: Vector2(centerX, centerY),
+  );
+  final ring = [
+    for (final point in profile)
+      b.emit(lift(point.x, point.y), n: normal, uv: point),
+  ];
+  for (var k = 0; k < profile.length; k++) {
+    final next = (k + 1) % profile.length;
+    final reverseWinding = (!atEnd) != clockwise;
+    if (reverseWinding) {
+      b.tri(center, ring[next], ring[k]);
+    } else {
+      b.tri(center, ring[k], ring[next]);
+    }
+  }
+}
+
+List<Vector2> _profileNormals(List<Vector2> profile) {
+  final count = profile.length;
+  final sign = _profileSignedArea(profile) >= 0 ? 1.0 : -1.0;
+
+  Vector2 edgeNormal(Vector2 edge) => Vector2(edge.y, -edge.x) * sign;
+
+  return [
+    for (var k = 0; k < count; k++)
+      () {
+        final previous = profile[(k - 1 + count) % count];
+        final current = profile[k];
+        final next = profile[(k + 1) % count];
+        var normal =
+            edgeNormal(current - previous) + edgeNormal(next - current);
+        if (normal.length2 < 1e-12) normal = edgeNormal(next - current);
+        if (normal.length2 < 1e-12) normal = Vector2(1, 0);
+        return normal.normalized();
+      }(),
+  ];
+}
+
+double _profileSignedArea(List<Vector2> profile) {
+  var doubledArea = 0.0;
+  for (var k = 0; k < profile.length; k++) {
+    final a = profile[k];
+    final next = profile[(k + 1) % profile.length];
+    doubledArea += a.x * next.y - next.x * a.y;
+  }
+  return doubledArea;
 }
 
 void _tubeCap(

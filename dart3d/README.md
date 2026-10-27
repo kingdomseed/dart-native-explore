@@ -119,18 +119,24 @@ currently inert.
 - Split-screen views and shadow breadth (W24): per-view `viewport`
   rects (iOS realizes screen splits as sibling `SCNView`s, Android as
   Filament viewports), directional-shadow options, and a
-  `shadowCatcher` material (live mode only, with no baked mode).
+  `shadowCatcher` material with live and baked modes. Baked mode caches a
+  local-XZ shadow footprint on load and on an explicit same-ID material
+  `upsertResource`; moving a caster or light alone leaves it unchanged.
+  `softness` controls the baked blur. The cache belongs to the material's
+  first consuming receiver; separate footprints per instance are unsupported.
+  Android live catchers support directional shadows; baked catchers also
+  capture spot shadows. This does not add full upstream contact/AO parity.
 - Stage effects (W25): a `.cube` LUT via asset path or payload chunk,
   lift/gamma/gain, film grain, auto-exposure, SSR, lens flare, god
   rays, chromatic aberration. Unsupported pieces log a declared
   limit: on iOS SSR, GI, and god rays (and lift/gamma/gain currently
   has no effect there); on Android CA, GI, god rays, and metering.
 - Expanded geometry and instancing (W26): `d3:procMesh` shapes
-  (cylinder, cone, capsule, disc, tube, ribbon, camera-facing
+  (cylinder, cone, capsule, disc, wedge, ring, path extrusion, tube, ribbon, camera-facing
   polyline/lineSegments/billboard, a real icosphere) and
-  `d3:instances`. Instancing is **CPU-baked** into one mesh on both
-  platforms (no hardware instancing, because Filament's Java binding
-  lacks `InstanceBuffer`). Tessellation, subdivision, instance, and
+  `d3:instances`. Android uses GPU instancing for regular meshes and
+  CPU-expanded geometry for camera-facing instances. iOS bakes instances
+  into one mesh. Tessellation, subdivision, instance, and
   dash counts are capped (`lib/src/geometry/limits.dart`,
   `../docs/triage/dart.md`).
 - Document layer (W29): `SceneController.serializeScene` (the live

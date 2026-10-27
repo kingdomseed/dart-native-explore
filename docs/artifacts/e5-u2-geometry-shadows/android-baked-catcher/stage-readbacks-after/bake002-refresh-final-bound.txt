@@ -1,0 +1,42 @@
+run=26937-2285342621090884 bake=2 label=refresh
+backend=OPENGL materialId=8444939141786894336
+matrixLayout=column-major; native coordinates; no CPU flip
+receiverEntity=3 primitive=0 owner=8444939141786894337
+receiverBounds=-2.1, 0.0, -2.1, 2.1, 0.0, 2.1
+receiverWorld=0.99280864, 0.0, 0.119712204, 0.0, 0.0, 1.0, 0.0, 0.0, -0.102952495, 0.0, 0.85381544, 0.0, 0.1, 0.025, 0.08, 1.0
+bakedRegion=-2.1, 2.1, 0.23809525, 0.23809525
+softness=0.0 targetSize=256
+casterDepth=(-0.025, 1.375) cameraOffset=1.445 near=0.07 far=1.47
+cameraWorld=0.9928086400032043, 0.0, 0.11971220374107361, 0.0, 0.11971220374107361, -0.0, -0.9928086400032043, 0.0, 0.0, 1.0, -0.0, 0.0, 0.10000000149011612, 1.4700000286102295, 0.07999999821186066, 1.0
+captureView=0.9928086326667889, 0.11971220285645352, 0.0, 0.0, 2.9098591217601047E-18, 1.4862702554860983E-18, 1.0, 0.0, 0.11971220285645352, -0.9928086326667889, -0.0, 0.0, -0.10885784076053322, 0.0674534683740325, -1.4700000286102295, 1.0
+captureProjection=0.4761905074119568, 0.0, 0.0, 0.0, 4.125459973636225E-9, 0.553709864616394, 0.0, 0.0, 0.0, 0.0, 1.4285714626312256, 0.0, 0.0, 0.0, 1.100000023841858, 1.0
+cullingProjection=0.4761905074119568, 0.0, 0.0, 0.0, 4.125459973636225E-9, 0.553709864616394, 0.0, 0.0, 0.0, 0.0, 1.4285714626312256, 0.0, 0.0, 0.0, 1.100000023841858, 1.0
+lightEntity=5 type=FOCUSED_SPOT
+lightWorldPosition=-2.0, 5.0, -2.0
+lightWorldDirection=0.34815538, -0.87038827, 0.34815535
+lightInverseRange=0.083333336 coneScale=2.7559297 coneOffset=-1.6695976
+lightRange=12.0 innerConeRadians=0.25096163 outerConeRadians=0.92
+finalBoundTexture=-5476376657102823600 region=-2.1, 2.1, 0.23809525, 0.23809525
+displayUv=((localX-region.x)*region.z,(region.y-localZ)*region.w); uvToRenderTargetUV at sampler
+stages=zero-aggregate,raw-light,aggregate,horizontal-blur,final-bound
+stageTexture=-5476376657102823600
+stage=bake002-refresh-final-bound width=256 height=256 format=RGBA/UBYTE alignment=1 stridePixels=256
+rowStrideBytes=1024 byteCount=262144 sha256=45e02cf217a2945d38bc94774b43174848e7a32153f6c5c282dc024b3bb5aba8
+bufferRowOrigin=top-left per pinned Renderer contract; bytes unmodified
+readPixelsOffsetOrigin=bottom-left x=0 y=0
+maskChannel=R; shadow amount; 0=unshadowed 255=full; capture A is independent opaque material alpha
+R min=0 max=205 zeros=39665 full=0 pixels=65536
+G min=0 max=205 zeros=39665 full=0 pixels=65536
+B min=0 max=205 zeros=39665 full=0 pixels=65536
+A min=255 max=255 zeros=0 full=65536 pixels=65536
+sample.topLeft x=0 y=0 rgba=0,0,0,255
+sample.topMiddle x=128 y=0 rgba=0,0,0,255
+sample.topRight x=255 y=0 rgba=0,0,0,255
+sample.leftMiddle x=0 y=128 rgba=0,0,0,255
+sample.center x=128 y=128 rgba=188,188,188,255
+sample.rightMiddle x=255 y=128 rgba=166,166,166,255
+sample.bottomLeft x=0 y=255 rgba=0,0,0,255
+sample.bottomMiddle x=128 y=255 rgba=0,0,0,255
+sample.bottomRight x=255 y=255 rgba=0,0,0,255
+sample.quarter x=64 y=64 rgba=0,0,0,255
+sample.threeQuarter x=192 y=192 rgba=176,176,176,255

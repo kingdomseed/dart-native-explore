@@ -2,7 +2,10 @@ package com.jasonholtdigital.dart3d
 
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.sin
 import kotlin.math.sqrt
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
@@ -18,6 +21,12 @@ import org.junit.Test
  * emit, plus the 84-byte skinned repack. Pure JVM; no Filament needed.
  */
 class MeshFactoryTest {
+
+    private val asymmetricExtrudeProfile = listOf(
+        MeshFactory.V2(0f, 0f),
+        MeshFactory.V2(2f, 0f),
+        MeshFactory.V2(0f, 1f),
+    )
 
     @Test
     fun `stride constants match the 15-float record`() {
@@ -80,6 +89,116 @@ class MeshFactoryTest {
     }
 
     @Test
+    fun `wedge maps document z to native z`() {
+        val wedge = MeshFactory.wedge(MeshFactory.V3(2f, 3f, 4f))
+        assertArrayEquals(floatArrayOf(1f, 3f, -2f), vert(wedge, 2), EPS)
+        assertArrayEquals(floatArrayOf(0f, 0.8f, 0.6f),
+            normalOf(record(wedge, 2)), EPS)
+        assertEquals(1f, record(wedge, 2)[7], 0f)
+        assertEquals(0f, record(wedge, 2)[8], 0f)
+        assertWindsOutward(wedge)
+    }
+
+    @Test
+    fun `ring reflects selected uv positions while preserving uv coordinates`() {
+        val ring = MeshFactory.ring(0.25f, 0.5f, segments = 8)
+        val selectedUv = record(ring, 1)
+        assertEquals(0.5f * kotlin.math.sqrt(0.5f), selectedUv[0], EPS)
+        assertEquals(-0.5f * kotlin.math.sqrt(0.5f), selectedUv[2], EPS)
+        assertArrayEquals(floatArrayOf(0f, 1f, 0f), normalOf(selectedUv), EPS)
+        assertEquals(0.125f, selectedUv[7], EPS)
+        assertEquals(1f, selectedUv[8], 0f)
+        assertWindsOutward(ring)
+    }
+
+    @Test
+    fun `extrude reflects document frames for a native z path`() {
+        val alongZ = MeshFactory.extrude(
+            listOf(MeshFactory.V3(0f, 0f, 1f), MeshFactory.V3(0f, 0f, -1f)),
+            asymmetricExtrudeProfile, stations = 2, caps = false)
+        assertArrayEquals(floatArrayOf(0f, -2f, 1f), vert(alongZ, 1), EPS)
+        assertArrayEquals(floatArrayOf(0f, -1f, 0f),
+            normalOf(record(alongZ, 1)), EPS)
+        assertEquals(1f / 3f, record(alongZ, 1)[7], EPS)
+        assertEquals(0f, record(alongZ, 1)[8], EPS)
+    }
+
+    @Test
+    fun `extrude reflects document frames for a native x path`() {
+        val alongX = MeshFactory.extrude(
+            listOf(MeshFactory.V3(-1f, 0f, 0f), MeshFactory.V3(1f, 0f, 0f)),
+            asymmetricExtrudeProfile, stations = 2, caps = false)
+        assertArrayEquals(floatArrayOf(-1f, 0f, 2f), vert(alongX, 1), EPS)
+        assertArrayEquals(floatArrayOf(0f, 0f, 1f),
+            normalOf(record(alongX, 1)), EPS)
+        assertEquals(1f / 3f, record(alongX, 1)[7], EPS)
+        assertEquals(0f, record(alongX, 1)[8], EPS)
+    }
+
+    @Test
+    fun `extrude reflects the frame after a bent native path`() {
+        val bent = MeshFactory.extrude(
+            listOf(
+                MeshFactory.V3(0f, 0f, 0f),
+                MeshFactory.V3(1f, 0f, 0f),
+                MeshFactory.V3(1f, 0f, -1f),
+            ),
+            asymmetricExtrudeProfile, stations = 2, caps = false)
+        assertArrayEquals(floatArrayOf(3f, 0f, -1f), vert(bent, 5), EPS)
+        assertArrayEquals(floatArrayOf(1f, 0f, 0f),
+            normalOf(record(bent, 5)), EPS)
+        assertEquals(1f / 3f, record(bent, 5)[7], EPS)
+        assertEquals(2.04069f, record(bent, 5)[8], 1e-4f)
+    }
+
+    @Test
+    fun `extrude keeps side and cap winding for both profile orientations`() {
+        val wirePath = listOf(
+            MeshFactory.V3(0f, 0f, 1f),
+            MeshFactory.V3(0f, 0f, -1f),
+        )
+        val profiles = listOf(
+            listOf(
+                MeshFactory.V2(0f, 0f),
+                MeshFactory.V2(1f, 0f),
+                MeshFactory.V2(1f, 2f),
+                MeshFactory.V2(0f, 2f),
+            ),
+            listOf(
+                MeshFactory.V2(0f, 0f),
+                MeshFactory.V2(0f, 2f),
+                MeshFactory.V2(1f, 2f),
+                MeshFactory.V2(1f, 0f),
+            ),
+        )
+        for (profile in profiles) {
+            val mesh = MeshFactory.extrude(
+                wirePath, profile, stations = 2, caps = true)
+            assertWindsOutward(mesh)
+            assertEquals(1f, normalOf(record(mesh, 10))[2], EPS)
+            assertEquals(-1f, normalOf(record(mesh, 15))[2], EPS)
+            assertEquals(profile[0].x, record(mesh, 11)[7], EPS)
+            assertEquals(profile[0].y, record(mesh, 11)[8], EPS)
+            for (triangle in 8 until 12) {
+                val a = vert(mesh, indexAt(mesh, triangle * 3))
+                val b = vert(mesh, indexAt(mesh, triangle * 3 + 1))
+                val c = vert(mesh, indexAt(mesh, triangle * 3 + 2))
+                val nz = (b[0] - a[0]) * (c[1] - a[1]) -
+                    (b[1] - a[1]) * (c[0] - a[0])
+                assertTrue("start cap triangle $triangle faces +Z", nz > 0f)
+            }
+            for (triangle in 12 until 16) {
+                val a = vert(mesh, indexAt(mesh, triangle * 3))
+                val b = vert(mesh, indexAt(mesh, triangle * 3 + 1))
+                val c = vert(mesh, indexAt(mesh, triangle * 3 + 2))
+                val nz = (b[0] - a[0]) * (c[1] - a[1]) -
+                    (b[1] - a[1]) * (c[0] - a[0])
+                assertTrue("end cap triangle $triangle faces -Z", nz < 0f)
+            }
+        }
+    }
+
+    @Test
     fun `sphere and torus wind outward`() {
         for (mesh in listOf(
             MeshFactory.sphere(1f, segments = 8, rings = 4),
@@ -109,6 +228,94 @@ class MeshFactoryTest {
                     nx * anx + ny * any + nz * anz > 0f)
             }
         }
+    }
+
+    @Test
+    fun `wedge ring and extrude match geometry contracts and mirrored winding`() {
+        val wedge = MeshFactory.wedge(MeshFactory.V3(2f, 3f, 4f))
+        assertProceduralMesh(
+            wedge, 18, 24, floatArrayOf(0f, 1.5f, 0f, 1f, 1.5f, 2f))
+        val slope = normalOf(record(wedge, 0))
+        assertEquals(0f, slope[0], EPS)
+        assertEquals(0.8f, slope[1], EPS)
+        assertEquals(0.6f, slope[2], EPS)
+        assertArrayEquals(floatArrayOf(-1f, 0f, 2f), vert(wedge, 0), EPS)
+        assertArrayEquals(floatArrayOf(1f, 3f, -2f), vert(wedge, 2), EPS)
+        for (v in 4 until 8) {
+            assertEquals(0f, record(wedge, v)[1], EPS)
+            assertEquals(-1f, normalOf(record(wedge, v))[1], EPS)
+        }
+        assertWindsOutward(wedge)
+
+        val ring = MeshFactory.ring(0.25f, 0.5f, segments = 8)
+        assertProceduralMesh(
+            ring, 18, 48, floatArrayOf(0f, 0f, 0f, 0.5f, 0f, 0.5f))
+        for (v in 0 until 9) {
+            val p = vert(ring, v)
+            assertEquals(0.5f, sqrt(p[0] * p[0] + p[2] * p[2]), EPS)
+        }
+        for (v in 9 until 18) {
+            val p = vert(ring, v)
+            assertEquals(0.25f, sqrt(p[0] * p[0] + p[2] * p[2]), EPS)
+            assertEquals(1f, normalOf(record(ring, v))[1], EPS)
+        }
+        assertWindsOutward(ring)
+
+        val profile = listOf(
+            MeshFactory.V2(-0.1f, -0.1f),
+            MeshFactory.V2(0.1f, -0.1f),
+            MeshFactory.V2(0.1f, 0.1f),
+            MeshFactory.V2(-0.1f, 0.1f))
+        val extrude = MeshFactory.extrude(
+            listOf(
+                MeshFactory.V3(0f, 0f, 0f),
+                MeshFactory.V3(1f, 1f, 0f),
+                MeshFactory.V3(2f, 1f, 1f),
+                MeshFactory.V3(3f, 0f, 1f)),
+            profile, stations = 9, caps = true)
+        assertEquals(55, extrude.vertexCount)
+        assertEquals(216, extrude.indexCount)
+        for (v in 0 until extrude.vertexCount) {
+            val r = record(extrude, v)
+            val normal = normalOf(r)
+            assertTrue(r.all { it.isFinite() })
+            assertEquals(
+                1f,
+                sqrt(
+                    normal[0] * normal[0] + normal[1] * normal[1] +
+                        normal[2] * normal[2]),
+                1e-4f,
+            )
+            for (axis in 0 until 3) {
+                assertTrue(abs(r[axis] - extrude.bounds[axis]) <=
+                    extrude.bounds[axis + 3] + EPS)
+            }
+        }
+        assertTrue(record(extrude, 9 * 5 - 5)[8] > 1f)
+        assertWindsOutward(extrude)
+
+        val mirror = floatArrayOf(
+            -1f, 0f, 0f, 0f,
+            0f, 1f, 0f, 0f,
+            0f, 0f, 1f, 0f,
+            0f, 0f, 0f, 1f)
+        for (base in listOf(wedge, ring, extrude)) {
+            assertWindsOutward(MeshFactory.bakeInstances(base, listOf(mirror)))
+        }
+    }
+
+    @Test
+    fun `large extrude selects the 32-bit index buffer`() {
+        val profile = List(128) { i ->
+            val theta = 2.0 * PI * i / 128
+            MeshFactory.V2(cos(theta).toFloat(), sin(theta).toFloat())
+        }
+        val mesh = MeshFactory.extrude(
+            listOf(MeshFactory.V3(0f, 0f, 0f), MeshFactory.V3(1f, 0f, 0f)),
+            profile, stations = 512, caps = false)
+
+        assertTrue(mesh.vertexCount > 0x10000)
+        assertEquals(MeshFactory.IndexWidth.UINT32, mesh.indexWidth)
     }
 
     @Test
@@ -601,7 +808,7 @@ class MeshFactoryTest {
         for (v in 0 until mesh.vertexCount) {
             val r = record(mesh, v)
             for (c in 0 until 3) {
-                assertTrue(abs(r[c]) <= bounds[3 + c] + EPS)
+                assertTrue(abs(r[c] - bounds[c]) <= bounds[3 + c] + EPS)
             }
             val qLen = sqrt(r[3] * r[3] + r[4] * r[4] +
                 r[5] * r[5] + r[6] * r[6])

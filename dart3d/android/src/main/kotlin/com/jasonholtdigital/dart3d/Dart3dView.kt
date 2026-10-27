@@ -77,6 +77,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     private val renderer: Renderer = guarded { engine.createRenderer() }
     val scene: Scene = guarded { engine.createScene() }
     private val view: View = guarded { engine.createView() }
+    internal val bakedShadowCatchers = BakedShadowCatcherPass(this)
     private var swapChain: SwapChain? = null
 
     private val surfaceView = guarded { SurfaceView(context) }
@@ -209,6 +210,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      */
     private var catcherMaterialBacking: Material? = null
     private var catcherMaterialFailed = false
+    private var bakedCatcherMaterialBacking: Material? = null
+    private var bakedCatcherCaptureMaterialBacking: Material? = null
+    private var bakedCatcherUtilityMaterialBacking: Material? = null
     val catcherMaterial: Material?
         get() {
             if (catcherMaterialBacking == null && !catcherMaterialFailed) {
@@ -223,6 +227,43 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             }
             return catcherMaterialBacking
         }
+
+    internal val bakedCatcherMaterial: Material?
+        get() {
+            if (bakedCatcherMaterialBacking == null) {
+                bakedCatcherMaterialBacking = loadFixed(
+                    MaterialPackages.bakedCatcherSpec(
+                        MaterialPackages.apiFor(engine.backend)))
+            }
+            return bakedCatcherMaterialBacking
+        }
+
+    internal val bakedCatcherCaptureMaterial: Material
+        get() = bakedCatcherCaptureMaterialBacking ?: loadFixed(
+            MaterialPackages.bakedCatcherCaptureSpec(
+                MaterialPackages.apiFor(engine.backend)))
+            .also { bakedCatcherCaptureMaterialBacking = it }
+
+    internal val bakedCatcherUtilityMaterial: Material
+        get() = bakedCatcherUtilityMaterialBacking ?: loadFixed(
+            MaterialPackages.bakedCatcherUtilitySpec(
+                MaterialPackages.apiFor(engine.backend)))
+            .also { bakedCatcherUtilityMaterialBacking = it }
+
+    internal val bakedCatcherZeroShadowTexture: Texture
+        get() = fallbackEmissive
+
+    internal val bakedCatcherTextureSampler = TextureSampler(
+        TextureSampler.MinFilter.LINEAR,
+        TextureSampler.MagFilter.LINEAR,
+        TextureSampler.WrapMode.CLAMP_TO_EDGE)
+
+    internal fun configureBakedCaptureView(captureView: View) {
+        captureView.setShadowingEnabled(view.isShadowingEnabled)
+        captureView.setShadowType(shadowType())
+        captureView.softShadowOptions = view.softShadowOptions
+        captureView.vsmShadowOptions = view.vsmShadowOptions
+    }
 
     /**
      * W22: KHR_materials_* feature variants, built lazily — a material
@@ -357,7 +398,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      * `d3:instances` billboard quads. Filament's line primitives are
      * thin; thick lines ride camera-facing ribbon quads instead.
      */
-    internal val cameraFacing = HashMap<Long, FacingSpec>()
+    internal var cameraFacing: MutableMap<Long, FacingSpec> = HashMap()
 
     // MARK: - W14 render targets + views
 
@@ -1413,7 +1454,12 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             .sunAngularRadius(Math.toDegrees(angularRad).toFloat())
         if (castsShadow) {
             builder.castShadows(true)
-            val so = LightManager.ShadowOptions()
+        }
+        builder.fenced { build(engine, entity) }
+        if (castsShadow) {
+            val lm = engine.lightManager
+            val lightInstance = lm.getInstance(entity)
+            val so = lm.getShadowOptions(lightInstance)
             so.mapSize = mapRes
             so.shadowCascades = cascades
             so.shadowFar = maxDist.toFloat()
@@ -1426,9 +1472,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 so.cascadeSplitPositions = FsceneRealizer.cascadeSplits(
                     splitLambda.toFloat(), cascades, maxDist.toFloat())
             }
-            builder.shadowOptions(so)
+            lm.setShadowOptionsPreservingTransform(lightInstance, so)
         }
-        builder.fenced { build(engine, entity) }
         scene.addEntity(entity)
         stageSunEntity = entity
         stageSunShadowSig = shadowSig
@@ -2254,6 +2299,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             animTargets.clear()
             for ((_, m) in materialInstances) engine.destroyMaterialInstance(m)
             materialInstances = HashMap()
+            bakedShadowCatchers.dispose()
             // W14: per-entry Views/Cameras and rt recs die here — the
             // rec owns its textures, so the texture sweep skips rt
             // keys (the shared `view` lets go of rec cameras first).
@@ -2283,6 +2329,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 engine.destroyMaterial(trailMaterial)
             }
             catcherMaterialBacking?.let { engine.destroyMaterial(it) }
+            bakedCatcherMaterialBacking?.let { engine.destroyMaterial(it) }
+            bakedCatcherCaptureMaterialBacking?.let { engine.destroyMaterial(it) }
+            bakedCatcherUtilityMaterialBacking?.let { engine.destroyMaterial(it) }
             // W18: the lazily-built sprite materials.
             particleAlphaMaterial?.let { engine.destroyMaterial(it) }
             particleAdditiveMaterial?.let { engine.destroyMaterial(it) }
@@ -3599,10 +3648,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
 
     private fun upsertMaterial(key: Long, res: JSONObject) {
         val old = materialInstances[key]
+        val catcherSettings = FsceneRealizer.parseShadowCatcherSettings(res)
         val fresh = HashMap<Long, MutableList<Pair<MaterialInstance, String>>>()
         val mi = FsceneRealizer.buildMaterialInstance(
             this, key, res, resources.textures, resources.textureSamplers,
-            fresh)
+            fresh, catcherSettings)
         // The old instance's consumer entries die with it; the new
         // instance records its own slot bindings.
         if (old != null) {
@@ -3617,19 +3667,15 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         }
         // Re-attach to every renderable that consumed the material.
         val rm = engine.renderableManager
+        val vCtx = FsceneRealizer.surgicalContext(this)
         var n = 0
-        val it = resources.materialConsumers[key]?.iterator()
-        while (it != null && it.hasNext()) {
-            val (entity, primSlot) = it.next()
+        val consumers = resources.materialConsumers[key]?.toList().orEmpty()
+        for ((entity, primSlot) in consumers) {
             if (rm.hasComponent(entity)) {
-                // setMaterialInstanceAt takes the component instance,
-                // not the entity — resolve per use. A multi-primitive
-                // mesh re-attaches at its own slot.
-                rm.setMaterialInstanceAt(
-                    rm.getInstance(entity), primSlot, mi)
+                vCtx.applyMaterialConsumer(entity, primSlot, mi)
                 n++
             } else {
-                it.remove()
+                resources.materialConsumers[key]?.remove(Pair(entity, primSlot))
             }
         }
         materialInstances[key] = mi
@@ -3642,7 +3688,6 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             // re-apply below would read the dead instance back off the
             // renderable and adopt it as the binding's default.
             val oldPtr = old.nativeObject
-            val vCtx = FsceneRealizer.surgicalContext(this)
             for ((_, vc) in resources.variantComponents) {
                 for (b in vc.bindings) {
                     if (b.applied?.nativeObject == oldPtr) {
@@ -3666,15 +3711,16 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             engine.destroyMaterialInstance(old)
         }
         Log.i(TAG, "upsertResource material $key: reattached to $n renderable(s)")
-        val ctx = FsceneRealizer.surgicalContext(this)
-        // E1: non-doubleSided colored d3:instances nodes bind per-chunk
-        // MaterialInstance duplicates to carry instanceColors uniforms —
-        // re-realize them against the fresh material.
-        ctx.redecodeColoredInstancesForMaterial(key)
         // W12: variant bindings holding the old instance re-resolve to
         // the fresh one (a rebound slot reads as a foreign write and
         // becomes the new default — the upstream rebase rule).
-        ctx.applyVariantComponents()
+        vCtx.applyVariantComponents()
+        if (catcherSettings?.mode == FsceneRealizer.ShadowCatcherMode.BAKED) {
+            vCtx.bindBakedCatcher(
+                key, bakedCatcherZeroShadowTexture,
+                floatArrayOf(0f, 1f, 1f, 1f))
+        }
+        bakedShadowCatchers.upsert(key, catcherSettings)
     }
 
     private fun upsertGeometry(key: Long, res: JSONObject) {
@@ -4631,6 +4677,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         materials: MutableMap<Long, MaterialInstance>,
         resources: FsceneRealizer.Context.InstalledResources,
         nodeSkins: MutableMap<Long, NodeSkin>,
+        cameraFacingSpecs: MutableMap<Long, FacingSpec>,
         particles: MutableMap<Long, MutableList<ParticleRuntime>>,
         pending: MutableSet<Long>,
         cameraKey: Long?,
@@ -4640,6 +4687,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         nodeCameraProps: MutableMap<Long, RenderTargets.CameraSpec>,
         bodies: MutableMap<Long, Body>,
         dynamicBodies: MutableSet<Long>,
+        bakedCatcherSettings: Map<Long, FsceneRealizer.ShadowCatcherSettings>,
     ) {
         // Teardown — old entities leave the scene, bodies leave the
         // world, GPU resources return to the engine. Joints referencing
@@ -4672,8 +4720,6 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             engine.destroyEntity(rec.entity)
             EntityManager.get().destroy(rec.entity)
         }
-        // W26: facing-spec VertexBuffers belonged to the old scene's
-        // component-owned meshes — the fresh decode re-registers.
         cameraFacing.clear()
         for ((_, b) in this.bodies) world.removeBody(b)
         // W11: skinning buffers are host-owned GPU objects — the
@@ -4687,6 +4733,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             g.destroy(engine)
         }
         for ((_, m) in materialInstances) engine.destroyMaterialInstance(m)
+        bakedShadowCatchers.clear()
         // W14: view + render-target objects die with the scene — each
         // rt rec owns its View-bound state, RenderTarget, and textures
         // (the colorTex sweep skips rt keys; the shared `view` lets go
@@ -4714,6 +4761,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         nodesById = nodes
         if (nodes.isNotEmpty()) ColdStart.mark("scene installed")
         nodeSkinning = nodeSkins
+        cameraFacing = cameraFacingSpecs
         particleRuntimes = particles
         this.gpuMeshes = gpuMeshes
         materialInstances = materials
@@ -4744,6 +4792,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             // camera node — the attach also re-snapshots authored TRS.
             attachCameraControl()
         }
+        bakedShadowCatchers.install(bakedCatcherSettings)
     }
 
     // MARK: - Skins / morphs / animations (W11)
@@ -5645,6 +5694,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // onDetachedFromSurface, before Android destroys the window.
         if (!uiHelper.isReadyToRender) return false
         val sc = swapChain ?: return false
+        bakedShadowCatchers.renderDirty(
+            renderer, FsceneRealizer.surgicalContext(this))
         if (renderer.beginFrame(sc, tNanos)) {
             // W14: due offscreen passes first — a material sampling an
             // rt reads this frame's output in the screen passes below.

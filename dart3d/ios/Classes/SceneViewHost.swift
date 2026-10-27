@@ -50,6 +50,11 @@ final class SceneViewHost: SCNView {
     private(set) var geometriesById: [UInt64: SCNGeometry] = [:]
     private(set) var materialsById: [UInt64: SCNMaterial] = [:]
     private(set) var texturesById: [UInt64: FsceneRealizer.DecodedTexture] = [:]
+    private(set) var shadowCatcherConfigurationsById:
+        [UInt64: ShadowCatcherConfiguration] = [:]
+    private(set) var shadowCatcherBindingsById:
+        [UInt64: [ShadowCatcherMaterialBinding]] = [:]
+    let bakedShadowCatcherRegistry = BakedShadowCatcherRegistry()
 
     /// Raw manifest entry per resource id, for surgical re-decodes;
     /// slot rebinding also reads material factors back out of it.
@@ -1130,7 +1135,8 @@ final class SceneViewHost: SCNView {
                 animLock.unlock()
                 let written = captureTransformWrites()
                 FsceneRealizer.realize(manifest: manifest, into: self,
-                                       preserveStage: true)
+                                       preserveStage: true,
+                                       preserveBakedShadowCaches: true)
                 // W15: the re-realize discarded the surgically
                 // streamed subtrees with the rest of the scene —
                 // rebuild each from its recorded load batch.
@@ -2042,6 +2048,16 @@ final class SceneViewHost: SCNView {
                 subtreeGeos.contains(ObjectIdentifier($0))
             }
         }
+        var bindings = shadowCatcherBindingsById
+        for key in Array(bindings.keys) {
+            bindings[key]?.removeAll { binding in
+                guard let boundNode = binding.node,
+                      let geometry = binding.geometry else { return true }
+                return subtree.contains(ObjectIdentifier(boundNode))
+                    || subtreeGeos.contains(ObjectIdentifier(geometry))
+            }
+        }
+        publishShadowCatcherBindings(bindings)
     }
 
     /// `{"op":"addNode","node":"<token>","parent":"<token>"|null,
@@ -2219,7 +2235,10 @@ final class SceneViewHost: SCNView {
         if let mo = node.morpher { retire(mo) }
         if let cam = node.camera { retire(cam) }
         if let lt = node.light { retire(lt) }
-        if let geo = old { retire(geo) }
+        if let geo = old {
+            retire(geo)
+            ctx.dropMaterialConsumer(geo)
+        }
         node.geometry = nil
         node.light = nil
         node.camera = nil
@@ -2276,15 +2295,9 @@ final class SceneViewHost: SCNView {
             tr.child.removeFromParentNode()
             retire(tr.child)
         }
-        // W16: the lod spec and its pending mark drop; the level
-        // geometry copies' material-consumer entries purge below
-        // (the bound copy rides `old`'s sweep — it IS node.geometry;
-        // the unbound ones are not).
         if let spec = ctx.lods.removeValue(forKey: key) {
             for copy in spec.geoCopies where copy !== old {
-                for mk in ctx.materialConsumers.keys {
-                    ctx.materialConsumers[mk]?.removeAll { $0 === copy }
-                }
+                ctx.dropMaterialConsumer(copy)
             }
         }
         ctx.pendingLodNodes.remove(key)
@@ -2296,11 +2309,6 @@ final class SceneViewHost: SCNView {
         // diff still declares.
         cameraFacing.removeValue(forKey: key)
         ctx.instancesProps.removeValue(forKey: key)
-        if let old {
-            for mk in ctx.materialConsumers.keys {
-                ctx.materialConsumers[mk]?.removeAll { $0 === old }
-            }
-        }
         // Multi-primitive meshes park extra primitives on anonymous
         // `d3prim:` children — they die with the node, so their
         // consumer entries and geometry refs purge here too.
@@ -2308,11 +2316,7 @@ final class SceneViewHost: SCNView {
             $0.name?.hasPrefix("d3prim:") == true
         }
         for child in primChildren {
-            if let g = child.geometry {
-                for mk in ctx.materialConsumers.keys {
-                    ctx.materialConsumers[mk]?.removeAll { $0 === g }
-                }
-            }
+            if let g = child.geometry { ctx.dropMaterialConsumer(g) }
             for gk in ctx.geometryConsumers.keys {
                 ctx.geometryConsumers[gk]?.removeAll { $0 === child }
             }
@@ -2350,10 +2354,23 @@ final class SceneViewHost: SCNView {
         p?.addChildNode(node)
     }
 
-    /// Writes back the registries a node op can mutate — the same
-    /// write-back `redecodeResource` does per kind.
+    private func publishShadowCatcherBindings(
+        _ bindings: [UInt64: [ShadowCatcherMaterialBinding]]
+    ) {
+        var current = bindings
+        for key in Array(current.keys) {
+            current[key]?.removeAll {
+                $0.node == nil || $0.geometry == nil
+            }
+        }
+        shadowCatcherBindingsById = current
+        bakedShadowCatcherRegistry.updateBindings(current)
+    }
+
     private func publish(_ ctx: FsceneRealizer.Context) {
         materialConsumers = ctx.materialConsumers
+        shadowCatcherConfigurationsById = ctx.shadowCatcherConfigurations
+        publishShadowCatcherBindings(ctx.shadowCatcherBindings)
         geometryConsumers = ctx.geometryConsumers
         dynamicBodyKeys = ctx.dynamicBodyKeys
         colliderIndexByKey = ctx.colliderIndexByKey
@@ -2657,6 +2674,8 @@ final class SceneViewHost: SCNView {
         ctx.geometries = geometriesById
         ctx.textureConsumers = textureConsumers
         ctx.materialConsumers = materialConsumers
+        ctx.shadowCatcherConfigurations = shadowCatcherConfigurationsById
+        ctx.shadowCatcherBindings = shadowCatcherBindingsById
         ctx.geometryConsumers = geometryConsumers
         ctx.texturePayloadKeys = texturePayloadKeys
         ctx.geometryPayloadKeys = geometryPayloadKeys
@@ -2775,6 +2794,7 @@ final class SceneViewHost: SCNView {
             textureConsumers = ctx.textureConsumers
         case "material":
             let old = ctx.materials[key]
+            let wasCatcher = ctx.shadowCatcherConfigurations[key] != nil
             // Stale bindings for this material go first — the re-decode
             // registers the new instance's slots fresh.
             for texKey in Array(ctx.textureConsumers.keys) {
@@ -2782,16 +2802,35 @@ final class SceneViewHost: SCNView {
                     $0.materialKey == key
                 }
             }
+            if wasCatcher || r["type"] as? String == "shadowCatcher" {
+                ctx.applyVariantComponents()
+            }
             ctx.decodeMaterial(key, r)
             materialsById = ctx.materials
             textureConsumers = ctx.textureConsumers
             resourceDefs = ctx.resourceDefs
             if let old, let new = materialsById[key] {
-                for geo in materialConsumers[key] ?? [] {
-                    geo.materials = geo.materials.map {
-                        $0 === old ? new : $0
+                let isCatcher = ctx.shadowCatcherConfigurations[key] != nil
+                if wasCatcher || isCatcher {
+                    ctx.refreshVariantDefaults(
+                        key: key, material: new)
+                    if !wasCatcher && isCatcher {
+                        ctx.registerCurrentShadowCatcherConsumers(
+                            key: key, previousMaterial: old)
                     }
+                    ctx.rebindShadowCatcherMaterial(key, to: new)
+                } else {
+                    for geo in materialConsumers[key] ?? [] {
+                        geo.materials = geo.materials.map {
+                            $0 === old ? new : $0
+                        }
+                    }
+                    ctx.refreshLiveCatcherMaterialReference(
+                        key, old: old, new: new)
                 }
+            }
+            if ctx.shadowCatcherConfigurations[key] == nil {
+                ctx.shadowCatcherBindings.removeValue(forKey: key)
             }
             // A variant/default material refresh re-applies selections
             // onto the new instance (the rebase rule keeps a foreign
@@ -2801,6 +2840,12 @@ final class SceneViewHost: SCNView {
             // W16: a material an `lod` level references — re-resolve
             // each consuming spec against the fresh instance.
             rebindLodConsumers(key, ctx)
+            bakedShadowCatcherRegistry.materialWasUpserted(
+                key: key,
+                configuration: ctx.shadowCatcherConfigurations[key],
+                bindings: ctx.shadowCatcherBindings[key] ?? [],
+                host: self)
+            publish(ctx)
         case "geometry":
             // Same surgical contract as texture: drop the stale decode
             // first — a deferred or malformed upsert rebinds consumers
@@ -2849,8 +2894,22 @@ final class SceneViewHost: SCNView {
                                 .compactMap { $0 === old ? rebound : $0 }
                             ?? []
                     }
+                    ctx.dropShadowCatcherBindings(old)
                 }
                 node.geometry = rebound
+                if let rebound {
+                    for (materialIndex, material) in
+                        rebound.materials.enumerated()
+                    {
+                        guard let materialKey = ctx.materials.first(where: {
+                            $0.value === material
+                        })?.key else { continue }
+                        ctx.recordShadowCatcherBinding(
+                            key: materialKey, node: node, geometry: rebound,
+                            material: material, materialIndex: materialIndex,
+                            isSnapshotClone: false)
+                    }
+                }
                 // W11: the rebuilt geometry may carry morph targets,
                 // and a skinned node's skinner holds the old base
                 // geometry — re-attach both on the new copy.
@@ -2875,6 +2934,7 @@ final class SceneViewHost: SCNView {
             // consuming spec (a pending spec builds its whole level
             // set; a live one rebuilds on the fresh resource).
             rebindLodConsumers(key, ctx)
+            publish(ctx)
         case "renderTexture":
             // W14: the old pixels die — a consumer may still be
             // sampling the colorTex in the in-flight pass, so retire,
@@ -4918,6 +4978,10 @@ final class SceneViewHost: SCNView {
         nodes: [UInt64: SCNNode],
         resources: (geometries: [UInt64: SCNGeometry],
                     materials: [UInt64: SCNMaterial],
+                    shadowCatcherConfigurations:
+                        [UInt64: ShadowCatcherConfiguration],
+                    shadowCatcherBindings:
+                        [UInt64: [ShadowCatcherMaterialBinding]],
                     textures: [UInt64: FsceneRealizer.DecodedTexture],
                     defs: [UInt64: [String: Any]],
                     payloadSpecs:
@@ -4957,6 +5021,7 @@ final class SceneViewHost: SCNView {
         dynamicBodies: Set<UInt64>,
         colliderIndices: [UInt64: Int],
         formatVersion: Int,
+        preserveBakedShadowCaches: Bool,
         stage: (json: [String: Any]?, exposure: Double,
                 toneMap: StageToneMap,
                 effects: StageEffects?, antiAliasing: String,
@@ -4982,6 +5047,14 @@ final class SceneViewHost: SCNView {
         colliderIndexByKey = colliderIndices
         geometriesById = resources.geometries
         materialsById = resources.materials
+        shadowCatcherConfigurationsById =
+            resources.shadowCatcherConfigurations
+        shadowCatcherBindingsById = resources.shadowCatcherBindings
+        bakedShadowCatcherRegistry.install(
+            configurations: resources.shadowCatcherConfigurations,
+            bindings: resources.shadowCatcherBindings,
+            preserveExistingCaches: preserveBakedShadowCaches,
+            host: self)
         texturesById = resources.textures
         resourceDefs = resources.defs
         payloadSpecs = resources.payloadSpecs
@@ -5461,6 +5534,7 @@ extension SceneViewHost: SCNSceneRendererDelegate {
         updateLods()
         updateCameraFacing()
         syncBlendCasters()
+        bakedShadowCatcherRegistry.renderDirty(at: time, host: self)
         renderDueTargets(at: time)
         syncScreenSubviews()
     }
@@ -5555,6 +5629,12 @@ extension SceneViewHost: SCNSceneRendererDelegate {
                 for mk in materialConsumers.keys {
                     materialConsumers[mk] = materialConsumers[mk]?
                         .compactMap { $0 === old ? geo : $0 } ?? []
+                }
+                for bindings in shadowCatcherBindingsById.values {
+                    for binding in bindings
+                    where binding.node === node && binding.geometry === old {
+                        binding.geometry = geo
+                    }
                 }
                 retire(old)
             }

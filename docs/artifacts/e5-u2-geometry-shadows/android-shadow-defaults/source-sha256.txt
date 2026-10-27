@@ -1,0 +1,4 @@
+e8da6600c8520f785b20e08c7c291c855efeaf9e16a702014a18b82eab487920  dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/FsceneRealizer.kt
+e77fff15ea2c1df339ef97fd45f19003d2169ce456f118bcfdd3b20a1be6b8c1  dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/Dart3dView.kt
+41761b8875fa48b92f93f3401576e3a65be689cb38d2af377022cff76a2ad8df  dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/ShadowOptionsAdapter.kt
+d38489ce6fff23433b77cec7afa6a35749a5a9d022d6331efc71357491da406b  dart3d/android/proguard-rules.pro

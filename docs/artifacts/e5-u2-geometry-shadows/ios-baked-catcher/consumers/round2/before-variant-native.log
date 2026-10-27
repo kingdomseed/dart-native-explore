@@ -1,0 +1,45 @@
+getpwuid_r did not find a match for uid 501
+Filtering the log data using "subsystem == "com.jasonholtdigital.dart3d""
+Timestamp               Ty Process[PID:TID]
+2026-10-26 21:10:59.932 Df Runner[13610:e4ae60] [com.jasonholtdigital.dart3d:scene] protocol hello: Dart v1.0
+2026-10-26 21:10:59.962 Df Runner[13610:e4ae60] [com.jasonholtdigital.dart3d:scene] materialsVariants on node 8444939141786894337: 1 variants, 1 bindings, selected=-
+2026-10-26 21:10:59.963 Df Runner[13610:e4ae60] [com.jasonholtdigital.dart3d:scene] node 8444939141786894337: body=nil shape=false pos=0.025 cat=- mask=-
+2026-10-26 21:10:59.963 Df Runner[13610:e4ae60] [com.jasonholtdigital.dart3d:scene] node 8444939141786894344: body=nil shape=false pos=0.46 cat=- mask=-
+2026-10-26 21:10:59.963 Df Runner[13610:e4ae60] [com.jasonholtdigital.dart3d:scene] node 8444939141786894339: body=nil shape=false pos=0.7 cat=- mask=-
+2026-10-26 21:10:59.963 Df Runner[13610:e4ae60] [com.jasonholtdigital.dart3d:scene] node 8444939141786894345: body=nil shape=false pos=10.400655 cat=- mask=-
+2026-10-26 21:10:59.963 Df Runner[13610:e4ae60] [com.jasonholtdigital.dart3d:scene] node 8444939141786894340: body=nil shape=false pos=5.0 cat=- mask=-
+2026-10-26 21:10:59.964 Df Runner[13610:e4ae60] [com.jasonholtdigital.dart3d:scene] variant apply node=8444939141786894337 prim=0 selIdx=- vkey=- vmap=1 target=default
+2026-10-26 21:11:01.068 Df Runner[13610:e4ae25] [com.jasonholtdigital.dart3d:scene] sim tick 429.424,05 dyn=0 awake=0 []
+2026-10-26 21:11:02.064 Df Runner[13610:e4ae28] [com.jasonholtdigital.dart3d:scene] sim tick 429.425,05 dyn=0 awake=0 []
+2026-10-26 21:11:03.062 Df Runner[13610:e4ae25] [com.jasonholtdigital.dart3d:scene] sim tick 429.426,05 dyn=0 awake=0 []
+2026-10-26 21:11:04.063 Df Runner[13610:e4ae29] [com.jasonholtdigital.dart3d:scene] sim tick 429.427,05 dyn=0 awake=0 []
+2026-10-26 21:11:05.062 Df Runner[13610:e4ae29] [com.jasonholtdigital.dart3d:scene] sim tick 429.428,05 dyn=0 awake=0 []
+2026-10-26 21:11:06.062 Df Runner[13610:e4af03] [com.jasonholtdigital.dart3d:scene] sim tick 429.429,05 dyn=0 awake=0 []
+2026-10-26 21:11:07.062 Df Runner[13610:e4af03] [com.jasonholtdigital.dart3d:scene] sim tick 429.430,05 dyn=0 awake=0 []
+2026-10-26 21:11:08.062 Df Runner[13610:e4ae25] [com.jasonholtdigital.dart3d:scene] sim tick 429.431,05 dyn=0 awake=0 []
+2026-10-26 21:11:09.062 Df Runner[13610:e4ae25] [com.jasonholtdigital.dart3d:scene] sim tick 429.432,05 dyn=0 awake=0 []
+2026-10-26 21:11:10.063 Df Runner[13610:e4ae60] [com.jasonholtdigital.dart3d:scene] sim tick 429.433,05 dyn=0 awake=0 []
+2026-10-26 21:11:11.063 Df Runner[13610:e4ae60] [com.jasonholtdigital.dart3d:scene] sim tick 429.434,05 dyn=0 awake=0 []
+2026-10-26 21:11:12.062 Df Runner[13610:e4ae60] [com.jasonholtdigital.dart3d:scene] sim tick 429.435,05 dyn=0 awake=0 []
+2026-10-26 21:11:13.062 Df Runner[13610:e4af03] [com.jasonholtdigital.dart3d:scene] sim tick 429.436,05 dyn=0 awake=0 []
+2026-10-26 21:11:14.063 Df Runner[13610:e4af03] [com.jasonholtdigital.dart3d:scene] sim tick 429.437,05 dyn=0 awake=0 []
+2026-10-26 21:11:15.063 Df Runner[13610:e4ae29] [com.jasonholtdigital.dart3d:scene] sim tick 429.438,05 dyn=0 awake=0 []
+2026-10-26 21:11:16.062 Df Runner[13610:e4ae60] [com.jasonholtdigital.dart3d:scene] sim tick 429.439,05 dyn=0 awake=0 []
+2026-10-26 21:11:17.062 Df Runner[13610:e4ae29] [com.jasonholtdigital.dart3d:scene] sim tick 429.440,05 dyn=0 awake=0 []
+2026-10-26 21:11:18.062 Df Runner[13610:e4ae29] [com.jasonholtdigital.dart3d:scene] sim tick 429.441,05 dyn=0 awake=0 []
+2026-10-26 21:11:19.062 Df Runner[13610:e4ae60] [com.jasonholtdigital.dart3d:scene] sim tick 429.442,05 dyn=0 awake=0 []
+2026-10-26 21:11:20.062 Df Runner[13610:e4ae60] [com.jasonholtdigital.dart3d:scene] sim tick 429.443,05 dyn=0 awake=0 []
+2026-10-26 21:11:20.963 Df Runner[13610:e4af03] [com.jasonholtdigital.dart3d:scene] variant apply node=8444939141786894337 prim=0 selIdx=- vkey=- vmap=1 target=default
+2026-10-26 21:11:20.963 Df Runner[13610:e4af03] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: explicit material upsert queued baked refresh
+2026-10-26 21:11:21.064 Df Runner[13610:e4af03] [com.jasonholtdigital.dart3d:scene] sim tick 429.444,05 dyn=0 awake=0 []
+2026-10-26 21:11:22.062 Df Runner[13610:e4ae60] [com.jasonholtdigital.dart3d:scene] sim tick 429.445,05 dyn=0 awake=0 []
+2026-10-26 21:11:23.063 Df Runner[13610:e4ae25] [com.jasonholtdigital.dart3d:scene] sim tick 429.446,05 dyn=0 awake=0 []
+2026-10-26 21:11:24.064 Df Runner[13610:e4ae29] [com.jasonholtdigital.dart3d:scene] sim tick 429.447,05 dyn=0 awake=0 []
+2026-10-26 21:11:25.063 Df Runner[13610:e4ae60] [com.jasonholtdigital.dart3d:scene] sim tick 429.448,05 dyn=0 awake=0 []
+2026-10-26 21:11:26.062 Df Runner[13610:e4af03] [com.jasonholtdigital.dart3d:scene] sim tick 429.449,05 dyn=0 awake=0 []
+2026-10-26 21:11:27.064 Df Runner[13610:e4ae29] [com.jasonholtdigital.dart3d:scene] sim tick 429.450,05 dyn=0 awake=0 []
+2026-10-26 21:11:28.063 Df Runner[13610:e4ae60] [com.jasonholtdigital.dart3d:scene] sim tick 429.451,05 dyn=0 awake=0 []
+2026-10-26 21:11:29.063 Df Runner[13610:e4ae29] [com.jasonholtdigital.dart3d:scene] sim tick 429.452,05 dyn=0 awake=0 []
+2026-10-26 21:11:30.063 Df Runner[13610:e4ae29] [com.jasonholtdigital.dart3d:scene] sim tick 429.453,05 dyn=0 awake=0 []
+2026-10-26 21:11:31.063 Df Runner[13610:e4ae29] [com.jasonholtdigital.dart3d:scene] sim tick 429.454,05 dyn=0 awake=0 []
+

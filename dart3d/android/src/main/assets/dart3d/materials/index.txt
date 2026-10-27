@@ -1,6 +1,12 @@
-# filament 1.77.3, source ce85f72+uncommitted
-1342357f473c4aab8e784cabdc800396 catcher|OPENGL
-77e7fda09aae89c9fb1b18c38c1e9823 catcher|VULKAN
+# filament 1.77.3, source 4a75520+uncommitted
+e688c1e670ef31db5607598d5237937b catcher|baked|OPENGL
+0a42743184c8da4237310cf2ccc666be catcher|baked|VULKAN
+baff98ee7a94044d4e3c87ee43636b80 catcher|capture|OPENGL
+a2dd592b5b8397eab2722e9064971f32 catcher|capture|VULKAN
+a6c36160f5f0568764dc9efb11790f06 catcher|OPENGL
+7db270ada850c559ea4ebff51508f55f catcher|utility|OPENGL
+1a9a7b20e6292503428c68cccd615192 catcher|utility|VULKAN
+ec4af1b844d62e3a687de67e22828147 catcher|VULKAN
 8aedd59c065ee88f945ac6e5cdc5df53 lit|false|MASKED|e0|s31|OPENGL
 72ceafc5bb5b93da9f57cac767bf0483 lit|false|MASKED|e0|s31|VULKAN
 95376a2f46a9fc87a886c391be4ad085 lit|false|OPAQUE|e0|s31|OPENGL

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.jasonholtdigital.dart3d.PendingClaimsTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-27T01:44:13.847Z" hostname="Jasons-Mac-mini" time="0.0">
+  <properties/>
+  <testcase name="skin and animation claims never arm" classname="com.jasonholtdigital.dart3d.PendingClaimsTest" time="0.0"/>
+  <testcase name="an unclaimed chunk never arms regardless of the pending set" classname="com.jasonholtdigital.dart3d.PendingClaimsTest" time="0.0"/>
+  <testcase name="a chunk claimed by a non-pending ref does not arm" classname="com.jasonholtdigital.dart3d.PendingClaimsTest" time="0.0"/>
+  <testcase name="a chunk awaited by a deferred geometry arms the re-realize" classname="com.jasonholtdigital.dart3d.PendingClaimsTest" time="0.0"/>
+  <testcase name="a chunk awaited by a deferred texture arms the re-realize" classname="com.jasonholtdigital.dart3d.PendingClaimsTest" time="0.0"/>
+  <testcase name="an env or LUT claim served surgically never arms" classname="com.jasonholtdigital.dart3d.PendingClaimsTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

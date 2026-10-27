@@ -1,0 +1,12 @@
+--- a/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/FsceneRealizer.kt
++++ b/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/FsceneRealizer.kt
+@@ -2192,6 +2192,9 @@
+                     val box = rm.getAxisAlignedBoundingBox(ri)
+                     val min = box.getMin(FloatArray(3))
+                     val max = box.getMax(FloatArray(3))
++                    Log.i("dart3d", "baked facing registered=" +
++                        cameraFacing.containsKey(ownerKey) + " min=" +
++                        min.joinToString(",") + " max=" + max.joinToString(","))
+                     floatArrayOf(
+                         min[0], min[1], min[2],
+                         max[0], max[1], max[2],

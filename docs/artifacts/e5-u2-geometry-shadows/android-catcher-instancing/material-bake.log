@@ -1,0 +1,8 @@
+compiling the fixed set on 00064149A002033 (about a minute) ...
+10-26 23:14:25.479 17586 17586 I dart3d  : bake: exporting material packages to /storage/emulated/0/Android/data/com.jasonholtdigital.dart3d_example/files/dart3d-materials
+10-26 23:14:40.213 17586 17611 I dart3d  : bake: fixed set exported (20 packages)
+/sdcard/Android/data/com.jasonholtdigital.dart3d_example/files/dart3d-materials/: 21 files pulled, 0 skipped. 16.9 MB/s (1323633 bytes in 0.075s)
+plugin: 20 packages in /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/android/src/main/assets/dart3d/materials
+stale plugin packages (no recipe produces them any more; remove them):
+  /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/android/src/main/assets/dart3d/materials/1342357f473c4aab8e784cabdc800396.filamat
+  /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/android/src/main/assets/dart3d/materials/77e7fda09aae89c9fb1b18c38c1e9823.filamat

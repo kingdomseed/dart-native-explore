@@ -239,8 +239,13 @@ enum GeometryFactory {
     }
 
     private struct ProcBuilder {
+        let reflectZ: Bool
         var parts = MeshParts()
         var vertexCount: Int { parts.positions.count }
+
+        init(reflectZ: Bool = false) {
+            self.reflectZ = reflectZ
+        }
 
         /// Emits a vertex; a nil [tangent] synthesizes the same
         /// perpendicular frame MeshFactory picks, a nil [uv1]
@@ -252,19 +257,32 @@ enum GeometryFactory {
                            tangent: SIMD4<Float>? = nil,
                            uv1: SIMD2<Float>? = nil) -> Int {
             let i = vertexCount
-            parts.positions.append(p)
-            parts.normals.append(n)
+            let sourceTangent = tangent ?? GeometryFactory.synthesizedTangent(n)
+            let position = reflectZ
+                ? SIMD3<Float>(p.x, p.y, -p.z) : p
+            let normal = reflectZ
+                ? SIMD3<Float>(n.x, n.y, -n.z) : n
+            let outputTangent = reflectZ
+                ? SIMD4<Float>(sourceTangent.x, sourceTangent.y,
+                               -sourceTangent.z, -sourceTangent.w)
+                : sourceTangent
+            parts.positions.append(position)
+            parts.normals.append(normal)
             parts.uvs.append(SIMD2(u, v))
             parts.colors.append(color)
-            parts.tangents.append(
-                tangent ?? GeometryFactory.synthesizedTangent(n))
+            parts.tangents.append(outputTangent)
             parts.uv1s.append(uv1 ?? .zero)
             return i
         }
 
         mutating func tri(_ a: Int, _ b: Int, _ c: Int) {
-            parts.indices.append(contentsOf:
-                [UInt32(a), UInt32(b), UInt32(c)])
+            if reflectZ {
+                parts.indices.append(contentsOf:
+                    [UInt32(a), UInt32(c), UInt32(b)])
+            } else {
+                parts.indices.append(contentsOf:
+                    [UInt32(a), UInt32(b), UInt32(c)])
+            }
         }
 
         mutating func quad(_ a: Int, _ b: Int, _ c: Int, _ d: Int) {
@@ -389,6 +407,66 @@ enum GeometryFactory {
         }
         for s in 0..<segments {
             b.tri(center, rimBase + s + 1, rimBase + s)
+        }
+        return b.parts
+    }
+
+    static func wedge(_ size: SIMD3<Float>) -> MeshParts {
+        let hx = size.x / 2, hz = size.z / 2
+        let l0 = SIMD3<Float>(-hx, 0, -hz)
+        let l1 = SIMD3<Float>(hx, 0, -hz)
+        let b0 = SIMD3<Float>(-hx, 0, hz)
+        let b1 = SIMD3<Float>(hx, 0, hz)
+        let t0 = SIMD3<Float>(-hx, size.y, hz)
+        let t1 = SIMD3<Float>(hx, size.y, hz)
+        let slopeNormal = simd_normalize(SIMD3(0, size.z, -size.y))
+        var b = ProcBuilder(reflectZ: true)
+
+        func quad(_ a: SIMD3<Float>, _ bv: SIMD3<Float>,
+                  _ c: SIMD3<Float>, _ d: SIMD3<Float>,
+                  _ n: SIMD3<Float>) {
+            let base = b.vertexCount
+            b.emit(a, n, 0, 1); b.emit(bv, n, 1, 1)
+            b.emit(c, n, 1, 0); b.emit(d, n, 0, 0)
+            b.tri(base, base + 3, base + 1)
+            b.tri(base + 3, base + 2, base + 1)
+        }
+        func triangle(_ a: SIMD3<Float>, _ bv: SIMD3<Float>,
+                      _ c: SIMD3<Float>, _ n: SIMD3<Float>) {
+            let base = b.vertexCount
+            b.emit(a, n, 0, 0); b.emit(bv, n, 1, 0); b.emit(c, n, 0, 1)
+            b.tri(base, base + 1, base + 2)
+        }
+
+        quad(l0, l1, t1, t0, slopeNormal)
+        quad(l0, b0, b1, l1, SIMD3(0, -1, 0))
+        quad(b0, t0, t1, b1, SIMD3(0, 0, 1))
+        triangle(l0, b0, t0, SIMD3(-1, 0, 0))
+        triangle(l1, t1, b1, SIMD3(1, 0, 0))
+        return b.parts
+    }
+
+    static func ring(
+        innerRadius: Float, outerRadius: Float, segments: Int
+    ) -> MeshParts {
+        var b = ProcBuilder(reflectZ: true)
+        let n = SIMD3<Float>(0, 1, 0)
+        for s in 0...segments {
+            let theta = Float(2 * Double.pi * Double(s) / Double(segments))
+            b.emit(SIMD3(outerRadius * cos(theta), 0, outerRadius * sin(theta)),
+                   n, Float(s) / Float(segments), 1)
+        }
+        let innerBase = b.vertexCount
+        for s in 0...segments {
+            let theta = Float(2 * Double.pi * Double(s) / Double(segments))
+            b.emit(SIMD3(innerRadius * cos(theta), 0, innerRadius * sin(theta)),
+                   n, Float(s) / Float(segments), 0)
+        }
+        for s in 0..<segments {
+            let o0 = s, o1 = s + 1
+            let i0 = innerBase + s, i1 = innerBase + s + 1
+            b.tri(o0, i1, o1)
+            b.tri(o0, i0, i1)
         }
         return b.parts
     }
@@ -770,13 +848,19 @@ enum GeometryFactory {
     }
 
     private static func stitchRings(
-        _ b: inout ProcBuilder, _ ringBases: [Int], _ ringSize: Int
+        _ b: inout ProcBuilder, _ ringBases: [Int], _ ringSize: Int,
+        reverseWinding: Bool = false
     ) {
         for s in 0..<ringBases.count - 1 {
             let base = ringBases[s], nextBase = ringBases[s + 1]
             for j in 0..<ringSize - 1 {
-                b.quad(base + j, base + j + 1,
-                       nextBase + j, nextBase + j + 1)
+                if reverseWinding {
+                    b.tri(base + j, nextBase + j, base + j + 1)
+                    b.tri(base + j + 1, nextBase + j, nextBase + j + 1)
+                } else {
+                    b.quad(base + j, base + j + 1,
+                           nextBase + j, nextBase + j + 1)
+                }
             }
         }
     }
@@ -867,6 +951,98 @@ enum GeometryFactory {
         }
         stitchRings(&b, ringBases, 2)
         return b.parts
+    }
+
+    static func extrude(
+        _ points: [SIMD3<Float>], profile: [SIMD2<Float>],
+        stations: Int, caps: Bool
+    ) -> MeshParts {
+        let documentPoints = points.map { SIMD3<Float>($0.x, $0.y, -$0.z) }
+        let path = catmullRomPath(documentPoints, closed: false)
+        let frames = path.evenlySpacedFrames(stations)
+        let length = path.length
+        let clockwise = profileSignedArea(profile) < 0
+        let normals = profileNormals(profile)
+        var b = ProcBuilder(reflectZ: true)
+        var ringBases = [Int]()
+        for i in 0..<stations {
+            let frame = frames[i]
+            let v = length * Float(i) / Float(stations - 1)
+            ringBases.append(b.vertexCount)
+            for k in 0...profile.count {
+                let index = k % profile.count
+                let point = profile[index]
+                let profileNormal = normals[index]
+                let position = frame.position + frame.normal * point.x +
+                    frame.binormal * point.y
+                let normal = simd_normalize(frame.normal * profileNormal.x +
+                    frame.binormal * profileNormal.y)
+                b.emit(position, normal, Float(k) / Float(profile.count), v)
+            }
+        }
+        stitchRings(&b, ringBases, profile.count + 1,
+                    reverseWinding: clockwise)
+        if caps {
+            extrudeCap(&b, frames.first!, profile, atEnd: false,
+                       clockwise: clockwise)
+            extrudeCap(&b, frames.last!, profile, atEnd: true,
+                       clockwise: clockwise)
+        }
+        return b.parts
+    }
+
+    private static func profileSignedArea(
+        _ profile: [SIMD2<Float>]
+    ) -> Float {
+        var doubledArea = Float(0)
+        for k in profile.indices {
+            let a = profile[k], next = profile[(k + 1) % profile.count]
+            doubledArea += a.x * next.y - next.x * a.y
+        }
+        return doubledArea
+    }
+
+    private static func profileNormals(
+        _ profile: [SIMD2<Float>]
+    ) -> [SIMD2<Float>] {
+        let sign: Float = profileSignedArea(profile) >= 0 ? 1 : -1
+        func edgeNormal(_ edge: SIMD2<Float>) -> SIMD2<Float> {
+            SIMD2(edge.y, -edge.x) * sign
+        }
+        return profile.indices.map { k in
+            let previous = profile[(k - 1 + profile.count) % profile.count]
+            let current = profile[k]
+            let next = profile[(k + 1) % profile.count]
+            let incoming = edgeNormal(current - previous)
+            let outgoing = edgeNormal(next - current)
+            var normal = incoming + outgoing
+            if simd_length_squared(normal) < 1e-12 {
+                normal = outgoing
+            }
+            if simd_length_squared(normal) < 1e-12 {
+                normal = SIMD2(1, 0)
+            }
+            return simd_normalize(normal)
+        }
+    }
+
+    private static func extrudeCap(
+        _ b: inout ProcBuilder, _ frame: PathFrame,
+        _ profile: [SIMD2<Float>], atEnd: Bool, clockwise: Bool
+    ) {
+        let center2 = profile.reduce(SIMD2<Float>.zero, +) / Float(profile.count)
+        func lift(_ point: SIMD2<Float>) -> SIMD3<Float> {
+            frame.position + frame.normal * point.x + frame.binormal * point.y
+        }
+        let normal = atEnd ? frame.tangent : -frame.tangent
+        let center = b.emit(lift(center2), normal, center2.x, center2.y)
+        let ring = profile.map { b.emit(lift($0), normal, $0.x, $0.y) }
+        for k in profile.indices {
+            let next = (k + 1) % profile.count
+            let reverseWinding = (!atEnd) != clockwise
+            if reverseWinding { b.tri(center, ring[next], ring[k]) }
+            else { b.tri(center, ring[k], ring[next]) }
+        }
     }
 
     // MARK: - Camera-facing expansion (lines / billboards)

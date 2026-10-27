@@ -1,0 +1,18 @@
+--- a/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/FsceneRealizer.kt
++++ b/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/FsceneRealizer.kt
+@@ -2196,6 +2196,15 @@
+                         ?: owner.instanceBakedGpuMesh?.bounds
+                         ?: owner.lastGeoBounds
+                 } ?: continue
++                if (owner.instancesProps?.tag("billboard").d3Bool() == true) {
++                    val box = rm.getAxisAlignedBoundingBox(ri)
++                    Log.i("dart3d", "baked facing registered=" +
++                        host.cameraFacing.containsKey(ownerKey) + " decoded=" +
++                        bounds.joinToString(",") + " renderedMin=" +
++                        box.getMin(FloatArray(3)).joinToString(",") +
++                        " renderedMax=" +
++                        box.getMax(FloatArray(3)).joinToString(","))
++                }
+                 val world = FloatArray(16)
+                 tcm.getWorldTransform(tcm.getInstance(entity), world)
+                 if (owner.instancesProps != null && primitive == 0) {

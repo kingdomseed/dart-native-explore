@@ -1,0 +1,53 @@
+{
+  "states": [
+    {
+      "variant": "split-cull",
+      "type": "FOCUSED_SPOT",
+      "lightWorldTransform": "[-0.6757246, 0.0, 0.7371541, 0.0, 0.6016942, 0.5777138, 0.5515531, 0.0, -0.4258641, 0.8162394, -0.39037538, 0.0, -2.4, 4.6, -2.2, 1.0]",
+      "shadowOptionsSource": "adapter",
+      "nearHint": "0.0",
+      "farHint": "0.0",
+      "transform": "[0.0, 0.0, 0.0, 0.0]",
+      "captureShadowType": "DPCF",
+      "casterCameraCulling": "FRONT_AND_BACK",
+      "casterShadowCulling": "NONE"
+    },
+    {
+      "variant": "split-cull",
+      "type": "DIRECTIONAL",
+      "lightWorldTransform": "[0.4788521, 2.9802322E-8, -0.8778956, 0.0, -0.74395263, 0.5309116, -0.40579236, 0.0, 0.46608496, 0.84742725, 0.25422812, 0.0, 0.0, 0.0, -0.0, 1.0]",
+      "shadowOptionsSource": "adapter",
+      "nearHint": "0.0",
+      "farHint": "0.0",
+      "transform": "[0.0, 0.0, 0.0, 0.0]",
+      "captureShadowType": "DPCF",
+      "casterCameraCulling": "FRONT_AND_BACK",
+      "casterShadowCulling": "NONE"
+    },
+    {
+      "variant": "native-defaults",
+      "type": "DIRECTIONAL",
+      "lightWorldTransform": "[0.4788521, 2.9802322E-8, -0.8778956, 0.0, -0.74395263, 0.5309116, -0.40579236, 0.0, 0.46608496, 0.84742725, 0.25422812, 0.0, 0.0, 0.0, -0.0, 1.0]",
+      "shadowOptionsSource": "native-defaults",
+      "nearHint": "1.0",
+      "farHint": "100.0",
+      "transform": "[0.0, 0.0, 0.0, 1.0]",
+      "captureShadowType": "DPCF",
+      "casterCameraCulling": "FRONT_AND_BACK",
+      "casterShadowCulling": "NONE"
+    },
+    {
+      "variant": "native-defaults-pcf",
+      "type": "DIRECTIONAL",
+      "lightWorldTransform": "[0.4788521, 2.9802322E-8, -0.8778956, 0.0, -0.74395263, 0.5309116, -0.40579236, 0.0, 0.46608496, 0.84742725, 0.25422812, 0.0, 0.0, 0.0, -0.0, 1.0]",
+      "shadowOptionsSource": "native-defaults",
+      "nearHint": "1.0",
+      "farHint": "100.0",
+      "transform": "[0.0, 0.0, 0.0, 1.0]",
+      "captureShadowType": "PCF",
+      "casterCameraCulling": "FRONT_AND_BACK",
+      "casterShadowCulling": "NONE"
+    }
+  ],
+  "directionalTransformsMatch": true
+}

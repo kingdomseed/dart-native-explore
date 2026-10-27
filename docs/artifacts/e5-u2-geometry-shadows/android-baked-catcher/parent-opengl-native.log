@@ -1,0 +1,522 @@
+--------- beginning of main
+10-27 01:12:08.331 24577 24577 I dart3d  : start +75ms plugin registered
+10-27 01:12:08.331 24577 24577 I dart3d  : dart3d provider registered (disposeView=true)
+10-27 01:12:08.363 24577 24577 I dart3d  : GPU: Mali-G610 MC4
+10-27 01:12:08.570 24577 24577 I dart3d  : Dart3dSetDispatcher: slot armed
+10-27 01:12:08.570 24577 24577 I dart3d  : Dart3dSetBackend: 1
+10-27 01:12:08.597 24577 24577 I Filament: FEngine (64 bits) created at 0xb400007309285a80 (threading is enabled)
+10-27 01:12:08.605 24577 24642 I Filament: FEngine resolved backend: OpenGL
+10-27 01:12:08.689 24577 24642 I Filament: [ARM], [Mali-G610 MC4], [OpenGL ES 3.2 v1.r38p1], [OpenGL ES GLSL ES 3.20]
+10-27 01:12:08.689 24577 24642 I Filament: Feature level: 2
+10-27 01:12:08.689 24577 24642 I Filament: Active workarounds: 
+10-27 01:12:08.689 24577 24642 I Filament: vao_doesnt_store_element_array_buffer_binding
+10-27 01:12:08.689 24577 24642 I Filament: dont_use_timer_query
+10-27 01:12:08.689 24577 24642 I Filament: allow_read_only_ancillary_feedback_loop
+10-27 01:12:08.689 24577 24642 I Filament: disable_framebuffer_fetch_extension
+10-27 01:12:08.689 24577 24642 I Filament: disable_es2_srgb_ext
+10-27 01:12:08.695 24577 24577 I Filament: Backend feature level: 2
+10-27 01:12:08.695 24577 24577 I Filament: FEngine feature level: 1
+10-27 01:12:08.726 24577 24577 I dart3d  : Filament engine backend: OPENGL (pref=1, tier=STANDARD)
+10-27 01:12:08.726 24577 24577 I dart3d  : start +470ms engine created
+10-27 01:12:08.750 24577 24577 I dart3d  : start +494ms base materials loaded
+10-27 01:12:08.849 24577 24577 I dart3d  : perf view: backend=OPENGL viewport=0x0 msaa=0 aa=FXAA post=true hdr=HIGH bloom=false(levels=6 res=384 q=LOW) ssao=false taa=false ssr=false dsr=false(0.5..1.0) dither=TEMPORAL quality=default physics=60Hzx8 entities=0 bodies=0
+10-27 01:12:08.849 24577 24577 I dart3d  : protocol hello: Dart v1.0
+10-27 01:12:08.850 24577 24577 I dart3d  : antialiasingMode=4 → MSAA enabled=true sampleCount=4 aa=FXAA
+10-27 01:12:08.850 24577 24577 I dart3d  : quality=medium → shadows=true aaSrc=1 tier=STANDARD shadowType=DPCF
+10-27 01:12:08.856 24577 24577 I dart3d  : d3:instances node 8444939141786894337: realized 1 instance(s) in 1 InstanceBuffer chunk(s)
+10-27 01:12:08.858 24577 24577 I dart3d  : shadow options: mapSize=1024 cascades=1 far=0.0 contactDist=0.3 contact=false bias=0.001 normalBias=1.0 bulbRadius=-1.0
+10-27 01:12:08.859 24577 24577 I dart3d  : node 8444939141786894337: body=none pos=(0.1,0.025,0.08)
+10-27 01:12:08.859 24577 24577 I dart3d  : node 8444939141786894339: body=none pos=(0.0,0.7,-0.0)
+10-27 01:12:08.859 24577 24577 I dart3d  : node 8444939141786894340: body=none pos=(-2.0,5.0,-2.0)
+10-27 01:12:08.859 24577 24577 I dart3d  : node 8444939141786894343: body=none pos=(1.2,0.46,0.72)
+10-27 01:12:08.859 24577 24577 I dart3d  : node 8444939141786894344: body=none pos=(-1.8074353,4.597556,5.466089)
+10-27 01:12:08.912 24577 24577 I dart3d  : environment 8444939141786894341: 256×128 equirect → 256² cube + SH3 in 25ms
+10-27 01:12:08.916 24577 24577 I dart3d  : applySkybox: sb=true textures=0
+10-27 01:12:08.920 24577 24577 I dart3d  : applyEnvironment: il=true textures=3
+10-27 01:12:08.922 24577 24577 I dart3d  : start +666ms scene installed
+10-27 01:12:08.922 24577 24577 I dart3d  : views applied: 0 entries (0 screen, 0 rts)
+10-27 01:12:08.922 24577 24577 I dart3d  : realize: 72ms
+10-27 01:12:08.951 24577 24577 I dart3d  : dart3d view 4 swapchain created
+10-27 01:12:08.951 24577 24577 I dart3d  : start +695ms swapchain created
+--------- beginning of crash
+10-27 01:12:08.990 24577 24577 E AndroidRuntime: FATAL EXCEPTION: main
+10-27 01:12:08.990 24577 24577 E AndroidRuntime: Process: com.jasonholtdigital.dart3d_example, PID: 24577
+10-27 01:12:08.990 24577 24577 E AndroidRuntime: java.lang.NoSuchMethodError: no non-static method "LK/g;.accept(I)V"
+10-27 01:12:08.990 24577 24577 E AndroidRuntime: 	at com.google.android.filament.Scene.nForEach(Native Method)
+10-27 01:12:08.990 24577 24577 E AndroidRuntime: 	at com.google.android.filament.Scene.b(SourceFile:4)
+10-27 01:12:08.990 24577 24577 E AndroidRuntime: 	at n1.e0.g0(SourceFile:803)
+10-27 01:12:08.990 24577 24577 E AndroidRuntime: 	at n1.b0.doFrame(SourceFile:3209)
+10-27 01:12:08.990 24577 24577 E AndroidRuntime: 	at android.view.Choreographer$CallbackRecord.run(Choreographer.java:1870)
+10-27 01:12:08.990 24577 24577 E AndroidRuntime: 	at android.view.Choreographer$CallbackRecord.run(Choreographer.java:1881)
+10-27 01:12:08.990 24577 24577 E AndroidRuntime: 	at android.view.Choreographer.doCallbacks(Choreographer.java:1427)
+10-27 01:12:08.990 24577 24577 E AndroidRuntime: 	at android.view.Choreographer.doFrame(Choreographer.java:1305)
+10-27 01:12:08.990 24577 24577 E AndroidRuntime: 	at android.view.Choreographer$FrameDisplayEventReceiver.run(Choreographer.java:1848)
+10-27 01:12:08.990 24577 24577 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:995)
+10-27 01:12:08.990 24577 24577 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:103)
+10-27 01:12:08.990 24577 24577 E AndroidRuntime: 	at android.os.Looper.loopOnce(Looper.java:283)
+10-27 01:12:08.990 24577 24577 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:392)
+10-27 01:12:08.990 24577 24577 E AndroidRuntime: 	at android.app.ActivityThread.main(ActivityThread.java:9231)
+10-27 01:12:08.990 24577 24577 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+10-27 01:12:08.990 24577 24577 E AndroidRuntime: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:633)
+10-27 01:12:08.990 24577 24577 E AndroidRuntime: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1026)
+10-27 01:12:59.031 24829 24829 I dart3d  : start +66ms plugin registered
+10-27 01:12:59.031 24829 24829 I dart3d  : dart3d provider registered (disposeView=true)
+10-27 01:12:59.052 24829 24829 I dart3d  : GPU: Mali-G610 MC4
+10-27 01:12:59.163 24829 24829 I dart3d  : Dart3dSetDispatcher: slot armed
+10-27 01:12:59.163 24829 24829 I dart3d  : Dart3dSetBackend: 1
+10-27 01:12:59.193 24829 24829 I Filament: FEngine (64 bits) created at 0xb400007309289210 (threading is enabled)
+10-27 01:12:59.196 24829 24881 I Filament: FEngine resolved backend: OpenGL
+10-27 01:12:59.261 24829 24881 I Filament: [ARM], [Mali-G610 MC4], [OpenGL ES 3.2 v1.r38p1], [OpenGL ES GLSL ES 3.20]
+10-27 01:12:59.261 24829 24881 I Filament: Feature level: 2
+10-27 01:12:59.261 24829 24881 I Filament: Active workarounds: 
+10-27 01:12:59.261 24829 24881 I Filament: vao_doesnt_store_element_array_buffer_binding
+10-27 01:12:59.261 24829 24881 I Filament: dont_use_timer_query
+10-27 01:12:59.261 24829 24881 I Filament: allow_read_only_ancillary_feedback_loop
+10-27 01:12:59.261 24829 24881 I Filament: disable_framebuffer_fetch_extension
+10-27 01:12:59.261 24829 24881 I Filament: disable_es2_srgb_ext
+10-27 01:12:59.267 24829 24829 I Filament: Backend feature level: 2
+10-27 01:12:59.267 24829 24829 I Filament: FEngine feature level: 1
+10-27 01:12:59.270 24829 24829 I dart3d  : Filament engine backend: OPENGL (pref=1, tier=STANDARD)
+10-27 01:12:59.270 24829 24829 I dart3d  : start +304ms engine created
+10-27 01:12:59.333 24829 24829 I dart3d  : start +368ms base materials loaded
+10-27 01:12:59.462 24829 24829 I dart3d  : perf view: backend=OPENGL viewport=0x0 msaa=0 aa=FXAA post=true hdr=HIGH bloom=false(levels=6 res=384 q=LOW) ssao=false taa=false ssr=false dsr=false(0.5..1.0) dither=TEMPORAL quality=default physics=60Hzx8 entities=0 bodies=0
+10-27 01:12:59.462 24829 24829 I dart3d  : protocol hello: Dart v1.0
+10-27 01:12:59.463 24829 24829 I dart3d  : antialiasingMode=4 → MSAA enabled=true sampleCount=4 aa=FXAA
+10-27 01:12:59.463 24829 24829 I dart3d  : quality=medium → shadows=true aaSrc=1 tier=STANDARD shadowType=DPCF
+10-27 01:12:59.469 24829 24829 I dart3d  : d3:instances node 8444939141786894337: realized 1 instance(s) in 1 InstanceBuffer chunk(s)
+10-27 01:12:59.471 24829 24829 I dart3d  : shadow options: mapSize=1024 cascades=1 far=0.0 contactDist=0.3 contact=false bias=0.001 normalBias=1.0 bulbRadius=-1.0
+10-27 01:12:59.472 24829 24829 I dart3d  : node 8444939141786894337: body=none pos=(0.1,0.025,0.08)
+10-27 01:12:59.472 24829 24829 I dart3d  : node 8444939141786894339: body=none pos=(0.0,0.7,-0.0)
+10-27 01:12:59.472 24829 24829 I dart3d  : node 8444939141786894340: body=none pos=(-2.0,5.0,-2.0)
+10-27 01:12:59.472 24829 24829 I dart3d  : node 8444939141786894343: body=none pos=(1.2,0.46,0.72)
+10-27 01:12:59.472 24829 24829 I dart3d  : node 8444939141786894344: body=none pos=(-1.8074353,4.597556,5.466089)
+10-27 01:12:59.537 24829 24829 I dart3d  : environment 8444939141786894341: 256×128 equirect → 256² cube + SH3 in 23ms
+10-27 01:12:59.540 24829 24829 I dart3d  : applySkybox: sb=true textures=0
+10-27 01:12:59.549 24829 24829 I dart3d  : applyEnvironment: il=true textures=3
+10-27 01:12:59.554 24829 24829 I dart3d  : start +588ms scene installed
+10-27 01:12:59.554 24829 24829 I dart3d  : views applied: 0 entries (0 screen, 0 rts)
+10-27 01:12:59.554 24829 24829 I dart3d  : realize: 91ms
+10-27 01:12:59.576 24829 24829 I dart3d  : dart3d view 4 swapchain created
+10-27 01:12:59.576 24829 24829 I dart3d  : start +611ms swapchain created
+10-27 01:12:59.614 24829 24829 E AndroidRuntime: FATAL EXCEPTION: main
+10-27 01:12:59.614 24829 24829 E AndroidRuntime: Process: com.jasonholtdigital.dart3d_example, PID: 24829
+10-27 01:12:59.614 24829 24829 E AndroidRuntime: java.lang.NoSuchMethodError: no non-static method "LK/g;.accept(I)V"
+10-27 01:12:59.614 24829 24829 E AndroidRuntime: 	at com.google.android.filament.Scene.nForEach(Native Method)
+10-27 01:12:59.614 24829 24829 E AndroidRuntime: 	at com.google.android.filament.Scene.b(SourceFile:4)
+10-27 01:12:59.614 24829 24829 E AndroidRuntime: 	at n1.e0.g0(SourceFile:803)
+10-27 01:12:59.614 24829 24829 E AndroidRuntime: 	at n1.b0.doFrame(SourceFile:3209)
+10-27 01:12:59.614 24829 24829 E AndroidRuntime: 	at android.view.Choreographer$CallbackRecord.run(Choreographer.java:1870)
+10-27 01:12:59.614 24829 24829 E AndroidRuntime: 	at android.view.Choreographer$CallbackRecord.run(Choreographer.java:1881)
+10-27 01:12:59.614 24829 24829 E AndroidRuntime: 	at android.view.Choreographer.doCallbacks(Choreographer.java:1427)
+10-27 01:12:59.614 24829 24829 E AndroidRuntime: 	at android.view.Choreographer.doFrame(Choreographer.java:1305)
+10-27 01:12:59.614 24829 24829 E AndroidRuntime: 	at android.view.Choreographer$FrameDisplayEventReceiver.run(Choreographer.java:1848)
+10-27 01:12:59.614 24829 24829 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:995)
+10-27 01:12:59.614 24829 24829 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:103)
+10-27 01:12:59.614 24829 24829 E AndroidRuntime: 	at android.os.Looper.loopOnce(Looper.java:283)
+10-27 01:12:59.614 24829 24829 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:392)
+10-27 01:12:59.614 24829 24829 E AndroidRuntime: 	at android.app.ActivityThread.main(ActivityThread.java:9231)
+10-27 01:12:59.614 24829 24829 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+10-27 01:12:59.614 24829 24829 E AndroidRuntime: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:633)
+10-27 01:12:59.614 24829 24829 E AndroidRuntime: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1026)
+10-27 01:13:52.117 25145 25145 I dart3d  : start +145ms plugin registered
+10-27 01:13:52.117 25145 25145 I dart3d  : dart3d provider registered (disposeView=true)
+10-27 01:13:52.159 25145 25145 I dart3d  : GPU: Mali-G610 MC4
+10-27 01:13:52.461 25145 25145 I dart3d  : Dart3dSetDispatcher: slot armed
+10-27 01:13:52.461 25145 25145 I dart3d  : Dart3dSetBackend: 1
+10-27 01:13:52.480 25145 25145 I Filament: FEngine (64 bits) created at 0xb400007309289210 (threading is enabled)
+10-27 01:13:52.483 25145 25231 I Filament: FEngine resolved backend: OpenGL
+10-27 01:13:52.512 25145 25231 I Filament: [ARM], [Mali-G610 MC4], [OpenGL ES 3.2 v1.r38p1], [OpenGL ES GLSL ES 3.20]
+10-27 01:13:52.512 25145 25231 I Filament: Feature level: 2
+10-27 01:13:52.512 25145 25231 I Filament: Active workarounds: 
+10-27 01:13:52.512 25145 25231 I Filament: vao_doesnt_store_element_array_buffer_binding
+10-27 01:13:52.512 25145 25231 I Filament: dont_use_timer_query
+10-27 01:13:52.512 25145 25231 I Filament: allow_read_only_ancillary_feedback_loop
+10-27 01:13:52.512 25145 25231 I Filament: disable_framebuffer_fetch_extension
+10-27 01:13:52.512 25145 25231 I Filament: disable_es2_srgb_ext
+10-27 01:13:52.516 25145 25145 I Filament: Backend feature level: 2
+10-27 01:13:52.516 25145 25145 I Filament: FEngine feature level: 1
+10-27 01:13:52.520 25145 25145 I dart3d  : Filament engine backend: OPENGL (pref=1, tier=STANDARD)
+10-27 01:13:52.520 25145 25145 I dart3d  : start +548ms engine created
+10-27 01:13:52.542 25145 25145 I dart3d  : start +570ms base materials loaded
+10-27 01:13:52.593 25145 25145 I dart3d  : perf view: backend=OPENGL viewport=0x0 msaa=0 aa=FXAA post=true hdr=HIGH bloom=false(levels=6 res=384 q=LOW) ssao=false taa=false ssr=false dsr=false(0.5..1.0) dither=TEMPORAL quality=default physics=60Hzx8 entities=0 bodies=0
+10-27 01:13:52.593 25145 25145 I dart3d  : protocol hello: Dart v1.0
+10-27 01:13:52.593 25145 25145 I dart3d  : antialiasingMode=4 → MSAA enabled=true sampleCount=4 aa=FXAA
+10-27 01:13:52.594 25145 25145 I dart3d  : quality=medium → shadows=true aaSrc=1 tier=STANDARD shadowType=DPCF
+10-27 01:13:52.600 25145 25145 I dart3d  : d3:instances node 8444939141786894337: realized 1 instance(s) in 1 InstanceBuffer chunk(s)
+10-27 01:13:52.602 25145 25145 I dart3d  : shadow options: mapSize=1024 cascades=1 far=0.0 contactDist=0.3 contact=false bias=0.001 normalBias=1.0 bulbRadius=-1.0
+10-27 01:13:52.603 25145 25145 I dart3d  : node 8444939141786894337: body=none pos=(0.1,0.025,0.08)
+10-27 01:13:52.603 25145 25145 I dart3d  : node 8444939141786894339: body=none pos=(0.0,0.7,-0.0)
+10-27 01:13:52.603 25145 25145 I dart3d  : node 8444939141786894340: body=none pos=(-2.0,5.0,-2.0)
+10-27 01:13:52.603 25145 25145 I dart3d  : node 8444939141786894343: body=none pos=(1.2,0.46,0.72)
+10-27 01:13:52.603 25145 25145 I dart3d  : node 8444939141786894344: body=none pos=(-1.8074353,4.597556,5.466089)
+10-27 01:13:52.656 25145 25145 I dart3d  : environment 8444939141786894341: 256×128 equirect → 256² cube + SH3 in 31ms
+10-27 01:13:52.657 25145 25145 I dart3d  : applySkybox: sb=true textures=0
+10-27 01:13:52.658 25145 25145 I dart3d  : applyEnvironment: il=true textures=3
+10-27 01:13:52.660 25145 25145 I dart3d  : start +688ms scene installed
+10-27 01:13:52.660 25145 25145 I dart3d  : views applied: 0 entries (0 screen, 0 rts)
+10-27 01:13:52.660 25145 25145 I dart3d  : realize: 65ms
+10-27 01:13:52.679 25145 25145 I dart3d  : dart3d view 4 swapchain created
+10-27 01:13:52.679 25145 25145 I dart3d  : start +707ms swapchain created
+10-27 01:13:52.813 25145 25145 F libc    : Fatal signal 6 (SIGABRT), code -1 (SI_QUEUE) in tid 25145 (.dart3d_example), pid 25145 (.dart3d_example)
+10-27 01:14:45.812 25408 25408 I dart3d  : start +100ms plugin registered
+10-27 01:14:45.812 25408 25408 I dart3d  : dart3d provider registered (disposeView=true)
+10-27 01:14:45.850 25408 25408 I dart3d  : GPU: Mali-G610 MC4
+10-27 01:14:46.213 25408 25408 I dart3d  : Dart3dSetDispatcher: slot armed
+10-27 01:14:46.214 25408 25408 I dart3d  : Dart3dSetBackend: 1
+10-27 01:14:46.244 25408 25408 I Filament: FEngine (64 bits) created at 0xb400007309289210 (threading is enabled)
+10-27 01:14:46.251 25408 25479 I Filament: FEngine resolved backend: OpenGL
+10-27 01:14:46.347 25408 25479 I Filament: [ARM], [Mali-G610 MC4], [OpenGL ES 3.2 v1.r38p1], [OpenGL ES GLSL ES 3.20]
+10-27 01:14:46.347 25408 25479 I Filament: Feature level: 2
+10-27 01:14:46.347 25408 25479 I Filament: Active workarounds: 
+10-27 01:14:46.348 25408 25479 I Filament: vao_doesnt_store_element_array_buffer_binding
+10-27 01:14:46.348 25408 25479 I Filament: dont_use_timer_query
+10-27 01:14:46.348 25408 25479 I Filament: allow_read_only_ancillary_feedback_loop
+10-27 01:14:46.348 25408 25479 I Filament: disable_framebuffer_fetch_extension
+10-27 01:14:46.348 25408 25479 I Filament: disable_es2_srgb_ext
+10-27 01:14:46.365 25408 25408 I Filament: Backend feature level: 2
+10-27 01:14:46.365 25408 25408 I Filament: FEngine feature level: 1
+10-27 01:14:46.368 25408 25408 I dart3d  : Filament engine backend: OPENGL (pref=1, tier=STANDARD)
+10-27 01:14:46.368 25408 25408 I dart3d  : start +656ms engine created
+10-27 01:14:46.389 25408 25408 I dart3d  : start +677ms base materials loaded
+10-27 01:14:46.509 25408 25408 I dart3d  : perf view: backend=OPENGL viewport=0x0 msaa=0 aa=FXAA post=true hdr=HIGH bloom=false(levels=6 res=384 q=LOW) ssao=false taa=false ssr=false dsr=false(0.5..1.0) dither=TEMPORAL quality=default physics=60Hzx8 entities=0 bodies=0
+10-27 01:14:46.509 25408 25408 I dart3d  : protocol hello: Dart v1.0
+10-27 01:14:46.510 25408 25408 I dart3d  : antialiasingMode=4 → MSAA enabled=true sampleCount=4 aa=FXAA
+10-27 01:14:46.510 25408 25408 I dart3d  : quality=medium → shadows=true aaSrc=1 tier=STANDARD shadowType=DPCF
+10-27 01:14:46.516 25408 25408 I dart3d  : d3:instances node 8444939141786894337: realized 1 instance(s) in 1 InstanceBuffer chunk(s)
+10-27 01:14:46.518 25408 25408 I dart3d  : shadow options: mapSize=1024 cascades=1 far=0.0 contactDist=0.3 contact=false bias=0.001 normalBias=1.0 bulbRadius=-1.0
+10-27 01:14:46.519 25408 25408 I dart3d  : node 8444939141786894337: body=none pos=(0.1,0.025,0.08)
+10-27 01:14:46.519 25408 25408 I dart3d  : node 8444939141786894339: body=none pos=(0.0,0.7,-0.0)
+10-27 01:14:46.519 25408 25408 I dart3d  : node 8444939141786894340: body=none pos=(-2.0,5.0,-2.0)
+10-27 01:14:46.519 25408 25408 I dart3d  : node 8444939141786894343: body=none pos=(1.2,0.46,0.72)
+10-27 01:14:46.519 25408 25408 I dart3d  : node 8444939141786894344: body=none pos=(-1.8074353,4.597556,5.466089)
+10-27 01:14:46.628 25408 25408 I dart3d  : environment 8444939141786894341: 256×128 equirect → 256² cube + SH3 in 19ms
+10-27 01:14:46.630 25408 25408 I dart3d  : applySkybox: sb=true textures=0
+10-27 01:14:46.631 25408 25408 I dart3d  : applyEnvironment: il=true textures=3
+10-27 01:14:46.633 25408 25408 I dart3d  : start +921ms scene installed
+10-27 01:14:46.637 25408 25408 I dart3d  : views applied: 0 entries (0 screen, 0 rts)
+10-27 01:14:46.637 25408 25408 I dart3d  : realize: 127ms
+10-27 01:14:46.655 25408 25408 I dart3d  : dart3d view 4 swapchain created
+10-27 01:14:46.655 25408 25408 I dart3d  : start +943ms swapchain created
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=0 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=1 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=2 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=3 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=4 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=5 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=6 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=7 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=8 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=9 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=10 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=11 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=12 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=13 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=14 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=15 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=16 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=17 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=18 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=19 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=20 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=21 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=22 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=23 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=24 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=25 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=26 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=27 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=28 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=29 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=30 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=31 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=32 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=33 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=34 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=35 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=36 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=37 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=38 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=39 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=40 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=41 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=42 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=43 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=44 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=45 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=46 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=47 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=48 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=49 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=50 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=51 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=52 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=53 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=54 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=55 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=56 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=57 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=58 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=59 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=60 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=61 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=62 was set between begin/endRenderPass
+10-27 01:14:46.690 25408 25408 W Filament: Descriptor set (handle=4294967295) binding=63 was set between begin/endRenderPass
+10-27 01:14:46.698 25408 25408 E AndroidRuntime: FATAL EXCEPTION: main
+10-27 01:14:46.698 25408 25408 E AndroidRuntime: Process: com.jasonholtdigital.dart3d_example, PID: 25408
+10-27 01:14:46.698 25408 25408 E AndroidRuntime: java.lang.ArrayIndexOutOfBoundsException: Array length must be at least 16
+10-27 01:14:46.698 25408 25408 E AndroidRuntime: 	at p0.a.d(SourceFile:10)
+10-27 01:14:46.698 25408 25408 E AndroidRuntime: 	at com.google.android.filament.MaterialInstance.n(SourceFile:0)
+10-27 01:14:46.698 25408 25408 E AndroidRuntime: 	at n1.o.a(SourceFile:212)
+10-27 01:14:46.698 25408 25408 E AndroidRuntime: 	at n1.i0.g0(SourceFile:1218)
+10-27 01:14:46.698 25408 25408 E AndroidRuntime: 	at n1.f0.doFrame(SourceFile:3209)
+10-27 01:14:46.698 25408 25408 E AndroidRuntime: 	at android.view.Choreographer$CallbackRecord.run(Choreographer.java:1870)
+10-27 01:14:46.698 25408 25408 E AndroidRuntime: 	at android.view.Choreographer$CallbackRecord.run(Choreographer.java:1881)
+10-27 01:14:46.698 25408 25408 E AndroidRuntime: 	at android.view.Choreographer.doCallbacks(Choreographer.java:1427)
+10-27 01:14:46.698 25408 25408 E AndroidRuntime: 	at android.view.Choreographer.doFrame(Choreographer.java:1305)
+10-27 01:14:46.698 25408 25408 E AndroidRuntime: 	at android.view.Choreographer$FrameDisplayEventReceiver.run(Choreographer.java:1848)
+10-27 01:14:46.698 25408 25408 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:995)
+10-27 01:14:46.698 25408 25408 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:103)
+10-27 01:14:46.698 25408 25408 E AndroidRuntime: 	at android.os.Looper.loopOnce(Looper.java:283)
+10-27 01:14:46.698 25408 25408 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:392)
+10-27 01:14:46.698 25408 25408 E AndroidRuntime: 	at android.app.ActivityThread.main(ActivityThread.java:9231)
+10-27 01:14:46.698 25408 25408 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+10-27 01:14:46.698 25408 25408 E AndroidRuntime: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:633)
+10-27 01:14:46.698 25408 25408 E AndroidRuntime: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1026)
+10-27 01:15:32.108 25656 25656 I dart3d  : start +78ms plugin registered
+10-27 01:15:32.108 25656 25656 I dart3d  : dart3d provider registered (disposeView=true)
+10-27 01:15:32.134 25656 25656 I dart3d  : GPU: Mali-G610 MC4
+10-27 01:15:32.278 25656 25656 I dart3d  : Dart3dSetDispatcher: slot armed
+10-27 01:15:32.279 25656 25656 I dart3d  : Dart3dSetBackend: 1
+10-27 01:15:32.311 25656 25656 I Filament: FEngine (64 bits) created at 0xb400007309289210 (threading is enabled)
+10-27 01:15:32.313 25656 25723 I Filament: FEngine resolved backend: OpenGL
+10-27 01:15:32.338 25656 25723 I Filament: [ARM], [Mali-G610 MC4], [OpenGL ES 3.2 v1.r38p1], [OpenGL ES GLSL ES 3.20]
+10-27 01:15:32.338 25656 25723 I Filament: Feature level: 2
+10-27 01:15:32.338 25656 25723 I Filament: Active workarounds: 
+10-27 01:15:32.338 25656 25723 I Filament: vao_doesnt_store_element_array_buffer_binding
+10-27 01:15:32.338 25656 25723 I Filament: dont_use_timer_query
+10-27 01:15:32.338 25656 25723 I Filament: allow_read_only_ancillary_feedback_loop
+10-27 01:15:32.338 25656 25723 I Filament: disable_framebuffer_fetch_extension
+10-27 01:15:32.338 25656 25723 I Filament: disable_es2_srgb_ext
+10-27 01:15:32.343 25656 25656 I Filament: Backend feature level: 2
+10-27 01:15:32.343 25656 25656 I Filament: FEngine feature level: 1
+10-27 01:15:32.346 25656 25656 I dart3d  : Filament engine backend: OPENGL (pref=1, tier=STANDARD)
+10-27 01:15:32.346 25656 25656 I dart3d  : start +316ms engine created
+10-27 01:15:32.375 25656 25656 I dart3d  : start +345ms base materials loaded
+10-27 01:15:32.426 25656 25656 I dart3d  : perf view: backend=OPENGL viewport=0x0 msaa=0 aa=FXAA post=true hdr=HIGH bloom=false(levels=6 res=384 q=LOW) ssao=false taa=false ssr=false dsr=false(0.5..1.0) dither=TEMPORAL quality=default physics=60Hzx8 entities=0 bodies=0
+10-27 01:15:32.426 25656 25656 I dart3d  : protocol hello: Dart v1.0
+10-27 01:15:32.426 25656 25656 I dart3d  : antialiasingMode=4 → MSAA enabled=true sampleCount=4 aa=FXAA
+10-27 01:15:32.427 25656 25656 I dart3d  : quality=medium → shadows=true aaSrc=1 tier=STANDARD shadowType=DPCF
+10-27 01:15:32.435 25656 25656 I dart3d  : d3:instances node 8444939141786894337: realized 1 instance(s) in 1 InstanceBuffer chunk(s)
+10-27 01:15:32.438 25656 25656 I dart3d  : shadow options: mapSize=1024 cascades=1 far=0.0 contactDist=0.3 contact=false bias=0.001 normalBias=1.0 bulbRadius=-1.0
+10-27 01:15:32.438 25656 25656 I dart3d  : node 8444939141786894337: body=none pos=(0.1,0.025,0.08)
+10-27 01:15:32.438 25656 25656 I dart3d  : node 8444939141786894339: body=none pos=(0.0,0.7,-0.0)
+10-27 01:15:32.438 25656 25656 I dart3d  : node 8444939141786894340: body=none pos=(-2.0,5.0,-2.0)
+10-27 01:15:32.438 25656 25656 I dart3d  : node 8444939141786894343: body=none pos=(1.2,0.46,0.72)
+10-27 01:15:32.438 25656 25656 I dart3d  : node 8444939141786894344: body=none pos=(-1.8074353,4.597556,5.466089)
+10-27 01:15:32.493 25656 25656 I dart3d  : environment 8444939141786894341: 256×128 equirect → 256² cube + SH3 in 29ms
+10-27 01:15:32.494 25656 25656 I dart3d  : applySkybox: sb=true textures=0
+10-27 01:15:32.495 25656 25656 I dart3d  : applyEnvironment: il=true textures=3
+10-27 01:15:32.497 25656 25656 I dart3d  : start +467ms scene installed
+10-27 01:15:32.497 25656 25656 I dart3d  : views applied: 0 entries (0 screen, 0 rts)
+10-27 01:15:32.497 25656 25656 I dart3d  : realize: 70ms
+10-27 01:15:32.585 25656 25656 I dart3d  : dart3d view 4 swapchain created
+10-27 01:15:32.585 25656 25656 I dart3d  : start +555ms swapchain created
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=0 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=1 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=2 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=3 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=4 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=5 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=6 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=7 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=8 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=9 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=10 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=11 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=12 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=13 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=14 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=15 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=16 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=17 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=18 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=19 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=20 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=21 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=22 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=23 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=24 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=25 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=26 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=27 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=28 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=29 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=30 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=31 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=32 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=33 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=34 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=35 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=36 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=37 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=38 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=39 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=40 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=41 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=42 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=43 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=44 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=45 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=46 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=47 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=48 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=49 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=50 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=51 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=52 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=53 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=54 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=55 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=56 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=57 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=58 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=59 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=60 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=61 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=62 was set between begin/endRenderPass
+10-27 01:15:32.676 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=63 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=0 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=1 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=2 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=3 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=4 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=5 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=0 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=1 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=2 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=3 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=4 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=5 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=0 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=1 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=2 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=3 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=4 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=5 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=6 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=7 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=8 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=9 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=10 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=11 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=12 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=13 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=14 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=15 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=16 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=17 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=18 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=19 was set between begin/endRenderPass
+10-27 01:15:32.699 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=20 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=21 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=22 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=23 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=24 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=25 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=26 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=27 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=28 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=29 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=30 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=31 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=32 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=33 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=34 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=35 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=36 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=37 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=38 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=39 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=40 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=41 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=42 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=43 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=44 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=45 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=46 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=47 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=48 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=49 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=50 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=51 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=52 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=53 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=54 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=55 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=56 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=57 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=58 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=59 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=60 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=61 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=62 was set between begin/endRenderPass
+10-27 01:15:32.700 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=63 was set between begin/endRenderPass
+10-27 01:15:32.702 25656 25656 I dart3d  : baked catcher material=8444939141786894336 captured size=256
+10-27 01:15:32.703 25656 25656 W Filament: Descriptor set (handle=109) binding=1 was set between begin/endRenderPass
+10-27 01:15:32.703 25656 25656 I dart3d  : start +673ms first frame submitted
+10-27 01:15:33.007 25656 25656 I dart3d  : start +977ms first frame rendered
+10-27 01:15:33.007 25656 25656 W dart3d  : slow frame 368ms on main: ops=0 realize=false
+10-27 01:15:34.436 25656 25656 I dart3d  : perf n=126 fps=62.7 frame p50=11.1 p95=11.2 max=384.2 ms | gpu p50=10.5 p95=13.1 | backend p50=2.1 p95=6.5 | sim p50=0.1 p95=0.1 (physics p50=0.0 p95=0.0) | submit p50=0.4 p95=1.3 | skipped=3/130 physics=48/s
+10-27 01:15:36.441 25656 25656 I dart3d  : perf n=180 fps=89.8 frame p50=11.1 p95=11.2 max=11.2 ms | gpu p50=10.8 p95=13.6 | backend p50=3.1 p95=5.1 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=1.0 p95=1.6 | skipped=0/180 physics=60/s
+10-27 01:15:38.443 25656 25656 I dart3d  : perf n=178 fps=88.9 frame p50=11.1 p95=11.2 max=22.3 ms | gpu p50=10.9 p95=14.2 | backend p50=2.9 p95=5.7 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=1.0 p95=1.7 | skipped=0/178 physics=60/s
+10-27 01:15:40.446 25656 25656 I dart3d  : perf n=180 fps=89.8 frame p50=11.1 p95=11.2 max=11.2 ms | gpu p50=10.6 p95=13.3 | backend p50=3.0 p95=5.1 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=1.0 p95=1.7 | skipped=0/180 physics=60/s
+10-27 01:15:42.449 25656 25656 I dart3d  : perf n=178 fps=88.9 frame p50=11.1 p95=11.2 max=22.2 ms | gpu p50=10.6 p95=14.3 | backend p50=2.8 p95=8.1 | sim p50=0.1 p95=0.2 (physics p50=0.0 p95=0.1) | submit p50=0.7 p95=1.4 | skipped=2/180 physics=60/s
+10-27 01:15:44.454 25656 25656 I dart3d  : perf n=180 fps=89.8 frame p50=11.1 p95=11.2 max=11.2 ms | gpu p50=10.6 p95=13.5 | backend p50=3.1 p95=5.7 | sim p50=0.1 p95=0.2 (physics p50=0.0 p95=0.1) | submit p50=1.0 p95=1.6 | skipped=0/180 physics=60/s
+10-27 01:15:46.457 25656 25656 I dart3d  : perf n=180 fps=89.8 frame p50=11.1 p95=11.2 max=11.2 ms | gpu p50=10.6 p95=13.4 | backend p50=3.0 p95=5.3 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=1.0 p95=1.6 | skipped=0/180 physics=60/s
+10-27 01:15:48.461 25656 25656 I dart3d  : perf n=180 fps=89.9 frame p50=11.1 p95=11.2 max=11.2 ms | gpu p50=10.5 p95=13.6 | backend p50=3.1 p95=5.2 | sim p50=0.1 p95=0.4 (physics p50=0.0 p95=0.1) | submit p50=1.0 p95=1.6 | skipped=0/180 physics=60/s
+10-27 01:15:50.464 25656 25656 I dart3d  : perf n=180 fps=89.9 frame p50=11.1 p95=11.2 max=11.2 ms | gpu p50=10.6 p95=13.3 | backend p50=3.0 p95=4.9 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=0.9 p95=1.7 | skipped=0/180 physics=60/s
+10-27 01:15:52.466 25656 25656 I dart3d  : perf n=180 fps=89.9 frame p50=11.1 p95=11.2 max=11.2 ms | gpu p50=10.7 p95=13.3 | backend p50=3.0 p95=4.9 | sim p50=0.1 p95=0.2 (physics p50=0.0 p95=0.1) | submit p50=1.0 p95=1.6 | skipped=0/180 physics=60/s
+10-27 01:15:54.470 25656 25656 I dart3d  : perf n=180 fps=89.9 frame p50=11.1 p95=11.2 max=11.2 ms | gpu p50=10.6 p95=13.2 | backend p50=3.0 p95=5.8 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=0.9 p95=1.4 | skipped=0/180 physics=60/s
+10-27 01:15:56.473 25656 25656 I dart3d  : perf n=179 fps=89.4 frame p50=11.1 p95=11.2 max=22.3 ms | gpu p50=10.6 p95=13.4 | backend p50=2.7 p95=5.3 | sim p50=0.1 p95=0.1 (physics p50=0.0 p95=0.0) | submit p50=0.6 p95=1.4 | skipped=1/180 physics=60/s
+10-27 01:15:58.476 25656 25656 I dart3d  : perf n=178 fps=88.9 frame p50=11.1 p95=11.2 max=22.2 ms | gpu p50=10.6 p95=14.6 | backend p50=3.2 p95=11.7 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=0.8 p95=2.1 | skipped=2/180 physics=60/s
+10-27 01:16:00.480 25656 25656 I dart3d  : perf n=180 fps=89.8 frame p50=11.1 p95=11.1 max=11.2 ms | gpu p50=10.8 p95=13.6 | backend p50=3.0 p95=6.0 | sim p50=0.1 p95=0.1 (physics p50=0.0 p95=0.1) | submit p50=0.9 p95=1.6 | skipped=0/180 physics=60/s
+10-27 01:16:02.484 25656 25656 I dart3d  : perf n=180 fps=89.9 frame p50=11.1 p95=11.2 max=11.2 ms | gpu p50=10.6 p95=13.1 | backend p50=3.0 p95=5.2 | sim p50=0.1 p95=0.2 (physics p50=0.0 p95=0.1) | submit p50=1.0 p95=1.5 | skipped=0/180 physics=60/s
+10-27 01:16:04.195 25656 25656 I dart3d  : upsertResource material 8444939141786894336: reattached to 1 renderable(s)
+10-27 01:16:04.195 25656 25656 I dart3d  : baked catcher material=8444939141786894336 refresh scheduled
+10-27 01:16:04.196 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=0 was set between begin/endRenderPass
+10-27 01:16:04.196 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=1 was set between begin/endRenderPass
+10-27 01:16:04.196 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=2 was set between begin/endRenderPass
+10-27 01:16:04.199 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=0 was set between begin/endRenderPass
+10-27 01:16:04.199 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=1 was set between begin/endRenderPass
+10-27 01:16:04.199 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=2 was set between begin/endRenderPass
+10-27 01:16:04.199 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=3 was set between begin/endRenderPass
+10-27 01:16:04.199 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=4 was set between begin/endRenderPass
+10-27 01:16:04.199 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=5 was set between begin/endRenderPass
+10-27 01:16:04.199 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=0 was set between begin/endRenderPass
+10-27 01:16:04.199 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=1 was set between begin/endRenderPass
+10-27 01:16:04.199 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=2 was set between begin/endRenderPass
+10-27 01:16:04.199 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=3 was set between begin/endRenderPass
+10-27 01:16:04.199 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=4 was set between begin/endRenderPass
+10-27 01:16:04.199 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=5 was set between begin/endRenderPass
+10-27 01:16:04.202 25656 25656 W Filament: Descriptor set (handle=4294967295) binding=0 was set between begin/endRenderPass
+10-27 01:16:04.204 25656 25656 I dart3d  : baked catcher material=8444939141786894336 captured size=256
+10-27 01:16:04.205 25656 25656 W Filament: Descriptor set (handle=2013266608) binding=1 was set between begin/endRenderPass
+10-27 01:16:04.493 25656 25656 I dart3d  : perf n=175 fps=87.4 frame p50=11.1 p95=11.2 max=22.3 ms | gpu p50=10.7 p95=15.3 | backend p50=4.4 p95=8.2 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=1.7 p95=4.7 | skipped=3/178 physics=60/s
+10-27 01:16:06.493 25656 25656 I dart3d  : perf n=174 fps=86.9 frame p50=11.1 p95=11.2 max=22.3 ms | gpu p50=10.9 p95=15.0 | backend p50=3.5 p95=8.5 | sim p50=0.1 p95=0.2 (physics p50=0.0 p95=0.1) | submit p50=2.8 p95=4.5 | skipped=3/177 physics=60/s
+10-27 01:16:08.497 25656 25656 I dart3d  : perf n=176 fps=87.9 frame p50=11.1 p95=11.1 max=22.3 ms | gpu p50=10.8 p95=14.7 | backend p50=3.8 p95=7.7 | sim p50=0.2 p95=0.2 (physics p50=0.1 p95=0.1) | submit p50=3.0 p95=5.4 | skipped=4/180 physics=60/s
+10-27 01:16:10.504 25656 25656 I dart3d  : perf n=173 fps=86.4 frame p50=11.1 p95=11.2 max=22.3 ms | gpu p50=11.1 p95=15.9 | backend p50=5.2 p95=8.5 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=2.2 p95=4.3 | skipped=7/180 physics=60/s
+10-27 01:16:12.502 25656 25656 I dart3d  : perf n=168 fps=83.9 frame p50=11.1 p95=22.2 max=22.5 ms | gpu p50=11.0 p95=16.1 | backend p50=5.7 p95=8.7 | sim p50=0.2 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=3.0 p95=5.4 | skipped=10/178 physics=60/s
+10-27 01:16:14.509 25656 25656 I dart3d  : perf n=173 fps=86.4 frame p50=11.1 p95=11.2 max=22.3 ms | gpu p50=11.1 p95=15.9 | backend p50=5.5 p95=9.0 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=2.3 p95=5.5 | skipped=7/180 physics=60/s
+10-27 01:16:16.514 25656 25656 I dart3d  : perf n=175 fps=87.4 frame p50=11.1 p95=11.2 max=22.3 ms | gpu p50=10.8 p95=15.6 | backend p50=5.1 p95=7.7 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=2.4 p95=4.6 | skipped=5/180 physics=60/s
+10-27 01:16:18.514 25656 25656 I dart3d  : perf n=173 fps=86.4 frame p50=11.1 p95=11.2 max=22.3 ms | gpu p50=10.8 p95=15.9 | backend p50=5.6 p95=8.9 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=2.6 p95=4.8 | skipped=6/179 physics=60/s
+10-27 01:16:20.517 25656 25656 I dart3d  : perf n=170 fps=84.9 frame p50=11.1 p95=22.2 max=22.3 ms | gpu p50=11.3 p95=15.6 | backend p50=5.4 p95=8.8 | sim p50=0.1 p95=0.2 (physics p50=0.0 p95=0.1) | submit p50=2.6 p95=5.3 | skipped=10/180 physics=60/s
+10-27 01:16:22.519 25656 25656 I dart3d  : perf n=172 fps=85.9 frame p50=11.1 p95=11.5 max=22.3 ms | gpu p50=11.0 p95=14.9 | backend p50=5.4 p95=8.9 | sim p50=0.2 p95=0.3 (physics p50=0.1 p95=0.1) | submit p50=2.4 p95=5.2 | skipped=8/180 physics=60/s
+10-27 01:16:24.522 25656 25656 I dart3d  : perf n=173 fps=86.4 frame p50=11.1 p95=11.2 max=22.4 ms | gpu p50=11.0 p95=15.1 | backend p50=5.1 p95=8.5 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=2.3 p95=5.3 | skipped=7/180 physics=60/s
+10-27 01:16:26.529 25656 25656 I dart3d  : perf n=172 fps=85.9 frame p50=11.1 p95=11.3 max=22.3 ms | gpu p50=11.0 p95=15.1 | backend p50=5.8 p95=9.1 | sim p50=0.1 p95=0.2 (physics p50=0.0 p95=0.1) | submit p50=2.5 p95=4.6 | skipped=8/180 physics=60/s
+10-27 01:16:28.533 25656 25656 I dart3d  : perf n=171 fps=85.4 frame p50=11.1 p95=22.2 max=22.3 ms | gpu p50=11.2 p95=15.6 | backend p50=5.6 p95=8.9 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=2.5 p95=5.4 | skipped=8/179 physics=60/s
+10-27 01:16:30.532 25656 25656 I dart3d  : perf n=173 fps=86.4 frame p50=11.1 p95=11.2 max=22.3 ms | gpu p50=11.2 p95=15.0 | backend p50=5.6 p95=8.3 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=2.9 p95=5.4 | skipped=6/179 physics=60/s
+10-27 01:16:32.537 25656 25656 I dart3d  : perf n=171 fps=85.4 frame p50=11.1 p95=22.2 max=22.3 ms | gpu p50=11.3 p95=15.4 | backend p50=5.6 p95=8.8 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=2.7 p95=5.0 | skipped=9/180 physics=60/s
+10-27 01:16:34.539 25656 25656 I dart3d  : perf n=171 fps=85.4 frame p50=11.1 p95=22.2 max=22.3 ms | gpu p50=11.1 p95=16.2 | backend p50=5.6 p95=8.9 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=2.5 p95=4.5 | skipped=9/180 physics=60/s
+10-27 01:16:36.543 25656 25656 I dart3d  : perf n=170 fps=84.9 frame p50=11.1 p95=22.2 max=22.3 ms | gpu p50=11.2 p95=15.8 | backend p50=5.6 p95=9.0 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=2.4 p95=5.0 | skipped=10/180 physics=60/s
+10-27 01:16:38.543 25656 25656 I dart3d  : perf n=174 fps=86.9 frame p50=11.1 p95=11.2 max=22.3 ms | gpu p50=11.1 p95=15.2 | backend p50=5.3 p95=8.8 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=2.4 p95=5.3 | skipped=6/180 physics=60/s
+10-27 01:16:40.547 25656 25656 I dart3d  : perf n=174 fps=86.9 frame p50=11.1 p95=11.2 max=22.3 ms | gpu p50=11.0 p95=15.1 | backend p50=5.4 p95=8.9 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=2.6 p95=4.7 | skipped=6/180 physics=60/s

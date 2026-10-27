@@ -1,0 +1,8 @@
+{
+  "path": "/private/tmp/dart3d-e5-geometry-20261026/android-shadow-defaults-r1/before-app-release.apk",
+  "sha256": "bdd249657c65bb9903fa2c28f96d998b91d7e98d54c7625be611489dbb51c406",
+  "bytes": 110860698,
+  "model": "u2-catcher",
+  "light": "directional",
+  "backend": "vulkan"
+}

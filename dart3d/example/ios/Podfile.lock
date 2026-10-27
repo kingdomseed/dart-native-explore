@@ -24,7 +24,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   dart3d: e8d2f34edf6d7cb04ee34eaf03d9495347aa7e36
-  dartnative_ios: 88d434758a21de28291d1ca70f9a144bd28548c7
+  dartnative_ios: c5e063a6bc126b1f88144c1c16ff9c200caf1e9e
   DartNativeCore: 225e49d9e35e234bcadc6b81586fc4275a1006ee
   FlexLayout: ea94491c923485f7f28891cb5b10245d22df380b
 

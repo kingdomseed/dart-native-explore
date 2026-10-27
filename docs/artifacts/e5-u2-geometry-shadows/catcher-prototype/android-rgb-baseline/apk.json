@@ -1,0 +1,9 @@
+{
+  "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-7651d186/dart3d/example/build/app/outputs/dn-apk/app-release.apk",
+  "sha256": "a1669c8f63b4e024ad77bc3e02396987076f7b998e18bc95391122ec644d3002",
+  "bytes": 110918514,
+  "prebuilt": true,
+  "sourceCheckpoint": "R2 prototype with parent R8 keep",
+  "backend": "VULKAN pref2",
+  "device": "00064149A002033"
+}

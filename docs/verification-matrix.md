@@ -563,7 +563,7 @@ directional light aimed opposite `sunDirection`), and implements rate-limited
 | T2 dice smoke | pass — dice rack loads cleanly with 0 errors (`ios-sim-dice.png`, `ios-sim-dice-run.log`) | pass — dice roll & settle (`readout=103` Vulkan, `readout=96` OpenGL), 0 crashes (`a142-{vulkan,opengl}-dice.{png,log}`) |
 | Unit tests | `dn analyze` + `dn test` (`dart3d`: 325, `example`: 227) | `./gradlew :dart3d:testReleaseUnitTest` passes |
 
-## E4 — W19 character controller (verification in progress)
+## E4 — W19 character controller (verified and merged)
 
 Evidence is in `docs/artifacts/e4-w19-character-controller/README.md`.
 The upstream codec drives Android `CharacterVirtual` and iOS sweep-and-slide.
@@ -581,7 +581,29 @@ character-reference release. No new wire operation is introduced.
 Package and example analyses are clean; 328 package and 228 example tests pass.
 The parent native task passes 151 tests with no skips and passes duplicate-class
 checking. Independent Codex source reviews report no material findings.
-The required device matrix is complete. Operator visual review remains before E4 merges.
+The required device matrix is complete. The operator approved the before/after
+screenshots and character-movement video (“Looks correct”) in [the PR #64
+comment](https://github.com/kingdomseed/dart-native-explore/pull/64#issuecomment-6410699749).
+PR #64 was squash-merged to `main` on 2026-10-26 at
+`4a75520fe0e1626aebb267328e1bf9d5a6797e58`. Three checks passed at tested head
+`805106d9fe6ead6204b133ab562ecad4e6190fbe`.
+
+## E5 — U2 geometry and shadows (verification in progress)
+
+Evidence: [E5 manifest](artifacts/e5-u2-geometry-shadows/README.md) and
+[final integrated checks](artifacts/e5-u2-geometry-shadows/final-verification/README.md).
+
+| Gate | Observed result |
+|---|---|
+| T1 Dart | Both analyses clean; 332 package tests and 250 example tests pass. |
+| Android JVM | 162 cases: 147 pass, 15 existing opt-in native-physics skips, zero failures/errors. |
+| A142 Vulkan T2 | Full harness W25 dice regression and W18 completion; real hero-to-dice roll settles at 63; no fatal marker. |
+| A142 OpenGL T2 | Same harness completion; real dice roll settles at 98; no fatal marker. Bright white regions in the dice image remain an uncalibrated visual observation. |
+| iOS simulator T2 | Same harness completion; real dice roll reports 79 then 85; final capture shows 85; no crash marker. App stopped and simulator shut down. |
+| Fire / Wacom T2 | NOT_RUN on final E5 source; tablets are not connected. |
+| U2 T3 | Geometry under two lights and spot shadows on all three feature lanes; baked cache load/freeze/refresh/softness and consumer proof in the platform manifests. Final Android spot-on captures and Vulkan tied-light/facing replay pass. |
+| Independent Codex review | Scoped geometry, iOS cache/consumer, Android defaults, instancing, directional-group, and facing corrections report PASS. Reviews distinguish source/artifact inspection from independent runtime. |
+| T4 | Operator screenshot approval pending; E5 remains open. |
 
 ## Notes
 

@@ -1,0 +1,140 @@
+--- a/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/BakedShadowCatcherPass.kt
++++ b/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/BakedShadowCatcherPass.kt
+@@ -322,25 +322,15 @@
+     private fun shadowLights(): List<Light> {
+         val out = ArrayList<Light>()
+         val lm = host.engine.lightManager
+-        var dominantDirectional = 0
+-        var dominantIntensity = Float.NEGATIVE_INFINITY
+-        host.scene.forEach { entity ->
+-            val instance = lm.getInstance(entity)
+-            if (instance > 0 &&
+-                lm.getType(instance) == LightManager.Type.DIRECTIONAL) {
+-                val intensity = lm.getIntensity(instance)
+-                if (intensity > dominantIntensity) {
+-                    dominantDirectional = entity
+-                    dominantIntensity = intensity
+-                }
+-            }
+-        }
++        var hasDirectionalCapture = false
+         host.scene.forEach { entity ->
+             val instance = lm.getInstance(entity)
+             if (instance <= 0 || !lm.isShadowCaster(instance)) return@forEach
+             val type = lm.getType(instance)
+-            if (type == LightManager.Type.DIRECTIONAL &&
+-                entity != dominantDirectional) return@forEach
++            if (type == LightManager.Type.DIRECTIONAL) {
++                if (hasDirectionalCapture) return@forEach
++                hasDirectionalCapture = true
++            }
+             if (type != LightManager.Type.DIRECTIONAL &&
+                 type != LightManager.Type.FOCUSED_SPOT &&
+                 type != LightManager.Type.SPOT
+@@ -421,7 +411,9 @@
+             val otherLights = ArrayList<Int>()
+             scene.forEach { entity ->
+                 val instance = lm.getInstance(entity)
+-                if (instance > 0 && entity != light.entity) {
++                if (instance > 0 && entity != light.entity &&
++                    (light.type != LightManager.Type.DIRECTIONAL ||
++                        lm.getType(instance) != LightManager.Type.DIRECTIONAL)) {
+                     otherLights.add(entity)
+                 }
+             }
+--- a/dart3d/example/lib/showcase_loader.dart
++++ b/dart3d/example/lib/showcase_loader.dart
+@@ -282,6 +282,7 @@
+       final light = switch (_kBootU2CatcherLight) {
+         'directional' => 'directional',
+         u2CatcherLightUnshadowedPrimary => u2CatcherLightUnshadowedPrimary,
++        u2CatcherLightTied => u2CatcherLightTied,
+         _ => 'spot',
+       };
+       doc = buildU2CatcherDocument(light: light, path: kBootU2CatcherPath);
+--- a/dart3d/example/lib/u2_catcher_scene.dart
++++ b/dart3d/example/lib/u2_catcher_scene.dart
+@@ -15,6 +15,7 @@
+ const u2CatcherPathCameraFacing = 'camera-facing';
+ const u2CatcherDefaultProbeVariant = 'other';
+ const u2CatcherLightUnshadowedPrimary = 'directional-primary-unshadowed';
++const u2CatcherLightTied = 'directional-tied';
+ const u2CatcherPathLod = 'lod';
+ const u2CatcherPathComponentRebuild = 'component-rebuild';
+ const u2CatcherPathRemoveRebuild = 'remove-rebuild';
+@@ -202,7 +203,9 @@
+     (node) => node.name == 'u2.shadow.spot',
+   );
+   lightNode.name = 'u2.catcher.light';
+-  if (light == 'directional' || light == u2CatcherLightUnshadowedPrimary) {
++  if (light == 'directional' ||
++      light == u2CatcherLightUnshadowedPrimary ||
++      light == u2CatcherLightTied) {
+     lightNode.transform = TrsTransform(
+       rotation: aimAlong(Vector3(-0.45, -1, 0.34)),
+     );
+@@ -238,6 +241,26 @@
+         ],
+         root: true,
+       );
++    }
++    if (light == u2CatcherLightTied) {
++      lightNode.components.single.properties['intensity'] = const DoubleValue(3);
++      lightNode.components.single.properties['castsShadow'] = const BoolValue(false);
++      for (var index = 1; index <= 2; index++) {
++        doc.createNode(
++          name: 'u2.catcher.light.tie.$index',
++          transform: lightNode.transform,
++          components: [
++            ComponentSpec(
++              'directionalLight',
++              properties: {
++                ...lightNode.components.single.properties,
++                'castsShadow': BoolValue(index == 2),
++              },
++            ),
++          ],
++          root: true,
++        );
++      }
+     }
+   }
+   return doc;
+--- a/dart3d/example/test/u2_catcher_showcase_test.dart
++++ b/dart3d/example/test/u2_catcher_showcase_test.dart
+@@ -55,7 +55,8 @@
+             .single
+             .type,
+         _bootLight == 'directional' ||
+-                _bootLight == u2CatcherLightUnshadowedPrimary
++                _bootLight == u2CatcherLightUnshadowedPrimary ||
++                _bootLight == u2CatcherLightTied
+             ? 'directionalLight'
+             : 'spotLight',
+       );
+@@ -106,6 +107,25 @@
+       expect((primary.properties['castsShadow']! as BoolValue).value, isFalse);
+       expect((secondary.properties['castsShadow']! as BoolValue).value, isTrue);
+       expect(u2CatcherMaterial(doc).type, 'shadowCatcher');
++    });
++
++    test('tied directionals keep only the third light shadow-casting', () {
++      final doc = buildU2CatcherDocument(light: u2CatcherLightTied);
++      final lights = doc.nodes.values
++          .expand((node) => node.components)
++          .where((component) => component.type == 'directionalLight')
++          .toList();
++      expect(lights, hasLength(3));
++      expect(
++        lights.map((component) =>
++            (component.properties['intensity']! as DoubleValue).value),
++        [3, 3, 3],
++      );
++      expect(
++        lights.map((component) =>
++            (component.properties['castsShadow']! as BoolValue).value),
++        [false, false, true],
++      );
+     });
+ 
+     test('instance-color path carries one white catcher tint with alpha', () {

@@ -173,6 +173,35 @@ class FacingSpec(
  */
 object FsceneRealizer {
 
+    enum class ShadowCatcherMode { LIVE, BAKED }
+
+    data class ShadowCatcherSettings(
+        val mode: ShadowCatcherMode,
+        val softness: Float,
+    )
+
+    data class BakedCatcherReceiver(
+        val entity: Int,
+        val primitive: Int,
+        val worldMatrix: FloatArray,
+        val minMaxBounds: FloatArray,
+        val ownerKey: Long,
+        val owner: NodeRec,
+    )
+
+    fun parseShadowCatcherSettings(r: JSONObject): ShadowCatcherSettings? {
+        if (r.optString("type") != "shadowCatcher") return null
+        val props = r.optJSONObject("properties") ?: JSONObject()
+        val mode = when (props.tag("mode").d3String()) {
+            "baked" -> ShadowCatcherMode.BAKED
+            else -> ShadowCatcherMode.LIVE
+        }
+        return ShadowCatcherSettings(
+            mode,
+            (props.tag("softness").d3Double() ?: 0.0).toFloat(),
+        )
+    }
+
     internal fun cascadeSplits(
         lambda: Float, cascades: Int, shadowFar: Float,
     ): FloatArray {
@@ -547,6 +576,7 @@ object FsceneRealizer {
             disabledComponents = res.disabledComponents,
             renderTargets = host.renderTargets,
             nodeCameraProps = host.nodeCameraProps,
+            cameraFacing = host.cameraFacing,
         )
     }
 
@@ -820,6 +850,8 @@ object FsceneRealizer {
             MutableList<Pair<Int, Int>>> = HashMap(),
         val textureResources: MutableMap<Long, JSONObject> = HashMap(),
         val materialResources: MutableMap<Long, JSONObject> = HashMap(),
+        val bakedCatcherSettings: MutableMap<Long,
+            ShadowCatcherSettings> = LinkedHashMap(),
         val texturePayloadIds: MutableMap<Long, Long> = HashMap(),
         // W5: geometry decode state. geometryConsumers: geoKey → node
         // keys; geometryPayloadIds: geoKey → the payload keys it
@@ -874,6 +906,7 @@ object FsceneRealizer {
         // install teardown from destroying buffers decoded in the
         // same pass.
         val nodeSkinning: MutableMap<Long, Dart3dView.NodeSkin> = HashMap(),
+        val cameraFacing: MutableMap<Long, FacingSpec> = HashMap(),
         // W18: nodeKey → live particle runtimes. Same ownership as
         // nodeSkinning — a manifest Context's fresh map swaps onto the
         // host at install; a surgical Context aliases the live one.
@@ -1296,6 +1329,25 @@ object FsceneRealizer {
                         e[0].toFloat(), e[1].toFloat(), e[2].toFloat(),
                         p.tag("debugColors").d3Bool() == true)
                 }
+                "wedge" -> {
+                    val size = p.tag("size").d3Vec3()
+                        ?: doubleArrayOf(1.0, 1.0, 1.0)
+                    return MeshFactory.wedge(MeshFactory.V3(
+                        size[0].toFloat(), size[1].toFloat(), size[2].toFloat()))
+                }
+                "ring" -> {
+                    val innerRadius =
+                        (p.tag("innerRadius").d3Double() ?: 0.25).toFloat()
+                    val outerRadius =
+                        (p.tag("outerRadius").d3Double() ?: 0.5).toFloat()
+                    if (innerRadius < 0f || outerRadius <= 0f ||
+                        innerRadius >= outerRadius) {
+                        Log.w(TAG, "ring: requires 0 <= innerRadius < outerRadius")
+                        return null
+                    }
+                    return MeshFactory.ring(
+                        innerRadius, outerRadius, seg(p, "segments", 32, min = 3))
+                }
                 "sphere" -> return MeshFactory.sphere(
                     (p.tag("radius").d3Double() ?: 0.5).toFloat(),
                     seg(p, "segments", 32), seg(p, "rings", 16))
@@ -1342,6 +1394,19 @@ object FsceneRealizer {
                 "disc" -> return MeshFactory.disc(
                     (p.tag("radius").d3Double() ?: 0.5).toFloat(),
                     seg(p, "segments", 32, min = 3))
+                "extrude" -> {
+                    val pts = d3PointList(p, "points")
+                    val profile = d3ProfileList(p, "profile")
+                    if (pts == null || pts.size < 2 ||
+                        profile == null || profile.size < 3) {
+                        Log.w(TAG, "extrude: needs at least two path points and three profile points")
+                        return null
+                    }
+                    return MeshFactory.extrude(
+                        pts, profile,
+                        seg(p, "stations", 64, min = 2),
+                        p.tag("caps").d3Bool() != false)
+                }
                 "tube" -> {
                     val pts = d3PointList(p, "points")
                     if (pts == null || pts.size < 2) {
@@ -1414,6 +1479,19 @@ object FsceneRealizer {
                 if (v.size < 3) return null
                 out.add(MeshFactory.V3(
                     v[0].toFloat(), v[1].toFloat(), -v[2].toFloat()))
+            }
+            return out
+        }
+
+        private fun d3ProfileList(
+            p: JSONObject, key: String,
+        ): List<MeshFactory.V2>? {
+            val list = p.tag(key).d3List() ?: return null
+            val out = ArrayList<MeshFactory.V2>(list.length())
+            for (i in 0 until list.length()) {
+                val v = list.opt(i).d3Vec2() ?: return null
+                if (v.size < 2) return null
+                out.add(MeshFactory.V2(v[0].toFloat(), v[1].toFloat()))
             }
             return out
         }
@@ -1523,7 +1601,7 @@ object FsceneRealizer {
             // drop it with the buffer, or an empty rebake (which
             // returns before re-registering) leaves updateCameraFacing
             // uploading into a destroyed buffer.
-            host.cameraFacing.remove(key)
+            cameraFacing.remove(key)
             // The rebuild re-registers its (entity, 0) consumer pairs —
             // drop the old ones first, or repeated payload rebakes grow
             // the list and a material upsert rebinds the slot N times.
@@ -1659,7 +1737,7 @@ object FsceneRealizer {
                 .material(0, inst)
                 .fenced { build(host.engine, rec.entity) }
             if (fp != null) {
-                host.cameraFacing[key] = FacingSpec(
+                cameraFacing[key] = FacingSpec(
                     shape, fp.points, fp.colors, fp.widths, fp.width,
                     fp.dashes, fp.closed, fp.sizeX, fp.sizeY,
                     fp.rotation, fp.tint, gm.vertexBuffer, rec.entity,
@@ -2046,6 +2124,155 @@ object FsceneRealizer {
             }
         }
 
+        fun applyMaterialConsumer(
+            entity: Int, primitive: Int, target: MaterialInstance,
+        ) {
+            val owner = nodes.entries.firstOrNull { (_, rec) ->
+                rec.entity == entity || entity in rec.instanceEntities
+            } ?: run {
+                val rm = host.engine.renderableManager
+                if (rm.hasComponent(entity)) {
+                    val ri = rm.getInstance(entity)
+                    if (primitive < rm.getPrimitiveCount(ri)) {
+                        rm.setMaterialInstanceAt(ri, primitive, target)
+                    }
+                }
+                return
+            }
+            if (owner.value.instancesProps != null && primitive == 0) {
+                applyMaterialToNode(owner.key, owner.value, primitive, target)
+                return
+            }
+            val rm = host.engine.renderableManager
+            if (rm.hasComponent(entity)) {
+                val ri = rm.getInstance(entity)
+                if (primitive < rm.getPrimitiveCount(ri)) {
+                    rm.setMaterialInstanceAt(ri, primitive, target)
+                }
+            }
+        }
+
+        fun firstBakedCatcherReceiver(
+            materialKey: Long,
+        ): BakedCatcherReceiver? {
+            val source = materials[materialKey] ?: return null
+            val rm = host.engine.renderableManager
+            for ((entity, primitive) in materialConsumers[materialKey].orEmpty()) {
+                if (!host.scene.hasEntity(entity) || !rm.hasComponent(entity)) {
+                    continue
+                }
+                val ownerEntry = nodes.entries.firstOrNull { (_, rec) ->
+                    rec.entity == entity || entity in rec.instanceEntities
+                } ?: continue
+                val (ownerKey, owner) = ownerEntry
+                if (isHidden(ownerKey) || owner.lod?.let {
+                        it.suspended || it.bound < 0
+                    } == true) continue
+                val ri = rm.getInstance(entity)
+                if (primitive < 0 || primitive >= rm.getPrimitiveCount(ri)) {
+                    continue
+                }
+                val current = rm.getMaterialInstanceAt(ri, primitive)
+                val sourceIsActive = current.nativeObject == source.nativeObject ||
+                    (owner.instancesProps != null && primitive == 0 &&
+                        owner.instanceBaseMaterial?.nativeObject ==
+                            source.nativeObject)
+                if (!sourceIsActive) continue
+
+                val geometryKey = when {
+                    owner.lod?.let { it.bound >= 0 } == true ->
+                        owner.lod!!.levels[owner.lod!!.bound].geoKey
+                    owner.instancesProps != null ->
+                        owner.instancesProps!!.tag("geometry").d3Ref()
+                    else -> owner.meshPrimGeoKeys?.getOrNull(primitive)
+                }
+                val minMaxBounds = if (cameraFacing.containsKey(ownerKey)) {
+                    val box = rm.getAxisAlignedBoundingBox(ri)
+                    val min = box.getMin(FloatArray(3))
+                    val max = box.getMax(FloatArray(3))
+                    floatArrayOf(
+                        min[0], min[1], min[2],
+                        max[0], max[1], max[2],
+                    )
+                } else {
+                    val bounds = if (owner.instancesProps != null &&
+                        owner.instanceBuffers.isEmpty()
+                    ) {
+                        owner.instanceBakedGpuMesh?.bounds
+                            ?: owner.procGpuMesh?.bounds
+                            ?: owner.lastGeoBounds
+                    } else {
+                        geometryKey?.let { gpuMeshes[it]?.bounds }
+                            ?: owner.procGpuMesh?.bounds
+                            ?: owner.instanceBakedGpuMesh?.bounds
+                            ?: owner.lastGeoBounds
+                    } ?: continue
+                    floatArrayOf(
+                        bounds[0] - bounds[3],
+                        bounds[1] - bounds[4],
+                        bounds[2] - bounds[5],
+                        bounds[0] + bounds[3],
+                        bounds[1] + bounds[4],
+                        bounds[2] + bounds[5],
+                    )
+                }
+                val world = FloatArray(16)
+                tcm.getWorldTransform(tcm.getInstance(entity), world)
+                if (owner.instancesProps != null && primitive == 0) {
+                    owner.instanceBuffers.firstOrNull()
+                        ?.takeIf { it.instanceCount > 0 }
+                        ?.getLocalTransform(0, FloatArray(16))
+                        ?.let { first ->
+                        val withInstance = FloatArray(16)
+                        Matrix.multiplyMM(withInstance, 0, world, 0, first, 0)
+                        System.arraycopy(withInstance, 0, world, 0, 16)
+                    }
+                }
+                return BakedCatcherReceiver(
+                    entity, primitive, world, minMaxBounds, ownerKey, owner)
+            }
+            return null
+        }
+
+        fun bindBakedCatcher(
+            materialKey: Long, texture: Texture, region: FloatArray,
+        ) {
+            val source = materials[materialKey] ?: return
+            fun bind(mi: MaterialInstance) {
+                mi.setParameter("bakedShadowTexture", texture,
+                    host.bakedCatcherTextureSampler)
+                mi.setParameter("bakedRegion",
+                    region[0], region[1], region[2], region[3])
+            }
+            bind(source)
+            val rm = host.engine.renderableManager
+            for ((entity, primitive) in materialConsumers[materialKey].orEmpty()) {
+                if (!rm.hasComponent(entity)) continue
+                val ri = rm.getInstance(entity)
+                if (primitive < 0 || primitive >= rm.getPrimitiveCount(ri)) {
+                    continue
+                }
+                bind(rm.getMaterialInstanceAt(ri, primitive))
+            }
+            for (rec in nodes.values) {
+                if (rec.instanceBaseMaterial?.nativeObject ==
+                    source.nativeObject) {
+                    for (mi in rec.instanceMaterialInstances) bind(mi)
+                }
+            }
+            for (vc in variantComponents.values) {
+                for (binding in vc.bindings) {
+                    if (binding.applied?.nativeObject == source.nativeObject) {
+                        bind(binding.applied!!)
+                    }
+                    if (binding.defaultMaterial?.nativeObject ==
+                        source.nativeObject) {
+                        bind(binding.defaultMaterial!!)
+                    }
+                }
+            }
+        }
+
         private fun decodeInstances(key: Long, rec: NodeRec, p: JSONObject) {
             // Retained BEFORE resolving transforms: a payload-backed
             // node usually decodes before its matrices chunk lands, and
@@ -2135,11 +2362,9 @@ object FsceneRealizer {
                         }
                     }
                 } else shared
-                if (!doubleSided) {
-                    matKey?.let {
-                        materialConsumers.getOrPut(it) { ArrayList() }
-                            .add(Pair(rec.entity, 0))
-                    }
+                matKey?.let {
+                    materialConsumers.getOrPut(it) { ArrayList() }
+                        .add(Pair(rec.entity, 0))
                 }
                 RenderableManager.Builder(1)
                     .boundingBox(Box(gm.bounds[0], gm.bounds[1], gm.bounds[2],
@@ -2157,7 +2382,7 @@ object FsceneRealizer {
                     flatCenters[i * 3 + 1] = m[13]
                     flatCenters[i * 3 + 2] = m[14]
                 }
-                host.cameraFacing[key] = FacingSpec.billboards(
+                cameraFacing[key] = FacingSpec.billboards(
                     flatCenters, s[0].toFloat(), s[1].toFloat(), rotation,
                     colors, gm.vertexBuffer, rec.entity, facing)
                 Log.i(TAG, "d3:instances node $key: realized ${transforms.size} billboard instance(s)")
@@ -2347,11 +2572,13 @@ object FsceneRealizer {
                         }
                     }
                 } else {
+                    shared
+                }
+                if (entity == rec.entity) {
                     matKey?.let {
                         materialConsumers.getOrPut(it) { ArrayList() }
-                            .add(Pair(entity, 0))
+                            .add(Pair(rec.entity, 0))
                     }
-                    shared
                 }
 
                 val vertexBuf = if (negDet) {
@@ -2412,12 +2639,12 @@ object FsceneRealizer {
                                 for (param in params) list.add(Pair(dup, param))
                             }
                         }
-                    } else {
+                    } else shared
+                    if (entity == rec.entity) {
                         matKey?.let {
                             materialConsumers.getOrPut(it) { ArrayList() }
-                                .add(Pair(entity, 0))
+                                .add(Pair(rec.entity, 0))
                         }
-                        shared
                     }
                     val b = bakedGm.bounds
                     RenderableManager.Builder(1)
@@ -2437,8 +2664,13 @@ object FsceneRealizer {
 
         private fun decodeMaterial(key: Long, r: JSONObject) {
             materialResources[key] = r
+            val catcherSettings = parseShadowCatcherSettings(r)
+            if (catcherSettings?.mode == ShadowCatcherMode.BAKED) {
+                bakedCatcherSettings[key] = catcherSettings
+            }
             materials[key] = buildMaterialInstance(
-                host, key, r, textures, textureSamplers, textureConsumers)
+                host, key, r, textures, textureSamplers, textureConsumers,
+                catcherSettings)
         }
 
         private fun decodeTexture(key: Long, r: JSONObject) {
@@ -4028,40 +4260,9 @@ object FsceneRealizer {
                     ?: (kotlin.math.PI / 4))
                 builder.spotLightCone(inner.toFloat(), outer.toFloat())
             }
-            if (p.tag("castsShadow").d3Bool() == true) {
+            val castsShadow = p.tag("castsShadow").d3Bool() == true
+            if (castsShadow) {
                 builder.castShadows(true)
-                // Shadow tuning → LightManager.ShadowOptions. mapSize
-                // pins ≥1024 whenever a light casts (Filament's own
-                // default is smaller than SceneKit's effective map);
-                // the 'high' view tier doubles it.
-                val so = LightManager.ShadowOptions()
-                so.mapSize =
-                    if (host.viewQuality == "high") 2048 else 1024
-                p.tag("shadowDepthBias").d3Double()?.let {
-                    // SceneKit shadowBias is a single depth offset;
-                    // Filament splits constant vs normal-scaled terms —
-                    // the wire value lands on constantBias and half of
-                    // it again on normalBias (2:1 split) so sloped
-                    // receivers stay acne-free without peter-panning.
-                    so.constantBias = it.toFloat()
-                    so.normalBias = (it * 0.5).toFloat()
-                }
-                p.tag("shadowRadius").d3Double()?.let {
-                    // PCSS penumbra driver — Filament's closest
-                    // semantic to SceneKit's blur radius; an
-                    // approximation, not equality.
-                    so.shadowBulbRadius = it.toFloat()
-                }
-                if (type == LightManager.Type.DIRECTIONAL) {
-                    decodeDirectionalShadow(host, builder, so, p)
-                }
-                builder.shadowOptions(so)
-                Log.i(TAG, "shadow options: mapSize=${so.mapSize}" +
-                    " cascades=${so.shadowCascades}" +
-                    " far=${so.shadowFar} contactDist=${so.maxShadowDistance}" +
-                    " contact=${so.screenSpaceContactShadows}" +
-                    " bias=${so.constantBias} normalBias=${so.normalBias}" +
-                    " bulbRadius=${so.shadowBulbRadius}")
             }
             if (type == LightManager.Type.DIRECTIONAL) {
                 // dart3d wire extension — upstream carries it on
@@ -4083,7 +4284,7 @@ object FsceneRealizer {
                 }
                 // The contact-shadow extensions still need a casting
                 // light — warn rather than drop silently.
-                if (p.tag("castsShadow").d3Bool() != true &&
+                if (!castsShadow &&
                     (p.tag("contactShadows") != null ||
                         p.tag("contactShadowDistance") != null)
                 ) {
@@ -4106,26 +4307,33 @@ object FsceneRealizer {
                 }
             }
             builder.fenced { build(host.engine, rec.entity) }
+            if (castsShadow) {
+                val lm = host.engine.lightManager
+                val lightInstance = lm.getInstance(rec.entity)
+                val so = lm.getShadowOptions(lightInstance)
+                so.mapSize =
+                    if (host.viewQuality == "high") 2048 else 1024
+                p.tag("shadowDepthBias").d3Double()?.let {
+                    so.constantBias = it.toFloat()
+                    so.normalBias = (it * 0.5).toFloat()
+                }
+                p.tag("shadowRadius").d3Double()?.let {
+                    so.shadowBulbRadius = it.toFloat()
+                }
+                if (type == LightManager.Type.DIRECTIONAL) {
+                    decodeDirectionalShadowOptions(so, p)
+                }
+                lm.setShadowOptionsPreservingTransform(lightInstance, so)
+                Log.i(TAG, "shadow options: mapSize=${so.mapSize}" +
+                    " cascades=${so.shadowCascades}" +
+                    " far=${so.shadowFar} contactDist=${so.maxShadowDistance}" +
+                    " contact=${so.screenSpaceContactShadows}" +
+                    " bias=${so.constantBias} normalBias=${so.normalBias}" +
+                    " bulbRadius=${so.shadowBulbRadius}")
+            }
         }
 
-        /**
-         * W24: the upstream directional-light shadow vocabulary
-         * (flutter_scene `DirectionalLightCodec`) plus three dart3d
-         * wire extensions upstream keeps on
-         * `stage.skyEnvironment.sunLight` (`SunLightSpec`):
-         * `contactShadows`, `contactShadowDistance`, `angularRadius`
-         * — the sun block stays deferred on both platforms, so the
-         * fields ride the light component here. `priority` and
-         * `localDirection` are upstream codec members dart3d doesn't
-         * map — they warn below like the other unmapped fields.
-         * Filament maps the breadth onto `ShadowOptions` + the sun
-         * knobs; fields with no Filament counterpart warn once
-         * instead of pretending parity. Runs inside the `castsShadow`
-         * guard — the options are only meaningful on a casting light.
-         */
-        private fun decodeDirectionalShadow(
-            host: Dart3dView,
-            builder: LightManager.Builder,
+        private fun decodeDirectionalShadowOptions(
             so: LightManager.ShadowOptions,
             p: JSONObject,
         ) {
@@ -4161,10 +4369,6 @@ object FsceneRealizer {
                 so.maxShadowDistance = it.toFloat()
             }
             p.tag("shadowSoftness").d3Double()?.let {
-                // World-space penumbra → the bulb radius PCSS-style
-                // filters scale by; DPCF (the view's shadow type)
-                // doesn't consume it — softening stays an
-                // approximation until a soft shadow type is chosen.
                 // Precedence: `shadowRadius` (W6) and `shadowSoftness`
                 // (W24) write the same knob — this decode runs second,
                 // so softness wins when a document authors both.
@@ -4389,8 +4593,24 @@ object FsceneRealizer {
                             (materials[variantKey]?.getNativeObject()
                                 ?: -1L)) "variant" else "current"))
             applyMaterialToNode(b.nodeKey, rec, b.primitive, target)
+            updateMaterialConsumer(rec, b.primitive, target)
             b.applied = target
             b.resolved = true
+        }
+
+        private fun updateMaterialConsumer(
+            rec: NodeRec, primitive: Int, target: MaterialInstance,
+        ) {
+            for ((_, list) in materialConsumers) {
+                list.removeAll {
+                    it.first == rec.entity && it.second == primitive
+                }
+            }
+            val key = materials.entries.firstOrNull {
+                it.value.nativeObject == target.nativeObject
+            }?.key ?: return
+            materialConsumers.getOrPut(key) { ArrayList() }
+                .add(Pair(rec.entity, primitive))
         }
 
         /**
@@ -6118,6 +6338,7 @@ object FsceneRealizer {
                     disabledComponents = disabledComponents,
                 ),
                 nodeSkins = nodeSkinning,
+                cameraFacingSpecs = cameraFacing,
                 particles = particleRuntimes,
                 pending = pendingPayloadRefs,
                 cameraKey = firstCameraKey,
@@ -6127,6 +6348,7 @@ object FsceneRealizer {
                 nodeCameraProps = nodeCameraProps,
                 bodies = bodies,
                 dynamicBodies = dynamicBodyKeys,
+                bakedCatcherSettings = bakedCatcherSettings,
             )
         }
     }
@@ -6146,17 +6368,14 @@ object FsceneRealizer {
         textures: Map<Long, Texture>,
         samplers: Map<Long, TextureSampler>,
         consumers: MutableMap<Long, MutableList<Pair<MaterialInstance, String>>>?,
+        catcherSettings: ShadowCatcherSettings? = null,
     ): MaterialInstance {
         val type = r.optString("type").ifEmpty { "physicallyBased" }
         val props = r.optJSONObject("properties") ?: JSONObject()
         if (type == "shadowCatcher") {
-            // W24 dart3d extension — upstream's live-mode
-            // ShadowCatcherMaterial: draws only the received shadow,
-            // `(shadowColor·a, a)` with a = intensity·(1−visibility).
-            // Filament's unlit+shadowMultiplier material carries the
-            // visibility; aoStrength/softness/fade*/mode have no
-            // per-material analog here and warn once.
-            val base = host.catcherMaterial
+            val baked = catcherSettings?.mode == ShadowCatcherMode.BAKED
+            val base = if (baked) host.bakedCatcherMaterial
+                else host.catcherMaterial
             if (base == null) {
                 warnOnce("w24.catcher.unavailable",
                     "shadowCatcher material unavailable; " +
@@ -6172,14 +6391,20 @@ object FsceneRealizer {
             mi.setParameter("shadowIntensity",
                 (props.tag("shadowIntensity").d3Double()
                     ?: 0.8).toFloat())
+            if (baked) {
+                mi.setParameter("bakedShadowTexture",
+                    host.bakedCatcherZeroShadowTexture,
+                    host.bakedCatcherTextureSampler)
+                mi.setParameter("bakedRegion", 0f, 1f, 1f, 1f)
+            }
             mi.setDoubleSided(
                 props.tag("doubleSided").d3Bool() ?: false)
-            for (field in listOf("aoStrength", "softness",
-                                 "fadeStart", "fadeEnd", "mode")) {
+            val unsupported = listOf("aoStrength", "fadeStart", "fadeEnd") +
+                if (baked) emptyList() else listOf("softness")
+            for (field in unsupported) {
                 if (props.tag(field) != null) {
                     warnOnce("w24.catcher.$field",
-                        "shadowCatcher '$field' unsupported on " +
-                            "Filament's shadowMultiplier path; ignored")
+                        "shadowCatcher '$field' unsupported; ignored")
                 }
             }
             return mi
