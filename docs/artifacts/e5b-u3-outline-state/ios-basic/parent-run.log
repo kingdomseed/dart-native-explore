@@ -1,0 +1,28 @@
+Launching lib/main.dart on iPhone 17 Pro in debug mode...
+Running Xcode build...                                          
+Xcode build done.                                           16.9s
+Syncing files to device iPhone 17 Pro...                        
+dartnative: [DN] Licence valid (community), expires 2027-09-14
+dartnative: [DN] lifecycle → AppLifecycleState.resumed
+Syncing files to device iPhone 17 Pro...                            21ms
+
+DartNative run key commands.
+r Hot reload. 🔥🔥🔥
+R Hot restart.
+h List all available interactive commands.
+d Detach (terminate "dn run" but leave application running).
+c Clear the screen
+q Quit (terminate the application on the device).
+
+A Dart VM Service on iPhone 17 Pro is available at: http://127.0.0.1:52688/wtbmZZDIZgE=/
+The DartNative DevTools debugger and profiler on iPhone 17 Pro is available at: http://127.0.0.1:52688/wtbmZZDIZgE=/devtools/?uri=ws://127.0.0.1:52688/wtbmZZDIZgE=/ws
+dartnative: dart3d: u3-highlight-state ready; press button to begin
+dartnative: dart3d: u3-highlight-state requested 1/7 Assign two colors
+dartnative: dart3d: u3-highlight-state requested 2/7 Clear parent, set sentinel
+dartnative: dart3d: u3-highlight-state requested 3/7 Move child, patch sentinel
+dartnative: dart3d: u3-highlight-state requested 4/7 Remove parent and child
+dartnative: dart3d: u3-highlight-state requested 5/7 Re-add same IDs
+dartnative: dart3d: u3-highlight-state requested 6/7 Highlight child explicitly
+dartnative: dart3d: u3-highlight-state requested 7/7 Load fresh same-ID scene
+
+Application finished.

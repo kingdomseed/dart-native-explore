@@ -1,0 +1,11 @@
+{
+  "pid": "88275",
+  "psExit": 0,
+  "captureEnvironment": {
+    "MTL_CAPTURE_ENABLED": "1",
+    "SIMCTL_CHILD_MTL_CAPTURE_ENABLED": null,
+    "MTLCAPTURE_WAIT_FOR_SIGNAL": null
+  },
+  "vmmapExit": -2,
+  "captureMappings": []
+}

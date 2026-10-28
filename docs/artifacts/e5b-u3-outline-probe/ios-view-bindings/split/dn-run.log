@@ -1,0 +1,18 @@
+Launching lib/u3_outline_views_main.dart on iPhone 17 Pro in debug mode...
+Running Xcode build...                                          
+Xcode build done.                                            5.1s
+Failed to build iOS app
+Swift Compiler Error (Xcode): Cannot find type 'OutlineViewsBinding' in scope
+/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/ios/Classes/RenderTargets.swift:51:24
+
+Swift Compiler Error (Xcode): Cannot find 'SelectionOutlineViewsProbe' in scope
+/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/ios/Classes/SceneViewHost.swift:18:28
+
+Swift Compiler Error (Xcode): Cannot find type 'OutlineViewsBinding' in scope
+/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/ios/Classes/SceneViewHost.swift:283:35
+
+Swift Compiler Error (Xcode): Cannot find type 'OutlineViewsFrame' in scope
+/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/ios/Classes/SceneViewHost.swift:293:18
+
+Could not build the application for the simulator.
+Error launching application on iPhone 17 Pro.

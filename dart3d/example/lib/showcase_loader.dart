@@ -10,6 +10,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:dart3d/dart3d.dart' show D3SpriteBlendMode;
 import 'package:dart3d/src/doc_layer.dart';
 import 'package:dart3d/src/fsceneb_reader.dart';
 import 'package:dart3d/src/geometry/instances.dart';
@@ -25,6 +26,9 @@ import 'dn_logo_stage.dart';
 import 'light_aim.dart';
 import 'u2_catcher_scene.dart';
 import 'u2_geometry_scene.dart';
+import 'u3_atlas_probe.dart';
+import 'u3_tone_scene.dart';
+import 'u3_sprite_scene.dart';
 
 /// One showcase entry: the cycler label, its bundle key, and the
 /// capability line shown under it.
@@ -160,7 +164,20 @@ const showcaseItems = [
     cameraDir: (-0.4, 0.9, -1.0),
     frameMargin: 1.6,
   ),
+  ShowcaseItem(
+    'u3-atlas-probe',
+    kBuiltinU3AtlasProbeKey,
+    'Image atlas UV probe',
+  ),
+  ShowcaseItem('u3-tone', kBuiltinU3ToneKey, 'iOS five-tone HDR comparison'),
+  ShowcaseItem('u3-sprite', kBuiltinU3SpriteKey, 'Standalone sprite material'),
 ];
+
+const String kBuiltinU3SpriteKey = 'builtin:u3-sprite';
+
+const String kBuiltinU3AtlasProbeKey = 'builtin:u3-atlas-probe';
+
+const String kBuiltinU3ToneKey = 'builtin:u3-tone';
 
 /// The synthetic asset key for the W21 materials conformance scene —
 /// no bundled file; [loadShowcaseScene] builds the document
@@ -256,6 +273,54 @@ ShowcaseScene? loadShowcaseScene(
   void Function(String message)? log,
 }) {
   final bytesOf = bytesFor ?? (_) => null;
+  if (item.assetKey == kBuiltinU3SpriteKey) {
+    final doc = buildU3SpriteDocument(
+      blend: D3SpriteBlendMode.values.byName(kBootU3SpriteBlend),
+      tinted: kBootU3SpriteTint,
+      untextured: kBootU3SpriteUntextured,
+      renderTexture: kBootU3SpriteRenderTexture,
+    );
+    log?.call('dart3d: u3-sprite frame=0 blend=$kBootU3SpriteBlend paused');
+    return ShowcaseScene(
+      document: doc,
+      cameraNode: u3SpriteNode(doc, 'camera').id,
+      cameraTarget: Vector3.zero(),
+      cameraDir: Vector3(0, 0, -1),
+      frameRadius: 0,
+      summary: 'Sheet / selected / fixed; overlap / shadow controls',
+    );
+  }
+  if (item.assetKey == kBuiltinU3AtlasProbeKey) {
+    final doc = buildU3AtlasProbeDocument();
+    log?.call(
+      'dart3d: u3-atlas-probe frame=0 expected=0 red paused fixed-camera',
+    );
+    return ShowcaseScene(
+      document: doc,
+      cameraNode: doc.nodes.values
+          .singleWhere((node) => node.name == 'u3.atlas.camera')
+          .id,
+      cameraTarget: Vector3.zero(),
+      cameraDir: Vector3(0, 0, -1),
+      frameRadius: 0,
+      summary: 'Top: sheet · below: selected cell',
+    );
+  }
+  if (item.assetKey == kBuiltinU3ToneKey) {
+    final tone = U3Tone.values.byName(kBootU3Tone);
+    final doc = buildU3ToneDocument(tone: tone);
+    log?.call('dart3d: u3-tone tone=${tone.name} exposure=1 fixed-camera');
+    return ShowcaseScene(
+      document: doc,
+      cameraNode: doc.nodes.values
+          .singleWhere((node) => node.name == 'u3.tone.camera')
+          .id,
+      cameraTarget: Vector3.zero(),
+      cameraDir: Vector3(0, 0, -1),
+      frameRadius: 0,
+      summary: 'Gray 0.018..12 · RGB/orange at 2/8',
+    );
+  }
   SceneDocument doc;
   try {
     if (item.assetKey == kBuiltinMaterialsKey ||

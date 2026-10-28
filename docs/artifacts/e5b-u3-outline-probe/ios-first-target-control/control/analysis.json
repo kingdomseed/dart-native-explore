@@ -1,0 +1,102 @@
+{
+  "stage": "control",
+  "maskPasses": [
+    {
+      "time": 542739.9833333334,
+      "cpuSelected": true,
+      "support": 205,
+      "contour": 267,
+      "currentMembershipMatches": true,
+      "targetOutsideChanged": 0,
+      "targetContourMismatches": 267,
+      "alphaOutsideChanged": 6645,
+      "alphaContourMismatches": 267,
+      "privateUpdateEvents": [
+        "2026-10-28 04:39:37.378 Df Runner[75848:13eb21a] [com.jasonholtdigital.dart3d:scene] U3OV private-update-publication binding=target=8445217361178394631 view=0 time=542739.9833333334 draws=3"
+      ],
+      "maskEvent": "2026-10-28 04:39:37.378 Df Runner[75848:13eb21a] [com.jasonholtdigital.dart3d:scene] U3OV mask-encoded binding=target=8445217361178394631 view=0 mode=2 cameraCase=0 time=542739.9833333334 camera=-3.0,1.2,5.0 maskLayers=3 raster=96x72 output=96x72 poses=[\"-0.85,0.2,0.0\", \"-0.85,0.2,0.0\", \"0.9,-0.4,-0.3\"]"
+    },
+    {
+      "time": 542743.8000000002,
+      "cpuSelected": false,
+      "support": 0,
+      "contour": 0,
+      "currentMembershipMatches": true,
+      "targetOutsideChanged": 0,
+      "targetContourMismatches": 0,
+      "alphaOutsideChanged": 0,
+      "alphaContourMismatches": 0,
+      "privateUpdateEvents": [
+        "2026-10-28 04:39:41.195 Df Runner[75848:13eb220] [com.jasonholtdigital.dart3d:scene] U3OV private-update-publication binding=target=8445217361178394631 view=0 time=542743.8000000002 draws=0"
+      ],
+      "maskEvent": "2026-10-28 04:39:41.195 Df Runner[75848:13eb220] [com.jasonholtdigital.dart3d:scene] U3OV mask-encoded binding=target=8445217361178394631 view=0 mode=2 cameraCase=0 time=542743.8000000002 camera=-3.0,1.2,5.0 maskLayers=3 raster=96x72 output=96x72 poses=[]"
+    },
+    {
+      "time": 542747.6166666668,
+      "cpuSelected": true,
+      "support": 205,
+      "contour": 267,
+      "currentMembershipMatches": true,
+      "targetOutsideChanged": 0,
+      "targetContourMismatches": 0,
+      "alphaOutsideChanged": 0,
+      "alphaContourMismatches": 0,
+      "privateUpdateEvents": [
+        "2026-10-28 04:39:45.011 Df Runner[75848:13eb21c] [com.jasonholtdigital.dart3d:scene] U3OV private-update-publication binding=target=8445217361178394631 view=0 time=542747.6166666668 draws=3"
+      ],
+      "maskEvent": "2026-10-28 04:39:45.011 Df Runner[75848:13eb21c] [com.jasonholtdigital.dart3d:scene] U3OV mask-encoded binding=target=8445217361178394631 view=0 mode=2 cameraCase=0 time=542747.6166666668 camera=-3.0,1.2,5.0 maskLayers=3 raster=96x72 output=96x72 poses=[\"-0.85,0.2,0.0\", \"-0.85,0.2,0.0\", \"0.9,-0.4,-0.3\"]"
+    },
+    {
+      "time": 542751.3500000001,
+      "cpuSelected": false,
+      "support": 0,
+      "contour": 0,
+      "currentMembershipMatches": true,
+      "targetOutsideChanged": 0,
+      "targetContourMismatches": 0,
+      "alphaOutsideChanged": 0,
+      "alphaContourMismatches": 0,
+      "privateUpdateEvents": [
+        "2026-10-28 04:39:48.744 Df Runner[75848:13eb5aa] [com.jasonholtdigital.dart3d:scene] U3OV private-update-publication binding=target=8445217361178394631 view=0 time=542751.3500000001 draws=0"
+      ],
+      "maskEvent": "2026-10-28 04:39:48.744 Df Runner[75848:13eb5aa] [com.jasonholtdigital.dart3d:scene] U3OV mask-encoded binding=target=8445217361178394631 view=0 mode=2 cameraCase=0 time=542751.3500000001 camera=-3.0,1.2,5.0 maskLayers=3 raster=96x72 output=96x72 poses=[]"
+    }
+  ],
+  "storedReads": [
+    {
+      "label": "stored-8445216278846636033:set,8445216278846636034:set target=8445217361178394631 dirty=false time=542736.7666666668",
+      "previous": "target target=8445217361178394631 view=0 mode=0 cameraCase=0 aa=1 time=542704.6166666668",
+      "byteDifferences": 0
+    },
+    {
+      "label": "stored-8445216278846636033:clear,8445216278846636034:clear target=8445217361178394631 dirty=false time=542741.8833333334",
+      "previous": "target target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=542739.9833333334",
+      "byteDifferences": 0
+    },
+    {
+      "label": "stored-8445216278846636033:set,8445216278846636034:set target=8445217361178394631 dirty=false time=542745.7333333334",
+      "previous": "target target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=542743.8000000002",
+      "byteDifferences": 0
+    },
+    {
+      "label": "stored-8445216278846636033:clear,8445216278846636034:clear target=8445217361178394631 dirty=false time=542749.4666666668",
+      "previous": "target target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=542747.6166666668",
+      "byteDifferences": 0
+    }
+  ],
+  "dueCount": 5,
+  "setClearCount": 4,
+  "dueEvents": [
+    "2026-10-28 04:39:02.033 Df Runner[75848:13eb220] [com.jasonholtdigital.dart3d:scene] U3OV due target=8445217361178394631 dirty=true scheduled=false time=542704.6166666668",
+    "2026-10-28 04:39:37.377 Df Runner[75848:13eb21a] [com.jasonholtdigital.dart3d:scene] U3OV due target=8445217361178394631 dirty=true scheduled=false time=542739.9833333334",
+    "2026-10-28 04:39:41.195 Df Runner[75848:13eb220] [com.jasonholtdigital.dart3d:scene] U3OV due target=8445217361178394631 dirty=true scheduled=false time=542743.8000000002",
+    "2026-10-28 04:39:45.011 Df Runner[75848:13eb21c] [com.jasonholtdigital.dart3d:scene] U3OV due target=8445217361178394631 dirty=true scheduled=false time=542747.6166666668",
+    "2026-10-28 04:39:48.744 Df Runner[75848:13eb5aa] [com.jasonholtdigital.dart3d:scene] U3OV due target=8445217361178394631 dirty=true scheduled=false time=542751.3500000001"
+  ],
+  "highlightEvents": [
+    "2026-10-28 04:39:34.188 Df Runner[75848:13eb21d] [com.jasonholtdigital.dart3d:scene] U3OV public-highlights 8445216278846636033:set,8445216278846636034:set",
+    "2026-10-28 04:39:39.295 Df Runner[75848:13eb21c] [com.jasonholtdigital.dart3d:scene] U3OV public-highlights 8445216278846636033:clear,8445216278846636034:clear",
+    "2026-10-28 04:39:43.145 Df Runner[75848:13eb21a] [com.jasonholtdigital.dart3d:scene] U3OV public-highlights 8445216278846636033:set,8445216278846636034:set",
+    "2026-10-28 04:39:46.878 Df Runner[75848:13eb21c] [com.jasonholtdigital.dart3d:scene] U3OV public-highlights 8445216278846636033:clear,8445216278846636034:clear"
+  ]
+}

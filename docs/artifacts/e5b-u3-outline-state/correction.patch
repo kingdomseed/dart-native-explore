@@ -1,0 +1,561 @@
+diff --git a/dart3d/lib/src/scene_controller.dart b/dart3d/lib/src/scene_controller.dart
+index a0eed7a..490992d 100644
+--- a/dart3d/lib/src/scene_controller.dart
++++ b/dart3d/lib/src/scene_controller.dart
+@@ -387,6 +387,43 @@ final class SceneController {
+     _sendOrQueue(D3Protocol.payload, bytes);
+   }
+ 
++  /// Patches node highlights in the current native scene using linear RGBA.
++  ///
++  /// A null value clears that node; omitted nodes retain their colors. An
++  /// empty batch does nothing. Scalars are copied synchronously, and all
++  /// entries cross to native in one mutation. Components must be finite.
++  /// Highlights are runtime state and are excluded from [serializeScene].
++  ///
++  /// [loadDocument] and native view recreation clear this state. The controller
++  /// does not retain selection across detachment and reattachment. Before
++  /// first attachment, queue [loadDocument] before highlights.
++  /// Without a queued load, attachment flushes pending commands before an
++  /// implicit document reload, which supersedes any queued highlights.
++  /// [dispose] alone leaves a still-mounted native view and its state running.
++  void setNodeHighlights(Map<LocalId, Vector4?> updates) {
++    if (updates.isEmpty) return;
++    _sendOrQueue(
++      D3Protocol.command,
++      D3Protocol.commandBytes({
++        'op': 'setNodeHighlights',
++        'updates': [
++          for (final entry in updates.entries)
++            {
++              'node': entry.key.toToken(),
++              'color': entry.value == null
++                  ? null
++                  : [
++                      entry.value!.x,
++                      entry.value!.y,
++                      entry.value!.z,
++                      entry.value!.w,
++                    ],
++            },
++        ],
++      }),
++    );
++  }
++
+   /// Applies structural ops (utf8 JSON commands) to the live scene without
+   /// replacing it. Supported ops: `addNode`, `removeNode`, `updateNode`,
+   /// `upsertResource`, `upsertPayload`, `updateStage`, `upsertSkin`,
+diff --git a/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/Dart3dView.kt b/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/Dart3dView.kt
+index f154221..ff21183 100644
+--- a/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/Dart3dView.kt
++++ b/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/Dart3dView.kt
+@@ -2403,6 +2403,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
+      * view tree, so what it still holds is what that costs.
+      */
+     private fun dropDocumentState() {
++        selectionOutline.clearScene()
+         payloadStore.clear()
+         opPayloadSpecs.clear()
+         pendingPayloadRefs.clear()
+@@ -2567,6 +2568,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
+     }
+ 
+     private fun applyLoadScene(data: ByteArray) {
++        selectionOutline.clearScene()
+         lastManifest = data
+         // Payload ids are document-local (session,index) — a previous
+         // document's bytes would shadow this doc's chunks at colliding
+@@ -2774,6 +2776,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
+     private val surgicalJournal = ArrayList<JournalEntry>()
+     private var replayingJournal = false
+ 
++    private val selectionOutline = SelectionOutline()
++
+     private val transformWrites = TransformWrites()
+ 
+     /** Puts the `setTransforms` state captured before a re-realize back
+@@ -2993,6 +2997,40 @@ class Dart3dView(context: Context) : FrameLayout(context) {
+     private fun applyCommandJson(json: JSONObject) {
+         val op = json.optString("op")
+         when (op) {
++            "setNodeHighlights" -> {
++                if (replayingJournal) return
++                val updates = json.optJSONArray("updates") ?: run {
++                    logCommandOnce("highlights.malformed", "setNodeHighlights: missing updates")
++                    return
++                }
++                val changes = ArrayList<SelectionOutline.Change>()
++                for (i in 0 until updates.length()) {
++                    val update = updates.optJSONObject(i)
++                    val key = update?.let { jsonKey(it) }
++                    if (update == null || key == null || !update.has("color")) {
++                        logCommandOnce("highlights.malformed", "setNodeHighlights: invalid update")
++                        continue
++                    }
++                    val color = if (update.isNull("color")) null else {
++                        val rgba = update.optJSONArray("color")
++                        val values = if (rgba?.length() == 4)
++                            (0..3).mapNotNull { (rgba.opt(it) as? Number)?.toFloat() }
++                            else emptyList()
++                        if (values.size != 4 || values.any { !it.isFinite() }) {
++                            logCommandOnce("highlights.malformed", "setNodeHighlights: invalid color")
++                            continue
++                        }
++                        SelectionOutline.LinearRgba(values[0], values[1], values[2], values[3])
++                    }
++                    if (color != null && key !in nodesById) {
++                        logCommandOnce("highlights.missing.$key",
++                            "setNodeHighlights: node $key not live; ignoring")
++                        continue
++                    }
++                    changes.add(SelectionOutline.Change(key, color))
++                }
++                selectionOutline.apply(changes)
++            }
+             "removeNode" -> {
+                 Log.i(TAG, "cmd removeNode")
+                 val key = jsonKey(json) ?: return
+@@ -3012,6 +3050,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
+                     }
+                 }
+                 val doomed = ids.toSet()
++                if (!replayingJournal) selectionOutline.removeNodes(doomed)
+                 val destroyedEntities = HashSet<Int>()
+                 val rmCtx = FsceneRealizer.surgicalContext(this)
+                 for (id in ids) {
+@@ -5445,6 +5484,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
+                     // streamed subtrees with the rest of the scene —
+                     // rebuild each from its recorded load batch.
+                     replayStreamedSubtrees()
++                    selectionOutline.retainNodes(nodesById.keys)
+                     restoreTransformWrites(written)
+                     restoreBodyMotion(moving)
+                     // install() zeroes the settle bookkeeping for a new
+diff --git a/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/SelectionOutline.kt b/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/SelectionOutline.kt
+new file mode 100644
+index 0000000..419c8a1
+--- /dev/null
++++ b/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/SelectionOutline.kt
+@@ -0,0 +1,26 @@
++package com.jasonholtdigital.dart3d
++
++internal class SelectionOutline {
++    data class LinearRgba(val r: Float, val g: Float, val b: Float, val a: Float)
++    data class Change(val node: Long, val color: LinearRgba?)
++
++    private val colors = HashMap<Long, LinearRgba>()
++
++    fun apply(changes: List<Change>) {
++        for ((node, color) in changes) {
++            if (color == null) colors.remove(node) else colors[node] = color
++        }
++    }
++
++    fun removeNodes(ids: Set<Long>) {
++        colors.keys.removeAll(ids)
++    }
++
++    fun retainNodes(ids: Set<Long>) {
++        colors.keys.retainAll(ids)
++    }
++
++    fun clearScene() {
++        colors.clear()
++    }
++}
+diff --git a/dart3d/ios/Classes/SceneViewHost.swift b/dart3d/ios/Classes/SceneViewHost.swift
+index 8b886a0..4b4d0e7 100644
+--- a/dart3d/ios/Classes/SceneViewHost.swift
++++ b/dart3d/ios/Classes/SceneViewHost.swift
+@@ -15,6 +15,8 @@ final class SceneViewHost: SCNView {
+     /// Node registry for `setTransforms`, `command` ops, and physics.
+     private(set) var nodesById: [UInt64: SCNNode] = [:]
+ 
++    private let selectionOutline = SelectionOutline()
++
+     /// Keys of nodes carrying a `dynamic` rigid body — the set the
+     /// settle detector polls after every simulated physics step.
+     private(set) var dynamicBodyKeys: Set<UInt64> = []
+@@ -935,6 +937,10 @@ final class SceneViewHost: SCNView {
+         setup()
+     }
+ 
++    deinit {
++        selectionOutline.clearScene()
++    }
++
+     private func setup() {
+         scene = SCNScene()
+         scene?.physicsWorld.contactDelegate = self
+@@ -1144,6 +1150,7 @@ final class SceneViewHost: SCNView {
+                 // streamed subtrees with the rest of the scene —
+                 // rebuild each from its recorded load batch.
+                 replayAfterRealize()
++                selectionOutline.retainNodes(Set(nodesById.keys))
+                 restoreTransformWrites(written)
+                 animLock.lock()
+                 for (key, clip) in carriedClips
+@@ -1356,6 +1363,7 @@ final class SceneViewHost: SCNView {
+     }
+ 
+     func applyLoadScene(_ data: Data) {
++        selectionOutline.clearScene()
+         lastManifest = data
+         blendCastersDirty = true
+         // Payload ids are document-local — a previous document's bytes
+@@ -1553,6 +1561,42 @@ final class SceneViewHost: SCNView {
+         }
+         defer { if journaled { journalNodeOp(op, json) } }
+         switch op {
++        case "setNodeHighlights":
++            guard !replayingOps else { return }
++            guard let updates = json["updates"] as? [Any] else {
++                logOnce("highlights.malformed", "setNodeHighlights: missing updates")
++                return
++            }
++            var changes: [SelectionOutline.Change] = []
++            for raw in updates {
++                guard let update = raw as? [String: Any],
++                      let token = update["node"] as? String,
++                      let key = D3Wire.localIdKey(token),
++                      let rawColor = update["color"] else {
++                    logOnce("highlights.malformed", "setNodeHighlights: invalid update")
++                    continue
++                }
++                let color: SelectionOutline.LinearRGBA?
++                if rawColor is NSNull {
++                    color = nil
++                } else {
++                    guard let rgba = vec(rawColor), rgba.count == 4,
++                          rgba.allSatisfy({ Float($0).isFinite }) else {
++                        logOnce("highlights.malformed", "setNodeHighlights: invalid color")
++                        continue
++                    }
++                    color = SelectionOutline.LinearRGBA(
++                        r: Float(rgba[0]), g: Float(rgba[1]),
++                        b: Float(rgba[2]), a: Float(rgba[3]))
++                }
++                if color != nil && nodesById[key] == nil {
++                    logOnce("highlights.missing.\(key)",
++                        "setNodeHighlights: node \(key) not live; ignoring")
++                    continue
++                }
++                changes.append(SelectionOutline.Change(node: key, color: color))
++            }
++            selectionOutline.apply(changes)
+         case "removeNode":
+             guard let token = json["node"] as? String,
+                   let key = D3Wire.localIdKey(token) else { return }
+@@ -1930,6 +1974,7 @@ final class SceneViewHost: SCNView {
+         let doomed = nodesById
+             .filter { subtree.contains(ObjectIdentifier($0.value)) }
+             .map(\.key)
++        if !replayingOps { selectionOutline.removeNodes(doomed) }
+         for k in doomed {
+             nodesById.removeValue(forKey: k)
+             dynamicBodyKeys.remove(k)
+diff --git a/dart3d/ios/Classes/SelectionOutline.swift b/dart3d/ios/Classes/SelectionOutline.swift
+new file mode 100644
+index 0000000..7c02dde
+--- /dev/null
++++ b/dart3d/ios/Classes/SelectionOutline.swift
+@@ -0,0 +1,32 @@
++import Foundation
++
++final class SelectionOutline {
++    struct LinearRGBA {
++        let r, g, b, a: Float
++    }
++
++    struct Change {
++        let node: UInt64
++        let color: LinearRGBA?
++    }
++
++    private var colors: [UInt64: LinearRGBA] = [:]
++
++    func apply(_ changes: [Change]) {
++        for change in changes {
++            colors[change.node] = change.color
++        }
++    }
++
++    func removeNodes(_ ids: [UInt64]) {
++        for id in ids { colors.removeValue(forKey: id) }
++    }
++
++    func retainNodes(_ ids: Set<UInt64>) {
++        colors = colors.filter { ids.contains($0.key) }
++    }
++
++    func clearScene() {
++        colors.removeAll()
++    }
++}
+diff --git a/dart3d/test/u3_node_highlights_test.dart b/dart3d/test/u3_node_highlights_test.dart
+new file mode 100644
+index 0000000..62bdf18
+--- /dev/null
++++ b/dart3d/test/u3_node_highlights_test.dart
+@@ -0,0 +1,260 @@
++import 'dart:convert';
++import 'dart:typed_data';
++
++import 'package:dart3d/src/diff_apply.dart';
++import 'package:dart3d/src/protocol.dart';
++import 'package:dart3d/src/scene_controller.dart';
++import 'package:dart3d/src/scene_model.dart';
++import 'package:dart3d/src/scene_view.dart';
++import 'package:test/test.dart';
++import 'package:vector_math/vector_math.dart';
++
++const first = LocalId(7, 1);
++const second = LocalId(7, 2);
++
++SceneDocument document() => SceneDocument()
++  ..addNode(NodeSpec(id: first, name: 'first', children: [second]))
++  ..addNode(NodeSpec(id: second, name: 'second'))
++  ..roots.add(first);
++
++class _MutationSink extends SceneViewElement {
++  _MutationSink(SceneController controller)
++    : super(SceneViewLeaf(controller: controller));
++
++  final mutations = <({int tag, Uint8List data})>[];
++
++  @override
++  int? get viewId => null;
++
++  @override
++  void sendMutation(int tag, Uint8List data) {
++    mutations.add((tag: tag, data: data));
++  }
++
++  List<Object?> get commands => [
++    for (final mutation in mutations)
++      if (mutation.tag == D3Protocol.command)
++        jsonDecode(utf8.decode(mutation.data)),
++  ];
++}
++
++void main() {
++  late SceneController controller;
++
++  setUp(() {
++    controller = SceneController();
++  });
++
++  tearDown(() {
++    controller.dispose();
++  });
++
++  test('one mutation atomically clears one node and sets another', () {
++    final sink = _MutationSink(controller);
++    controller.attachElement(sink);
++    controller.setNodeHighlights({first: null, second: Vector4(1, 0.5, 0, 1)});
++
++    expect(sink.mutations.map((m) => m.tag), [D3Protocol.command]);
++    expect(sink.commands, [
++      {
++        'op': 'setNodeHighlights',
++        'updates': [
++          {'node': first.toToken(), 'color': null},
++          {
++            'node': second.toToken(),
++            'color': [1.0, 0.5, 0.0, 1.0],
++          },
++        ],
++      },
++    ]);
++  });
++
++  test('two independent colors and alpha values travel in one patch', () {
++    final sink = _MutationSink(controller);
++    controller.attachElement(sink);
++    controller.setNodeHighlights({
++      first: Vector4(1, 0.25, 0, 0),
++      second: Vector4(0, 0.5, 1, 0.5),
++    });
++
++    expect(sink.mutations, hasLength(1));
++    expect(sink.commands, [
++      {
++        'op': 'setNodeHighlights',
++        'updates': [
++          {
++            'node': first.toToken(),
++            'color': [1.0, 0.25, 0.0, 0.0],
++          },
++          {
++            'node': second.toToken(),
++            'color': [0.0, 0.5, 1.0, 0.5],
++          },
++        ],
++      },
++    ]);
++  });
++
++  test('a later null clears only the named node on the wire', () {
++    final sink = _MutationSink(controller);
++    controller.attachElement(sink);
++    controller.setNodeHighlights({
++      first: Vector4.all(1),
++      second: Vector4.all(1),
++    });
++    controller.setNodeHighlights({first: null});
++
++    expect(sink.commands, hasLength(2));
++    expect(sink.commands.last, {
++      'op': 'setNodeHighlights',
++      'updates': [
++        {'node': first.toToken(), 'color': null},
++      ],
++    });
++  });
++
++  test('empty attached and queued batches emit nothing', () {
++    controller.setNodeHighlights({});
++    final sink = _MutationSink(controller);
++    controller.attachElement(sink);
++    controller.setNodeHighlights({});
++
++    expect(sink.mutations, isEmpty);
++  });
++
++  test('queued colors copy mutable vectors and map entries before attach', () {
++    final color = Vector4(0.25, 0.5, 0.75, 1);
++    final updates = <LocalId, Vector4?>{first: color};
++    controller.setNodeHighlights(updates);
++    color.setValues(1, 0, 0, 0);
++    updates.clear();
++    final sink = _MutationSink(controller);
++    controller.attachElement(sink);
++
++    expect(sink.commands.single, {
++      'op': 'setNodeHighlights',
++      'updates': [
++        {
++          'node': first.toToken(),
++          'color': [0.25, 0.5, 0.75, 1.0],
++        },
++      ],
++    });
++    expect(controller.document, isNull);
++  });
++
++  test(
++    'initial explicit load then highlight flush in order without reload',
++    () {
++      controller.loadDocument(document());
++      controller.setNodeHighlights({first: Vector4.all(1)});
++      final sink = _MutationSink(controller);
++      controller.attachElement(sink);
++
++      expect(sink.mutations.map((m) => m.tag), [
++        D3Protocol.loadScene,
++        D3Protocol.command,
++      ]);
++    },
++  );
++
++  test('a later explicit load remains after the queued highlight', () {
++    controller.setNodeHighlights({first: Vector4.all(1)});
++    controller.loadDocument(document());
++    final sink = _MutationSink(controller);
++    controller.attachElement(sink);
++
++    expect(sink.mutations.map((m) => m.tag), [
++      D3Protocol.command,
++      D3Protocol.loadScene,
++    ]);
++  });
++
++  test('command-built scenes flush highlights before the implicit load', () {
++    controller.applyCommands([
++      {
++        'op': 'addNode',
++        'node': first.toToken(),
++        'spec': encodeNodeCommandSpec(NodeSpec(id: first), document()),
++      },
++    ]);
++    controller.setNodeHighlights({first: Vector4.all(1)});
++    final sink = _MutationSink(controller);
++    controller.attachElement(sink);
++
++    expect(sink.mutations.map((m) => m.tag), [
++      D3Protocol.command,
++      D3Protocol.command,
++      D3Protocol.loadScene,
++    ]);
++    expect((sink.commands.last as Map)['op'], 'setNodeHighlights');
++  });
++
++  test('recreated views receive authored content without highlight replay', () {
++    controller.loadDocument(document());
++    final oldSink = _MutationSink(controller);
++    controller.attachElement(oldSink);
++    controller.setNodeHighlights({first: Vector4.all(1)});
++    controller.detachElement(oldSink);
++    final newSink = _MutationSink(controller);
++    controller.attachElement(newSink);
++
++    expect(oldSink.commands, hasLength(1));
++    expect(newSink.mutations.map((m) => m.tag), [D3Protocol.loadScene]);
++  });
++
++  test('detached highlights precede the implicit reconstruction load', () {
++    controller.loadDocument(document());
++    final oldSink = _MutationSink(controller);
++    controller.attachElement(oldSink);
++    controller.detachElement(oldSink);
++    controller.setNodeHighlights({first: Vector4.all(1)});
++    final newSink = _MutationSink(controller);
++    controller.attachElement(newSink);
++
++    expect(newSink.mutations.map((m) => m.tag), [
++      D3Protocol.command,
++      D3Protocol.loadScene,
++    ]);
++    expect(oldSink.commands, isEmpty);
++  });
++
++  test('highlight set and clear leave authored serialization unchanged', () {
++    final doc = document();
++    final before = writeFsceneWithExtensions(doc);
++    controller.loadDocument(doc);
++    controller.setNodeHighlights({first: Vector4.all(1)});
++    controller.setNodeHighlights({first: null});
++
++    expect(controller.document, same(doc));
++    expect(writeFsceneWithExtensions(controller.serializeScene()!), before);
++  });
++
++  test(
++    'the existing JSON encoder rejects non-finite components before send',
++    () {
++      final sink = _MutationSink(controller);
++      controller.attachElement(sink);
++
++      expect(
++        () =>
++            controller.setNodeHighlights({first: Vector4(double.nan, 0, 0, 1)}),
++        throwsA(isA<JsonUnsupportedObjectError>()),
++      );
++      expect(sink.mutations, isEmpty);
++    },
++  );
++
++  test('dispose sends no clear to an attached view', () {
++    controller.loadDocument(document());
++    final sink = _MutationSink(controller);
++    controller.attachElement(sink);
++    controller.setNodeHighlights({first: Vector4.all(1)});
++    final count = sink.mutations.length;
++    controller.dispose();
++
++    expect(sink.mutations, hasLength(count));
++    expect(controller.isAttached, isFalse);
++    expect(controller.document, isNull);
++  });
++}

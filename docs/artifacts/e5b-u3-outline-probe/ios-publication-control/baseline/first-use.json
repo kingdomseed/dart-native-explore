@@ -1,0 +1,168 @@
+[
+  {
+    "label": "target target=8445217361178394631 view=0 mode=0 cameraCase=0 aa=1 time=541303.7666666668",
+    "changedFromActualOffPixels": 0,
+    "topColorsBGRA": [
+      [
+        "0,0,0,0",
+        6695
+      ],
+      [
+        "206,181,162,255",
+        217
+      ]
+    ]
+  },
+  {
+    "label": "target target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=541347.7833333334",
+    "changedFromActualOffPixels": 0,
+    "topColorsBGRA": [
+      [
+        "0,0,0,0",
+        6695
+      ],
+      [
+        "206,181,162,255",
+        217
+      ]
+    ]
+  },
+  {
+    "label": "alpha-output target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=541347.7833333334",
+    "changedFromActualOffPixels": 6912,
+    "topColorsBGRA": [
+      [
+        "0,0,0,255",
+        6912
+      ]
+    ]
+  },
+  {
+    "label": "target target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=541351.6166666668",
+    "changedFromActualOffPixels": 267,
+    "topColorsBGRA": [
+      [
+        "0,0,0,0",
+        6428
+      ],
+      [
+        "206,181,162,255",
+        217
+      ],
+      [
+        "255,188,71,255",
+        148
+      ],
+      [
+        "71,137,255,255",
+        119
+      ]
+    ]
+  },
+  {
+    "label": "alpha-output target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=541351.6166666668",
+    "changedFromActualOffPixels": 4608,
+    "topColorsBGRA": [
+      [
+        "0,0,0,0",
+        2304
+      ],
+      [
+        "80,24,48,255",
+        2304
+      ],
+      [
+        "16,64,32,128",
+        2037
+      ],
+      [
+        "255,188,71,255",
+        148
+      ],
+      [
+        "71,137,255,255",
+        119
+      ]
+    ]
+  },
+  {
+    "label": "alpha-output target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=541355.4333333335",
+    "changedFromActualOffPixels": 4608,
+    "topColorsBGRA": [
+      [
+        "0,0,0,0",
+        2304
+      ],
+      [
+        "16,64,32,128",
+        2304
+      ],
+      [
+        "80,24,48,255",
+        2304
+      ]
+    ]
+  },
+  {
+    "label": "target target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=541355.4333333335",
+    "changedFromActualOffPixels": 0,
+    "topColorsBGRA": [
+      [
+        "0,0,0,0",
+        6695
+      ],
+      [
+        "206,181,162,255",
+        217
+      ]
+    ]
+  },
+  {
+    "label": "alpha-output target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=541359.2333333334",
+    "changedFromActualOffPixels": 4608,
+    "topColorsBGRA": [
+      [
+        "0,0,0,0",
+        2304
+      ],
+      [
+        "80,24,48,255",
+        2304
+      ],
+      [
+        "16,64,32,128",
+        2037
+      ],
+      [
+        "255,188,71,255",
+        148
+      ],
+      [
+        "71,137,255,255",
+        119
+      ]
+    ]
+  },
+  {
+    "label": "target target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=541359.2333333334",
+    "changedFromActualOffPixels": 267,
+    "topColorsBGRA": [
+      [
+        "0,0,0,0",
+        6428
+      ],
+      [
+        "206,181,162,255",
+        217
+      ],
+      [
+        "255,188,71,255",
+        148
+      ],
+      [
+        "71,137,255,255",
+        119
+      ]
+    ]
+  }
+]

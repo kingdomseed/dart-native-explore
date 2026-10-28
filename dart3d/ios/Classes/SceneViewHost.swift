@@ -15,6 +15,8 @@ final class SceneViewHost: SCNView {
     /// Node registry for `setTransforms`, `command` ops, and physics.
     private(set) var nodesById: [UInt64: SCNNode] = [:]
 
+    private let selectionOutline = SelectionOutline()
+
     /// Keys of nodes carrying a `dynamic` rigid body — the set the
     /// settle detector polls after every simulated physics step.
     private(set) var dynamicBodyKeys: Set<UInt64> = []
@@ -932,6 +934,10 @@ final class SceneViewHost: SCNView {
         setup()
     }
 
+    deinit {
+        selectionOutline.clearScene()
+    }
+
     private func setup() {
         scene = SCNScene()
         scene?.physicsWorld.contactDelegate = self
@@ -1141,6 +1147,7 @@ final class SceneViewHost: SCNView {
                 // streamed subtrees with the rest of the scene —
                 // rebuild each from its recorded load batch.
                 replayAfterRealize()
+                selectionOutline.retainNodes(Set(nodesById.keys))
                 restoreTransformWrites(written)
                 animLock.lock()
                 for (key, clip) in carriedClips
@@ -1353,6 +1360,7 @@ final class SceneViewHost: SCNView {
     }
 
     func applyLoadScene(_ data: Data) {
+        selectionOutline.clearScene()
         lastManifest = data
         blendCastersDirty = true
         // Payload ids are document-local — a previous document's bytes
@@ -1550,6 +1558,42 @@ final class SceneViewHost: SCNView {
         }
         defer { if journaled { journalNodeOp(op, json) } }
         switch op {
+        case "setNodeHighlights":
+            guard !replayingOps else { return }
+            guard let updates = json["updates"] as? [Any] else {
+                logOnce("highlights.malformed", "setNodeHighlights: missing updates")
+                return
+            }
+            var changes: [SelectionOutline.Change] = []
+            for raw in updates {
+                guard let update = raw as? [String: Any],
+                      let token = update["node"] as? String,
+                      let key = D3Wire.localIdKey(token),
+                      let rawColor = update["color"] else {
+                    logOnce("highlights.malformed", "setNodeHighlights: invalid update")
+                    continue
+                }
+                let color: SelectionOutline.LinearRGBA?
+                if rawColor is NSNull {
+                    color = nil
+                } else {
+                    guard let rgba = vec(rawColor), rgba.count == 4,
+                          rgba.allSatisfy({ Float($0).isFinite }) else {
+                        logOnce("highlights.malformed", "setNodeHighlights: invalid color")
+                        continue
+                    }
+                    color = SelectionOutline.LinearRGBA(
+                        r: Float(rgba[0]), g: Float(rgba[1]),
+                        b: Float(rgba[2]), a: Float(rgba[3]))
+                }
+                if color != nil && nodesById[key] == nil {
+                    logOnce("highlights.missing.\(key)",
+                        "setNodeHighlights: node \(key) not live; ignoring")
+                    continue
+                }
+                changes.append(SelectionOutline.Change(node: key, color: color))
+            }
+            selectionOutline.apply(changes)
         case "removeNode":
             guard let token = json["node"] as? String,
                   let key = D3Wire.localIdKey(token) else { return }
@@ -1927,6 +1971,7 @@ final class SceneViewHost: SCNView {
         let doomed = nodesById
             .filter { subtree.contains(ObjectIdentifier($0.value)) }
             .map(\.key)
+        if !replayingOps { selectionOutline.removeNodes(doomed) }
         for k in doomed {
             nodesById.removeValue(forKey: k)
             dynamicBodyKeys.remove(k)
@@ -2240,6 +2285,7 @@ final class SceneViewHost: SCNView {
             ctx.dropMaterialConsumer(geo)
         }
         node.geometry = nil
+        node.castsShadow = true
         node.light = nil
         node.camera = nil
         node.physicsBody = nil
@@ -2811,6 +2857,9 @@ final class SceneViewHost: SCNView {
             resourceDefs = ctx.resourceDefs
             if let old, let new = materialsById[key] {
                 let isCatcher = ctx.shadowCatcherConfigurations[key] != nil
+                if old.name == "d3.sprite" || new.name == "d3.sprite" {
+                    ctx.refreshVariantDefaults(key: key, material: new)
+                }
                 if wasCatcher || isCatcher {
                     ctx.refreshVariantDefaults(
                         key: key, material: new)
@@ -2840,6 +2889,9 @@ final class SceneViewHost: SCNView {
             // W16: a material an `lod` level references — re-resolve
             // each consuming spec against the fresh instance.
             rebindLodConsumers(key, ctx)
+            for nodeKey in cameraFacing.keys {
+                applyBillboardMaterialPolicy(nodeKey)
+            }
             bakedShadowCatcherRegistry.materialWasUpserted(
                 key: key,
                 configuration: ctx.shadowCatcherConfigurations[key],
@@ -5537,6 +5589,12 @@ extension SceneViewHost: SCNSceneRendererDelegate {
         bakedShadowCatcherRegistry.renderDirty(at: time, host: self)
         renderDueTargets(at: time)
         syncScreenSubviews()
+    }
+
+    func applyBillboardMaterialPolicy(_ key: UInt64) {
+        guard let spec = cameraFacing[key], spec.shape == "billboard",
+              let node = spec.node else { return }
+        node.castsShadow = node.geometry?.firstMaterial?.name != "d3.sprite"
     }
 
     /// W26: rebuilds each `cameraFacing` entry's geometry expanded

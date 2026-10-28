@@ -41,6 +41,8 @@ export 'src/scene_view.dart' show SceneQuality, SceneView;
 export 'src/subtree_stream.dart';
 export 'src/ffi_bindings.dart' show Dart3dFFIBindings;
 export 'src/physics.dart';
+export 'src/texture_atlas.dart';
+export 'src/sprite_material.dart';
 export 'src/trail_lod.dart';
 export 'src/vertex_pack.dart' show VertexPack;
 export 'src/world_bounds.dart'

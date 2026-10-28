@@ -1,0 +1,706 @@
+{
+  "baseline": {
+    "raw_textures_verified": 21,
+    "off_sha256": "b330c9051c95b8c02c2acb8bbcac4443fd0e8fe1a9ddaf68de631ca8d4113388",
+    "off_colors": [
+      [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        6695
+      ],
+      [
+        [
+          206,
+          181,
+          162,
+          255
+        ],
+        217
+      ]
+    ],
+    "passes": [
+      {
+        "time": 542658.2500000001,
+        "support": 205,
+        "contour": 267,
+        "targetOutsideChanged": 0,
+        "targetContourMismatches": 267,
+        "alphaOutsideChanged": 6645,
+        "alphaContourMismatches": 267,
+        "first_target_equals_off": true,
+        "target_sha256": "b330c9051c95b8c02c2acb8bbcac4443fd0e8fe1a9ddaf68de631ca8d4113388",
+        "alpha_black_opaque_pixels": 6912,
+        "callback_draws": 3,
+        "event_indices": [
+          571,
+          573,
+          574,
+          577
+        ],
+        "mask_colors": [
+          [
+            [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            6707
+          ],
+          [
+            [
+              0.0625,
+              0.5,
+              1.0,
+              0.5
+            ],
+            111
+          ],
+          [
+            [
+              1.0,
+              0.25,
+              0.0625,
+              1.0
+            ],
+            94
+          ]
+        ]
+      },
+      {
+        "time": 542661.7833333334,
+        "support": 0,
+        "contour": 0,
+        "targetOutsideChanged": 0,
+        "targetContourMismatches": 0,
+        "alphaOutsideChanged": 0,
+        "alphaContourMismatches": 0,
+        "first_target_equals_off": true,
+        "target_sha256": "b330c9051c95b8c02c2acb8bbcac4443fd0e8fe1a9ddaf68de631ca8d4113388",
+        "alpha_black_opaque_pixels": 0,
+        "callback_draws": 0,
+        "event_indices": [
+          1081,
+          1082,
+          1083,
+          1085
+        ],
+        "mask_colors": [
+          [
+            [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            6912
+          ]
+        ]
+      },
+      {
+        "time": 542665.5166666668,
+        "support": 205,
+        "contour": 267,
+        "targetOutsideChanged": 0,
+        "targetContourMismatches": 0,
+        "alphaOutsideChanged": 0,
+        "alphaContourMismatches": 0,
+        "first_target_equals_off": false,
+        "target_sha256": "430e76555cd1277826681e31cfd7e9004ae12627b4b8f43a3162525382530481",
+        "alpha_black_opaque_pixels": 0,
+        "callback_draws": 3,
+        "event_indices": [
+          1621,
+          1622,
+          1623,
+          1625
+        ],
+        "mask_colors": [
+          [
+            [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            6707
+          ],
+          [
+            [
+              0.0625,
+              0.5,
+              1.0,
+              0.5
+            ],
+            111
+          ],
+          [
+            [
+              1.0,
+              0.25,
+              0.0625,
+              1.0
+            ],
+            94
+          ]
+        ]
+      },
+      {
+        "time": 542669.0500000002,
+        "support": 0,
+        "contour": 0,
+        "targetOutsideChanged": 0,
+        "targetContourMismatches": 0,
+        "alphaOutsideChanged": 0,
+        "alphaContourMismatches": 0,
+        "first_target_equals_off": true,
+        "target_sha256": "b330c9051c95b8c02c2acb8bbcac4443fd0e8fe1a9ddaf68de631ca8d4113388",
+        "alpha_black_opaque_pixels": 0,
+        "callback_draws": 0,
+        "event_indices": [
+          2129,
+          2130,
+          2131,
+          2133
+        ],
+        "mask_colors": [
+          [
+            [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            6912
+          ]
+        ]
+      }
+    ],
+    "held_reads": [
+      {
+        "label": "stored-8445216278846636033:set,8445216278846636034:set target=8445217361178394631 dirty=false time=542656.4166666667",
+        "byte_differences": 0
+      },
+      {
+        "label": "stored-8445216278846636033:clear,8445216278846636034:clear target=8445217361178394631 dirty=false time=542660.0166666668",
+        "byte_differences": 0
+      },
+      {
+        "label": "stored-8445216278846636033:set,8445216278846636034:set target=8445217361178394631 dirty=false time=542663.5833333335",
+        "byte_differences": 0
+      },
+      {
+        "label": "stored-8445216278846636033:clear,8445216278846636034:clear target=8445217361178394631 dirty=false time=542667.2500000001",
+        "byte_differences": 0
+      }
+    ],
+    "first_use": [
+      {
+        "label": "target target=8445217361178394631 view=0 mode=0 cameraCase=0 aa=1 time=542630.3833333334",
+        "changedFromActualOffPixels": 0,
+        "topColorsBGRA": [
+          [
+            "0,0,0,0",
+            6695
+          ],
+          [
+            "206,181,162,255",
+            217
+          ]
+        ]
+      },
+      {
+        "label": "target target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=542658.2500000001",
+        "changedFromActualOffPixels": 0,
+        "topColorsBGRA": [
+          [
+            "0,0,0,0",
+            6695
+          ],
+          [
+            "206,181,162,255",
+            217
+          ]
+        ]
+      },
+      {
+        "label": "alpha-output target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=542658.2500000001",
+        "changedFromActualOffPixels": 6912,
+        "topColorsBGRA": [
+          [
+            "0,0,0,255",
+            6912
+          ]
+        ]
+      },
+      {
+        "label": "alpha-output target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=542661.7833333334",
+        "changedFromActualOffPixels": 4608,
+        "topColorsBGRA": [
+          [
+            "0,0,0,0",
+            2304
+          ],
+          [
+            "16,64,32,128",
+            2304
+          ],
+          [
+            "80,24,48,255",
+            2304
+          ]
+        ]
+      },
+      {
+        "label": "target target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=542661.7833333334",
+        "changedFromActualOffPixels": 0,
+        "topColorsBGRA": [
+          [
+            "0,0,0,0",
+            6695
+          ],
+          [
+            "206,181,162,255",
+            217
+          ]
+        ]
+      },
+      {
+        "label": "target target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=542665.5166666668",
+        "changedFromActualOffPixels": 267,
+        "topColorsBGRA": [
+          [
+            "0,0,0,0",
+            6428
+          ],
+          [
+            "206,181,162,255",
+            217
+          ],
+          [
+            "255,188,71,255",
+            148
+          ],
+          [
+            "71,137,255,255",
+            119
+          ]
+        ]
+      },
+      {
+        "label": "alpha-output target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=542665.5166666668",
+        "changedFromActualOffPixels": 4608,
+        "topColorsBGRA": [
+          [
+            "0,0,0,0",
+            2304
+          ],
+          [
+            "80,24,48,255",
+            2304
+          ],
+          [
+            "16,64,32,128",
+            2037
+          ],
+          [
+            "255,188,71,255",
+            148
+          ],
+          [
+            "71,137,255,255",
+            119
+          ]
+        ]
+      },
+      {
+        "label": "alpha-output target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=542669.0500000002",
+        "changedFromActualOffPixels": 4608,
+        "topColorsBGRA": [
+          [
+            "0,0,0,0",
+            2304
+          ],
+          [
+            "16,64,32,128",
+            2304
+          ],
+          [
+            "80,24,48,255",
+            2304
+          ]
+        ]
+      },
+      {
+        "label": "target target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=542669.0500000002",
+        "changedFromActualOffPixels": 0,
+        "topColorsBGRA": [
+          [
+            "0,0,0,0",
+            6695
+          ],
+          [
+            "206,181,162,255",
+            217
+          ]
+        ]
+      }
+    ]
+  },
+  "control": {
+    "raw_textures_verified": 21,
+    "off_sha256": "b330c9051c95b8c02c2acb8bbcac4443fd0e8fe1a9ddaf68de631ca8d4113388",
+    "off_colors": [
+      [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        6695
+      ],
+      [
+        [
+          206,
+          181,
+          162,
+          255
+        ],
+        217
+      ]
+    ],
+    "passes": [
+      {
+        "time": 542739.9833333334,
+        "support": 205,
+        "contour": 267,
+        "targetOutsideChanged": 0,
+        "targetContourMismatches": 267,
+        "alphaOutsideChanged": 6645,
+        "alphaContourMismatches": 267,
+        "first_target_equals_off": true,
+        "target_sha256": "b330c9051c95b8c02c2acb8bbcac4443fd0e8fe1a9ddaf68de631ca8d4113388",
+        "alpha_black_opaque_pixels": 6912,
+        "callback_draws": 3,
+        "event_indices": [
+          1763,
+          1765,
+          1766,
+          1769
+        ],
+        "mask_colors": [
+          [
+            [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            6707
+          ],
+          [
+            [
+              0.0625,
+              0.5,
+              1.0,
+              0.5
+            ],
+            111
+          ],
+          [
+            [
+              1.0,
+              0.25,
+              0.0625,
+              1.0
+            ],
+            94
+          ]
+        ]
+      },
+      {
+        "time": 542743.8000000002,
+        "support": 0,
+        "contour": 0,
+        "targetOutsideChanged": 0,
+        "targetContourMismatches": 0,
+        "alphaOutsideChanged": 0,
+        "alphaContourMismatches": 0,
+        "first_target_equals_off": true,
+        "target_sha256": "b330c9051c95b8c02c2acb8bbcac4443fd0e8fe1a9ddaf68de631ca8d4113388",
+        "alpha_black_opaque_pixels": 0,
+        "callback_draws": 0,
+        "event_indices": [
+          2312,
+          2313,
+          2314,
+          2316
+        ],
+        "mask_colors": [
+          [
+            [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            6912
+          ]
+        ]
+      },
+      {
+        "time": 542747.6166666668,
+        "support": 205,
+        "contour": 267,
+        "targetOutsideChanged": 0,
+        "targetContourMismatches": 0,
+        "alphaOutsideChanged": 0,
+        "alphaContourMismatches": 0,
+        "first_target_equals_off": false,
+        "target_sha256": "430e76555cd1277826681e31cfd7e9004ae12627b4b8f43a3162525382530481",
+        "alpha_black_opaque_pixels": 0,
+        "callback_draws": 3,
+        "event_indices": [
+          2860,
+          2861,
+          2862,
+          2864
+        ],
+        "mask_colors": [
+          [
+            [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            6707
+          ],
+          [
+            [
+              0.0625,
+              0.5,
+              1.0,
+              0.5
+            ],
+            111
+          ],
+          [
+            [
+              1.0,
+              0.25,
+              0.0625,
+              1.0
+            ],
+            94
+          ]
+        ]
+      },
+      {
+        "time": 542751.3500000001,
+        "support": 0,
+        "contour": 0,
+        "targetOutsideChanged": 0,
+        "targetContourMismatches": 0,
+        "alphaOutsideChanged": 0,
+        "alphaContourMismatches": 0,
+        "first_target_equals_off": true,
+        "target_sha256": "b330c9051c95b8c02c2acb8bbcac4443fd0e8fe1a9ddaf68de631ca8d4113388",
+        "alpha_black_opaque_pixels": 0,
+        "callback_draws": 0,
+        "event_indices": [
+          3395,
+          3396,
+          3397,
+          3399
+        ],
+        "mask_colors": [
+          [
+            [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            6912
+          ]
+        ]
+      }
+    ],
+    "held_reads": [
+      {
+        "label": "stored-8445216278846636033:set,8445216278846636034:set target=8445217361178394631 dirty=false time=542736.7666666668",
+        "byte_differences": 0
+      },
+      {
+        "label": "stored-8445216278846636033:clear,8445216278846636034:clear target=8445217361178394631 dirty=false time=542741.8833333334",
+        "byte_differences": 0
+      },
+      {
+        "label": "stored-8445216278846636033:set,8445216278846636034:set target=8445217361178394631 dirty=false time=542745.7333333334",
+        "byte_differences": 0
+      },
+      {
+        "label": "stored-8445216278846636033:clear,8445216278846636034:clear target=8445217361178394631 dirty=false time=542749.4666666668",
+        "byte_differences": 0
+      }
+    ],
+    "first_use": [
+      {
+        "label": "target target=8445217361178394631 view=0 mode=0 cameraCase=0 aa=1 time=542704.6166666668",
+        "changedFromActualOffPixels": 0,
+        "topColorsBGRA": [
+          [
+            "0,0,0,0",
+            6695
+          ],
+          [
+            "206,181,162,255",
+            217
+          ]
+        ]
+      },
+      {
+        "label": "alpha-output target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=542739.9833333334",
+        "changedFromActualOffPixels": 6912,
+        "topColorsBGRA": [
+          [
+            "0,0,0,255",
+            6912
+          ]
+        ]
+      },
+      {
+        "label": "target target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=542739.9833333334",
+        "changedFromActualOffPixels": 0,
+        "topColorsBGRA": [
+          [
+            "0,0,0,0",
+            6695
+          ],
+          [
+            "206,181,162,255",
+            217
+          ]
+        ]
+      },
+      {
+        "label": "alpha-output target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=542743.8000000002",
+        "changedFromActualOffPixels": 4608,
+        "topColorsBGRA": [
+          [
+            "0,0,0,0",
+            2304
+          ],
+          [
+            "16,64,32,128",
+            2304
+          ],
+          [
+            "80,24,48,255",
+            2304
+          ]
+        ]
+      },
+      {
+        "label": "target target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=542743.8000000002",
+        "changedFromActualOffPixels": 0,
+        "topColorsBGRA": [
+          [
+            "0,0,0,0",
+            6695
+          ],
+          [
+            "206,181,162,255",
+            217
+          ]
+        ]
+      },
+      {
+        "label": "target target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=542747.6166666668",
+        "changedFromActualOffPixels": 267,
+        "topColorsBGRA": [
+          [
+            "0,0,0,0",
+            6428
+          ],
+          [
+            "206,181,162,255",
+            217
+          ],
+          [
+            "255,188,71,255",
+            148
+          ],
+          [
+            "71,137,255,255",
+            119
+          ]
+        ]
+      },
+      {
+        "label": "alpha-output target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=542747.6166666668",
+        "changedFromActualOffPixels": 4608,
+        "topColorsBGRA": [
+          [
+            "0,0,0,0",
+            2304
+          ],
+          [
+            "80,24,48,255",
+            2304
+          ],
+          [
+            "16,64,32,128",
+            2037
+          ],
+          [
+            "255,188,71,255",
+            148
+          ],
+          [
+            "71,137,255,255",
+            119
+          ]
+        ]
+      },
+      {
+        "label": "alpha-output target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=542751.3500000001",
+        "changedFromActualOffPixels": 4608,
+        "topColorsBGRA": [
+          [
+            "0,0,0,0",
+            2304
+          ],
+          [
+            "16,64,32,128",
+            2304
+          ],
+          [
+            "80,24,48,255",
+            2304
+          ]
+        ]
+      },
+      {
+        "label": "target target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=542751.3500000001",
+        "changedFromActualOffPixels": 0,
+        "topColorsBGRA": [
+          [
+            "0,0,0,0",
+            6695
+          ],
+          [
+            "206,181,162,255",
+            217
+          ]
+        ]
+      }
+    ]
+  }
+}

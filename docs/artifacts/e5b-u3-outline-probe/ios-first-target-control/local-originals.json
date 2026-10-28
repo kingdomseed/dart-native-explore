@@ -1,0 +1,17 @@
+[
+  {
+    "path": "/private/tmp/dart3d-u3-outline-first-target-control-20261028/r1/parent/native-all.log",
+    "sha256": "6074fe0aea8c5091674b025106df6ee2408887b769602448bcfd9a5aa82dd1a9",
+    "bytes": 13045620
+  },
+  {
+    "path": "/private/tmp/dart3d-u3-outline-first-target-control-20261028/r1/parent/baseline/journey.mp4",
+    "sha256": "4b53a763b989ce6a7a26a4bce73d2ab6fb457735b54a48d18336146cb2a560fa",
+    "bytes": 16542651
+  },
+  {
+    "path": "/private/tmp/dart3d-u3-outline-first-target-control-20261028/r1/parent/control/journey.mp4",
+    "sha256": "3a9f319c6ae9d64ca9e5aab4145fae37b2b1f06e0e55e1beeb2d807c365dd095",
+    "bytes": 26287824
+  }
+]

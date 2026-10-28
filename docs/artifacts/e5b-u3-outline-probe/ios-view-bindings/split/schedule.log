@@ -1,0 +1,31 @@
+2026-10-28 03:49:56.424 Df Runner[26941:13c4240] [com.jasonholtdigital.dart3d:scene] U3OV control mode=0 cameraCase=0 draws=0 time=539758.5166666668
+2026-10-28 03:49:56.424 Df Runner[26941:13c4240] [com.jasonholtdigital.dart3d:scene] U3OV due target=8445217361178394631 dirty=true scheduled=false time=539758.5166666668
+2026-10-28 03:49:56.426 Df Runner[26941:13c4240] [com.jasonholtdigital.dart3d:scene] U3OV target-normal-encode target=8445217361178394631 view=0 mode=0 aa=1 sameBuffer=true time=539758.5166666668
+2026-10-28 03:50:14.870 Df Runner[26941:13c4248] [com.jasonholtdigital.dart3d:scene] U3OV control mode=2 cameraCase=0 draws=0 time=539777.4833333334
+2026-10-28 03:50:16.820 Df Runner[26941:13c424a] [com.jasonholtdigital.dart3d:scene] U3OV public-highlights 8445216278846636033:set,8445216278846636034:set
+2026-10-28 03:50:16.822 Df Runner[26941:13c424a] [com.jasonholtdigital.dart3d:scene] U3OV control mode=2 cameraCase=0 draws=3 time=539779.4333333335
+2026-10-28 03:50:28.784 Df Runner[26941:13c4243] [com.jasonholtdigital.dart3d:scene] U3OV due target=8445217361178394631 dirty=true scheduled=false time=539791.4000000001
+2026-10-28 03:50:28.784 Df Runner[26941:13c4243] [com.jasonholtdigital.dart3d:scene] U3OV target-mask-encode target=8445217361178394631 view=0 time=539791.4000000001
+2026-10-28 03:50:28.785 Df Runner[26941:13c4243] [com.jasonholtdigital.dart3d:scene] U3OV target-normal-encode target=8445217361178394631 view=0 mode=2 aa=1 sameBuffer=true time=539791.4000000001
+2026-10-28 03:50:31.751 Df Runner[26941:13c4243] [com.jasonholtdigital.dart3d:scene] U3OV public-highlights 8445216278846636033:clear,8445216278846636034:clear
+2026-10-28 03:50:31.752 Df Runner[26941:13c4243] [com.jasonholtdigital.dart3d:scene] U3OV control mode=2 cameraCase=0 draws=0 time=539794.3666666668
+2026-10-28 03:50:33.701 Df Runner[26941:13c4243] [com.jasonholtdigital.dart3d:scene] U3OV due target=8445217361178394631 dirty=true scheduled=false time=539796.3166666668
+2026-10-28 03:50:33.701 Df Runner[26941:13c4243] [com.jasonholtdigital.dart3d:scene] U3OV target-mask-encode target=8445217361178394631 view=0 time=539796.3166666668
+2026-10-28 03:50:33.702 Df Runner[26941:13c4243] [com.jasonholtdigital.dart3d:scene] U3OV target-normal-encode target=8445217361178394631 view=0 mode=2 aa=1 sameBuffer=true time=539796.3166666668
+2026-10-28 03:52:04.384 Df Runner[26941:13c4247] [com.jasonholtdigital.dart3d:scene] U3OV due target=8445217361178394631 dirty=true scheduled=false time=539887.0000000001
+2026-10-28 03:52:04.384 Df Runner[26941:13c4247] [com.jasonholtdigital.dart3d:scene] U3OV target-mask-encode target=8445217361178394631 view=0 time=539887.0000000001
+2026-10-28 03:52:04.384 Df Runner[26941:13c4247] [com.jasonholtdigital.dart3d:scene] U3OV target-normal-encode target=8445217361178394631 view=0 mode=2 aa=1 sameBuffer=true time=539887.0000000001
+2026-10-28 03:52:06.635 Df Runner[26941:13c4249] [com.jasonholtdigital.dart3d:scene] U3OV public-highlights 8445216278846636033:set,8445216278846636034:set
+2026-10-28 03:52:06.635 Df Runner[26941:13c4249] [com.jasonholtdigital.dart3d:scene] U3OV control mode=2 cameraCase=0 draws=3 time=539889.2500000001
+2026-10-28 03:52:08.584 Df Runner[26941:13c4248] [com.jasonholtdigital.dart3d:scene] U3OV due target=8445217361178394631 dirty=true scheduled=false time=539891.2000000001
+2026-10-28 03:52:08.584 Df Runner[26941:13c4248] [com.jasonholtdigital.dart3d:scene] U3OV target-mask-encode target=8445217361178394631 view=0 time=539891.2000000001
+2026-10-28 03:52:08.585 Df Runner[26941:13c4248] [com.jasonholtdigital.dart3d:scene] U3OV target-normal-encode target=8445217361178394631 view=0 mode=2 aa=1 sameBuffer=true time=539891.2000000001
+2026-10-28 03:52:10.485 Df Runner[26941:13c4243] [com.jasonholtdigital.dart3d:scene] U3OV due target=8445217361178394631 dirty=true scheduled=false time=539893.1000000001
+2026-10-28 03:52:10.485 Df Runner[26941:13c4243] [com.jasonholtdigital.dart3d:scene] U3OV target-mask-encode target=8445217361178394631 view=0 time=539893.1000000001
+2026-10-28 03:52:10.485 Df Runner[26941:13c4243] [com.jasonholtdigital.dart3d:scene] U3OV target-normal-encode target=8445217361178394631 view=0 mode=2 aa=1 sameBuffer=true time=539893.1000000001
+2026-10-28 03:52:12.451 Df Runner[26941:13c4249] [com.jasonholtdigital.dart3d:scene] U3OV public-highlights 8445216278846636033:clear,8445216278846636034:clear
+2026-10-28 03:52:12.451 Df Runner[26941:13c4249] [com.jasonholtdigital.dart3d:scene] U3OV control mode=2 cameraCase=0 draws=0 time=539895.0666666668
+2026-10-28 03:52:14.385 Df Runner[26941:13c4248] [com.jasonholtdigital.dart3d:scene] U3OV due target=8445217361178394631 dirty=true scheduled=false time=539897.0000000001
+2026-10-28 03:52:14.385 Df Runner[26941:13c4248] [com.jasonholtdigital.dart3d:scene] U3OV target-mask-encode target=8445217361178394631 view=0 time=539897.0000000001
+2026-10-28 03:52:14.385 Df Runner[26941:13c4248] [com.jasonholtdigital.dart3d:scene] U3OV target-normal-encode target=8445217361178394631 view=0 mode=2 aa=1 sameBuffer=true time=539897.0000000001
+2026-10-28 03:53:34.323 Df Runner[26941:13c4249] [com.jasonholtdigital.dart3d:scene] U3OV control mode=0 cameraCase=0 draws=0 time=539976.9333333335

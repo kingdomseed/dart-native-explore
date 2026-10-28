@@ -1,0 +1,270 @@
+{
+  "worktree": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-b961d8d8",
+  "head": "2f38e4e33f0b1cb678bc408a42d069c796cefc12",
+  "reviewedDesignSha256": "88c100cd456e7025bb0fab725624ea37cfde7d0db149a66970c04fc589100bc1",
+  "requestedInputHashesVerified": {
+    "/private/tmp/dart3d-u3-outline-view-bindings-20261028/r1/worker/design.md": "88c100cd456e7025bb0fab725624ea37cfde7d0db149a66970c04fc589100bc1",
+    "/private/tmp/dart3d-u3-outline-view-bindings-20261028/r1/worker/source-receipt.json": "683a7cc241c3dcc328bfd1abaf422855717ae6f4060a60d23a0f8445e73d51e3",
+    "/private/tmp/dart3d-u3-outline-view-bindings-20261028/r1/worker/preservation-receipt.json": "e7d79489341da575286d845ea8cba08367d1161485ebfc1fe0c7be9fec79bcb5"
+  },
+  "sources": [
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-b961d8d8/dart3d/ios/Classes/SelectionOutline.swift",
+      "sha256": "6df1ba956e86e84455e19e322237d989818a2dbcd8c2feaf8a3a7b4f6faa5220",
+      "lines": 32,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-b961d8d8/dart3d/ios/Classes/SceneViewHost.swift",
+      "sha256": "201c97bc611f7d569e3f8f39f7d40b46115beb83c53f379e83100beac00ddd73",
+      "lines": 6060,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-b961d8d8/dart3d/ios/Classes/RenderTargets.swift",
+      "sha256": "4ae98bf9c638b626630d436644ae8406ae6e8fb7aace58285bd8b0a1ae84a38b",
+      "lines": 771,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-b961d8d8/dart3d/ios/Classes/ToneMapping.swift",
+      "sha256": "45aebc06f6fd24673dbd8d0d092364c86f9b0d20c4710b5bc258084168faaa43",
+      "lines": 575,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-b961d8d8/dart3d/ios/Classes/ScreenDebugPresentation.swift",
+      "sha256": "0b9962c3677b51f8f6fae037137859434706a7c08c6310ef463df968bb4422d7",
+      "lines": 374,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-b961d8d8/dart3d/ios/Classes/FsceneRealizer.swift",
+      "sha256": "2a3c6bd8977c723a0b8df17ae408b56c1d09f5f598d5dcb29c9dd8bc568042d5",
+      "lines": 8540,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-b961d8d8/dart3d/ios/Classes/Dart3dPlugin.swift",
+      "sha256": "d6c0db876999bb6cbd9c5edfc2624da9f2f362b75c08781a454de313c3cdf4b5",
+      "lines": 156,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-b961d8d8/dart3d/lib/src/scene_controller.dart",
+      "sha256": "05302404557ed885385b0488f57d5e1df0b4b07bdfdbdaabd42362e46d9bda1c",
+      "lines": 1195,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-b961d8d8/dart3d/pubspec.yaml",
+      "sha256": "9a41fdaa7b09b22b5b294eebd12b4cab58ad596194fa2fdefd42fe1bd92474f0",
+      "lines": 45,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": null
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-b961d8d8/dart3d/pubspec.lock",
+      "sha256": "868933c6c9bdd80476a9d1b6d380078eb8ecf45960820d8414beebd55a0b555f",
+      "lines": 445,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": null
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-b961d8d8/dart3d/README.md",
+      "sha256": "4821af3cc32a81682ffe3d4ab99fd1ad1c4137235aad7dc92712431138b2065a",
+      "lines": 291,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": null
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-b961d8d8/docs/program-v2.md",
+      "sha256": "92a83fc5b87bd3f76f15152487c407e0d563cdd73cdb90d1e3ad035f58ebc5ca",
+      "lines": 781,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-b961d8d8/docs/debug-views.md",
+      "sha256": "44304f5e6e68f01930aeec2f17c08f841a21e72e1fa24402303660f529880082",
+      "lines": 311,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": null
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-b961d8d8/.devin/skills/dart-native/SKILL.md",
+      "sha256": "191d83dfd51d896ffae687f5e3c8cc490df9bfcd86f3162dc14c830e7333ef78",
+      "lines": 341,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/Users/jasonholt/.pub-cache/hosted/pub.dev/flutter_scene-0.23.0/lib/src/render/selection_outline_pass.dart",
+      "sha256": "8903eba5f6ea05a5b60c68af9a220775998aa1c141f5e0ecaa5ea1165d33385e",
+      "lines": 196,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/Users/jasonholt/.pub-cache/hosted/pub.dev/flutter_scene-0.23.0/lib/src/render/object_filter.dart",
+      "sha256": "42cab45779187d55d50bc5de6d6c596a11947bb3de67b4e1b857edbe53bc03b4",
+      "lines": 261,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/Users/jasonholt/.pub-cache/hosted/pub.dev/flutter_scene-0.23.0/lib/src/render/render_scene.dart",
+      "sha256": "825b1b7ef5b4f64da8ee5eac80302e2ed83b4f51f1a5e8453912975e2d290e1d",
+      "lines": 807,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": null
+    },
+    {
+      "path": "/Users/jasonholt/.pub-cache/hosted/pub.dev/flutter_scene-0.23.0/lib/src/scene.dart",
+      "sha256": "97d610a8cf48cb706f5306b3a23b778618865894bc142a7fdfdc8f633b8d74ca",
+      "lines": 3055,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/Users/jasonholt/.pub-cache/hosted/pub.dev/flutter_scene-0.23.0/shaders/flutter_scene_mask.frag",
+      "sha256": "3ac96bf99f4388466300e7dca57e67d659c21a3804d472e04c3a2420dadcda19",
+      "lines": 18,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/Users/jasonholt/.pub-cache/hosted/pub.dev/flutter_scene-0.23.0/shaders/flutter_scene_outline.frag",
+      "sha256": "3900336ff45cd432a40c95e9f149812af297495b47bad5c8e77a9c3fdd129d38",
+      "lines": 60,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNTechnique.h",
+      "sha256": "1f0057a24db957f47bc2fa32fb2ad2d31f7faf91fc4988549da2b2b172d55a74",
+      "lines": 320,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNRenderer.h",
+      "sha256": "94bd9965b7ac3e97f2dd0f2aacaed51ef2da60e91e5c53e81c0581ef0a2dc484",
+      "lines": 102,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNSceneRenderer.h",
+      "sha256": "672f070bd65505d715a4f69bdf4ce187665fd87947d9e3d3edb1b5e22be9affc",
+      "lines": 389,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNSkinner.h",
+      "sha256": "41cbe9a7382cebf4350c68a43b23efe66a0fd081820441c7bab33cbd604fe8b5",
+      "lines": 84,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNMorpher.h",
+      "sha256": "e06c940f58c244302a4d9c08fccd56c097e1c6280400b71863f29a3e60028cfa",
+      "lines": 79,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNNode.h",
+      "sha256": "9cbf3b56efe9d885371b4530e9115946779152691a4ad174d5dcf7a584d4a722",
+      "lines": 695,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNView.h",
+      "sha256": "ecc5bad695c385f1c9ac01e8944fd9ddaf0b051c0d45ef1c310bcc4c6424ea90",
+      "lines": 170,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNCamera.h",
+      "sha256": "ab73dabe3d9a0825ad267aef0053dbf65e785a6861520503fa9929d184fd00c1",
+      "lines": 356,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": null
+    },
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNMaterialProperty.h",
+      "sha256": "6c4edb58d28636fb2909094e84289e4d01b7178806a73e115a5dbb284f46ea29",
+      "lines": 149,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": null
+    },
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandQueue.h",
+      "sha256": "6e9da7a33496e30ef20cd415a51dfc72cf1d3f6892b1d8d7e8cfdeab451f5761",
+      "lines": 102,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h",
+      "sha256": "d84dda866f07ffc37ce68e3c635177373cdefa419fc1f64c766442ed81966895",
+      "lines": 458,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/private/tmp/dart3d-u3-outline-view-bindings-20261028/r1/FRAME.md",
+      "sha256": "7fc4b34ef12ad5d06b367f5e6c28bbbc9f4483135a834e64056e5e3b6a3db0db",
+      "lines": 71,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    },
+    {
+      "path": "/private/tmp/dart3d-u3-outline-view-bindings-20261028/r1/worker/design.md",
+      "sha256": "88c100cd456e7025bb0fab725624ea37cfde7d0db149a66970c04fc589100bc1",
+      "lines": 183,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": null
+    },
+    {
+      "path": "/private/tmp/dart3d-u3-outline-view-bindings-20261028/r1/worker/source-receipt.json",
+      "sha256": "683a7cc241c3dcc328bfd1abaf422855717ae6f4060a60d23a0f8445e73d51e3",
+      "lines": 205,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": null
+    },
+    {
+      "path": "/private/tmp/dart3d-u3-outline-view-bindings-20261028/r1/worker/preservation-receipt.json",
+      "sha256": "e7d79489341da575286d845ea8cba08367d1161485ebfc1fe0c7be9fec79bcb5",
+      "lines": 39,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": null
+    },
+    {
+      "path": "/private/tmp/dart3d-e5b-outline-design-20261027/synthesis.md",
+      "sha256": "623ab56e94c17075ce6b7d02f902c4c9601286ec787f211ae19e9c58867f21e1",
+      "lines": 17,
+      "basis": "source/document/receipt inspection; partial source ranges where relevant",
+      "matchesWorkerSourceHash": true
+    }
+  ],
+  "missingDocumentedPaths": [
+    "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-b961d8d8/dartnative/docs/plugin_development.md"
+  ],
+  "sourceBoundary": "Current imported iOS call paths, installed SDK and pinned upstream sources. No old probe runtime result used. Android archive entries imported and hash-verified only; no Android source/behavior review.",
+  "memoryUse": "Scoping and proof boundaries only; no historical runtime conclusion accepted.",
+  "remoteOverlap": "FRAME snapshot read; no new claim of current PR/issue absence; no external calls."
+}

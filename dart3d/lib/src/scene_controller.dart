@@ -385,6 +385,43 @@ final class SceneController {
     _sendOrQueue(D3Protocol.payload, D3Protocol.payloadBytes(payload));
   }
 
+  /// Patches node highlights in the current native scene using linear RGBA.
+  ///
+  /// A null value clears that node; omitted nodes retain their colors. An
+  /// empty batch does nothing. Scalars are copied synchronously, and all
+  /// entries cross to native in one mutation. Components must be finite.
+  /// Highlights are runtime state and are excluded from [serializeScene].
+  ///
+  /// [loadDocument] and native view recreation clear this state. The controller
+  /// does not retain selection across detachment and reattachment. Before
+  /// first attachment, queue [loadDocument] before highlights.
+  /// Without a queued load, attachment flushes pending commands before an
+  /// implicit document reload, which supersedes any queued highlights.
+  /// [dispose] alone leaves a still-mounted native view and its state running.
+  void setNodeHighlights(Map<LocalId, Vector4?> updates) {
+    if (updates.isEmpty) return;
+    _sendOrQueue(
+      D3Protocol.command,
+      D3Protocol.commandBytes({
+        'op': 'setNodeHighlights',
+        'updates': [
+          for (final entry in updates.entries)
+            {
+              'node': entry.key.toToken(),
+              'color': entry.value == null
+                  ? null
+                  : [
+                      entry.value!.x,
+                      entry.value!.y,
+                      entry.value!.z,
+                      entry.value!.w,
+                    ],
+            },
+        ],
+      }),
+    );
+  }
+
   /// Applies structural ops (utf8 JSON commands) to the live scene without
   /// replacing it. Supported ops: `addNode`, `removeNode`, `updateNode`,
   /// `upsertResource`, `upsertPayload`, `updateStage`, `upsertSkin`,

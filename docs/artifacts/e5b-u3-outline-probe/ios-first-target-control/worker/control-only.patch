@@ -1,0 +1,187 @@
+diff --git a/dart3d/example/lib/u3_outline_views_main.dart b/dart3d/example/lib/u3_outline_views_main.dart
+--- a/dart3d/example/lib/u3_outline_views_main.dart
++++ b/dart3d/example/lib/u3_outline_views_main.dart
+@@ -8,6 +8,9 @@
+ const _msaa = bool.fromEnvironment('DART3D_U3_OUTLINE_TARGET_MSAA');
+ const _publishInUpdate = bool.fromEnvironment(
+   'DART3D_U3_OUTLINE_PUBLISH_IN_UPDATE',
++);
++const _bindBeforeInstall = bool.fromEnvironment(
++  'DART3D_U3_OUTLINE_BIND_BEFORE_INSTALL',
+ );
+ const _modeName = String.fromEnvironment(
+   'DART3D_U3_OUTLINE_MODE',
+@@ -36,6 +39,7 @@
+     single: _single,
+     targetMsaa: _msaa,
+     publishInUpdate: _publishInUpdate,
++    bindBeforeInstall: _bindBeforeInstall,
+     mode: _bootMode,
+   );
+   U3OutlineMode _mode = _bootMode;
+@@ -86,6 +90,7 @@
+                               mode,
+                               cameraB: _cameraB,
+                               publishInUpdate: _publishInUpdate,
++                              bindBeforeInstall: _bindBeforeInstall,
+                             );
+                           },
+                         ),
+@@ -137,6 +142,7 @@
+                             _mode,
+                             cameraB: _cameraB,
+                             publishInUpdate: _publishInUpdate,
++                            bindBeforeInstall: _bindBeforeInstall,
+                           );
+                           setU3OutlineCameraPose(
+                             _controller,
+diff --git a/dart3d/example/lib/u3_outline_views_scene.dart b/dart3d/example/lib/u3_outline_views_scene.dart
+--- a/dart3d/example/lib/u3_outline_views_scene.dart
++++ b/dart3d/example/lib/u3_outline_views_scene.dart
+@@ -20,6 +20,7 @@
+   bool single = false,
+   bool targetMsaa = false,
+   bool publishInUpdate = false,
++  bool bindBeforeInstall = false,
+   U3OutlineMode mode = U3OutlineMode.off,
+ }) {
+   final doc = SceneDocument(allocator: IdAllocator(session: 0x75337072));
+@@ -134,6 +135,7 @@
+       name: u3OutlineMarker,
+       transform: TrsTransform(
+         translation: Vector3(mode.index.toDouble(), 0, publishInUpdate ? 1 : 0),
++        scale: Vector3(bindBeforeInstall ? 2 : 1, 1, 1),
+       ),
+     ),
+   );
+@@ -252,6 +254,7 @@
+   U3OutlineMode mode, {
+   required bool cameraB,
+   bool publishInUpdate = false,
++  bool bindBeforeInstall = false,
+ }) => controller.setNodeTransforms([
+   NodeTransform(
+     u3OutlineControl,
+@@ -260,6 +263,7 @@
+       cameraB ? 1 : 0,
+       publishInUpdate ? 1 : 0,
+     ),
++    scale: bindBeforeInstall ? Vector3(2, 1, 1) : null,
+   ),
+ ]);
+ 
+diff --git a/dart3d/example/test/u3_outline_views_test.dart b/dart3d/example/test/u3_outline_views_test.dart
+--- a/dart3d/example/test/u3_outline_views_test.dart
++++ b/dart3d/example/test/u3_outline_views_test.dart
+@@ -143,12 +143,18 @@
+     },
+   );
+ 
+-  for (final publishInUpdate in [false, true]) {
++  for (final (publishInUpdate, bindBeforeInstall) in [
++    (false, false),
++    (true, false),
++    (false, true),
++    (true, true),
++  ]) {
+     test(
+-      'publication selector=$publishInUpdate survives public mode/camera writes without requesting a draw',
++      'publication=$publishInUpdate bindBeforeInstall=$bindBeforeInstall survive public mode/camera writes without requesting a draw',
+       () {
+         final doc = buildU3OutlineViewsDocument(
+           publishInUpdate: publishInUpdate,
++          bindBeforeInstall: bindBeforeInstall,
+         );
+         final controller = SceneController()..loadDocument(doc);
+         addTearDown(controller.dispose);
+@@ -188,6 +194,13 @@
+           0,
+           publishInUpdate ? 1 : 0,
+         ]);
++        expect(
++          (controller.document!.nodes[u3OutlineControl]!.transform
++                  as TrsTransform)
++              .scale
++              .x,
++          bindBeforeInstall ? 2 : 1,
++        );
+         marker['transform'] = originalMarker['transform'];
+         loaded['documentId'] = original['documentId'];
+         expect(loaded, original);
+@@ -198,6 +211,7 @@
+             mode,
+             cameraB: true,
+             publishInUpdate: publishInUpdate,
++            bindBeforeInstall: bindBeforeInstall,
+           );
+         }
+         expect(sink.mutations, hasLength(3));
+@@ -205,6 +219,7 @@
+           final mutation = sink.mutations[i];
+           expect(mutation.tag, D3Protocol.setTransforms);
+           final data = ByteData.sublistView(mutation.data);
++          expect(data.getUint8(12), bindBeforeInstall ? 5 : 1);
+           expect(
+             [
+               for (var c = 0; c < 3; c++)
+@@ -212,6 +227,15 @@
+             ],
+             [i.toDouble(), 1, publishInUpdate ? 1 : 0],
+           );
++          if (bindBeforeInstall) {
++            expect(
++              [
++                for (var c = 0; c < 3; c++)
++                  data.getFloat32(25 + c * 4, Endian.little),
++              ],
++              [2, 1, 1],
++            );
++          }
+         }
+         expect(sink.commands, isEmpty);
+         setU3OutlineColors(controller);
+diff --git a/dart3d/ios/Classes/RenderTargets.swift b/dart3d/ios/Classes/RenderTargets.swift
+--- a/dart3d/ios/Classes/RenderTargets.swift
++++ b/dart3d/ios/Classes/RenderTargets.swift
+@@ -400,7 +400,12 @@
+                     layerMask: cam.categoryBitMask, width: rec.width, height: rec.height,
+                     outputWidth: rec.width, outputHeight: rec.height, commandBuffer: cb, host: self)
+                 if renderer.technique == nil, let device = renderDevice() {
+-                    renderer.technique = ToneMapTechnique.make(device: device, outline: true, compositeOnly: true)
++                    let technique = ToneMapTechnique.make(device: device, outline: true, compositeOnly: true)
++                    if frame.bindBeforeInstall {
++                        binding?.bind(technique, frame: frame)
++                    }
++                    renderer.technique = technique
++                    d3Log("U3OV target-technique-install target=\(key) view=\(viewIndex) bindBeforeInstall=\(frame.bindBeforeInstall) mode=\(frame.mode) time=\(frame.time)")
+                 }
+                 binding?.bind(renderer.technique, frame: frame)
+             } else {
+diff --git a/dart3d/ios/Classes/SelectionOutlineViewsProbe.swift b/dart3d/ios/Classes/SelectionOutlineViewsProbe.swift
+--- a/dart3d/ios/Classes/SelectionOutlineViewsProbe.swift
++++ b/dart3d/ios/Classes/SelectionOutlineViewsProbe.swift
+@@ -16,6 +16,7 @@
+     let mode: Int
+     let cameraCase: Int
+     let publishInUpdate: Bool
++    let bindBeforeInstall: Bool
+     let draws: [Draw]
+ }
+ 
+@@ -81,6 +82,7 @@
+         let cameraCase = Int(control.position.y.rounded())
+         // Authored marker z=1 is reflected to SceneKit z=-1 at both native ingresses.
+         let publishInUpdate = control.position.z == -1
++        let bindBeforeInstall = control.scale.x == 2
+         if tailEnabled != (mode != 0) {
+             tailEnabled = mode != 0
+             host.invalidateOutlineViewsResolve()
+@@ -138,7 +140,7 @@
+         }
+         templates = templates.filter { used.contains($0.key) }
+         frame = OutlineViewsFrame(time: time, mode: mode, cameraCase: cameraCase,
+-            publishInUpdate: publishInUpdate, draws: draws)
++            publishInUpdate: publishInUpdate, bindBeforeInstall: bindBeforeInstall, draws: draws)
+         let label = "mode=\(mode) cameraCase=\(cameraCase) draws=\(draws.count) publishInUpdate=\(publishInUpdate)"
+         if label != lastControl { d3Log("U3OV control \(label) time=\(time)"); lastControl = label }
+         guard !host.multiScreenMode, mode != 0, let pov = host.pointOfView,

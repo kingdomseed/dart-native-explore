@@ -146,7 +146,7 @@ mkdir -p "$plugin_dir"
 : > "$work/app-index.txt"
 while read -r fingerprint key; do
   case "$key" in
-    'lit|'*'|e0|s31|'*|'trail|'*|'catcher|'*|'particle|'*)
+    'lit|'*'|e0|s31|'*|'trail|'*|'catcher|'*|'particle|'*|'sprite|'*)
       cp "$work/out/$fingerprint.filamat" "$plugin_dir/"
       echo "$fingerprint $key" >> "$work/plugin-index.txt" ;;
     *)

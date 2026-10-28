@@ -1974,6 +1974,9 @@ enum FsceneRealizer {
                 host.retire(old)
             }
             node.geometry = geometry
+            if shape == "billboard" {
+                node.castsShadow = geometry.firstMaterial?.name != "d3.sprite"
+            }
             if let t = host.pendingColliderShapes.removeValue(forKey: key) {
                 let s = derivedShape(node, t, "deferred")
                 if let body = node.physicsBody, body.physicsShape == nil {
@@ -2321,6 +2324,47 @@ enum FsceneRealizer {
                 return
             }
             shadowCatcherConfigurations.removeValue(forKey: key)
+            if type == "d3:sprite" {
+                let props = r["properties"] as? [String: Any] ?? [:]
+                let additive = d3String(props["blendMode"]) == "additive"
+                m.name = "d3.sprite"
+                m.lightingModel = .constant
+                m.isDoubleSided = true
+                m.readsFromDepthBuffer = true
+                m.writesToDepthBuffer = false
+                m.blendMode = additive ? .add : .alpha
+                // SceneKit's .add also adds alpha; preserve destination coverage.
+                m.colorBufferWriteMask = additive ? [.red, .green, .blue] : .all
+                m.transparencyMode = .aOne
+                m.diffuse.contents = UIColor.white
+                let tint = d3ColorComponents(props["baseColor"])
+                    ?? [1, 1, 1, 1]
+                m.setValue(SCNVector4(tint[0], tint[1], tint[2], tint[3]),
+                           forKey: "d3SpriteTint")
+                // SceneKit's transparent modifier requires premultiplied RGB.
+                m.shaderModifiers = [.geometry: """
+                    #pragma varyings
+                    float4 d3SpriteColor;
+                    #pragma body
+                    out.d3SpriteColor = _geometry.color;
+                    _geometry.color = float4(1.0);
+                    """, .fragment: """
+                    #pragma arguments
+                    float4 d3SpriteTint;
+                    #pragma transparent
+                    #pragma body
+                    float4 c = _surface.diffuse * d3SpriteTint
+                        * in.d3SpriteColor;
+                    _output.color = float4(c.rgb * c.a, c.a);
+                    """]
+                if props["baseColorTexture"] != nil {
+                    applyTextureSlot(m, materialKey: key,
+                                     slot: "baseColorTexture")
+                }
+                warnUnhandledMaterialProps(key, props)
+                materials[key] = m
+                return
+            }
             m.lightingModel = type == "unlit"
                 ? .constant : .physicallyBased
             let props = r["properties"] as? [String: Any] ?? [:]
@@ -2601,7 +2645,7 @@ enum FsceneRealizer {
         /// else warn-onces as unhandled — the conformance matrix's
         /// `warn` row.
         static let handledMaterialProps: Set<String> = [
-            "baseColor", "baseColorTexture",
+            "baseColor", "baseColorTexture", "blendMode",
             "metallic", "roughness", "metallicRoughnessTexture",
             "normalTexture", "normalScale",
             "occlusionTexture", "occlusionStrength",
@@ -2659,6 +2703,26 @@ enum FsceneRealizer {
                 list.append(TextureBinding(
                     material: m, materialKey: materialKey, slot: slot))
                 textureConsumers[texKey] = list
+            }
+            if m.name == "d3.sprite", slot == "baseColorTexture" {
+                if let rt = renderTargets[texKey] {
+                    applyRenderTextureSlot(m, rt: rt, slot: slot)
+                } else {
+                    if let tex = textures[texKey] {
+                        bindTextureContents(m.diffuse, tex: tex, baked: nil,
+                            logKey: "material.\(materialKey).sprite.mips")
+                    } else {
+                        m.diffuse.contents = UIColor.white
+                    }
+                    m.diffuse.minificationFilter = .linear
+                    m.diffuse.magnificationFilter = .linear
+                    m.diffuse.wrapS = .clamp
+                    m.diffuse.wrapT = .clamp
+                }
+                applyContentsTransform(m.diffuse,
+                    props["baseColorTextureTransform"],
+                    materialKey: materialKey, slot: slot)
+                return
             }
             // W14: a renderTexture ref binds the live color texture —
             // the slot samples whatever the offscreen passes last drew.
@@ -4270,6 +4334,7 @@ enum FsceneRealizer {
                 + "vmap=\(b.materialsByVariant.count) target=\(which)")
             dropShadowCatcherBindings(geo)
             geo.materials[0] = target
+            host.applyBillboardMaterialPolicy(b.nodeKey)
             b.applied = target
             b.appliedGeometry = geo
             b.resolved = true

@@ -1,0 +1,55 @@
+{
+  "preexisting_files": 1902,
+  "preexisting_unowned_files_verified": 1873,
+  "imported_unowned_peers_verified": 65,
+  "six_locks_unchanged": true,
+  "all_final70_verified": true,
+  "kept_generated_files": [
+    "dart3d/example/ios/DartNative/Generated.xcconfig",
+    "dart3d/example/ios/DartNative/dn_export_environment.sh"
+  ],
+  "generated_outputs_removed": [
+    {
+      "path": "dart3d/.dart_tool",
+      "entries": 4
+    },
+    {
+      "path": "dart3d/build",
+      "entries": 8
+    },
+    {
+      "path": "dart3d/example/.dart_tool",
+      "entries": 135
+    },
+    {
+      "path": "dart3d/example/build",
+      "entries": 4506
+    },
+    {
+      "path": "dart3d/example/ios/Pods",
+      "entries": 144
+    },
+    {
+      "path": "dart3d/example/ios/.symlinks",
+      "entries": 2
+    },
+    {
+      "path": "dart3d/example/ios/DartNative/ephemeral",
+      "entries": 10
+    },
+    {
+      "path": "dart3d/example/.dn-plugins-dependencies",
+      "symlink": false
+    },
+    {
+      "path": "dart3d/example/android/local.properties",
+      "symlink": false
+    },
+    {
+      "path": "dart3d/example/ios/DartNative/DartNativeCore.podspec",
+      "symlink": false
+    }
+  ],
+  "head": "2f38e4e33f0b1cb678bc408a42d069c796cefc12",
+  "parent_access": "read-only"
+}

@@ -1,0 +1,534 @@
+diff --git a/dart3d/example/lib/showcase_loader.dart b/dart3d/example/lib/showcase_loader.dart
+index 81692ee..b888c73 100644
+--- a/dart3d/example/lib/showcase_loader.dart
++++ b/dart3d/example/lib/showcase_loader.dart
+@@ -28,6 +28,7 @@ import 'u2_catcher_scene.dart';
+ import 'u2_geometry_scene.dart';
+ import 'u3_atlas_probe.dart';
+ import 'u3_tone_scene.dart';
++import 'u3_highlight_state_scene.dart';
+ import 'u3_sprite_scene.dart';
+ import 'u4_property_scene.dart';
+ import 'u4_material_scene.dart';
+@@ -173,6 +174,11 @@ const showcaseItems = [
+     kBuiltinU3AtlasProbeKey,
+     'Image atlas UV probe',
+   ),
++  ShowcaseItem(
++    'u3-highlight-state',
++    kBuiltinU3HighlightStateKey,
++    'Temporary native state probe',
++  ),
+   ShowcaseItem('u3-tone', kBuiltinU3ToneKey, 'iOS five-tone HDR comparison'),
+   ShowcaseItem('u3-sprite', kBuiltinU3SpriteKey, 'Standalone sprite material'),
+   ShowcaseItem('u4-snapshots', kBuiltinU4SnapshotsKey, 'Current · snapshot'),
+@@ -201,6 +207,7 @@ const String kBuiltinU3SpriteKey = 'builtin:u3-sprite';
+ 
+ const String kBuiltinU3AtlasProbeKey = 'builtin:u3-atlas-probe';
+ 
++const String kBuiltinU3HighlightStateKey = 'builtin:u3-highlight-state';
+ const String kBuiltinU3ToneKey = 'builtin:u3-tone';
+ 
+ /// The synthetic asset key for the W21 materials conformance scene —
+@@ -386,6 +393,18 @@ ShowcaseScene? loadShowcaseScene(
+       summary: 'Top: sheet · below: selected cell',
+     );
+   }
++  if (item.assetKey == kBuiltinU3HighlightStateKey) {
++    final doc = buildU3HighlightStateDocument();
++    log?.call('dart3d: u3-highlight-state ready; press button to begin');
++    return ShowcaseScene(
++      document: doc,
++      cameraNode: u3HighlightCamera,
++      cameraTarget: Vector3.zero(),
++      cameraDir: Vector3(0, 0, -1),
++      frameRadius: 0,
++      summary: 'Parent left, child center, sentinel right. State logs only.',
++    );
++  }
+   if (item.assetKey == kBuiltinU3ToneKey) {
+     final tone = U3Tone.values.byName(kBootU3Tone);
+     final doc = buildU3ToneDocument(tone: tone);
+diff --git a/dart3d/example/lib/showcase_scene.dart b/dart3d/example/lib/showcase_scene.dart
+index 0c71c42..7d0479b 100644
+--- a/dart3d/example/lib/showcase_scene.dart
++++ b/dart3d/example/lib/showcase_scene.dart
+@@ -20,6 +20,7 @@ import 'u2_catcher_scene.dart';
+ import 'u2_geometry_scene.dart';
+ import 'u3_atlas_probe.dart';
+ import 'u3_tone_scene.dart';
++import 'u3_highlight_state_scene.dart';
+ import 'u3_sprite_scene.dart';
+ import 'u4_property_scene.dart';
+ import 'u4_owner_scene.dart';
+@@ -85,6 +86,7 @@ class ShowcaseScreen extends StatefulWidget {
+ 
+ class _ShowcaseScreenState extends State<ShowcaseScreen> {
+   final _controller = SceneController();
++  int _highlightStep = 0;
+ 
+   /// The gallery roster — the upstream corpus. Dice live on their own
+   /// tab; a single die reads huge next to the authored scenes.
+@@ -181,6 +183,7 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
+   }
+ 
+   void _load(ShowcaseItem item) {
++    _highlightStep = 0;
+     _propertyControls = null;
+     _lightControls = null;
+     _ownerControls = null;
+@@ -225,6 +228,7 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
+         item.assetKey == kBuiltinU4MaterialsKey ||
+         item.assetKey == kBuiltinU3SpriteKey ||
+         item.assetKey == kBuiltinU3ToneKey ||
++        item.assetKey == kBuiltinU3HighlightStateKey ||
+         item.assetKey == kBuiltinU3AtlasProbeKey) {
+       _orbitController = null;
+       _activeCameraController = null;
+@@ -1348,6 +1352,7 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
+     final isU2 = item.assetKey == kBuiltinU2Key;
+     final isU2Catcher = item.assetKey == kBuiltinU2CatcherKey;
+     final isAtlasProbe = item.assetKey == kBuiltinU3AtlasProbeKey;
++    final isHighlightState = item.assetKey == kBuiltinU3HighlightStateKey;
+     final isU3Tone = item.assetKey == kBuiltinU3ToneKey;
+     final isSprite = item.assetKey == kBuiltinU3SpriteKey;
+     final u2CatcherVariantName =
+@@ -1395,6 +1400,7 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
+                     item.assetKey == kBuiltinU4OwnersKey ||
+                     item.assetKey == kBuiltinU4MaterialsKey ||
+                     isU3Tone ||
++                    isHighlightState ||
+                     isAtlasProbe ||
+                     isSprite) {
+                   return SceneView(
+@@ -1666,6 +1672,42 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
+                               ],
+                             ),
+                         ],
++                        if (isHighlightState && _scene != null) ...[
++                          const SizedBox(height: 8),
++                          Text(
++                            _highlightStep == 0
++                                ? 'Ready. Press to start. Read native logs.'
++                                : 'Requested stage $_highlightStep/7. Read native logs.',
++                            style: const TextStyle(
++                              color: Color(0xEEFFFFFF),
++                              fontSize: 12,
++                            ),
++                          ),
++                          Button(
++                            title: _highlightStep < U3HighlightStep.values.length
++                                ? U3HighlightStep.values[_highlightStep].title
++                                : 'Sequence finished. Read native logs.',
++                            onPressed: _highlightStep < U3HighlightStep.values.length
++                                ? () {
++                                    final step =
++                                        U3HighlightStep.values[_highlightStep];
++                                    dnLog(
++                                      'dart3d: u3-highlight-state requested ${step.title}',
++                                    );
++                                    runU3HighlightStep(_controller, step);
++                                    setState(() => _highlightStep++);
++                                  }
++                                : null,
++                            shape: const StadiumBorder(),
++                            color: const Color(0x2EFFFFFF),
++                            foregroundColor: const Color(0xEEFFFFFF),
++                            padding: const EdgeInsets.symmetric(
++                              horizontal: 12,
++                              vertical: 5,
++                            ),
++                            fontSize: 12,
++                          ),
++                        ],
+                         if (isU3Tone && _scene != null) ...[
+                           const SizedBox(height: 8),
+                           Button(
+diff --git a/dart3d/example/lib/u3_highlight_state_scene.dart b/dart3d/example/lib/u3_highlight_state_scene.dart
+new file mode 100644
+index 0000000..c7f399a
+--- /dev/null
++++ b/dart3d/example/lib/u3_highlight_state_scene.dart
+@@ -0,0 +1,139 @@
++library;
++
++import 'dart:typed_data';
++
++import 'package:dart3d/dart3d.dart';
++import 'package:vector_math/vector_math.dart';
++
++const u3HighlightParent = LocalId(0x7533, 1);
++const u3HighlightChild = LocalId(0x7533, 2);
++const u3HighlightSentinel = LocalId(0x7533, 3);
++const u3HighlightCamera = LocalId(0x7533, 4);
++
++SceneDocument buildU3HighlightStateDocument() {
++  final doc = SceneDocument(
++    documentId: DocumentId(Uint8List.fromList(List.generate(16, (i) => i))),
++    allocator: IdAllocator(session: 0x7534),
++  );
++  final geometry = doc.addResource(
++    GeometryResource(
++      doc.newId(),
++      procedural: CuboidGeometrySpec(extents: Vector3.all(0.7)),
++    ),
++  );
++  final material = doc.addResource(
++    MaterialResource(
++      doc.newId(),
++      type: 'physicallyBased',
++      properties: {
++        'baseColor': const ColorValue(0.3, 0.6, 0.8, 1),
++        'emissive': const ColorValue(0.3, 0.6, 0.8, 1),
++        'emissiveStrength': const DoubleValue(1),
++      },
++    ),
++  );
++  for (final (id, name, x) in [
++    (u3HighlightParent, 'parent', -1.2),
++    (u3HighlightChild, 'child', 1.2),
++    (u3HighlightSentinel, 'sentinel', 1.2),
++  ]) {
++    doc.addNode(
++      NodeSpec(
++        id: id,
++        name: 'u3.highlight.$name',
++        transform: TrsTransform(translation: Vector3(x, 1, 0)),
++        children: id == u3HighlightParent ? [u3HighlightChild] : [],
++        components: [
++          ComponentSpec(
++            'mesh',
++            properties: {
++              'geometry': ResourceRefValue(geometry.id),
++              'material': ResourceRefValue(material.id),
++            },
++          ),
++        ],
++      ),
++      root: id != u3HighlightChild,
++    );
++  }
++  doc.addNode(
++    NodeSpec(
++      id: u3HighlightCamera,
++      name: 'u3.highlight.camera',
++      transform: TrsTransform(translation: Vector3(0, 0, -10)),
++      components: [
++        ComponentSpec(
++          'camera',
++          properties: {
++            'projection': const StringValue('perspective'),
++            'fovRadiansY': const DoubleValue(0.8),
++            'near': const DoubleValue(0.1),
++            'far': const DoubleValue(30),
++          },
++        ),
++      ],
++    ),
++    root: true,
++  );
++  return doc;
++}
++
++enum U3HighlightStep {
++  assign('1/7 Assign two colors'),
++  patch('2/7 Clear parent, set sentinel'),
++  edit('3/7 Move child, patch sentinel'),
++  remove('4/7 Remove parent and child'),
++  reAdd('5/7 Re-add same IDs'),
++  selectAgain('6/7 Highlight child explicitly'),
++  replace('7/7 Load fresh same-ID scene');
++
++  const U3HighlightStep(this.title);
++  final String title;
++}
++
++void runU3HighlightStep(SceneController controller, U3HighlightStep step) {
++  switch (step) {
++    case U3HighlightStep.assign:
++      controller.setNodeHighlights({
++        u3HighlightParent: Vector4(1, 0.25, 0, 1),
++        u3HighlightChild: Vector4(0, 0.5, 1, 0.5),
++      });
++    case U3HighlightStep.patch:
++      controller.setNodeHighlights({
++        u3HighlightParent: null,
++        u3HighlightSentinel: Vector4(0.25, 1, 0, 0),
++      });
++    case U3HighlightStep.edit:
++      controller.setNodeTransforms([
++        NodeTransform(u3HighlightChild, translation: Vector3(1.2, 1.25, 0)),
++      ]);
++      controller.setNodeHighlights({
++        u3HighlightSentinel: Vector4(0.25, 1, 0, 0.25),
++      });
++    case U3HighlightStep.remove:
++      controller.removeNode(u3HighlightParent);
++      controller.setNodeHighlights({
++        u3HighlightSentinel: Vector4(0.5, 1, 0, 0.25),
++      });
++    case U3HighlightStep.reAdd:
++      final fresh = buildU3HighlightStateDocument();
++      controller.applyCommands([
++        for (final id in [u3HighlightParent, u3HighlightChild])
++          {
++            'op': 'addNode',
++            'node': id.toToken(),
++            'parent': id == u3HighlightChild
++                ? u3HighlightParent.toToken()
++                : null,
++            'spec': encodeNodeCommandSpec(fresh.nodes[id]!, fresh),
++          },
++      ]);
++      controller.setNodeHighlights({
++        u3HighlightSentinel: Vector4(0.75, 1, 0, 0.25),
++      });
++    case U3HighlightStep.selectAgain:
++      controller.setNodeHighlights({u3HighlightChild: Vector4(1, 0, 1, 0.5)});
++    case U3HighlightStep.replace:
++      controller.loadDocument(buildU3HighlightStateDocument());
++  }
++}
+diff --git a/dart3d/example/test/u3_highlight_state_showcase_test.dart b/dart3d/example/test/u3_highlight_state_showcase_test.dart
+new file mode 100644
+index 0000000..c6c929d
+--- /dev/null
++++ b/dart3d/example/test/u3_highlight_state_showcase_test.dart
+@@ -0,0 +1,203 @@
++// ignore_for_file: implementation_imports
++
++import 'dart:convert';
++import 'dart:typed_data';
++
++import 'package:dart3d/dart3d.dart';
++import 'package:dart3d/src/protocol.dart';
++import 'package:dart3d/src/scene_view.dart';
++import 'package:dart3d_example/app_route.dart';
++import 'package:dart3d_example/showcase_loader.dart';
++import 'package:dart3d_example/u3_highlight_state_scene.dart';
++import 'package:test/test.dart';
++import 'package:vector_math/vector_math.dart';
++
++void main() {
++  test(
++    'route loads deterministic visible hierarchy without highlight commands',
++    () {
++      final item = showcaseItems.singleWhere(
++        (i) => i.label == 'u3-highlight-state',
++      );
++      expect(AppRoute.boot(model: item.label).screen, AppScreen.showcase);
++      expect(item.assetKey, kBuiltinU3HighlightStateKey);
++      final scene = loadShowcaseScene(item)!;
++      expect(scene.frameRadius, 0);
++      expect(scene.cameraNode, u3HighlightCamera);
++      expect(scene.document.nodes, hasLength(4));
++      expect(scene.document.nodes[u3HighlightParent]!.children, [
++        u3HighlightChild,
++      ]);
++      expect(
++        scene.document.roots,
++        containsAll([u3HighlightParent, u3HighlightSentinel]),
++      );
++      expect(scene.document.roots, isNot(contains(u3HighlightChild)));
++      expect(
++        writeFsceneWithExtensions(scene.document),
++        writeFsceneWithExtensions(buildU3HighlightStateDocument()),
++      );
++      final controller = SceneController()..loadDocument(scene.document);
++      addTearDown(controller.dispose);
++      final sink = _Sink(controller);
++      controller.attachElement(sink);
++      expect(sink.mutations.map((m) => m.tag), [D3Protocol.loadScene]);
++    },
++  );
++
++  test(
++    'manual actions emit public controller mutations with literal values',
++    () {
++      final controller = SceneController()
++        ..loadDocument(buildU3HighlightStateDocument());
++      addTearDown(controller.dispose);
++      final sink = _Sink(controller);
++      controller.attachElement(sink);
++      sink.mutations.clear();
++
++      Map<String, dynamic> command() {
++        final mutation = sink.mutations.removeAt(0);
++        expect(mutation.tag, D3Protocol.command);
++        return jsonDecode(utf8.decode(mutation.data)) as Map<String, dynamic>;
++      }
++
++      runU3HighlightStep(controller, U3HighlightStep.assign);
++      expect(command(), {
++        'op': 'setNodeHighlights',
++        'updates': [
++          {
++            'node': u3HighlightParent.toToken(),
++            'color': [1, 0.25, 0, 1],
++          },
++          {
++            'node': u3HighlightChild.toToken(),
++            'color': [0, 0.5, 1, 0.5],
++          },
++        ],
++      });
++      runU3HighlightStep(controller, U3HighlightStep.patch);
++      expect(command(), {
++        'op': 'setNodeHighlights',
++        'updates': [
++          {'node': u3HighlightParent.toToken(), 'color': null},
++          {
++            'node': u3HighlightSentinel.toToken(),
++            'color': [0.25, 1, 0, 0],
++          },
++        ],
++      });
++      runU3HighlightStep(controller, U3HighlightStep.edit);
++      final transform = sink.mutations.removeAt(0);
++      expect(transform.tag, D3Protocol.setTransforms);
++      final bytes = ByteData.sublistView(transform.data);
++      expect(bytes.getUint32(0, Endian.little), 1);
++      expect(bytes.getUint32(4, Endian.little), 0x7533);
++      expect(bytes.getUint32(8, Endian.little), 2);
++      expect(bytes.getUint8(12), 1);
++      expect(bytes.getFloat32(13, Endian.little), closeTo(1.2, 0.00001));
++      expect(bytes.getFloat32(17, Endian.little), 1.25);
++      expect(bytes.getFloat32(21, Endian.little), 0);
++      expect(
++        (controller.document!.nodes[u3HighlightChild]!.transform
++                as TrsTransform)
++            .translation,
++        Vector3(1.2, 1.25, 0),
++      );
++      expect(command()['updates'], [
++        {
++          'node': u3HighlightSentinel.toToken(),
++          'color': [0.25, 1, 0, 0.25],
++        },
++      ]);
++
++      runU3HighlightStep(controller, U3HighlightStep.remove);
++      expect(command(), {
++        'op': 'removeNode',
++        'node': u3HighlightParent.toToken(),
++      });
++      expect(
++        controller.document!.nodes.containsKey(u3HighlightParent),
++        isFalse,
++      );
++      expect(controller.document!.nodes.containsKey(u3HighlightChild), isFalse);
++      expect(command()['updates'], [
++        {
++          'node': u3HighlightSentinel.toToken(),
++          'color': [0.5, 1, 0, 0.25],
++        },
++      ]);
++
++      runU3HighlightStep(controller, U3HighlightStep.reAdd);
++      final adds = command();
++      expect(adds['op'], 'batch');
++      final ops = (adds['ops'] as List).cast<Map>();
++      expect(ops.map((op) => op['op']), ['addNode', 'addNode']);
++      expect(ops.map((op) => op['node']), [
++        u3HighlightParent.toToken(),
++        u3HighlightChild.toToken(),
++      ]);
++      expect(ops.map((op) => op['parent']), [
++        null,
++        u3HighlightParent.toToken(),
++      ]);
++      expect(controller.document!.nodes[u3HighlightParent]!.children, [
++        u3HighlightChild,
++      ]);
++      expect(command()['updates'], [
++        {
++          'node': u3HighlightSentinel.toToken(),
++          'color': [0.75, 1, 0, 0.25],
++        },
++      ]);
++
++      runU3HighlightStep(controller, U3HighlightStep.selectAgain);
++      expect(command()['updates'], [
++        {
++          'node': u3HighlightChild.toToken(),
++          'color': [1, 0, 1, 0.5],
++        },
++      ]);
++      runU3HighlightStep(controller, U3HighlightStep.replace);
++      final replacement = sink.mutations.removeAt(0);
++      expect(replacement.tag, D3Protocol.loadScene);
++      expect(
++        replacement.data,
++        D3Protocol.loadSceneBytes(buildU3HighlightStateDocument()),
++      );
++      expect(sink.mutations, isEmpty);
++    },
++  );
++
++  test('objects and moved child project above the portrait footer', () {
++    final doc = buildU3HighlightStateDocument();
++    final camera = SceneCamera.fromDocument(
++      doc,
++      cameraNode: u3HighlightCamera,
++    )!;
++    for (final (width, height) in [(402.0, 874.0), (390.0, 844.0)]) {
++      for (final x in [-1.55, -0.85, -0.35, 0.35, 0.85, 1.55]) {
++        for (final y in [0.65, 2.6]) {
++          for (final z in [-0.35, 0.35]) {
++            final screen = camera.worldToScreen(
++              Vector3(x, y, z),
++              width,
++              height,
++            )!;
++            expect(screen.$1, inInclusiveRange(16, width - 16));
++            expect(screen.$2, inInclusiveRange(80, height - 220));
++          }
++        }
++      }
++    }
++  });
++}
++
++class _Sink extends SceneViewElement {
++  _Sink(SceneController controller)
++    : super(SceneViewLeaf(controller: controller));
++  final mutations = <({int tag, Uint8List data})>[];
++
++  @override
++  void sendMutation(int tag, Uint8List data) =>
++      mutations.add((tag: tag, data: data));
++}
+diff --git a/dart3d/ios/Classes/SelectionOutline.swift b/dart3d/ios/Classes/SelectionOutline.swift
+index 7c02dde..295338c 100644
+--- a/dart3d/ios/Classes/SelectionOutline.swift
++++ b/dart3d/ios/Classes/SelectionOutline.swift
+@@ -16,17 +16,29 @@ final class SelectionOutline {
+         for change in changes {
+             colors[change.node] = change.color
+         }
++        logDiagnostic("apply")
+     }
+ 
+     func removeNodes(_ ids: [UInt64]) {
+         for id in ids { colors.removeValue(forKey: id) }
++        logDiagnostic("removeNodes")
+     }
+ 
+     func retainNodes(_ ids: Set<UInt64>) {
+         colors = colors.filter { ids.contains($0.key) }
++        logDiagnostic("retainNodes")
+     }
+ 
+     func clearScene() {
+         colors.removeAll()
++        logDiagnostic("clearScene")
++    }
++
++    private func logDiagnostic(_ operation: String) {
++        let entries = colors.keys.sorted().map { id in
++            let color = colors[id]!
++            return "\(id)=[\(color.r),\(color.g),\(color.b),\(color.a)]"
++        }.joined(separator: ";")
++        d3Log("U3HighlightState op=\(operation) count=\(colors.count) colors={\(entries)}")
+     }
+ }
