@@ -12,6 +12,12 @@ final class SelectionOutline {
 
     private var colors: [UInt64: LinearRGBA] = [:]
 
+    var isEmpty: Bool { colors.isEmpty }
+
+    func forEachActive(_ visit: (UInt64, LinearRGBA) -> Void) {
+        for id in colors.keys.sorted() { visit(id, colors[id]!) }
+    }
+
     func apply(_ changes: [Change]) {
         for change in changes {
             colors[change.node] = change.color

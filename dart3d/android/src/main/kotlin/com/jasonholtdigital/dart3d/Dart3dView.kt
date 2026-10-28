@@ -2321,6 +2321,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             for ((_, m) in materialInstances) engine.destroyMaterialInstance(m)
             materialInstances = HashMap()
             bakedShadowCatchers.dispose()
+            selectionOutlineRenderer.dispose()
             // W14: per-entry Views/Cameras and rt recs die here — the
             // rec owns its textures, so the texture sweep skips rt
             // keys (the shared `view` lets go of rec cameras first).
@@ -2564,6 +2565,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
 
     private fun applyLoadScene(data: ByteArray) {
         selectionOutline.clearScene()
+        selectionOutlineRenderer.clearPasses()
         lastManifest = data
         // Payload ids are document-local (session,index) — a previous
         // document's bytes would shadow this doc's chunks at colliding
@@ -2764,6 +2766,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     private var replayingJournal = false
 
     private val selectionOutline = SelectionOutline()
+    private val selectionOutlineRenderer = SelectionOutlineRenderer(this)
 
     private val transformWrites = TransformWrites()
 
@@ -3471,6 +3474,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             n++
         }
         if (old != null) {
+            selectionOutlineRenderer.clearPasses()
             engine.destroyRenderTarget(old.rt)
             engine.destroyTexture(old.colorTex)
             old.depthTex?.let { engine.destroyTexture(it) }
@@ -3491,6 +3495,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      * `view` is restored to the default pass exactly.
      */
     private fun applyViews(recs: List<RenderTargets.ViewRec>) {
+        selectionOutlineRenderer.clearPasses()
         // The shared screen view must never hold a dying camera.
         view.camera = camera
         for (rec in viewRecs) destroyViewObjects(rec)
@@ -5758,16 +5763,45 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         val sc = swapChain ?: return false
         bakedShadowCatchers.renderDirty(
             renderer, FsceneRealizer.surgicalContext(this))
+        val dueTargets = renderTargets.entries.filter { (_, rec) ->
+            rec.views.isNotEmpty() && RenderTargets.due(rec, tNanos)
+        }
+        val outlineRequests = ArrayList<SelectionOutlineRenderer.Request>()
+        for ((_, rec) in dueTargets) {
+            for (v in rec.views) {
+                val cam = v.camera ?: continue
+                val rv = v.view ?: continue
+                outlineRequests.add(SelectionOutlineRenderer.Request(
+                    rec.rt, rec.spec.width, rec.spec.height,
+                    cam, rv.viewport, v.layerMask and 0xFF))
+            }
+        }
+        if (screenViews.isEmpty()) {
+            view.camera?.let { cam ->
+                outlineRequests.add(SelectionOutlineRenderer.Request(
+                    null, viewportW, viewportH, cam, view.viewport, 0xFF))
+            }
+        } else {
+            for (rec in screenViews) {
+                val cam = rec.camera ?: continue
+                val vp = rec.viewport?.let { viewportOf(it) }
+                    ?: Viewport(0, 0, viewportW, viewportH)
+                outlineRequests.add(SelectionOutlineRenderer.Request(
+                    null, viewportW, viewportH, cam, vp, rec.layerMask and 0xFF))
+            }
+        }
+        selectionOutlineRenderer.capture(renderer, selectionOutline, outlineRequests)
         if (renderer.beginFrame(sc, tNanos)) {
+            var outlinePassIndex = 0
             // W14: due offscreen passes first — a material sampling an
             // rt reads this frame's output in the screen passes below.
             // An rt's views render in `order` (sorted at apply).
-            for ((_, rec) in renderTargets) {
-                if (rec.views.isEmpty() ||
-                    !RenderTargets.due(rec, tNanos)) continue
+            for ((_, rec) in dueTargets) {
                 for (v in rec.views) {
+                    if (v.camera == null) continue
                     v.view?.let {
                         renderer.render(it)
+                        selectionOutlineRenderer.composite(renderer, outlinePassIndex++)
                         logCommandOnce("w14.rtpass.${rec.spec.width}",
                             "rt pass rendered ${rec.spec.width}x" +
                                 "${rec.spec.height}")
@@ -5784,6 +5818,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             // renders the default pass — the pre-W14 path.
             if (screenViews.isEmpty()) {
                 renderer.render(view)
+                selectionOutlineRenderer.composite(renderer, outlinePassIndex++)
             } else {
                 for (rec in screenViews) {
                     val cam = rec.camera ?: continue
@@ -5795,6 +5830,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     view.antiAliasing = rec.aa
                     view.dynamicResolutionOptions = rec.dsr
                     renderer.render(view)
+                    selectionOutlineRenderer.composite(renderer, outlinePassIndex++)
                 }
             }
             renderer.endFrame()

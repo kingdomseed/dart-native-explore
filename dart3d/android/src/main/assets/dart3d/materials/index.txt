@@ -1,4 +1,4 @@
-# filament 1.77.3, source 4a75520+uncommitted
+# filament 1.77.3, source e276adc+uncommitted
 e688c1e670ef31db5607598d5237937b catcher|baked|OPENGL
 0a42743184c8da4237310cf2ccc666be catcher|baked|VULKAN
 baff98ee7a94044d4e3c87ee43636b80 catcher|capture|OPENGL
@@ -23,5 +23,7 @@ bf17a9d35c44410fe0b736a689934932 particle|false|OPENGL
 60db2576495cb5109fa9c0fc8450f641 particle|false|VULKAN
 0555a78e595c0ffd12b11594379786e5 particle|true|OPENGL
 245a387414250f21341ee6a84961038b particle|true|VULKAN
+24b29927b19eb70f82bc66a66bde7477 sprite|OPENGL
+90d54642b5912f5c37785ced90d3483e sprite|VULKAN
 dfee9e0200a597e20022cecf8f0c6e5c trail|OPENGL
 73eeaeaf2d729d9c39e2753451c56162 trail|VULKAN

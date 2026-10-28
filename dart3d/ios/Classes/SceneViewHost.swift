@@ -16,6 +16,7 @@ final class SceneViewHost: SCNView {
     private(set) var nodesById: [UInt64: SCNNode] = [:]
 
     private let selectionOutline = SelectionOutline()
+    let outlineViewsProbe = SelectionOutlineViewsProbe()
 
     /// Keys of nodes carrying a `dynamic` rigid body — the set the
     /// settle detector polls after every simulated physics step.
@@ -268,6 +269,8 @@ final class SceneViewHost: SCNView {
     /// `mainScreenSubviews` belong to — a pose snapshot from another
     /// generation is dropped instead of posing the wrong sibling.
     var mainScreenSubviewGen = 0
+    var mainOutlineViewsEnabled = false
+    var mainOutlineBindings: [Int: OutlineViewsBinding] = [:]
 
     /// W24 torn-pose fix: the render queue captures each proxy
     /// sibling's pose in `willRenderScene` (post-physics) and parks it
@@ -275,7 +278,8 @@ final class SceneViewHost: SCNView {
     /// right before `setNeedsDisplay`, so a sibling never draws a
     /// proxy the render queue is halfway through rewriting.
     var siblingPoseSnapshot:
-        (gen: Int, poses: [Int: (SCNMatrix4, SCNCamera)])?
+        (gen: Int, poses: [Int: (SCNMatrix4, SCNCamera)],
+         outline: OutlineViewsFrame?)?
     let siblingPoseLock = NSLock()
 
     /// UIKit facts the render queue needs, snapshotted on MAIN
@@ -285,6 +289,11 @@ final class SceneViewHost: SCNView {
     private var _screenScale: CGFloat = UIScreen.main.scale
     private var _boundsAspect: Double = 1.0
     private let uiSnapshotLock = NSLock()
+    private var _outlineRaster = (width: 0, height: 0, outputWidth: 0, outputHeight: 0)
+    var outlineRasterSnapshot: (width: Int, height: Int, outputWidth: Int, outputHeight: Int) {
+        uiSnapshotLock.lock(); defer { uiSnapshotLock.unlock() }
+        return _outlineRaster
+    }
 
     /// The device (screen) scale — NOT `contentScaleFactor`, which
     /// also carries the dynamic `renderScale`.
@@ -306,6 +315,9 @@ final class SceneViewHost: SCNView {
         uiSnapshotLock.lock()
         _screenScale = scale
         _boundsAspect = aspect
+        _outlineRaster = (Int((bounds.width * contentScaleFactor).rounded()),
+            Int((bounds.height * contentScaleFactor).rounded()),
+            Int((bounds.width * scale).rounded()), Int((bounds.height * scale).rounded()))
         uiSnapshotLock.unlock()
     }
 
@@ -410,6 +422,21 @@ final class SceneViewHost: SCNView {
     /// tone-mapping operator, colour grading, vignette and LUT.
     /// Texture-target views render without it, as their Android
     /// counterparts do.
+    func retireOutlineProbe(_ object: AnyObject) {
+        if Thread.isMainThread {
+            enqueueSceneWork { [weak self] in self?.retire(object) }
+        } else {
+            retire(object)
+        }
+    }
+
+    func invalidateOutlineViewsResolve() {
+        if let resolveTechnique { retire(resolveTechnique) }
+        if let technique { retire(technique) }
+        resolveTechnique = nil
+        applyToneMap()
+    }
+
     func applyToneMap() {
         let bloom = lastEffects.flatMap { $0.bloom.enabled ? $0.bloom : nil }
         let chain = bloom.flatMap {
@@ -419,7 +446,7 @@ final class SceneViewHost: SCNView {
         if resolveTechnique == nil || resolveChain != chain,
            let device = device ?? MTLCreateSystemDefaultDevice() {
             resolveTechnique =
-                ToneMapTechnique.make(device: device, bloom: chain)
+                ToneMapTechnique.make(device: device, bloom: chain, outline: outlineViewsProbe.tailEnabled && !multiScreenMode)
             resolveChain = chain
             if resolveTechnique == nil {
                 logOnce("stage.toneMapping.technique",
@@ -445,6 +472,10 @@ final class SceneViewHost: SCNView {
                 })
         ToneMapTechnique.configure(resolve, look, bloom: chain)
         if technique !== resolve { technique = resolve }
+        if outlineViewsProbe.tailEnabled, !multiScreenMode, let installed = technique {
+            ToneMapTechnique.configure(installed, look, bloom: chain)
+            if let frame = outlineViewsProbe.frame { outlineViewsProbe.hostBinding?.bind(installed, frame: frame) }
+        }
         DispatchQueue.main.async { [weak self] in
             self?.siblingResolve = (look, chain)
             self?.applySiblingResolve()
@@ -456,7 +487,7 @@ final class SceneViewHost: SCNView {
     /// chain sized for the sibling's own viewport.
     func applySiblingResolve() {
         guard let (look, hostChain) = siblingResolve else { return }
-        for sibling in mainScreenSubviews {
+        for (i, sibling) in mainScreenSubviews.enumerated() {
             let size = sibling.view.bounds.size
             let chain = hostChain.flatMap { _ in
                 look.bloom.flatMap {
@@ -469,9 +500,14 @@ final class SceneViewHost: SCNView {
             guard let device = sibling.view.device
                     ?? MTLCreateSystemDefaultDevice(),
                   let pass = ToneMapTechnique.make(
-                      device: device, bloom: chain) else { continue }
+                      device: device, bloom: chain, outline: mainOutlineViewsEnabled) else { continue }
             ToneMapTechnique.configure(pass, look, bloom: chain)
+            if mainOutlineViewsEnabled, let old = sibling.view.technique { retireOutlineProbe(old) }
             sibling.view.technique = pass
+            if let installed = sibling.view.technique {
+                ToneMapTechnique.configure(installed, look, bloom: chain)
+                if mainOutlineViewsEnabled { mainOutlineBindings[i]?.bind(installed, frame: nil) }
+            }
         }
     }
 
@@ -1594,6 +1630,11 @@ final class SceneViewHost: SCNView {
                 changes.append(SelectionOutline.Change(node: key, color: color))
             }
             selectionOutline.apply(changes)
+            if SelectionOutlineViewsProbe.control(self) != nil {
+                let label = changes.map { "\($0.node):\($0.color == nil ? "clear" : "set")" }.joined(separator: ",")
+                d3Log("U3OV public-highlights \(label)")
+                outlineViewsProbe.storedTargets(host: self, label: label)
+            }
         case "removeNode":
             guard let token = json["node"] as? String,
                   let key = D3Wire.localIdKey(token) else { return }
@@ -5587,6 +5628,7 @@ extension SceneViewHost: SCNSceneRendererDelegate {
         updateCameraFacing()
         syncBlendCasters()
         bakedShadowCatcherRegistry.renderDirty(at: time, host: self)
+        outlineViewsProbe.capture(host: self, selection: selectionOutline, time: time)
         renderDueTargets(at: time)
         syncScreenSubviews()
     }
@@ -5711,6 +5753,9 @@ extension SceneViewHost: SCNSceneRendererDelegate {
                   atTime time: TimeInterval) {
         // W24: the host's completed frame is the siblings' signal to
         // draw — poke before the early-out below.
+        if outlineViewsProbe.enabled, !multiScreenMode {
+            outlineViewsProbe.hostBinding?.renderer(renderer, didRenderScene: scene, atTime: time)
+        }
         pokeScreenSubviews()
         guard let stamp = subtreeVisibleStamp else { return }
         subtreeVisibleStamp = nil

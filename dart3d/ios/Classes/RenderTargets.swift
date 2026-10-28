@@ -49,6 +49,7 @@ struct ViewRec {
     var renderer: SCNRenderer?
     var msaaColorTex: MTLTexture?
     var msaaDepthTex: MTLTexture?
+    var outlineBinding: OutlineViewsBinding?
     var msaaSamples = 1
 }
 
@@ -281,6 +282,9 @@ extension SceneViewHost {
             // dirty forces one pass on any mode — that's the `render`
             // op's meaning; manual draws ONLY on dirty.
             guard scheduled || rec.dirty else { continue }
+            if outlineViewsProbe.enabled {
+                d3Log("U3OV due target=\(key) dirty=\(rec.dirty) scheduled=\(scheduled) time=\(time)")
+            }
             // Clear BEFORE the passes: this frame's renders answer the
             // mark even when a view's camera fails to resolve.
             renderTargets[key]?.dirty = false
@@ -385,10 +389,47 @@ extension SceneViewHost {
             pass.depthAttachment.storeAction = .dontCare
         }
         guard let cb = queue.makeCommandBuffer() else { return }
+        if let frame = outlineViewsProbe.frame {
+            if view.outlineBinding == nil, let device = renderDevice() {
+                view.outlineBinding = OutlineViewsBinding(device: device, label: "target=\(key) view=\(viewIndex)")
+            }
+            let binding = view.outlineBinding
+            if frame.mode != 0 {
+                d3Log("U3OV target-mask-encode target=\(key) view=\(viewIndex) time=\(frame.time)")
+                binding?.encode(frame, camera: cam, transform: camNode.presentation.worldTransform,
+                    layerMask: cam.categoryBitMask, width: rec.width, height: rec.height,
+                    outputWidth: rec.width, outputHeight: rec.height, commandBuffer: cb, host: self) {
+                    if renderer.technique == nil, let device = self.renderDevice() {
+                        let technique = ToneMapTechnique.make(device: device, outline: true, compositeOnly: true)
+                        if frame.bindBeforeInstall {
+                            binding?.bind(technique, frame: frame)
+                        }
+                        renderer.technique = technique
+                        d3Log("U3OV target-technique-install target=\(key) view=\(viewIndex) bindBeforeInstall=\(frame.bindBeforeInstall) mode=\(frame.mode) time=\(frame.time)")
+                    }
+                    binding?.bind(renderer.technique, frame: frame)
+                }
+            } else {
+                if let old = renderer.technique {
+                    old.setObject(NSValue(scnVector4: SCNVector4(0, 0, 0, 0)),
+                        forKeyedSubscript: "u3ModeSymbol" as NSCopying)
+                    retire(old)
+                }
+                renderer.technique = nil
+            }
+            rec.views[viewIndex] = view
+            renderTargets[key] = rec
+            d3Log("U3OV target-normal-encode target=\(key) view=\(viewIndex) mode=\(frame.mode) aa=\(samples) sameBuffer=true time=\(frame.time)")
+        }
         renderer.render(
             withViewport: CGRect(x: 0, y: 0,
                                  width: rec.width, height: rec.height),
             commandBuffer: cb, passDescriptor: pass)
+        if let frame = outlineViewsProbe.frame, frame.isProbe {
+            view.outlineBinding?.targetProof(rec.colorTex, samples: samples, frame: frame,
+                commandBuffer: cb, host: self)
+            view.outlineBinding?.completion(cb, label: "target-render")
+        }
         cb.commit()
     }
 
@@ -419,7 +460,7 @@ extension SceneViewHost {
     }
 
     /// A `type2DMultisample` scratch texture for an MSAA pass.
-    private func msaaTexture(pixelFormat: MTLPixelFormat, width: Int,
+    func msaaTexture(pixelFormat: MTLPixelFormat, width: Int,
                              height: Int, samples: Int) -> MTLTexture? {
         let d = MTLTextureDescriptor.texture2DDescriptor(
             pixelFormat: pixelFormat, width: width, height: height,
@@ -435,6 +476,7 @@ extension SceneViewHost {
     /// pass may still reference them, so they join the graveyard
     /// rather than dropping.
     func retireViewRuntime(_ v: ViewRec) {
+        if let binding = v.outlineBinding { d3Log("U3OV retire target binding"); retire(binding) }
         if let r = v.renderer { retire(r) }
         if let t = v.msaaColorTex { retire(t) }
         if let t = v.msaaDepthTex { retire(t) }
@@ -452,6 +494,7 @@ extension SceneViewHost {
             for v in rec.views { retireViewRuntime(v) }
         }
         renderTargets = [:]
+        outlineViewsProbe.clear(host: self)
         views = []
         screenViews = []
         teardownScreenSubviews()
@@ -482,6 +525,12 @@ extension SceneViewHost {
         screenSubviewBuild += 1
         let gen = screenSubviewBuild
         multiScreenMode = wantsScreenSubviews
+        if multiScreenMode, let binding = outlineViewsProbe.hostBinding {
+            d3Log("U3OV retire host binding entering sibling mode")
+            retire(binding)
+            outlineViewsProbe.hostBinding = nil
+        }
+        if outlineViewsProbe.enabled { invalidateOutlineViewsResolve() }
         screenSubviews = []
         teardownScreenSubviews()
         guard multiScreenMode else { return }
@@ -547,7 +596,13 @@ extension SceneViewHost {
         siblingPoseLock.unlock()
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
+            let bindings = Array(self.mainOutlineBindings.values)
+            self.mainOutlineBindings = [:]
+            self.enqueueSceneWork { [weak self] in
+                for binding in bindings { d3Log("U3OV retire sibling binding"); self?.retire(binding) }
+            }
             for s in self.mainScreenSubviews {
+                s.view.delegate = nil
                 s.view.removeFromSuperview()
             }
             self.mainScreenSubviews = []
@@ -586,7 +641,7 @@ extension SceneViewHost {
             }
             if s.drivesRealNode {
                 cam.categoryBitMask = mask
-                continue
+                if outlineViewsProbe.frame == nil { continue }
             }
             if let copy = cam.copy() as? SCNCamera {
                 copy.categoryBitMask = mask
@@ -594,8 +649,8 @@ extension SceneViewHost {
             }
         }
         siblingPoseLock.lock()
-        siblingPoseSnapshot = poses.isEmpty
-            ? nil : (gen: screenSubviewBuild, poses: poses)
+        siblingPoseSnapshot = poses.isEmpty && outlineViewsProbe.frame == nil
+            ? nil : (gen: screenSubviewBuild, poses: poses, outline: outlineViewsProbe.frame)
         siblingPoseLock.unlock()
     }
 
@@ -615,13 +670,53 @@ extension SceneViewHost {
             if let snap, snap.gen == self.mainScreenSubviewGen {
                 SCNTransaction.begin()
                 SCNTransaction.disableActions = true
+                if snap.outline == nil, !self.mainOutlineBindings.isEmpty {
+                    for binding in self.mainOutlineBindings.values { self.retireOutlineProbe(binding) }
+                    self.mainOutlineBindings = [:]
+                    for sibling in self.mainScreenSubviews { sibling.view.delegate = nil }
+                }
+                let enabled = snap.outline.map { $0.mode != 0 } ?? false
+                if self.mainOutlineViewsEnabled != enabled {
+                    self.mainOutlineViewsEnabled = enabled
+                    self.applySiblingResolve()
+                }
                 for (i, pose) in snap.poses
                 where i < self.mainScreenSubviewPovs.count {
                     let pov = self.mainScreenSubviewPovs[i]
-                    pov.transform = pose.0
-                    pov.camera = pose.1
+                    if i != 0 {
+                        pov.transform = pose.0
+                        pov.camera = pose.1
+                    }
                 }
                 SCNTransaction.commit()
+                for (i, sibling) in self.mainScreenSubviews.enumerated() {
+                    guard let frame = snap.outline, frame.mode != 0,
+                          let pose = snap.poses[i], let device = sibling.view.device,
+                          let queue = sibling.view.commandQueue, let cb = queue.makeCommandBuffer() else {
+                        if let installed = sibling.view.technique, self.mainOutlineViewsEnabled {
+                            installed.setObject(NSValue(scnVector4: SCNVector4(0, 0, 0, 0)),
+                                forKeyedSubscript: "u3ModeSymbol" as NSCopying)
+                        }
+                        continue
+                    }
+                    if self.mainOutlineBindings[i] == nil {
+                        self.mainOutlineBindings[i] = OutlineViewsBinding(device: device, label: "sibling=\(i)")
+                    }
+                    let binding = self.mainOutlineBindings[i]!
+                    sibling.view.delegate = binding
+                    let size = sibling.view.bounds.size
+                    let raster = sibling.view.contentScaleFactor
+                    let output = sibling.view.window?.screen.scale ?? self.screenScale
+                    binding.encode(frame, camera: pose.1, transform: pose.0,
+                        layerMask: pose.1.categoryBitMask,
+                        width: max(1, Int((size.width * raster).rounded())),
+                        height: max(1, Int((size.height * raster).rounded())),
+                        outputWidth: Int((size.width * output).rounded()),
+                        outputHeight: Int((size.height * output).rounded()), commandBuffer: cb, host: self)
+                    binding.bind(sibling.view.technique, frame: frame)
+                    binding.completion(cb, label: "sibling-mask time=\(frame.time)")
+                    cb.commit()
+                }
             }
             for s in self.mainScreenSubviews {
                 s.view.setNeedsDisplay()
