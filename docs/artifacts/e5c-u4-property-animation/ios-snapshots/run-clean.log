@@ -1,0 +1,32 @@
+Launching lib/main.dart on iPhone 17 Pro in debug mode...
+Running Xcode build...                                          
+Xcode build done.                                           17.7s
+dartnative: [DN] Licence valid (community), expires 2027-09-14
+dartnative: [DN] lifecycle → AppLifecycleState.inactive
+dartnative: dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+dartnative: dart3d: u4 requested mode=u4.snapshots clip=01TK8WR00000W time=0 weight=1 rawIds=false
+Syncing files to device iPhone 17 Pro...                            58ms
+
+DartNative run key commands.
+r Hot reload. 🔥🔥🔥
+R Hot restart.
+h List all available interactive commands.
+d Detach (terminate "dn run" but leave application running).
+c Clear the screen
+q Quit (terminate the application on the device).
+
+A Dart VM Service on iPhone 17 Pro is available at: http://127.0.0.1:62831/PqK4KeEuDF4=/
+The DartNative DevTools debugger and profiler on iPhone 17 Pro is available at: http://127.0.0.1:62831/PqK4KeEuDF4=/devtools/?uri=ws://127.0.0.1:62831/PqK4KeEuDF4=/ws
+dartnative: [DN] lifecycle → AppLifecycleState.resumed
+dartnative: dart3d: u4 requested clip=01TK8WR00000W weight=0.25 playing=false
+dartnative: dart3d: u4 requested clip=01TK8WR00000W pause time=1.0
+dartnative: dart3d: u4-snapshots requested Texture 1
+dartnative: dart3d: u4-snapshots requested Sprite refresh rest=[.2,.4,.6,1] T2
+dartnative: dart3d: u4 requested clip=01TK8WR00000W pause time=2.0
+dartnative: dart3d: u4-snapshots requested Texture 2
+dartnative: dart3d: u4-snapshots requested Sprite refresh rest=[.2,.4,.6,1] T2
+dartnative: dart3d: u4 requested clip=01TK8WR00000W pause time=1.0
+dartnative: dart3d: u4-snapshots requested variant=other
+dartnative: dart3d: u4-snapshots requested variant=default
+
+Application finished.

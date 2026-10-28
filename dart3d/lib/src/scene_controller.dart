@@ -277,10 +277,11 @@ final class SceneController {
       }
     }
     if (resolveLuts != null) resolveLutAssets(doc, resolve: resolveLuts);
+    final manifestBytes = D3Protocol.loadSceneBytes(doc);
     _document = doc;
     _streamed.clear();
     _warnUnrealizedFeatures(doc);
-    _sendOrQueue(D3Protocol.loadScene, D3Protocol.loadSceneBytes(doc));
+    _sendOrQueue(D3Protocol.loadScene, manifestBytes);
     for (final payload in doc.payloads.values) {
       if (payload.bytes == null) continue;
       _sendOrQueue(D3Protocol.payload, D3Protocol.payloadBytes(payload));
@@ -381,8 +382,9 @@ final class SceneController {
   /// [applyCommands] — rather than going missing from
   /// [serializeScene].
   void sendPayload(PayloadSpec payload) {
+    final bytes = D3Protocol.payloadBytes(payload);
     doc_layer.foldPayloadIntoDocument(_document ??= SceneDocument(), payload);
-    _sendOrQueue(D3Protocol.payload, D3Protocol.payloadBytes(payload));
+    _sendOrQueue(D3Protocol.payload, bytes);
   }
 
   /// Patches node highlights in the current native scene using linear RGBA.
@@ -433,7 +435,9 @@ final class SceneController {
   /// fold into the tracked [document] as they go out — that fold is
   /// what [serializeScene] reads back. A scene built entirely from ops
   /// gets a fresh document to fold into; a fold that can't decode an
-  /// op logs and drops just that mirror update, never the send.
+  /// op logs and drops just that mirror update. Animation metadata is
+  /// decoded before any fold or dispatch. Runtime curve chunks can arrive
+  /// separately; natives validate their joined curve before sampling it.
   ///
   /// The whole call reaches the native side as ONE mutation (a `batch`
   /// envelope when [ops] has more than one entry — see
@@ -442,10 +446,48 @@ final class SceneController {
   /// ever rendered.
   void applyCommands(List<Map<String, Object?>> ops) {
     if (ops.isEmpty) return;
+    Iterable<Map<String, Object?>> leaves(
+      List<Map<String, Object?>> commands,
+    ) sync* {
+      for (final op in commands) {
+        if (op['op'] == 'batch' ||
+            op['op'] == 'loadSubtree' ||
+            op['op'] == 'unloadSubtree') {
+          yield* leaves(
+            (op['ops'] as List)
+                .map((o) => Map<String, Object?>.from(o as Map))
+                .toList(),
+          );
+        } else {
+          yield op;
+        }
+      }
+    }
+
+    final commands = leaves(ops).toList();
+    final decoded = <Map<String, Object?>, AnimationSpec>{};
+    for (final op in commands) {
+      if (op['op'] != 'upsertAnimation') continue;
+      final animation = decodeAnimationSpec(
+        LocalId.parse(op['id'] as String),
+        Map<String, Object?>.from(op['animation'] as Map),
+      );
+      decoded[op] = animation;
+    }
     for (final op in ops) {
-      if (doc_layer.commandAffectsDocument(op)) {
+      if (op['op'] == 'upsertAnimation') {
+        doc_layer.foldCommandIntoDocument(
+          _document ??= SceneDocument(),
+          op,
+          decodedAnimation: decoded[op],
+        );
+      } else if (doc_layer.commandAffectsDocument(op)) {
         try {
-          doc_layer.foldCommandIntoDocument(_document ??= SceneDocument(), op);
+          doc_layer.foldCommandIntoDocument(
+            _document ??= SceneDocument(),
+            op,
+            decodedAnimation: decoded[op],
+          );
         } catch (e) {
           dnLog('dart3d: document mirror dropped op ${op['op']} ($e)');
         }
@@ -814,7 +856,11 @@ final class SceneController {
   /// upstream, so switching by stop alone leaves every clip ever
   /// played mixed into the pose. [from] may be null when nothing plays
   /// yet.
-  void switchAnimation({LocalId? from, required LocalId to, bool loop = false}) {
+  void switchAnimation({
+    LocalId? from,
+    required LocalId to,
+    bool loop = false,
+  }) {
     applyCommands(encodeSwitchAnimCommands(from: from, to: to, loop: loop));
   }
 
@@ -989,11 +1035,7 @@ final class SceneController {
         final curPos = docNode.transform.toMatrix4().getTranslation();
         nextLocal = curPos + movement.translation;
       }
-      doc_layer.foldTransformIntoDocument(
-        doc,
-        node,
-        translation: nextLocal,
-      );
+      doc_layer.foldTransformIntoDocument(doc, node, translation: nextLocal);
     }
     return movement;
   }

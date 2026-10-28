@@ -1,0 +1,80 @@
+{
+  "checks": {
+    "current_realized_fragment": {
+      "observed": [
+        0.5146484375,
+        0.409912109375,
+        0.409912109375,
+        1
+      ],
+      "expected": [
+        0.5147705078125,
+        0.409942626953125,
+        0.409942626953125,
+        1
+      ],
+      "maximumAbsoluteError": 0.000152587890625
+    },
+    "without_late_multiply": {
+      "observed": [
+        0.5146484375,
+        0.409912109375,
+        0.409912109375,
+        1
+      ],
+      "expected": [
+        0.5147705078125,
+        0.409942626953125,
+        0.409942626953125,
+        1
+      ],
+      "maximumAbsoluteError": 0.000152587890625
+    },
+    "original_late_multiply": {
+      "observed": [
+        0.409912109375,
+        0.383544921875,
+        0.383544921875,
+        1
+      ],
+      "expected": [
+        0.409942626953125,
+        0.38373565673828125,
+        0.38373565673828125,
+        1
+      ],
+      "maximumAbsoluteError": 0.00022125244140625
+    },
+    "explicit_premult_reference": {
+      "observed": [
+        0.625,
+        0.4375,
+        0.4375,
+        1
+      ],
+      "expected": [
+        0.625,
+        0.4375,
+        0.4375,
+        1
+      ],
+      "maximumAbsoluteError": 0.0
+    }
+  },
+  "allSevenGpuCommandsCompleted": true,
+  "outsidePlaneUnchanged": true,
+  "absoluteTolerance": 0.001,
+  "measuredOpaqueRGBA": [
+    0.55908203125,
+    0.1397705078125,
+    0.1397705078125,
+    1
+  ],
+  "measuredDestinationRGBA": [
+    0.5,
+    0.5,
+    0.5,
+    1
+  ],
+  "boundary": "Raw rgba16Float synthetic white-source ordinary unlit control. Compares corresponding pixels to measured opaque and destination controls; generated opaque shading varies across the patch and differs from a direct final-output override. Not PBR, textured-source or whole-U4 numeric parity."
+}

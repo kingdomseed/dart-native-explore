@@ -1,0 +1,6 @@
+7e08806c500adbd75fa22cd149bc8e7c589309bd053ef531a3c9823a82170dc2  dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/PropertyAnimation.kt
+0b4c9dfadbfc6c773ca5f83ee11f546ddc104dc18459691bd0f1166aa05f4d46  dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/AnimClips.kt
+8f099acabacf38156d2b0b2b2cc12dcd95743e34f7fbf270cb2faee221481656  dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/FsceneRealizer.kt
+5afa8de41466548263cb72270d4b5ccc1b034e109f5e3b7a2e4912fb62d94c32  dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/Dart3dView.kt
+4d4acb08e623f5732d5e24a3b051ae37654c916db831014586c791ab920063f2  dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/RenderTargets.kt
+bb864305204ae8b284998b560a1c6847d401f907e654d36551fedbee90ace7e4  dart3d/android/src/test/kotlin/com/jasonholtdigital/dart3d/U4PropertyAnimationTest.kt

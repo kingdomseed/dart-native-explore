@@ -1,0 +1,481 @@
+{
+  "literalChecks": [
+    {
+      "time": 0,
+      "weight": 1,
+      "expectedColor": [
+        1,
+        0,
+        0,
+        1
+      ],
+      "expectedDocumentIntensity": 2,
+      "expectedNativeIntensity": 636.6197723675814,
+      "matchingRows": 2,
+      "observed": {
+        "line": 15,
+        "timestamp": "2026-10-27 13:55:39.108",
+        "clipId": "128866198749197",
+        "time": 0.0,
+        "weight": 1.0,
+        "colors": {
+          "128866198749184": [
+            1.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "128866198749185": [
+            0.45,
+            0.45,
+            0.45,
+            1.0
+          ]
+        },
+        "intensity": 2.0,
+        "nativeIntensity": 636.6197723675814,
+        "fovRadians": 1.0471976,
+        "nativeDegrees": 60.0,
+        "trsTargets": 0
+      }
+    },
+    {
+      "time": 1,
+      "weight": 1,
+      "expectedColor": [
+        0.5,
+        0,
+        0.5,
+        1
+      ],
+      "expectedDocumentIntensity": 4,
+      "expectedNativeIntensity": 1273.2395447351628,
+      "matchingRows": 8,
+      "observed": {
+        "line": 70,
+        "timestamp": "2026-10-27 13:56:34.354",
+        "clipId": "128866198749197",
+        "time": 1.0,
+        "weight": 1.0,
+        "colors": {
+          "128866198749184": [
+            0.5,
+            0.0,
+            0.5,
+            1.0
+          ],
+          "128866198749185": [
+            0.45,
+            0.45,
+            0.45,
+            1.0
+          ]
+        },
+        "intensity": 4.0,
+        "nativeIntensity": 1273.2395447351628,
+        "fovRadians": 1.0471976,
+        "nativeDegrees": 60.0,
+        "trsTargets": 0
+      }
+    },
+    {
+      "time": 2,
+      "weight": 1,
+      "expectedColor": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "expectedDocumentIntensity": 6,
+      "expectedNativeIntensity": 1909.8593171027442,
+      "matchingRows": 6,
+      "observed": {
+        "line": 103,
+        "timestamp": "2026-10-27 13:57:06.954",
+        "clipId": "128866198749197",
+        "time": 2.0,
+        "weight": 1.0,
+        "colors": {
+          "128866198749184": [
+            0.0,
+            0.0,
+            1.0,
+            1.0
+          ],
+          "128866198749185": [
+            0.45,
+            0.45,
+            0.45,
+            1.0
+          ]
+        },
+        "intensity": 6.0,
+        "nativeIntensity": 1909.8593171027442,
+        "fovRadians": 1.0471976,
+        "nativeDegrees": 60.0,
+        "trsTargets": 0
+      }
+    },
+    {
+      "time": 1,
+      "weight": 0.25,
+      "expectedColor": [
+        0.875,
+        0.75,
+        0.875,
+        1
+      ],
+      "expectedDocumentIntensity": 1.75,
+      "expectedNativeIntensity": 557.0423008216337,
+      "matchingRows": 1,
+      "observed": {
+        "line": 124,
+        "timestamp": "2026-10-27 13:57:25.103",
+        "clipId": "128866198749197",
+        "time": 1.0,
+        "weight": 0.25,
+        "colors": {
+          "128866198749184": [
+            0.875,
+            0.75,
+            0.875,
+            1.0
+          ],
+          "128866198749185": [
+            0.45,
+            0.45,
+            0.45,
+            1.0
+          ]
+        },
+        "intensity": 1.75,
+        "nativeIntensity": 557.0423008216337,
+        "fovRadians": 1.0471976,
+        "nativeDegrees": 60.0,
+        "trsTargets": 0
+      }
+    },
+    {
+      "time": 0,
+      "weight": 0.25,
+      "expectedColor": [
+        1,
+        0.75,
+        0.75,
+        1
+      ],
+      "expectedDocumentIntensity": 1.25,
+      "expectedNativeIntensity": 397.88735772973837,
+      "matchingRows": 1,
+      "observed": {
+        "line": 138,
+        "timestamp": "2026-10-27 13:57:38.720",
+        "clipId": "128866198749197",
+        "time": 0.0,
+        "weight": 0.25,
+        "colors": {
+          "128866198749184": [
+            1.0,
+            0.75,
+            0.75,
+            1.0
+          ],
+          "128866198749185": [
+            0.45,
+            0.45,
+            0.45,
+            1.0
+          ]
+        },
+        "intensity": 1.25,
+        "nativeIntensity": 397.88735772973837,
+        "fovRadians": 1.0471976,
+        "nativeDegrees": 60.0,
+        "trsTargets": 0
+      }
+    },
+    {
+      "time": 0,
+      "expectedDegrees": 45,
+      "matchingRows": 1,
+      "observed": {
+        "line": 12,
+        "timestamp": "2026-10-27 13:58:59.998",
+        "clipId": "128866198749197",
+        "time": 0.0,
+        "weight": 1.0,
+        "colors": {
+          "128866198749184": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "128866198749185": [
+            0.45,
+            0.45,
+            0.45,
+            1.0
+          ]
+        },
+        "intensity": 1.0,
+        "nativeIntensity": 318.3098861837907,
+        "fovRadians": 0.7853982,
+        "nativeDegrees": 45.0,
+        "trsTargets": 0
+      }
+    },
+    {
+      "time": 1,
+      "expectedDegrees": 67.5,
+      "matchingRows": 18,
+      "observed": {
+        "line": 52,
+        "timestamp": "2026-10-27 13:59:39.687",
+        "clipId": "128866198749197",
+        "time": 1.0,
+        "weight": 1.0,
+        "colors": {
+          "128866198749184": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "128866198749185": [
+            0.45,
+            0.45,
+            0.45,
+            1.0
+          ]
+        },
+        "intensity": 1.0,
+        "nativeIntensity": 318.3098861837907,
+        "fovRadians": 1.1780972,
+        "nativeDegrees": 67.5,
+        "trsTargets": 0
+      }
+    },
+    {
+      "time": 2,
+      "expectedDegrees": 90,
+      "matchingRows": 18,
+      "observed": {
+        "line": 61,
+        "timestamp": "2026-10-27 13:59:47.904",
+        "clipId": "128866198749197",
+        "time": 2.0,
+        "weight": 1.0,
+        "colors": {
+          "128866198749184": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "128866198749185": [
+            0.45,
+            0.45,
+            0.45,
+            1.0
+          ]
+        },
+        "intensity": 1.0,
+        "nativeIntensity": 318.3098861837907,
+        "fovRadians": 1.5707964,
+        "nativeDegrees": 90.0,
+        "trsTargets": 0
+      }
+    }
+  ],
+  "logs": {
+    "color-light-native.log": {
+      "bytesRead": 295823,
+      "totalLines": 878,
+      "observationRows": 698,
+      "allTrsTargetsZero": true,
+      "nonObservationNonTickLines": [
+        {
+          "line": 1,
+          "text": "getpwuid_r did not find a match for uid 501"
+        },
+        {
+          "line": 2,
+          "text": "Filtering the log data using \"subsystem == \"com.jasonholtdigital.dart3d\"\""
+        },
+        {
+          "line": 3,
+          "text": "Timestamp               Ty Process[PID:TID]"
+        },
+        {
+          "line": 4,
+          "text": "2026-10-27 13:55:39.088 Df Runner[98590:10f59e7] [com.jasonholtdigital.dart3d:scene] protocol hello: Dart v1.0"
+        },
+        {
+          "line": 5,
+          "text": "2026-10-27 13:55:39.102 Df Runner[98590:10f59e7] [com.jasonholtdigital.dart3d:scene] animation 128866198749197 channel 0: pending payloads 128866198749193/128866198749194"
+        },
+        {
+          "line": 6,
+          "text": "2026-10-27 13:55:39.102 Df Runner[98590:10f59e7] [com.jasonholtdigital.dart3d:scene] animation 128866198749197 channel 1: pending payloads 128866198749193/128866198749195"
+        },
+        {
+          "line": 7,
+          "text": "2026-10-27 13:55:39.102 Df Runner[98590:10f59e7] [com.jasonholtdigital.dart3d:scene] node 128866198749188: body=nil shape=false pos=1.25 cat=- mask=-"
+        },
+        {
+          "line": 8,
+          "text": "2026-10-27 13:55:39.102 Df Runner[98590:10f59e7] [com.jasonholtdigital.dart3d:scene] node 128866198749189: body=nil shape=false pos=1.25 cat=- mask=-"
+        },
+        {
+          "line": 9,
+          "text": "2026-10-27 13:55:39.102 Df Runner[98590:10f59e7] [com.jasonholtdigital.dart3d:scene] node 128866198749187: body=nil shape=false pos=1.25 cat=- mask=-"
+        },
+        {
+          "line": 10,
+          "text": "2026-10-27 13:55:39.102 Df Runner[98590:10f59e7] [com.jasonholtdigital.dart3d:scene] node 128866198749190: body=nil shape=false pos=0.0 cat=- mask=-"
+        },
+        {
+          "line": 11,
+          "text": "2026-10-27 13:55:39.102 Df Runner[98590:10f59e7] [com.jasonholtdigital.dart3d:scene] node 128866198749191: body=nil shape=false pos=0.0 cat=- mask=-"
+        },
+        {
+          "line": 12,
+          "text": "2026-10-27 13:55:39.106 Df Runner[98590:10f59e7] [com.jasonholtdigital.dart3d:scene] animation 128866198749197 channel 0: pending payloads 128866198749193/128866198749194"
+        },
+        {
+          "line": 13,
+          "text": "2026-10-27 13:55:39.106 Df Runner[98590:10f59e7] [com.jasonholtdigital.dart3d:scene] animation 128866198749197 channel 1: pending payloads 128866198749193/128866198749195"
+        },
+        {
+          "line": 14,
+          "text": "2026-10-27 13:55:39.106 Df Runner[98590:10f59e7] [com.jasonholtdigital.dart3d:scene] animation 128866198749197 channel 1: pending payloads 128866198749193/128866198749195"
+        }
+      ],
+      "uniqueTimes": 121
+    },
+    "camera-native.log": {
+      "bytesRead": 814431,
+      "totalLines": 2252,
+      "observationRows": 2084,
+      "allTrsTargetsZero": true,
+      "nonObservationNonTickLines": [
+        {
+          "line": 1,
+          "text": "getpwuid_r did not find a match for uid 501"
+        },
+        {
+          "line": 2,
+          "text": "Filtering the log data using \"subsystem == \"com.jasonholtdigital.dart3d\"\""
+        },
+        {
+          "line": 3,
+          "text": "Timestamp               Ty Process[PID:TID]"
+        },
+        {
+          "line": 4,
+          "text": "2026-10-27 13:58:59.971 Df Runner[2550:10f8b08] [com.jasonholtdigital.dart3d:scene] protocol hello: Dart v1.0"
+        },
+        {
+          "line": 5,
+          "text": "2026-10-27 13:58:59.987 Df Runner[2550:10f8b08] [com.jasonholtdigital.dart3d:scene] animation 128866198749197 channel 0: pending payloads 128866198749193/128866198749196"
+        },
+        {
+          "line": 6,
+          "text": "2026-10-27 13:58:59.987 Df Runner[2550:10f8b08] [com.jasonholtdigital.dart3d:scene] node 128866198749191: body=nil shape=false pos=0.0 cat=- mask=-"
+        },
+        {
+          "line": 7,
+          "text": "2026-10-27 13:58:59.987 Df Runner[2550:10f8b08] [com.jasonholtdigital.dart3d:scene] node 128866198749190: body=nil shape=false pos=0.0 cat=- mask=-"
+        },
+        {
+          "line": 8,
+          "text": "2026-10-27 13:58:59.987 Df Runner[2550:10f8b08] [com.jasonholtdigital.dart3d:scene] node 128866198749187: body=nil shape=false pos=1.25 cat=- mask=-"
+        },
+        {
+          "line": 9,
+          "text": "2026-10-27 13:58:59.987 Df Runner[2550:10f8b08] [com.jasonholtdigital.dart3d:scene] node 128866198749188: body=nil shape=false pos=1.25 cat=- mask=-"
+        },
+        {
+          "line": 10,
+          "text": "2026-10-27 13:58:59.987 Df Runner[2550:10f8b08] [com.jasonholtdigital.dart3d:scene] node 128866198749189: body=nil shape=false pos=1.25 cat=- mask=-"
+        },
+        {
+          "line": 11,
+          "text": "2026-10-27 13:58:59.995 Df Runner[2550:10f8b08] [com.jasonholtdigital.dart3d:scene] animation 128866198749197 channel 0: pending payloads 128866198749193/128866198749196"
+        }
+      ],
+      "uniqueTimes": 121
+    },
+    "raw-clean-native.log": {
+      "bytesRead": 14334,
+      "totalLines": 118,
+      "observationRows": 0,
+      "allTrsTargetsZero": true,
+      "nonObservationNonTickLines": [
+        {
+          "line": 1,
+          "text": "getpwuid_r did not find a match for uid 501"
+        },
+        {
+          "line": 2,
+          "text": "Filtering the log data using \"subsystem == \"com.jasonholtdigital.dart3d\"\""
+        },
+        {
+          "line": 3,
+          "text": "Timestamp               Ty Process[PID:TID]"
+        },
+        {
+          "line": 4,
+          "text": "2026-10-27 14:02:30.124 Df Runner[6877:10fc228] [com.jasonholtdigital.dart3d:scene] protocol hello: Dart v1.0"
+        },
+        {
+          "line": 5,
+          "text": "2026-10-27 14:02:30.146 Df Runner[6877:10fc228] [com.jasonholtdigital.dart3d:scene] animation 128866198749197 channel 0: pending payloads 128866198749193/128866198749194"
+        },
+        {
+          "line": 6,
+          "text": "2026-10-27 14:02:30.146 Df Runner[6877:10fc228] [com.jasonholtdigital.dart3d:scene] animation 128866198749197 channel 1: pending payloads 128866198749193/128866198749195"
+        },
+        {
+          "line": 7,
+          "text": "2026-10-27 14:02:30.146 Df Runner[6877:10fc228] [com.jasonholtdigital.dart3d:scene] node 128866198749189: body=nil shape=false pos=1.25 cat=- mask=-"
+        },
+        {
+          "line": 8,
+          "text": "2026-10-27 14:02:30.146 Df Runner[6877:10fc228] [com.jasonholtdigital.dart3d:scene] node 128866198749190: body=nil shape=false pos=0.0 cat=- mask=-"
+        },
+        {
+          "line": 9,
+          "text": "2026-10-27 14:02:30.146 Df Runner[6877:10fc228] [com.jasonholtdigital.dart3d:scene] node 128866198749191: body=nil shape=false pos=0.0 cat=- mask=-"
+        },
+        {
+          "line": 10,
+          "text": "2026-10-27 14:02:30.146 Df Runner[6877:10fc228] [com.jasonholtdigital.dart3d:scene] node 128866198749188: body=nil shape=false pos=1.25 cat=- mask=-"
+        },
+        {
+          "line": 11,
+          "text": "2026-10-27 14:02:30.146 Df Runner[6877:10fc228] [com.jasonholtdigital.dart3d:scene] node 128866198749187: body=nil shape=false pos=1.25 cat=- mask=-"
+        },
+        {
+          "line": 12,
+          "text": "2026-10-27 14:02:30.153 Df Runner[6877:10fc228] [com.jasonholtdigital.dart3d:scene] animation 128866198749197 channel 0: pending payloads 128866198749193/128866198749194"
+        },
+        {
+          "line": 13,
+          "text": "2026-10-27 14:02:30.153 Df Runner[6877:10fc228] [com.jasonholtdigital.dart3d:scene] animation 128866198749197 channel 1: pending payloads 128866198749193/128866198749195"
+        },
+        {
+          "line": 14,
+          "text": "2026-10-27 14:02:30.153 Df Runner[6877:10fc228] [com.jasonholtdigital.dart3d:scene] animation 128866198749197 channel 1: pending payloads 128866198749193/128866198749195"
+        },
+        {
+          "line": 15,
+          "text": "2026-10-27 14:02:30.154 Df Runner[6877:10fc228] [com.jasonholtdigital.dart3d:scene] command batch: 2 ops applied in one drain"
+        }
+      ],
+      "uniqueTimes": 0
+    }
+  }
+}

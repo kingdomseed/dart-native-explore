@@ -3,6 +3,7 @@
 // Pure-Dart (no dartnative import) so the shapes are reachable under
 // `dart test` (the W12 constraint).
 
+import 'animation.dart';
 import 'scene_model.dart';
 
 /// The `selectVariant` op: selects variant [selected] on the
@@ -72,7 +73,7 @@ List<LocalId> uncomposedEagerInstances(SceneDocument doc) => [
 /// (W29), plus `prefabInstances` when [doc] still carries eager
 /// instances nobody composed ([uncomposedEagerInstances]).
 Set<String> missingRequiredFeatures(SceneDocument doc) {
-  final missing = doc.featuresRequired.difference(kRealizedFeatures);
+  final missing = _requiredFeatures(doc).difference(kRealizedFeatures);
   if (doc.featuresRequired.contains('prefabInstances') &&
       uncomposedEagerInstances(doc).isNotEmpty) {
     missing.add('prefabInstances');
@@ -100,7 +101,7 @@ List<String> unrealizedFeatureWarnings(SceneDocument doc) {
     return wave != null ? ' (planned $wave)' : '';
   }
 
-  for (final feature in doc.featuresRequired) {
+  for (final feature in _requiredFeatures(doc)) {
     if (kRealizedFeatures.contains(feature) || !seen.add(feature)) {
       continue;
     }
@@ -128,3 +129,11 @@ List<String> unrealizedFeatureWarnings(SceneDocument doc) {
   }
   return warnings;
 }
+
+Set<String> _requiredFeatures(SceneDocument doc) => {
+  ...doc.featuresRequired,
+  if (doc.animations.values.any(
+    (a) => a is Dart3dAnimationSpec && a.propertyChannels.isNotEmpty,
+  ))
+    'd3:propertyAnimation',
+};

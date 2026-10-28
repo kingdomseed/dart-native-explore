@@ -1,0 +1,471 @@
+diff --git a/dart3d/example/lib/showcase_loader.dart b/dart3d/example/lib/showcase_loader.dart
+index a3dde45..51da169 100644
+--- a/dart3d/example/lib/showcase_loader.dart
++++ b/dart3d/example/lib/showcase_loader.dart
+@@ -10,6 +10,7 @@ import 'dart:io';
+ import 'dart:math';
+ import 'dart:typed_data';
+ 
++import 'package:dart3d/dart3d.dart' show D3SpriteBlendMode;
+ import 'package:dart3d/src/doc_layer.dart';
+ import 'package:dart3d/src/fsceneb_reader.dart';
+ import 'package:dart3d/src/geometry/instances.dart';
+@@ -25,6 +26,11 @@ import 'dn_logo_stage.dart';
+ import 'light_aim.dart';
+ import 'u2_catcher_scene.dart';
+ import 'u2_geometry_scene.dart';
++import 'u3_atlas_probe.dart';
++import 'u3_tone_scene.dart';
++import 'u3_sprite_scene.dart';
++import 'u4_property_scene.dart';
++import 'u4_material_scene.dart';
+ 
+ /// One showcase entry: the cycler label, its bundle key, and the
+ /// capability line shown under it.
+@@ -160,8 +166,35 @@ const showcaseItems = [
+     cameraDir: (-0.4, 0.9, -1.0),
+     frameMargin: 1.6,
+   ),
++  ShowcaseItem(
++    'u3-atlas-probe',
++    kBuiltinU3AtlasProbeKey,
++    'Image atlas UV probe',
++  ),
++  ShowcaseItem('u3-tone', kBuiltinU3ToneKey, 'iOS five-tone HDR comparison'),
++  ShowcaseItem('u3-sprite', kBuiltinU3SpriteKey, 'Standalone sprite material'),
++  ShowcaseItem(
++    'u4-materials',
++    kBuiltinU4MaterialsKey,
++    'Textured shared pair · PBR · reference · alpha · snapshot',
++  ),
++  ShowcaseItem(
++    'u4',
++    kBuiltinU4Key,
++    'Property animation: shared color / light / camera',
++  ),
+ ];
+ 
++const String kBuiltinU4MaterialsKey = 'builtin:u4-materials';
++
++const String kBuiltinU4Key = 'builtin:u4';
++
++const String kBuiltinU3SpriteKey = 'builtin:u3-sprite';
++
++const String kBuiltinU3AtlasProbeKey = 'builtin:u3-atlas-probe';
++
++const String kBuiltinU3ToneKey = 'builtin:u3-tone';
++
+ /// The synthetic asset key for the W21 materials conformance scene —
+ /// no bundled file; [loadShowcaseScene] builds the document
+ /// procedurally (see [buildMaterialsDocument]).
+@@ -256,6 +289,78 @@ ShowcaseScene? loadShowcaseScene(
+   void Function(String message)? log,
+ }) {
+   final bytesOf = bytesFor ?? (_) => null;
++  if (item.assetKey == kBuiltinU4MaterialsKey) {
++    final doc = buildU4MaterialDocument();
++    return ShowcaseScene(
++      document: doc,
++      cameraNode: u4MaterialNode(doc, 'camera').id,
++      cameraTarget: Vector3.zero(),
++      cameraDir: Vector3(0, 0, -1),
++      frameRadius: 0,
++      summary: 'Shared pair · PBR/ref · alpha/snapshot',
++    );
++  }
++  if (item.assetKey == kBuiltinU4Key) {
++    final doc = buildU4PropertyDocument(camera: kBootU4Camera);
++    return ShowcaseScene(
++      document: doc,
++      cameraNode: u4Node(doc, 'camera').id,
++      cameraTarget: Vector3.zero(),
++      cameraDir: Vector3(0, 0, -1),
++      frameRadius: 0,
++      summary: kBootU4Camera
++          ? 'Camera FOV · fixed pose'
++          : 'Shared color pair · neutral lit face',
++    );
++  }
++  if (item.assetKey == kBuiltinU3SpriteKey) {
++    final doc = buildU3SpriteDocument(
++      blend: D3SpriteBlendMode.values.byName(kBootU3SpriteBlend),
++      tinted: kBootU3SpriteTint,
++      untextured: kBootU3SpriteUntextured,
++      renderTexture: kBootU3SpriteRenderTexture,
++    );
++    log?.call('dart3d: u3-sprite frame=0 blend=$kBootU3SpriteBlend paused');
++    return ShowcaseScene(
++      document: doc,
++      cameraNode: u3SpriteNode(doc, 'camera').id,
++      cameraTarget: Vector3.zero(),
++      cameraDir: Vector3(0, 0, -1),
++      frameRadius: 0,
++      summary: 'Sheet / selected / fixed; overlap / shadow controls',
++    );
++  }
++  if (item.assetKey == kBuiltinU3AtlasProbeKey) {
++    final doc = buildU3AtlasProbeDocument();
++    log?.call(
++      'dart3d: u3-atlas-probe frame=0 expected=0 red paused fixed-camera',
++    );
++    return ShowcaseScene(
++      document: doc,
++      cameraNode: doc.nodes.values
++          .singleWhere((node) => node.name == 'u3.atlas.camera')
++          .id,
++      cameraTarget: Vector3.zero(),
++      cameraDir: Vector3(0, 0, -1),
++      frameRadius: 0,
++      summary: 'Top: sheet · below: selected cell',
++    );
++  }
++  if (item.assetKey == kBuiltinU3ToneKey) {
++    final tone = U3Tone.values.byName(kBootU3Tone);
++    final doc = buildU3ToneDocument(tone: tone);
++    log?.call('dart3d: u3-tone tone=${tone.name} exposure=1 fixed-camera');
++    return ShowcaseScene(
++      document: doc,
++      cameraNode: doc.nodes.values
++          .singleWhere((node) => node.name == 'u3.tone.camera')
++          .id,
++      cameraTarget: Vector3.zero(),
++      cameraDir: Vector3(0, 0, -1),
++      frameRadius: 0,
++      summary: 'Gray 0.018..12 · RGB/orange at 2/8',
++    );
++  }
+   SceneDocument doc;
+   try {
+     if (item.assetKey == kBuiltinMaterialsKey ||
+diff --git a/dart3d/example/lib/showcase_scene.dart b/dart3d/example/lib/showcase_scene.dart
+index 112cfe8..4ef91a1 100644
+--- a/dart3d/example/lib/showcase_scene.dart
++++ b/dart3d/example/lib/showcase_scene.dart
+@@ -18,6 +18,10 @@ import 'light_aim.dart';
+ import 'showcase_loader.dart';
+ import 'u2_catcher_scene.dart';
+ import 'u2_geometry_scene.dart';
++import 'u3_atlas_probe.dart';
++import 'u3_tone_scene.dart';
++import 'u3_sprite_scene.dart';
++import 'u4_property_scene.dart';
+ 
+ /// Boot override for the U1 camera-controller pose (`orbit1..3`,
+ /// `fly1..3`, `follow1..3`).
+@@ -104,6 +108,11 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
+   LocalId? _u1FollowSubjectId;
+   LocalId? _u1PickMarkerId;
+ 
++  Timer? _atlasTimer;
++  U3SpriteControls? _spriteControls;
++  U4PropertyControls? _propertyControls;
++  int _atlasFrame = 0;
++
+   /// W17 state: active mode in [_kW17ModeSequence] and optional sun-sweep timer.
+   int _w17ModeIndex = max(0, _kW17ModeSequence.indexOf(_kBootW17Mode));
+   Timer? _w17SweepTimer;
+@@ -167,6 +176,12 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
+   }
+ 
+   void _load(ShowcaseItem item) {
++    _propertyControls = null;
++    _spriteControls?.dispose();
++    _spriteControls = null;
++    _atlasTimer?.cancel();
++    _atlasTimer = null;
++    _atlasFrame = 0;
+     _w17SweepTimer?.cancel();
+     _w17SweepTimer = null;
+     setState(() {
+@@ -196,6 +211,37 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
+     _cameraNode = scene.cameraNode;
+     _frameRadius = scene.frameRadius;
+ 
++    if (item.assetKey == kBuiltinU4Key ||
++        item.assetKey == kBuiltinU4MaterialsKey ||
++        item.assetKey == kBuiltinU3SpriteKey ||
++        item.assetKey == kBuiltinU3ToneKey ||
++        item.assetKey == kBuiltinU3AtlasProbeKey) {
++      _orbitController = null;
++      _activeCameraController = null;
++      _scenePointer = null;
++      _aspectFramed = true;
++      _controller.loadDocument(scene.document);
++      if (item.assetKey == kBuiltinU4Key ||
++          item.assetKey == kBuiltinU4MaterialsKey) {
++        _propertyControls = U4PropertyControls(
++          _controller,
++          scene.document,
++          bareIds: item.assetKey == kBuiltinU4Key && kBootU4BareIds,
++          log: dnLog,
++          onChanged: () => setState(() {}),
++        );
++      }
++      if (item.assetKey == kBuiltinU3SpriteKey) {
++        _spriteControls = U3SpriteControls(
++          _controller,
++          scene.document,
++          onChanged: () => setState(() {}),
++        );
++      }
++      setState(() => _status = item.label);
++      return;
++    }
++
+     final dir = scene.cameraDir;
+     final azimuth = atan2(dir.x, -dir.z);
+     final elevation = asin(dir.y.clamp(-1.0, 1.0));
+@@ -555,6 +601,30 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
+     setState(() {});
+   }
+ 
++  void _nextAtlasFrame() {
++    _atlasFrame = nextU3AtlasFrame(_controller, _scene!.document, _atlasFrame);
++    dnLog(
++      'dart3d: u3-atlas-probe frame=$_atlasFrame expected=${u3AtlasCellNames[_atlasFrame]} playing=${_atlasTimer != null}',
++    );
++    setState(() {});
++  }
++
++  void _toggleAtlasPlayback() {
++    if (_atlasTimer == null) {
++      _atlasTimer = Timer.periodic(
++        const Duration(seconds: 1),
++        (_) => _nextAtlasFrame(),
++      );
++    } else {
++      _atlasTimer!.cancel();
++      _atlasTimer = null;
++    }
++    dnLog(
++      'dart3d: u3-atlas-probe frame=$_atlasFrame expected=${u3AtlasCellNames[_atlasFrame]} playing=${_atlasTimer != null}',
++    );
++    setState(() {});
++  }
++
+   void _cycleU2Light() {
+     final next = switch (_u2LightMode) {
+       U2LightMode.left => U2LightMode.right,
+@@ -774,6 +844,8 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
+ 
+   @override
+   void dispose() {
++    _spriteControls?.dispose();
++    _atlasTimer?.cancel();
+     _w17SweepTimer?.cancel();
+     _controller.dispose();
+     super.dispose();
+@@ -1252,6 +1324,9 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
+     final isW17 = item.assetKey == kBuiltinW17SkyKey;
+     final isU2 = item.assetKey == kBuiltinU2Key;
+     final isU2Catcher = item.assetKey == kBuiltinU2CatcherKey;
++    final isAtlasProbe = item.assetKey == kBuiltinU3AtlasProbeKey;
++    final isU3Tone = item.assetKey == kBuiltinU3ToneKey;
++    final isSprite = item.assetKey == kBuiltinU3SpriteKey;
+     final u2CatcherVariantName =
+         kBootU2CatcherPath == u2CatcherPathVariantDefault
+         ? u2CatcherDefaultProbeVariant
+@@ -1292,6 +1367,17 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
+                   constraints.maxWidth,
+                   constraints.maxHeight,
+                 );
++                if (item.assetKey == kBuiltinU4Key ||
++                    item.assetKey == kBuiltinU4MaterialsKey ||
++                    isU3Tone ||
++                    isAtlasProbe ||
++                    isSprite) {
++                  return SceneView(
++                    controller: _controller,
++                    quality: widget.quality,
++                    backgroundColor: isSprite ? 0xFF182028 : 0xFF000000,
++                  );
++                }
+                 return GestureDetector(
+                   onTapDown: (d) => _startTap(d.localPosition, viewSize),
+                   onTapUp: (d) => _finishTap(d.localPosition, viewSize),
+@@ -1372,6 +1458,185 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
+                             ),
+                           ),
+                         ],
++                        if (isSprite && _spriteControls != null) ...[
++                          const SizedBox(height: 4),
++                          Text(
++                            'Frame ${_spriteControls!.frame} · ${_spriteControls!.ordinary ? "ordinary" : _spriteControls!.blend.name}',
++                            style: const TextStyle(
++                              fontSize: 12,
++                              color: Color(0xEEFFFFFF),
++                            ),
++                          ),
++                          for (final row in [
++                            [
++                              ('NextFrame', _spriteControls!.nextFrame),
++                              (
++                                _spriteControls!.playing ? 'Pause' : 'Play',
++                                _spriteControls!.togglePlayback,
++                              ),
++                            ],
++                            [
++                              (
++                                'Blend',
++                                () {
++                                  final controls = _spriteControls!;
++                                  controls.blend =
++                                      controls.blend == D3SpriteBlendMode.alpha
++                                      ? D3SpriteBlendMode.additive
++                                      : D3SpriteBlendMode.alpha;
++                                  controls.upsert();
++                                },
++                              ),
++                              ('Tint / vertex', _spriteControls!.toggleTint),
++                            ],
++                            [
++                              (
++                                _spriteControls!.textured
++                                    ? 'Untexture'
++                                    : 'Texture',
++                                () {
++                                  _spriteControls!.textured =
++                                      !_spriteControls!.textured;
++                                  _spriteControls!.upsert();
++                                },
++                              ),
++                              (
++                                'Type',
++                                () {
++                                  _spriteControls!.ordinary =
++                                      !_spriteControls!.ordinary;
++                                  _spriteControls!.upsert();
++                                },
++                              ),
++                              ('Depth', _spriteControls!.crossDepths),
++                            ],
++                          ])
++                            Row(
++                              mainAxisAlignment: MainAxisAlignment.center,
++                              children: [
++                                for (final (title, action) in row)
++                                  Button(
++                                    title: title,
++                                    onPressed: action,
++                                    shape: const StadiumBorder(),
++                                    color: const Color(0x2EFFFFFF),
++                                    foregroundColor: const Color(0xEEFFFFFF),
++                                    padding: const EdgeInsets.symmetric(
++                                      horizontal: 6,
++                                      vertical: 4,
++                                    ),
++                                    fontSize: 11,
++                                  ),
++                              ],
++                            ),
++                        ],
++                        if (isAtlasProbe && _scene != null) ...[
++                          const SizedBox(height: 8),
++                          Text(
++                            'Frame $_atlasFrame · expected ${u3AtlasCellNames[_atlasFrame]}',
++                            style: const TextStyle(
++                              fontSize: 12,
++                              color: Color(0xEEFFFFFF),
++                            ),
++                          ),
++                          Button(
++                            title: 'Next Frame',
++                            onPressed: _nextAtlasFrame,
++                            shape: const StadiumBorder(),
++                            color: const Color(0x2EFFFFFF),
++                            foregroundColor: const Color(0xEEFFFFFF),
++                            padding: const EdgeInsets.symmetric(
++                              horizontal: 12,
++                              vertical: 5,
++                            ),
++                            fontSize: 12,
++                          ),
++                          Button(
++                            title: _atlasTimer == null ? 'Play' : 'Pause',
++                            onPressed: _toggleAtlasPlayback,
++                            shape: const StadiumBorder(),
++                            color: const Color(0x2EFFFFFF),
++                            foregroundColor: const Color(0xEEFFFFFF),
++                            padding: const EdgeInsets.symmetric(
++                              horizontal: 12,
++                              vertical: 5,
++                            ),
++                            fontSize: 12,
++                          ),
++                        ],
++                        if (_propertyControls != null) ...[
++                          const SizedBox(height: 8),
++                          for (final row in [
++                            [
++                              for (final time in [0.0, 1.0, 2.0])
++                                (
++                                  'Seek${time.toInt()}',
++                                  () => _propertyControls!.seek(time),
++                                ),
++                            ],
++                            [
++                              (
++                                _propertyControls!.playing ? 'Pause' : 'Play',
++                                _propertyControls!.togglePlayback,
++                              ),
++                              ('Stop', _propertyControls!.stop),
++                            ],
++                            [
++                              (
++                                'Weight1',
++                                () => _propertyControls!.setWeight(1),
++                              ),
++                              (
++                                'Weight.25',
++                                () => _propertyControls!.setWeight(0.25),
++                              ),
++                            ],
++                          ])
++                            Row(
++                              mainAxisAlignment: MainAxisAlignment.center,
++                              children: [
++                                for (final (title, action) in row)
++                                  Button(
++                                    title: title,
++                                    onPressed: action,
++                                    shape: const StadiumBorder(),
++                                    color: const Color(0x2EFFFFFF),
++                                    foregroundColor: const Color(0xEEFFFFFF),
++                                    padding: const EdgeInsets.symmetric(
++                                      horizontal: 6,
++                                      vertical: 4,
++                                    ),
++                                    fontSize: 11,
++                                  ),
++                              ],
++                            ),
++                        ],
++                        if (isU3Tone && _scene != null) ...[
++                          const SizedBox(height: 8),
++                          Button(
++                            title:
++                                'Tone ${u3Tone(_scene!.document).index + 1}/5: ${u3Tone(_scene!.document).name} · Next',
++                            onPressed: () {
++                              final doc = _scene!.document;
++                              final next =
++                                  U3Tone.values[(u3Tone(doc).index + 1) %
++                                      U3Tone.values.length];
++                              selectU3Tone(_controller, doc, next);
++                              dnLog(
++                                'dart3d: u3-tone tone=${next.name} exposure=1 fixed-camera',
++                              );
++                              setState(() {});
++                            },
++                            shape: const StadiumBorder(),
++                            color: const Color(0x2EFFFFFF),
++                            foregroundColor: const Color(0xEEFFFFFF),
++                            padding: const EdgeInsets.symmetric(
++                              horizontal: 12,
++                              vertical: 5,
++                            ),
++                            fontSize: 12,
++                          ),
++                        ],
+                         if (isU1) ...[
+                           const SizedBox(height: 8),
+                           GestureDetector(

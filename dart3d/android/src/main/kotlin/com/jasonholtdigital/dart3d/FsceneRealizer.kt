@@ -490,6 +490,7 @@ object FsceneRealizer {
         }
         val ctx = Context(host, json.optInt("fscene", 5))
         ctx.decodePayloads(json.optJSONObject("payloads"))
+        if (preserveStage) ctx.payloadSpecs.putAll(host.opPayloadSpecs)
         ctx.decodeResources(json.optJSONObject("resources"))
         if (preserveStage) {
             // Op-added env resources aren't in the manifest — overlay
@@ -545,6 +546,7 @@ object FsceneRealizer {
             geometries = res.geometries,
             gpuMeshes = host.gpuMeshes,
             materials = host.materialInstances,
+            materialColors = res.materialColors,
             payloadSpecs = res.payloadSpecs,
             pendingPayloadRefs = host.pendingPayloadRefs,
             textures = res.textures,
@@ -654,7 +656,40 @@ object FsceneRealizer {
         val name: String,
         val channels: List<DecodedChannel>,
         val endTime: Double,
+        val definition: AnimationDefinition,
+        val properties: List<PropertyCurve>,
     )
+
+    class MaterialColorOwner(val instance: MaterialInstance, val parameter: String,
+        val value: AnimatedProperty) {
+        fun write(target: MaterialInstance, color: FloatArray) {
+            target.setParameter(parameter, color[0], color[1], color[2], color[3])
+        }
+    }
+
+    fun materialColorOwner(instance: MaterialInstance, resource: JSONObject): MaterialColorOwner? {
+        val type = resource.optString("type").ifEmpty { "physicallyBased" }
+        if (type !in listOf("physicallyBased", "unlit", "d3:sprite")) return null
+        val color = resource.optJSONObject("properties")?.tag("baseColor").d3Color()
+            ?: floatArrayOf(1f, 1f, 1f, 1f)
+        return MaterialColorOwner(instance, if (type == "d3:sprite") "tint" else "baseColor",
+            AnimatedProperty(color))
+    }
+
+    class LightOwner(val entities: List<Int>, val directional: Boolean,
+        val width: Float = 1f, val height: Float = 1f, val area: Boolean = false,
+        intensity: Float) {
+        val value = AnimatedProperty(floatArrayOf(intensity))
+        fun write(manager: LightManager, intensity: Float) {
+            for (entity in entities) {
+                val instance = manager.getInstance(entity)
+                if (directional) manager.setIntensity(instance, intensity)
+                else manager.setIntensityCandela(instance, convertedIntensity(intensity))
+            }
+        }
+        fun convertedIntensity(intensity: Float): Float =
+            if (area) intensity * width * height / 4f else intensity
+    }
 
     class NodeRec(
         val entity: Int,
@@ -736,6 +771,9 @@ object FsceneRealizer {
         // material upserts update all chunks while preserving per-chunk
         // colors and `doubleSided`.
         var instanceBaseMaterial: MaterialInstance? = null,
+        var lightOwner: LightOwner? = null,
+        var lightDeclarations: Int = 0,
+        var cameraDeclarations: Int = 0,
         val instanceChunkColors: MutableList<FloatArray?> = mutableListOf(),
         // Retained `d3:instances` props — a geometry-ref consumer
         // re-realizes when the resource upserts.
@@ -832,6 +870,7 @@ object FsceneRealizer {
         val geometries: MutableMap<Long, MeshFactory.MeshData> = HashMap(),
         val gpuMeshes: MutableMap<Long, GpuMesh> = HashMap(),
         val materials: MutableMap<Long, MaterialInstance> = HashMap(),
+        val materialColors: MutableMap<Long, MaterialColorOwner> = HashMap(),
         val payloadSpecs: MutableMap<Long, PayloadMeta> = HashMap(),
         val pendingPayloadRefs: MutableSet<Long> = HashSet(),
         // W4: texture uploads + the binding maps the host's surgical
@@ -937,6 +976,7 @@ object FsceneRealizer {
          * without a scene re-realize.
          */
         class InstalledResources(
+            val materialColors: MutableMap<Long, MaterialColorOwner> = HashMap(),
             val textures: MutableMap<Long, Texture> = HashMap(),
             val textureSamplers: MutableMap<Long, TextureSampler> =
                 HashMap(),
@@ -2681,9 +2721,12 @@ object FsceneRealizer {
             if (catcherSettings?.mode == ShadowCatcherMode.BAKED) {
                 bakedCatcherSettings[key] = catcherSettings
             }
-            materials[key] = buildMaterialInstance(
+            val instance = buildMaterialInstance(
                 host, key, r, textures, textureSamplers, textureConsumers,
                 catcherSettings)
+            materials[key] = instance
+            materialColors.remove(key)
+            materialColorOwner(instance, r)?.let { materialColors[key] = it }
         }
 
         private fun decodeTexture(key: Long, r: JSONObject) {
@@ -2778,7 +2821,6 @@ object FsceneRealizer {
             for (token in map.keys()) {
                 val key = D3Wire.localIdKey(token) ?: continue
                 val def = map.optJSONObject(token) ?: continue
-                animDefs[key] = def
                 decodeAnimation(key, def)
             }
         }
@@ -2797,96 +2839,115 @@ object FsceneRealizer {
          * iOS `decodeAnimation`.
          */
         fun decodeAnimation(key: Long, def: JSONObject) {
+            val metadata = if (animDefs[key] === def) animations[key]?.definition else null
+            val definition = metadata ?: try {
+                AnimationDefinition.parse(def)
+            } catch (e: IllegalArgumentException) {
+                Log.w(TAG, "animation $key: ${e.message}; keeping prior definition")
+                return
+            }
             val name = def.optString("name")
             val channels = ArrayList<DecodedChannel>()
             var endTime = 0.0
-            val claims = animPayloadIds[key] ?: HashSet()
-            def.optJSONArray("channels")?.let { arr ->
-                for (i in 0 until arr.length()) {
-                    val c = arr.optJSONObject(i) ?: continue
-                    val target = c.optString("target")
-                        .takeIf { it.isNotEmpty() }
-                        ?.let { D3Wire.localIdKey(it) } ?: continue
-                    val kind = when (c.optString("property")) {
-                        "rotation" -> DecodedChannel.Kind.ROTATION
-                        "scale" -> DecodedChannel.Kind.SCALE
-                        "weights" -> DecodedChannel.Kind.WEIGHTS
-                        else -> DecodedChannel.Kind.TRANSLATION
+            val claims = definition.claims
+            for (c in definition.ordinary) {
+                val target = c.target
+                val kind = when (c.kind) {
+                    "translation" -> DecodedChannel.Kind.TRANSLATION
+                    "rotation" -> DecodedChannel.Kind.ROTATION
+                    "scale" -> DecodedChannel.Kind.SCALE
+                    "weights" -> DecodedChannel.Kind.WEIGHTS
+                    else -> error("validated ordinary kind")
+                }
+                val tPid = c.timeline
+                val kPid = c.keyframes
+                val tData = host.payloadStore[tPid]
+                val kData = host.payloadStore[kPid]
+                if (tData == null || kData == null) {
+                    logOnce("anim.$key.awaiting",
+                        "animation $key: awaiting channel payloads")
+                    continue
+                }
+                val times = DoubleArray(tData.size / 4) {
+                    D3Wire.f32LE(tData, it * 4).toDouble()
+                }
+                val vals = f32List(kData)
+                val arity = when (kind) {
+                    DecodedChannel.Kind.TRANSLATION, DecodedChannel.Kind.SCALE -> 3
+                    DecodedChannel.Kind.ROTATION -> 4
+                    DecodedChannel.Kind.WEIGHTS -> 1
+                }
+                if (tData.size % 4 != 0 || kData.size % 4 != 0 || times.isEmpty() ||
+                    times.indices.any { !times[it].isFinite() || times[it] < 0 ||
+                        (it > 0 && times[it] <= times[it - 1]) } ||
+                    vals.size < times.size * arity || vals.any { !it.isFinite() }) {
+                    Log.w(TAG, "animation $key ${c.kind}: invalid joined curve; inactive")
+                    continue
+                }
+                var vec3 = FloatArray(0)
+                var quat = FloatArray(0)
+                var weights = FloatArray(0)
+                var targetCount = 0
+                when (kind) {
+                    DecodedChannel.Kind.TRANSLATION -> {
+                        val n = minOf(times.size, vals.size / 3)
+                        vec3 = FloatArray(n * 3) { j ->
+                            val b = (j / 3) * 3
+                            val c = j % 3
+                            if (c == 2) -vals[b + 2] else vals[b + c]
+                        }
                     }
-                    val tPid = c.optString("timeline")
-                        .takeIf { it.isNotEmpty() }
-                        ?.let { D3Wire.localIdKey(it) }
-                    val kPid = c.optString("keyframes")
-                        .takeIf { it.isNotEmpty() }
-                        ?.let { D3Wire.localIdKey(it) }
-                    if (tPid == null || kPid == null) {
-                        Log.i(TAG, "animation $key: channel missing " +
-                            "timeline/keyframes")
-                        continue
+                    DecodedChannel.Kind.SCALE -> {
+                        val n = minOf(times.size, vals.size / 3)
+                        vec3 = vals.copyOfRange(0, n * 3)
                     }
-                    claims.add(tPid); claims.add(kPid)
-                    val tData = host.payloadStore[tPid]
-                    val kData = host.payloadStore[kPid]
-                    if (tData == null || kData == null) {
-                        logOnce("anim.$key.awaiting",
-                            "animation $key: awaiting channel payloads")
-                        continue
-                    }
-                    val times = DoubleArray(tData.size / 4) {
-                        D3Wire.f32LE(tData, it * 4).toDouble()
-                    }
-                    val vals = f32List(kData)
-                    var vec3 = FloatArray(0)
-                    var quat = FloatArray(0)
-                    var weights = FloatArray(0)
-                    var targetCount = 0
-                    when (kind) {
-                        DecodedChannel.Kind.TRANSLATION -> {
-                            val n = minOf(times.size, vals.size / 3)
-                            vec3 = FloatArray(n * 3) { j ->
-                                val b = (j / 3) * 3
-                                val c = j % 3
-                                if (c == 2) -vals[b + 2] else vals[b + c]
+                    DecodedChannel.Kind.ROTATION -> {
+                        val n = minOf(times.size, vals.size / 4)
+                        quat = FloatArray(n * 4) { j ->
+                            val b = (j / 4) * 4
+                            when (j % 4) {
+                                0 -> -vals[b]
+                                1 -> -vals[b + 1]
+                                2 -> vals[b + 2]
+                                else -> vals[b + 3]
                             }
                         }
-                        DecodedChannel.Kind.SCALE -> {
-                            val n = minOf(times.size, vals.size / 3)
-                            vec3 = vals.copyOfRange(0, n * 3)
-                        }
-                        DecodedChannel.Kind.ROTATION -> {
-                            val n = minOf(times.size, vals.size / 4)
-                            quat = FloatArray(n * 4) { j ->
-                                val b = (j / 4) * 4
-                                when (j % 4) {
-                                    0 -> -vals[b]
-                                    1 -> -vals[b + 1]
-                                    2 -> vals[b + 2]
-                                    else -> vals[b + 3]
-                                }
-                            }
-                        }
-                        DecodedChannel.Kind.WEIGHTS -> {
-                            val keyCount = times.size
-                            val tc = if (keyCount > 0) {
-                                vals.size / keyCount
-                            } else 0
-                            targetCount = tc
-                            weights = vals.copyOf(
-                                minOf(tc * keyCount, vals.size))
-                        }
                     }
-                    times.lastOrNull()?.let { endTime = maxOf(endTime, it) }
-                    channels.add(DecodedChannel(
-                        target = target,
-                        targetName = c.optString("targetName")
-                            .takeIf { it.isNotEmpty() },
-                        kind = kind, times = times,
-                        vec3 = vec3, quat = quat,
-                        weights = weights, targetCount = targetCount))
+                    DecodedChannel.Kind.WEIGHTS -> {
+                        val keyCount = times.size
+                        val tc = if (keyCount > 0) {
+                            vals.size / keyCount
+                        } else 0
+                        targetCount = tc
+                        weights = vals.copyOf(
+                            minOf(tc * keyCount, vals.size))
+                    }
+                }
+                times.lastOrNull()?.let { endTime = maxOf(endTime, it) }
+                channels.add(DecodedChannel(
+                    target = target,
+                    targetName = c.targetName,
+                    kind = kind, times = times,
+                    vec3 = vec3, quat = quat,
+                    weights = weights, targetCount = targetCount))
+            }
+            val properties = definition.properties.mapNotNull { property ->
+                try {
+                    PropertyCurve.decode(property, host.payloadStore[property.timeline],
+                        host.payloadStore[property.keyframes], payloadSpecs[property.timeline],
+                        payloadSpecs[property.keyframes]).also {
+                        if (it == null) logOnce("anim.$key.pending.${property.kind}",
+                            "animation $key: property awaiting payloads/specs")
+                    }
+                } catch (e: IllegalArgumentException) {
+                    Log.w(TAG, "animation $key ${property.kind} ${property.timeline}/${property.keyframes}: ${e.message}; inactive")
+                    null
                 }
             }
+            for (property in properties) endTime = maxOf(endTime, property.times.last())
+            animDefs[key] = def
             animPayloadIds[key] = claims
-            animations[key] = DecodedAnimation(name, channels, endTime)
+            animations[key] = DecodedAnimation(name, channels, endTime, definition, properties)
         }
 
         /**
@@ -3119,6 +3180,9 @@ object FsceneRealizer {
             val spec = any as? JSONObject ?: return
             val type = spec.optString("type")
             val props = spec.optJSONObject("properties") ?: JSONObject()
+            if (type == "camera") rec.cameraDeclarations++
+            if (type in listOf("directionalLight", "pointLight", "spotLight", "rectAreaLight"))
+                rec.lightDeclarations++
             // Universal `enabled` (W12) — upstream's component wrapper
             // applies it around update/fixedUpdate callbacks only; it
             // does not remove realized state. W18 particle emitters
@@ -4254,17 +4318,13 @@ object FsceneRealizer {
             }
             // Upstream's defaults: 3 for a directional light, 1 for the
             // others (see the unit note at the top of the file).
-            val intensity = p.tag("intensity").d3Double()
-            when (type) {
-                LightManager.Type.DIRECTIONAL ->
-                    builder.intensity((intensity ?: 3.0).toFloat())
-                else -> {
-                    builder.intensityCandela((intensity ?: 1.0).toFloat())
-                    val range = p.tag("range").d3Double() ?: 0.0
-                    builder.falloff(
-                        if (range > 0) range.toFloat()
-                        else UNBOUNDED_LIGHT_RANGE)
-                }
+            val directional = type == LightManager.Type.DIRECTIONAL
+            val intensity = (p.tag("intensity").d3Double() ?: if (directional) 3.0 else 1.0).toFloat()
+            if (!directional) {
+                val range = p.tag("range").d3Double() ?: 0.0
+                builder.falloff(
+                    if (range > 0) range.toFloat()
+                    else UNBOUNDED_LIGHT_RANGE)
             }
             if (type == LightManager.Type.FOCUSED_SPOT) {
                 // Half-angles, radians; upstream's defaults.
@@ -4320,6 +4380,9 @@ object FsceneRealizer {
                 }
             }
             builder.fenced { build(host.engine, rec.entity) }
+            rec.lightOwner = LightOwner(listOf(rec.entity), directional, intensity = intensity).also {
+                it.write(host.engine.lightManager, intensity)
+            }
             if (castsShadow) {
                 val lm = host.engine.lightManager
                 val lightInstance = lm.getInstance(rec.entity)
@@ -4443,9 +4506,8 @@ object FsceneRealizer {
             val h = (p.tag("height").d3Double() ?: 1.0).toFloat()
             val color = p.tag("color").d3Color()
                 ?: floatArrayOf(1f, 1f, 1f, 1f)
-            val intensityCandela =
-                ((p.tag("intensity").d3Double() ?: 1.0) * w * h / 4.0)
-                    .toFloat()
+            val intensity = (p.tag("intensity").d3Double() ?: 1.0).toFloat()
+            val owner = LightOwner(rec.lightEntities, false, w, h, true, intensity)
             val range = (p.tag("range").d3Double() ?: 0.0)
                 .takeIf { it > 0 }?.toFloat() ?: UNBOUNDED_LIGHT_RANGE
             val identQ = floatArrayOf(0f, 0f, 0f, 1f)
@@ -4455,7 +4517,7 @@ object FsceneRealizer {
                 val child = em.create()
                 LightManager.Builder(LightManager.Type.POINT)
                     .color(color[0], color[1], color[2])
-                    .intensityCandela(intensityCandela)
+                    .intensityCandela(owner.convertedIntensity(intensity))
                     .falloff(range)
                     .fenced { build(host.engine, child) }
                 tcm.create(
@@ -4468,6 +4530,7 @@ object FsceneRealizer {
                 host.scene.addEntity(child)
                 rec.lightEntities.add(child)
             }
+            rec.lightOwner = owner
             logOnce("rectAreaLight:$key",
                 "rectAreaLight on node $key: approximated by a 4-point " +
                     "cluster (${w}×${h}); Filament has no area light type")
@@ -5714,6 +5777,9 @@ object FsceneRealizer {
             // component list.
             destroyProcRenderable(key, rec)
             rec.instancesProps = null
+            rec.lightOwner = null
+            rec.lightDeclarations = 0
+            rec.cameraDeclarations = 0
             if (rec.isCamera) {
                 rec.isCamera = false
                 nodeCameraProps.remove(key)
@@ -6325,6 +6391,7 @@ object FsceneRealizer {
                 gpuMeshes = gpuMeshes,
                 materials = materials,
                 resources = InstalledResources(
+                    materialColors = materialColors,
                     textures = textures,
                     textureSamplers = textureSamplers,
                     textureConsumers = textureConsumers,

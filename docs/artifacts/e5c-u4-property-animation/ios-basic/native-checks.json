@@ -1,0 +1,212 @@
+{
+  "checks": [
+    {
+      "name": "color/light start",
+      "expected": {
+        "color": [
+          1.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "intensity": 2,
+        "nativeIntensity": 636.6197723675814
+      },
+      "observed": {
+        "time": 0.0,
+        "weight": 1.0,
+        "color": [
+          1.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "intensity": 2.0,
+        "nativeIntensity": 636.6197723675814,
+        "fovRadians": 1.0471976,
+        "nativeDegrees": 60.0,
+        "trsTargets": 0
+      }
+    },
+    {
+      "name": "color/light midpoint",
+      "expected": {
+        "color": [
+          0.5,
+          0.0,
+          0.5,
+          1.0
+        ],
+        "intensity": 4,
+        "nativeIntensity": 1273.2395447351628
+      },
+      "observed": {
+        "time": 1.0,
+        "weight": 1.0,
+        "color": [
+          0.5,
+          0.0,
+          0.5,
+          1.0
+        ],
+        "intensity": 4.0,
+        "nativeIntensity": 1273.2395447351628,
+        "fovRadians": 1.0471976,
+        "nativeDegrees": 60.0,
+        "trsTargets": 0
+      }
+    },
+    {
+      "name": "color/light end",
+      "expected": {
+        "color": [
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "intensity": 6,
+        "nativeIntensity": 1909.859317102744
+      },
+      "observed": {
+        "time": 2.0,
+        "weight": 1.0,
+        "color": [
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "intensity": 6.0,
+        "nativeIntensity": 1909.8593171027442,
+        "fovRadians": 1.0471976,
+        "nativeDegrees": 60.0,
+        "trsTargets": 0
+      }
+    },
+    {
+      "name": "quarter-weight midpoint",
+      "expected": {
+        "color": [
+          0.875,
+          0.75,
+          0.875,
+          1.0
+        ],
+        "intensity": 1.75,
+        "nativeIntensity": 557.0423008216337
+      },
+      "observed": {
+        "time": 1.0,
+        "weight": 0.25,
+        "color": [
+          0.875,
+          0.75,
+          0.875,
+          1.0
+        ],
+        "intensity": 1.75,
+        "nativeIntensity": 557.0423008216337,
+        "fovRadians": 1.0471976,
+        "nativeDegrees": 60.0,
+        "trsTargets": 0
+      }
+    },
+    {
+      "name": "stop preserves quarter weight",
+      "expected": {
+        "color": [
+          1.0,
+          0.75,
+          0.75,
+          1.0
+        ],
+        "intensity": 1.25,
+        "nativeIntensity": 397.88735772973837
+      },
+      "observed": {
+        "time": 0.0,
+        "weight": 0.25,
+        "color": [
+          1.0,
+          0.75,
+          0.75,
+          1.0
+        ],
+        "intensity": 1.25,
+        "nativeIntensity": 397.88735772973837,
+        "fovRadians": 1.0471976,
+        "nativeDegrees": 60.0,
+        "trsTargets": 0
+      }
+    },
+    {
+      "name": "camera 45.0 degrees",
+      "expected": {
+        "nativeDegrees": 45.0
+      },
+      "observed": {
+        "time": 0.0,
+        "weight": 1.0,
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "intensity": 1.0,
+        "nativeIntensity": 318.3098861837907,
+        "fovRadians": 0.7853982,
+        "nativeDegrees": 45.0,
+        "trsTargets": 0
+      }
+    },
+    {
+      "name": "camera 67.5 degrees",
+      "expected": {
+        "nativeDegrees": 67.5
+      },
+      "observed": {
+        "time": 1.0,
+        "weight": 1.0,
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "intensity": 1.0,
+        "nativeIntensity": 318.3098861837907,
+        "fovRadians": 1.1780972,
+        "nativeDegrees": 67.5,
+        "trsTargets": 0
+      }
+    },
+    {
+      "name": "camera 90.0 degrees",
+      "expected": {
+        "nativeDegrees": 90.0
+      },
+      "observed": {
+        "time": 2.0,
+        "weight": 1.0,
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "intensity": 1.0,
+        "nativeIntensity": 318.3098861837907,
+        "fovRadians": 1.5707964,
+        "nativeDegrees": 90.0,
+        "trsTargets": 0
+      }
+    }
+  ],
+  "colorObservationRows": 698,
+  "cameraObservationRows": 2084,
+  "allObservedTrsTargetCounts": 0,
+  "numericTolerance": 0.000001,
+  "scope": "Actual SceneKit uniform/light/camera readback in the opaque untextured primary-view fixture; not performance or general material parity"
+}

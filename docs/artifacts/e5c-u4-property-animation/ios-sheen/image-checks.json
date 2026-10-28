@@ -1,0 +1,69 @@
+{
+  "boundary" : "Exact decoded PNG comparisons, not linear color calibration. Only the partial-alpha PBR sheen region changes; default fixture, zero\/full endpoints and other faces remain identical.",
+  "comparisons" : {
+    "cleanT0" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "cleanT1" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "cleanT2" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "defaultFixtureUnchanged" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "pbrT0" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "pbrT1" : {
+      "changedPixels" : 3006,
+      "maximumChannelDifference" : 48
+    },
+    "pbrT2" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "unchangedalphaSnapshotT0" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "unchangedalphaSnapshotT1" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "unchangedalphaSnapshotT2" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "unchangedreferenceT0" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "unchangedreferenceT1" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "unchangedreferenceT2" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "unchangedsharedT0" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "unchangedsharedT1" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "unchangedsharedT2" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    }
+  }
+}

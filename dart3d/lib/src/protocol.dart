@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'animation.dart';
 import 'diff_apply.dart';
 import 'scene_model.dart';
 
@@ -313,8 +314,12 @@ abstract final class D3Protocol {
   /// `viewport` (its private `_encodeView` emits upstream fields only)
   /// and W26 procedural-shape geometry resources — so the manifest
   /// goes through [writeFsceneWithExtensions], which re-adds both.
-  static Uint8List loadSceneBytes(SceneDocument doc) =>
-      Uint8List.fromList(utf8.encode(writeFsceneWithExtensions(doc)));
+  static Uint8List loadSceneBytes(SceneDocument doc) {
+    for (final animation in doc.animations.values) {
+      validatePropertyAnimation(animation, doc.payload);
+    }
+    return Uint8List.fromList(utf8.encode(writeFsceneWithExtensions(doc)));
+  }
 
   /// `[8B payloadId][raw bytes]` for one [PayloadSpec].
   static Uint8List payloadBytes(PayloadSpec payload) {

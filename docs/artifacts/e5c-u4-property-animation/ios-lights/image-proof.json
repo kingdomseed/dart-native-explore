@@ -1,0 +1,509 @@
+{
+  "areaCleanMatches" : {
+    "00-initial" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "01-full-t1" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "02-full-t2" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "03-quarter-t1" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "04-replaced" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "05-replaced-t2" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "06-removed" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "07-readded" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "08-readded-t1" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    }
+  },
+  "boundary" : "Exact decoded PNGs converted to sRGB. Samples illustrate scene output; actual native field logs establish unit conversions. No photometric calibration or monotonic area-size\/brightness claim.",
+  "crop" : [
+    95,
+    300,
+    215,
+    85
+  ],
+  "lightRemovalAndRestorationSamplesPass" : true,
+  "samplesSRGB8" : {
+    "area-00-initial" : [
+      [
+        255,
+        38,
+        0
+      ],
+      [
+        255,
+        38,
+        0
+      ],
+      [
+        65,
+        65,
+        65
+      ]
+    ],
+    "area-01-full-t1" : [
+      [
+        202,
+        48,
+        199
+      ],
+      [
+        202,
+        48,
+        199
+      ],
+      [
+        90,
+        90,
+        90
+      ]
+    ],
+    "area-02-full-t2" : [
+      [
+        4,
+        50,
+        254
+      ],
+      [
+        4,
+        50,
+        254
+      ],
+      [
+        106,
+        106,
+        106
+      ]
+    ],
+    "area-03-quarter-t1" : [
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        62,
+        62,
+        62
+      ]
+    ],
+    "area-04-replaced" : [
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        126,
+        126,
+        126
+      ]
+    ],
+    "area-05-replaced-t2" : [
+      [
+        229,
+        230,
+        253
+      ],
+      [
+        229,
+        230,
+        253
+      ],
+      [
+        134,
+        134,
+        134
+      ]
+    ],
+    "area-06-removed" : [
+      [
+        229,
+        230,
+        253
+      ],
+      [
+        229,
+        230,
+        253
+      ],
+      [
+        0,
+        0,
+        0
+      ]
+    ],
+    "area-07-readded" : [
+      [
+        229,
+        230,
+        253
+      ],
+      [
+        229,
+        230,
+        253
+      ],
+      [
+        69,
+        69,
+        69
+      ]
+    ],
+    "area-08-readded-t1" : [
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        62,
+        62,
+        62
+      ]
+    ],
+    "point-00-initial" : [
+      [
+        255,
+        38,
+        0
+      ],
+      [
+        255,
+        38,
+        0
+      ],
+      [
+        66,
+        66,
+        66
+      ]
+    ],
+    "point-01-full-t1" : [
+      [
+        202,
+        48,
+        199
+      ],
+      [
+        202,
+        48,
+        199
+      ],
+      [
+        91,
+        91,
+        91
+      ]
+    ],
+    "point-02-full-t2" : [
+      [
+        4,
+        50,
+        254
+      ],
+      [
+        4,
+        50,
+        254
+      ],
+      [
+        108,
+        108,
+        108
+      ]
+    ],
+    "point-03-quarter-t1" : [
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        62,
+        62,
+        62
+      ]
+    ],
+    "point-04-replaced" : [
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        84,
+        84,
+        84
+      ]
+    ],
+    "point-05-replaced-t2" : [
+      [
+        229,
+        230,
+        253
+      ],
+      [
+        229,
+        230,
+        253
+      ],
+      [
+        89,
+        89,
+        89
+      ]
+    ],
+    "point-06-removed" : [
+      [
+        229,
+        230,
+        253
+      ],
+      [
+        229,
+        230,
+        253
+      ],
+      [
+        0,
+        0,
+        0
+      ]
+    ],
+    "point-07-readded" : [
+      [
+        229,
+        230,
+        253
+      ],
+      [
+        229,
+        230,
+        253
+      ],
+      [
+        70,
+        70,
+        70
+      ]
+    ],
+    "point-08-readded-t1" : [
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        62,
+        62,
+        62
+      ]
+    ],
+    "spot-00-initial" : [
+      [
+        255,
+        38,
+        0
+      ],
+      [
+        255,
+        38,
+        0
+      ],
+      [
+        66,
+        66,
+        66
+      ]
+    ],
+    "spot-01-full-t1" : [
+      [
+        202,
+        48,
+        199
+      ],
+      [
+        202,
+        48,
+        199
+      ],
+      [
+        91,
+        91,
+        91
+      ]
+    ],
+    "spot-02-full-t2" : [
+      [
+        4,
+        50,
+        254
+      ],
+      [
+        4,
+        50,
+        254
+      ],
+      [
+        108,
+        108,
+        108
+      ]
+    ],
+    "spot-03-quarter-t1" : [
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        62,
+        62,
+        62
+      ]
+    ],
+    "spot-04-replaced" : [
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        84,
+        84,
+        84
+      ]
+    ],
+    "spot-05-replaced-t2" : [
+      [
+        229,
+        230,
+        253
+      ],
+      [
+        229,
+        230,
+        253
+      ],
+      [
+        89,
+        89,
+        89
+      ]
+    ],
+    "spot-06-removed" : [
+      [
+        229,
+        230,
+        253
+      ],
+      [
+        229,
+        230,
+        253
+      ],
+      [
+        0,
+        0,
+        0
+      ]
+    ],
+    "spot-07-readded" : [
+      [
+        229,
+        230,
+        253
+      ],
+      [
+        229,
+        230,
+        253
+      ],
+      [
+        70,
+        70,
+        70
+      ]
+    ],
+    "spot-08-readded-t1" : [
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        62,
+        62,
+        62
+      ]
+    ]
+  }
+}
