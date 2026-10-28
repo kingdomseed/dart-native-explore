@@ -25,6 +25,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'animation.dart';
 import 'diff_apply.dart';
 import 'scene_model.dart';
 
@@ -121,6 +122,9 @@ SceneDocument readFsceneb(Uint8List bytes) {
   blobs.forEach((id, payload) {
     document.payload(id)?.bytes = payload;
   });
+  for (final animation in document.animations.values) {
+    validatePropertyAnimation(animation, document.payload);
+  }
   return document;
 }
 

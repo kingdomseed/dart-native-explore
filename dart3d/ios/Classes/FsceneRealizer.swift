@@ -198,7 +198,10 @@ enum FsceneRealizer {
     /// `vec3`/`quat`/`weights` are populated by kind; `times` is f32
     /// seconds widened to Double.
     struct DecodedChannel {
-        enum Kind { case translation, rotation, scale, weights }
+        enum Kind: String {
+            case translation, rotation, scale, weights
+            case materialBaseColor, lightIntensity, cameraFovRadiansY
+        }
         var target: UInt64
         var targetName: String?
         var kind: Kind
@@ -207,6 +210,143 @@ enum FsceneRealizer {
         var quat: [simd_quatf] = []
         var weights: [Float] = []
         var targetCount = 0
+        var propertyValues: [simd_float4] = []
+    }
+
+    struct AnimationChannelDefinition {
+        let target: UInt64
+        let targetName: String?
+        let kind: DecodedChannel.Kind
+        let timeline: UInt64
+        let keyframes: UInt64
+    }
+
+    struct AnimationDefinition {
+        let name: String
+        let channels: [AnimationChannelDefinition]
+
+        init?(_ json: [String: Any]) {
+            var parsed: [AnimationChannelDefinition] = []
+            if let ordinary = json["channels"], !(ordinary is [Any]) { return nil }
+            if let properties = json["d3:properties"], !(properties is [Any]) { return nil }
+            var endpoints = Set<String>()
+            for (isProperty, entries) in [
+                (false, json["channels"] as? [Any] ?? []),
+                (true, json["d3:properties"] as? [Any] ?? [])
+            ] {
+                for entry in entries {
+                    guard let c = entry as? [String: Any],
+                          let spelling = c[isProperty ? "kind" : "property"] as? String,
+                          let kind = DecodedChannel.Kind(rawValue: spelling)
+                    else { return nil }
+                    let targetField: String
+                    switch kind {
+                    case .translation, .rotation, .scale, .weights:
+                        guard !isProperty else { return nil }
+                        targetField = "target"
+                    case .materialBaseColor:
+                        guard isProperty else { return nil }
+                        targetField = "material"
+                    case .lightIntensity, .cameraFovRadiansY:
+                        guard isProperty else { return nil }
+                        targetField = "node"
+                    }
+                    guard let token = c[targetField] as? String,
+                          let target = D3Wire.localIdKey(token),
+                          let timeline = c["timeline"] as? String,
+                          let t = D3Wire.localIdKey(timeline),
+                          let keyframes = c["keyframes"] as? String,
+                          let k = D3Wire.localIdKey(keyframes) else { return nil }
+                    if isProperty {
+                        guard Set(c.keys) == Set(["kind", targetField, "timeline", "keyframes"]),
+                              endpoints.insert("\(spelling).\(target)").inserted
+                        else { return nil }
+                    }
+                    parsed.append(AnimationChannelDefinition(
+                        target: target, targetName: c["targetName"] as? String,
+                        kind: kind, timeline: t, keyframes: k))
+                }
+            }
+            name = json["name"] as? String ?? ""
+            channels = parsed
+        }
+    }
+
+    final class MaterialColorOwner {
+        let material: SCNMaterial
+        let rest: simd_float4
+        var effective: simd_float4
+        var animationBound = false
+        let sprite: Bool
+        let supportsAnimation: Bool
+
+        init(_ material: SCNMaterial, color: [Double], sprite: Bool,
+             supportsAnimation: Bool) {
+            self.material = material
+            rest = simd_float4(color.map(Float.init))
+            effective = rest
+            self.sprite = sprite
+            self.supportsAnimation = supportsAnimation
+            apply(rest)
+        }
+
+        func apply(_ value: simd_float4) {
+            effective = value
+            material.setValue(SCNVector4(value.x, value.y, value.z, value.w),
+                forKey: sprite ? "d3SpriteTint" : "d3BaseColorFactor")
+        }
+
+        func copyFactor(to copy: SCNMaterial) {
+            copy.setValue(SCNVector4(effective.x, effective.y, effective.z, effective.w),
+                forKey: sprite ? "d3SpriteTint" : "d3BaseColorFactor")
+        }
+    }
+
+    final class LightIntensityOwner {
+        let light: SCNLight
+        let rest: Float
+        var effective: Float
+        var animationBound = false
+        let declarationCount: Int
+
+        init(_ light: SCNLight, intensity: Double, declarationCount: Int) {
+            self.light = light
+            rest = Float(intensity)
+            effective = rest
+            self.declarationCount = declarationCount
+            apply(rest)
+        }
+
+        func apply(_ value: Float) {
+            effective = value
+            switch light.type {
+            case .directional: light.intensity = CGFloat(Double(value) * 1000 / .pi)
+            case .area: light.intensity = CGFloat(value) * 1000
+            default: light.intensity = CGFloat(value)
+            }
+        }
+    }
+
+    final class CameraFovOwner {
+        let camera: SCNCamera
+        let rest: Float
+        var effective: Float
+        var animationBound = false
+        let declarationCount: Int
+
+        init(_ camera: SCNCamera, fov: Double, declarationCount: Int) {
+            self.camera = camera
+            rest = Float(fov)
+            effective = rest
+            self.declarationCount = declarationCount
+            apply(rest)
+        }
+
+        func apply(_ value: Float) {
+            effective = value
+            camera.projectionDirection = .vertical
+            camera.fieldOfView = CGFloat(Double(value) * 180 / .pi)
+        }
     }
 
     /// A decoded `animations` entry (W11): the channels plus
@@ -450,6 +590,9 @@ enum FsceneRealizer {
         var nodes: [UInt64: SCNNode] = [:]
         var geometries: [UInt64: SCNGeometry] = [:]
         var materials: [UInt64: SCNMaterial] = [:]
+        var materialColorOwners: [UInt64: MaterialColorOwner] = [:]
+        var lightIntensityOwners: [UInt64: LightIntensityOwner] = [:]
+        var cameraFovOwners: [UInt64: CameraFovOwner] = [:]
         var shadowCatcherConfigurations:
             [UInt64: ShadowCatcherConfiguration] = [:]
         var shadowCatcherBindings:
@@ -551,7 +694,7 @@ enum FsceneRealizer {
         /// ops (`upsertSkin`, `upsertAnimation`, `upsertPayload`)
         /// re-decode a single entry out of these, like `resourceDefs`.
         var skinDefs: [UInt64: [String: Any]] = [:]
-        var animDefs: [UInt64: [String: Any]] = [:]
+        var animDefs: [UInt64: AnimationDefinition] = [:]
 
         /// Set on surgical contexts (seeded from live registries): node
         /// lookups fall back to `host.nodesById`. Manifest decode leaves
@@ -682,6 +825,9 @@ enum FsceneRealizer {
             host.install(scene: scene, nodes: nodes,
                          resources: (geometries: geometries,
                                      materials: materials,
+                                     materialColorOwners: materialColorOwners,
+                                     lightIntensityOwners: lightIntensityOwners,
+                                     cameraFovOwners: cameraFovOwners,
                                      shadowCatcherConfigurations:
                                         shadowCatcherConfigurations,
                                      shadowCatcherBindings:
@@ -1908,6 +2054,7 @@ enum FsceneRealizer {
                 let rebound: SCNMaterial
                 if binding.isSnapshotClone {
                     rebound = material.copy() as! SCNMaterial
+                    materialColorOwners[key]?.copyFactor(to: rebound)
                     rebound.isDoubleSided = binding.material.isDoubleSided
                 } else {
                     rebound = material
@@ -2218,6 +2365,7 @@ enum FsceneRealizer {
                 var isSnapshotClone = false
                 if doubleSided && !m.isDoubleSided,
                    let clone = m.copy() as? SCNMaterial {
+                    materialColorOwners[ref]?.copyFactor(to: clone)
                     clone.isDoubleSided = true
                     bound = clone
                     isSnapshotClone = true
@@ -2265,15 +2413,8 @@ enum FsceneRealizer {
             }
         }
 
-        /// Realizes one `material` resource. Factor properties decode
-        /// first; each texture slot then replaces its property's
-        /// `contents` — a texture-backed `SCNMaterialProperty` never
-        /// multiplies a color factor, so factor×texture is baked into
-        /// the pixels (`bakeFactor`). A slot whose texture is
-        /// unresolved keeps the factor-only contents (the deferred
-        /// lane's fallback) and records a consumer binding so a later
-        /// `upsertResource`/`upsertPayload` rebinds it.
         func decodeMaterial(_ key: UInt64, _ r: [String: Any]) {
+            materialColorOwners.removeValue(forKey: key)
             let m = SCNMaterial()
             let type = r["type"] as? String ?? "physicallyBased"
             if type == "shadowCatcher" {
@@ -2339,8 +2480,9 @@ enum FsceneRealizer {
                 m.diffuse.contents = UIColor.white
                 let tint = d3ColorComponents(props["baseColor"])
                     ?? [1, 1, 1, 1]
-                m.setValue(SCNVector4(tint[0], tint[1], tint[2], tint[3]),
-                           forKey: "d3SpriteTint")
+                materialColorOwners[key] = MaterialColorOwner(m, color: tint,
+                    sprite: true, supportsAnimation: true)
+                m.setValue(0.0, forKey: "d3SpriteSourcePremultiplied")
                 // SceneKit's transparent modifier requires premultiplied RGB.
                 m.shaderModifiers = [.geometry: """
                     #pragma varyings
@@ -2351,11 +2493,14 @@ enum FsceneRealizer {
                     """, .fragment: """
                     #pragma arguments
                     float4 d3SpriteTint;
+                    float d3SpriteSourcePremultiplied;
                     #pragma transparent
                     #pragma body
                     float4 c = _surface.diffuse * d3SpriteTint
                         * in.d3SpriteColor;
-                    _output.color = float4(c.rgb * c.a, c.a);
+                    float weight = d3SpriteSourcePremultiplied > 0.5
+                        ? d3SpriteTint.a * in.d3SpriteColor.a : c.a;
+                    _output.color = float4(c.rgb * weight, c.a);
                     """]
                 if props["baseColorTexture"] != nil {
                     applyTextureSlot(m, materialKey: key,
@@ -2368,7 +2513,7 @@ enum FsceneRealizer {
             m.lightingModel = type == "unlit"
                 ? .constant : .physicallyBased
             let props = r["properties"] as? [String: Any] ?? [:]
-            if let c = d3Color(props["baseColor"]) { m.diffuse.contents = c }
+            m.diffuse.contents = UIColor.white
             if let v = d3Double(props["metallic"]) {
                 m.metalness.contents = NSNumber(value: v)
             }
@@ -2443,7 +2588,8 @@ enum FsceneRealizer {
             // once). `unlit` skips extensions the way the importer
             // drops them.
             if type != "unlit" {
-                decodeMaterialExtensions(m, key, props)
+                decodeMaterialExtensions(m, key, props,
+                    alphaBlended: (alphaMode ?? "opaque").lowercased() == "blend")
                 for slot in ["clearcoatTexture",
                              "clearcoatRoughnessTexture",
                              "clearcoatNormalTexture",
@@ -2454,6 +2600,21 @@ enum FsceneRealizer {
                     applyTextureSlot(m, materialKey: key, slot: slot)
                 }
             }
+            var modifiers = m.shaderModifiers ?? [:]
+            modifiers[.surface] = """
+                #pragma arguments
+                float4 d3BaseColorFactor;
+                #pragma body
+                _surface.diffuse *= d3BaseColorFactor;
+                """ + "\n" + (modifiers[.surface] ?? "")
+            if (alphaMode ?? "opaque").lowercased() == "blend" {
+                let fragment = modifiers[.fragment] ?? ""
+                modifiers[.fragment] = "#pragma transparent\n" + fragment
+            }
+            m.shaderModifiers = modifiers
+            materialColorOwners[key] = MaterialColorOwner(m,
+                color: d3ColorComponents(props["baseColor"]) ?? [1, 1, 1, 1],
+                sprite: false, supportsAnimation: type == "physicallyBased" || type == "unlit")
             warnUnhandledMaterialProps(key, props)
             materials[key] = m
         }
@@ -2479,7 +2640,7 @@ enum FsceneRealizer {
         /// coat and sheen live on separate mechanisms now and combine
         /// freely on one material.
         func decodeMaterialExtensions(_ m: SCNMaterial, _ key: UInt64,
-                                      _ props: [String: Any]) {
+                                      _ props: [String: Any], alphaBlended: Bool) {
             // KHR_materials_clearcoat → the real coat lobe. Factor
             // contents here are the texture-absent values; the texture
             // slots bind in applyTextureSlot (R×factor → clearCoat,
@@ -2535,7 +2696,8 @@ enum FsceneRealizer {
                     + "normalize(_surface.normal),"
                     + " normalize(_surface.view))),"
                     + " 1.0 + (1.0 - saturate(rough)) * 3.0);\n"
-                    + "_output.color.rgb += tint * rim;"
+                    + "_output.color.rgb += tint * rim"
+                    + (alphaBlended ? " * _output.color.a;" : ";")
                 if !decl.isEmpty {
                     body = "constexpr sampler d3SheenS(filter::linear,"
                         + " mip_filter::linear, address::repeat);\n"
@@ -2684,13 +2846,6 @@ enum FsceneRealizer {
             }
         }
 
-        /// Binds (or rebinds) one texture slot on `m`; `slot` is the
-        /// wire property name (`baseColorTexture`, …). The raw
-        /// properties come back out of `resourceDefs[materialKey]` so a
-        /// rebind redoes the factor×texture bake exactly like the
-        /// manifest pass. An unresolved texture binds the factor-only
-        /// fallback — also the unbind path when an upserted texture
-        /// fails to decode.
         func applyTextureSlot(_ m: SCNMaterial, materialKey: UInt64,
                               slot: String) {
             let props = (resourceDefs[materialKey]?["properties"]
@@ -2705,6 +2860,8 @@ enum FsceneRealizer {
                 textureConsumers[texKey] = list
             }
             if m.name == "d3.sprite", slot == "baseColorTexture" {
+                m.setValue(renderTargets[texKey] == nil ? 0.0 : 1.0,
+                           forKey: "d3SpriteSourcePremultiplied")
                 if let rt = renderTargets[texKey] {
                     applyRenderTextureSlot(m, rt: rt, slot: slot)
                 } else {
@@ -2739,16 +2896,13 @@ enum FsceneRealizer {
                 if let tex {
                     bindTextureContents(
                         m.diffuse, tex: tex,
-                        baked: bakeFactor(
-                            tex,
-                            color: d3ColorComponents(props["baseColor"]),
-                            rgbOnly: false),
+                        baked: nil,
                         logKey: "material.\(materialKey).diffuse.mips")
                     applyContentsTransform(
                         m.diffuse, transform, materialKey: materialKey,
                         slot: slot)
                 } else {
-                    m.diffuse.contents = d3Color(props["baseColor"])
+                    m.diffuse.contents = UIColor.white
                 }
             case "metallicRoughnessTexture":
                 if let tex {
@@ -2959,14 +3113,6 @@ enum FsceneRealizer {
             }
         }
 
-        /// W14 rt branch of `applyTextureSlot`: binds the render
-        /// target's live `colorTex` as the slot's contents and maps
-        /// the spec's `filter`/`wrap` onto the slot's sampling state.
-        /// `bakeFactor` is SKIPPED — a dynamic texture can't be
-        /// CPU-baked, so the factor isn't multiplied, matching this
-        /// codebase's existing texture-factor rule. For the packed
-        /// metallicRoughness slot both scalar properties take the
-        /// color texture — a live texture has no CPU channel split.
         func applyRenderTextureSlot(_ m: SCNMaterial,
                                     rt: RenderTargetRec, slot: String) {
             // Sheen textures live in the rim modifier's texture2d
@@ -4056,11 +4202,11 @@ enum FsceneRealizer {
             }
             switch type {
             case "mesh":            decodeMesh(key, node, props)
-            case "camera":          decodeCamera(node, props)
-            case "directionalLight": decodeLight(node, props, .directional)
-            case "pointLight":       decodeLight(node, props, .omni)
-            case "spotLight":        decodeLight(node, props, .spot)
-            case "rectAreaLight":    decodeLight(node, props, .area)
+            case "camera":          decodeCamera(key, node, props)
+            case "directionalLight": decodeLight(key, node, props, .directional)
+            case "pointLight":       decodeLight(key, node, props, .omni)
+            case "spotLight":        decodeLight(key, node, props, .spot)
+            case "rectAreaLight":    decodeLight(key, node, props, .area)
             case "particleEmitter":
                 decodeParticleEmitter(key: key, node: node, index: index,
                                       props: props, mesh: false)
@@ -4235,6 +4381,7 @@ enum FsceneRealizer {
                     let replacement: SCNMaterial
                     if binding.defaultMaterialSource?.isSnapshotClone == true {
                         replacement = material.copy() as! SCNMaterial
+                        materialColorOwners[key]?.copyFactor(to: replacement)
                         replacement.isDoubleSided = previousDefault.isDoubleSided
                     } else {
                         replacement = material
@@ -5313,14 +5460,11 @@ enum FsceneRealizer {
             }
         }
 
-        func decodeCamera(_ node: SCNNode, _ p: [String: Any]) {
+        func decodeCamera(_ key: UInt64, _ node: SCNNode, _ p: [String: Any]) {
             let cam = SCNCamera()
-            if let fov = d3Double(p["fovRadiansY"]) {
-                cam.fieldOfView = CGFloat(fov * 180.0 / .pi)
-                // The wire field is vertical (Filament's Fov.VERTICAL
-                // on Android); SCNCamera defaults to horizontal.
-                cam.projectionDirection = .vertical
-            }
+            cameraFovOwners[key] = CameraFovOwner(cam,
+                fov: d3Double(p["fovRadiansY"]) ?? .pi / 3,
+                declarationCount: (cameraFovOwners[key]?.declarationCount ?? 0) + 1)
             if let n = d3Double(p["near"]) { cam.zNear = n }
             if let f = d3Double(p["far"]) { cam.zFar = f }
             if (p["projection"] as? [String: Any])?["s"] as? String == "orthographic" {
@@ -5399,20 +5543,14 @@ enum FsceneRealizer {
             return image
         }
 
-        func decodeLight(_ node: SCNNode, _ p: [String: Any],
+        func decodeLight(_ key: UInt64, _ node: SCNNode, _ p: [String: Any],
                          _ type: SCNLight.LightType) {
             let light = SCNLight()
             light.type = type
             if let c = d3Color(p["color"]) { light.color = c }
-            let intensity = d3Double(p["intensity"])
-            switch type {
-            case .directional:
-                light.intensity = CGFloat((intensity ?? 3) * 1000 / .pi)
-            case .area:
-                light.intensity = CGFloat((intensity ?? 1) * 1000)
-            default:
-                light.intensity = CGFloat(intensity ?? 1)
-            }
+            lightIntensityOwners[key] = LightIntensityOwner(light,
+                intensity: d3Double(p["intensity"]) ?? (type == .directional ? 3 : 1),
+                declarationCount: (lightIntensityOwners[key]?.declarationCount ?? 0) + 1)
             if type != .directional {
                 let range = d3Double(p["range"]) ?? 0
                 light.attenuationStartDistance = 0
@@ -6435,8 +6573,12 @@ enum FsceneRealizer {
             for (id, any) in map {
                 guard let key = D3Wire.localIdKey(id),
                       let def = any as? [String: Any] else { continue }
-                animDefs[key] = def
-                decodeAnimation(key, def)
+                guard let parsed = AnimationDefinition(def) else {
+                    d3Log("animation \(key): malformed metadata; prior definition retained")
+                    continue
+                }
+                animDefs[key] = parsed
+                decodeAnimation(key, parsed)
             }
         }
 
@@ -6450,44 +6592,64 @@ enum FsceneRealizer {
         /// channels carry flattened per-key values — `targetCount` is
         /// `values.count / times.count`, trailing floats that don't
         /// complete a keyframe are dropped (upstream's rule).
-        func decodeAnimation(_ key: UInt64, _ def: [String: Any]) {
-            let name = def["name"] as? String ?? ""
+        func decodeAnimation(_ key: UInt64, _ def: AnimationDefinition) {
             var channels: [DecodedChannel] = []
             var endTime = 0.0
-            var claims = animPayloadKeys[key] ?? []
-            for any in def["channels"] as? [Any] ?? [] {
-                guard let c = any as? [String: Any],
-                      let targetTok = c["target"] as? String,
-                      let target = D3Wire.localIdKey(targetTok)
-                else { continue }
-                var ch = DecodedChannel(
-                    target: target,
-                    targetName: c["targetName"] as? String,
-                    kind: .translation)
-                switch c["property"] as? String {
-                case "rotation": ch.kind = .rotation
-                case "scale":    ch.kind = .scale
-                case "weights":  ch.kind = .weights
-                default:         ch.kind = .translation
-                }
-                guard let tTok = c["timeline"] as? String,
-                      let kTok = c["keyframes"] as? String,
-                      let tPid = D3Wire.localIdKey(tTok),
-                      let kPid = D3Wire.localIdKey(kTok) else {
-                    d3Log("animation \(key): channel missing "
-                        + "timeline/keyframes")
-                    continue
-                }
+            var claims = Set<UInt64>()
+            for (index, c) in def.channels.enumerated() {
+                let tPid = c.timeline, kPid = c.keyframes
                 claims.insert(tPid)
                 claims.insert(kPid)
                 guard let tData = host.payloadStore[tPid],
                       let kData = host.payloadStore[kPid] else {
-                    host.logOnce("anim.\(key).awaiting",
-                        "animation \(key): awaiting channel payloads")
+                    d3Log("animation \(key) channel \(index): pending payloads \(tPid)/\(kPid)")
+                    continue
+                }
+                guard payloadSpecs[tPid]?.encoding == "floats",
+                      payloadSpecs[kPid]?.encoding == "floats",
+                      tData.count % 4 == 0, kData.count % 4 == 0,
+                      payloadSpecs[tPid]?.length.map({ $0 >= 0 && $0 % 4 == 0 }) ?? true,
+                      payloadSpecs[kPid]?.length.map({ $0 >= 0 && $0 % 4 == 0 }) ?? true else {
+                    d3Log("animation \(key) channel \(index): invalid payload metadata \(tPid)/\(kPid)")
                     continue
                 }
                 let times = f32List(tData).map(Double.init)
                 let vals = f32List(kData)
+                guard !times.isEmpty, times.allSatisfy({ $0.isFinite && $0 >= 0 }),
+                      zip(times, times.dropFirst()).allSatisfy({ $0 < $1 }),
+                      vals.allSatisfy({ $0.isFinite }) else {
+                    d3Log("animation \(key) channel \(index): invalid timeline/values \(tPid)/\(kPid)")
+                    continue
+                }
+                var ch = DecodedChannel(target: c.target, targetName: c.targetName, kind: c.kind)
+                let arity: Int
+                switch c.kind {
+                case .materialBaseColor, .rotation: arity = 4
+                case .translation, .scale: arity = 3
+                case .lightIntensity, .cameraFovRadiansY: arity = 1
+                case .weights: arity = vals.count / times.count
+                }
+                let isProperty = c.kind == .materialBaseColor
+                    || c.kind == .lightIntensity || c.kind == .cameraFovRadiansY
+                if isProperty && vals.count != times.count * arity {
+                    d3Log("animation \(key) channel \(index): invalid value arity \(kPid)")
+                    continue
+                }
+                let validDomain: Bool
+                switch c.kind {
+                case .materialBaseColor:
+                    validDomain = vals.enumerated().allSatisfy {
+                        $0.element >= 0 && ($0.offset % 4 != 3 || $0.element <= 1)
+                    }
+                case .lightIntensity: validDomain = vals.allSatisfy { $0 >= 0 }
+                case .cameraFovRadiansY:
+                    validDomain = vals.allSatisfy { $0 > 0 && Double($0) < Double.pi }
+                default: validDomain = true
+                }
+                guard validDomain else {
+                    d3Log("animation \(key) channel \(index): invalid property domain \(kPid)")
+                    continue
+                }
                 switch ch.kind {
                 case .translation:
                     ch.vec3 = (0..<min(times.count, vals.count / 3))
@@ -6513,6 +6675,13 @@ enum FsceneRealizer {
                                     -vals[b], -vals[b + 1],
                                     vals[b + 2]))
                         }
+                case .materialBaseColor:
+                    ch.propertyValues = (0..<times.count).map {
+                        let b = $0 * 4
+                        return simd_float4(vals[b], vals[b + 1], vals[b + 2], vals[b + 3])
+                    }
+                case .lightIntensity, .cameraFovRadiansY:
+                    ch.propertyValues = vals.map { simd_float4($0, 0, 0, 0) }
                 case .weights:
                     let keyCount = times.count
                     let tc = keyCount > 0 ? vals.count / keyCount : 0
@@ -6527,7 +6696,7 @@ enum FsceneRealizer {
             }
             animPayloadKeys[key] = claims
             animations[key] = DecodedAnimation(
-                name: name, channels: channels, endTime: endTime)
+                name: def.name, channels: channels, endTime: endTime)
         }
 
         /// Attaches the geometry's morph targets as a `SCNMorpher` —

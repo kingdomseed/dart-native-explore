@@ -21,6 +21,9 @@ import 'u2_geometry_scene.dart';
 import 'u3_atlas_probe.dart';
 import 'u3_tone_scene.dart';
 import 'u3_sprite_scene.dart';
+import 'u4_property_scene.dart';
+import 'u4_owner_scene.dart';
+import 'u4_snapshot_scene.dart';
 
 /// Boot override for the U1 camera-controller pose (`orbit1..3`,
 /// `fly1..3`, `follow1..3`).
@@ -109,6 +112,10 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
 
   Timer? _atlasTimer;
   U3SpriteControls? _spriteControls;
+  U4PropertyControls? _propertyControls;
+  U4LightControls? _lightControls;
+  U4OwnerControls? _ownerControls;
+  U4SnapshotControls? _snapshotControls;
   int _atlasFrame = 0;
 
   /// W17 state: active mode in [_kW17ModeSequence] and optional sun-sweep timer.
@@ -174,6 +181,10 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
   }
 
   void _load(ShowcaseItem item) {
+    _propertyControls = null;
+    _lightControls = null;
+    _ownerControls = null;
+    _snapshotControls = null;
     _spriteControls?.dispose();
     _spriteControls = null;
     _atlasTimer?.cancel();
@@ -208,7 +219,11 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
     _cameraNode = scene.cameraNode;
     _frameRadius = scene.frameRadius;
 
-    if (item.assetKey == kBuiltinU3SpriteKey ||
+    if (item.assetKey == kBuiltinU4Key ||
+        item.assetKey == kBuiltinU4SnapshotsKey ||
+        item.assetKey == kBuiltinU4OwnersKey ||
+        item.assetKey == kBuiltinU4MaterialsKey ||
+        item.assetKey == kBuiltinU3SpriteKey ||
         item.assetKey == kBuiltinU3ToneKey ||
         item.assetKey == kBuiltinU3AtlasProbeKey) {
       _orbitController = null;
@@ -216,12 +231,35 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
       _scenePointer = null;
       _aspectFramed = true;
       _controller.loadDocument(scene.document);
+      if (item.assetKey == kBuiltinU4Key ||
+          item.assetKey == kBuiltinU4SnapshotsKey ||
+          item.assetKey == kBuiltinU4OwnersKey ||
+          item.assetKey == kBuiltinU4MaterialsKey) {
+        _propertyControls = U4PropertyControls(
+          _controller,
+          scene.document,
+          bareIds: item.assetKey == kBuiltinU4Key && kBootU4BareIds,
+          log: dnLog,
+          onChanged: () => setState(() {}),
+        );
+      }
+      if (item.assetKey == kBuiltinU4Key &&
+          !kBootU4Camera &&
+          kBootU4Light != U4LightKind.directional) {
+        _lightControls = U4LightControls(_controller, kBootU4Light, log: dnLog);
+      }
       if (item.assetKey == kBuiltinU3SpriteKey) {
         _spriteControls = U3SpriteControls(
           _controller,
           scene.document,
           onChanged: () => setState(() {}),
         );
+      }
+      if (item.assetKey == kBuiltinU4SnapshotsKey) {
+        _snapshotControls = U4SnapshotControls(_controller, log: dnLog);
+      }
+      if (item.assetKey == kBuiltinU4OwnersKey) {
+        _ownerControls = U4OwnerControls(_controller, log: dnLog);
       }
       setState(() => _status = item.label);
       return;
@@ -1352,7 +1390,13 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
                   constraints.maxWidth,
                   constraints.maxHeight,
                 );
-                if (isU3Tone || isAtlasProbe || isSprite) {
+                if (item.assetKey == kBuiltinU4Key ||
+                    item.assetKey == kBuiltinU4SnapshotsKey ||
+                    item.assetKey == kBuiltinU4OwnersKey ||
+                    item.assetKey == kBuiltinU4MaterialsKey ||
+                    isU3Tone ||
+                    isAtlasProbe ||
+                    isSprite) {
                   return SceneView(
                     controller: _controller,
                     quality: widget.quality,
@@ -1544,6 +1588,83 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
                             ),
                             fontSize: 12,
                           ),
+                        ],
+                        if (_propertyControls != null) ...[
+                          const SizedBox(height: 8),
+                          for (final row in [
+                            [
+                              for (final time in [0.0, 1.0, 2.0])
+                                (
+                                  'Seek${time.toInt()}',
+                                  () => _propertyControls!.seek(time),
+                                ),
+                            ],
+                            [
+                              (
+                                _propertyControls!.playing ? 'Pause' : 'Play',
+                                _propertyControls!.togglePlayback,
+                              ),
+                              ('Stop', _propertyControls!.stop),
+                            ],
+                            [
+                              (
+                                'Weight1',
+                                () => _propertyControls!.setWeight(1),
+                              ),
+                              (
+                                'Weight.25',
+                                () => _propertyControls!.setWeight(0.25),
+                              ),
+                            ],
+                            if (_lightControls != null) ...[
+                              [
+                                ('Replace light', _lightControls!.replace),
+                                ('Remove light', _lightControls!.remove),
+                              ],
+                              [('Re-add light', _lightControls!.reAdd)],
+                            ],
+                            if (_snapshotControls != null) ...[
+                              [
+                                ('Texture 1', _snapshotControls!.texture1),
+                                ('Texture 2', _snapshotControls!.texture2),
+                              ],
+                              [
+                                ('Sprite refresh', _snapshotControls!.spriteRefresh),
+                              ],
+                              [
+                                ('Other', _snapshotControls!.other),
+                                ('Default', _snapshotControls!.defaults),
+                              ],
+                            ],
+                            if (_ownerControls != null) ...[
+                              [
+                                ('Other', _ownerControls!.other),
+                                ('Default', _ownerControls!.defaults),
+                              ],
+                              [
+                                ('Replace A', _ownerControls!.replaceA),
+                                ('Rebind F', _ownerControls!.rebindF),
+                              ],
+                            ],
+                          ])
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                for (final (title, action) in row)
+                                  Button(
+                                    title: title,
+                                    onPressed: action,
+                                    shape: const StadiumBorder(),
+                                    color: const Color(0x2EFFFFFF),
+                                    foregroundColor: const Color(0xEEFFFFFF),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 4,
+                                    ),
+                                    fontSize: 11,
+                                  ),
+                              ],
+                            ),
                         ],
                         if (isU3Tone && _scene != null) ...[
                           const SizedBox(height: 8),

@@ -1,0 +1,284 @@
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/Users/jasonholt/.gradle/wrapper/dists/gradle-9.3.1-all/9ot9r568e8zfvvd4mn8rbu1j0/gradle-9.3.1/lib/native-platform-0.22-milestone-29.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.3.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :gradle:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle:pluginDescriptors UP-TO-DATE
+> Task :gradle:processResources UP-TO-DATE
+> Task :gradle:compileKotlin
+> Task :gradle:compileJava NO-SOURCE
+> Task :gradle:compileGroovy NO-SOURCE
+> Task :gradle:classes UP-TO-DATE
+> Task :gradle:jar UP-TO-DATE
+Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+> Task :dart3d:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :dart3d:preBuild UP-TO-DATE
+> Task :dart3d:preReleaseBuild UP-TO-DATE
+> Task :dart3d:generateReleaseBuildConfig UP-TO-DATE
+> Task :dart3d:generateReleaseResValues UP-TO-DATE
+> Task :dart3d:generateReleaseResources UP-TO-DATE
+> Task :dart3d:packageReleaseResources UP-TO-DATE
+> Task :dart3d:parseReleaseLocalResources UP-TO-DATE
+> Task :dart3d:generateReleaseRFile UP-TO-DATE
+> Task :dart3d:javaPreCompileRelease UP-TO-DATE
+> Task :dart3d:preReleaseUnitTestBuild UP-TO-DATE
+> Task :dart3d:generateReleaseUnitTestStubRFile FAILED
+
+> Task :dart3d:compileReleaseKotlin
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/Dart3dView.kt:2074:17 'field filterWidth: Float' is deprecated. Deprecated in Java.
+
+[Incubating] Problems report is available at: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':dart3d:generateReleaseUnitTestStubRFile'.
+> Multiple build operations failed.
+      The contents of the immutable workspace '/Users/jasonholt/.gradle/caches/9.3.1/transforms/5ccd47e3ee7b62c3895d5ddba7052349' have been modified. These workspace directories are not supposed to be modified once they are created. The modification might have been caused by an external process, or could be the result of disk corruption.
+  outputDirectory:
+   - transformed (Directory, bb661ff8b73afbdad8da192535ed006a)
+     - filament-utils-android-1.77.3 (Directory, 301899e33354c5aac382a9d1318e7ef6)
+       - AndroidManifest.xml (RegularFile, a8c6f94eacef2289ad0246ddbca36145)
+       - jars (Directory, a06c51d451757ab43ab5bc9d0a36d849)
+         - classes.jar (RegularFile, 411b6bbde4414eccc870d9575b21e2b8)
+       - jni (Directory, be69a4da6f2cd720062b5c60ee477b9d)
+         - arm64-v8a (Directory, fd7ef3f1d69eb99281057fbefb8888da)
+           - libfilament-utils-jni.so (RegularFile, afa40af2b1ca202a624ce7d3f74fb502)
+         - armeabi-v7a (Directory, 94799cfd74f09b24ea342404d8e6231b)
+           - libfilament-utils-jni.so (RegularFile, ee2cfd6b616e7c30642920ef0177858a)
+         - x86 (Directory, 023c759afab014994986648fe3fd7074)
+           - libfilament-utils-jni.so (RegularFile, efd83aaf092f6686f83fc05e03ff4bbf)
+         - x86_64 (Directory, 889bb3d7678afb710a5283d1678a6aae)
+           - libfilament-utils-jni.so (RegularFile, dacbd810bc0ef0fe62177040b1ba53c0)
+       - META-INF (Directory, 1b045b27731a43f79c333230a2e81d81)
+         - com (Directory, a570cadcff4b214235197c52fd682cb7)
+           - android (Directory, 27b326e05704958c8595a706e6da2747)
+             - build (Directory, 8a0fcf976c22f905024b79b5f6f40a3d)
+               - gradle (Directory, 73367e9d3ffe66ba9eeba1e031e84f3c)
+                 - aar-metadata.properties (RegularFile, 56814d48ee68ded4220592ecb348b43c)
+       - proguard.txt (RegularFile, ac3997f7d46a41ece9333f347b88b64d)
+       - R.txt (RegularFile, 6c1773cc45a25495401cabf3dd630840)
+  
+  resultsFile:
+   - results.bin (RegularFile, a6c21060e95d1a3e2397176c8138a438)
+  
+      The contents of the immutable workspace '/Users/jasonholt/.gradle/caches/9.3.1/transforms/9468a88c0fead7ac0c509cb5d3cc0058' have been modified. These workspace directories are not supposed to be modified once they are created. The modification might have been caused by an external process, or could be the result of disk corruption.
+  outputDirectory:
+   - transformed (Directory, cdb7e96697f3156b803f187645790b27)
+     - filament-android-1.77.3 (Directory, 4561cda75bebe6fa0cda46c48f738a77)
+       - AndroidManifest.xml (RegularFile, 096596ca016987c06b75af3807ed3642)
+       - jars (Directory, 52364c952b340a804a085ea728f03efb)
+         - classes.jar (RegularFile, 6abfc17658a41af1e1e9806192089cd2)
+       - jni (Directory, 0ac22ab2d784aa9472a6d9f95e5db356)
+         - arm64-v8a (Directory, e71c4ae28b3f5bf8c4db3c79ed5603b2)
+           - libfilament-jni.so (RegularFile, 175b5a418d4a01df2eb13ec1dc0b7b2f)
+         - armeabi-v7a (Directory, b0b290c34b19cdf9d25ec572927802f3)
+           - libfilament-jni.so (RegularFile, f0be9054dad00d0809f1c23cd9305362)
+         - x86 (Directory, d55230b5de612e70ae9b66a48bd7bf06)
+           - libfilament-jni.so (RegularFile, db7d0c62fec87cff4f9b3c99a9edcc9b)
+         - x86_64 (Directory, ec93fe3bd1148489d04a667b172da00c)
+           - libfilament-jni.so (RegularFile, 9af573ea651810bf0f2a793db27dae6c)
+       - META-INF (Directory, 1b045b27731a43f79c333230a2e81d81)
+         - com (Directory, a570cadcff4b214235197c52fd682cb7)
+           - android (Directory, 27b326e05704958c8595a706e6da2747)
+             - build (Directory, 8a0fcf976c22f905024b79b5f6f40a3d)
+               - gradle (Directory, 73367e9d3ffe66ba9eeba1e031e84f3c)
+                 - aar-metadata.properties (RegularFile, 56814d48ee68ded4220592ecb348b43c)
+       - proguard.txt (RegularFile, ac3997f7d46a41ece9333f347b88b64d)
+       - R.txt (RegularFile, 6c1773cc45a25495401cabf3dd630840)
+       - res (Directory, 0668fd0edab04252a14c785dd68c55f2)
+         - values (Directory, a6d67e8823896336469cf7191dc45cfe)
+           - values.xml (RegularFile, b5c25766a68d096eb765767939851542)
+  
+  resultsFile:
+   - results.bin (RegularFile, e9be7b70ce857c17b6a4f1d0cf6287f0)
+  
+      The contents of the immutable workspace '/Users/jasonholt/.gradle/caches/9.3.1/transforms/97d57dafff1504b608e72944f6a6f86e' have been modified. These workspace directories are not supposed to be modified once they are created. The modification might have been caused by an external process, or could be the result of disk corruption.
+  outputDirectory:
+   - transformed (Directory, d6359df94d636eabb8707c8d8b740e3b)
+     - gltfio-android-1.77.3 (Directory, 5f6c7a980930f177655784cda6411280)
+       - AndroidManifest.xml (RegularFile, 2e9ff0293d6a5bc2232bbf7d7dd68aee)
+       - jars (Directory, aed1153d8cffdfe941d01e2045c566bb)
+         - classes.jar (RegularFile, b023ec054eb1ac32feb79a0874b70aec)
+       - jni (Directory, c702fcb7fd36c293b8cf49377dce0407)
+         - arm64-v8a (Directory, 424e3b7ab5293c64e4af42ed8064fb5e)
+           - libgltfio-jni.so (RegularFile, 7ee6fb7e7bca519ff59f2319cb070dfa)
+         - armeabi-v7a (Directory, f39349431928b382162eaee771155113)
+           - libgltfio-jni.so (RegularFile, c02c4597874a9fc1c459f919ead39374)
+         - x86 (Directory, c7f61df2ae1b6045ab8fb70ff9abc7b7)
+           - libgltfio-jni.so (RegularFile, 828ca53c6345036e779ff42e6d68c2df)
+         - x86_64 (Directory, 14c5181e58b9829880f41bf7d5334340)
+           - libgltfio-jni.so (RegularFile, 0d6dddeda4342c05bd000a7528db23bf)
+       - META-INF (Directory, 1b045b27731a43f79c333230a2e81d81)
+         - com (Directory, a570cadcff4b214235197c52fd682cb7)
+           - android (Directory, 27b326e05704958c8595a706e6da2747)
+             - build (Directory, 8a0fcf976c22f905024b79b5f6f40a3d)
+               - gradle (Directory, 73367e9d3ffe66ba9eeba1e031e84f3c)
+                 - aar-metadata.properties (RegularFile, 56814d48ee68ded4220592ecb348b43c)
+       - proguard.txt (RegularFile, ac3997f7d46a41ece9333f347b88b64d)
+       - R.txt (RegularFile, 6c1773cc45a25495401cabf3dd630840)
+  
+  resultsFile:
+   - results.bin (RegularFile, fa352b2f90f401ae7c1e210fcec248e2)
+  
+      The contents of the immutable workspace '/Users/jasonholt/.gradle/caches/9.3.1/transforms/75a366057682aa95dd4ba556aae12219' have been modified. These workspace directories are not supposed to be modified once they are created. The modification might have been caused by an external process, or could be the result of disk corruption.
+  outputDirectory:
+   - transformed (Directory, 8c78d3522e99f71b5e22a97b2cd870c6)
+     - filamat-android-1.77.3 (Directory, 8878cdca632712e77fadaa4661717f86)
+       - AndroidManifest.xml (RegularFile, 162d5618bc2cb540a563551553f13b31)
+       - jars (Directory, c02a1958f6a5bf0e4843dcd55a6ba919)
+         - classes.jar (RegularFile, 5fabb5342460a4bbec917b33647918f3)
+       - jni (Directory, 3cce6a73c6128d9d0a7a3dec380a3044)
+         - arm64-v8a (Directory, dd7ec33b96ec8ee6afb9498937073457)
+           - libfilamat-jni.so (RegularFile, a864b4984f0face7c0c084b37a630e67)
+         - armeabi-v7a (Directory, fa00b700996416b8ec445fd38f6b737e)
+           - libfilamat-jni.so (RegularFile, 6c6430973ff57e2ab4b02dd6246bb8b3)
+         - x86 (Directory, c9aafbeee81f9eb3156f42418c45fe67)
+           - libfilamat-jni.so (RegularFile, 1520e9a778055b6f4e3b32d696060ecb)
+         - x86_64 (Directory, 388ac7b06c6a2dafc1b76755f7d02958)
+           - libfilamat-jni.so (RegularFile, 82841b41a06ba4ac01cff54ab16d194d)
+       - META-INF (Directory, 1b045b27731a43f79c333230a2e81d81)
+         - com (Directory, a570cadcff4b214235197c52fd682cb7)
+           - android (Directory, 27b326e05704958c8595a706e6da2747)
+             - build (Directory, 8a0fcf976c22f905024b79b5f6f40a3d)
+               - gradle (Directory, 73367e9d3ffe66ba9eeba1e031e84f3c)
+                 - aar-metadata.properties (RegularFile, 56814d48ee68ded4220592ecb348b43c)
+       - proguard.txt (RegularFile, ac3997f7d46a41ece9333f347b88b64d)
+       - R.txt (RegularFile, f571933bb948577b1f9f3076fb8fc7c6)
+  
+  resultsFile:
+   - results.bin (RegularFile, 87558737e13546146f7b9502828c8270)
+
+   > The contents of the immutable workspace '/Users/jasonholt/.gradle/caches/9.3.1/transforms/5ccd47e3ee7b62c3895d5ddba7052349' have been modified. These workspace directories are not supposed to be modified once they are created. The modification might have been caused by an external process, or could be the result of disk corruption.
+     outputDirectory:
+      - transformed (Directory, bb661ff8b73afbdad8da192535ed006a)
+        - filament-utils-android-1.77.3 (Directory, 301899e33354c5aac382a9d1318e7ef6)
+          - AndroidManifest.xml (RegularFile, a8c6f94eacef2289ad0246ddbca36145)
+          - jars (Directory, a06c51d451757ab43ab5bc9d0a36d849)
+            - classes.jar (RegularFile, 411b6bbde4414eccc870d9575b21e2b8)
+          - jni (Directory, be69a4da6f2cd720062b5c60ee477b9d)
+            - arm64-v8a (Directory, fd7ef3f1d69eb99281057fbefb8888da)
+              - libfilament-utils-jni.so (RegularFile, afa40af2b1ca202a624ce7d3f74fb502)
+            - armeabi-v7a (Directory, 94799cfd74f09b24ea342404d8e6231b)
+              - libfilament-utils-jni.so (RegularFile, ee2cfd6b616e7c30642920ef0177858a)
+            - x86 (Directory, 023c759afab014994986648fe3fd7074)
+              - libfilament-utils-jni.so (RegularFile, efd83aaf092f6686f83fc05e03ff4bbf)
+            - x86_64 (Directory, 889bb3d7678afb710a5283d1678a6aae)
+              - libfilament-utils-jni.so (RegularFile, dacbd810bc0ef0fe62177040b1ba53c0)
+          - META-INF (Directory, 1b045b27731a43f79c333230a2e81d81)
+            - com (Directory, a570cadcff4b214235197c52fd682cb7)
+              - android (Directory, 27b326e05704958c8595a706e6da2747)
+                - build (Directory, 8a0fcf976c22f905024b79b5f6f40a3d)
+                  - gradle (Directory, 73367e9d3ffe66ba9eeba1e031e84f3c)
+                    - aar-metadata.properties (RegularFile, 56814d48ee68ded4220592ecb348b43c)
+          - proguard.txt (RegularFile, ac3997f7d46a41ece9333f347b88b64d)
+          - R.txt (RegularFile, 6c1773cc45a25495401cabf3dd630840)
+     
+     resultsFile:
+      - results.bin (RegularFile, a6c21060e95d1a3e2397176c8138a438)
+
+   > The contents of the immutable workspace '/Users/jasonholt/.gradle/caches/9.3.1/transforms/9468a88c0fead7ac0c509cb5d3cc0058' have been modified. These workspace directories are not supposed to be modified once they are created. The modification might have been caused by an external process, or could be the result of disk corruption.
+     outputDirectory:
+      - transformed (Directory, cdb7e96697f3156b803f187645790b27)
+        - filament-android-1.77.3 (Directory, 4561cda75bebe6fa0cda46c48f738a77)
+          - AndroidManifest.xml (RegularFile, 096596ca016987c06b75af3807ed3642)
+          - jars (Directory, 52364c952b340a804a085ea728f03efb)
+            - classes.jar (RegularFile, 6abfc17658a41af1e1e9806192089cd2)
+          - jni (Directory, 0ac22ab2d784aa9472a6d9f95e5db356)
+            - arm64-v8a (Directory, e71c4ae28b3f5bf8c4db3c79ed5603b2)
+              - libfilament-jni.so (RegularFile, 175b5a418d4a01df2eb13ec1dc0b7b2f)
+            - armeabi-v7a (Directory, b0b290c34b19cdf9d25ec572927802f3)
+              - libfilament-jni.so (RegularFile, f0be9054dad00d0809f1c23cd9305362)
+            - x86 (Directory, d55230b5de612e70ae9b66a48bd7bf06)
+              - libfilament-jni.so (RegularFile, db7d0c62fec87cff4f9b3c99a9edcc9b)
+            - x86_64 (Directory, ec93fe3bd1148489d04a667b172da00c)
+              - libfilament-jni.so (RegularFile, 9af573ea651810bf0f2a793db27dae6c)
+          - META-INF (Directory, 1b045b27731a43f79c333230a2e81d81)
+            - com (Directory, a570cadcff4b214235197c52fd682cb7)
+              - android (Directory, 27b326e05704958c8595a706e6da2747)
+                - build (Directory, 8a0fcf976c22f905024b79b5f6f40a3d)
+                  - gradle (Directory, 73367e9d3ffe66ba9eeba1e031e84f3c)
+                    - aar-metadata.properties (RegularFile, 56814d48ee68ded4220592ecb348b43c)
+          - proguard.txt (RegularFile, ac3997f7d46a41ece9333f347b88b64d)
+          - R.txt (RegularFile, 6c1773cc45a25495401cabf3dd630840)
+          - res (Directory, 0668fd0edab04252a14c785dd68c55f2)
+            - values (Directory, a6d67e8823896336469cf7191dc45cfe)
+              - values.xml (RegularFile, b5c25766a68d096eb765767939851542)
+     
+     resultsFile:
+      - results.bin (RegularFile, e9be7b70ce857c17b6a4f1d0cf6287f0)
+
+   > The contents of the immutable workspace '/Users/jasonholt/.gradle/caches/9.3.1/transforms/97d57dafff1504b608e72944f6a6f86e' have been modified. These workspace directories are not supposed to be modified once they are created. The modification might have been caused by an external process, or could be the result of disk corruption.
+     outputDirectory:
+      - transformed (Directory, d6359df94d636eabb8707c8d8b740e3b)
+        - gltfio-android-1.77.3 (Directory, 5f6c7a980930f177655784cda6411280)
+          - AndroidManifest.xml (RegularFile, 2e9ff0293d6a5bc2232bbf7d7dd68aee)
+          - jars (Directory, aed1153d8cffdfe941d01e2045c566bb)
+            - classes.jar (RegularFile, b023ec054eb1ac32feb79a0874b70aec)
+          - jni (Directory, c702fcb7fd36c293b8cf49377dce0407)
+            - arm64-v8a (Directory, 424e3b7ab5293c64e4af42ed8064fb5e)
+              - libgltfio-jni.so (RegularFile, 7ee6fb7e7bca519ff59f2319cb070dfa)
+            - armeabi-v7a (Directory, f39349431928b382162eaee771155113)
+              - libgltfio-jni.so (RegularFile, c02c4597874a9fc1c459f919ead39374)
+            - x86 (Directory, c7f61df2ae1b6045ab8fb70ff9abc7b7)
+              - libgltfio-jni.so (RegularFile, 828ca53c6345036e779ff42e6d68c2df)
+            - x86_64 (Directory, 14c5181e58b9829880f41bf7d5334340)
+              - libgltfio-jni.so (RegularFile, 0d6dddeda4342c05bd000a7528db23bf)
+          - META-INF (Directory, 1b045b27731a43f79c333230a2e81d81)
+            - com (Directory, a570cadcff4b214235197c52fd682cb7)
+              - android (Directory, 27b326e05704958c8595a706e6da2747)
+                - build (Directory, 8a0fcf976c22f905024b79b5f6f40a3d)
+                  - gradle (Directory, 73367e9d3ffe66ba9eeba1e031e84f3c)
+                    - aar-metadata.properties (RegularFile, 56814d48ee68ded4220592ecb348b43c)
+          - proguard.txt (RegularFile, ac3997f7d46a41ece9333f347b88b64d)
+          - R.txt (RegularFile, 6c1773cc45a25495401cabf3dd630840)
+     
+     resultsFile:
+      - results.bin (RegularFile, fa352b2f90f401ae7c1e210fcec248e2)
+
+   > The contents of the immutable workspace '/Users/jasonholt/.gradle/caches/9.3.1/transforms/75a366057682aa95dd4ba556aae12219' have been modified. These workspace directories are not supposed to be modified once they are created. The modification might have been caused by an external process, or could be the result of disk corruption.
+     outputDirectory:
+      - transformed (Directory, 8c78d3522e99f71b5e22a97b2cd870c6)
+        - filamat-android-1.77.3 (Directory, 8878cdca632712e77fadaa4661717f86)
+          - AndroidManifest.xml (RegularFile, 162d5618bc2cb540a563551553f13b31)
+          - jars (Directory, c02a1958f6a5bf0e4843dcd55a6ba919)
+            - classes.jar (RegularFile, 5fabb5342460a4bbec917b33647918f3)
+          - jni (Directory, 3cce6a73c6128d9d0a7a3dec380a3044)
+            - arm64-v8a (Directory, dd7ec33b96ec8ee6afb9498937073457)
+              - libfilamat-jni.so (RegularFile, a864b4984f0face7c0c084b37a630e67)
+            - armeabi-v7a (Directory, fa00b700996416b8ec445fd38f6b737e)
+              - libfilamat-jni.so (RegularFile, 6c6430973ff57e2ab4b02dd6246bb8b3)
+            - x86 (Directory, c9aafbeee81f9eb3156f42418c45fe67)
+              - libfilamat-jni.so (RegularFile, 1520e9a778055b6f4e3b32d696060ecb)
+            - x86_64 (Directory, 388ac7b06c6a2dafc1b76755f7d02958)
+              - libfilamat-jni.so (RegularFile, 82841b41a06ba4ac01cff54ab16d194d)
+          - META-INF (Directory, 1b045b27731a43f79c333230a2e81d81)
+            - com (Directory, a570cadcff4b214235197c52fd682cb7)
+              - android (Directory, 27b326e05704958c8595a706e6da2747)
+                - build (Directory, 8a0fcf976c22f905024b79b5f6f40a3d)
+                  - gradle (Directory, 73367e9d3ffe66ba9eeba1e031e84f3c)
+                    - aar-metadata.properties (RegularFile, 56814d48ee68ded4220592ecb348b43c)
+          - proguard.txt (RegularFile, ac3997f7d46a41ece9333f347b88b64d)
+          - R.txt (RegularFile, f571933bb948577b1f9f3076fb8fc7c6)
+     
+     resultsFile:
+      - results.bin (RegularFile, 87558737e13546146f7b9502828c8270)
+
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.3.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 14s
+13 actionable tasks: 3 executed, 10 up-to-date

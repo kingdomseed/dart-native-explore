@@ -1,0 +1,111 @@
+{
+  "bothCrop" : [
+    100,
+    275,
+    210,
+    95
+  ],
+  "boundary" : "Decoded PNGs converted to sRGB, exact crop comparisons; no linear color calibration, raw visibility or latency claim.",
+  "comparisons" : {
+    "cleanMatch-00-initial" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "cleanMatch-01-quarter-seek1" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "cleanMatch-02-ordinary-image-arrival" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "cleanMatch-03-first-sprite-snapshot" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "cleanMatch-04-current-seek2" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "cleanMatch-05-sprite-image-arrival" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "cleanMatch-06-refreshed-ready-snapshot" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "cleanMatch-07-source-only-seek1" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "cleanMatch-08-variant-other" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "cleanMatch-09-restored-snapshot" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "ordinaryLateTexture-current" : {
+      "changedPixels" : 5017,
+      "maximumChannelDifference" : 132
+    },
+    "ordinaryLateTexture-snapshot" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "readyRefresh-current" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "readyRefresh-snapshot" : {
+      "changedPixels" : 5852,
+      "maximumChannelDifference" : 141
+    },
+    "seekKeepsSnapshot-current" : {
+      "changedPixels" : 5852,
+      "maximumChannelDifference" : 35
+    },
+    "seekKeepsSnapshot-snapshot" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "spriteLateTexture-current" : {
+      "changedPixels" : 5186,
+      "maximumChannelDifference" : 155
+    },
+    "spriteLateTexture-snapshot" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "variantRoundTrip" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    }
+  },
+  "currentCrop" : [
+    105,
+    280,
+    85,
+    90
+  ],
+  "firstRefreshCenterSamples" : [
+    [
+      160,
+      168,
+      210
+    ],
+    [
+      160,
+      168,
+      210
+    ]
+  ],
+  "snapshotCrop" : [
+    210,
+    280,
+    90,
+    90
+  ]
+}

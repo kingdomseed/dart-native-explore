@@ -1,0 +1,963 @@
+{
+  "depthStencil" : "depth32Float_stencil8, private",
+  "doubleFromOpaqueControlRGBA" : [
+    0.409942626953125,
+    0.38373565673828125,
+    0.38373565673828125,
+    1
+  ],
+  "equations" : {
+    "D" : "Measured empty-scene center, not requested clear.",
+    "double" : "S*a*a + D*(1-a)",
+    "straight" : "S*a + D*(1-a)"
+  },
+  "expectedDoublePremultipliedRGBA" : [
+    0.4375,
+    0.390625,
+    0.390625,
+    1
+  ],
+  "expectedFromOpaqueControlRGBA" : [
+    0.5147705078125,
+    0.409942626953125,
+    0.409942626953125,
+    1
+  ],
+  "expectedStraightAlphaRGBA" : [
+    0.625,
+    0.4375,
+    0.4375,
+    1
+  ],
+  "fixture" : "u4.materials.alpha",
+  "id" : "215D9DB9-FAFB-400F-B2EC-1494097617F0",
+  "interpretation" : "Raw GPU floats. Parent must assess equations; no runtime\/parity PASS assigned.",
+  "nativeFactor" : [
+    1,
+    0.25,
+    0.25,
+    0.25
+  ],
+  "observedEmptyBaselineRGBA" : [
+    0.5,
+    0.5,
+    0.5,
+    1
+  ],
+  "observedOpaqueControlRGBA" : [
+    0.55908203125,
+    0.1397705078125,
+    0.1397705078125,
+    1
+  ],
+  "productionFragmentModifier" : "#pragma transparent\n",
+  "productionSurfaceModifier" : "#pragma arguments\nfloat4 d3BaseColorFactor;\n#pragma body\n_surface.diffuse *= d3BaseColorFactor;\n",
+  "readback" : "Metal texture blit to shared buffer, 512 bytes per row",
+  "results" : [
+    {
+      "case" : "clear_only",
+      "centerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ],
+      "commandStatus" : 4,
+      "gpuError" : null,
+      "outerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ]
+    },
+    {
+      "case" : "empty_scene_load",
+      "centerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ],
+      "commandStatus" : 4,
+      "gpuError" : null,
+      "outerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ]
+    },
+    {
+      "case" : "generated_opaque_control",
+      "centerPatchRGBA" : [
+        [
+          0.55908203125,
+          0.1397705078125,
+          0.1397705078125,
+          1
+        ],
+        [
+          0.55712890625,
+          0.1392822265625,
+          0.1392822265625,
+          1
+        ],
+        [
+          0.55517578125,
+          0.1387939453125,
+          0.1387939453125,
+          1
+        ],
+        [
+          0.55712890625,
+          0.1392822265625,
+          0.1392822265625,
+          1
+        ],
+        [
+          0.55908203125,
+          0.1397705078125,
+          0.1397705078125,
+          1
+        ],
+        [
+          0.56103515625,
+          0.1402587890625,
+          0.1402587890625,
+          1
+        ],
+        [
+          0.55517578125,
+          0.1387939453125,
+          0.1387939453125,
+          1
+        ],
+        [
+          0.56103515625,
+          0.1402587890625,
+          0.1402587890625,
+          1
+        ],
+        [
+          0.56689453125,
+          0.1417236328125,
+          0.1417236328125,
+          1
+        ]
+      ],
+      "commandStatus" : 4,
+      "fragmentModifier" : "#pragma opaque\n",
+      "gpuError" : null,
+      "material" : {
+        "blendModeRaw" : 5,
+        "colorWriteMaskRaw" : 15,
+        "diffuseContents" : "Optional(UIExtendedGrayColorSpace 1 1)",
+        "diffuseIntensity" : 1,
+        "doubleSided" : false,
+        "lightingModel" : "SCNLightingModelConstant",
+        "readsDepth" : true,
+        "transparency" : 1,
+        "transparencyModeRaw" : 0,
+        "writesDepth" : false
+      },
+      "outerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ]
+    },
+    {
+      "case" : "current_realized_fragment",
+      "centerPatchRGBA" : [
+        [
+          0.5146484375,
+          0.409912109375,
+          0.409912109375,
+          1
+        ],
+        [
+          0.51416015625,
+          0.40966796875,
+          0.40966796875,
+          1
+        ],
+        [
+          0.513671875,
+          0.40966796875,
+          0.40966796875,
+          1
+        ],
+        [
+          0.51416015625,
+          0.40966796875,
+          0.40966796875,
+          1
+        ],
+        [
+          0.5146484375,
+          0.409912109375,
+          0.409912109375,
+          1
+        ],
+        [
+          0.51513671875,
+          0.409912109375,
+          0.409912109375,
+          1
+        ],
+        [
+          0.513671875,
+          0.40966796875,
+          0.40966796875,
+          1
+        ],
+        [
+          0.51513671875,
+          0.409912109375,
+          0.409912109375,
+          1
+        ],
+        [
+          0.5166015625,
+          0.410400390625,
+          0.410400390625,
+          1
+        ]
+      ],
+      "commandStatus" : 4,
+      "fragmentModifier" : "#pragma transparent\n",
+      "gpuError" : null,
+      "material" : {
+        "blendModeRaw" : 0,
+        "colorWriteMaskRaw" : 15,
+        "diffuseContents" : "Optional(UIExtendedGrayColorSpace 1 1)",
+        "diffuseIntensity" : 1,
+        "doubleSided" : false,
+        "lightingModel" : "SCNLightingModelConstant",
+        "readsDepth" : true,
+        "transparency" : 1,
+        "transparencyModeRaw" : 0,
+        "writesDepth" : false
+      },
+      "outerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ]
+    },
+    {
+      "case" : "original_late_multiply",
+      "centerPatchRGBA" : [
+        [
+          0.409912109375,
+          0.383544921875,
+          0.383544921875,
+          1
+        ],
+        [
+          0.40966796875,
+          0.383544921875,
+          0.383544921875,
+          1
+        ],
+        [
+          0.40966796875,
+          0.383544921875,
+          0.383544921875,
+          1
+        ],
+        [
+          0.40966796875,
+          0.383544921875,
+          0.383544921875,
+          1
+        ],
+        [
+          0.409912109375,
+          0.383544921875,
+          0.383544921875,
+          1
+        ],
+        [
+          0.409912109375,
+          0.383544921875,
+          0.383544921875,
+          1
+        ],
+        [
+          0.40966796875,
+          0.383544921875,
+          0.383544921875,
+          1
+        ],
+        [
+          0.409912109375,
+          0.383544921875,
+          0.383544921875,
+          1
+        ],
+        [
+          0.410400390625,
+          0.3837890625,
+          0.3837890625,
+          1
+        ]
+      ],
+      "commandStatus" : 4,
+      "fragmentModifier" : "#pragma transparent\n\n_output.color.rgb *= _output.color.a;",
+      "gpuError" : null,
+      "material" : {
+        "blendModeRaw" : 0,
+        "colorWriteMaskRaw" : 15,
+        "diffuseContents" : "Optional(UIExtendedGrayColorSpace 1 1)",
+        "diffuseIntensity" : 1,
+        "doubleSided" : false,
+        "lightingModel" : "SCNLightingModelConstant",
+        "readsDepth" : true,
+        "transparency" : 1,
+        "transparencyModeRaw" : 0,
+        "writesDepth" : false
+      },
+      "outerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ]
+    },
+    {
+      "case" : "without_late_multiply",
+      "centerPatchRGBA" : [
+        [
+          0.5146484375,
+          0.409912109375,
+          0.409912109375,
+          1
+        ],
+        [
+          0.51416015625,
+          0.40966796875,
+          0.40966796875,
+          1
+        ],
+        [
+          0.513671875,
+          0.40966796875,
+          0.40966796875,
+          1
+        ],
+        [
+          0.51416015625,
+          0.40966796875,
+          0.40966796875,
+          1
+        ],
+        [
+          0.5146484375,
+          0.409912109375,
+          0.409912109375,
+          1
+        ],
+        [
+          0.51513671875,
+          0.409912109375,
+          0.409912109375,
+          1
+        ],
+        [
+          0.513671875,
+          0.40966796875,
+          0.40966796875,
+          1
+        ],
+        [
+          0.51513671875,
+          0.409912109375,
+          0.409912109375,
+          1
+        ],
+        [
+          0.5166015625,
+          0.410400390625,
+          0.410400390625,
+          1
+        ]
+      ],
+      "commandStatus" : 4,
+      "fragmentModifier" : "#pragma transparent\n",
+      "gpuError" : null,
+      "material" : {
+        "blendModeRaw" : 0,
+        "colorWriteMaskRaw" : 15,
+        "diffuseContents" : "Optional(UIExtendedGrayColorSpace 1 1)",
+        "diffuseIntensity" : 1,
+        "doubleSided" : false,
+        "lightingModel" : "SCNLightingModelConstant",
+        "readsDepth" : true,
+        "transparency" : 1,
+        "transparencyModeRaw" : 0,
+        "writesDepth" : false
+      },
+      "outerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ]
+    },
+    {
+      "case" : "explicit_premult_reference",
+      "centerPatchRGBA" : [
+        [
+          0.625,
+          0.4375,
+          0.4375,
+          1
+        ],
+        [
+          0.625,
+          0.4375,
+          0.4375,
+          1
+        ],
+        [
+          0.625,
+          0.4375,
+          0.4375,
+          1
+        ],
+        [
+          0.625,
+          0.4375,
+          0.4375,
+          1
+        ],
+        [
+          0.625,
+          0.4375,
+          0.4375,
+          1
+        ],
+        [
+          0.625,
+          0.4375,
+          0.4375,
+          1
+        ],
+        [
+          0.625,
+          0.4375,
+          0.4375,
+          1
+        ],
+        [
+          0.625,
+          0.4375,
+          0.4375,
+          1
+        ],
+        [
+          0.625,
+          0.4375,
+          0.4375,
+          1
+        ]
+      ],
+      "commandStatus" : 4,
+      "fragmentModifier" : "#pragma transparent\n#pragma body\n_output.color = float4(0.25, 0.0625, 0.0625, 0.25);",
+      "gpuError" : null,
+      "material" : {
+        "blendModeRaw" : 0,
+        "colorWriteMaskRaw" : 15,
+        "diffuseContents" : "Optional(UIExtendedGrayColorSpace 1 1)",
+        "diffuseIntensity" : 1,
+        "doubleSided" : false,
+        "lightingModel" : "SCNLightingModelConstant",
+        "readsDepth" : true,
+        "transparency" : 1,
+        "transparencyModeRaw" : 0,
+        "writesDepth" : false
+      },
+      "outerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ]
+    }
+  ],
+  "seedRGBA" : [
+    0.5,
+    0.5,
+    0.5,
+    1
+  ],
+  "sourceMaterial" : {
+    "blendModeRaw" : 0,
+    "colorWriteMaskRaw" : 15,
+    "diffuseContents" : "Optional(<MTLSimTexture: 0x10fa6c900>\n    label = <none> \n    textureType = MTLTextureType2D \n    pixelFormat = MTLPixelFormatRGBA8Unorm_sRGB \n    decompressedPixelFormat = MTLPixelFormatRGBA8Unorm_sRGB \n    width = 2 \n    height = 2 \n    depth = 1 \n    arrayLength = 1 \n    mipmapLevelCount = 2 \n    sampleCount = 1 \n    cpuCacheMode = MTLCPUCacheModeDefaultCache \n    storageMode = MTLStorageModeShared \n    hazardTrackingMode = MTLHazardTrackingModeTracked \n    resourceOptions = MTLResourceCPUCacheModeDefaultCache MTLResourceStorageModeShared MTLResourceHazardTrackingModeTracked  \n    usage = MTLTextureUsageShaderRead MTLTextureUsagePixelFormatView \n    shareable = 0 \n    framebufferOnly = 0 \n    swizzle = [MTLTextureSwizzleRed, MTLTextureSwizzleGreen, MTLTextureSwizzleBlue, MTLTextureSwizzleAlpha] \n    parentTexture = <MTLSimTexture: 0x10fa6c780>\n        label = <none> \n        textureType = MTLTextureType2D \n        pixelFormat = MTLPixelFormatRGBA8Unorm \n        decompressedPixelFormat = MTLPixelFormatRGBA8Unorm \n        width = 2 \n        height = 2 \n        depth = 1 \n        arrayLength = 1 \n        mipmapLevelCount = 2 \n        sampleCount = 1 \n        cpuCacheMode = MTLCPUCacheModeDefaultCache \n        storageMode = MTLStorageModeShared \n        hazardTrackingMode = MTLHazardTrackingModeTracked \n        resourceOptions = MTLResourceCPUCacheModeDefaultCache MTLResourceStorageModeShared MTLResourceHazardTrackingModeTracked  \n        usage = MTLTextureUsageShaderRead MTLTextureUsagePixelFormatView \n        shareable = 0 \n        framebufferOnly = 0 \n        swizzle = [MTLTextureSwizzleRed, MTLTextureSwizzleGreen, MTLTextureSwizzleBlue, MTLTextureSwizzleAlpha] \n        parentTexture = <null> \n        parentRelativeLevel = 0 \n        parentRelativeSlice = 0 \n        buffer = <null> \n        bufferOffset = 0 \n        bufferBytesPerRow = 0 \n        allowGPUOptimizedContents = YES \n    parentRelativeLevel = 0 \n    parentRelativeSlice = 0 \n    buffer = <null> \n    bufferOffset = 0 \n    bufferBytesPerRow = 0 \n    allowGPUOptimizedContents = YES)",
+    "diffuseIntensity" : 1,
+    "doubleSided" : false,
+    "lightingModel" : "SCNLightingModelConstant",
+    "readsDepth" : true,
+    "transparency" : 1,
+    "transparencyModeRaw" : 0,
+    "writesDepth" : false
+  },
+  "status" : "READBACK_RECORDED_REQUIRES_PARENT_INTERPRETATION",
+  "syntheticInputs" : "Copied realized ordinary material; diffuse texture replaced by white. Private SCNPlane2x2, private orthographic camera at native Z3, HDR\/exposure\/effects disabled.",
+  "target" : "rgba16Float, 64x64, private, single sample"
+}

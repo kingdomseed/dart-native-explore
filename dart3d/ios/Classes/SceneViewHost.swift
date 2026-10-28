@@ -52,6 +52,9 @@ final class SceneViewHost: SCNView {
     /// doc, which would respawn physics bodies mid-scene.
     private(set) var geometriesById: [UInt64: SCNGeometry] = [:]
     private(set) var materialsById: [UInt64: SCNMaterial] = [:]
+    private(set) var materialColorOwners: [UInt64: FsceneRealizer.MaterialColorOwner] = [:]
+    private(set) var lightIntensityOwners: [UInt64: FsceneRealizer.LightIntensityOwner] = [:]
+    private(set) var cameraFovOwners: [UInt64: FsceneRealizer.CameraFovOwner] = [:]
     private(set) var texturesById: [UInt64: FsceneRealizer.DecodedTexture] = [:]
     private(set) var shadowCatcherConfigurationsById:
         [UInt64: ShadowCatcherConfiguration] = [:]
@@ -133,7 +136,7 @@ final class SceneViewHost: SCNView {
     private(set) var skinPayloadKeys: [UInt64: UInt64] = [:]
     private(set) var animPayloadKeys: [UInt64: Set<UInt64>] = [:]
     private(set) var skinDefs: [UInt64: [String: Any]] = [:]
-    private(set) var animDefs: [UInt64: [String: Any]] = [:]
+    private(set) var animDefs: [UInt64: FsceneRealizer.AnimationDefinition] = [:]
 
     /// W26: node key → a camera-facing mesh spec (polyline, line
     /// segments, billboard, billboard instances). SceneKit's native
@@ -273,7 +276,7 @@ final class SceneViewHost: SCNView {
     var mainOutlineBindings: [Int: OutlineViewsBinding] = [:]
 
     /// W24 torn-pose fix: the render queue captures each proxy
-    /// sibling's pose in `willRenderScene` (post-physics) and parks it
+    /// sibling's pose in `didApplyConstraintsAtTime` and parks it
     /// here; the main-thread poke applies it in one `SCNTransaction`
     /// right before `setNeedsDisplay`, so a sibling never draws a
     /// proxy the render queue is halfway through rewriting.
@@ -1421,7 +1424,7 @@ final class SceneViewHost: SCNView {
     }
 
     func applyPayload(_ data: Data) {
-        guard data.count > 8 else { return }
+        guard data.count >= 8 else { return }
         let id = D3Wire.readLocalId(data, data.startIndex)
         let bytes = data.subdata(in: data.startIndex + 8..<data.endIndex)
         payloadStore[id] = bytes
@@ -2048,6 +2051,8 @@ final class SceneViewHost: SCNView {
             geometryConsumers.removeValue(forKey: k)
             // W11: the node's skin binding and pending attach die with
             // it; a captured bind pose would be stale for a recycled id.
+            lightIntensityOwners.removeValue(forKey: k)
+            cameraFovOwners.removeValue(forKey: k)
             nodeSkinKeys.removeValue(forKey: k)
             pendingSkinNodes.remove(k)
             pendingColliderShapes.removeValue(forKey: k)
@@ -2329,6 +2334,8 @@ final class SceneViewHost: SCNView {
         node.castsShadow = true
         node.light = nil
         node.camera = nil
+        ctx.lightIntensityOwners.removeValue(forKey: key)
+        ctx.cameraFovOwners.removeValue(forKey: key)
         node.physicsBody = nil
         // W18: particle systems ride on the node — retire each before
         // detaching so an in-flight pass still holding one renders
@@ -2491,6 +2498,9 @@ final class SceneViewHost: SCNView {
         animDefs = ctx.animDefs
         geometryPayloadKeys = ctx.geometryPayloadKeys
         geometriesById = ctx.geometries
+        materialColorOwners = ctx.materialColorOwners
+        lightIntensityOwners = ctx.lightIntensityOwners
+        cameraFovOwners = ctx.cameraFovOwners
         materialsById = ctx.materials
         texturesById = ctx.textures
         textureConsumers = ctx.textureConsumers
@@ -2725,12 +2735,6 @@ final class SceneViewHost: SCNView {
                     redecodeSkin(skinKey, def)
                 }
             }
-            for (animKey, pids) in animPayloadKeys
-            where pids.contains(key) {
-                if let def = animDefs[animKey] {
-                    redecodeAnimation(animKey, def)
-                }
-            }
         } else {
             // W25 fix-2: every claim map was checked surgically above
             // — reaching here means no installed or deferred resource
@@ -2741,6 +2745,9 @@ final class SceneViewHost: SCNView {
                 "upsertPayload \(key): encoding "
                 + "'\(payloadSpecs[key]?.encoding ?? "?")' backs no "
                 + "known texture or geometry")
+        }
+        for (animKey, pids) in animPayloadKeys where pids.contains(key) {
+            if let def = animDefs[animKey] { redecodeAnimation(animKey, def) }
         }
     }
 
@@ -2758,6 +2765,9 @@ final class SceneViewHost: SCNView {
         ctx.instanceSpecs = instanceSpecs
         ctx.textures = texturesById
         ctx.materials = materialsById
+        ctx.materialColorOwners = materialColorOwners
+        ctx.lightIntensityOwners = lightIntensityOwners
+        ctx.cameraFovOwners = cameraFovOwners
         ctx.geometries = geometriesById
         ctx.textureConsumers = textureConsumers
         ctx.materialConsumers = materialConsumers
@@ -2893,6 +2903,9 @@ final class SceneViewHost: SCNView {
                 ctx.applyVariantComponents()
             }
             ctx.decodeMaterial(key, r)
+            if let owner = ctx.materialColorOwners[key] {
+                applyRetainedMaterialSample(key, owner: owner)
+            }
             materialsById = ctx.materials
             textureConsumers = ctx.textureConsumers
             resourceDefs = ctx.resourceDefs
@@ -4649,7 +4662,11 @@ final class SceneViewHost: SCNView {
                 "upsertAnimation: missing id/animation")
             return
         }
-        redecodeAnimation(key, anim)
+        guard let definition = FsceneRealizer.AnimationDefinition(anim) else {
+            d3Log("animation \(key): malformed metadata; prior definition retained")
+            return
+        }
+        redecodeAnimation(key, definition)
     }
 
     /// `{"op":"removeSkin","id":"<id>"}` — drop the def; every bound
@@ -4744,7 +4761,7 @@ final class SceneViewHost: SCNView {
     /// Re-decodes one animation def — a live clip keeps playback
     /// state, its `time` clamped to the new `endTime` (upstream
     /// `rebind`'s clamp).
-    private func redecodeAnimation(_ key: UInt64, _ def: [String: Any]) {
+    private func redecodeAnimation(_ key: UInt64, _ def: FsceneRealizer.AnimationDefinition) {
         let ctx = surgicalContext()
         ctx.animDefs[key] = def
         ctx.decodeAnimation(key, def)
@@ -4789,7 +4806,11 @@ final class SceneViewHost: SCNView {
         // even with zero clips (upstream's update touches every
         // `_targetTransforms` entry, so a clip removal snaps its nodes
         // back to bind).
-        guard !animClips.isEmpty || !animTargets.isEmpty else { return }
+        guard !animClips.isEmpty || !animTargets.isEmpty
+            || materialColorOwners.values.contains(where: { $0.animationBound })
+            || lightIntensityOwners.values.contains(where: { $0.animationBound })
+            || cameraFovOwners.values.contains(where: { $0.animationBound })
+        else { return }
 
         // Advance + drop clips whose def was removed.
         for key in Array(animClips.keys) {
@@ -4829,6 +4850,9 @@ final class SceneViewHost: SCNView {
             var weights: [Float]?
         }
         var accs: [UInt64: PoseAcc] = [:]
+        var colors: [UInt64: simd_float4] = [:]
+        var intensities: [UInt64: Float] = [:]
+        var fovs: [UInt64: Float] = [:]
 
         // Channels apply in channel order; clips in id order (upstream
         // applies in registration order — key order is the stable
@@ -4841,6 +4865,43 @@ final class SceneViewHost: SCNView {
                   let def = animationsById[animKey] else { continue }
             let w = Float(clip.weight * mult)
             for ch in def.channels {
+                switch ch.kind {
+                case .materialBaseColor:
+                    guard let owner = materialColorOwners[ch.target],
+                          owner.supportsAnimation else {
+                        logOnce("anim.material.\(ch.target)",
+                            "animation baseColor target \(ch.target): missing or ineligible material")
+                        continue
+                    }
+                    let value = sampleProperty(ch, clip.time)
+                    colors[ch.target] = (colors[ch.target] ?? owner.rest)
+                        + (value - owner.rest) * w
+                    continue
+                case .lightIntensity:
+                    guard let owner = lightIntensityOwners[ch.target],
+                          owner.declarationCount == 1 else {
+                        logOnce("anim.light.\(ch.target)",
+                            "animation intensity target \(ch.target): expected exactly one light declaration")
+                        continue
+                    }
+                    let value = sampleProperty(ch, clip.time).x
+                    intensities[ch.target] = (intensities[ch.target] ?? owner.rest)
+                        + (value - owner.rest) * w
+                    continue
+                case .cameraFovRadiansY:
+                    guard let owner = cameraFovOwners[ch.target],
+                          owner.declarationCount == 1,
+                          !owner.camera.usesOrthographicProjection else {
+                        logOnce("anim.camera.\(ch.target)",
+                            "animation FOV target \(ch.target): expected exactly one perspective camera declaration")
+                        continue
+                    }
+                    let value = sampleProperty(ch, clip.time).x
+                    fovs[ch.target] = (fovs[ch.target] ?? owner.rest)
+                        + (value - owner.rest) * w
+                    continue
+                case .translation, .rotation, .scale, .weights: break
+                }
                 guard let (nk, node) = animTarget(ch) else { continue }
                 // Bind-pose capture — once, at first bind, never
                 // re-captured while the entry lives (upstream's
@@ -4863,6 +4924,8 @@ final class SceneViewHost: SCNView {
                     p: st.bindP, r: st.bindR, s: st.bindS,
                     weights: st.bindWeights)
                 switch ch.kind {
+                case .materialBaseColor, .lightIntensity, .cameraFovRadiansY:
+                    preconditionFailure("property channel entered transform binding")
                 case .translation:
                     st.drivesTransform = true
                     if w > 0, let v = sampleVec3(ch, clip.time) {
@@ -4908,6 +4971,34 @@ final class SceneViewHost: SCNView {
             }
         }
 
+        for (key, owner) in materialColorOwners {
+            if let value = colors[key] {
+                owner.animationBound = true
+                owner.apply(value)
+            } else if owner.animationBound {
+                owner.apply(owner.rest)
+                owner.animationBound = false
+            }
+        }
+        for (key, owner) in lightIntensityOwners {
+            if let value = intensities[key] {
+                owner.animationBound = true
+                owner.apply(value)
+            } else if owner.animationBound {
+                owner.apply(owner.rest)
+                owner.animationBound = false
+            }
+        }
+        for (key, owner) in cameraFovOwners {
+            if let value = fovs[key] {
+                owner.animationBound = true
+                owner.apply(value)
+            } else if owner.animationBound {
+                owner.apply(owner.rest)
+                owner.animationBound = false
+            }
+        }
+
         // Write back: bound nodes get their accumulated pose; recorded
         // nodes no channel bound this frame reset to bind — upstream
         // writes every `_targetTransforms` entry each update.
@@ -4934,6 +5025,39 @@ final class SceneViewHost: SCNView {
             }
         }
         for nk in stale { animTargets.removeValue(forKey: nk) }
+    }
+
+    private func sampleProperty(_ ch: FsceneRealizer.DecodedChannel,
+                                _ time: Double) -> simd_float4 {
+        let key = timelineKey(ch.times, time)
+        let value = ch.propertyValues[key.index]
+        if key.lerp < 1, key.index > 0 {
+            let previous = ch.propertyValues[key.index - 1]
+            return previous + (value - previous) * Float(key.lerp)
+        }
+        return value
+    }
+
+    private func applyRetainedMaterialSample(
+        _ key: UInt64, owner: FsceneRealizer.MaterialColorOwner
+    ) {
+        guard owner.supportsAnimation else { return }
+        animLock.lock()
+        defer { animLock.unlock() }
+        let total = animClips.values.reduce(0.0) { $0 + $1.weight }
+        let mult = total > 1 ? 1 / total : 1
+        var value = owner.rest
+        for animKey in animClips.keys.sorted() {
+            guard let clip = animClips[animKey],
+                  let definition = animationsById[animKey] else { continue }
+            for channel in definition.channels
+            where channel.kind == .materialBaseColor && channel.target == key {
+                owner.animationBound = true
+                value += (sampleProperty(channel, clip.time) - owner.rest)
+                    * Float(clip.weight * mult)
+            }
+        }
+        if owner.animationBound { owner.apply(value) }
     }
 
     /// Channel binding — `target` id first, `targetName` fallback
@@ -5071,6 +5195,9 @@ final class SceneViewHost: SCNView {
         nodes: [UInt64: SCNNode],
         resources: (geometries: [UInt64: SCNGeometry],
                     materials: [UInt64: SCNMaterial],
+                    materialColorOwners: [UInt64: FsceneRealizer.MaterialColorOwner],
+                    lightIntensityOwners: [UInt64: FsceneRealizer.LightIntensityOwner],
+                    cameraFovOwners: [UInt64: FsceneRealizer.CameraFovOwner],
                     shadowCatcherConfigurations:
                         [UInt64: ShadowCatcherConfiguration],
                     shadowCatcherBindings:
@@ -5099,7 +5226,7 @@ final class SceneViewHost: SCNView {
                     skinPayloadKeys: [UInt64: UInt64],
                     animPayloadKeys: [UInt64: Set<UInt64>],
                     skinDefs: [UInt64: [String: Any]],
-                    animDefs: [UInt64: [String: Any]],
+                    animDefs: [UInt64: FsceneRealizer.AnimationDefinition],
                     variantComponents:
                         [UInt64: FsceneRealizer.VariantComponentSpec],
                     disabledComponents: [UInt64: Set<Int>],
@@ -5140,6 +5267,9 @@ final class SceneViewHost: SCNView {
         colliderIndexByKey = colliderIndices
         geometriesById = resources.geometries
         materialsById = resources.materials
+        materialColorOwners = resources.materialColorOwners
+        lightIntensityOwners = resources.lightIntensityOwners
+        cameraFovOwners = resources.cameraFovOwners
         shadowCatcherConfigurationsById =
             resources.shadowCatcherConfigurations
         shadowCatcherBindingsById = resources.shadowCatcherBindings
@@ -5269,7 +5399,7 @@ extension SceneViewHost: SCNSceneRendererDelegate {
         sampleAnimations(at: time)
         // W16: trails record after the sampler — the head follows
         // this frame's sampled pose. LOD selection runs later, in
-        // `willRenderScene`: a physics-driven node's pose is only
+        // `didApplyConstraintsAtTime`: a physics-driven node's pose is only
         // final after the sim step, and selecting here read the
         // pre-sim pose (a one-frame lag on moving bodies).
         updateTrails(at: time)
@@ -5612,18 +5742,10 @@ extension SceneViewHost: SCNSceneRendererDelegate {
         spec.ownsRenderable = true
     }
 
-    /// W14: post-physics, pre-drawable — the offscreen passes draw the
-    /// same pose the screen frame is about to. Only fires for the
-    /// SCNView; the per-view SCNRenderers have no delegate set. W24:
-    /// sibling proxies sync in the same hook so their poke-drawn
-    /// frames share this pose. W26 also re-expands camera-facing
-    /// meshes here — the last hook before draw sees the final camera
-    /// pose.
+    /// Shared-scene captures must finish encoding before SceneKit
+    /// opens the host render encoder; constraints have finalized the pose.
     func renderer(_ renderer: SCNSceneRenderer,
-                  willRenderScene scene: SCNScene,
-                  atTime time: TimeInterval) {
-        // W16: post-physics, pre-draw — Android's `updateTrailsLods`
-        // slot (post-camera, pre-render) for the lod half.
+                  didApplyConstraintsAtTime time: TimeInterval) {
         updateLods()
         updateCameraFacing()
         syncBlendCasters()

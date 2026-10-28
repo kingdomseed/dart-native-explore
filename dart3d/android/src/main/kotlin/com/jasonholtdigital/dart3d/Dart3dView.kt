@@ -1264,6 +1264,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     private fun applyProjection() {
         if (viewportH <= 0) return
         val aspect = viewportW.toDouble() / viewportH.toDouble()
+        cameraNodeKey?.takeIf { nodesById[it]?.cameraDeclarations == 1 }
+            ?.let { nodeCameraProps[it] }?.let {
+            it.applyTo(camera, aspect)
+            return
+        }
         if (cameraOrtho) {
             // iOS maps projection:'orthographic' onto SCNCamera's
             // orthographicProjection; its orthographicScale is the
@@ -2574,6 +2579,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // chunks arrive next, so the store starts empty and every
         // payload claim defers until its own bytes land.
         payloadStore.clear()
+        opPayloadSpecs.clear()
         realizePending = false
         // W15: the new document's session keys invalidate every
         // recorded subtree batch — drop them before the realize, and
@@ -2589,7 +2595,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     }
 
     private fun applyPayload(data: ByteArray) {
-        if (data.size <= 8) return
+        if (data.size < 8) return
         val id = D3Wire.readLocalId(data, 0)
         payloadStore[id] = data.copyOfRange(8, data.size)
         // W25: a rewritten LUT chunk invalidates its cached tables.
@@ -2729,8 +2735,15 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      */
     private fun applyTopLevelCommand(json: JSONObject) {
         if (json.optString("op") != "batch") {
-            journalTopLevel(json)
-            applyCommandJson(json)
+            if (json.optString("op") == "upsertAnimation") {
+                applyCommandJson(json)
+                val key = D3Wire.localIdKey(json.optString("id"))
+                if (key != null && resources.animDefs[key] === json.optJSONObject("animation"))
+                    journalTopLevel(json)
+            } else {
+                journalTopLevel(json)
+                applyCommandJson(json)
+            }
             return
         }
         val ops = json.optJSONArray("ops") ?: run {
@@ -3719,6 +3732,12 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         val mi = FsceneRealizer.buildMaterialInstance(
             this, key, res, resources.textures, resources.textureSamplers,
             fresh, catcherSettings)
+        resources.materialColors.remove(key)
+        FsceneRealizer.materialColorOwner(mi, res)?.let { owner ->
+            resources.materialColors[key] = owner
+            owner.value.apply(propertySample(AnimationDefinition.Kind.COLOR, key, owner.value,
+                blendWeights(animClips))) { owner.write(mi, it) }
+        }
         // The old instance's consumer entries die with it; the new
         // instance records its own slot bindings.
         if (old != null) {
@@ -4979,7 +4998,6 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     /// `rebind`'s clamp).
     private fun redecodeAnimation(key: Long, def: JSONObject) {
         val ctx = FsceneRealizer.surgicalContext(this)
-        ctx.animDefs[key] = def
         ctx.decodeAnimation(key, def)
         animClips[key]?.let { clip ->
             clip.time = clip.time.coerceIn(
@@ -5004,7 +5022,6 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // even with zero clips (upstream's update touches every
         // `_targetTransforms` entry, so a clip removal snaps its nodes
         // back to bind).
-        if (animClips.isEmpty() && animTargets.isEmpty()) return
 
         // Advance + drop clips whose def was removed.
         for (key in ArrayList(animClips.keys)) {
@@ -5031,6 +5048,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         // Effective per-clip weights — upstream normalizes by Σ every
         // registered clip's weight; a weight-0 clip contributes nothing.
         val weights = blendWeights(animClips)
+        sampleProperties(weights)
 
         /// Accumulating pose state for one bound node this frame —
         /// starts at the captured bind pose / rest weights.
@@ -5159,6 +5177,69 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             }
         }
         for (nk in stale) animTargets.remove(nk)
+    }
+
+    private fun propertySample(kind: AnimationDefinition.Kind, target: Long,
+        owner: AnimatedProperty, weights: Map<Long, Float>): FloatArray? {
+        var acc: FloatArray? = null
+        for ((key, weight) in weights) {
+            val clip = animClips.getValue(key)
+            for (curve in resources.animations[key]?.properties.orEmpty()) {
+                if (curve.spec.kind != kind || curve.spec.target != target) continue
+                val values = acc ?: owner.rest.copyOf().also { acc = it }
+                owner.accumulate(values, curve, clip.time, weight)
+            }
+        }
+        return acc
+    }
+
+    private fun sampleProperties(weights: Map<Long, Float>) {
+        for ((clipKey, _) in weights) {
+            for (property in resources.animations[clipKey]?.definition?.properties.orEmpty()) {
+                val node = nodesById[property.target]
+                val eligible = when (property.kind) {
+                    AnimationDefinition.Kind.COLOR -> resources.materialColors.containsKey(property.target)
+                    AnimationDefinition.Kind.INTENSITY -> node?.lightDeclarations == 1 && node.lightOwner != null
+                    AnimationDefinition.Kind.FOV -> node?.cameraDeclarations == 1 &&
+                        nodeCameraProps[property.target]?.ortho == false
+                }
+                if (!eligible) logCommandOnce("animation.$clipKey.${property.kind}.${property.target}",
+                    "animation $clipKey ${property.kind} target ${property.target}: missing, ambiguous or ineligible owner; inactive")
+            }
+        }
+        val rm = engine.renderableManager
+        for ((key, owner) in resources.materialColors) {
+            owner.value.apply(propertySample(AnimationDefinition.Kind.COLOR, key, owner.value, weights)) { color ->
+                owner.write(owner.instance, color)
+                for (node in nodesById.values) {
+                    if (node.instanceBaseMaterial?.nativeObject != owner.instance.nativeObject) continue
+                    val owned = node.instanceMaterialInstances.map { it.nativeObject }.toSet()
+                    for (entity in listOf(node.entity) + node.instanceEntities) {
+                        val renderable = rm.getInstance(entity)
+                        if (renderable == 0) continue
+                        val primCount = rm.getPrimitiveCount(renderable)
+                        for (primitive in 0 until primCount) {
+                            val current = rm.getMaterialInstanceAt(renderable, primitive)
+                            if (current.nativeObject in owned) owner.write(current, color)
+                        }
+                    }
+                }
+            }
+        }
+        for ((key, node) in nodesById) {
+            node.lightOwner?.let { owner ->
+                val acc = if (node.lightDeclarations == 1)
+                    propertySample(AnimationDefinition.Kind.INTENSITY, key, owner.value, weights)
+                    else null
+                owner.value.apply(acc) { owner.write(engine.lightManager, it[0]) }
+            }
+            nodeCameraProps[key]?.let { owner ->
+                val acc = if (node.cameraDeclarations == 1 && !owner.ortho)
+                    propertySample(AnimationDefinition.Kind.FOV, key, owner.fov, weights)
+                    else null
+                owner.fov.apply(acc) { if (key == cameraNodeKey) applyProjection() }
+            }
+        }
     }
 
     /// Channel binding — `target` id first, `targetName` fallback
@@ -5538,8 +5619,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             tcm.getWorldTransform(tcm.getInstance(camRec.entity), m)
             camPos[0] = m[12]; camPos[1] = m[13]; camPos[2] = m[14]
         }
+        val projection = cameraNodeKey?.takeIf { nodesById[it]?.cameraDeclarations == 1 }
+            ?.let { nodeCameraProps[it] }
         FsceneRealizer.surgicalContext(this).updateTrailsLods(
-            dt, camPos, cameraFovDeg * Math.PI / 180.0, !cameraOrtho)
+            dt, camPos, (projection?.fovDeg ?: cameraFovDeg) * Math.PI / 180.0,
+            !(projection?.ortho ?: cameraOrtho))
     }
 
     /** Writes each dynamic body's world pose into its node transform. */

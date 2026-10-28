@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'animation.dart';
 import 'components.dart';
 import 'geometry/proc.dart' show kD3ProcShapes;
 import 'scene_model.dart';
@@ -73,15 +74,21 @@ List<Map<String, Object?>> diffCommands(
   }
   for (final entry in newDoc.payloads.entries) {
     final bytes = entry.value.bytes;
-    // Only arrivals and content changes produce an upsert — a chunk
-    // can't be "unsent", so a payload that loses its bytes is skipped.
     if (bytes == null) continue;
-    if (_bytesEqual(oldDoc?.payload(entry.key)?.bytes, bytes)) continue;
+    final spec = entry.value;
+    final previous = oldDoc?.payload(entry.key);
+    if (_bytesEqual(previous?.bytes, bytes) &&
+        previous?.encoding == spec.encoding &&
+        previous?.layout == spec.layout &&
+        previous?.format == spec.format &&
+        previous?.width == spec.width &&
+        previous?.height == spec.height &&
+        previous?.length == spec.length)
+      continue;
     // The spec rides the op: a runtime-minted chunk's encoding/layout
     // never reaches the manifest's `payloads` block, so without these
     // fields the native `payloadSpecs` table never learns the chunk's
     // shape and every consumer stays unresolved.
-    final spec = entry.value;
     ops.add({
       'op': 'upsertPayload',
       'id': idKey(entry.key),
@@ -361,7 +368,104 @@ Map<String, Object?> encodeAnimationSpec(
           'keyframes': idKey(ch.keyframes),
         },
     ],
+    if (animation is Dart3dAnimationSpec &&
+        animation.propertyChannels.isNotEmpty)
+      'd3:properties': [
+        for (final channel in animation.propertyChannels)
+          {
+            ...switch (channel) {
+              D3MaterialBaseColorChannel(:final material) => {
+                'kind': 'materialBaseColor',
+                'material': 'mat:${material.toToken()}',
+              },
+              D3LightIntensityChannel(:final node) => {
+                'kind': 'lightIntensity',
+                'node': 'n:${node.toToken()}',
+              },
+              D3CameraFovChannel(:final node) => {
+                'kind': 'cameraFovRadiansY',
+                'node': 'n:${node.toToken()}',
+              },
+            },
+            'timeline': 'chunk:${channel.timeline.toToken()}',
+            'keyframes': 'chunk:${channel.keyframes.toToken()}',
+          },
+      ],
   };
+}
+
+/// Decodes one animation entry through the paired document/command lane.
+/// Ordinary channels retain upstream decoding, including unknown-kind rejection.
+AnimationSpec decodeAnimationSpec(LocalId id, Map<String, Object?> entry) {
+  final ordinary = decodeDocument(<String, dynamic>{
+    'fscene': 5,
+    'documentId': DocumentId(Uint8List(16)).toToken(),
+    'stage': <String, dynamic>{},
+    'animations': {
+      id.toToken(): {...entry}..remove('d3:properties'),
+    },
+  }).animations[id]!;
+  return _decodePropertyChannels(ordinary, entry);
+}
+
+AnimationSpec _decodePropertyChannels(
+  AnimationSpec ordinary,
+  Map<String, Object?> entry,
+) {
+  final id = ordinary.id;
+  if (!entry.containsKey('d3:properties')) return ordinary;
+  final raw = entry['d3:properties'];
+  if (raw is! List)
+    throw FormatException('animation $id d3:properties must be a list');
+  final channels = <D3PropertyChannelSpec>[];
+  for (var i = 0; i < raw.length; i++) {
+    final value = raw[i];
+    Never invalid() =>
+        throw FormatException('animation $id property $i has invalid metadata');
+    if (value is! Map) invalid();
+    final kind = value['kind'];
+    final targetKey = switch (kind) {
+      'materialBaseColor' => 'material',
+      'lightIntensity' || 'cameraFovRadiansY' => 'node',
+      _ => invalid(),
+    };
+    final keys = {'kind', targetKey, 'timeline', 'keyframes'};
+    if (value.length != keys.length || value.keys.any((k) => !keys.contains(k)))
+      invalid();
+    LocalId ref(String key) {
+      final token = value[key];
+      if (token is! String) invalid();
+      return LocalId.parse(token);
+    }
+
+    final target = ref(targetKey),
+        timeline = ref('timeline'),
+        keyframes = ref('keyframes');
+    channels.add(switch (kind) {
+      'materialBaseColor' => D3MaterialBaseColorChannel(
+        material: target,
+        timeline: timeline,
+        keyframes: keyframes,
+      ),
+      'lightIntensity' => D3LightIntensityChannel(
+        node: target,
+        timeline: timeline,
+        keyframes: keyframes,
+      ),
+      'cameraFovRadiansY' => D3CameraFovChannel(
+        node: target,
+        timeline: timeline,
+        keyframes: keyframes,
+      ),
+      _ => invalid(),
+    });
+  }
+  return Dart3dAnimationSpec(
+    id,
+    name: ordinary.name,
+    channels: ordinary.channels,
+    propertyChannels: channels,
+  );
 }
 
 /// A [RenderViewSpec] plus the dart3d `viewport` extension (W24).
@@ -475,7 +579,8 @@ void applyViewExtensions(SceneDocument doc, Map<String, Object?> manifest) {
 /// - geometry resources whose `procedural.shape` is a W26 dart3d shape
 ///   (upstream throws `Unknown procedural geometry shape`) are held
 ///   verbatim in [d3ExtensionResources] instead;
-/// - `featuresRequired` names dart3d realizes but upstream's
+/// - dart3d `d3:properties` animation channels round-trip as typed clips;
+/// - `featuresRequired` names the paired codec recognizes but upstream's
 ///   `supportedFeatures` doesn't list ([kD3ExtensionFeatures]) no
 ///   longer fail the decode — they're stripped for upstream and
 ///   restored on the document.
@@ -524,7 +629,26 @@ SceneDocument readFsceneWithExtensions(String manifest) {
     json['resources'] = kept;
   }
 
+  final extendedAnimations = <LocalId, Map<String, Object?>>{};
+  final animations = json['animations'];
+  if (animations is Map) {
+    for (final entry in animations.entries) {
+      final value = entry.value;
+      if (value is Map && value.containsKey('d3:properties')) {
+        extendedAnimations[LocalId.parse(entry.key as String)] =
+            Map<String, Object?>.from(value);
+        value.remove('d3:properties');
+      }
+    }
+  }
   final doc = decodeDocument(json);
+  for (final entry in extendedAnimations.entries) {
+    final animation = _decodePropertyChannels(
+      doc.animations[entry.key]!,
+      entry.value,
+    );
+    doc.animations[entry.key] = animation;
+  }
   doc.featuresRequired.addAll(extFeatures);
   if (ext.isNotEmpty) d3ExtensionResources(doc).addAll(ext);
   applyViewExtensions(doc, json);
@@ -541,13 +665,13 @@ const kUpstreamProceduralShapes = {
   'icosphere',
 };
 
-/// `featuresRequired` names dart3d realizes that upstream's decoder
-/// refuses (they're outside its `supportedFeatures`): stripped before
-/// the upstream decode and restored after, so a document that
-/// truthfully requires them still loads.
-final Set<String> kD3ExtensionFeatures = kRealizedFeatures.difference(
-  supportedFeatures,
-);
+/// Extension feature vocabulary accepted by the paired codec. These names
+/// are stripped for upstream decode and restored afterward. Codec acceptance
+/// does not imply native playback support; that uses [kRealizedFeatures].
+final Set<String> kD3ExtensionFeatures = {
+  ...kRealizedFeatures.difference(supportedFeatures),
+  'd3:propertyAnimation',
+};
 
 /// Whether a manifest `resources` entry is a geometry resource with a
 /// dart3d-only procedural shape — one of [kD3ProcShapes] that
@@ -586,15 +710,29 @@ Map<LocalId, Map<String, Object?>> d3ExtensionResources(SceneDocument doc) =>
 
 /// Canonical `.fscene` JSON for [doc] including the dart3d extensions
 /// upstream's `writeFscene` drops: view `viewport`s ([encodeViewSpec])
-/// and [d3ExtensionResources]. For a document with neither, the output
+/// and [d3ExtensionResources], plus property clips. Without extensions, output
 /// is byte-identical to `writeFscene`. Read it back with
 /// [readFsceneWithExtensions] (or `SceneController.loadFscene`).
 String writeFsceneWithExtensions(SceneDocument doc) {
   final ext = _extensionResources[doc];
-  if (doc.views.isEmpty && (ext == null || ext.isEmpty)) {
+  final properties = doc.animations.values.any(
+    (a) => a is Dart3dAnimationSpec && a.propertyChannels.isNotEmpty,
+  );
+  if (doc.views.isEmpty && (ext == null || ext.isEmpty) && !properties) {
     return writeFscene(doc);
   }
   final manifest = encodeDocument(doc);
+  if (properties) {
+    manifest['animations'] = {
+      for (final a in doc.animations.values)
+        'anim:${a.id.toToken()}': encodeAnimationSpec(a, doc),
+    };
+    manifest['featuresRequired'] = [
+      ...doc.featuresRequired,
+      if (!doc.featuresRequired.contains('d3:propertyAnimation'))
+        'd3:propertyAnimation',
+    ]..sort();
+  }
   final idKey = manifestIdKey(doc);
   if (doc.views.isNotEmpty) {
     manifest['views'] = [for (final v in doc.views) encodeViewSpec(v, idKey)];
@@ -659,23 +797,25 @@ bool _animationChanged(
 ) {
   final old = oldDoc?.animations[animation.id];
   if (old == null) return true;
-  if (old.name != animation.name) return true;
-  if (old.channels.length != animation.channels.length) return true;
-  for (var i = 0; i < animation.channels.length; i++) {
-    final oc = old.channels[i];
-    final nc = animation.channels[i];
-    if (oc.target != nc.target ||
-        oc.targetName != nc.targetName ||
-        oc.property != nc.property) {
-      return true;
+  if (canonicalJson(encodeAnimationSpec(old, oldDoc!)) !=
+      canonicalJson(encodeAnimationSpec(animation, newDoc)))
+    return true;
+  if (animation is Dart3dAnimationSpec) {
+    for (final channel in animation.propertyChannels) {
+      for (final id in [channel.timeline, channel.keyframes]) {
+        if (!_bytesEqual(oldDoc.payload(id)?.bytes, newDoc.payload(id)?.bytes))
+          return true;
+      }
     }
+  }
+  for (final nc in animation.channels) {
     if (retargeted.contains(nc.target)) return true;
     if (!_bytesEqual(
-          oldDoc?.payload(oc.timeline)?.bytes,
+          oldDoc.payload(nc.timeline)?.bytes,
           newDoc.payload(nc.timeline)?.bytes,
         ) ||
         !_bytesEqual(
-          oldDoc?.payload(oc.keyframes)?.bytes,
+          oldDoc.payload(nc.keyframes)?.bytes,
           newDoc.payload(nc.keyframes)?.bytes,
         )) {
       return true;

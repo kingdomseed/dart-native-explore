@@ -1,0 +1,16 @@
+00:00 +0: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_showcase_test.dart
+00:00 +0: u4 uses the existing route and a self-contained fixed camera
+00:00 +1: selected property-only clip carries literal f32 curves and exact kinds
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +2: public controls emit exact mutations camera=false bare=false
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +3: public controls emit exact mutations camera=false bare=true
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +4: public controls emit exact mutations camera=true bare=false
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +5: public controls emit exact mutations camera=true bare=true
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +6: camera selector changes only the clip, retaining geometry and payloads
+00:00 +7: bounds fit above reserved footer at rest and narrowest authored FOV
+00:00 +8: All tests passed!

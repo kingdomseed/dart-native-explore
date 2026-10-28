@@ -1,0 +1,5 @@
+ffprobe -v error -show_entries format=duration -of json area-clean-controls.mp4
+ffmpeg -v error -i area-clean-controls.mp4 -fps_mode passthrough -enc_time_base demux -f null -
+ffmpeg -v error -i area-clean-controls.mp4 -vf 'fps=1,scale=180:-1,tile=6x4' -frames:v 1 area-clean-ffmpeg-contact.png
+
+Source clip is retained unchanged. The sequential 1fps contact sheet is a sampling aid, not proof against an unsampled transient. Container duration is not an app performance or frame-latency measurement.

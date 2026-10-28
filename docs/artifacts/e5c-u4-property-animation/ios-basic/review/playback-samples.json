@@ -1,0 +1,409 @@
+{
+  "samples": {
+    "color-controls": [
+      {
+        "seconds": 83.1,
+        "centerRgb": [
+          [
+            228,
+            0,
+            148
+          ],
+          [
+            228,
+            0,
+            148
+          ],
+          [
+            176,
+            176,
+            176
+          ]
+        ],
+        "visibleFaceWidths": [
+          54,
+          54,
+          54
+        ]
+      },
+      {
+        "seconds": 83.4,
+        "centerRgb": [
+          [
+            197,
+            0,
+            187
+          ],
+          [
+            197,
+            0,
+            187
+          ],
+          [
+            192,
+            192,
+            192
+          ]
+        ],
+        "visibleFaceWidths": [
+          54,
+          54,
+          54
+        ]
+      },
+      {
+        "seconds": 83.7,
+        "centerRgb": [
+          [
+            164,
+            0,
+            214
+          ],
+          [
+            164,
+            0,
+            214
+          ],
+          [
+            203,
+            203,
+            203
+          ]
+        ],
+        "visibleFaceWidths": [
+          54,
+          54,
+          54
+        ]
+      },
+      {
+        "seconds": 84.0,
+        "centerRgb": [
+          [
+            126,
+            0,
+            235
+          ],
+          [
+            126,
+            0,
+            235
+          ],
+          [
+            218,
+            218,
+            218
+          ]
+        ],
+        "visibleFaceWidths": [
+          54,
+          54,
+          54
+        ]
+      },
+      {
+        "seconds": 84.3,
+        "centerRgb": [
+          [
+            65,
+            0,
+            254
+          ],
+          [
+            65,
+            0,
+            254
+          ],
+          [
+            233,
+            233,
+            233
+          ]
+        ],
+        "visibleFaceWidths": [
+          54,
+          54,
+          54
+        ]
+      },
+      {
+        "seconds": 84.6,
+        "centerRgb": [
+          [
+            254,
+            0,
+            70
+          ],
+          [
+            254,
+            0,
+            70
+          ],
+          [
+            148,
+            148,
+            148
+          ]
+        ],
+        "visibleFaceWidths": [
+          54,
+          54,
+          54
+        ]
+      },
+      {
+        "seconds": 84.9,
+        "centerRgb": [
+          [
+            242,
+            0,
+            124
+          ],
+          [
+            242,
+            0,
+            124
+          ],
+          [
+            165,
+            165,
+            165
+          ]
+        ],
+        "visibleFaceWidths": [
+          54,
+          54,
+          54
+        ]
+      },
+      {
+        "seconds": 85.2,
+        "centerRgb": [
+          [
+            221,
+            0,
+            165
+          ],
+          [
+            221,
+            0,
+            165
+          ],
+          [
+            181,
+            181,
+            181
+          ]
+        ],
+        "visibleFaceWidths": [
+          54,
+          54,
+          54
+        ]
+      }
+    ],
+    "camera-controls": [
+      {
+        "seconds": 34.1,
+        "centerRgb": [
+          [
+            251,
+            251,
+            251
+          ],
+          [
+            251,
+            251,
+            251
+          ],
+          [
+            94,
+            94,
+            94
+          ]
+        ],
+        "visibleFaceWidths": [
+          67,
+          66,
+          66
+        ]
+      },
+      {
+        "seconds": 34.4,
+        "centerRgb": [
+          [
+            251,
+            251,
+            251
+          ],
+          [
+            251,
+            251,
+            251
+          ],
+          [
+            94,
+            94,
+            94
+          ]
+        ],
+        "visibleFaceWidths": [
+          58,
+          58,
+          57
+        ]
+      },
+      {
+        "seconds": 34.7,
+        "centerRgb": [
+          [
+            251,
+            251,
+            251
+          ],
+          [
+            251,
+            251,
+            251
+          ],
+          [
+            94,
+            94,
+            94
+          ]
+        ],
+        "visibleFaceWidths": [
+          51,
+          50,
+          50
+        ]
+      },
+      {
+        "seconds": 35.0,
+        "centerRgb": [
+          [
+            251,
+            251,
+            251
+          ],
+          [
+            251,
+            251,
+            251
+          ],
+          [
+            94,
+            94,
+            94
+          ]
+        ],
+        "visibleFaceWidths": [
+          45,
+          44,
+          44
+        ]
+      },
+      {
+        "seconds": 35.3,
+        "centerRgb": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "visibleFaceWidths": [
+          40,
+          40,
+          39
+        ]
+      },
+      {
+        "seconds": 35.6,
+        "centerRgb": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "visibleFaceWidths": [
+          35,
+          36,
+          35
+        ]
+      },
+      {
+        "seconds": 35.9,
+        "centerRgb": [
+          [
+            251,
+            251,
+            251
+          ],
+          [
+            251,
+            251,
+            251
+          ],
+          [
+            94,
+            94,
+            94
+          ]
+        ],
+        "visibleFaceWidths": [
+          75,
+          74,
+          73
+        ]
+      },
+      {
+        "seconds": 36.2,
+        "centerRgb": [
+          [
+            251,
+            251,
+            251
+          ],
+          [
+            251,
+            251,
+            251
+          ],
+          [
+            94,
+            94,
+            94
+          ]
+        ],
+        "visibleFaceWidths": [
+          64,
+          64,
+          63
+        ]
+      }
+    ]
+  },
+  "boundary": "Decoded video pixels during recorded Play intervals. Lossy video-space RGB only, no native-unit, clock, latency or FPS inference."
+}

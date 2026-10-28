@@ -1,0 +1,298 @@
+00:00 +0: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_atlas_probe_test.dart
+00:00 +0: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_atlas_probe_test.dart: public route fixes camera and independent unlit billboard inventory
+00:00 +1: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_atlas_probe_test.dart: image is a deterministic padded top-left RGBA grid with asymmetric marks
+00:00 +2: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_material_showcase_test.dart: u4-materials routes to a self-contained fixed showcase
+00:00 +3: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_atlas_probe_test.dart: next emits exact material transforms, wraps and preserves all other state
+00:00 +4: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_atlas_probe_test.dart: next emits exact material transforms, wraps and preserves all other state
+00:00 +5: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_atlas_probe_test.dart: next emits exact material transforms, wraps and preserves all other state
+00:00 +6: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_material_showcase_test.dart: typed property-only clip dispatches exact little-endian curves
+00:00 +7: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_material_showcase_test.dart: typed property-only clip dispatches exact little-endian curves
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +8: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/fsceneb_reader_test.dart: round-trip: manifest + BLOB + GZBL payloads land on the doc
+00:00 +8: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_material_showcase_test.dart: existing controls request only clock mutations and preserve authored scene
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +9: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_material_showcase_test.dart: existing controls request only clock mutations and preserve authored scene
+00:00 +10: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/fsceneb_reader_test.dart: BLOB chunk lands uncompressed bytes
+00:00 +11: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_material_showcase_test.dart: authored bounds project above the reserved footer at 402x874
+00:00 +12: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_material_showcase_test.dart: authored bounds project above the reserved footer at 402x874
+00:00 +13: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/fsceneb_reader_test.dart: rejects bad magic, truncation, and newer versions
+00:00 +14: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/fsceneb_reader_test.dart: real importer artifact: d4 .fsceneb decodes with payloads
+00:00 +15: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u2_catcher_showcase_test.dart: U2 baked shadow-catcher showcase catalogue route builds the baked catcher fixture
+00:00 +16: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/fsceneb_reader_test.dart: real importer artifact: full dice set decodes
+00:00 +17: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/fsceneb_reader_test.dart: real importer artifact: full dice set decodes
+00:00 +18: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/fsceneb_reader_test.dart: real importer artifact: full dice set decodes
+00:00 +19: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/fsceneb_reader_test.dart: real importer artifact: full dice set decodes
+00:00 +20: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u2_catcher_showcase_test.dart: U2 baked shadow-catcher showcase instance-color path carries one white catcher tint with alpha
+00:00 +21: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u2_catcher_showcase_test.dart: U2 baked shadow-catcher showcase public resource command accepts edits and identical refreshes
+00:00 +22: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u2_catcher_showcase_test.dart: U2 baked shadow-catcher showcase ordinary receiver resource can become a baked catcher by upsert
+00:00 +23: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u2_catcher_showcase_test.dart: U2 baked shadow-catcher showcase variant-default keeps the default material as the catcher target
+00:00 +24: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u2_catcher_showcase_test.dart: U2 baked shadow-catcher showcase camera-facing fixture keeps one baked billboard over nonzero bounds
+00:00 +25: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u2_catcher_showcase_test.dart: U2 baked shadow-catcher showcase resource-backed instance geometry upsert stays explicit-refresh
+00:00 +26: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u2_catcher_showcase_test.dart: U2 baked shadow-catcher showcase variant and LOD fixtures expose their catcher material slots
+00:00 +27: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_feel_test.dart: d4 shard reads upright numerals read along the crystal: up across it, right to +X
+00:00 +28: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +29: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +30: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +31: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +32: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +33: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +34: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +35: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +36: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +37: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +38: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +39: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +40: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +41: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +42: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +43: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +44: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +45: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +46: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +47: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: cancelAll stops pending one-shots, nested ones included
+00:00 +48: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_feel_test.dart: aim throw spawns off-screen behind the arrow and flies in: diagonal
+00:00 +49: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: after cancelAll, new timers are inert
+00:00 +50: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: after cancelAll, new timers are inert
+00:00 +51: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: after cancelAll, new timers are inert
+00:00 +52: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_feel_test.dart: sweep: hits within reach, shoves along the finger with a hop
+00:00 +53: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +54: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +55: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +56: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +57: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +58: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +59: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +60: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: periodic timers stop on cancelAll and release on self-cancel
+00:00 +61: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w26_geometry_test.dart: primitive generators extrude follows a bent path with convex caps and arc-length UVs
+00:00 +62: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: owned subscriptions cancel with the generation
+00:00 +63: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: owned subscriptions cancel with the generation
+00:00 +64: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +65: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +66: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +67: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +68: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +69: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +70: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +71: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +72: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +73: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +74: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +75: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +76: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +77: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +78: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +79: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +80: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:00 +81: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:01 +82: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:01 +83: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:01 +84: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:01 +85: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dice_numerals_fit_test.dart: every numeral fits inside its face inlay
+00:01 +86: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/phase_timers_test.dart: bodies the settle lanes retire bodies that do come to rest stay
+00:01 +87: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w26_geometry_test.dart: polyline expansion the dash cursor carries across vertices
+00:01 +88: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w26_geometry_test.dart: polyline expansion line segments emit independent quads
+00:01 +89: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w26_geometry_test.dart: CatmullRomPath interpolates every control point at its natural parameter
+00:01 +90: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w26_geometry_test.dart: CatmullRomPath arc length exceeds the chord for a bent path
+00:01 +91: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w26_geometry_test.dart: CatmullRomPath a straight polyline measures its exact length
+00:01 +92: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w26_geometry_test.dart: CatmullRomPath frames are orthonormal and rotation-minimizing
+00:01 +93: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w26_geometry_test.dart: CatmullRomPath arc-length parameterization spaces samples evenly
+00:01 +94: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w26_geometry_test.dart: d3:instances the component carries shape, transforms and attributes
+00:01 +95: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w26_geometry_test.dart: d3:instances exactly one of geometry/proc is required
+00:01 +96: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w26_geometry_test.dart: d3:instances billboard mode carries size and rotation
+00:01 +97: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w26_geometry_test.dart: d3:instances payload encoders pack column-major f32
+00:01 +98: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w26_geometry_test.dart: d3:instances bounds union the geometry AABB over every transform
+00:01 +99: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w26_geometry_test.dart: component wire flow d3:procMesh encodes through the manifest node codec
+00:01 +100: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/doc_layer_test.dart: serializeScene snapshot serializes byte-identically to the live document
+00:01 +101: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/doc_layer_test.dart: serializeScene snapshot serializes byte-identically to the live document
+00:01 +102: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/doc_layer_test.dart: serializeScene snapshot serializes byte-identically to the live document
+00:01 +103: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/doc_layer_test.dart: serializeScene snapshot serializes byte-identically to the live document
+00:01 +104: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/doc_layer_test.dart: serializeScene snapshot serializes byte-identically to the live document
+00:01 +105: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/doc_layer_test.dart: serializeScene snapshot serializes byte-identically to the live document
+00:01 +106: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/doc_layer_test.dart: serializeScene snapshot serializes byte-identically to the live document
+00:01 +107: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/doc_layer_test.dart: serializeScene snapshot serializes byte-identically to the live document
+00:01 +108: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w26_geometry_test.dart: bounds buildGeometryDocument scales to 10k-instance field
+00:01 +109: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/doc_layer_test.dart: serializeScene snapshot keeps chunk bytes so it can re-realize
+00:01 +110: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/doc_layer_test.dart: serializeScene snapshot is detached from later live edits
+00:01 +111: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: public route keeps the ordinary probe separate and shares one image
+00:01 +112: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: public route keeps the ordinary probe separate and shares one image
+00:01 +113: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: public route keeps the ordinary probe separate and shares one image
+00:01 +114: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: public route keeps the ordinary probe separate and shares one image
+00:01 +115: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: public route keeps the ordinary probe separate and shares one image
+00:01 +116: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: public route keeps the ordinary probe separate and shares one image
+00:01 +117: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: public route keeps the ordinary probe separate and shares one image
+00:01 +118: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_tone_showcase_test.dart: u3-tone route uses the boot operator and a fixed camera
+00:01 +119: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_tone_showcase_test.dart: u3-tone route uses the boot operator and a fixed camera
+00:01 +120: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_tone_showcase_test.dart: u3-tone route uses the boot operator and a fixed camera
+00:01 +121: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_tone_showcase_test.dart: u3-tone route uses the boot operator and a fixed camera
+00:01 +122: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_tone_showcase_test.dart: u3-tone route uses the boot operator and a fixed camera
+00:01 +123: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_tone_showcase_test.dart: u3-tone route uses the boot operator and a fixed camera
+00:01 +124: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_tone_showcase_test.dart: u3-tone route uses the boot operator and a fixed camera
+00:01 +125: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_tone_showcase_test.dart: u3-tone route uses the boot operator and a fixed camera
+00:01 +126: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: NextFrame emits real upserts, wraps, preserves the fixed reference and reloads
+00:01 +127: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: NextFrame emits real upserts, wraps, preserves the fixed reference and reloads
+00:01 +128: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: NextFrame emits real upserts, wraps, preserves the fixed reference and reloads
+00:01 +129: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: NextFrame emits real upserts, wraps, preserves the fixed reference and reloads
+00:01 +130: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: NextFrame emits real upserts, wraps, preserves the fixed reference and reloads
+00:01 +131: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: NextFrame emits real upserts, wraps, preserves the fixed reference and reloads
+00:01 +132: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: NextFrame emits real upserts, wraps, preserves the fixed reference and reloads
+00:01 +133: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: NextFrame emits real upserts, wraps, preserves the fixed reference and reloads
+00:01 +134: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: NextFrame emits real upserts, wraps, preserves the fixed reference and reloads
+00:01 +135: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: NextFrame emits real upserts, wraps, preserves the fixed reference and reloads
+00:01 +136: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: NextFrame emits real upserts, wraps, preserves the fixed reference and reloads
+00:01 +137: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: NextFrame emits real upserts, wraps, preserves the fixed reference and reloads
+00:01 +138: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: NextFrame emits real upserts, wraps, preserves the fixed reference and reloads
+00:01 +139: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: NextFrame emits real upserts, wraps, preserves the fixed reference and reloads
+00:01 +140: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_tone_showcase_test.dart: public controller emits environment upserts and mirrors each selection
+00:01 +141: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_tone_showcase_test.dart: public controller emits environment upserts and mirrors each selection
+00:01 +142: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_tone_showcase_test.dart: public controller emits environment upserts and mirrors each selection
+00:01 +143: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_tone_showcase_test.dart: public controller emits environment upserts and mirrors each selection
+00:01 +144: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_tone_showcase_test.dart: public controller emits environment upserts and mirrors each selection
+00:01 +145: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_tone_showcase_test.dart: public controller emits environment upserts and mirrors each selection
+00:01 +146: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_tone_showcase_test.dart: public controller emits environment upserts and mirrors each selection
+00:01 +147: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_tone_showcase_test.dart: public controller emits environment upserts and mirrors each selection
+00:01 +148: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_tone_showcase_test.dart: public controller emits environment upserts and mirrors each selection
+00:01 +149: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: explicit depth control crosses the translucent pair without changing frames or camera
+00:01 +150: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_tone_showcase_test.dart: serialized emission retains HDR gray steps and saturated patches
+00:01 +151: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +152: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +153: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +154: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +155: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +156: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +157: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +158: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +159: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +160: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +161: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +162: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +163: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +164: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +165: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +166: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +167: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +168: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +169: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +170: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +171: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +172: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +173: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +174: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +175: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +176: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +177: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +178: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +179: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:01 +180: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +181: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +182: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +183: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +184: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +185: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +186: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +187: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +188: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +189: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +190: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +191: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +192: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +193: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +194: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +195: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +196: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +196: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_showcase_test.dart: selected property-only clip carries literal f32 curves and exact kinds
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:02 +197: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +198: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +199: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +200: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +200: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_showcase_test.dart: public controls emit exact mutations camera=false bare=false
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:02 +201: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +202: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +203: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +204: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +205: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +206: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +207: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +207: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_showcase_test.dart: public controls emit exact mutations camera=false bare=true
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:02 +208: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +208: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_showcase_test.dart: public controls emit exact mutations camera=true bare=false
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:02 +209: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +209: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_showcase_test.dart: public controls emit exact mutations camera=true bare=true
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:02 +210: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +211: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +212: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +213: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +214: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +215: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +216: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +217: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +218: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +219: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +220: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +221: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +222: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +223: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +224: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +225: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +226: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +227: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +228: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +229: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +230: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:02 +231: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +232: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +233: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +234: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +235: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +236: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +237: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +238: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +239: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +240: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +241: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +242: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +243: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +244: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +245: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +246: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +247: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +248: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +249: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +250: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +251: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +252: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +253: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +254: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +255: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +256: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +257: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +258: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +259: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +260: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +261: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +262: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +263: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +264: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +265: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:03 +266: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:04 +267: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:04 +268: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:04 +269: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:04 +270: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:04 +271: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:04 +272: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/material_extensions_test.dart: catalog conformance volume props without transmission classify as the inert drop
+00:04 +273: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/material_extensions_test.dart: catalog conformance volume props without transmission classify as the inert drop
+00:04 +274: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/material_extensions_test.dart: catalog conformance volume props without transmission classify as the inert drop
+00:04 +275: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/material_extensions_test.dart: catalog conformance the support table covers every catalog property name
+00:04 +276: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/material_extensions_test.dart: android sampler budget (W22-r3) flag space: emitted declarations never exceed the FL1 cap
+00:04 +277: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/material_extensions_test.dart: android sampler budget (W22-r3) the on-device crash variants now fit their bound sets
+00:04 +278: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/material_extensions_test.dart: android sampler budget (W22-r3) every catalog material fits the cap under bound-only emission
+00:05 +279: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/material_extensions_test.dart: android sampler budget (W22-r3) a bound set over the cap takes the degrade path
+00:05 +280: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/material_extensions_test.dart: golden manifest classifies the upstream smoke scenes and generates fixtures
+00:05 +281: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/material_extensions_test.dart: golden manifest writes the matrix and golden artifacts
+00:05 +282: All tests passed!

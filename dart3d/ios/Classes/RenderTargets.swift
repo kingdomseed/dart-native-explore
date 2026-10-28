@@ -10,7 +10,7 @@ import SceneKit
 /// top-level `views` array declares per-camera draws — `target` absent
 /// means the screen, `target:'rt:<tok>'` draws into that rt via an
 /// `SCNRenderer` sharing the SAME scene object, scheduled from
-/// `renderer(_:willRenderScene:atTime:)` so the pass sees the same
+/// `renderer(_:didApplyConstraintsAtTime:)` so the pass sees the same
 /// post-physics pose as the screen frame.
 ///
 /// Screen views (W24): a single target-absent view with no `viewport`
@@ -24,7 +24,7 @@ import SceneKit
 /// A sibling is `isPlaying:false` + `rendersContinuously:false` — it
 /// shares the scene object but advances no scene time of its own (no
 /// second physics step); the host's delegate syncs each sibling's
-/// point of view in `willRenderScene` and pokes `setNeedsDisplay` in
+/// point of view in `didApplyConstraintsAtTime` and pokes `setNeedsDisplay` in
 /// `didRenderScene`, so sibling draws follow the host's frame.
 ///
 /// Update policies: `everyFrame` draws every vsync, `interval` draws
@@ -255,7 +255,7 @@ extension SceneViewHost {
         device ?? MTLCreateSystemDefaultDevice()
     }
 
-    /// The scheduler — runs from `renderer(_:willRenderScene:atTime:)`
+    /// The scheduler — runs from `renderer(_:didApplyConstraintsAtTime:)`
     /// (post-physics, pre-drawable) so offscreen passes draw the same
     /// pose as the screen frame. Command buffers commit on the view's
     /// own queue ahead of the view's pass — no waitUntilCompleted; the
@@ -611,7 +611,7 @@ extension SceneViewHost {
     }
 
     /// Per-frame sibling point-of-view capture — runs in
-    /// `willRenderScene` (post-physics, same hook the offscreen
+    /// `didApplyConstraintsAtTime` (same hook the offscreen
     /// scheduler uses). Index 0's pov is the real node — its mask
     /// write lands on the real camera here, inside the host scene's
     /// own callback (the same write `applyScreenViewCamera` does).

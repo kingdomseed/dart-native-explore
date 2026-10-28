@@ -1,0 +1,18 @@
+Full sequential decode (run separately for clean and observed):
+ffmpeg -v error -i snapshot-sequence-clean.mp4 -fps_mode passthrough -enc_time_base demux -f null -
+ffmpeg -v error -i snapshot-sequence-observed.mp4 -fps_mode passthrough -enc_time_base demux -f null -
+
+The observed null-mux check exits0 but emits non-monotonic DTS warnings. A separate rawvideo-output attempt also exits0 with mux timestamp warnings. Preserve both; neither is a clean decode/timing receipt. The clean clip remains the motion proof.
+ffmpeg -v error -i snapshot-sequence-observed.mp4 -fps_mode passthrough -c:v rawvideo -f rawvideo - > /dev/null
+
+Source video dimensions/codec/duration:
+ffprobe -v error -select_streams v:0 -show_entries stream=width,height,codec_name,r_frame_rate -show_entries format=duration -of json snapshot-sequence-clean.mp4
+
+Diagnostic complete frames: output seeking after input means decoding starts at the beginning.
+ffmpeg -v error -i snapshot-sequence-clean.mp4 -ss 0.638 -frames:v 1 clean-video-ffmpeg-0.638.png
+ffmpeg -v error -i snapshot-sequence-clean.mp4 -ss 13.410 -frames:v 1 clean-video-ffmpeg-13.410.png
+
+Sequential clean contact sheet, one sample per second in row order,30 cells:
+ffmpeg -v error -i snapshot-sequence-clean.mp4 -vf 'fps=1,scale=180:-1,tile=6x5' -frames:v 1 snapshot-sequence-clean-ffmpeg-contact.png
+
+Original record contact-sheet output remains separate and excluded from motion proof because it contains incomplete regions absent from the independent decoded frames. No exact internal cause is claimed.

@@ -1,0 +1,95 @@
+
+Welcome to Gradle 9.3.1!
+
+Here are the highlights of this release:
+ - Test reporting improvements
+ - Error and warning improvements
+ - Build authoring improvements
+
+For more details see https://docs.gradle.org/9.3.1/release-notes.html
+
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.3.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :gradle:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle:pluginDescriptors
+> Task :gradle:processResources
+
+> Task :gradle:compileKotlin
+w: file:///Users/jasonholt/zero/packages/flutter_tools/gradle/src/main/kotlin/Deeplink.kt:13:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+- To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+- To keep applying to the value parameter only, use the '@param:' annotation target.
+
+See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+w: file:///Users/jasonholt/zero/packages/flutter_tools/gradle/src/main/kotlin/Deeplink.kt:15:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+- To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+- To keep applying to the value parameter only, use the '@param:' annotation target.
+
+See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+w: file:///Users/jasonholt/zero/packages/flutter_tools/gradle/src/main/kotlin/Deeplink.kt:17:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+- To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+- To keep applying to the value parameter only, use the '@param:' annotation target.
+
+See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+w: file:///Users/jasonholt/zero/packages/flutter_tools/gradle/src/main/kotlin/Deeplink.kt:19:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to property.
+- To opt in to applying to both value parameter and property, add '-Xannotation-default-target=param-property' to your compiler arguments.
+- To keep applying to the value parameter only, use the '@param:' annotation target.
+
+See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+w: file:///Users/jasonholt/zero/packages/flutter_tools/gradle/src/main/kotlin/FlutterPlugin.kt:11:8 'interface ApkVariant : Any, BaseVariant, InstallableVariant, AndroidArtifactVariant, InternalBaseVariant' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/zero/packages/flutter_tools/gradle/src/main/kotlin/FlutterPlugin.kt:628:69 'interface ApkVariant : Any, BaseVariant, InstallableVariant, AndroidArtifactVariant, InternalBaseVariant' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/zero/packages/flutter_tools/gradle/src/main/kotlin/plugins/PluginHandler.kt:194:64 Unchecked cast of 'NamedDomainObjectContainer<out BuildType>' to 'NamedDomainObjectContainer<BuildType>'.
+w: file:///Users/jasonholt/zero/packages/flutter_tools/gradle/src/main/kotlin/plugins/PluginHandler.kt:195:69 Unchecked cast of 'NamedDomainObjectContainer<out BuildType>' to 'NamedDomainObjectContainer<BuildType>'.
+
+> Task :gradle:compileJava NO-SOURCE
+> Task :gradle:compileGroovy NO-SOURCE
+> Task :gradle:classes
+> Task :gradle:jar
+
+> Configure project :app
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/android/app/build.gradle.kts:19:5: 'fun BaseAppModuleExtension.kotlinOptions(configure: Action<DeprecatedKotlinJvmOptions>): Unit' is deprecated. Please migrate to the compilerOptions DSL. More details are here: https://kotl.in/u1r8ln.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/android/app/build.gradle.kts:20:9: 'var jvmTarget: String' is deprecated. Please migrate to the compilerOptions DSL. More details are here: https://kotl.in/u1r8ln.
+Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+
+> Task :dart3d:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :dart3d:preBuild UP-TO-DATE
+> Task :dart3d:preReleaseBuild UP-TO-DATE
+> Task :dart3d:generateReleaseBuildConfig
+> Task :dart3d:generateReleaseResValues
+> Task :dart3d:generateReleaseResources
+> Task :dart3d:packageReleaseResources
+> Task :dart3d:javaPreCompileRelease
+> Task :dart3d:preReleaseUnitTestBuild UP-TO-DATE
+> Task :dart3d:javaPreCompileReleaseUnitTest
+> Task :dart3d:parseReleaseLocalResources
+> Task :dart3d:generateReleaseRFile
+> Task :dart3d:generateReleaseUnitTestStubRFile
+
+> Task :dart3d:compileReleaseKotlin
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/Dart3dView.kt:2074:17 'field filterWidth: Float' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/EnvironmentFactory.kt:1023:45 'constructor(p0: Buffer, p1: Texture.Format, p2: Texture.Type): Texture.PixelBufferDescriptor' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/EnvironmentFactory.kt:1030:45 'constructor(p0: Buffer, p1: Texture.Format, p2: Texture.Type): Texture.PixelBufferDescriptor' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/EnvironmentFactory.kt:1231:25 'constructor(p0: Buffer, p1: Texture.Format, p2: Texture.Type): Texture.PixelBufferDescriptor' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/FsceneRealizer.kt:6144:17 Condition is always 'true'.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/TextureFactory.kt:274:41 'constructor(p0: Buffer, p1: Texture.Format, p2: Texture.Type): Texture.PixelBufferDescriptor' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/TextureFactory.kt:300:41 'constructor(p0: Buffer, p1: Texture.Format, p2: Texture.Type): Texture.PixelBufferDescriptor' is deprecated. Deprecated in Java.
+
+> Task :dart3d:compileReleaseJavaWithJavac
+> Task :dart3d:bundleLibRuntimeToJarRelease
+> Task :dart3d:bundleLibCompileToJarRelease
+> Task :dart3d:processReleaseJavaRes
+> Task :dart3d:compileReleaseUnitTestKotlin
+> Task :dart3d:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :dart3d:processReleaseUnitTestJavaRes
+> Task :dart3d:testReleaseUnitTest
+
+[Incubating] Problems report is available at: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.3.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 51s
+21 actionable tasks: 21 executed
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.3.1/userguide/configuration_cache_enabling.html

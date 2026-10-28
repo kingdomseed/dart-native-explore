@@ -1,0 +1,1458 @@
+{
+  "comparison" : "Subtract same-alpha withoutSheen from each candidate; compare delta at .5 to half its alpha1 delta. No expected renderer formula is supplied by the probe.",
+  "depthStencil" : "depth32Float_stencil8, private",
+  "fixture" : "u4.materials.pbr",
+  "id" : "B4FDDF56-E9CA-41E4-8F69-7E1472D9C996",
+  "interpretation" : "Raw GPU floats. Parent must assess equations; no runtime\/parity PASS assigned.",
+  "nativeFactor" : [
+    0,
+    0,
+    0,
+    0
+  ],
+  "observedEmptyBaselineRGBA" : [
+    0.5,
+    0.5,
+    0.5,
+    1
+  ],
+  "productionFragmentModifier" : "#pragma transparent\n\nfloat3 tint = float3(1.000000, 1.000000, 1.000000);\nfloat rough = 1.000000;\nfloat rim = pow(1.0 - saturate(dot(normalize(_surface.normal), normalize(_surface.view))), 1.0 + (1.0 - saturate(rough)) * 3.0);\n_output.color.rgb += tint * rim;",
+  "productionSurfaceModifier" : "#pragma arguments\nfloat4 d3BaseColorFactor;\n#pragma body\n_surface.diffuse *= d3BaseColorFactor;\n",
+  "readback" : "Metal texture blit to shared buffer, 512 bytes per row",
+  "results" : [
+    {
+      "case" : "clear_only",
+      "centerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ],
+      "commandStatus" : 4,
+      "gpuError" : null,
+      "outerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ]
+    },
+    {
+      "case" : "empty_scene_load",
+      "centerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ],
+      "commandStatus" : 4,
+      "gpuError" : null,
+      "outerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ]
+    },
+    {
+      "case" : "alpha0.0_current",
+      "centerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ],
+      "commandStatus" : 4,
+      "copyAlpha" : 0,
+      "fragmentModifier" : "#pragma transparent\n\nfloat3 tint = float3(1.000000, 1.000000, 1.000000);\nfloat rough = 1.000000;\nfloat rim = pow(1.0 - saturate(dot(normalize(_surface.normal), normalize(_surface.view))), 1.0 + (1.0 - saturate(rough)) * 3.0);\n_output.color.rgb += tint * rim;",
+      "gpuError" : null,
+      "material" : {
+        "blendModeRaw" : 0,
+        "colorWriteMaskRaw" : 15,
+        "diffuseContents" : "Optional(UIExtendedGrayColorSpace 1 1)",
+        "diffuseIntensity" : 1,
+        "doubleSided" : false,
+        "lightingModel" : "SCNLightingModelPhysicallyBased",
+        "readsDepth" : true,
+        "transparency" : 1,
+        "transparencyModeRaw" : 0,
+        "writesDepth" : false
+      },
+      "outerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ]
+    },
+    {
+      "case" : "alpha0.0_weighted",
+      "centerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ],
+      "commandStatus" : 4,
+      "copyAlpha" : 0,
+      "fragmentModifier" : "#pragma transparent\n\nfloat3 tint = float3(1.000000, 1.000000, 1.000000);\nfloat rough = 1.000000;\nfloat rim = pow(1.0 - saturate(dot(normalize(_surface.normal), normalize(_surface.view))), 1.0 + (1.0 - saturate(rough)) * 3.0);\n\n_output.color.rgb += tint * rim * _output.color.a;",
+      "gpuError" : null,
+      "material" : {
+        "blendModeRaw" : 0,
+        "colorWriteMaskRaw" : 15,
+        "diffuseContents" : "Optional(UIExtendedGrayColorSpace 1 1)",
+        "diffuseIntensity" : 1,
+        "doubleSided" : false,
+        "lightingModel" : "SCNLightingModelPhysicallyBased",
+        "readsDepth" : true,
+        "transparency" : 1,
+        "transparencyModeRaw" : 0,
+        "writesDepth" : false
+      },
+      "outerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ]
+    },
+    {
+      "case" : "alpha0.0_withoutSheen",
+      "centerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ],
+      "commandStatus" : 4,
+      "copyAlpha" : 0,
+      "fragmentModifier" : "#pragma transparent\n\nfloat3 tint = float3(1.000000, 1.000000, 1.000000);\nfloat rough = 1.000000;\nfloat rim = pow(1.0 - saturate(dot(normalize(_surface.normal), normalize(_surface.view))), 1.0 + (1.0 - saturate(rough)) * 3.0);\n",
+      "gpuError" : null,
+      "material" : {
+        "blendModeRaw" : 0,
+        "colorWriteMaskRaw" : 15,
+        "diffuseContents" : "Optional(UIExtendedGrayColorSpace 1 1)",
+        "diffuseIntensity" : 1,
+        "doubleSided" : false,
+        "lightingModel" : "SCNLightingModelPhysicallyBased",
+        "readsDepth" : true,
+        "transparency" : 1,
+        "transparencyModeRaw" : 0,
+        "writesDepth" : false
+      },
+      "outerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ]
+    },
+    {
+      "case" : "alpha0.5_current",
+      "centerPatchRGBA" : [
+        [
+          0.7431640625,
+          0.7431640625,
+          0.7431640625,
+          1
+        ],
+        [
+          0.75634765625,
+          0.75634765625,
+          0.75634765625,
+          1
+        ],
+        [
+          0.76953125,
+          0.76953125,
+          0.76953125,
+          1
+        ],
+        [
+          0.7431640625,
+          0.7431640625,
+          0.7431640625,
+          1
+        ],
+        [
+          0.75634765625,
+          0.75634765625,
+          0.75634765625,
+          1
+        ],
+        [
+          0.76953125,
+          0.76953125,
+          0.76953125,
+          1
+        ],
+        [
+          0.7431640625,
+          0.7431640625,
+          0.7431640625,
+          1
+        ],
+        [
+          0.75634765625,
+          0.75634765625,
+          0.75634765625,
+          1
+        ],
+        [
+          0.76953125,
+          0.76953125,
+          0.76953125,
+          1
+        ]
+      ],
+      "commandStatus" : 4,
+      "copyAlpha" : 0.5,
+      "fragmentModifier" : "#pragma transparent\n\nfloat3 tint = float3(1.000000, 1.000000, 1.000000);\nfloat rough = 1.000000;\nfloat rim = pow(1.0 - saturate(dot(normalize(_surface.normal), normalize(_surface.view))), 1.0 + (1.0 - saturate(rough)) * 3.0);\n_output.color.rgb += tint * rim;",
+      "gpuError" : null,
+      "material" : {
+        "blendModeRaw" : 0,
+        "colorWriteMaskRaw" : 15,
+        "diffuseContents" : "Optional(UIExtendedGrayColorSpace 1 1)",
+        "diffuseIntensity" : 1,
+        "doubleSided" : false,
+        "lightingModel" : "SCNLightingModelPhysicallyBased",
+        "readsDepth" : true,
+        "transparency" : 1,
+        "transparencyModeRaw" : 0,
+        "writesDepth" : false
+      },
+      "outerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ]
+    },
+    {
+      "case" : "alpha0.5_weighted",
+      "centerPatchRGBA" : [
+        [
+          0.49658203125,
+          0.49658203125,
+          0.49658203125,
+          1
+        ],
+        [
+          0.5029296875,
+          0.5029296875,
+          0.5029296875,
+          1
+        ],
+        [
+          0.509765625,
+          0.509765625,
+          0.509765625,
+          1
+        ],
+        [
+          0.49658203125,
+          0.49658203125,
+          0.49658203125,
+          1
+        ],
+        [
+          0.5029296875,
+          0.5029296875,
+          0.5029296875,
+          1
+        ],
+        [
+          0.509765625,
+          0.509765625,
+          0.509765625,
+          1
+        ],
+        [
+          0.49658203125,
+          0.49658203125,
+          0.49658203125,
+          1
+        ],
+        [
+          0.5029296875,
+          0.5029296875,
+          0.5029296875,
+          1
+        ],
+        [
+          0.509765625,
+          0.509765625,
+          0.509765625,
+          1
+        ]
+      ],
+      "commandStatus" : 4,
+      "copyAlpha" : 0.5,
+      "fragmentModifier" : "#pragma transparent\n\nfloat3 tint = float3(1.000000, 1.000000, 1.000000);\nfloat rough = 1.000000;\nfloat rim = pow(1.0 - saturate(dot(normalize(_surface.normal), normalize(_surface.view))), 1.0 + (1.0 - saturate(rough)) * 3.0);\n\n_output.color.rgb += tint * rim * _output.color.a;",
+      "gpuError" : null,
+      "material" : {
+        "blendModeRaw" : 0,
+        "colorWriteMaskRaw" : 15,
+        "diffuseContents" : "Optional(UIExtendedGrayColorSpace 1 1)",
+        "diffuseIntensity" : 1,
+        "doubleSided" : false,
+        "lightingModel" : "SCNLightingModelPhysicallyBased",
+        "readsDepth" : true,
+        "transparency" : 1,
+        "transparencyModeRaw" : 0,
+        "writesDepth" : false
+      },
+      "outerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ]
+    },
+    {
+      "case" : "alpha0.5_withoutSheen",
+      "centerPatchRGBA" : [
+        [
+          0.25,
+          0.25,
+          0.25,
+          1
+        ],
+        [
+          0.25,
+          0.25,
+          0.25,
+          1
+        ],
+        [
+          0.25,
+          0.25,
+          0.25,
+          1
+        ],
+        [
+          0.25,
+          0.25,
+          0.25,
+          1
+        ],
+        [
+          0.25,
+          0.25,
+          0.25,
+          1
+        ],
+        [
+          0.25,
+          0.25,
+          0.25,
+          1
+        ],
+        [
+          0.25,
+          0.25,
+          0.25,
+          1
+        ],
+        [
+          0.25,
+          0.25,
+          0.25,
+          1
+        ],
+        [
+          0.25,
+          0.25,
+          0.25,
+          1
+        ]
+      ],
+      "commandStatus" : 4,
+      "copyAlpha" : 0.5,
+      "fragmentModifier" : "#pragma transparent\n\nfloat3 tint = float3(1.000000, 1.000000, 1.000000);\nfloat rough = 1.000000;\nfloat rim = pow(1.0 - saturate(dot(normalize(_surface.normal), normalize(_surface.view))), 1.0 + (1.0 - saturate(rough)) * 3.0);\n",
+      "gpuError" : null,
+      "material" : {
+        "blendModeRaw" : 0,
+        "colorWriteMaskRaw" : 15,
+        "diffuseContents" : "Optional(UIExtendedGrayColorSpace 1 1)",
+        "diffuseIntensity" : 1,
+        "doubleSided" : false,
+        "lightingModel" : "SCNLightingModelPhysicallyBased",
+        "readsDepth" : true,
+        "transparency" : 1,
+        "transparencyModeRaw" : 0,
+        "writesDepth" : false
+      },
+      "outerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ]
+    },
+    {
+      "case" : "alpha1.0_current",
+      "centerPatchRGBA" : [
+        [
+          0.4931640625,
+          0.4931640625,
+          0.4931640625,
+          1
+        ],
+        [
+          0.50634765625,
+          0.50634765625,
+          0.50634765625,
+          1
+        ],
+        [
+          0.51953125,
+          0.51953125,
+          0.51953125,
+          1
+        ],
+        [
+          0.4931640625,
+          0.4931640625,
+          0.4931640625,
+          1
+        ],
+        [
+          0.50634765625,
+          0.50634765625,
+          0.50634765625,
+          1
+        ],
+        [
+          0.51953125,
+          0.51953125,
+          0.51953125,
+          1
+        ],
+        [
+          0.4931640625,
+          0.4931640625,
+          0.4931640625,
+          1
+        ],
+        [
+          0.50634765625,
+          0.50634765625,
+          0.50634765625,
+          1
+        ],
+        [
+          0.51953125,
+          0.51953125,
+          0.51953125,
+          1
+        ]
+      ],
+      "commandStatus" : 4,
+      "copyAlpha" : 1,
+      "fragmentModifier" : "#pragma transparent\n\nfloat3 tint = float3(1.000000, 1.000000, 1.000000);\nfloat rough = 1.000000;\nfloat rim = pow(1.0 - saturate(dot(normalize(_surface.normal), normalize(_surface.view))), 1.0 + (1.0 - saturate(rough)) * 3.0);\n_output.color.rgb += tint * rim;",
+      "gpuError" : null,
+      "material" : {
+        "blendModeRaw" : 0,
+        "colorWriteMaskRaw" : 15,
+        "diffuseContents" : "Optional(UIExtendedGrayColorSpace 1 1)",
+        "diffuseIntensity" : 1,
+        "doubleSided" : false,
+        "lightingModel" : "SCNLightingModelPhysicallyBased",
+        "readsDepth" : true,
+        "transparency" : 1,
+        "transparencyModeRaw" : 0,
+        "writesDepth" : false
+      },
+      "outerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ]
+    },
+    {
+      "case" : "alpha1.0_weighted",
+      "centerPatchRGBA" : [
+        [
+          0.4931640625,
+          0.4931640625,
+          0.4931640625,
+          1
+        ],
+        [
+          0.50634765625,
+          0.50634765625,
+          0.50634765625,
+          1
+        ],
+        [
+          0.51953125,
+          0.51953125,
+          0.51953125,
+          1
+        ],
+        [
+          0.4931640625,
+          0.4931640625,
+          0.4931640625,
+          1
+        ],
+        [
+          0.50634765625,
+          0.50634765625,
+          0.50634765625,
+          1
+        ],
+        [
+          0.51953125,
+          0.51953125,
+          0.51953125,
+          1
+        ],
+        [
+          0.4931640625,
+          0.4931640625,
+          0.4931640625,
+          1
+        ],
+        [
+          0.50634765625,
+          0.50634765625,
+          0.50634765625,
+          1
+        ],
+        [
+          0.51953125,
+          0.51953125,
+          0.51953125,
+          1
+        ]
+      ],
+      "commandStatus" : 4,
+      "copyAlpha" : 1,
+      "fragmentModifier" : "#pragma transparent\n\nfloat3 tint = float3(1.000000, 1.000000, 1.000000);\nfloat rough = 1.000000;\nfloat rim = pow(1.0 - saturate(dot(normalize(_surface.normal), normalize(_surface.view))), 1.0 + (1.0 - saturate(rough)) * 3.0);\n\n_output.color.rgb += tint * rim * _output.color.a;",
+      "gpuError" : null,
+      "material" : {
+        "blendModeRaw" : 0,
+        "colorWriteMaskRaw" : 15,
+        "diffuseContents" : "Optional(UIExtendedGrayColorSpace 1 1)",
+        "diffuseIntensity" : 1,
+        "doubleSided" : false,
+        "lightingModel" : "SCNLightingModelPhysicallyBased",
+        "readsDepth" : true,
+        "transparency" : 1,
+        "transparencyModeRaw" : 0,
+        "writesDepth" : false
+      },
+      "outerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ]
+    },
+    {
+      "case" : "alpha1.0_withoutSheen",
+      "centerPatchRGBA" : [
+        [
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          1
+        ]
+      ],
+      "commandStatus" : 4,
+      "copyAlpha" : 1,
+      "fragmentModifier" : "#pragma transparent\n\nfloat3 tint = float3(1.000000, 1.000000, 1.000000);\nfloat rough = 1.000000;\nfloat rim = pow(1.0 - saturate(dot(normalize(_surface.normal), normalize(_surface.view))), 1.0 + (1.0 - saturate(rough)) * 3.0);\n",
+      "gpuError" : null,
+      "material" : {
+        "blendModeRaw" : 0,
+        "colorWriteMaskRaw" : 15,
+        "diffuseContents" : "Optional(UIExtendedGrayColorSpace 1 1)",
+        "diffuseIntensity" : 1,
+        "doubleSided" : false,
+        "lightingModel" : "SCNLightingModelPhysicallyBased",
+        "readsDepth" : true,
+        "transparency" : 1,
+        "transparencyModeRaw" : 0,
+        "writesDepth" : false
+      },
+      "outerPatchRGBA" : [
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ]
+      ]
+    }
+  ],
+  "seedRGBA" : [
+    0.5,
+    0.5,
+    0.5,
+    1
+  ],
+  "sourceMaterial" : {
+    "blendModeRaw" : 0,
+    "colorWriteMaskRaw" : 15,
+    "diffuseContents" : "Optional(<MTLSimTexture: 0x102f75380>\n    label = <none> \n    textureType = MTLTextureType2D \n    pixelFormat = MTLPixelFormatRGBA8Unorm_sRGB \n    decompressedPixelFormat = MTLPixelFormatRGBA8Unorm_sRGB \n    width = 2 \n    height = 2 \n    depth = 1 \n    arrayLength = 1 \n    mipmapLevelCount = 2 \n    sampleCount = 1 \n    cpuCacheMode = MTLCPUCacheModeDefaultCache \n    storageMode = MTLStorageModeShared \n    hazardTrackingMode = MTLHazardTrackingModeTracked \n    resourceOptions = MTLResourceCPUCacheModeDefaultCache MTLResourceStorageModeShared MTLResourceHazardTrackingModeTracked  \n    usage = MTLTextureUsageShaderRead MTLTextureUsagePixelFormatView \n    shareable = 0 \n    framebufferOnly = 0 \n    swizzle = [MTLTextureSwizzleRed, MTLTextureSwizzleGreen, MTLTextureSwizzleBlue, MTLTextureSwizzleAlpha] \n    parentTexture = <MTLSimTexture: 0x102f75200>\n        label = <none> \n        textureType = MTLTextureType2D \n        pixelFormat = MTLPixelFormatRGBA8Unorm \n        decompressedPixelFormat = MTLPixelFormatRGBA8Unorm \n        width = 2 \n        height = 2 \n        depth = 1 \n        arrayLength = 1 \n        mipmapLevelCount = 2 \n        sampleCount = 1 \n        cpuCacheMode = MTLCPUCacheModeDefaultCache \n        storageMode = MTLStorageModeShared \n        hazardTrackingMode = MTLHazardTrackingModeTracked \n        resourceOptions = MTLResourceCPUCacheModeDefaultCache MTLResourceStorageModeShared MTLResourceHazardTrackingModeTracked  \n        usage = MTLTextureUsageShaderRead MTLTextureUsagePixelFormatView \n        shareable = 0 \n        framebufferOnly = 0 \n        swizzle = [MTLTextureSwizzleRed, MTLTextureSwizzleGreen, MTLTextureSwizzleBlue, MTLTextureSwizzleAlpha] \n        parentTexture = <null> \n        parentRelativeLevel = 0 \n        parentRelativeSlice = 0 \n        buffer = <null> \n        bufferOffset = 0 \n        bufferBytesPerRow = 0 \n        allowGPUOptimizedContents = YES \n    parentRelativeLevel = 0 \n    parentRelativeSlice = 0 \n    buffer = <null> \n    bufferOffset = 0 \n    bufferBytesPerRow = 0 \n    allowGPUOptimizedContents = YES)",
+    "diffuseIntensity" : 1,
+    "doubleSided" : false,
+    "lightingModel" : "SCNLightingModelPhysicallyBased",
+    "readsDepth" : true,
+    "transparency" : 1,
+    "transparencyModeRaw" : 0,
+    "writesDepth" : false
+  },
+  "status" : "READBACK_RECORDED_REQUIRES_PARENT_INTERPRETATION",
+  "syntheticInputs" : "Copied realized PBR sheen material; diffuse texture replaced white, base RGB stays zero, copy alpha set to 0\/.5\/1. Private SCNPlane2x2 rotated Y60 degrees, private orthographic camera Z3, no lights\/HDR\/exposure\/effects.",
+  "target" : "rgba16Float, 64x64, private, single sample"
+}
