@@ -1,5 +1,9 @@
 # W11 — Skins, skeletal animation, morph targets (spec)
 
+Status (2026-10-28): landed (W11). Two boundaries below have since
+moved: animation is no longer transforms-only (U4 property
+animation, E5c), and runtime glTF import exists (W29).
+
 The fidelity-path workstream: upstream's `skins`/`animations` document
 blocks plus `GeometryResource.morphTargets`, realized on both engines
 with upstream's playback semantics. Sources:

@@ -1,5 +1,9 @@
 # W29 — document layer completion
 
+Status (2026-10-28): landed (W29). `streaming` and
+`prefabInstances` — "this engine doesn't" below — are realized
+(W15).
+
 Closes the `.fscene` round trip: a live scene serializes back to a
 document, older schema versions upgrade on load, capability
 negotiation follows upstream semantics, and a `.glb`/`.gltf` imports

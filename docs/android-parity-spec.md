@@ -1,5 +1,10 @@
 # W6 — Android parity gaps
 
+Status (2026-10-28): the W6 work below landed; feasibility was
+confirmed against Filament 1.71.6 jars (**the pin is now 1.77.3**,
+E1/D3 — re-check any version-specific claim). §Light units, §Physics
+fidelity and the Filament-backend sections are current contracts.
+
 Closes the remaining iOS↔Android semantic gaps. Feasibility was
 confirmed per row against the resolved jars (Filament 1.71.6,
 filament-utils 1.71.6, jolt-jni 6.0.0) — nothing here needs an

@@ -1,0 +1,44 @@
+--------- beginning of main
+10-26 22:41:32.497 15150 15150 I dart3d  : start +113ms plugin registered
+10-26 22:41:32.497 15150 15150 I dart3d  : dart3d provider registered (disposeView=true)
+10-26 22:41:32.522 15150 15150 I dart3d  : GPU: Mali-G610 MC4
+10-26 22:41:32.669 15150 15150 I dart3d  : Dart3dSetDispatcher: slot armed
+10-26 22:41:32.670 15150 15150 I dart3d  : Dart3dSetBackend: 2
+10-26 22:41:32.722 15150 15150 I dart3d  : Filament engine backend: VULKAN (pref=2, tier=STANDARD)
+10-26 22:41:32.722 15150 15150 I dart3d  : start +338ms engine created
+10-26 22:41:32.747 15150 15150 I dart3d  : start +363ms base materials loaded
+10-26 22:41:32.811 15150 15150 I dart3d  : perf view: backend=VULKAN viewport=0x0 msaa=0 aa=FXAA post=true hdr=HIGH bloom=false(levels=6 res=384 q=LOW) ssao=false taa=false ssr=false dsr=false(0.5..1.0) dither=TEMPORAL quality=default physics=60Hzx8 entities=0 bodies=0
+10-26 22:41:32.811 15150 15150 I dart3d  : protocol hello: Dart v1.0
+10-26 22:41:32.811 15150 15150 I dart3d  : antialiasingMode=4 → MSAA enabled=true sampleCount=4 aa=FXAA
+10-26 22:41:32.812 15150 15150 I dart3d  : quality=default → shadows=true aaSrc=4 tier=STANDARD shadowType=DPCF
+10-26 22:41:32.817 15150 15150 W dart3d  : shadowCatcher 'softness' unsupported on Filament's shadowMultiplier path; ignored
+10-26 22:41:32.817 15150 15150 W dart3d  : shadowCatcher 'mode' unsupported on Filament's shadowMultiplier path; ignored
+10-26 22:41:32.821 15150 15150 I dart3d  : d3:instances node 8444939141786894337: realized 1 instance(s) in 1 InstanceBuffer chunk(s)
+10-26 22:41:32.822 15150 15150 I dart3d  : shadow options: mapSize=1024 cascades=1 far=0.0 contactDist=0.3 contact=false bias=0.001 normalBias=1.0 bulbRadius=-1.0
+10-26 22:41:32.824 15150 15150 I dart3d  : node 8444939141786894337: body=none pos=(0.1,0.025,0.08)
+10-26 22:41:32.824 15150 15150 I dart3d  : node 8444939141786894339: body=none pos=(0.0,0.7,-0.0)
+10-26 22:41:32.824 15150 15150 I dart3d  : node 8444939141786894340: body=none pos=(0.0,0.0,-0.0)
+10-26 22:41:32.824 15150 15150 I dart3d  : node 8444939141786894343: body=none pos=(1.2,0.46,0.72)
+10-26 22:41:32.824 15150 15150 I dart3d  : node 8444939141786894344: body=none pos=(-1.8074353,4.597556,5.466089)
+10-26 22:41:32.871 15150 15150 I dart3d  : environment 8444939141786894341: 256×128 equirect → 256² cube + SH3 in 25ms
+10-26 22:41:32.872 15150 15150 I dart3d  : applySkybox: sb=true textures=0
+10-26 22:41:32.873 15150 15150 I dart3d  : applyEnvironment: il=true textures=3
+10-26 22:41:32.879 15150 15150 I dart3d  : start +494ms scene installed
+10-26 22:41:32.879 15150 15150 I dart3d  : views applied: 0 entries (0 screen, 0 rts)
+10-26 22:41:32.879 15150 15150 I dart3d  : realize: 67ms
+10-26 22:41:32.970 15150 15150 I dart3d  : dart3d view 4 swapchain created
+10-26 22:41:32.970 15150 15150 I dart3d  : start +586ms swapchain created
+10-26 22:41:33.058 15150 15150 I dart3d  : start +674ms first frame submitted
+10-26 22:41:33.479 15150 15150 I dart3d  : start +1095ms first frame rendered
+10-26 22:41:33.479 15150 15150 W dart3d  : slow frame 429ms on main: ops=0 realize=false
+10-26 22:41:34.809 15150 15150 I dart3d  : perf n=118 fps=58.9 frame p50=11.1 p95=11.2 max=436.9 ms | gpu p50=9.3 p95=11.8 | backend p50=1.0 p95=8.1 | sim p50=0.1 p95=0.2 (physics p50=0.0 p95=0.1) | submit p50=0.3 p95=0.8 | skipped=2/121 physics=45/s
+10-26 22:41:36.815 15150 15150 I dart3d  : perf n=180 fps=89.8 frame p50=11.1 p95=11.2 max=11.5 ms | gpu p50=9.3 p95=12.0 | backend p50=3.0 p95=7.0 | sim p50=0.1 p95=0.5 (physics p50=0.0 p95=0.1) | submit p50=0.8 p95=2.0 | skipped=0/180 physics=60/s
+10-26 22:41:38.816 15150 15150 I dart3d  : perf n=180 fps=89.8 frame p50=11.1 p95=11.2 max=11.2 ms | gpu p50=9.4 p95=11.7 | backend p50=2.5 p95=5.9 | sim p50=0.1 p95=0.4 (physics p50=0.0 p95=0.1) | submit p50=0.9 p95=2.5 | skipped=0/180 physics=60/s
+10-26 22:41:40.820 15150 15150 I dart3d  : perf n=179 fps=89.3 frame p50=11.1 p95=11.2 max=22.2 ms | gpu p50=9.2 p95=11.9 | backend p50=2.7 p95=6.6 | sim p50=0.1 p95=0.2 (physics p50=0.0 p95=0.1) | submit p50=0.5 p95=1.9 | skipped=1/180 physics=60/s
+10-26 22:41:42.823 15150 15150 I dart3d  : perf n=180 fps=89.9 frame p50=11.1 p95=11.1 max=11.2 ms | gpu p50=9.2 p95=11.4 | backend p50=3.4 p95=7.2 | sim p50=0.1 p95=0.4 (physics p50=0.0 p95=0.1) | submit p50=0.9 p95=1.9 | skipped=0/180 physics=60/s
+10-26 22:41:44.827 15150 15150 I dart3d  : perf n=179 fps=89.3 frame p50=11.1 p95=11.2 max=22.3 ms | gpu p50=9.3 p95=11.6 | backend p50=3.4 p95=6.5 | sim p50=0.1 p95=0.4 (physics p50=0.0 p95=0.1) | submit p50=0.9 p95=2.0 | skipped=1/180 physics=60/s
+10-26 22:41:46.831 15150 15150 I dart3d  : perf n=178 fps=88.8 frame p50=11.1 p95=11.2 max=22.3 ms | gpu p50=9.1 p95=11.6 | backend p50=3.1 p95=8.4 | sim p50=0.1 p95=0.4 (physics p50=0.0 p95=0.1) | submit p50=0.9 p95=2.1 | skipped=2/180 physics=60/s
+10-26 22:41:48.835 15150 15150 I dart3d  : perf n=179 fps=89.4 frame p50=11.1 p95=11.1 max=22.2 ms | gpu p50=9.3 p95=11.3 | backend p50=3.8 p95=7.6 | sim p50=0.1 p95=0.5 (physics p50=0.0 p95=0.1) | submit p50=0.8 p95=1.9 | skipped=1/180 physics=60/s
+10-26 22:41:50.837 15150 15150 I dart3d  : perf n=177 fps=88.4 frame p50=11.1 p95=11.2 max=22.3 ms | gpu p50=9.2 p95=11.6 | backend p50=3.5 p95=8.6 | sim p50=0.1 p95=0.3 (physics p50=0.0 p95=0.1) | submit p50=0.8 p95=1.8 | skipped=3/180 physics=60/s
+10-26 22:41:52.841 15150 15150 I dart3d  : perf n=180 fps=89.8 frame p50=11.1 p95=11.2 max=11.3 ms | gpu p50=9.1 p95=11.3 | backend p50=3.5 p95=7.1 | sim p50=0.1 p95=0.4 (physics p50=0.0 p95=0.1) | submit p50=0.8 p95=2.1 | skipped=0/180 physics=60/s
+10-26 22:41:54.843 15150 15150 I dart3d  : perf n=179 fps=89.4 frame p50=11.1 p95=11.2 max=22.2 ms | gpu p50=9.5 p95=11.6 | backend p50=3.8 p95=8.8 | sim p50=0.1 p95=0.4 (physics p50=0.0 p95=0.1) | submit p50=0.9 p95=2.0 | skipped=1/180 physics=60/s

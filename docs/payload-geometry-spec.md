@@ -1,5 +1,9 @@
 # Payload geometry — wire spec (W3)
 
+Status (2026-10-28): landed (W3); `morphTargets` and skinned
+`joints`/`weights` — "deferred"/"consumed-but-ignored" below — were
+realized in W11.
+
 Pins the upstream `package:scene` vocabulary for payload-backed geometry so
 dart3d documents interchange with `flutter_scene` producers. All field names,
 layout strings, and defaults below are taken from `scene-0.3.0`

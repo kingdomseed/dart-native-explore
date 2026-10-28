@@ -428,14 +428,9 @@ internal object MaterialPackages {
         return specs
     }
 
-    /**
-     * Every package whose recipe does not depend on a document: the
-     * base set, the shadow catcher and both particle blends. These ship
-     * with the plugin for both target APIs. Lit variants (extension
-     * flags × bound slots) depend on the document and are open-ended.
-     */
     fun fixedSet(api: MaterialBuilder.TargetApi): List<Spec> =
-        baseSet(api) + catcherSpec(api) +
+        baseSet(api) + catcherSpec(api) + bakedCatcherSpec(api) +
+            bakedCatcherCaptureSpec(api) + bakedCatcherUtilitySpec(api) +
             particleSpec(false, api) + particleSpec(true, api)
 
     private fun startPrewarm(api: MaterialBuilder.TargetApi) {
@@ -500,6 +495,7 @@ internal object MaterialPackages {
                 .name("d3_shadow_catcher")
                 .shading(MaterialBuilder.Shading.UNLIT)
                 .doubleSided(true)
+                .instanced(true)
                 .blending(MaterialBuilder.BlendingMode.TRANSPARENT)
                 // The catcher is still a real surface — it joins the
                 // depth prepass like upstream's catcher does, so
@@ -510,6 +506,13 @@ internal object MaterialPackages {
                     "shadowColor")
                 .uniformParameter(MaterialBuilder.UniformType.FLOAT,
                     "shadowIntensity")
+                .uniformParameterArray(
+                    MaterialBuilder.UniformType.FLOAT4,
+                    MAX_INSTANCES,
+                    "instanceColors",
+                )
+                .uniformParameter(MaterialBuilder.UniformType.FLOAT,
+                    "useInstanceColors")
                 // `shadowMultiplier` makes the engine multiply the
                 // FINAL color — alpha included — by the shadow factor;
                 // no MaterialInputs field exposes it to read. The
@@ -517,11 +520,198 @@ internal object MaterialPackages {
                 // tint/opacity.
                 .material("void material(inout MaterialInputs material) {\n" +
                     "    prepareMaterial(material);\n" +
+                    "    vec4 instColor = " +
+                    "materialParams.useInstanceColors > 0.5\n" +
+                    "        ? materialParams.instanceColors[" +
+                    "getInstanceIndex()]\n" +
+                    "        : vec4(1.0);\n" +
                     "    material.baseColor = vec4(" +
                     "materialParams.shadowColor.rgb," +
                     " materialParams.shadowColor.a * " +
-                    "materialParams.shadowIntensity);\n" +
+                    "materialParams.shadowIntensity) * instColor;\n" +
                     "}\n"))
+
+    fun bakedCatcherSpec(api: MaterialBuilder.TargetApi): Spec =
+        Spec("catcher|baked|$api",
+            MaterialRecipe()
+                .platform(MaterialBuilder.Platform.MOBILE)
+                .targetApi(api)
+                .name("d3_shadow_catcher_baked")
+                .shading(MaterialBuilder.Shading.UNLIT)
+                .doubleSided(true)
+                .instanced(true)
+                .blending(MaterialBuilder.BlendingMode.TRANSPARENT)
+                .depthWrite(true)
+                .variable(MaterialBuilder.Variable.CUSTOM0,
+                    "catcherLocalPosition")
+                .samplerParameter(MaterialBuilder.SamplerType.SAMPLER_2D,
+                    MaterialBuilder.SamplerFormat.FLOAT,
+                    MaterialBuilder.ParameterPrecision.DEFAULT,
+                    "bakedShadowTexture")
+                .uniformParameter(MaterialBuilder.UniformType.FLOAT4,
+                    "bakedRegion")
+                .uniformParameter(MaterialBuilder.UniformType.FLOAT4,
+                    "shadowColor")
+                .uniformParameter(MaterialBuilder.UniformType.FLOAT,
+                    "shadowIntensity")
+                .uniformParameterArray(MaterialBuilder.UniformType.FLOAT4,
+                    MAX_INSTANCES, "instanceColors")
+                .uniformParameter(MaterialBuilder.UniformType.FLOAT,
+                    "useInstanceColors")
+                .materialVertex(
+                    "void materialVertex(inout MaterialVertexInputs m) {\n" +
+                        "    m.catcherLocalPosition = getPosition();\n" +
+                        "}\n")
+                .material("""
+                    void material(inout MaterialInputs material) {
+                        prepareMaterial(material);
+                        vec3 localPosition =
+                            variable_catcherLocalPosition.xyz;
+                        vec2 cacheUv = vec2(
+                            (localPosition.x - materialParams.bakedRegion.x) *
+                                materialParams.bakedRegion.z,
+                            (materialParams.bakedRegion.y - localPosition.z) *
+                                materialParams.bakedRegion.w);
+                        float amount = texture(
+                            materialParams_bakedShadowTexture,
+                            uvToRenderTargetUV(clamp(cacheUv, 0.0, 1.0))).r;
+                        vec4 instanceColor =
+                            materialParams.useInstanceColors > 0.5
+                                ? materialParams.instanceColors[getInstanceIndex()]
+                                : vec4(1.0);
+                        material.baseColor = vec4(
+                            materialParams.shadowColor.rgb,
+                            materialParams.shadowColor.a *
+                                materialParams.shadowIntensity * amount) *
+                            instanceColor;
+                    }
+                    """.trimIndent()))
+
+    fun bakedCatcherCaptureSpec(api: MaterialBuilder.TargetApi): Spec =
+        Spec("catcher|capture|$api",
+            MaterialRecipe()
+                .platform(MaterialBuilder.Platform.MOBILE)
+                .targetApi(api)
+                .name("d3_shadow_catcher_capture")
+                .shading(MaterialBuilder.Shading.LIT)
+                .doubleSided(true)
+                .culling(MaterialBuilder.CullingMode.NONE)
+                .instanced(true)
+                .customSurfaceShading(true)
+                .depthWrite(false)
+                .uniformParameter(MaterialBuilder.UniformType.INT,
+                    "lightKind")
+                .uniformParameter(MaterialBuilder.UniformType.FLOAT3,
+                    "lightPosition")
+                .uniformParameter(MaterialBuilder.UniformType.FLOAT3,
+                    "lightDirection")
+                .uniformParameter(MaterialBuilder.UniformType.FLOAT,
+                    "inverseRange")
+                .uniformParameter(MaterialBuilder.UniformType.FLOAT,
+                    "coneScale")
+                .uniformParameter(MaterialBuilder.UniformType.FLOAT,
+                    "coneOffset")
+                .material("""
+                    void material(inout MaterialInputs material) {
+                        prepareMaterial(material);
+                        material.baseColor = vec4(1.0);
+                    }
+
+                    vec3 surfaceShading(
+                        const MaterialInputs materialInputs,
+                        const ShadingData shadingData,
+                        const LightData lightData
+                    ) {
+                        float amount = 1.0 - lightData.visibility;
+                        if (materialParams.lightKind == 0) {
+                            amount *= clamp(lightData.NdotL / 0.15,
+                                0.0, 1.0);
+                        } else {
+                            vec3 worldPosition = getWorldPosition();
+                            vec3 toLight = materialParams.lightPosition -
+                                worldPosition;
+                            float distanceSquared = dot(toLight, toLight);
+                            vec3 lightDirection =
+                                normalize(materialParams.lightDirection);
+                            float rangeFactor = distanceSquared *
+                                materialParams.inverseRange *
+                                materialParams.inverseRange;
+                            float window = clamp(
+                                1.0 - rangeFactor * rangeFactor, 0.0, 1.0);
+                            float cone = clamp(
+                                dot(lightDirection,
+                                    normalize(worldPosition -
+                                        materialParams.lightPosition)) *
+                                    materialParams.coneScale +
+                                    materialParams.coneOffset,
+                                0.0, 1.0);
+                            amount *= window * window * cone * cone;
+                        }
+                        return vec3(amount, 0.0, 0.0);
+                    }
+                    """.trimIndent()))
+
+    fun bakedCatcherUtilitySpec(api: MaterialBuilder.TargetApi): Spec =
+        Spec("catcher|utility|$api",
+            MaterialRecipe()
+                .platform(MaterialBuilder.Platform.MOBILE)
+                .targetApi(api)
+                .name("d3_shadow_catcher_utility")
+                .shading(MaterialBuilder.Shading.UNLIT)
+                .doubleSided(true)
+                .culling(MaterialBuilder.CullingMode.NONE)
+                .blending(MaterialBuilder.BlendingMode.OPAQUE)
+                .depthWrite(false)
+                .flipUV(false)
+                .require(MaterialBuilder.VertexAttribute.UV0)
+                .samplerParameter(MaterialBuilder.SamplerType.SAMPLER_2D,
+                    MaterialBuilder.SamplerFormat.FLOAT,
+                    MaterialBuilder.ParameterPrecision.DEFAULT, "inputA")
+                .samplerParameter(MaterialBuilder.SamplerType.SAMPLER_2D,
+                    MaterialBuilder.SamplerFormat.FLOAT,
+                    MaterialBuilder.ParameterPrecision.DEFAULT, "inputB")
+                .uniformParameter(MaterialBuilder.UniformType.INT,
+                    "operation")
+                .uniformParameter(MaterialBuilder.UniformType.FLOAT2,
+                    "blurStep")
+                .material("""
+                    float blurWeight(int offset) {
+                        int i = abs(offset);
+                        if (i == 0) return 0.153170;
+                        if (i == 1) return 0.144893;
+                        if (i == 2) return 0.122649;
+                        if (i == 3) return 0.092902;
+                        return 0.062970;
+                    }
+
+                    void material(inout MaterialInputs material) {
+                        prepareMaterial(material);
+                        vec2 uv = getUV0();
+                        float amount = 0.0;
+                        if (materialParams.operation == 1) {
+                            float a = texture(materialParams_inputA,
+                                uvToRenderTargetUV(uv)).r;
+                            float b = texture(materialParams_inputB,
+                                uvToRenderTargetUV(uv)).r;
+                            amount = 1.0 - (1.0 - a) * (1.0 - b);
+                        } else if (materialParams.operation >= 2) {
+                            vec2 axis = materialParams.operation == 2
+                                ? vec2(materialParams.blurStep.x, 0.0)
+                                : vec2(0.0, materialParams.blurStep.y);
+                            float weighted = 0.0;
+                            float weights = 0.0;
+                            for (int i = -4; i <= 4; ++i) {
+                                float weight = blurWeight(i);
+                                weighted += texture(materialParams_inputA,
+                                    uvToRenderTargetUV(uv + axis * float(i))).r *
+                                    weight;
+                                weights += weight;
+                            }
+                            amount = weighted / weights;
+                        }
+                        material.baseColor = vec4(amount, amount, amount, 1.0);
+                    }
+                    """.trimIndent()))
 
     /**
      * Upstream multiplies everything by the stage's exposure before the

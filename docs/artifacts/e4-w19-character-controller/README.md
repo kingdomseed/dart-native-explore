@@ -1,7 +1,7 @@
 # E4 character-controller evidence
 
-E4 is in progress. The inherited implementation is based on E3 merge `6366c07`.
-The current SDK is DartNative 1.4.0, framework `75bc07e9b49`.
+E4 is complete. The inherited implementation is based on E3 merge `6366c07`.
+At the start of this evidence record, the SDK was DartNative 1.4.0, framework `75bc07e9b49`.
 
 ## Native compilation
 
@@ -139,10 +139,14 @@ attempts, a close retry succeeded. The recording resource and both owned
 native paths were verified absent. `wacom-recording-export.txt` records that
 limit; its screenshots and complete run logs remain the tablet evidence.
 
-## Remaining gates
+## Final merge checkpoint
 
-- `ci-implementation-head.json` records passing Dart, Android unit, and security checks at implementation commit `6a63b24`. Current-head checks are shown on the PR.
-- Operator review of the screenshots remains pending.
-
-[PR #64](https://github.com/kingdomseed/dart-native-explore/pull/64) is draft.
-E4 has not merged.
+- The operator approved the before/after screenshots and character-movement
+  video (“Looks correct”) in [the PR #64 comment](https://github.com/kingdomseed/dart-native-explore/pull/64#issuecomment-6410699749).
+- Three checks passed at tested head `805106d9fe6ead6204b133ab562ecad4e6190fbe`.
+- [PR #64](https://github.com/kingdomseed/dart-native-explore/pull/64) was
+  squash-merged to `main` on 2026-10-26 at
+  `4a75520fe0e1626aebb267328e1bf9d5a6797e58`.
+- All mandatory device lanes completed. The iOS settled readout 48 followed by
+  the later watchdog readout 48, and the optional Wacom video export limit,
+  remain documented above.

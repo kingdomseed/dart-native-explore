@@ -1,0 +1,41 @@
+Launching lib/main.dart on iPhone 17 Pro in debug mode...
+Running Xcode build...                                          
+Xcode build done.                                            6.0s
+dartnative: [DN] Licence valid (community), expires 2027-09-14
+dartnative: [DN] lifecycle → AppLifecycleState.resumed
+dartnative: dart3d: u2-catcher light=directional mode=baked softness=0
+dartnative: dart3d: showcase — u2-catcher: Baked shadow footprint · explicit refresh · live shadowOnly mode
+Syncing files to device iPhone 17 Pro...                             9ms
+
+DartNative run key commands.
+r Hot reload. 🔥🔥🔥
+R Hot restart.
+h List all available interactive commands.
+d Detach (terminate "dn run" but leave application running).
+c Clear the screen
+q Quit (terminate the application on the device).
+
+A Dart VM Service on iPhone 17 Pro is available at: http://127.0.0.1:62361/Oof7YETrxCM=/
+The DartNative DevTools debugger and profiler on iPhone 17 Pro is available at: http://127.0.0.1:62361/Oof7YETrxCM=/devtools/?uri=ws://127.0.0.1:62361/Oof7YETrxCM=/ws
+dartnative: dart3d: u2-catcher caster moved; baked output waits for explicit refresh
+dartnative: dart3d: u2-catcher explicit upsert sent with unchanged properties
+dartnative: dart3d: u2-catcher mode=live explicit upsert sent
+
+Performing hot restart...                                       
+Restarted application in 94ms.
+dartnative: [DN] Licence valid (community), expires 2027-09-14
+dartnative: [DN] lifecycle → AppLifecycleState.resumed
+dartnative: dart3d: u2-catcher light=directional mode=baked softness=0
+dartnative: dart3d: showcase — u2-catcher: Baked shadow footprint · explicit refresh · live shadowOnly mode
+dartnative: dart3d: u2-catcher caster moved; baked output waits for explicit refresh
+dartnative: dart3d: u2-catcher explicit upsert sent with unchanged properties
+dartnative: dart3d: u2-catcher light moved; baked output waits for explicit refresh
+dartnative: dart3d: u2-catcher explicit upsert sent with unchanged properties
+dartnative: dart3d: u2-catcher softness=0.14 explicit upsert sent
+dartnative: dart3d: u2-catcher softness=0.0 explicit upsert sent
+dartnative: dart3d: u2-catcher mode=live explicit upsert sent
+dartnative: dart3d: u2-catcher caster moved; baked output waits for explicit refresh
+dartnative: dart3d: u2-catcher light moved; baked output waits for explicit refresh
+dartnative: dart3d: u2-catcher mode=baked explicit upsert sent
+
+Application finished.

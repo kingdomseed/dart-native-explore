@@ -54,13 +54,9 @@ See `example/` for a live feature harness that exercises the surface.
 
 ## Verification status
 
-Everything below is implemented and covered by Dart unit/wire-contract
-tests, but live device evidence is uneven. W21 and W30 have recorded
-device runs; W15's was taken before its last fix round; W16, W18,
-W22–W26, and W29 have none recorded yet. Known open defects are
-tracked in `../docs/program-audit-2026-09-28.md` §3. One of them
-matters for anything shadow-related: Android directional shadows are
-currently inert.
+Per-unit device evidence (T1–T4) is indexed in
+`../docs/verification-matrix.md`; program status and remaining work
+live in `../docs/program-v2.md` (*Where we are*).
 
 ## What's implemented
 
@@ -119,18 +115,24 @@ currently inert.
 - Split-screen views and shadow breadth (W24): per-view `viewport`
   rects (iOS realizes screen splits as sibling `SCNView`s, Android as
   Filament viewports), directional-shadow options, and a
-  `shadowCatcher` material (live mode only, with no baked mode).
+  `shadowCatcher` material with live and baked modes. Baked mode caches a
+  local-XZ shadow footprint on load and on an explicit same-ID material
+  `upsertResource`; moving a caster or light alone leaves it unchanged.
+  `softness` controls the baked blur. The cache belongs to the material's
+  first consuming receiver; separate footprints per instance are unsupported.
+  Android live catchers support directional shadows; baked catchers also
+  capture spot shadows. This does not add full upstream contact/AO parity.
 - Stage effects (W25): a `.cube` LUT via asset path or payload chunk,
   lift/gamma/gain, film grain, auto-exposure, SSR, lens flare, god
   rays, chromatic aberration. Unsupported pieces log a declared
   limit: on iOS SSR, GI, and god rays (and lift/gamma/gain currently
   has no effect there); on Android CA, GI, god rays, and metering.
 - Expanded geometry and instancing (W26): `d3:procMesh` shapes
-  (cylinder, cone, capsule, disc, tube, ribbon, camera-facing
+  (cylinder, cone, capsule, disc, path extrusion, tube, ribbon, camera-facing
   polyline/lineSegments/billboard, a real icosphere) and
-  `d3:instances`. Instancing is **CPU-baked** into one mesh on both
-  platforms (no hardware instancing, because Filament's Java binding
-  lacks `InstanceBuffer`). Tessellation, subdivision, instance, and
+  `d3:instances`. Android uses GPU instancing for regular meshes and
+  CPU-expanded geometry for camera-facing instances. iOS bakes instances
+  into one mesh. Tessellation, subdivision, instance, and
   dash counts are capped (`lib/src/geometry/limits.dart`,
   `../docs/triage/dart.md`).
 - Document layer (W29): `SceneController.serializeScene` (the live
@@ -213,8 +215,8 @@ closest approximation and logs once:
   `maxParticles`/`bursts`/`turbulence`/`randomFlipX`/`aspectRatio`
   decode but warn once (no `SCNParticleSystem` counterpart); Android
   honors them all. `meshParticleEmitter` degrades to a sprite pass on
-  iOS and renders as a baked per-particle renderable pool on Android
-  — the Filament Java binding has no `InstanceBuffer`.
+  iOS and renders through GPU `InstanceBuffer` instancing on Android
+  (E1, Filament 1.77.3).
 
 Full detail lives in `docs/verification-matrix.md` and the per-
 workstream specs under `docs/`.
@@ -239,32 +241,14 @@ worth knowing:
 Both behaviors are load-bearing; `docs/verification-matrix.md` (W21)
 has the failure modes they replaced.
 
-## Exploratory directions (deferred exclusions)
+## Not yet implemented
 
-Five upstream surface areas were deliberately excluded from the
-numbered workstream program. They are **deferred, not eternal** — the
-wire never blocks them, and each can be pulled back into a workstream:
-
-1. **Gaussian splats (`splat`)** — no SceneKit or Filament facility;
-   needs a dedicated decode→pack→sort→rasterize renderer on both
-   platforms plus an asset→bytes delivery path.
-2. **Audio engine backend on Android** — Filament has no audio; an
-   Oboe/AAudio mixer is host-app work. iOS `SCNAudioSource` support
-   can still land independently.
-3. **Widget slots** — upstream binds Flutter widgets to world-anchored
-   quads; needs a DartNative host bridge before the engine half
-   (texture-on-quad + input routing) matters.
-4. **Mesh particles on iOS** — landed as the documented delta:
-   `SCNParticleSystem` is sprite-only, so `meshParticleEmitter`
-   renders as an untextured sprite pass tinted by the material's
-   baseColor (W18). True mesh particles on iOS would need a custom
-   instanced-geometry path — still excluded.
-5. **`renderScale`/`filterQuality` fidelity** — partially folded into
-   W14: both decode per stage and per view, Android applies
-   `renderScale` via dynamic resolution and iOS approximates via
-   `contentScaleFactor`; `filterQuality` remains decode+retain only.
-   Full fidelity (temporal upscaling, sampler-quality mapping) is
-   open.
+Remaining surface and its scheduling are owned by `../docs/program-v2.md`:
+Gaussian splats (E12), audio as the sibling `dart3d_audio` package
+(E11, decision D5), external textures + semantics (E10), the shader
+contract (E6, after the S1 spike) and the 0.24 delta (Track V).
+Widget-to-texture is blocked on DartNative (D6); upstream `kit/`,
+editor/MCP and networking are out of scope (D7).
 
 ## Development
 
@@ -279,7 +263,7 @@ dn run           # the example app (hero → Dice / Showcase)
 dn run --dart-define=DART3D_SCENE=harness   # the verification harness
 ```
 
-Program docs live in `../docs/` — `dart3d-completion-program.md` for
-the workstream history, `extended-surface-program.md` for the W11+
-follow-on program, and `verification-matrix.md` for per-platform
-evidence.
+Program docs live in `../docs/` — `program-v2.md` is the active
+plan (start at *Where we are*); `verification-matrix.md` indexes
+per-platform evidence. Older program files in that directory are
+superseded and say so at the top.

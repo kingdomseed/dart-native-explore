@@ -1,5 +1,11 @@
 # Physics component schema (W2)
 
+Status (2026-10-28): landed (W2; W23 sections below are current).
+Two W2-era notes are outdated: `allowsResting` *is* carried (both
+natives decode it — `android-parity-spec.md`), and `contactMask`
+stays out by resolution in `physics-events-queries-spec.md`, not
+"when W8 lands".
+
 Source of truth: `flutter_scene` 0.23.0 `physics_codecs.dart` and
 `package:scene` 0.3.0 `sim_types.dart`. dart3d adopts the upstream
 vocabulary wholesale so a `.fscene` document authored for flutter_scene

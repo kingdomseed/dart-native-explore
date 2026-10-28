@@ -1,0 +1,14 @@
+Launching lib/main.dart on A142 in release mode...
+Installing build/app/outputs/dn-apk/app-release.apk...              3.3s
+
+DartNative run key commands.
+h List all available interactive commands.
+c Clear the screen
+q Quit (terminate the application on the device).
+
+dartnative: dart3d: showcase — u2-catcher-cull-spot: SPLIT CULLING / SPOT / DPCF
+dartnative: dart3d: showcase — u2-catcher-cull-directional: SPLIT CULLING / DIRECTIONAL / DPCF
+dartnative: dart3d: showcase — u2-catcher-cull-native-directional: SPLIT CULLING / NATIVE SHADOW DEFAULTS / DPCF
+dartnative: dart3d: showcase — u2-catcher-cull-native-pcf-directional: SPLIT CULLING / NATIVE SHADOW DEFAULTS / PCF
+
+Application finished.

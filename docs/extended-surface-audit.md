@@ -1,11 +1,21 @@
 # Extended surface audit — every upstream codec family (W10)
 
+> **Inventory as of the W9 head (2026-09).** The codec census below is
+> still the reference inventory, but its present-tense status claims
+> ("not decoded", "not realized", Filament 1.71.6) describe that head:
+> skins/animation (W11), joint components + `enabled` (W12), render
+> textures (W14), prefab instances + streaming (W15) and Filament
+> 1.77.3 (E1) have since landed. Dispositions are superseded by
+> `program-v2.md` decisions D1–D9 and Track E; current status lives in
+> `verification-matrix.md`.
+
 The W10 deliverable: a complete inventory of the upstream `.fscene`
 codec surface — every component codec type, every resource kind, every
 document-level block — with a native feasibility verdict on both
 platforms and a disposition (already realized, follow-on workstream, or
-deliberate exclusion). The follow-on workstreams themselves are
-sequenced in `extended-surface-program.md`.
+deliberate exclusion). The follow-on workstreams were sequenced in a
+companion program file since removed; their successors are Tracks E/V
+in `program-v2.md`.
 
 ## Sources and method
 
@@ -109,7 +119,7 @@ events.
 
 Rows: upstream family → upstream source → wire status today → iOS
 native path → Android native path → verdict + disposition. The
-dispositions feed `extended-surface-program.md`.
+dispositions fed the (since removed) follow-on program.
 
 Verdict legend: **supported** — native API covers upstream semantics,
 work is decode+glue; **partial** — some fields/behaviors unmappable
@@ -228,6 +238,13 @@ resources + 7 document items + 5 spec families + 5 format items = 52.**
 No silent gaps.
 
 ## Deliberate exclusions (approved, not eternal)
+
+> **Superseded by `program-v2.md` (2026-09-28 reset).** Splats are now
+> scheduled (E12); audio ships as the sibling `dart3d_audio` package
+> (D5/E11), not host-app work; widget slots are **blocked** on
+> DartNative (D6), not merely deferred; `renderScale` landed with the
+> views work (W14/W24). Only #4 (iOS mesh-particle delta) and the
+> resolved #6 still hold. Kept below as the W10 record.
 
 Each exclusion names the reason and carries an operator sign-off box.
 The operator approved all six on the W10 review — with the explicit

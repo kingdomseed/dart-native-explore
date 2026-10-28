@@ -1,0 +1,5 @@
+00:00 +0: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/u2_shadow_showcase_test.dart
+00:00 +0: U2 spot-shadow showcase catalogue route builds one spot and uses the boot flag
+00:00 +1: U2 spot-shadow showcase off and on documents differ only in the spot cast flag
+00:00 +2: U2 spot-shadow showcase receiver, caster, and spot aim share the same fixture geometry
+00:00 +3: All tests passed!

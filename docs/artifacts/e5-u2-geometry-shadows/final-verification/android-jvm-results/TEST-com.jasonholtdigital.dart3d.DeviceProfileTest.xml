@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.jasonholtdigital.dart3d.DeviceProfileTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-10-27T01:44:13.507Z" hostname="Jasons-Mac-mini" time="0.005">
+  <properties/>
+  <testcase name="the profile is on only for a low device with no quality tier" classname="com.jasonholtdigital.dart3d.DeviceProfileTest" time="0.003"/>
+  <testcase name="off the low profile the widget's mode passes through" classname="com.jasonholtdigital.dart3d.DeviceProfileTest" time="0.001"/>
+  <testcase name="the low profile turns requested MSAA into FXAA alone" classname="com.jasonholtdigital.dart3d.DeviceProfileTest" time="0.0"/>
+  <testcase name="an invalid authored scale means full resolution, not dynamic" classname="com.jasonholtdigital.dart3d.DeviceProfileTest" time="0.0"/>
+  <testcase name="an authored 1_0 stays fixed at full resolution" classname="com.jasonholtdigital.dart3d.DeviceProfileTest" time="0.0"/>
+  <testcase name="nothing authored - dynamic on the low profile, off otherwise" classname="com.jasonholtdigital.dart3d.DeviceProfileTest" time="0.0"/>
+  <testcase name="an authored scale is fixed on either tier, the entry's first" classname="com.jasonholtdigital.dart3d.DeviceProfileTest" time="0.001"/>
+  <testcase name="a quality tier owns AA whatever the widget asked for" classname="com.jasonholtdigital.dart3d.DeviceProfileTest" time="0.0"/>
+  <testcase name="the low profile keeps an explicit no-AA and an unsent mode" classname="com.jasonholtdigital.dart3d.DeviceProfileTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

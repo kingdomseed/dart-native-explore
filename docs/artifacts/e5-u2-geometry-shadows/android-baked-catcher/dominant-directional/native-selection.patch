@@ -1,0 +1,28 @@
+--- a/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/BakedShadowCatcherPass.kt
++++ b/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/BakedShadowCatcherPass.kt
+@@ -322,10 +322,25 @@
+     private fun shadowLights(): List<Light> {
+         val out = ArrayList<Light>()
+         val lm = host.engine.lightManager
++        var dominantDirectional = 0
++        var dominantIntensity = Float.NEGATIVE_INFINITY
+         host.scene.forEach { entity ->
+             val instance = lm.getInstance(entity)
++            if (instance > 0 &&
++                lm.getType(instance) == LightManager.Type.DIRECTIONAL) {
++                val intensity = lm.getIntensity(instance)
++                if (intensity > dominantIntensity) {
++                    dominantDirectional = entity
++                    dominantIntensity = intensity
++                }
++            }
++        }
++        host.scene.forEach { entity ->
++            val instance = lm.getInstance(entity)
+             if (instance <= 0 || !lm.isShadowCaster(instance)) return@forEach
+             val type = lm.getType(instance)
++            if (type == LightManager.Type.DIRECTIONAL &&
++                entity != dominantDirectional) return@forEach
+             if (type != LightManager.Type.DIRECTIONAL &&
+                 type != LightManager.Type.FOCUSED_SPOT &&
+                 type != LightManager.Type.SPOT

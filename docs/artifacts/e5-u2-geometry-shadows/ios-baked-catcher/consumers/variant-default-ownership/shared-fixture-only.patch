@@ -1,0 +1,11 @@
+--- a/dart3d/example/lib/u2_catcher_scene.dart
++++ b/dart3d/example/lib/u2_catcher_scene.dart
+@@ -132,7 +132,7 @@
+           geometry: receiverGeometry.id,
+           material: materialId,
+           transforms: D3InstanceTransforms.inline([Matrix4.identity()]),
+-          doubleSided: true,
++          doubleSided: false,
+         ).toComponent(),
+       )
+       ..add(

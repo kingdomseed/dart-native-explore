@@ -33,7 +33,8 @@ enum FsceneRealizer {
     ///   forward instead of the manifest's stale stage being
     ///   re-decoded on top of it.
     static func realize(manifest: Data, into host: SceneViewHost,
-                        preserveStage: Bool = false) {
+                        preserveStage: Bool = false,
+                        preserveBakedShadowCaches: Bool = false) {
         guard let json = try? JSONSerialization.jsonObject(with: manifest)
                 as? [String: Any] else {
             d3Log("loadScene: manifest is not a JSON object"); return
@@ -47,8 +48,10 @@ enum FsceneRealizer {
         // mutating the rendered scene in its own update callback is
         // the sanctioned window.
         host.beginSceneReset()
-        let ctx = Context(host: host, formatVersion: version,
-                          scene: host.scene ?? SCNScene())
+        let ctx = Context(
+            host: host, formatVersion: version,
+            scene: host.scene ?? SCNScene(),
+            preserveBakedShadowCaches: preserveBakedShadowCaches)
         // W12: the installing document re-declares its component
         // joints — drop the previous document's registrations so a
         // re-install never duplicates them.
@@ -148,6 +151,8 @@ enum FsceneRealizer {
         /// The default currently in force — the declared default, or
         /// a mesh material the rebase rule adopted.
         var defaultMaterial: SCNMaterial?
+        var defaultMaterialSource: (key: UInt64, isSnapshotClone: Bool)?
+        weak var appliedGeometry: SCNGeometry?
         /// False while the target node/geometry hasn't resolved — the
         /// landing retries re-attempt it.
         var resolved = false
@@ -441,9 +446,14 @@ enum FsceneRealizer {
         let host: SceneViewHost
         let formatVersion: Int
         let scene: SCNScene
+        let preserveBakedShadowCaches: Bool
         var nodes: [UInt64: SCNNode] = [:]
         var geometries: [UInt64: SCNGeometry] = [:]
         var materials: [UInt64: SCNMaterial] = [:]
+        var shadowCatcherConfigurations:
+            [UInt64: ShadowCatcherConfiguration] = [:]
+        var shadowCatcherBindings:
+            [UInt64: [ShadowCatcherMaterialBinding]] = [:]
         var textures: [UInt64: DecodedTexture] = [:]
         var environments: [UInt64: [String: Any]] = [:]
         var payloadSpecs: [UInt64: PayloadSpec] = [:]
@@ -660,16 +670,22 @@ enum FsceneRealizer {
         /// camera lands on the real scene. The `SCNScene()` default
         /// only backs a pre-setup call where the view has none yet.
         init(host: SceneViewHost, formatVersion: Int,
-             scene: SCNScene = SCNScene()) {
+             scene: SCNScene = SCNScene(),
+             preserveBakedShadowCaches: Bool = false) {
             self.host = host
             self.formatVersion = formatVersion
             self.scene = scene
+            self.preserveBakedShadowCaches = preserveBakedShadowCaches
         }
 
         func installScene() {
             host.install(scene: scene, nodes: nodes,
                          resources: (geometries: geometries,
                                      materials: materials,
+                                     shadowCatcherConfigurations:
+                                        shadowCatcherConfigurations,
+                                     shadowCatcherBindings:
+                                        shadowCatcherBindings,
                                      textures: textures,
                                      defs: resourceDefs,
                                      payloadSpecs: payloadSpecs,
@@ -707,6 +723,8 @@ enum FsceneRealizer {
                          dynamicBodies: dynamicBodyKeys,
                          colliderIndices: colliderIndexByKey,
                          formatVersion: formatVersion,
+                         preserveBakedShadowCaches:
+                            preserveBakedShadowCaches,
                          stage: (json: stageJSON, exposure: stageExposure,
                                  toneMap: stageToneMap,
                                  effects: stageEffects,
@@ -1457,6 +1475,24 @@ enum FsceneRealizer {
                         extents: SIMD3(Float(e[0]), Float(e[1]),
                                        Float(e[2])),
                         debugColors: d3Bool(p["debugColors"]) == true))
+            case "wedge":
+                let size = d3Vec3(p["size"]) ?? [1, 1, 1]
+                return GeometryFactory.makeGeometry(
+                    GeometryFactory.wedge(
+                        SIMD3(Float(size[0]), Float(size[1]), Float(size[2]))))
+            case "ring":
+                let innerRadius = Float(d3Double(p["innerRadius"]) ?? 0.25)
+                let outerRadius = Float(d3Double(p["outerRadius"]) ?? 0.5)
+                guard innerRadius >= 0, outerRadius > 0,
+                      innerRadius < outerRadius else {
+                    d3Log("ring: requires 0 <= innerRadius < outerRadius")
+                    return nil
+                }
+                return GeometryFactory.makeGeometry(
+                    GeometryFactory.ring(
+                        innerRadius: innerRadius,
+                        outerRadius: outerRadius,
+                        segments: max(3, seg(p, "segments", 32))))
             case "sphere":
                 return GeometryFactory.makeGeometry(
                     GeometryFactory.sphere(
@@ -1524,6 +1560,17 @@ enum FsceneRealizer {
                     GeometryFactory.disc(
                         radius: Float(d3Double(p["radius"]) ?? 0.5),
                         segments: seg(p, "segments", 32)))
+            case "extrude":
+                guard let pts = d3PointList(p["points"]), pts.count >= 2,
+                      let profile = d3ProfileList(p["profile"]),
+                      profile.count >= 3 else {
+                    d3Log("extrude: needs at least two path points and three profile points")
+                    return nil
+                }
+                return GeometryFactory.makeGeometry(
+                    GeometryFactory.extrude(
+                        pts, profile: profile, stations: stations(p),
+                        caps: d3Bool(p["caps"]) != false))
             case "tube":
                 guard let pts = d3PointList(p["points"]), pts.count >= 2
                 else {
@@ -1594,6 +1641,19 @@ enum FsceneRealizer {
             for e in list {
                 guard let p = d3Vec3(e), p.count >= 3 else { return nil }
                 out.append(SIMD3(Float(p[0]), Float(p[1]), Float(-p[2])))
+            }
+            return out
+        }
+
+        func d3ProfileList(_ v: Any?) -> [SIMD2<Float>]? {
+            guard let list = d3List(v) else { return nil }
+            var out: [SIMD2<Float>] = []
+            out.reserveCapacity(list.count)
+            for item in list {
+                guard let point = d3Vec2(item), point.count >= 2 else {
+                    return nil
+                }
+                out.append(SIMD2(Float(point[0]), Float(point[1])))
             }
             return out
         }
@@ -1753,6 +1813,119 @@ enum FsceneRealizer {
             for mk in materialConsumers.keys {
                 materialConsumers[mk]?.removeAll { $0 === geometry }
             }
+            dropShadowCatcherBindings(geometry)
+        }
+
+        func dropShadowCatcherBindings(_ geometry: SCNGeometry) {
+            for key in shadowCatcherBindings.keys {
+                shadowCatcherBindings[key]?.removeAll {
+                    $0.geometry === geometry
+                }
+            }
+        }
+
+        func recordShadowCatcherBinding(
+            key: UInt64,
+            node: SCNNode,
+            geometry: SCNGeometry,
+            material: SCNMaterial,
+            materialIndex: Int,
+            isSnapshotClone: Bool
+        ) {
+            guard resourceDefs[key]?["type"] as? String == "shadowCatcher"
+            else { return }
+            let bindings = shadowCatcherBindings[key] ?? []
+            if bindings.contains(where: {
+                $0.geometry === geometry && $0.materialIndex == materialIndex
+            }) { return }
+            shadowCatcherBindings[key] = bindings + [
+                ShadowCatcherMaterialBinding(
+                    node: node, geometry: geometry, material: material,
+                    materialIndex: materialIndex,
+                    isSnapshotClone: isSnapshotClone)
+            ]
+        }
+
+        func registerCurrentShadowCatcherConsumers(
+            key: UInt64, previousMaterial: SCNMaterial
+        ) {
+            let consumerGeometryIds = Set(
+                (materialConsumers[key] ?? []).map(ObjectIdentifier.init))
+            guard !consumerGeometryIds.isEmpty else { return }
+            scene.rootNode.enumerateHierarchy { targetNode, _ in
+                guard let geometry = targetNode.geometry,
+                      consumerGeometryIds.contains(ObjectIdentifier(geometry))
+                else { return }
+                let ownerNode: SCNNode
+                let primitiveIndex: Int
+                if let name = targetNode.name,
+                   name.hasPrefix("d3prim:"),
+                   let index = Int(name.dropFirst("d3prim:".count)),
+                   let parent = targetNode.parent {
+                    ownerNode = parent
+                    primitiveIndex = index
+                } else {
+                    ownerNode = targetNode
+                    primitiveIndex = 0
+                }
+                guard let nodeKey = host.nodesById.first(where: {
+                    $0.value === ownerNode
+                })?.key else { return }
+                let hasVariantOwner = variantComponents.values.contains {
+                    $0.bindings.contains {
+                        $0.nodeKey == nodeKey
+                            && $0.primitive == primitiveIndex
+                    }
+                }
+                let hasActiveLodOwner = lods[nodeKey].map {
+                    $0.ownsRenderable && !$0.suspended
+                } ?? false
+                guard !hasVariantOwner, !hasActiveLodOwner else { return }
+                let isDoubleSidedInstance =
+                    primitiveIndex == 0
+                    && d3Bool(instancesProps[nodeKey]?["doubleSided"]) == true
+                for (materialIndex, material) in geometry.materials.enumerated() {
+                    let isSnapshotClone = material !== previousMaterial
+                    guard material === previousMaterial
+                        || (isDoubleSidedInstance
+                            && materialIndex == 0 && isSnapshotClone)
+                    else { continue }
+                    recordShadowCatcherBinding(
+                        key: key, node: targetNode, geometry: geometry,
+                        material: material, materialIndex: materialIndex,
+                        isSnapshotClone: isSnapshotClone)
+                }
+            }
+        }
+
+        func rebindShadowCatcherMaterial(_ key: UInt64,
+                                        to material: SCNMaterial) {
+            for binding in shadowCatcherBindings[key] ?? [] {
+                guard let geometry = binding.geometry,
+                      geometry.materials.indices.contains(binding.materialIndex),
+                      geometry.materials[binding.materialIndex] === binding.material
+                else { continue }
+                let rebound: SCNMaterial
+                if binding.isSnapshotClone {
+                    rebound = material.copy() as! SCNMaterial
+                    rebound.isDoubleSided = binding.material.isDoubleSided
+                } else {
+                    rebound = material
+                }
+                var materials = geometry.materials
+                materials[binding.materialIndex] = rebound
+                geometry.materials = materials
+                binding.material = rebound
+            }
+        }
+
+        func refreshLiveCatcherMaterialReference(
+            _ key: UInt64, old: SCNMaterial, new: SCNMaterial
+        ) {
+            for binding in shadowCatcherBindings[key] ?? []
+            where !binding.isSnapshotClone && binding.material === old {
+                binding.material = new
+            }
         }
 
         func decodeProcMesh(key: UInt64, node: SCNNode,
@@ -1783,6 +1956,10 @@ enum FsceneRealizer {
             }
             if let ref = d3Ref(p["material"]), let m = materials[ref] {
                 geometry.materials = [m]
+                recordShadowCatcherBinding(
+                    key: ref, node: node, geometry: geometry,
+                    material: m, materialIndex: 0,
+                    isSnapshotClone: false)
                 let existing = materialConsumers[ref] ?? []
                 if !existing.contains(where: { $0 === geometry }) {
                     materialConsumers[ref] = existing + [geometry]
@@ -2035,14 +2212,20 @@ enum FsceneRealizer {
                 // don't propagate (the payload-geometry contract doc
                 // records the limitation).
                 let bound: SCNMaterial
+                var isSnapshotClone = false
                 if doubleSided && !m.isDoubleSided,
                    let clone = m.copy() as? SCNMaterial {
                     clone.isDoubleSided = true
                     bound = clone
+                    isSnapshotClone = true
                 } else {
                     bound = m
                 }
                 geometry.materials = [bound]
+                recordShadowCatcherBinding(
+                    key: ref, node: node, geometry: geometry,
+                    material: bound, materialIndex: 0,
+                    isSnapshotClone: isSnapshotClone)
                 let existing = materialConsumers[ref] ?? []
                 if !existing.contains(where: { $0 === geometry }) {
                     materialConsumers[ref] = existing + [geometry]
@@ -2091,33 +2274,53 @@ enum FsceneRealizer {
             let m = SCNMaterial()
             let type = r["type"] as? String ?? "physicallyBased"
             if type == "shadowCatcher" {
-                // W24 dart3d extension — upstream's
-                // ShadowCatcherMaterial 'live' mode: the surface
-                // draws only the shadow it receives (transparent
-                // where lit). SceneKit's .shadowOnly is the native
-                // equivalent; the caught shadow takes each light's
-                // shadowColor (per-light, default black at 50%) —
-                // the material-level shadowColor/shadowIntensity/
-                // aoStrength/softness/fade*/mode knobs have no
-                // per-material analog and log once. Depth writes
-                // stay on, matching upstream's depth-prepass join.
-                m.lightingModel = .shadowOnly
                 let props = r["properties"] as? [String: Any] ?? [:]
+                let authoredMode = d3String(props["mode"])
+                    ?? props["mode"] as? String ?? "live"
+                let mode: ShadowCatcherConfiguration.Mode
+                if authoredMode == "baked" {
+                    mode = .baked
+                    m.lightingModel = .constant
+                    m.diffuse.contents = UIColor.clear
+                    m.blendMode = .alpha
+                    m.transparencyMode = .aOne
+                    m.writesToDepthBuffer = true
+                    m.readsFromDepthBuffer = true
+                } else {
+                    mode = .live
+                    m.lightingModel = .shadowOnly
+                    if authoredMode != "live" {
+                        host.logOnce("w24.catcher.mode.\(authoredMode)",
+                            "shadowCatcher mode '\(authoredMode)' unknown; "
+                            + "using live")
+                    }
+                }
+                let softness = d3Double(props["softness"])
+                    ?? (props["softness"] as? NSNumber)?.doubleValue ?? 0
+                shadowCatcherConfigurations[key] =
+                    ShadowCatcherConfiguration(mode: mode,
+                                               softness: softness)
+                m.name = "d3.shadowCatcher:\(key)"
                 if d3Bool(props["doubleSided"]) == true {
                     m.isDoubleSided = true
                 }
                 for field in ["shadowColor", "shadowIntensity",
-                              "aoStrength", "softness",
-                              "fadeStart", "fadeEnd", "mode"]
+                              "aoStrength", "fadeStart", "fadeEnd"]
                 where props[field] != nil {
                     host.logOnce("w24.catcher.\(field)",
                         "shadowCatcher '\(field)' unsupported on "
-                        + "SceneKit's shadowOnly — the light's "
-                        + "shadowColor drives the catch")
+                        + "SceneKit; captured RGBA values drive the "
+                        + "baked footprint")
+                }
+                if mode == .live, props["softness"] != nil {
+                    host.logOnce("w24.catcher.liveSoftness",
+                        "shadowCatcher live softness unsupported on "
+                        + "SceneKit's shadowOnly material")
                 }
                 materials[key] = m
                 return
             }
+            shadowCatcherConfigurations.removeValue(forKey: key)
             m.lightingModel = type == "unlit"
                 ? .constant : .physicallyBased
             let props = r["properties"] as? [String: Any] ?? [:]
@@ -3954,6 +4157,35 @@ enum FsceneRealizer {
             }
         }
 
+        func refreshVariantDefaults(
+            key: UInt64, material: SCNMaterial
+        ) {
+            for componentKey in Array(variantComponents.keys) {
+                guard var component = variantComponents[componentKey]
+                else { continue }
+                for index in component.bindings.indices {
+                    var binding = component.bindings[index]
+                    guard binding.defaultMaterialSource?.key == key,
+                          let previousDefault = binding.defaultMaterial
+                    else { continue }
+                    let replacement: SCNMaterial
+                    if binding.defaultMaterialSource?.isSnapshotClone == true {
+                        replacement = material.copy() as! SCNMaterial
+                        replacement.isDoubleSided = previousDefault.isDoubleSided
+                    } else {
+                        replacement = material
+                    }
+                    binding.defaultMaterial = replacement
+                    if let geometry = binding.appliedGeometry,
+                       geometry.materials.first === previousDefault {
+                        dropShadowCatcherBindings(geometry)
+                    }
+                    component.bindings[index] = binding
+                }
+                variantComponents[componentKey] = component
+            }
+        }
+
         /// Applies one binding: writes `geometry.materials[primitive]`
         /// with the variant's mapped material, or the binding's default
         /// when the variant has no mapping (or none is selected).
@@ -3974,14 +4206,16 @@ enum FsceneRealizer {
             // prim 0 rides node.geometry; extras park on `d3prim:i`
             // children, each carrying exactly one material slot.
             let geo: SCNGeometry?
+            let targetNode: SCNNode?
             if b.primitive == 0 {
-                geo = node.geometry
+                targetNode = node
+                geo = targetNode?.geometry
             } else {
-                geo = node.childNodes
-                    .first { $0.name == "d3prim:\(b.primitive)" }?
-                    .geometry
+                targetNode = node.childNodes
+                    .first { $0.name == "d3prim:\(b.primitive)" }
+                geo = targetNode?.geometry
             }
-            guard let geo else {
+            guard let geo, let targetNode else {
                 host.logOnce("variant.unresolved.\(b.nodeKey)",
                     "materialsVariants binding: node \(b.nodeKey) or its "
                     + "geometry not live yet; pending")
@@ -3998,6 +4232,7 @@ enum FsceneRealizer {
             if b.defaultMaterial == nil {
                 b.defaultMaterial =
                     b.defaultMaterialKey.flatMap { materials[$0] }
+                b.defaultMaterialSource = b.defaultMaterialKey.map { ($0, false) }
             }
             let variantMats = b.materialsByVariant.values
                 .compactMap { materials[$0] }
@@ -4005,6 +4240,20 @@ enum FsceneRealizer {
                 && current !== b.defaultMaterial
                 && !variantMats.contains(where: { $0 === current }) {
                 b.defaultMaterial = current
+                b.defaultMaterialSource = materials.first {
+                    $0.value === current
+                }.map { ($0.key, false) }
+                if b.defaultMaterialSource == nil,
+                   geo !== b.appliedGeometry, b.primitive == 0,
+                   d3Bool(instancesProps[b.nodeKey]?["doubleSided"]) == true,
+                   let sourceKey = d3Ref(instancesProps[b.nodeKey]?["material"]),
+                   materials[sourceKey]?.isDoubleSided == false,
+                   current.isDoubleSided,
+                   materialConsumers[sourceKey]?.contains(where: {
+                       $0 === geo
+                   }) == true {
+                    b.defaultMaterialSource = (sourceKey, true)
+                }
             }
             let variantKey = variantIndex
                 .flatMap { b.materialsByVariant[$0] }
@@ -4019,9 +4268,20 @@ enum FsceneRealizer {
                 + "selIdx=\(variantIndex.map(String.init) ?? "-") "
                 + "vkey=\(variantKey.map(String.init) ?? "-") "
                 + "vmap=\(b.materialsByVariant.count) target=\(which)")
+            dropShadowCatcherBindings(geo)
             geo.materials[0] = target
             b.applied = target
+            b.appliedGeometry = geo
             b.resolved = true
+            let materialKey = target === b.defaultMaterial
+                ? b.defaultMaterialSource?.key
+                : materials.first(where: { $0.value === target })?.key
+            if let materialKey {
+                recordShadowCatcherBinding(
+                    key: materialKey, node: targetNode, geometry: geo,
+                    material: target, materialIndex: 0,
+                    isSnapshotClone: target !== materials[materialKey])
+            }
         }
 
         // MARK: Physics
@@ -4718,6 +4978,12 @@ enum FsceneRealizer {
                 guard let ref = primMatKeys[i],
                       let m = materials[ref] else { continue }
                 g.materials = [m]
+                if i == 0 {
+                    recordShadowCatcherBinding(
+                        key: ref, node: node, geometry: g,
+                        material: m, materialIndex: 0,
+                        isSnapshotClone: false)
+                }
                 let existing = materialConsumers[ref] ?? []
                 if !existing.contains(where: { $0 === g }) {
                     materialConsumers[ref] = existing + [g]
@@ -4740,6 +5006,9 @@ enum FsceneRealizer {
                         $0 === child.geometry
                     }
                 }
+                if let geometry = child.geometry {
+                    dropShadowCatcherBindings(geometry)
+                }
                 child.removeFromParentNode()
             }
             for i in 1..<primGeos.count {
@@ -4747,6 +5016,13 @@ enum FsceneRealizer {
                 child.name = "d3prim:\(i)"
                 child.categoryBitMask = node.categoryBitMask
                 node.addChildNode(child)
+                if let ref = primMatKeys[i],
+                   let material = materials[ref] {
+                    recordShadowCatcherBinding(
+                        key: ref, node: child, geometry: primGeos[i],
+                        material: material, materialIndex: 0,
+                        isSnapshotClone: false)
+                }
                 var list = geometryConsumers[primGeoKeys[i]] ?? []
                 if !list.contains(where: { $0 === child }) {
                     list.append(child)
@@ -4884,6 +5160,7 @@ enum FsceneRealizer {
                     for mk in materialConsumers.keys {
                         materialConsumers[mk]?.removeAll { $0 === copy }
                     }
+                    dropShadowCatcherBindings(copy)
                 }
             }
             lods[key] = spec
@@ -4937,6 +5214,7 @@ enum FsceneRealizer {
                 for mk in materialConsumers.keys {
                     materialConsumers[mk]?.removeAll { $0 === old }
                 }
+                dropShadowCatcherBindings(old)
             }
             for (i, g) in geos.enumerated() {
                 let mk = spec.levels[i].matKey
@@ -4945,6 +5223,12 @@ enum FsceneRealizer {
                 }) {
                     materialConsumers[mk] =
                         (materialConsumers[mk] ?? []) + [g]
+                }
+                if let material = materials[mk] {
+                    recordShadowCatcherBinding(
+                        key: mk, node: node, geometry: g,
+                        material: material, materialIndex: 0,
+                        isSnapshotClone: false)
                 }
             }
             spec.geoCopies = geos

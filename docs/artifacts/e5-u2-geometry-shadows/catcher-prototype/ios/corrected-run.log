@@ -1,0 +1,49 @@
+Launching lib/main.dart on iPhone 17 Pro in debug mode...
+Running Xcode build...                                          
+dartnative: [DN] Licence valid (community), expires 2027-09-14
+dartnative: [DN] lifecycle → AppLifecycleState.inactive
+dartnative: dart3d: showcase — u2-ios-control-dir: control capture · dir light · source / mask
+dartnative: [DN] lifecycle → AppLifecycleState.resumed
+Xcode build done.                                           23.4s
+Syncing files to device iPhone 17 Pro...                        
+dartnative: [DN] Licence valid (community), expires 2027-09-14
+dartnative: [DN] lifecycle → AppLifecycleState.resumed
+dartnative: dart3d: showcase — u2-ios-control-dir: control capture · dir light · source / mask
+Syncing files to device iPhone 17 Pro...                            62ms
+
+DartNative run key commands.
+r Hot reload. 🔥🔥🔥
+R Hot restart.
+h List all available interactive commands.
+d Detach (terminate "dn run" but leave application running).
+c Clear the screen
+q Quit (terminate the application on the device).
+
+A Dart VM Service on iPhone 17 Pro is available at: http://127.0.0.1:55395/2gVDjii1R9A=/
+The DartNative DevTools debugger and profiler on iPhone 17 Pro is available at: http://127.0.0.1:55395/2gVDjii1R9A=/devtools/?uri=ws://127.0.0.1:55395/2gVDjii1R9A=/ws
+
+Performing hot restart...                                       
+Restarted application in 222ms.
+dartnative: [DN] Licence valid (community), expires 2027-09-14
+dartnative: [DN] lifecycle → AppLifecycleState.resumed
+dartnative: dart3d: showcase — u2-ios-control-dir: control capture · dir light · source / mask
+dartnative: dart3d: showcase — u2-ios-clip-dir: clip capture · dir light · source / mask
+dartnative: dart3d: showcase — u2-ios-color-dir: color capture · dir light · source / mask
+dartnative: dart3d: showcase — u2-ios-cull-dir: cull capture · dir light · source / mask
+dartnative: dart3d: showcase — u2-ios-control-spot: control capture · spot light · source / mask
+dartnative: dart3d: showcase — u2-ios-clip-spot: clip capture · spot light · source / mask
+dartnative: dart3d: showcase — u2-ios-color-spot: color capture · spot light · source / mask
+dartnative: dart3d: showcase — u2-ios-cull-spot: cull capture · spot light · source / mask
+
+Performing hot restart...                                       
+Restarted application in 172ms.
+dartnative: [DN] Licence valid (community), expires 2027-09-14
+dartnative: [DN] lifecycle → AppLifecycleState.resumed
+dartnative: dart3d: showcase — u2-ios-control-dir: control capture · dir light · source / mask
+dartnative: dart3d: showcase — u2-ios-clip-dir: clip capture · dir light · source / mask
+dartnative: dart3d: showcase — u2-ios-color-dir: color capture · dir light · source / mask
+dartnative: dart3d: showcase — u2-ios-cull-dir: cull capture · dir light · source / mask
+dartnative: dart3d: showcase — u2-ios-control-spot: control capture · spot light · source / mask
+dartnative: dart3d: showcase — u2-ios-clip-spot: clip capture · spot light · source / mask
+
+Application finished.

@@ -1,0 +1,525 @@
+--------- beginning of main
+10-27 03:05:57.427  9257  9257 I dart3d  : start +102ms plugin registered
+10-27 03:05:57.427  9257  9257 I dart3d  : dart3d provider registered (disposeView=true)
+10-27 03:05:57.460  9257  9257 I dart3d  : GPU: Mali-G610 MC4
+10-27 03:05:57.698  9257  9257 I dart3d  : Dart3dSetDispatcher: slot armed
+10-27 03:05:57.699  9257  9257 I dart3d  : Dart3dSetBackend: 1
+10-27 03:05:57.791  9257  9257 I Filament: FEngine (64 bits) created at 0xb40000730927eb60 (threading is enabled)
+10-27 03:05:57.795  9257  9354 I Filament: FEngine resolved backend: OpenGL
+10-27 03:05:57.858  9257  9354 I Filament: [ARM], [Mali-G610 MC4], [OpenGL ES 3.2 v1.r38p1], [OpenGL ES GLSL ES 3.20]
+10-27 03:05:57.858  9257  9354 I Filament: Feature level: 2
+10-27 03:05:57.858  9257  9354 I Filament: Active workarounds: 
+10-27 03:05:57.858  9257  9354 I Filament: vao_doesnt_store_element_array_buffer_binding
+10-27 03:05:57.858  9257  9354 I Filament: dont_use_timer_query
+10-27 03:05:57.858  9257  9354 I Filament: allow_read_only_ancillary_feedback_loop
+10-27 03:05:57.858  9257  9354 I Filament: disable_framebuffer_fetch_extension
+10-27 03:05:57.858  9257  9354 I Filament: disable_es2_srgb_ext
+10-27 03:05:57.864  9257  9257 I Filament: Backend feature level: 2
+10-27 03:05:57.864  9257  9257 I Filament: FEngine feature level: 1
+10-27 03:05:57.871  9257  9257 I dart3d  : Filament engine backend: OPENGL (pref=1, tier=STANDARD)
+10-27 03:05:57.871  9257  9257 I dart3d  : start +546ms engine created
+10-27 03:05:57.901  9257  9257 I dart3d  : start +576ms base materials loaded
+10-27 03:05:57.946  9257  9257 I dart3d  : perf view: backend=OPENGL viewport=0x0 msaa=0 aa=FXAA post=true hdr=HIGH bloom=false(levels=6 res=384 q=LOW) ssao=false taa=false ssr=false dsr=false(0.5..1.0) dither=TEMPORAL quality=default physics=60Hzx8 entities=0 bodies=0
+10-27 03:05:57.946  9257  9257 I dart3d  : protocol hello: Dart v1.0
+10-27 03:05:57.946  9257  9257 I dart3d  : antialiasingMode=4 → MSAA enabled=true sampleCount=4 aa=FXAA
+10-27 03:05:57.947  9257  9257 I dart3d  : quality=default → shadows=true aaSrc=4 tier=STANDARD shadowType=DPCF
+10-27 03:05:57.948  9257  9257 I dart3d  : texture 26147370056024066: awaiting payload
+10-27 03:05:57.953  9257  9257 W dart3d  : material slot baseColorTexture: texture 26147370056024066 not realized — binding fallback
+10-27 03:05:57.953  9257  9257 W dart3d  : material slot emissiveTexture: texture 26147370056024066 not realized — binding fallback
+10-27 03:05:57.954  9257  9257 I dart3d  : geometry 26147370056024070: awaiting payload
+10-27 03:05:57.954  9257  9257 I dart3d  : animation 26147370056024075: awaiting channel payloads
+10-27 03:05:57.955  9257  9257 W dart3d  : mesh node: geometry unresolved
+10-27 03:05:57.956  9257  9257 I dart3d  : shadow options: mapSize=1024 cascades=1 far=0.0 contactDist=0.3 contact=false bias=0.01 normalBias=0.005 bulbRadius=4.0
+10-27 03:05:57.957  9257  9257 I dart3d  : node 26147370056024064: body=none pos=(0.0,0.8673283,-0.0)
+10-27 03:05:57.957  9257  9257 I dart3d  : node 522948616596226048: body=none pos=(1.2293458E-4,2.666544,12.823052)
+10-27 03:05:57.957  9257  9257 I dart3d  : node 522948616596226049: body=none pos=(-4.458765E-6,-0.022633433,0.1246618)
+10-27 03:05:57.957  9257  9257 I dart3d  : node 522948616596226050: body=none pos=(-4.458765E-6,-0.022633433,0.1246618)
+10-27 03:05:57.957  9257  9257 I dart3d  : node 522948616596226051: body=none pos=(-4.458765E-6,-0.022633433,0.1246618)
+10-27 03:05:57.957  9257  9257 I dart3d  : node 522948616596226053: body=none pos=(1.2293458E-4,0.86438143,-0.0)
+10-27 03:05:58.073  9257  9257 I dart3d  : environment 522948616596226052: 256×128 equirect → 256² cube + SH3 in 90ms
+10-27 03:05:58.101  9257  9257 I dart3d  : applySkybox: sb=true textures=1
+10-27 03:05:58.102  9257  9257 I dart3d  : applyEnvironment: il=true textures=3
+10-27 03:05:58.104  9257  9257 I dart3d  : start +779ms scene installed
+10-27 03:05:58.104  9257  9257 I dart3d  : views applied: 0 entries (0 screen, 0 rts)
+10-27 03:05:58.104  9257  9257 I dart3d  : realize: 157ms
+10-27 03:05:58.109  9257  9257 I dart3d  : texture 26147370056024066: 1024x1024 rgba8 in 1ms
+10-27 03:05:58.134  9257  9257 I dart3d  : geometry 26147370056024070: decoded 7685 verts in 24ms
+10-27 03:05:58.143  9257  9257 I dart3d  : shadow options: mapSize=1024 cascades=1 far=0.0 contactDist=0.3 contact=false bias=0.01 normalBias=0.005 bulbRadius=4.0
+10-27 03:05:58.143  9257  9257 I dart3d  : node 26147370056024064: body=none pos=(0.0,0.8673283,-0.0)
+10-27 03:05:58.143  9257  9257 I dart3d  : node 522948616596226048: body=none pos=(1.2293458E-4,2.666544,12.823052)
+10-27 03:05:58.143  9257  9257 I dart3d  : node 522948616596226049: body=none pos=(-4.458765E-6,-0.022633433,0.1246618)
+10-27 03:05:58.143  9257  9257 I dart3d  : node 522948616596226050: body=none pos=(-4.458765E-6,-0.022633433,0.1246618)
+10-27 03:05:58.143  9257  9257 I dart3d  : node 522948616596226051: body=none pos=(-4.458765E-6,-0.022633433,0.1246618)
+10-27 03:05:58.143  9257  9257 I dart3d  : node 522948616596226053: body=none pos=(1.2293458E-4,0.86438143,-0.0)
+10-27 03:05:58.143  9257  9257 I dart3d  : views applied: 0 entries (0 screen, 0 rts)
+10-27 03:05:58.144  9257  9257 I dart3d  : realize: 36ms
+10-27 03:05:58.144  9257  9257 I dart3d  : re-realize: restored 1 written transform(s)
+10-27 03:05:58.162  9257  9257 I dart3d  : dart3d view 4 swapchain created
+10-27 03:05:58.162  9257  9257 I dart3d  : start +837ms swapchain created
+10-27 03:05:58.193  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:05:58.195  9257  9257 I dart3d  : start +870ms first frame submitted
+10-27 03:05:58.250  9257  9257 I dart3d  : start +925ms first frame rendered
+10-27 03:05:58.255  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:05:58.307  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:05:58.407  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:05:58.863  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:05:58.975  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:05:59.075  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:05:59.175  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:05:59.275  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:05:59.375  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:05:59.475  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:05:59.576  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:05:59.676  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:05:59.776  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:05:59.876  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:05:59.955  9257  9257 I dart3d  : perf n=133 fps=66.2 frame p50=11.1 p95=22.3 max=66.8 ms | gpu p50=10.5 p95=21.0 | backend p50=9.7 p95=21.0 | sim p50=0.1 p95=0.4 (physics p50=0.0 p95=0.0) | submit p50=0.3 p95=0.4 | skipped=22/156 physics=56/s
+10-27 03:05:59.976  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:00.076  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:00.177  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:00.277  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:00.377  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:00.477  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:00.579  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:00.678  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:00.779  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:00.880  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:00.980  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:01.104  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:01.370  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:01.470  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:01.569  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:01.669  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:01.769  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:01.869  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:01.960  9257  9257 I dart3d  : perf n=124 fps=61.9 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=16.2 p95=18.1 | backend p50=16.2 p95=19.1 | sim p50=0.1 p95=0.8 (physics p50=0.0 p95=0.0) | submit p50=0.6 p95=1.1 | skipped=56/180 physics=60/s
+10-27 03:06:01.971  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:02.071  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:02.170  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:02.271  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:02.370  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:02.470  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:02.571  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:02.671  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:02.771  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:02.871  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:02.971  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:03.071  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:03.171  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:03.274  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:03.373  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:03.484  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:03.773  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:03.963  9257  9257 I dart3d  : perf n=125 fps=62.4 frame p50=11.1 p95=22.3 max=22.4 ms | gpu p50=16.4 p95=17.9 | backend p50=16.2 p95=18.5 | sim p50=0.1 p95=1.1 (physics p50=0.0 p95=0.1) | submit p50=0.6 p95=1.4 | skipped=55/180 physics=60/s
+10-27 03:06:03.973  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:04.073  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:04.174  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:04.273  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:04.374  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:04.474  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:04.575  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:04.675  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:04.775  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:04.877  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:04.975  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:05.075  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:05.177  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:05.276  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:05.378  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:05.481  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:05.579  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:05.676  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:05.776  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:05.888  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:05.966  9257  9257 I dart3d  : perf n=123 fps=61.4 frame p50=11.1 p95=22.3 max=33.4 ms | gpu p50=16.3 p95=18.0 | backend p50=16.3 p95=18.0 | sim p50=0.1 p95=1.3 (physics p50=0.0 p95=0.1) | submit p50=0.7 p95=2.0 | skipped=57/180 physics=60/s
+10-27 03:06:06.178  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:06.279  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:06.378  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:06.477  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:06.577  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:06.678  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:06.778  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:06.879  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:06.978  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:07.079  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:07.179  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:07.278  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:07.378  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:07.479  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:07.580  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:07.678  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:07.779  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:07.880  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:07.970  9257  9257 I dart3d  : perf n=122 fps=60.9 frame p50=11.2 p95=22.3 max=22.3 ms | gpu p50=16.4 p95=18.0 | backend p50=16.5 p95=18.3 | sim p50=0.1 p95=1.3 (physics p50=0.0 p95=0.0) | submit p50=0.7 p95=1.2 | skipped=58/180 physics=60/s
+10-27 03:06:07.980  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:08.082  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:08.182  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:08.303  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:08.570  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:08.671  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:08.770  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:08.871  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:08.971  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:09.071  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:09.171  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:09.271  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:09.371  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:09.471  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:09.572  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:09.673  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:09.773  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:09.872  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:09.972  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:09.973  9257  9257 I dart3d  : perf n=124 fps=61.9 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=16.3 p95=17.9 | backend p50=16.2 p95=18.4 | sim p50=0.1 p95=0.9 (physics p50=0.0 p95=0.1) | submit p50=0.7 p95=1.9 | skipped=56/180 physics=60/s
+10-27 03:06:10.072  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:10.172  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:10.273  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:10.373  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:10.473  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:10.573  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:10.685  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:10.975  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:11.074  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:11.176  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:11.274  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:11.375  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:11.475  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:11.575  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:11.676  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:11.775  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:11.876  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:11.976  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:11.978  9257  9257 I dart3d  : perf n=121 fps=60.4 frame p50=11.2 p95=22.3 max=22.3 ms | gpu p50=16.5 p95=18.1 | backend p50=16.6 p95=18.0 | sim p50=0.1 p95=0.8 (physics p50=0.0 p95=0.0) | submit p50=0.7 p95=1.8 | skipped=59/180 physics=60/s
+10-27 03:06:12.076  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:12.176  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:12.276  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:12.376  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:12.477  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:12.577  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:12.676  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:12.778  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:12.877  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:12.977  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:13.101  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:13.367  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:13.467  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:13.567  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:13.668  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:13.768  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:13.868  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:13.968  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:13.981  9257  9257 I dart3d  : perf n=122 fps=60.9 frame p50=11.2 p95=22.3 max=22.4 ms | gpu p50=16.4 p95=18.0 | backend p50=16.2 p95=18.1 | sim p50=0.1 p95=0.8 (physics p50=0.0 p95=0.1) | submit p50=0.7 p95=2.1 | skipped=58/180 physics=60/s
+10-27 03:06:14.068  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:14.168  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:14.269  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:14.368  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:14.471  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:14.570  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:14.669  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:14.768  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:14.869  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:14.969  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:15.069  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:15.169  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:15.270  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:15.370  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:15.481  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:15.771  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:15.872  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:15.972  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:15.984  9257  9257 I dart3d  : perf n=124 fps=61.9 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=16.4 p95=17.8 | backend p50=16.4 p95=17.7 | sim p50=0.1 p95=0.7 (physics p50=0.0 p95=0.0) | submit p50=0.5 p95=1.3 | skipped=56/180 physics=60/s
+10-27 03:06:16.073  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:16.172  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:16.272  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:16.372  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:16.473  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:16.573  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:16.673  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:16.786  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:16.886  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:16.985  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:17.086  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:17.185  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:17.287  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:17.388  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:17.488  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:17.588  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:17.687  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:17.787  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:17.919  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:17.987  9257  9257 I dart3d  : perf n=123 fps=61.4 frame p50=11.2 p95=22.3 max=22.4 ms | gpu p50=16.6 p95=18.0 | backend p50=16.6 p95=18.1 | sim p50=0.1 p95=0.9 (physics p50=0.0 p95=0.0) | submit p50=0.7 p95=1.9 | skipped=57/180 physics=60/s
+10-27 03:06:18.165  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:18.265  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:18.366  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:18.465  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:18.565  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:18.666  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:18.766  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:18.866  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:18.966  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:19.066  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:19.166  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:19.269  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:19.367  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:19.468  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:19.571  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:19.668  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:19.769  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:19.869  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:19.968  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:19.992  9257  9257 I dart3d  : perf n=123 fps=61.4 frame p50=11.1 p95=22.3 max=22.3 ms | gpu p50=16.3 p95=17.9 | backend p50=16.2 p95=18.3 | sim p50=0.1 p95=1.0 (physics p50=0.0 p95=0.1) | submit p50=0.7 p95=1.3 | skipped=57/180 physics=60/s
+10-27 03:06:20.070  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:20.168  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:20.281  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:20.581  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:20.682  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:20.780  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:20.881  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:20.981  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:21.081  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:21.181  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:21.281  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:21.381  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:21.482  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:21.593  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:21.693  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:21.794  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:21.893  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:21.994  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:21.995  9257  9257 I dart3d  : perf n=122 fps=60.9 frame p50=11.2 p95=22.3 max=22.3 ms | gpu p50=16.7 p95=18.5 | backend p50=16.5 p95=18.5 | sim p50=0.1 p95=0.7 (physics p50=0.0 p95=0.0) | submit p50=0.7 p95=1.8 | skipped=58/180 physics=60/s
+10-27 03:06:22.094  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:22.194  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:22.294  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:22.394  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:22.495  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:22.594  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:22.761  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:22.951  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:23.050  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:23.151  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:23.251  9257  9257 I dart3d  : upsertResource material 26147370056024067: reattached to 1 renderable(s)
+10-27 03:06:23.371  9257  9257 I dart3d  : dart3d view 4 swapchain destroyed (surface destroyed); driver drained in 26ms
+10-27 03:06:23.372  9257  9257 I dart3d  : dart3d view 4 released (disposeView(4))
+10-27 03:06:23.408  9257  9257 I Filament: FEngine (64 bits) created at 0xb400007309277c40 (threading is enabled)
+10-27 03:06:23.408  9257  9424 I Filament: FEngine resolved backend: OpenGL
+10-27 03:06:23.417  9257  9424 I Filament: [ARM], [Mali-G610 MC4], [OpenGL ES 3.2 v1.r38p1], [OpenGL ES GLSL ES 3.20]
+10-27 03:06:23.417  9257  9424 I Filament: Feature level: 2
+10-27 03:06:23.417  9257  9424 I Filament: Active workarounds: 
+10-27 03:06:23.417  9257  9424 I Filament: vao_doesnt_store_element_array_buffer_binding
+10-27 03:06:23.417  9257  9424 I Filament: dont_use_timer_query
+10-27 03:06:23.417  9257  9424 I Filament: allow_read_only_ancillary_feedback_loop
+10-27 03:06:23.417  9257  9424 I Filament: disable_framebuffer_fetch_extension
+10-27 03:06:23.417  9257  9424 I Filament: disable_es2_srgb_ext
+10-27 03:06:23.420  9257  9257 I Filament: Backend feature level: 2
+10-27 03:06:23.420  9257  9257 I Filament: FEngine feature level: 1
+10-27 03:06:23.423  9257  9257 I dart3d  : Filament engine backend: OPENGL (pref=1, tier=STANDARD)
+10-27 03:06:23.439  9257  9257 I dart3d  : perf view: backend=OPENGL viewport=0x0 msaa=0 aa=FXAA post=true hdr=HIGH bloom=false(levels=6 res=384 q=LOW) ssao=false taa=false ssr=false dsr=false(0.5..1.0) dither=TEMPORAL quality=default physics=60Hzx8 entities=0 bodies=0
+10-27 03:06:23.439  9257  9257 I dart3d  : protocol hello: Dart v1.0
+10-27 03:06:23.439  9257  9257 I dart3d  : antialiasingMode=4 → MSAA enabled=true sampleCount=4 aa=FXAA
+10-27 03:06:23.439  9257  9257 I dart3d  : quality=default → shadows=true aaSrc=4 tier=STANDARD shadowType=DPCF
+10-27 03:06:23.444  9257  9257 I dart3d  : dart3d view 27 swapchain created
+10-27 03:06:24.495  9257  9257 I dart3d  : texture 7968362140329312260: awaiting payload
+10-27 03:06:24.495  9257  9257 I dart3d  : texture 7968362140329312304: awaiting payload
+10-27 03:06:24.495  9257  9257 I dart3d  : texture 7968362140329312310: awaiting payload
+10-27 03:06:24.495  9257  9257 I dart3d  : texture 7968362140329312316: awaiting payload
+10-27 03:06:24.495  9257  9257 I dart3d  : texture 7968362140329312322: awaiting payload
+10-27 03:06:24.495  9257  9257 I dart3d  : texture 7968362140329312328: awaiting payload
+10-27 03:06:24.495  9257  9257 I dart3d  : texture 7968362140329312334: awaiting payload
+10-27 03:06:24.495  9257  9257 I dart3d  : texture 7968362140329312340: awaiting payload
+10-27 03:06:24.495  9257  9257 I dart3d  : texture -3348190467286259916: awaiting payload
+10-27 03:06:24.496  9257  9257 W dart3d  : material slot emissiveTexture: texture 7968362140329312260 not realized — binding fallback
+10-27 03:06:24.496  9257  9257 I dart3d  : geometry 7968362140329312264: awaiting payload
+10-27 03:06:24.496  9257  9257 I dart3d  : geometry 7968362140329312268: awaiting payload
+10-27 03:06:24.496  9257  9257 I dart3d  : geometry 7968362140329312272: awaiting payload
+10-27 03:06:24.496  9257  9257 I dart3d  : geometry 7968362140329312276: awaiting payload
+10-27 03:06:24.496  9257  9257 I dart3d  : geometry 7968362140329312280: awaiting payload
+10-27 03:06:24.496  9257  9257 I dart3d  : geometry 7968362140329312284: awaiting payload
+10-27 03:06:24.496  9257  9257 I dart3d  : geometry 7968362140329312288: awaiting payload
+10-27 03:06:24.496  9257  9257 I dart3d  : geometry 7968362140329312292: awaiting payload
+10-27 03:06:24.496  9257  9257 I dart3d  : geometry 7968362140329312302: awaiting payload
+10-27 03:06:24.496  9257  9257 W dart3d  : material slot baseColorTexture: texture 7968362140329312304 not realized — binding fallback
+10-27 03:06:24.496  9257  9257 W dart3d  : material slot emissiveTexture: texture 7968362140329312304 not realized — binding fallback
+10-27 03:06:24.496  9257  9257 I dart3d  : geometry 7968362140329312308: awaiting payload
+10-27 03:06:24.496  9257  9257 W dart3d  : material slot baseColorTexture: texture 7968362140329312310 not realized — binding fallback
+10-27 03:06:24.496  9257  9257 W dart3d  : material slot emissiveTexture: texture 7968362140329312310 not realized — binding fallback
+10-27 03:06:24.496  9257  9257 I dart3d  : geometry 7968362140329312314: awaiting payload
+10-27 03:06:24.496  9257  9257 W dart3d  : material slot baseColorTexture: texture 7968362140329312316 not realized — binding fallback
+10-27 03:06:24.496  9257  9257 W dart3d  : material slot emissiveTexture: texture 7968362140329312316 not realized — binding fallback
+10-27 03:06:24.496  9257  9257 I dart3d  : geometry 7968362140329312320: awaiting payload
+10-27 03:06:24.496  9257  9257 W dart3d  : material slot baseColorTexture: texture 7968362140329312322 not realized — binding fallback
+10-27 03:06:24.496  9257  9257 W dart3d  : material slot emissiveTexture: texture 7968362140329312322 not realized — binding fallback
+10-27 03:06:24.496  9257  9257 I dart3d  : geometry 7968362140329312326: awaiting payload
+10-27 03:06:24.496  9257  9257 W dart3d  : material slot baseColorTexture: texture 7968362140329312328 not realized — binding fallback
+10-27 03:06:24.496  9257  9257 W dart3d  : material slot emissiveTexture: texture 7968362140329312328 not realized — binding fallback
+10-27 03:06:24.497  9257  9257 I dart3d  : geometry 7968362140329312332: awaiting payload
+10-27 03:06:24.497  9257  9257 W dart3d  : material slot baseColorTexture: texture 7968362140329312334 not realized — binding fallback
+10-27 03:06:24.497  9257  9257 W dart3d  : material slot emissiveTexture: texture 7968362140329312334 not realized — binding fallback
+10-27 03:06:24.497  9257  9257 I dart3d  : geometry 7968362140329312338: awaiting payload
+10-27 03:06:24.497  9257  9257 W dart3d  : material slot baseColorTexture: texture 7968362140329312340 not realized — binding fallback
+10-27 03:06:24.497  9257  9257 W dart3d  : material slot emissiveTexture: texture 7968362140329312340 not realized — binding fallback
+10-27 03:06:24.497  9257  9257 I dart3d  : geometry -8540867768301368387: awaiting payload
+10-27 03:06:24.497  9257  9257 W dart3d  : material slot baseColorTexture: texture -3348190467286259916 not realized — binding fallback
+10-27 03:06:24.497  9257  9257 W dart3d  : material slot emissiveTexture: texture -3348190467286259916 not realized — binding fallback
+10-27 03:06:24.497  9257  9257 I dart3d  : animation 8222407619367374659: awaiting channel payloads
+10-27 03:06:24.497  9257  9257 W dart3d  : mesh node: geometry unresolved
+10-27 03:06:24.497  9257  9257 W dart3d  : mesh node: geometry unresolved
+10-27 03:06:24.497  9257  9257 W dart3d  : mesh node: geometry unresolved
+10-27 03:06:24.498  9257  9257 W dart3d  : mesh node: geometry unresolved
+10-27 03:06:24.498  9257  9257 W dart3d  : mesh node: geometry unresolved
+10-27 03:06:24.498  9257  9257 W dart3d  : mesh node: geometry unresolved
+10-27 03:06:24.498  9257  9257 W dart3d  : mesh node: geometry unresolved
+10-27 03:06:24.498  9257  9257 W dart3d  : mesh node: geometry unresolved
+10-27 03:06:24.498  9257  9257 W dart3d  : mesh node: geometry unresolved
+10-27 03:06:24.498  9257  9257 W dart3d  : mesh node: geometry unresolved
+10-27 03:06:24.498  9257  9257 W dart3d  : mesh node: geometry unresolved
+10-27 03:06:24.498  9257  9257 W dart3d  : mesh node: geometry unresolved
+10-27 03:06:24.498  9257  9257 W dart3d  : mesh node: geometry unresolved
+10-27 03:06:24.498  9257  9257 W dart3d  : mesh node: geometry unresolved
+10-27 03:06:24.498  9257  9257 W dart3d  : mesh node: geometry unresolved
+10-27 03:06:24.498  9257  9257 W dart3d  : mesh node: geometry unresolved
+10-27 03:06:24.498  9257  9257 W dart3d  : mesh node: geometry unresolved
+10-27 03:06:24.498  9257  9257 W dart3d  : mesh node: geometry unresolved
+10-27 03:06:24.498  9257  9257 W dart3d  : mesh node: geometry unresolved
+10-27 03:06:24.498  9257  9257 W dart3d  : mesh node: geometry unresolved
+10-27 03:06:24.498  9257  9257 W dart3d  : mesh node: geometry unresolved
+10-27 03:06:24.498  9257  9257 W dart3d  : mesh node: geometry unresolved
+10-27 03:06:24.498  9257  9257 I dart3d  : shadow options: mapSize=1024 cascades=1 far=0.0 contactDist=0.3 contact=false bias=0.01 normalBias=0.005 bulbRadius=2.5
+10-27 03:06:24.500  9257  9257 W dart3d  : collider 'convexHull': node has no geometry
+10-27 03:06:24.500  9257  9257 W dart3d  : collider 'convexHull': node has no geometry
+10-27 03:06:24.500  9257  9257 W dart3d  : collider 'convexHull': node has no geometry
+10-27 03:06:24.500  9257  9257 W dart3d  : collider 'convexHull': node has no geometry
+10-27 03:06:24.500  9257  9257 W dart3d  : collider 'convexHull': node has no geometry
+10-27 03:06:24.500  9257  9257 W dart3d  : collider 'convexHull': node has no geometry
+10-27 03:06:24.500  9257  9257 W dart3d  : collider 'convexHull': node has no geometry
+10-27 03:06:24.505  9257  9257 W dart3d  : node 7968362140329312342: collider has no shape yet; body deferred
+10-27 03:06:24.505  9257  9257 W dart3d  : node 7968362140329312344: collider has no shape yet; body deferred
+10-27 03:06:24.505  9257  9257 W dart3d  : node 7968362140329312346: collider has no shape yet; body deferred
+10-27 03:06:24.505  9257  9257 W dart3d  : node 7968362140329312348: collider has no shape yet; body deferred
+10-27 03:06:24.505  9257  9257 W dart3d  : node 7968362140329312350: collider has no shape yet; body deferred
+10-27 03:06:24.505  9257  9257 W dart3d  : node 7968362140329312352: collider has no shape yet; body deferred
+10-27 03:06:24.505  9257  9257 W dart3d  : node 7968362140329312354: collider has no shape yet; body deferred
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312258: body=Static pos=(0.0,-20.0,-0.0)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312265: body=none pos=(0.0,0.6,-80.92261)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312269: body=none pos=(0.0,0.6,75.580025)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312273: body=none pos=(-46.307144,0.6,-2.67129)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312277: body=none pos=(46.307144,0.6,-2.67129)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312281: body=none pos=(37.307144,0.6,-71.92261)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312285: body=none pos=(-37.307144,0.6,-71.92261)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312289: body=none pos=(-37.307144,0.6,66.580025)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312293: body=none pos=(37.307144,0.6,66.580025)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312294: body=Static pos=(-170.18195,1948.5778,-0.0)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312295: body=Static pos=(170.18195,1948.5778,-0.0)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312296: body=Static pos=(0.0,1915.183,334.8377)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312297: body=Static pos=(0.0,1921.5922,-310.22577)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312298: body=Static pos=(0.0,210.0,-0.0)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312299: body=none pos=(0.0,0.0,-0.0)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312342: body=none pos=(-27.347422,4.4905,-30.018711)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312343: body=none pos=(-27.347422,4.4905,-30.018711)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312344: body=none pos=(0.0,7.0648003,-30.018711)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312345: body=none pos=(0.0,7.0648003,-30.018711)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312346: body=none pos=(27.347422,5.4019556,-30.018711)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312347: body=none pos=(27.347422,5.4019556,-30.018711)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312348: body=none pos=(-27.347422,6.150383,-2.67129)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312349: body=none pos=(-27.347422,6.150383,-2.67129)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312350: body=none pos=(0.0,6.150383,-2.67129)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312351: body=none pos=(0.0,6.150383,-2.67129)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312352: body=none pos=(27.347422,7.9950852,-2.67129)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312353: body=none pos=(27.347422,7.9950852,-2.67129)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312354: body=none pos=(0.0,7.8525224,24.676132)
+10-27 03:06:24.506  9257  9257 I dart3d  : node 7968362140329312355: body=none pos=(0.0,7.8525224,24.676132)
+10-27 03:06:24.506  9257  9257 I dart3d  : node -5111490374820429824: body=none pos=(0.0,323.0045,-0.0)
+10-27 03:06:24.506  9257  9257 I dart3d  : node -5111490374820429823: body=none pos=(0.0,0.0,-0.0)
+10-27 03:06:24.527  9257  9257 I dart3d  : environment -5111490374820429822: 256×128 equirect → 256² cube + SH3 in 9ms
+10-27 03:06:24.542  9257  9257 I dart3d  : applySkybox: sb=true textures=1
+10-27 03:06:24.542  9257  9257 I dart3d  : applyEnvironment: il=true textures=3
+10-27 03:06:24.542  9257  9257 I dart3d  : views applied: 0 entries (0 screen, 0 rts)
+10-27 03:06:24.543  9257  9257 I dart3d  : realize: 48ms
+10-27 03:06:24.547  9257  9257 I dart3d  : texture 7968362140329312260: 64x1 rgba8 in 0ms
+10-27 03:06:24.550  9257  9257 I dart3d  : texture 7968362140329312304: 519x346 encoded in 3ms
+10-27 03:06:24.554  9257  9257 I dart3d  : texture 7968362140329312310: 738x492 encoded in 4ms
+10-27 03:06:24.558  9257  9257 I dart3d  : texture 7968362140329312316: 561x561 encoded in 4ms
+10-27 03:06:24.564  9257  9257 I dart3d  : texture 7968362140329312322: 888x666 encoded in 6ms
+10-27 03:06:24.570  9257  9257 I dart3d  : texture 7968362140329312328: 888x666 encoded in 6ms
+10-27 03:06:24.573  9257  9257 I dart3d  : texture 7968362140329312334: 604x453 encoded in 3ms
+10-27 03:06:24.578  9257  9257 I dart3d  : texture 7968362140329312340: 740x592 encoded in 5ms
+10-27 03:06:24.580  9257  9257 I dart3d  : texture -3348190467286259916: 1024x1024 rgba8 in 2ms
+10-27 03:06:24.580  9257  9257 I dart3d  : geometry 7968362140329312264: decoded 4 verts in 0ms
+10-27 03:06:24.581  9257  9257 I dart3d  : geometry 7968362140329312268: decoded 4 verts in 0ms
+10-27 03:06:24.582  9257  9257 I dart3d  : geometry 7968362140329312272: decoded 4 verts in 0ms
+10-27 03:06:24.582  9257  9257 I dart3d  : geometry 7968362140329312276: decoded 4 verts in 0ms
+10-27 03:06:24.582  9257  9257 I dart3d  : geometry 7968362140329312280: decoded 22 verts in 0ms
+10-27 03:06:24.583  9257  9257 I dart3d  : geometry 7968362140329312284: decoded 22 verts in 0ms
+10-27 03:06:24.583  9257  9257 I dart3d  : geometry 7968362140329312288: decoded 22 verts in 0ms
+10-27 03:06:24.583  9257  9257 I dart3d  : geometry 7968362140329312292: decoded 22 verts in 0ms
+10-27 03:06:24.583  9257  9257 I dart3d  : geometry 7968362140329312302: decoded 452 verts in 0ms
+10-27 03:06:24.584  9257  9257 I dart3d  : geometry 7968362140329312308: decoded 270 verts in 0ms
+10-27 03:06:24.584  9257  9257 I dart3d  : geometry 7968362140329312314: decoded 272 verts in 0ms
+10-27 03:06:24.585  9257  9257 I dart3d  : geometry 7968362140329312320: decoded 450 verts in 0ms
+10-27 03:06:24.585  9257  9257 I dart3d  : geometry 7968362140329312326: decoded 450 verts in 0ms
+10-27 03:06:24.586  9257  9257 I dart3d  : geometry 7968362140329312332: decoded 672 verts in 0ms
+10-27 03:06:24.587  9257  9257 I dart3d  : geometry 7968362140329312338: decoded 680 verts in 0ms
+10-27 03:06:24.599  9257  9257 I dart3d  : geometry -8540867768301368387: decoded 7685 verts in 12ms
+10-27 03:06:24.610  9257  9257 I dart3d  : shadow options: mapSize=1024 cascades=1 far=0.0 contactDist=0.3 contact=false bias=0.01 normalBias=0.005 bulbRadius=2.5
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312258: body=Static pos=(0.0,-20.0,-0.0)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312265: body=none pos=(0.0,0.6,-80.92261)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312269: body=none pos=(0.0,0.6,75.580025)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312273: body=none pos=(-46.307144,0.6,-2.67129)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312277: body=none pos=(46.307144,0.6,-2.67129)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312281: body=none pos=(37.307144,0.6,-71.92261)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312285: body=none pos=(-37.307144,0.6,-71.92261)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312289: body=none pos=(-37.307144,0.6,66.580025)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312293: body=none pos=(37.307144,0.6,66.580025)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312294: body=Static pos=(-170.18195,1948.5778,-0.0)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312295: body=Static pos=(170.18195,1948.5778,-0.0)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312296: body=Static pos=(0.0,1915.183,334.8377)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312297: body=Static pos=(0.0,1921.5922,-310.22577)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312298: body=Static pos=(0.0,210.0,-0.0)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312299: body=none pos=(0.0,0.0,-0.0)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312342: body=Dynamic pos=(-27.347422,4.4905,-30.018711)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312343: body=none pos=(-27.347422,4.4905,-30.018711)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312344: body=Dynamic pos=(0.0,7.0648003,-30.018711)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312345: body=none pos=(0.0,7.0648003,-30.018711)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312346: body=Dynamic pos=(27.347422,5.4019556,-30.018711)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312347: body=none pos=(27.347422,5.4019556,-30.018711)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312348: body=Dynamic pos=(-27.347422,6.150383,-2.67129)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312349: body=none pos=(-27.347422,6.150383,-2.67129)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312350: body=Dynamic pos=(0.0,6.150383,-2.67129)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312351: body=none pos=(0.0,6.150383,-2.67129)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312352: body=Dynamic pos=(27.347422,7.9950852,-2.67129)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312353: body=none pos=(27.347422,7.9950852,-2.67129)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312354: body=Dynamic pos=(0.0,7.8525224,24.676132)
+10-27 03:06:24.618  9257  9257 I dart3d  : node 7968362140329312355: body=none pos=(0.0,7.8525224,24.676132)
+10-27 03:06:24.618  9257  9257 I dart3d  : node -5111490374820429824: body=none pos=(0.0,323.0045,-0.0)
+10-27 03:06:24.618  9257  9257 I dart3d  : node -5111490374820429823: body=none pos=(0.0,0.0,-0.0)
+10-27 03:06:24.619  9257  9257 I dart3d  : views applied: 0 entries (0 screen, 0 rts)
+10-27 03:06:24.619  9257  9257 I dart3d  : realize: 73ms
+10-27 03:06:24.620  9257  9257 I dart3d  : re-realize: restored 14 written transform(s)
+10-27 03:06:24.881  9257  9257 W dart3d  : slow frame 387ms on main: ops=47 realize=true
+10-27 03:06:25.445  9257  9257 I dart3d  : perf n=122 fps=60.9 frame p50=11.1 p95=22.3 max=400.7 ms | gpu p50=4.5 p95=20.9 | backend p50=1.2 p95=21.1 | sim p50=0.0 p95=0.8 (physics p50=0.0 p95=0.5) | submit p50=0.2 p95=1.1 | skipped=23/146 physics=66/s
+10-27 03:06:27.448  9257  9257 I dart3d  : perf n=110 fps=54.9 frame p50=22.3 p95=22.3 max=22.3 ms | gpu p50=18.2 p95=19.6 | backend p50=18.1 p95=19.3 | sim p50=0.1 p95=0.7 (physics p50=0.0 p95=0.2) | submit p50=0.9 p95=1.5 | skipped=70/180 physics=120/s
+10-27 03:06:29.451  9257  9257 I dart3d  : perf n=110 fps=54.9 frame p50=22.2 p95=22.3 max=22.3 ms | gpu p50=18.2 p95=20.0 | backend p50=18.1 p95=19.2 | sim p50=0.1 p95=0.2 (physics p50=0.0 p95=0.0) | submit p50=0.8 p95=1.2 | skipped=70/180 physics=120/s
+10-27 03:06:31.456  9257  9257 I dart3d  : perf n=93 fps=46.4 frame p50=22.3 p95=22.3 max=33.4 ms | gpu p50=21.5 p95=24.5 | backend p50=21.5 p95=23.7 | sim p50=0.3 p95=0.4 (physics p50=0.1 p95=0.1) | submit p50=2.6 p95=3.6 | skipped=87/180 physics=120/s
+10-27 03:06:33.459  9257  9257 I dart3d  : perf n=92 fps=45.9 frame p50=22.3 p95=33.4 max=33.4 ms | gpu p50=21.9 p95=24.0 | backend p50=21.7 p95=23.6 | sim p50=0.3 p95=0.4 (physics p50=0.1 p95=0.1) | submit p50=2.5 p95=3.9 | skipped=88/180 physics=120/s
+10-27 03:06:35.467  9257  9257 I dart3d  : perf n=91 fps=45.4 frame p50=22.3 p95=33.4 max=33.4 ms | gpu p50=21.8 p95=26.8 | backend p50=21.5 p95=25.7 | sim p50=0.3 p95=0.7 (physics p50=0.1 p95=0.1) | submit p50=2.6 p95=3.4 | skipped=89/180 physics=120/s
+10-27 03:06:37.471  9257  9257 I dart3d  : perf n=93 fps=46.4 frame p50=22.3 p95=22.3 max=33.4 ms | gpu p50=21.6 p95=24.1 | backend p50=21.5 p95=23.9 | sim p50=0.3 p95=0.4 (physics p50=0.1 p95=0.1) | submit p50=2.7 p95=3.7 | skipped=87/180 physics=120/s
+10-27 03:06:39.475  9257  9257 I dart3d  : perf n=92 fps=45.9 frame p50=22.3 p95=22.3 max=33.4 ms | gpu p50=21.6 p95=24.5 | backend p50=21.7 p95=24.1 | sim p50=0.3 p95=0.5 (physics p50=0.1 p95=0.1) | submit p50=2.7 p95=3.6 | skipped=88/180 physics=120/s
+10-27 03:06:41.472  9257  9257 I dart3d  : perf n=92 fps=45.9 frame p50=22.3 p95=22.3 max=33.4 ms | gpu p50=21.6 p95=24.5 | backend p50=21.6 p95=23.6 | sim p50=0.3 p95=0.4 (physics p50=0.1 p95=0.1) | submit p50=2.8 p95=3.3 | skipped=88/180 physics=120/s
+10-27 03:06:43.479  9257  9257 I dart3d  : perf n=91 fps=45.4 frame p50=22.3 p95=33.4 max=33.4 ms | gpu p50=22.0 p95=24.5 | backend p50=21.7 p95=23.7 | sim p50=0.3 p95=0.5 (physics p50=0.1 p95=0.2) | submit p50=2.6 p95=3.5 | skipped=89/180 physics=120/s
+10-27 03:06:45.481  9257  9257 I dart3d  : perf n=92 fps=45.9 frame p50=22.3 p95=22.3 max=33.4 ms | gpu p50=21.5 p95=25.6 | backend p50=21.5 p95=24.9 | sim p50=0.3 p95=0.5 (physics p50=0.1 p95=0.1) | submit p50=2.6 p95=4.1 | skipped=88/180 physics=120/s
+10-27 03:06:47.485  9257  9257 I dart3d  : perf n=90 fps=44.9 frame p50=22.3 p95=33.4 max=33.4 ms | gpu p50=21.7 p95=26.7 | backend p50=21.7 p95=26.0 | sim p50=1.3 p95=3.1 (physics p50=0.6 p95=2.0) | submit p50=1.5 p95=3.1 | skipped=89/179 physics=120/s
+10-27 03:06:49.490  9257  9257 I dart3d  : perf n=94 fps=46.9 frame p50=22.3 p95=33.4 max=33.4 ms | gpu p50=21.3 p95=27.1 | backend p50=21.2 p95=24.5 | sim p50=1.3 p95=3.6 (physics p50=0.4 p95=1.2) | submit p50=1.5 p95=2.5 | skipped=86/180 physics=120/s
+10-27 03:06:51.494  9257  9257 I dart3d  : perf n=93 fps=46.4 frame p50=22.3 p95=33.4 max=33.4 ms | gpu p50=21.7 p95=25.1 | backend p50=21.1 p95=24.3 | sim p50=1.4 p95=3.1 (physics p50=0.4 p95=1.5) | submit p50=1.8 p95=2.7 | skipped=86/179 physics=120/s
+10-27 03:06:53.494  9257  9257 I dart3d  : perf n=93 fps=46.4 frame p50=22.3 p95=33.4 max=33.5 ms | gpu p50=21.2 p95=25.6 | backend p50=21.2 p95=23.4 | sim p50=1.7 p95=3.7 (physics p50=0.5 p95=2.0) | submit p50=1.6 p95=2.6 | skipped=87/180 physics=120/s
+10-27 03:06:55.501  9257  9257 I dart3d  : perf n=94 fps=46.9 frame p50=22.3 p95=22.3 max=33.4 ms | gpu p50=21.4 p95=24.4 | backend p50=21.4 p95=23.7 | sim p50=0.9 p95=3.2 (physics p50=0.2 p95=1.3) | submit p50=2.0 p95=3.2 | skipped=86/180 physics=120/s
+10-27 03:06:57.504  9257  9257 I dart3d  : perf n=91 fps=45.4 frame p50=22.3 p95=33.4 max=33.4 ms | gpu p50=22.2 p95=25.7 | backend p50=22.1 p95=24.4 | sim p50=0.3 p95=0.5 (physics p50=0.1 p95=0.1) | submit p50=2.6 p95=3.5 | skipped=89/180 physics=120/s
+10-27 03:06:59.508  9257  9257 I dart3d  : perf n=91 fps=45.4 frame p50=22.3 p95=33.4 max=33.4 ms | gpu p50=21.8 p95=24.6 | backend p50=21.7 p95=24.1 | sim p50=0.3 p95=0.6 (physics p50=0.1 p95=0.2) | submit p50=2.8 p95=4.1 | skipped=89/180 physics=120/s
+10-27 03:07:01.512  9257  9257 I dart3d  : perf n=92 fps=45.9 frame p50=22.3 p95=33.4 max=33.5 ms | gpu p50=21.4 p95=24.5 | backend p50=21.6 p95=24.2 | sim p50=0.3 p95=0.5 (physics p50=0.1 p95=0.1) | submit p50=2.6 p95=3.6 | skipped=88/180 physics=120/s
+10-27 03:07:03.516  9257  9257 I dart3d  : perf n=93 fps=46.4 frame p50=22.3 p95=22.3 max=33.4 ms | gpu p50=21.7 p95=24.9 | backend p50=21.4 p95=24.5 | sim p50=0.3 p95=0.4 (physics p50=0.1 p95=0.1) | submit p50=2.6 p95=3.4 | skipped=87/180 physics=120/s
+10-27 03:07:05.518  9257  9257 I dart3d  : perf n=91 fps=45.4 frame p50=22.3 p95=33.4 max=33.4 ms | gpu p50=22.2 p95=24.3 | backend p50=21.5 p95=24.2 | sim p50=0.3 p95=0.6 (physics p50=0.1 p95=0.2) | submit p50=2.6 p95=3.7 | skipped=89/180 physics=120/s
+10-27 03:07:07.522  9257  9257 I dart3d  : perf n=92 fps=45.9 frame p50=22.3 p95=22.3 max=33.4 ms | gpu p50=21.7 p95=25.2 | backend p50=21.5 p95=24.5 | sim p50=0.3 p95=0.4 (physics p50=0.1 p95=0.2) | submit p50=2.6 p95=3.6 | skipped=88/180 physics=120/s
+10-27 03:07:09.526  9257  9257 I dart3d  : perf n=93 fps=46.4 frame p50=22.3 p95=33.4 max=33.4 ms | gpu p50=21.9 p95=24.8 | backend p50=21.4 p95=23.7 | sim p50=0.3 p95=0.7 (physics p50=0.1 p95=0.1) | submit p50=2.7 p95=3.5 | skipped=87/180 physics=120/s
+10-27 03:07:11.530  9257  9257 I dart3d  : perf n=99 fps=49.4 frame p50=22.3 p95=22.3 max=33.4 ms | gpu p50=19.9 p95=24.6 | backend p50=19.7 p95=24.0 | sim p50=0.2 p95=0.4 (physics p50=0.1 p95=0.1) | submit p50=2.2 p95=3.3 | skipped=81/180 physics=120/s
+10-27 03:07:13.532  9257  9257 I dart3d  : perf n=90 fps=44.9 frame p50=22.3 p95=33.4 max=33.5 ms | gpu p50=21.9 p95=24.9 | backend p50=21.9 p95=24.2 | sim p50=0.3 p95=0.5 (physics p50=0.1 p95=0.1) | submit p50=2.7 p95=3.6 | skipped=90/180 physics=120/s
+10-27 03:07:15.538  9257  9257 I dart3d  : perf n=92 fps=45.9 frame p50=22.3 p95=22.3 max=33.5 ms | gpu p50=21.8 p95=25.7 | backend p50=21.6 p95=24.4 | sim p50=0.3 p95=0.5 (physics p50=0.1 p95=0.1) | submit p50=2.6 p95=3.4 | skipped=88/180 physics=120/s
+10-27 03:07:17.538  9257  9257 I dart3d  : perf n=91 fps=45.4 frame p50=22.3 p95=22.3 max=33.5 ms | gpu p50=21.7 p95=25.3 | backend p50=21.6 p95=24.4 | sim p50=0.3 p95=0.5 (physics p50=0.1 p95=0.1) | submit p50=2.6 p95=4.0 | skipped=89/180 physics=120/s
+10-27 03:07:19.544  9257  9257 I dart3d  : perf n=93 fps=46.4 frame p50=22.3 p95=22.3 max=33.4 ms | gpu p50=21.4 p95=25.8 | backend p50=21.6 p95=23.8 | sim p50=0.2 p95=0.4 (physics p50=0.1 p95=0.1) | submit p50=2.5 p95=3.9 | skipped=87/180 physics=120/s

@@ -1,0 +1,5 @@
+The initial before-build.log, before-run.log, before-native.log,
+before-baked.png, and before-live-control.png ran the spot fixture because
+showcase_loader normalized the new selector to spot. fixture-tests.log
+records that route mismatch. These files are not directional-selection proof.
+The corrected-before-* files use the accepted selector route instead.

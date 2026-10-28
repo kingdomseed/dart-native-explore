@@ -810,6 +810,13 @@ TriangleMeshBvh? _resolveD3ProcShapeBvh(
     ],
     _ => const <Vector3>[],
   };
+  List<Vector2> profile() => switch (props['profile']) {
+    ListValue(:final values) => [
+      for (final value in values)
+        if (value is Vec2Value) value.value,
+    ],
+    _ => const <Vector2>[],
+  };
 
   D3MeshData? mesh;
   switch (shape) {
@@ -819,6 +826,18 @@ TriangleMeshBvh? _resolveD3ProcShapeBvh(
         _ => Vector3.all(1.0),
       };
       mesh = buildCuboid(ext, debugColors: b('debugColors', false));
+    case 'wedge':
+      final size = switch (props['size']) {
+        Vec3Value(:final value) => value,
+        _ => Vector3.all(1.0),
+      };
+      mesh = buildWedge(size);
+    case 'ring':
+      mesh = buildRing(
+        innerRadius: d('innerRadius', 0.25),
+        outerRadius: d('outerRadius', 0.5),
+        segments: i('segments', 32),
+      );
     case 'plane':
       mesh = buildPlane(
         width: d('width', 1.0),
@@ -876,6 +895,17 @@ TriangleMeshBvh? _resolveD3ProcShapeBvh(
         radius: d('radius', 0.5),
         segments: i('segments', 32),
       );
+    case 'extrude':
+      final p = pts();
+      final crossSection = profile();
+      if (p.length >= 2 && crossSection.length >= 3) {
+        mesh = buildExtrude(
+          CatmullRomPath(p),
+          profile: crossSection,
+          stations: i('stations', 64),
+          caps: b('caps', true),
+        );
+      }
     case 'tube':
       final p = pts();
       if (p.length >= 2) {

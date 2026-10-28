@@ -1,0 +1,577 @@
+Launching lib/main.dart on A142 in release mode...
+Installing build/app/outputs/dn-apk/app-release.apk...              3.2s
+
+DartNative run key commands.
+h List all available interactive commands.
+c Clear the screen
+q Quit (terminate the application on the device).
+
+dartnative: dart3d: u2-catcher light=spot mode=baked softness=0
+dartnative: dart3d: showcase — u2-catcher: Baked shadow footprint · explicit refresh · live shadowOnly mode
+F/.dart3d_example(25145): thread.cc:2868] Throwing new exception 'no "F" field "mCenterY" in class "Lcom/google/android/filament/Box;" or its superclasses' with unexpected pending exception: java.lang.NoSuchFieldError: no "F" field "mCenterX" in class "Lcom/google/android/filament/Box;" or its superclasses
+F/.dart3d_example(25145): thread.cc:2868]   at void com.google.android.filament.RenderableManager.nGetAxisAlignedBoundingBox(long, int, com.google.android.filament.Box) (SourceFile:-2)
+F/.dart3d_example(25145): thread.cc:2868]   at com.google.android.filament.Box com.google.android.filament.RenderableManager.q(int) (SourceFile:-1)
+F/.dart3d_example(25145): thread.cc:2868]   at void n1.c.accept(int) (SourceFile:-1)
+F/.dart3d_example(25145): thread.cc:2868]   at void com.google.android.filament.Scene.nForEach(long, com.google.android.filament.Scene$ForEachCallback) (SourceFile:-2)
+F/.dart3d_example(25145): thread.cc:2868]   at void com.google.android.filament.Scene.b(com.google.android.filament.Scene$ForEachCallback) (SourceFile:-1)
+F/.dart3d_example(25145): thread.cc:2868]   at boolean n1.i0.g0(long) (SourceFile:-1)
+F/.dart3d_example(25145): thread.cc:2868]   at void n1.f0.doFrame(long) (SourceFile:-1)
+F/.dart3d_example(25145): thread.cc:2868]   at void android.view.Choreographer$CallbackRecord.run(long) (Choreographer.java:1870)
+F/.dart3d_example(25145): thread.cc:2868]   at void android.view.Choreographer$CallbackRecord.run(android.view.Choreographer$FrameData) (Choreographer.java:1881)
+F/.dart3d_example(25145): thread.cc:2868]   at void android.view.Choreographer.doCallbacks(int, long) (Choreographer.java:1427)
+F/.dart3d_example(25145): thread.cc:2868]   at void android.view.Choreographer.doFrame(long, int, android.view.DisplayEventReceiver$VsyncEventData) (Choreographer.java:1305)
+F/.dart3d_example(25145): thread.cc:2868]   at void android.view.Choreographer$FrameDisplayEventReceiver.run() (Choreographer.java:1848)
+F/.dart3d_example(25145): thread.cc:2868]   at void android.os.Handler.handleCallback(android.os.Message) (Handler.java:995)
+F/.dart3d_example(25145): thread.cc:2868]   at void android.os.Handler.dispatchMessage(android.os.Message) (Handler.java:103)
+F/.dart3d_example(25145): thread.cc:2868]   at boolean android.os.Looper.loopOnce(android.os.Looper, long, int) (Looper.java:283)
+F/.dart3d_example(25145): thread.cc:2868]   at void android.os.Looper.loop() (Looper.java:392)
+F/.dart3d_example(25145): thread.cc:2868]   at void android.app.ActivityThread.main(java.lang.String[]) (ActivityThread.java:9231)
+F/.dart3d_example(25145): thread.cc:2868]   at java.lang.Object java.lang.reflect.Method.invoke(java.lang.Object, java.lang.Object[]) (Method.java:-2)
+F/.dart3d_example(25145): thread.cc:2868]   at void com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run() (RuntimeInit.java:633)
+F/.dart3d_example(25145): thread.cc:2868]   at void com.android.internal.os.ZygoteInit.main(java.lang.String[]) (ZygoteInit.java:1026)
+F/.dart3d_example(25145): thread.cc:2868] 
+F/.dart3d_example(25145): runtime.cc:769] Runtime aborting...
+F/.dart3d_example(25145): runtime.cc:769] All threads:
+F/.dart3d_example(25145): runtime.cc:769] DALVIK THREADS (24):
+F/.dart3d_example(25145): runtime.cc:769] "main" prio=10 tid=1 Runnable
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=0 ucsCount=0 flags=0 obj=0 self=0xb40000726921e010
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25145 nice=-20 cgrp=top-app sched=0/0 handle=0x740a2f9090
+F/.dart3d_example(25145): runtime.cc:769]   | state=R schedstat=( 322982999 149244236 486 ) utm=19 stm=12 core=7 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x7ff2018000-0x7ff201a000 stackSize=8188KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes= "abort lock" "mutator lock"(shared held)
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 00423758  /apex/com.android.art/lib64/libart.so (art::DumpNativeStack+112) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 00598d08  /apex/com.android.art/lib64/libart.so (art::Thread::DumpStack const+172) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 005989a4  /apex/com.android.art/lib64/libart.so (art::DumpCheckpoint::Run+360) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #03 pc 002e3e14  /apex/com.android.art/lib64/libart.so (art::ThreadList::RunCheckpoint+3124) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #04 pc 00596958  /apex/com.android.art/lib64/libart.so (art::ThreadList::Dump+212) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #05 pc 0095cfdc  /apex/com.android.art/lib64/libart.so (art::AbortState::DumpAllThreads const+456) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #06 pc 0095cb10  /apex/com.android.art/lib64/libart.so (art::AbortState::Dump const+212) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #07 pc 00953964  /apex/com.android.art/lib64/libart.so (art::Runtime::Abort+836) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #08 pc 00016438  /apex/com.android.art/lib64/libbase.so (android::base::SetAborter::$_0::__invoke+84) (BuildId: 7dc1c498b08b3374928e8d043f574325)
+F/.dart3d_example(25145): runtime.cc:769]   native: #09 pc 00015b78  /apex/com.android.art/lib64/libbase.so (android::base::LogMessage::~LogMessage+556) (BuildId: 7dc1c498b08b3374928e8d043f574325)
+F/.dart3d_example(25145): runtime.cc:769]   native: #10 pc 003296a0  /apex/com.android.art/lib64/libart.so (art::Thread::AssertNoPendingExceptionForNewException const+1136) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #11 pc 00306288  /apex/com.android.art/lib64/libart.so (art::Thread::ThrowNewExceptionF+184) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #12 pc 003066c4  /apex/com.android.art/lib64/libart.so (art::FindFieldJNI+992) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #13 pc 0068cdc4  /apex/com.android.art/lib64/libart.so (art::JNI<false>::GetFieldID+260) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #14 pc 00141584  /data/app/~~QcFtp5qTZZomhNzUwj9LmA==/com.jasonholtdigital.dart3d_example-rwer71ROp5xhR54_9-Q5LA==/base.apk (offset 1f30000) (???) (BuildId: fc2d7f424052f88b44e43eff8e0e292df566e2ca)
+F/.dart3d_example(25145): runtime.cc:769]   native: #15 pc 001414fc  /data/app/~~QcFtp5qTZZomhNzUwj9LmA==/com.jasonholtdigital.dart3d_example-rwer71ROp5xhR54_9-Q5LA==/base.apk (offset 1f30000) (Java_com_google_android_filament_RenderableManager_nGetAxisAlignedBoundingBox+272) (BuildId: fc2d7f424052f88b44e43eff8e0e292df566e2ca)
+F/.dart3d_example(25145): runtime.cc:769]   at com.google.android.filament.RenderableManager.nGetAxisAlignedBoundingBox(Native method)
+F/.dart3d_example(25145): runtime.cc:769]   at com.google.android.filament.RenderableManager.q(unavailable:9)
+F/.dart3d_example(25145): runtime.cc:769]   at n1.c.accept(unavailable:41)
+F/.dart3d_example(25145): runtime.cc:769]   at com.google.android.filament.Scene.nForEach(Native method)
+F/.dart3d_example(25145): runtime.cc:769]   at com.google.android.filament.Scene.b(unavailable:4)
+F/.dart3d_example(25145): runtime.cc:769]   at n1.i0.g0(unavailable:821)
+F/.dart3d_example(25145): runtime.cc:769]   at n1.f0.doFrame(unavailable:3209)
+F/.dart3d_example(25145): runtime.cc:769]   at android.view.Choreographer$CallbackRecord.run(Choreographer.java:1870)
+F/.dart3d_example(25145): runtime.cc:769]   at android.view.Choreographer$CallbackRecord.run(Choreographer.java:1881)
+F/.dart3d_example(25145): runtime.cc:769]   at android.view.Choreographer.doCallbacks(Choreographer.java:1427)
+F/.dart3d_example(25145): runtime.cc:769]   at android.view.Choreographer.doFrame(Choreographer.java:1305)
+F/.dart3d_example(25145): runtime.cc:769]   at android.view.Choreographer$FrameDisplayEventReceiver.run(Choreographer.java:1848)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.Handler.handleCallback(Handler.java:995)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.Handler.dispatchMessage(Handler.java:103)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.Looper.loopOnce(Looper.java:283)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.Looper.loop(Looper.java:392)
+F/.dart3d_example(25145): runtime.cc:769]   at android.app.ActivityThread.main(ActivityThread.java:9231)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.reflect.Method.invoke(Native method)
+F/.dart3d_example(25145): runtime.cc:769]   at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:633)
+F/.dart3d_example(25145): runtime.cc:769]   at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1026)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] "FinalizerDaemon" prio=5 tid=5 Waiting
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=1 ucsCount=0 flags=1 obj=0 self=0xb400007269224f50
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25151 nice=4 cgrp=top-app sched=0/0 handle=0x71002e44c0
+F/.dart3d_example(25145): runtime.cc:769]   | state=S schedstat=( 354846 92384 8 ) utm=0 stm=0 core=2 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x71001e1000-0x71001e3000 stackSize=1037KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes=
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 00099d1c  /apex/com.android.runtime/lib64/bionic/libc.so (syscall+28) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 00231f34  /apex/com.android.art/lib64/libart.so (art::ConditionVariable::WaitHoldingLocks+140) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 005bd32c  /apex/com.android.art/lib64/libart.so (art::Monitor::Wait+2360) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Object.wait(Native method)
+F/.dart3d_example(25145): runtime.cc:769]   - waiting on <0x0fb64a49> (a java.lang.Object)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Object.wait(Object.java:390)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:207)
+F/.dart3d_example(25145): runtime.cc:769]   - locked <0x0fb64a49> (a java.lang.Object)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:228)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Daemons$FinalizerDaemon.runInternal(Daemons.java:348)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Daemons$Daemon.run(Daemons.java:135)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Thread.run(Thread.java:1571)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] "ReferenceQueueDaemon" prio=5 tid=6 Waiting
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=1 ucsCount=0 flags=1 obj=0 self=0xb40000726924ead0
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25150 nice=4 cgrp=top-app sched=0/0 handle=0x71013f44c0
+F/.dart3d_example(25145): runtime.cc:769]   | state=S schedstat=( 182385 10008692 6 ) utm=0 stm=0 core=7 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x71012f1000-0x71012f3000 stackSize=1037KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes=
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 00099d1c  /apex/com.android.runtime/lib64/bionic/libc.so (syscall+28) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 00231f34  /apex/com.android.art/lib64/libart.so (art::ConditionVariable::WaitHoldingLocks+140) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 005bd32c  /apex/com.android.art/lib64/libart.so (art::Monitor::Wait+2360) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Object.wait(Native method)
+F/.dart3d_example(25145): runtime.cc:769]   - waiting on <0x08b60f4e> (a java.lang.Class<java.lang.ref.ReferenceQueue>)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Object.wait(Object.java:390)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Object.wait(Object.java:528)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Daemons$ReferenceQueueDaemon.runInternal(Daemons.java:260)
+F/.dart3d_example(25145): runtime.cc:769]   - locked <0x08b60f4e> (a java.lang.Class<java.lang.ref.ReferenceQueue>)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Daemons$Daemon.run(Daemons.java:135)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Thread.run(Thread.java:1571)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] "FinalizerWatchdogDaemon" prio=5 tid=9 Waiting
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=1 ucsCount=0 flags=1 obj=0 self=0xb4000072692286f0
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25152 nice=4 cgrp=top-app sched=0/0 handle=0x70ff1d44c0
+F/.dart3d_example(25145): runtime.cc:769]   | state=S schedstat=( 396768 12142077 6 ) utm=0 stm=0 core=3 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x70ff0d1000-0x70ff0d3000 stackSize=1037KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes=
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 00099d1c  /apex/com.android.runtime/lib64/bionic/libc.so (syscall+28) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 00231f34  /apex/com.android.art/lib64/libart.so (art::ConditionVariable::WaitHoldingLocks+140) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 005bd32c  /apex/com.android.art/lib64/libart.so (art::Monitor::Wait+2360) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Object.wait(Native method)
+F/.dart3d_example(25145): runtime.cc:769]   - waiting on <0x0282786f> (a java.lang.Daemons$FinalizerWatchdogDaemon)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Object.wait(Object.java:390)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Object.wait(Object.java:528)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Daemons$FinalizerWatchdogDaemon.sleepUntilNeeded(Daemons.java:481)
+F/.dart3d_example(25145): runtime.cc:769]   - locked <0x0282786f> (a java.lang.Daemons$FinalizerWatchdogDaemon)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Daemons$FinalizerWatchdogDaemon.runInternal(Daemons.java:461)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Daemons$Daemon.run(Daemons.java:135)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Thread.run(Thread.java:1571)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] "Cleaner-0" prio=8 tid=21 TimedWaiting
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=1 ucsCount=0 flags=1 obj=0 self=0xb40000726928efe0
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25238 nice=-5 cgrp=top-app sched=0/0 handle=0x5ee82dd4c0
+F/.dart3d_example(25145): runtime.cc:769]   | state=S schedstat=( 239461 27708385 2 ) utm=0 stm=0 core=1 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x5ee81da000-0x5ee81dc000 stackSize=1037KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes=
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 00099d20  /apex/com.android.runtime/lib64/bionic/libc.so (syscall+32) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 00379f84  /apex/com.android.art/lib64/libart.so (art::ConditionVariable::TimedWait+296) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 005bcce4  /apex/com.android.art/lib64/libart.so (art::Monitor::Wait+752) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Object.wait(Native method)
+F/.dart3d_example(25145): runtime.cc:769]   - waiting on <0x0719497c> (a java.lang.Object)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Object.wait(Object.java:390)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:207)
+F/.dart3d_example(25145): runtime.cc:769]   - locked <0x0719497c> (a java.lang.Object)
+F/.dart3d_example(25145): runtime.cc:769]   at jdk.internal.ref.CleanerImpl.run(CleanerImpl.java:173)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Thread.run(Thread.java:1571)
+F/.dart3d_example(25145): runtime.cc:769]   at jdk.internal.misc.InnocuousThread.run(InnocuousThread.java:186)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] "Signal Catcher" prio=10 tid=2 WaitingInMainSignalCatcherLoop
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=1 ucsCount=0 flags=1 obj=0 self=0xb40000726922a2c0
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25146 nice=-20 cgrp=top-app sched=0/0 handle=0x71028184c0
+F/.dart3d_example(25145): runtime.cc:769]   | state=S schedstat=( 332307 574154 1 ) utm=0 stm=0 core=6 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x7102721000-0x7102723000 stackSize=989KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes=
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 000df048  /apex/com.android.runtime/lib64/bionic/libc.so (__rt_sigtimedwait+8) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 00089d20  /apex/com.android.runtime/lib64/bionic/libc.so (sigwaitinfo64+64) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 00562490  /apex/com.android.art/lib64/libart.so (art::SignalCatcher::WaitForSignal+120) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #03 pc 00562270  /apex/com.android.art/lib64/libart.so (art::SignalCatcher::Run+264) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #04 pc 00083c8c  /apex/com.android.runtime/lib64/bionic/libc.so (__pthread_start+236) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #05 pc 00076190  /apex/com.android.runtime/lib64/bionic/libc.so (__start_thread+64) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   (no managed stack frames)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] "HeapTaskDaemon" prio=5 tid=3 WaitingForTaskProcessor
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=1 ucsCount=0 flags=1 obj=0 self=0xb400007269223380
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25149 nice=4 cgrp=top-app sched=0/0 handle=0x71015044c0
+F/.dart3d_example(25145): runtime.cc:769]   | state=S schedstat=( 372538 0 2 ) utm=0 stm=0 core=3 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x7101401000-0x7101403000 stackSize=1037KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes=
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 00099d20  /apex/com.android.runtime/lib64/bionic/libc.so (syscall+32) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 00379f84  /apex/com.android.art/lib64/libart.so (art::ConditionVariable::TimedWait+296) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 0037983c  /apex/com.android.art/lib64/libart.so (art::gc::TaskProcessor::RunAllTasks+212) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   at dalvik.system.VMRuntime.runHeapTasks(Native method)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Daemons$HeapTaskDaemon.runInternal(Daemons.java:764)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Daemons$Daemon.run(Daemons.java:135)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Thread.run(Thread.java:1571)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] "Jit thread pool worker thread 0" prio=4 tid=4 Native
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=1 ucsCount=0 flags=1 obj=0 self=0xb4000072692217b0
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25148 nice=9 cgrp=top-app sched=0/0 handle=0x71016104c0
+F/.dart3d_example(25145): runtime.cc:769]   | state=S schedstat=( 7427839 16459538 27 ) utm=0 stm=0 core=6 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x7101511000-0x7101513000 stackSize=1021KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes=
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 00099d1c  /apex/com.android.runtime/lib64/bionic/libc.so (syscall+28) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 00231f34  /apex/com.android.art/lib64/libart.so (art::ConditionVariable::WaitHoldingLocks+140) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 00231e2c  /apex/com.android.art/lib64/libart.so (art::ThreadPoolWorker::Run+228) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #03 pc 00561dac  /apex/com.android.art/lib64/libart.so (art::ThreadPoolWorker::Callback+180) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #04 pc 00083c8c  /apex/com.android.runtime/lib64/bionic/libc.so (__pthread_start+236) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #05 pc 00076190  /apex/com.android.runtime/lib64/bionic/libc.so (__start_thread+64) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   (no managed stack frames)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] "perfetto_hprof_listener" prio=10 tid=7 Native (still starting up)
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=1 ucsCount=0 flags=1 obj=0 self=0xb40000726925ad80
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25147 nice=-20 cgrp=top-app sched=0/0 handle=0x71017144c0
+F/.dart3d_example(25145): runtime.cc:769]   | state=S schedstat=( 519386 1732077 12 ) utm=0 stm=0 core=7 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x710161d000-0x710161f000 stackSize=989KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes=
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 000dd604  /apex/com.android.runtime/lib64/bionic/libc.so (read+4) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 000345c0  /apex/com.android.art/lib64/libperfetto_hprof.so (void* std::__1::__thread_proxy[abi:nn220000]<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct>>, ArtPlugin_Initialize::$_7>>+272) (BuildId: 6c98b0315056646421acb85048973f61)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 00083c8c  /apex/com.android.runtime/lib64/bionic/libc.so (__pthread_start+236) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #03 pc 00076190  /apex/com.android.runtime/lib64/bionic/libc.so (__start_thread+64) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   (no managed stack frames)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] "binder:25145_1" prio=10 tid=8 Native
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=1 ucsCount=0 flags=1 obj=0 self=0xb4000072692575e0
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25153 nice=-20 cgrp=top-app sched=0/0 handle=0x70fde124c0
+F/.dart3d_example(25145): runtime.cc:769]   | state=S schedstat=( 655231 7918770 8 ) utm=0 stm=0 core=5 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x70fdd1b000-0x70fdd1d000 stackSize=989KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes=
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 000ddc48  /apex/com.android.runtime/lib64/bionic/libc.so (__ioctl+8) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 0007e7dc  /apex/com.android.runtime/lib64/bionic/libc.so (ioctl+156) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 0004d224  /system/lib64/libbinder.so (android::IPCThreadState::talkWithDriver+212) (BuildId: 9e00e2427238efcd0c6ef91fb3e8f5f6)
+F/.dart3d_example(25145): runtime.cc:769]   native: #03 pc 00051878  /system/lib64/libbinder.so (android::IPCThreadState::joinThreadPool+152) (BuildId: 9e00e2427238efcd0c6ef91fb3e8f5f6)
+F/.dart3d_example(25145): runtime.cc:769]   native: #04 pc 0007e488  /system/lib64/libbinder.so (android::PoolThread::threadLoop+24) (BuildId: 9e00e2427238efcd0c6ef91fb3e8f5f6)
+F/.dart3d_example(25145): runtime.cc:769]   native: #05 pc 00019268  /system/lib64/libutils.so (android::Thread::_threadLoop+248) (BuildId: 7aa2d71e030a290c8dd28236ba0a838f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #06 pc 0012f0cc  /system/lib64/libandroid_runtime.so (android::AndroidRuntime::javaThreadShell+140) (BuildId: 3fb1b573d263845073cb901a737d0f0a)
+F/.dart3d_example(25145): runtime.cc:769]   native: #07 pc 0001b994  /system/lib64/libutils.so (libutil_thread_trampoline +20) (BuildId: 7aa2d71e030a290c8dd28236ba0a838f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #08 pc 00083c8c  /apex/com.android.runtime/lib64/bionic/libc.so (__pthread_start+236) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #09 pc 00076190  /apex/com.android.runtime/lib64/bionic/libc.so (__start_thread+64) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   (no managed stack frames)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] "binder:25145_2" prio=10 tid=10 Native
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=1 ucsCount=0 flags=1 obj=0 self=0xb400007269255a10
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25154 nice=-20 cgrp=top-app sched=0/0 handle=0x70fdd0e4c0
+F/.dart3d_example(25145): runtime.cc:769]   | state=S schedstat=( 5024154 8025537 29 ) utm=0 stm=0 core=1 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x70fdc17000-0x70fdc19000 stackSize=989KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes=
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 000ddc48  /apex/com.android.runtime/lib64/bionic/libc.so (__ioctl+8) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 0007e7dc  /apex/com.android.runtime/lib64/bionic/libc.so (ioctl+156) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 0004d224  /system/lib64/libbinder.so (android::IPCThreadState::talkWithDriver+212) (BuildId: 9e00e2427238efcd0c6ef91fb3e8f5f6)
+F/.dart3d_example(25145): runtime.cc:769]   native: #03 pc 00051878  /system/lib64/libbinder.so (android::IPCThreadState::joinThreadPool+152) (BuildId: 9e00e2427238efcd0c6ef91fb3e8f5f6)
+F/.dart3d_example(25145): runtime.cc:769]   native: #04 pc 0007e488  /system/lib64/libbinder.so (android::PoolThread::threadLoop+24) (BuildId: 9e00e2427238efcd0c6ef91fb3e8f5f6)
+F/.dart3d_example(25145): runtime.cc:769]   native: #05 pc 00019268  /system/lib64/libutils.so (android::Thread::_threadLoop+248) (BuildId: 7aa2d71e030a290c8dd28236ba0a838f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #06 pc 0012f0cc  /system/lib64/libandroid_runtime.so (android::AndroidRuntime::javaThreadShell+140) (BuildId: 3fb1b573d263845073cb901a737d0f0a)
+F/.dart3d_example(25145): runtime.cc:769]   native: #07 pc 0001b994  /system/lib64/libutils.so (libutil_thread_trampoline +20) (BuildId: 7aa2d71e030a290c8dd28236ba0a838f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #08 pc 00083c8c  /apex/com.android.runtime/lib64/bionic/libc.so (__pthread_start+236) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #09 pc 00076190  /apex/com.android.runtime/lib64/bionic/libc.so (__start_thread+64) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   (no managed stack frames)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] "Profile Saver" prio=4 tid=11 Native
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=1 ucsCount=0 flags=1 obj=0 self=0xb4000072692591b0
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25155 nice=9 cgrp=top-app sched=0/0 handle=0x70fd7ba4c0
+F/.dart3d_example(25145): runtime.cc:769]   | state=S schedstat=( 152615 528231 1 ) utm=0 stm=0 core=7 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x70fd6c3000-0x70fd6c5000 stackSize=989KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes=
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 00099d1c  /apex/com.android.runtime/lib64/bionic/libc.so (syscall+28) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 00231f34  /apex/com.android.art/lib64/libart.so (art::ConditionVariable::WaitHoldingLocks+140) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 00561a74  /apex/com.android.art/lib64/libart.so (art::ProfileSaver::RunProfileSaverThread+1500) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #03 pc 00083c8c  /apex/com.android.runtime/lib64/bionic/libc.so (__pthread_start+236) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #04 pc 00076190  /apex/com.android.runtime/lib64/bionic/libc.so (__start_thread+64) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   (no managed stack frames)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] "SharedPreferences" prio=5 tid=12 TimedWaiting
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=1 ucsCount=0 flags=1 obj=0 self=0xb40000726925c950
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25156 nice=0 cgrp=top-app sched=0/0 handle=0x71318e14c0
+F/.dart3d_example(25145): runtime.cc:769]   | state=S schedstat=( 553308 379385 1 ) utm=0 stm=0 core=7 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x71317de000-0x71317e0000 stackSize=1037KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes=
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 00099d20  /apex/com.android.runtime/lib64/bionic/libc.so (syscall+32) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 0048c530  /apex/com.android.art/lib64/libart.so (art::Thread::Park+768) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 0048bd9c  /apex/com.android.art/lib64/libart.so (art::Unsafe_park +184) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   at jdk.internal.misc.Unsafe.park(Native method)
+F/.dart3d_example(25145): runtime.cc:769]   - waiting on an unknown object
+F/.dart3d_example(25145): runtime.cc:769]   at java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:276)
+F/.dart3d_example(25145): runtime.cc:769]   at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:1803)
+F/.dart3d_example(25145): runtime.cc:769]   at java.util.concurrent.LinkedBlockingQueue.poll(LinkedBlockingQueue.java:460)
+F/.dart3d_example(25145): runtime.cc:769]   at java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1025)
+F/.dart3d_example(25145): runtime.cc:769]   at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1086)
+F/.dart3d_example(25145): runtime.cc:769]   at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Thread.run(Thread.java:1571)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] "flutter-worker-0" prio=5 tid=13 TimedWaiting
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=1 ucsCount=0 flags=1 obj=0 self=0xb4000072692600f0
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25160 nice=0 cgrp=top-app sched=0/0 handle=0x71317d14c0
+F/.dart3d_example(25145): runtime.cc:769]   | state=S schedstat=( 5057692 14483615 19 ) utm=0 stm=0 core=6 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x71316ce000-0x71316d0000 stackSize=1037KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes=
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 00099d20  /apex/com.android.runtime/lib64/bionic/libc.so (syscall+32) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 0048c530  /apex/com.android.art/lib64/libart.so (art::Thread::Park+768) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 0048bd9c  /apex/com.android.art/lib64/libart.so (art::Unsafe_park +184) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   at jdk.internal.misc.Unsafe.park(Native method)
+F/.dart3d_example(25145): runtime.cc:769]   - waiting on an unknown object
+F/.dart3d_example(25145): runtime.cc:769]   at java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:417)
+F/.dart3d_example(25145): runtime.cc:769]   at java.util.concurrent.LinkedTransferQueue$DualNode.await(LinkedTransferQueue.java:452)
+F/.dart3d_example(25145): runtime.cc:769]   at java.util.concurrent.SynchronousQueue$Transferer.xferLifo(SynchronousQueue.java:194)
+F/.dart3d_example(25145): runtime.cc:769]   at java.util.concurrent.SynchronousQueue.xfer(SynchronousQueue.java:235)
+F/.dart3d_example(25145): runtime.cc:769]   at java.util.concurrent.SynchronousQueue.poll(SynchronousQueue.java:338)
+F/.dart3d_example(25145): runtime.cc:769]   at java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1025)
+F/.dart3d_example(25145): runtime.cc:769]   at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1086)
+F/.dart3d_example(25145): runtime.cc:769]   at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Thread.run(Thread.java:1571)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] "FramePolicy" prio=5 tid=14 Native
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=1 ucsCount=0 flags=1 obj=0 self=0xb400007269263890
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25191 nice=0 cgrp=top-app sched=0/0 handle=0x708cac04c0
+F/.dart3d_example(25145): runtime.cc:769]   | state=S schedstat=( 1661155 7432000 9 ) utm=0 stm=0 core=6 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x708c9bd000-0x708c9bf000 stackSize=1037KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes=
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 000dfc88  /apex/com.android.runtime/lib64/bionic/libc.so (__epoll_pwait+8) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 00016980  /system/lib64/libutils.so (android::Looper::pollOnce+288) (BuildId: 7aa2d71e030a290c8dd28236ba0a838f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 001daf7c  /system/lib64/libandroid_runtime.so (android::android_os_MessageQueue_nativePollOnce+44) (BuildId: 3fb1b573d263845073cb901a737d0f0a)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.MessageQueue.nativePollOnce(Native method)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.MessageQueue.nextLegacy(MessageQueue.java:909)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.MessageQueue.next(MessageQueue.java:1021)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.Looper.loopOnce(Looper.java:213)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.Looper.loop(Looper.java:392)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.HandlerThread.run(HandlerThread.java:94)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] "android.bg" prio=4 tid=15 Native
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=1 ucsCount=0 flags=1 obj=0 self=0xb400007269267030
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25192 nice=10 cgrp=top-app sched=0/0 handle=0x708c8fc4c0
+F/.dart3d_example(25145): runtime.cc:769]   | state=S schedstat=( 2309769 16861923 15 ) utm=0 stm=0 core=6 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x708c7f9000-0x708c7fb000 stackSize=1037KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes=
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 000dfc88  /apex/com.android.runtime/lib64/bionic/libc.so (__epoll_pwait+8) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 00016980  /system/lib64/libutils.so (android::Looper::pollOnce+288) (BuildId: 7aa2d71e030a290c8dd28236ba0a838f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 001daf7c  /system/lib64/libandroid_runtime.so (android::android_os_MessageQueue_nativePollOnce+44) (BuildId: 3fb1b573d263845073cb901a737d0f0a)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.MessageQueue.nativePollOnce(Native method)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.MessageQueue.nextLegacy(MessageQueue.java:909)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.MessageQueue.next(MessageQueue.java:1021)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.Looper.loopOnce(Looper.java:213)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.Looper.loop(Looper.java:392)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.HandlerThread.run(HandlerThread.java:94)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] "RenderThread" prio=10 tid=16 Native
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=1 ucsCount=0 flags=1 obj=0 self=0xb40000726926df70
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25193 nice=-20 cgrp=top-app sched=0/0 handle=0x708c7ec4c0
+F/.dart3d_example(25145): runtime.cc:769]   | state=S schedstat=( 20109159 9724152 51 ) utm=2 stm=0 core=6 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x708c6f5000-0x708c6f7000 stackSize=989KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes=
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 000dfc88  /apex/com.android.runtime/lib64/bionic/libc.so (__epoll_pwait+8) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 00016980  /system/lib64/libutils.so (android::Looper::pollOnce+288) (BuildId: 7aa2d71e030a290c8dd28236ba0a838f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 0037cff0  /system/lib64/libhwui.so (android::uirenderer::renderthread::RenderThread::threadLoop+224) (BuildId: 548b643383f46a1522b669aa5c8f57a1)
+F/.dart3d_example(25145): runtime.cc:769]   native: #03 pc 00019268  /system/lib64/libutils.so (android::Thread::_threadLoop+248) (BuildId: 7aa2d71e030a290c8dd28236ba0a838f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #04 pc 0001b994  /system/lib64/libutils.so (libutil_thread_trampoline +20) (BuildId: 7aa2d71e030a290c8dd28236ba0a838f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #05 pc 00083c8c  /apex/com.android.runtime/lib64/bionic/libc.so (__pthread_start+236) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #06 pc 00076190  /apex/com.android.runtime/lib64/bionic/libc.so (__start_thread+64) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   (no managed stack frames)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] "hwuiTask0" prio=6 tid=17 Native
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=1 ucsCount=0 flags=1 obj=0 self=0xb400007269281160
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25219 nice=-2 cgrp=top-app sched=0/0 handle=0x708c1044c0
+F/.dart3d_example(25145): runtime.cc:769]   | state=S schedstat=( 355847 1503385 3 ) utm=0 stm=0 core=1 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x708c00d000-0x708c00f000 stackSize=989KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes=
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 00099d1c  /apex/com.android.runtime/lib64/bionic/libc.so (syscall+28) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 00074f50  /apex/com.android.runtime/lib64/bionic/libc.so (__futex_wait_ex+144) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 00082e48  /apex/com.android.runtime/lib64/bionic/libc.so (pthread_cond_wait+72) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #03 pc 000a0f28  /system/lib64/libc++.so (std::__1::condition_variable::wait+28) (BuildId: ada37e5198285720b02f7d77fd27626c7782fe29)
+F/.dart3d_example(25145): runtime.cc:769]   native: #04 pc 00598db0  /system/lib64/libhwui.so (void* std::__1::__thread_proxy[abi:nn200000]<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct>>, android::uirenderer::CommonPool::CommonPool::$_0>> +320) (BuildId: 548b643383f46a1522b669aa5c8f57a1)
+F/.dart3d_example(25145): runtime.cc:769]   native: #05 pc 00083c8c  /apex/com.android.runtime/lib64/bionic/libc.so (__pthread_start+236) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #06 pc 00076190  /apex/com.android.runtime/lib64/bionic/libc.so (__start_thread+64) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   (no managed stack frames)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] "hwuiTask1" prio=6 tid=18 Native
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=1 ucsCount=0 flags=1 obj=0 self=0xb400007269265460
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25220 nice=-2 cgrp=top-app sched=0/0 handle=0x7080a254c0
+F/.dart3d_example(25145): runtime.cc:769]   | state=S schedstat=( 3196770 17773692 12 ) utm=0 stm=0 core=6 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x708092e000-0x7080930000 stackSize=989KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes=
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 00099d1c  /apex/com.android.runtime/lib64/bionic/libc.so (syscall+28) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 00074f50  /apex/com.android.runtime/lib64/bionic/libc.so (__futex_wait_ex+144) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 00082e48  /apex/com.android.runtime/lib64/bionic/libc.so (pthread_cond_wait+72) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #03 pc 000a0f28  /system/lib64/libc++.so (std::__1::condition_variable::wait+28) (BuildId: ada37e5198285720b02f7d77fd27626c7782fe29)
+F/.dart3d_example(25145): runtime.cc:769]   native: #04 pc 00598db0  /system/lib64/libhwui.so (void* std::__1::__thread_proxy[abi:nn200000]<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct>>, android::uirenderer::CommonPool::CommonPool::$_0>> +320) (BuildId: 548b643383f46a1522b669aa5c8f57a1)
+F/.dart3d_example(25145): runtime.cc:769]   native: #05 pc 00083c8c  /apex/com.android.runtime/lib64/bionic/libc.so (__pthread_start+236) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #06 pc 00076190  /apex/com.android.runtime/lib64/bionic/libc.so (__start_thread+64) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   (no managed stack frames)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] "binder:25145_3" prio=10 tid=19 Native
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=1 ucsCount=0 flags=1 obj=0 self=0xb400007269284900
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25223 nice=-20 cgrp=top-app sched=0/0 handle=0x70809214c0
+F/.dart3d_example(25145): runtime.cc:769]   | state=S schedstat=( 2030770 4160306 12 ) utm=0 stm=0 core=7 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x708082a000-0x708082c000 stackSize=989KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes=
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 000ddc48  /apex/com.android.runtime/lib64/bionic/libc.so (__ioctl+8) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 0007e7dc  /apex/com.android.runtime/lib64/bionic/libc.so (ioctl+156) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 0004d224  /system/lib64/libbinder.so (android::IPCThreadState::talkWithDriver+212) (BuildId: 9e00e2427238efcd0c6ef91fb3e8f5f6)
+F/.dart3d_example(25145): runtime.cc:769]   native: #03 pc 00051878  /system/lib64/libbinder.so (android::IPCThreadState::joinThreadPool+152) (BuildId: 9e00e2427238efcd0c6ef91fb3e8f5f6)
+F/.dart3d_example(25145): runtime.cc:769]   native: #04 pc 0007e488  /system/lib64/libbinder.so (android::PoolThread::threadLoop+24) (BuildId: 9e00e2427238efcd0c6ef91fb3e8f5f6)
+F/.dart3d_example(25145): runtime.cc:769]   native: #05 pc 00019268  /system/lib64/libutils.so (android::Thread::_threadLoop+248) (BuildId: 7aa2d71e030a290c8dd28236ba0a838f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #06 pc 0012f0cc  /system/lib64/libandroid_runtime.so (android::AndroidRuntime::javaThreadShell+140) (BuildId: 3fb1b573d263845073cb901a737d0f0a)
+F/.dart3d_example(25145): runtime.cc:769]   native: #07 pc 0001b994  /system/lib64/libutils.so (libutil_thread_trampoline +20) (BuildId: 7aa2d71e030a290c8dd28236ba0a838f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #08 pc 00083c8c  /apex/com.android.runtime/lib64/bionic/libc.so (__pthread_start+236) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #09 pc 00076190  /apex/com.android.runtime/lib64/bionic/libc.so (__start_thread+64) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   (no managed stack frames)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] "FEngine::loop" prio=7 tid=20 Native
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=1 ucsCount=0 flags=1 obj=0 self=0xb40000726925e520
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25231 nice=-4 cgrp=top-app sched=1073741824/0 handle=0x5ef29884c0
+F/.dart3d_example(25145): runtime.cc:769]   | state=S schedstat=( 36366161 63647996 71 ) utm=1 stm=2 core=7 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x5ef2891000-0x5ef2893000 stackSize=989KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes=
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 00099d1c  /apex/com.android.runtime/lib64/bionic/libc.so (syscall+28) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 0028b81c  /data/app/~~QcFtp5qTZZomhNzUwj9LmA==/com.jasonholtdigital.dart3d_example-rwer71ROp5xhR54_9-Q5LA==/base.apk (offset 1f30000) (???) (BuildId: fc2d7f424052f88b44e43eff8e0e292df566e2ca)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 001e93f0  /data/app/~~QcFtp5qTZZomhNzUwj9LmA==/com.jasonholtdigital.dart3d_example-rwer71ROp5xhR54_9-Q5LA==/base.apk (offset 1f30000) (???) (BuildId: fc2d7f424052f88b44e43eff8e0e292df566e2ca)
+F/.dart3d_example(25145): runtime.cc:769]   native: #03 pc 001a64e8  /data/app/~~QcFtp5qTZZomhNzUwj9LmA==/com.jasonholtdigital.dart3d_example-rwer71ROp5xhR54_9-Q5LA==/base.apk (offset 1f30000) (???) (BuildId: fc2d7f424052f88b44e43eff8e0e292df566e2ca)
+F/.dart3d_example(25145): runtime.cc:769]   native: #04 pc 001a2a04  /data/app/~~QcFtp5qTZZomhNzUwj9LmA==/com.jasonholtdigital.dart3d_example-rwer71ROp5xhR54_9-Q5LA==/base.apk (offset 1f30000) (???) (BuildId: fc2d7f424052f88b44e43eff8e0e292df566e2ca)
+F/.dart3d_example(25145): runtime.cc:769]   native: #05 pc 001a988c  /data/app/~~QcFtp5qTZZomhNzUwj9LmA==/com.jasonholtdigital.dart3d_example-rwer71ROp5xhR54_9-Q5LA==/base.apk (offset 1f30000) (???) (BuildId: fc2d7f424052f88b44e43eff8e0e292df566e2ca)
+F/.dart3d_example(25145): runtime.cc:769]   native: #06 pc 00083c8c  /apex/com.android.runtime/lib64/bionic/libc.so (__pthread_start+236) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #07 pc 00076190  /apex/com.android.runtime/lib64/bionic/libc.so (__start_thread+64) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   (no managed stack frames)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] "ServiceThread" prio=5 tid=22 Native
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=1 ucsCount=0 flags=1 obj=0 self=0xb4000072692d9bd0
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25234 nice=0 cgrp=top-app sched=0/0 handle=0x5eeb5174c0
+F/.dart3d_example(25145): runtime.cc:769]   | state=S schedstat=( 401383 44704537 7 ) utm=0 stm=0 core=7 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x5eeb420000-0x5eeb422000 stackSize=989KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes=
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 00099d1c  /apex/com.android.runtime/lib64/bionic/libc.so (syscall+28) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 0028b81c  /data/app/~~QcFtp5qTZZomhNzUwj9LmA==/com.jasonholtdigital.dart3d_example-rwer71ROp5xhR54_9-Q5LA==/base.apk (offset 1f30000) (???) (BuildId: fc2d7f424052f88b44e43eff8e0e292df566e2ca)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 001eab58  /data/app/~~QcFtp5qTZZomhNzUwj9LmA==/com.jasonholtdigital.dart3d_example-rwer71ROp5xhR54_9-Q5LA==/base.apk (offset 1f30000) (???) (BuildId: fc2d7f424052f88b44e43eff8e0e292df566e2ca)
+F/.dart3d_example(25145): runtime.cc:769]   native: #03 pc 00083c8c  /apex/com.android.runtime/lib64/bionic/libc.so (__pthread_start+236) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #04 pc 00076190  /apex/com.android.runtime/lib64/bionic/libc.so (__start_thread+64) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   (no managed stack frames)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] "SurfaceSyncGroupTimer" prio=5 tid=23 Native
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=1 ucsCount=0 flags=1 obj=0 self=0xb4000072692d2c90
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25243 nice=0 cgrp=top-app sched=0/0 handle=0x5ea63a84c0
+F/.dart3d_example(25145): runtime.cc:769]   | state=S schedstat=( 187077 0 1 ) utm=0 stm=0 core=6 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x5ea62a5000-0x5ea62a7000 stackSize=1037KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes=
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 000dfc88  /apex/com.android.runtime/lib64/bionic/libc.so (__epoll_pwait+8) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 00016980  /system/lib64/libutils.so (android::Looper::pollOnce+288) (BuildId: 7aa2d71e030a290c8dd28236ba0a838f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 001daf7c  /system/lib64/libandroid_runtime.so (android::android_os_MessageQueue_nativePollOnce+44) (BuildId: 3fb1b573d263845073cb901a737d0f0a)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.MessageQueue.nativePollOnce(Native method)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.MessageQueue.nextLegacy(MessageQueue.java:909)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.MessageQueue.next(MessageQueue.java:1021)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.Looper.loopOnce(Looper.java:213)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.Looper.loop(Looper.java:392)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.HandlerThread.run(HandlerThread.java:94)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] "binder:25145_4" prio=10 tid=24 Native
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=1 ucsCount=0 flags=1 obj=0 self=0xb40000726928b840
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25244 nice=-20 cgrp=top-app sched=0/0 handle=0x5ea52984c0
+F/.dart3d_example(25145): runtime.cc:769]   | state=S schedstat=( 989079 347383 8 ) utm=0 stm=0 core=4 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x5ea51a1000-0x5ea51a3000 stackSize=989KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes=
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 000ddc48  /apex/com.android.runtime/lib64/bionic/libc.so (__ioctl+8) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 0007e7dc  /apex/com.android.runtime/lib64/bionic/libc.so (ioctl+156) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 0004d224  /system/lib64/libbinder.so (android::IPCThreadState::talkWithDriver+212) (BuildId: 9e00e2427238efcd0c6ef91fb3e8f5f6)
+F/.dart3d_example(25145): runtime.cc:769]   native: #03 pc 00051878  /system/lib64/libbinder.so (android::IPCThreadState::joinThreadPool+152) (BuildId: 9e00e2427238efcd0c6ef91fb3e8f5f6)
+F/.dart3d_example(25145): runtime.cc:769]   native: #04 pc 0007e488  /system/lib64/libbinder.so (android::PoolThread::threadLoop+24) (BuildId: 9e00e2427238efcd0c6ef91fb3e8f5f6)
+F/.dart3d_example(25145): runtime.cc:769]   native: #05 pc 00019268  /system/lib64/libutils.so (android::Thread::_threadLoop+248) (BuildId: 7aa2d71e030a290c8dd28236ba0a838f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #06 pc 0012f0cc  /system/lib64/libandroid_runtime.so (android::AndroidRuntime::javaThreadShell+140) (BuildId: 3fb1b573d263845073cb901a737d0f0a)
+F/.dart3d_example(25145): runtime.cc:769]   native: #07 pc 0001b994  /system/lib64/libutils.so (libutil_thread_trampoline +20) (BuildId: 7aa2d71e030a290c8dd28236ba0a838f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #08 pc 00083c8c  /apex/com.android.runtime/lib64/bionic/libc.so (__pthread_start+236) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   native: #09 pc 00076190  /apex/com.android.runtime/lib64/bionic/libc.so (__start_thread+64) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   (no managed stack frames)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:769] Aborting thread:
+F/.dart3d_example(25145): runtime.cc:769] "main" prio=10 tid=1 Runnable
+F/.dart3d_example(25145): runtime.cc:769]   | group="" sCount=0 ucsCount=0 flags=0 obj=0 self=0xb40000726921e010
+F/.dart3d_example(25145): runtime.cc:769]   | sysTid=25145 nice=-20 cgrp=top-app sched=0/0 handle=0x740a2f9090
+F/.dart3d_example(25145): runtime.cc:769]   | state=R schedstat=( 327904230 150573389 488 ) utm=19 stm=13 core=7 HZ=100
+F/.dart3d_example(25145): runtime.cc:769]   | stack=0x7ff2018000-0x7ff201a000 stackSize=8188KB
+F/.dart3d_example(25145): runtime.cc:769]   | held mutexes= "abort lock" "mutator lock"(shared held)
+F/.dart3d_example(25145): runtime.cc:769]   native: #00 pc 00423758  /apex/com.android.art/lib64/libart.so (art::DumpNativeStack+112) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #01 pc 00598d08  /apex/com.android.art/lib64/libart.so (art::Thread::DumpStack const+172) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #02 pc 0096cda4  /apex/com.android.art/lib64/libart.so (art::Thread::DumpStack const+108) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #03 pc 0095d068  /apex/com.android.art/lib64/libart.so (art::AbortState::DumpThread const+60) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #04 pc 00953964  /apex/com.android.art/lib64/libart.so (art::Runtime::Abort+836) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #05 pc 00016438  /apex/com.android.art/lib64/libbase.so (android::base::SetAborter::$_0::__invoke+84) (BuildId: 7dc1c498b08b3374928e8d043f574325)
+F/.dart3d_example(25145): runtime.cc:769]   native: #06 pc 00015b78  /apex/com.android.art/lib64/libbase.so (android::base::LogMessage::~LogMessage+556) (BuildId: 7dc1c498b08b3374928e8d043f574325)
+F/.dart3d_example(25145): runtime.cc:769]   native: #07 pc 003296a0  /apex/com.android.art/lib64/libart.so (art::Thread::AssertNoPendingExceptionForNewException const+1136) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #08 pc 00306288  /apex/com.android.art/lib64/libart.so (art::Thread::ThrowNewExceptionF+184) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #09 pc 003066c4  /apex/com.android.art/lib64/libart.so (art::FindFieldJNI+992) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #10 pc 0068cdc4  /apex/com.android.art/lib64/libart.so (art::JNI<false>::GetFieldID+260) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #11 pc 00141584  /data/app/~~QcFtp5qTZZomhNzUwj9LmA==/com.jasonholtdigital.dart3d_example-rwer71ROp5xhR54_9-Q5LA==/base.apk (offset 1f30000) (???) (BuildId: fc2d7f424052f88b44e43eff8e0e292df566e2ca)
+F/.dart3d_example(25145): runtime.cc:769]   native: #12 pc 001414fc  /data/app/~~QcFtp5qTZZomhNzUwj9LmA==/com.jasonholtdigital.dart3d_example-rwer71ROp5xhR54_9-Q5LA==/base.apk (offset 1f30000) (Java_com_google_android_filament_RenderableManager_nGetAxisAlignedBoundingBox+272) (BuildId: fc2d7f424052f88b44e43eff8e0e292df566e2ca)
+F/.dart3d_example(25145): runtime.cc:769]   native: #13 pc 00e6641c  /data/misc/apexdata/com.android.art/dalvik-cache/arm64/boot.oat (art_jni_trampoline+124)
+F/.dart3d_example(25145): runtime.cc:769]   native: #14 pc 006bf3fc  /apex/com.android.art/lib64/libart.so (nterp_helper+780) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #15 pc 0019a8dc  /data/app/~~QcFtp5qTZZomhNzUwj9LmA==/com.jasonholtdigital.dart3d_example-rwer71ROp5xhR54_9-Q5LA==/oat/arm64/base.vdex (com.google.android.filament.RenderableManager.q+24)
+F/.dart3d_example(25145): runtime.cc:769]   native: #16 pc 006bf8e4  /apex/com.android.art/lib64/libart.so (nterp_helper+2036) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #17 pc 001fb292  /data/app/~~QcFtp5qTZZomhNzUwj9LmA==/com.jasonholtdigital.dart3d_example-rwer71ROp5xhR54_9-Q5LA==/oat/arm64/base.vdex (n1.c.accept+82)
+F/.dart3d_example(25145): runtime.cc:769]   native: #18 pc 00270cf4  /apex/com.android.art/lib64/libart.so (art_quick_invoke_stub+612) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #19 pc 0026eed4  /apex/com.android.art/lib64/libart.so (art::JValue art::InvokeVirtualOrInterfaceWithVarArgs<_jmethodID*>+872) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #20 pc 00649cf4  /apex/com.android.art/lib64/libart.so (art::JNI<false>::CallVoidMethodV+188) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #21 pc 001438a8  /data/app/~~QcFtp5qTZZomhNzUwj9LmA==/com.jasonholtdigital.dart3d_example-rwer71ROp5xhR54_9-Q5LA==/base.apk (offset 1f30000) (???) (BuildId: fc2d7f424052f88b44e43eff8e0e292df566e2ca)
+F/.dart3d_example(25145): runtime.cc:769]   native: #22 pc 001ca994  /data/app/~~QcFtp5qTZZomhNzUwj9LmA==/com.jasonholtdigital.dart3d_example-rwer71ROp5xhR54_9-Q5LA==/base.apk (offset 1f30000) (???) (BuildId: fc2d7f424052f88b44e43eff8e0e292df566e2ca)
+F/.dart3d_example(25145): runtime.cc:769]   native: #23 pc 00143740  /data/app/~~QcFtp5qTZZomhNzUwj9LmA==/com.jasonholtdigital.dart3d_example-rwer71ROp5xhR54_9-Q5LA==/base.apk (offset 1f30000) (Java_com_google_android_filament_Scene_nForEach+132) (BuildId: fc2d7f424052f88b44e43eff8e0e292df566e2ca)
+F/.dart3d_example(25145): runtime.cc:769]   native: #24 pc 00e619d8  /data/misc/apexdata/com.android.art/dalvik-cache/arm64/boot.oat (art_jni_trampoline+120)
+F/.dart3d_example(25145): runtime.cc:769]   native: #25 pc 006bf3fc  /apex/com.android.art/lib64/libart.so (nterp_helper+780) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #26 pc 0019ae0a  /data/app/~~QcFtp5qTZZomhNzUwj9LmA==/com.jasonholtdigital.dart3d_example-rwer71ROp5xhR54_9-Q5LA==/oat/arm64/base.vdex (com.google.android.filament.Scene.b+14)
+F/.dart3d_example(25145): runtime.cc:769]   native: #27 pc 006bf8e4  /apex/com.android.art/lib64/libart.so (nterp_helper+2036) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #28 pc 00202ad2  /data/app/~~QcFtp5qTZZomhNzUwj9LmA==/com.jasonholtdigital.dart3d_example-rwer71ROp5xhR54_9-Q5LA==/oat/arm64/base.vdex (n1.i0.g0+1642)
+F/.dart3d_example(25145): runtime.cc:769]   native: #29 pc 006bf8e4  /apex/com.android.art/lib64/libart.so (nterp_helper+2036) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #30 pc 002019e6  /data/app/~~QcFtp5qTZZomhNzUwj9LmA==/com.jasonholtdigital.dart3d_example-rwer71ROp5xhR54_9-Q5LA==/oat/arm64/base.vdex (n1.f0.doFrame+6418)
+F/.dart3d_example(25145): runtime.cc:769]   native: #31 pc 00a8d148  /data/misc/apexdata/com.android.art/dalvik-cache/arm64/boot.oat (android.view.Choreographer.doCallbacks+2120)
+F/.dart3d_example(25145): runtime.cc:769]   native: #32 pc 00a8ed98  /data/misc/apexdata/com.android.art/dalvik-cache/arm64/boot.oat (android.view.Choreographer.doFrame+6216)
+F/.dart3d_example(25145): runtime.cc:769]   native: #33 pc 00a8ac98  /data/misc/apexdata/com.android.art/dalvik-cache/arm64/boot.oat (android.view.Choreographer$FrameDisplayEventReceiver.run+72)
+F/.dart3d_example(25145): runtime.cc:769]   native: #34 pc 0090ef94  /data/misc/apexdata/com.android.art/dalvik-cache/arm64/boot.oat (android.os.Handler.dispatchMessage+68)
+F/.dart3d_example(25145): runtime.cc:769]   native: #35 pc 0094d9a8  /data/misc/apexdata/com.android.art/dalvik-cache/arm64/boot.oat (android.os.Looper.loopOnce+1320)
+F/.dart3d_example(25145): runtime.cc:769]   native: #36 pc 0094d2f0  /data/misc/apexdata/com.android.art/dalvik-cache/arm64/boot.oat (android.os.Looper.loop+960)
+F/.dart3d_example(25145): runtime.cc:769]   native: #37 pc 00663a1c  /data/misc/apexdata/com.android.art/dalvik-cache/arm64/boot.oat (android.app.ActivityThread.main+1484)
+F/.dart3d_example(25145): runtime.cc:769]   native: #38 pc 00270fc0  /apex/com.android.art/lib64/libart.so (art_quick_invoke_static_stub+640) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #39 pc 0026c2d8  /apex/com.android.art/lib64/libart.so (_jobject* art::InvokeMethod<8>+1240) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #40 pc 005eb428  /apex/com.android.art/lib64/libart.so (art::Method_invoke +36) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #41 pc 00e5cdb4  /data/misc/apexdata/com.android.art/dalvik-cache/arm64/boot.oat (art_jni_trampoline+116)
+F/.dart3d_example(25145): runtime.cc:769]   native: #42 pc 00c56a74  /data/misc/apexdata/com.android.art/dalvik-cache/arm64/boot.oat (com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run+116)
+F/.dart3d_example(25145): runtime.cc:769]   native: #43 pc 00c5f4a4  /data/misc/apexdata/com.android.art/dalvik-cache/arm64/boot.oat (com.android.internal.os.ZygoteInit.main+2948)
+F/.dart3d_example(25145): runtime.cc:769]   native: #44 pc 00270fc0  /apex/com.android.art/lib64/libart.so (art_quick_invoke_static_stub+640) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #45 pc 00270024  /apex/com.android.art/lib64/libart.so (art::JValue art::InvokeWithVarArgs<_jmethodID*>+1304) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #46 pc 0064b4fc  /apex/com.android.art/lib64/libart.so (art::JNI<true>::CallStaticVoidMethodV+192) (BuildId: a47994c420371ffbd05d16fc9a15ac9f)
+F/.dart3d_example(25145): runtime.cc:769]   native: #47 pc 00103568  /system/lib64/libandroid_runtime.so (_JNIEnv::CallStaticVoidMethod+104) (BuildId: 3fb1b573d263845073cb901a737d0f0a)
+F/.dart3d_example(25145): runtime.cc:769]   native: #48 pc 0012ed3c  /system/lib64/libandroid_runtime.so (android::AndroidRuntime::start+988) (BuildId: 3fb1b573d263845073cb901a737d0f0a)
+F/.dart3d_example(25145): runtime.cc:769]   native: #49 pc 0000459c  /system/bin/app_process64 (main+1212) (BuildId: db632c68ddb58598fdff25de1e648f56)
+F/.dart3d_example(25145): runtime.cc:769]   native: #50 pc 0006bc18  /apex/com.android.runtime/lib64/bionic/libc.so (__libc_init+120) (BuildId: 1dd68f91f82ddf6072a0e900abccad58)
+F/.dart3d_example(25145): runtime.cc:769]   at com.google.android.filament.RenderableManager.nGetAxisAlignedBoundingBox(Native method)
+F/.dart3d_example(25145): runtime.cc:769]   at com.google.android.filament.RenderableManager.q(unavailable:9)
+F/.dart3d_example(25145): runtime.cc:769]   at n1.c.accept(unavailable:41)
+F/.dart3d_example(25145): runtime.cc:769]   at com.google.android.filament.Scene.nForEach(Native method)
+F/.dart3d_example(25145): runtime.cc:769]   at com.google.android.filament.Scene.b(unavailable:4)
+F/.dart3d_example(25145): runtime.cc:769]   at n1.i0.g0(unavailable:821)
+F/.dart3d_example(25145): runtime.cc:769]   at n1.f0.doFrame(unavailable:3209)
+F/.dart3d_example(25145): runtime.cc:769]   at android.view.Choreographer$CallbackRecord.run(Choreographer.java:1870)
+F/.dart3d_example(25145): runtime.cc:769]   at android.view.Choreographer$CallbackRecord.run(Choreographer.java:1881)
+F/.dart3d_example(25145): runtime.cc:769]   at android.view.Choreographer.doCallbacks(Choreographer.java:1427)
+F/.dart3d_example(25145): runtime.cc:769]   at android.view.Choreographer.doFrame(Choreographer.java:1305)
+F/.dart3d_example(25145): runtime.cc:769]   at android.view.Choreographer$FrameDisplayEventReceiver.run(Choreographer.java:1848)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.Handler.handleCallback(Handler.java:995)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.Handler.dispatchMessage(Handler.java:103)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.Looper.loopOnce(Looper.java:283)
+F/.dart3d_example(25145): runtime.cc:769]   at android.os.Looper.loop(Looper.java:392)
+F/.dart3d_example(25145): runtime.cc:769]   at android.app.ActivityThread.main(ActivityThread.java:9231)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.reflect.Method.invoke(Native method)
+F/.dart3d_example(25145): runtime.cc:769]   at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:633)
+F/.dart3d_example(25145): runtime.cc:769]   at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1026)
+F/.dart3d_example(25145): runtime.cc:769] Pending exception java.lang.NoSuchFieldError: no "F" field "mCenterX" in class "Lcom/google/android/filament/Box;" or its superclasses
+F/.dart3d_example(25145): runtime.cc:769]   at void com.google.android.filament.RenderableManager.nGetAxisAlignedBoundingBox(long, int, com.google.android.filament.Box) (SourceFile:-2)
+F/.dart3d_example(25145): runtime.cc:769]   at com.google.android.filament.Box com.google.android.filament.RenderableManager.q(int) (SourceFile:-1)
+F/.dart3d_example(25145): runtime.cc:769]   at void n1.c.accept(int) (SourceFile:-1)
+F/.dart3d_example(25145): runtime.cc:769]   at void com.google.android.filament.Scene.nForEach(long, com.google.android.filament.Scene$ForEachCallback) (SourceFile:-2)
+F/.dart3d_example(25145): runtime.cc:769]   at void com.google.android.filament.Scene.b(com.google.android.filament.Scene$ForEachCallback) (SourceFile:-1)
+F/.dart3d_example(25145): runtime.cc:769]   at boolean n1.i0.g0(long) (SourceFile:-1)
+F/.dart3d_example(25145): runtime.cc:769]   at void n1.f0.doFrame(long) (SourceFile:-1)
+F/.dart3d_example(25145): runtime.cc:769]   at void android.view.Choreographer$CallbackRecord.run(long) (Choreographer.java:1870)
+F/.dart3d_example(25145): runtime.cc:769]   at void android.view.Choreographer$CallbackRecord.run(android.view.Choreographer$FrameData) (Choreographer.java:1881)
+F/.dart3d_example(25145): runtime.cc:769]   at void android.view.Choreographer.doCallbacks(int, long) (Choreographer.java:1427)
+F/.dart3d_example(25145): runtime.cc:769]   at void android.view.Choreographer.doFrame(long, int, android.view.DisplayEventReceiver$VsyncEventData) (Choreographer.java:1305)
+F/.dart3d_example(25145): runtime.cc:769]   at void android.view.Choreographer$FrameDisplayEventReceiver.run() (Choreographer.java:1848)
+F/.dart3d_example(25145): runtime.cc:769]   at void android.os.Handler.handleCallback(android.os.Message) (Handler.java:995)
+F/.dart3d_example(25145): runtime.cc:769]   at void android.os.Handler.dispatchMessage(android.os.Message) (Handler.java:103)
+F/.dart3d_example(25145): runtime.cc:769]   at boolean android.os.Looper.loopOnce(android.os.Looper, long, int) (Looper.java:283)
+F/.dart3d_example(25145): runtime.cc:769]   at void android.os.Looper.loop() (Looper.java:392)
+F/.dart3d_example(25145): runtime.cc:769]   at void android.app.ActivityThread.main(java.lang.String[]) (ActivityThread.java:9231)
+F/.dart3d_example(25145): runtime.cc:769]   at java.lang.Object java.lang.reflect.Method.invoke(java.lang.Object, java.lang.Object[]) (Method.java:-2)
+F/.dart3d_example(25145): runtime.cc:769]   at void com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run() (RuntimeInit.java:633)
+F/.dart3d_example(25145): runtime.cc:769]   at void com.android.internal.os.ZygoteInit.main(java.lang.String[]) (ZygoteInit.java:1026)
+F/.dart3d_example(25145): runtime.cc:769] 
+F/.dart3d_example(25145): runtime.cc:777] Throwing new exception 'no "F" field "mCenterY" in class "Lcom/google/android/filament/Box;" or its superclasses' with unexpected pending exception: java.lang.NoSuchFieldError: no "F" field "mCenterX" in class "Lcom/google/android/filament/Box;" or its superclasses
+F/.dart3d_example(25145): runtime.cc:777]   at void com.google.android.filament.RenderableManager.nGetAxisAlignedBoundingBox(long, int, com.google.android.filament.Box) (SourceFile:-2)
+F/.dart3d_example(25145): runtime.cc:777]   at com.google.android.filament.Box com.google.android.filament.RenderableManager.q(int) (SourceFile:-1)
+F/.dart3d_example(25145): runtime.cc:777]   at void n1.c.accept(int) (SourceFile:-1)
+F/.dart3d_example(25145): runtime.cc:777]   at void com.google.android.filament.Scene.nForEach(long, com.google.android.filament.Scene$ForEachCallback) (SourceFile:-2)
+F/.dart3d_example(25145): runtime.cc:777]   at void com.google.android.filament.Scene.b(com.google.android.filament.Scene$ForEachCallback) (SourceFile:-1)
+F/.dart3d_example(25145): runtime.cc:777]   at boolean n1.i0.g0(long) (SourceFile:-1)
+F/.dart3d_example(25145): runtime.cc:777]   at void n1.f0.doFrame(long) (SourceFile:-1)
+F/.dart3d_example(25145): runtime.cc:777]   at void android.view.Choreographer$CallbackRecord.run(long) (Choreographer.java:1870)
+F/.dart3d_example(25145): runtime.cc:777]   at void android.view.Choreographer$CallbackRecord.run(android.view.Choreographer$FrameData) (Choreographer.java:1881)
+F/.dart3d_example(25145): runtime.cc:777]   at void android.view.Choreographer.doCallbacks(int, long) (Choreographer.java:1427)
+F/.dart3d_example(25145): runtime.cc:777]   at void android.view.Choreographer.doFrame(long, int, android.view.DisplayEventReceiver$VsyncEventData) (Choreographer.java:1305)
+F/.dart3d_example(25145): runtime.cc:777]   at void android.view.Choreographer$FrameDisplayEventReceiver.run() (Choreographer.java:1848)
+F/.dart3d_example(25145): runtime.cc:777]   at void android.os.Handler.handleCallback(android.os.Message) (Handler.java:995)
+F/.dart3d_example(25145): runtime.cc:777]   at void android.os.Handler.dispatchMessage(android.os.Message) (Handler.java:103)
+F/.dart3d_example(25145): runtime.cc:777]   at boolean android.os.Looper.loopOnce(android.os.Looper, long, int) (Looper.java:283)
+F/.dart3d_example(25145): runtime.cc:777]   at void android.os.Looper.loop() (Looper.java:392)
+F/.dart3d_example(25145): runtime.cc:777]   at void android.app.ActivityThread.main(java.lang.String[]) (ActivityThread.java:9231)
+F/.dart3d_example(25145): runtime.cc:777]   at java.lang.Object java.lang.reflect.Method.invoke(java.lang.Object, java.lang.Object[]) (Method.java:-2)
+F/.dart3d_example(25145): runtime.cc:777]   at void com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run() (RuntimeInit.java:633)
+F/.dart3d_example(25145): runtime.cc:777]   at void com.android.internal.os.ZygoteInit.main(java.lang.String[]) (ZygoteInit.java:1026)
+F/.dart3d_example(25145): runtime.cc:777] 
+
+Application finished.

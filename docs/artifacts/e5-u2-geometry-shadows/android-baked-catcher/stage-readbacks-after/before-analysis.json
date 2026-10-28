@@ -1,0 +1,84 @@
+{
+  "bake001-load": {
+    "raw_vs_aggregate_R_changed_pixels": 0,
+    "raw_vs_aggregate_R_max_delta": 0,
+    "stages": {
+      "bake001-load-horizontal-blur.rgba": {
+        "bytes": 262144,
+        "R_min": 0,
+        "R_max": 198,
+        "R_zero_pixels": 3531,
+        "R_mean_byte": 163.48492431640625
+      },
+      "bake001-load-zero-aggregate.rgba": {
+        "bytes": 262144,
+        "R_min": 0,
+        "R_max": 0,
+        "R_zero_pixels": 65536,
+        "R_mean_byte": 0.0
+      },
+      "bake001-load-aggregate.rgba": {
+        "bytes": 262144,
+        "R_min": 0,
+        "R_max": 198,
+        "R_zero_pixels": 4000,
+        "R_mean_byte": 163.49960327148438
+      },
+      "bake001-load-raw-light-5.rgba": {
+        "bytes": 262144,
+        "R_min": 0,
+        "R_max": 198,
+        "R_zero_pixels": 4000,
+        "R_mean_byte": 163.49960327148438
+      },
+      "bake001-load-final-bound.rgba": {
+        "bytes": 262144,
+        "R_min": 0,
+        "R_max": 198,
+        "R_zero_pixels": 2891,
+        "R_mean_byte": 163.46473693847656
+      }
+    }
+  },
+  "bake002-refresh": {
+    "raw_vs_aggregate_R_changed_pixels": 0,
+    "raw_vs_aggregate_R_max_delta": 0,
+    "stages": {
+      "bake002-refresh-aggregate.rgba": {
+        "bytes": 262144,
+        "R_min": 0,
+        "R_max": 198,
+        "R_zero_pixels": 23265,
+        "R_mean_byte": 112.52313232421875
+      },
+      "bake002-refresh-horizontal-blur.rgba": {
+        "bytes": 262144,
+        "R_min": 0,
+        "R_max": 198,
+        "R_zero_pixels": 22618,
+        "R_mean_byte": 112.50131225585938
+      },
+      "bake002-refresh-final-bound.rgba": {
+        "bytes": 262144,
+        "R_min": 0,
+        "R_max": 198,
+        "R_zero_pixels": 21784,
+        "R_mean_byte": 112.49734497070312
+      },
+      "bake002-refresh-zero-aggregate.rgba": {
+        "bytes": 262144,
+        "R_min": 0,
+        "R_max": 0,
+        "R_zero_pixels": 65536,
+        "R_mean_byte": 0.0
+      },
+      "bake002-refresh-raw-light-5.rgba": {
+        "bytes": 262144,
+        "R_min": 0,
+        "R_max": 198,
+        "R_zero_pixels": 23265,
+        "R_mean_byte": 112.52313232421875
+      }
+    }
+  }
+}

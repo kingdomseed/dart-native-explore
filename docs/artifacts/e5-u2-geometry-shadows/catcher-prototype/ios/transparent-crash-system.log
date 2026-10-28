@@ -1,0 +1,695 @@
+Timestamp               Ty Process[PID:TID]
+2026-10-26 14:24:54.002 A  Runner[13950:d387e7] (RunningBoardServices) didChangeInheritances
+2026-10-26 14:24:54.012 Df Runner[13950:d387da] [com.apple.FrontBoard:SceneExtension] Realizing settings extension FBSSceneSettingsCore on FBSSceneSettings
+2026-10-26 14:24:54.012 Df Runner[13950:d387db] [com.apple.UIKit:BackgroundTask] Ending task with identifier 1 and description: <_UIBackgroundTaskInfo: 0x1060acd00>: taskID = 1, taskName = Launch Background Task for Coalescing, creationTime = 405055 (elapsed = 2), _expireHandler: (null)
+2026-10-26 14:24:54.012 Df Runner[13950:d387db] [com.apple.UIKit:BackgroundTask] Decrementing reference count for assertion <BKSProcessAssertion: 0x1061c0000> (used by background task with identifier 1: <_UIBackgroundTaskInfo: 0x1060acd00>: taskID = 1, taskName = Launch Background Task for Coalescing, creationTime = 405055 (elapsed = 2))
+2026-10-26 14:24:54.012 Df Runner[13950:d387db] [com.apple.UIKit:BackgroundTask] Will invalidate assertion: <BKSProcessAssertion: 0x1061c0000> for task identifier: 1
+2026-10-26 14:24:54.240 Df Runner[13950:d387da] [com.apple.FrontBoard:SceneExtension] Realizing settings extension FBSSceneClientSettingsCore on FBSSceneClientSettings
+2026-10-26 14:24:54.250 Df Runner[13950:d387da] [com.apple.FrontBoard:SceneExtension] UIMutableApplicationSceneSettings setting counterpart class: UIApplicationSceneSettings
+2026-10-26 14:24:54.250 Df Runner[13950:d387da] [com.apple.FrontBoard:SceneExtension] UIMutableApplicationSceneClientSettings setting counterpart class: UIApplicationSceneClientSettings
+2026-10-26 14:24:54.250 Df Runner[13950:d387da] [com.apple.FrontBoard:SceneExtension] Realizing settings extension FBSSceneTransitionContextCore on FBSSceneTransitionContext
+2026-10-26 14:24:54.380 A  Runner[13950:d387c1] (CoreFoundation) Updating Key-Value Observers Of Preferences
+2026-10-26 14:24:54.407 Df Runner[13950:d387c1] [com.apple.dt.xctest:Default] Registering for test daemon availability notify post.
+2026-10-26 14:24:54.407 Df Runner[13950:d387c1] [com.apple.dt.xctest:Default] notify_get_state check indicated test daemon not ready.
+2026-10-26 14:24:54.407 Df Runner[13950:d387c1] [com.apple.dt.xctest:Default] notify_get_state check indicated test daemon not ready.
+2026-10-26 14:24:54.407 Df Runner[13950:d387c1] [com.apple.dt.xctest:Default] notify_get_state check indicated test daemon not ready.
+2026-10-26 14:24:54.408 Df Runner[13950:d387c1] [com.apple.UIKit:Application] Deactivation reason added: 11; deactivation reasons: 1024 -> 3072; animating application lifecycle event: 0
+2026-10-26 14:24:54.448 Df Runner[13950:d387c1] [com.apple.UIKit:UIScreen] Evaluated capturing state as 0 on <UIScreen: 0x1061748c0> for initial
+2026-10-26 14:24:54.448 Df Runner[13950:d387c1] [com.apple.UIKit:UIScreen] Evaluated capturing state as 0 on <UIScreen: 0x1061748c0> for CADisplay KVO
+2026-10-26 14:24:54.451 Df Runner[13950:d387c1] [com.apple.Accessibility:AXSupportCommon] Read CategoryName: per-app = 1, category name = (null)
+2026-10-26 14:24:54.452 Df Runner[13950:d387c1] [com.apple.Accessibility:AXSupportCommon] Read CategoryName: per-app = 0, category name = UICTContentSizeCategoryL
+2026-10-26 14:24:54.465 Df Runner[13950:d387c1] [com.apple.UIKit:Application] Deactivation reason removed: 10; deactivation reasons: 3072 -> 2048; animating application lifecycle event: 0
+2026-10-26 14:24:54.470 Df Runner[13950:d387c1] [com.apple.UIKit:UpdateScheduler] Selected display: name=LCD (primary), id=1
+2026-10-26 14:24:54.473 Df Runner[13950:d387d9] [com.apple.xpc:connection] [0x106174dc0] activating connection: mach=true listener=false peer=false name=com.apple.fontservicesd
+2026-10-26 14:24:54.480 Df Runner[13950:d387c1] [com.apple.UIKit:ResourceConditions] Recomputing aggregate memory pressure: perScene=[:], kernel=_UIResourceConditions.MemoryPressure.normal, result=_UIResourceConditions.MemoryPressure.normal
+2026-10-26 14:24:54.484 Df Runner[13950:d387c1] [com.apple.UIKit:ResourceConditions] Recomputing aggregate memory pressure: perScene=["sceneID:com.jasonholtdigital.dart3dExample-default": _UIResourceConditions.MemoryPressure.normal], kernel=_UIResourceConditions.MemoryPressure.normal, result=_UIResourceConditions.MemoryPressure.normal
+2026-10-26 14:24:54.486 Df Runner[13950:d387c1] [com.apple.app_launch_measurement:ApplicationLaunch] alm_acquire_pageins_recording_assertion: acquired pageins recording assertion!
+2026-10-26 14:24:54.496 Df Runner[13950:d387c1] [com.apple.UIKit:Application] Deactivation reason added: 5; deactivation reasons: 2048 -> 2080; animating application lifecycle event: 1
+2026-10-26 14:24:54.496 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Should send trait collection or coordinate space update, interface style 1 -> 1, <UIWindowScene: 0x10a89c600> (6636514C-A8DB-4ED5-8585-657EA35B4A6F)
+2026-10-26 14:24:54.498 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 1, <UIWindowScene: 0x10a89c600> (6636514C-A8DB-4ED5-8585-657EA35B4A6F)
+2026-10-26 14:24:54.499 Df Runner[13950:d387c1] [com.apple.UIKit:HomeAffordanceObservation] Initializing: <_UIHomeAffordanceSceneNotifier: 0x10a926140>; with scene: <UIWindowScene: 0x10a89c600>
+2026-10-26 14:24:54.499 Df Runner[13950:d387c1] [com.apple.BacklightServices:scenes] 0x10a91dda0 setDelegate:<0x10a91e520 _UIBacklightEnvironment> hasDelegate:YES for environment:sceneID:com.jasonholtdigital.dart3dExample-default
+2026-10-26 14:24:54.499 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 1, <UIWindowScene: 0x10a89c600> (6636514C-A8DB-4ED5-8585-657EA35B4A6F)
+2026-10-26 14:24:54.499 Df Runner[13950:d387c1] [com.apple.UIKit:EventDeferring] [0x1062e3780] Initialized with scene: <UIWindowScene: 0x10a89c600>; behavior: <_UIEventDeferringBehavior_iOS: 0x10a86fb80>; availableForProcess: 1, systemShellManagesKeyboardFocus: 1
+2026-10-26 14:24:54.500 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 1, <UIWindowScene: 0x10a89c600> (6636514C-A8DB-4ED5-8585-657EA35B4A6F)
+2026-10-26 14:24:54.500 Df Runner[13950:d387c1] [com.apple.xpc:connection] [0x106175900] activating connection: mach=false listener=false peer=false name=(anonymous)
+2026-10-26 14:24:54.501 Df Runner[13950:d387c1] [com.apple.BackBoard:EventDelivery] policy observer <BKSHIDEventDeliveryPolicyObserver: 0x10a9260d0; process scope; policy: UNKNOWN> added
+2026-10-26 14:24:54.501 Df Runner[13950:d387c1] [com.apple.BackBoard:EventDelivery] [BKSHIDEventObserver] set observing:YES
+2026-10-26 14:24:54.503 Df Runner[13950:d387da] [com.apple.BackBoard:EventDelivery] [BKSHIDEventObserver] - connection activation
+2026-10-26 14:24:54.503 Df Runner[13950:d387c1] [com.apple.BackBoard:EventDelivery] policyStatus:<BKSHIDEventDeliveryPolicyObserver: 0x10a9260d0; process scope; <target; generation: 33; finalStringToken>> was:(null)
+2026-10-26 14:24:54.503 Df Runner[13950:d387c1] [com.apple.BackBoard:EventDelivery] [BKSHIDEventObserver] 0x10a9260d0 _UIKeyWindowSceneObserver-0x10a91dbc0 setToken:com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default
+2026-10-26 14:24:54.503 Df Runner[13950:d387c1] [com.apple.UIKit:KeyWindow] Setting default evaluation strategy for UIUserInterfaceIdiomPhone to LastOneWins
+2026-10-26 14:24:54.503 Df Runner[13950:d387c1] [com.apple.UIKit:KeyWindow] Scene target of keyboard event deferring environment did change: target=1; ancestor=0; scene: UIWindowScene: 0x10a89c600; scene identity: com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default
+2026-10-26 14:24:54.503 Df Runner[13950:d387da] [com.apple.BackBoard:EventDelivery] will update observations for 0 observers
+2026-10-26 14:24:54.503 Df Runner[13950:d387c1] [com.apple.UIKit:EventDeferring] [0x1062e3780] Scene target of event deferring environments did update: scene: 0x10a89c600; current systemShellManagesKeyboardFocus: 1; systemShellManagesKeyboardFocusForScene: 1; eligibleForRecordRemoval: 1;
+2026-10-26 14:24:54.503 Df Runner[13950:d387c1] [com.apple.UIKit:KeyWindow] Scene became target of keyboard event deferring environment: UIWindowScene: 0x10a89c600; scene identity: com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default
+2026-10-26 14:24:54.503 Df Runner[13950:d387c1] [com.apple.UIKit:KeyWindow] Stack[KeyWindow] 0x10a91e250: Taking no further action for migration from LastOneWins -> SystemShellManaged as there are no scenes
+2026-10-26 14:24:54.503 Df Runner[13950:d387c1] [com.apple.UIKit:KeyWindow] Setting default evaluation strategy for UIUserInterfaceIdiomPhone to SystemShellManaged
+2026-10-26 14:24:54.504 Df Runner[13950:d387c1] [com.apple.UIKit:KeyWindow] Key window needs update: 0; currentKeyWindowScene: 0x0; evaluatedKeyWindowScene: 0x10a89c600; currentApplicationKeyWindow: 0x0; evaluatedApplicationKeyWindow: 0x0; reason: UIWindowScene: 0x10a89c600: Window scene became target of keyboard environment
+2026-10-26 14:24:54.504 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 1, <UIWindowScene: 0x10a89c600> (6636514C-A8DB-4ED5-8585-657EA35B4A6F)
+2026-10-26 14:24:54.504 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 1, <UIWindowScene: 0x10a89c600> (6636514C-A8DB-4ED5-8585-657EA35B4A6F)
+2026-10-26 14:24:54.504 Df Runner[13950:d387c1] [com.apple.BackBoard:EventDelivery] policy observer <BKSHIDEventDeliveryPolicyObserver: 0x10a9257a0; process scope; policy: UNKNOWN> added
+2026-10-26 14:24:54.504 Df Runner[13950:d387c1] [com.apple.BackBoard:EventDelivery] [BKSHIDEventObserver] set observing:YES
+2026-10-26 14:24:54.504 Df Runner[13950:d387c1] [com.apple.BackBoard:EventDelivery] policyStatus:<BKSHIDEventDeliveryPolicyObserver: 0x10a9257a0; process scope; <target; generation: 33; finalStringToken>> was:(null)
+2026-10-26 14:24:54.504 Df Runner[13950:d387da] [com.apple.BackBoard:EventDelivery] will update observations for 0 observers
+2026-10-26 14:24:54.504 Df Runner[13950:d387c1] [com.apple.BackBoard:EventDelivery] [BKSHIDEventObserver] 0x10a9257a0  setToken:com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default
+2026-10-26 14:24:54.504 Df Runner[13950:d387c1] [com.apple.UIKit:KeyboardFocusAssistant] Event deferring policy changed: finalScene:N->Y (token: com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default)
+2026-10-26 14:24:54.504 Df Runner[13950:d387c1] [com.apple.UIKit:KeyboardSceneDelegate] Scene gained keyboard focus (scene: <UIWindowScene: 0x10a89c600>, responder: (nil), wantsKB: N)
+2026-10-26 14:24:54.505 Df Runner[13950:d387c1] [com.apple.UIKit:KeyboardArbiterClientLog] isWritingToolsHandlingKeyboardTracking:Y (WT ready:Y, Arbiter ready:Y)
+2026-10-26 14:24:54.505 Df Runner[13950:d387c1] [com.apple.UIKit:KeyboardArbiterClientLog] -[_UIRemoteKeyboards prepareToMoveKeyboard:withIAV:isIAVRelevant:showing:notifyRemote:forScene:] position: {{0, 0}, {0, 0}} visible: 0; notifyRemote: 1; isMinimized: NO
+2026-10-26 14:24:54.505 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 1, <UIWindowScene: 0x10a89c600> (6636514C-A8DB-4ED5-8585-657EA35B4A6F)
+2026-10-26 14:24:54.505 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 1, <UIWindowScene: 0x10a89c600> (6636514C-A8DB-4ED5-8585-657EA35B4A6F)
+2026-10-26 14:24:54.505 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 1, <UIWindowScene: 0x10a89c600> (6636514C-A8DB-4ED5-8585-657EA35B4A6F)
+2026-10-26 14:24:54.505 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 1, <UIWindowScene: 0x10a89c600> (6636514C-A8DB-4ED5-8585-657EA35B4A6F)
+2026-10-26 14:24:54.505 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 1, <UIWindowScene: 0x10a89c600> (6636514C-A8DB-4ED5-8585-657EA35B4A6F)
+2026-10-26 14:24:54.507 Df Runner[13950:d387c1] [com.apple.UIKit:KeyboardScene] Requesting keyboard scene for (FBSceneManager):sceneID:com.jasonholtdigital.dart3dExample-default
+2026-10-26 14:24:54.507 Df Runner[13950:d387c1] [com.apple.xpc:connection] [0x106177480] activating connection: mach=false listener=false peer=false name=(anonymous)
+2026-10-26 14:24:54.507 Df Runner[13950:d387c1] [com.apple.FrontBoard:Common] FBSWorkspace registering source: com.apple.UIKit.KeyboardManagement.hosted
+2026-10-26 14:24:54.507 Df Runner[13950:d387c1] [com.apple.FrontBoard:Common] FBSWorkspace connected to endpoint : <BSServiceConnectionEndpoint: 0x10612f600; target: NL:com.apple.UIKit.KeyboardManagement.hosted; service: com.apple.frontboard.workspace-service>
+2026-10-26 14:24:54.511 A  Runner[13950:d387da] (RunningBoardServices) didChangeInheritances
+2026-10-26 14:24:54.512 Df Runner[13950:d387e7] [com.apple.FrontBoard:Common] <FBSWorkspaceScenesClient:0x1060dac60 com.apple.UIKit.KeyboardManagement.hosted> attempting delayed handshake from activation handler
+2026-10-26 14:24:54.512 Df Runner[13950:d387e7] [com.apple.FrontBoard:Common] <FBSWorkspaceScenesClient:0x1060dac60 com.apple.UIKit.KeyboardManagement.hosted> sent handshake
+2026-10-26 14:24:54.519 Df Runner[13950:d387e7] [com.apple.FrontBoard:SceneExtension] Realizing settings extension <_UIKeyboardInputSceneSettings> on FBSSceneSettings
+2026-10-26 14:24:54.526 Df Runner[13950:d387e7] [com.apple.FrontBoard:SceneExtension] Realizing settings extension <_UIKeyboardInputSceneClientSettings> on FBSSceneClientSettings
+2026-10-26 14:24:54.560 Df Runner[13950:d387e7] [com.apple.xpc:connection] [0x106177e80] activating connection: mach=false listener=false peer=false name=(anonymous)
+2026-10-26 14:24:54.604 Df Runner[13950:d387c1] [PrototypeTools:domain] Not observing PTDefaults on customer install.
+2026-10-26 14:24:54.609 Df Runner[13950:d387c1] [com.apple.UIKit:KeyWindow] Key window API is scene-level: YES
+2026-10-26 14:24:54.690 Df Runner[13950:d387c1] [com.apple.UIKit:Orientation] <UIWindowScene: 0x10a89c600> (6636514C-A8DB-4ED5-8585-657EA35B4A6F) Scene updated orientation preferences: none -> ( Pu Ll Lr )
+2026-10-26 14:24:54.690 Df Runner[13950:d387c1] [com.apple.UIKit:KeyWindow] UIWindowScene: 0x10a89c600: Window became key in scene: UIWindow: 0x1061c8000; contextId: 0xA37E95BB: reason: UIWindowScene: 0x10a89c600: Window requested to become key in scene: 0x1061c8000
+2026-10-26 14:24:54.690 Df Runner[13950:d387c1] [com.apple.UIKit:KeyWindow] Key window needs update: 1; currentKeyWindowScene: 0x0; evaluatedKeyWindowScene: 0x10a89c600; currentApplicationKeyWindow: 0x0; evaluatedApplicationKeyWindow: 0x1061c8000; reason: UIWindowScene: 0x10a89c600: Window requested to become key in scene: 0x1061c8000
+2026-10-26 14:24:54.690 Df Runner[13950:d387c1] [com.apple.UIKit:KeyWindow] Window did become application key: UIWindow: 0x1061c8000; contextId: 0xA37E95BB; scene identity: com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default
+2026-10-26 14:24:54.690 Df Runner[13950:d387c1] [com.apple.UIKit:EventDeferring] [0x1062e3780] Begin local event deferring requested for token: 0x1061f5200; environments: 1; reason: UIWindowScene: 0x10a89c600: Begin event deferring in keyboardFocus for window: 0x1061c8000
+2026-10-26 14:24:54.691 Df Runner[13950:d387c1] [com.apple.UIKit:EventDeferring] [0x1062e3780] [keyboardFocus] Start observing context for local target window: 0x1061c8000; contextId: 0xA37E95BB
+2026-10-26 14:24:54.691 Df Runner[13950:d387c1] [com.apple.UIKit:EventDeferring] [0x1062e3780] [keyboardFocus] Began tracking context for local target window: 0x1061c8000; contextId: 0xA37E95BB
+2026-10-26 14:24:54.691 Df Runner[13950:d387e7] [com.apple.BackBoard:EventDelivery] BKSHIDEventDeliveryManager - connection activation
+2026-10-26 14:24:54.692 Df Runner[13950:d387e7] [com.apple.BackBoard:EventDelivery] will update observations for 2 observers
+2026-10-26 14:24:54.692 Df Runner[13950:d387e7] [com.apple.BackBoard:EventDelivery] [BKSHIDEventObserver] policy-per (
+    <0x10a9257a0; _UIKeyboardFocu…ant-0x1060588a0; fb/FBSceneManag…Example-default; <target; generation: 33; finalStringToken>>,
+    <0x10a9260d0; _UIKeyWindowSce…ver-0x10a91dbc0; fb/FBSceneManag…Example-default; <target; generation: 33; finalStringToken>>
+)
+2026-10-26 14:24:54.692 Df Runner[13950:d387e7] [com.apple.BackBoard:EventDelivery] will update observations for 2 observers
+2026-10-26 14:24:54.692 Df Runner[13950:d387e7] [com.apple.BackBoard:EventDelivery] policyStatus:<0x10a9257a0; _UIKeyboardFocusAssistant-0x1060588a0; fb/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default; <ancestor; generation: 34; finalStringToken>> was:<target; generation: 33; finalStringToken>
+2026-10-26 14:24:54.692 Df Runner[13950:d387e7] [com.apple.BackBoard:EventDelivery] [BKSHIDEventObserver] policyDidChange: 0x10a9257a0 -> <_UIKeyboardFocusAssistant: 0x1060588a0> now:<ancestor; generation: 34; finalStringToken>
+2026-10-26 14:24:54.692 Df Runner[13950:d387e7] [com.apple.BackBoard:EventDelivery] policyStatus:<0x10a9260d0; _UIKeyWindowSceneObserver-0x10a91dbc0; fb/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default; <ancestor; generation: 34; finalStringToken>> was:<target; generation: 33; finalStringToken>
+2026-10-26 14:24:54.692 Df Runner[13950:d387e7] [com.apple.BackBoard:EventDelivery] [BKSHIDEventObserver] policyDidChange: 0x10a9260d0 -> <_UIKeyWindowSceneObserver: 0x10a91dbc0> now:<ancestor; generation: 34; finalStringToken>
+2026-10-26 14:24:54.692 Df Runner[13950:d387e7] [com.apple.BackBoard:EventDelivery] [BKSHIDEventObserver] policy-per (
+    <0x10a9257a0; _UIKeyboardFocu…ant-0x1060588a0; fb/FBSceneManag…Example-default; <ancestor; generation: 34; finalStringToken>>,
+    <0x10a9260d0; _UIKeyWindowSce…ver-0x10a91dbc0; fb/FBSceneManag…Example-default; <ancestor; generation: 34; finalStringToken>>
+)
+2026-10-26 14:24:54.733 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 1, <UIWindowScene: 0x10a89c600> (6636514C-A8DB-4ED5-8585-657EA35B4A6F)
+2026-10-26 14:24:54.735 Df Runner[13950:d387c1] [com.apple.UIKit:AppLifecycle] sceneOfRecord: sceneID: sceneID:com.jasonholtdigital.dart3dExample-default  persistentID: 6636514C-A8DB-4ED5-8585-657EA35B4A6F
+2026-10-26 14:24:54.735 Df Runner[13950:d387c1] [com.apple.UIKit:Application] Ignoring already applied deactivation reason: 5; deactivation reasons: 2080
+2026-10-26 14:24:54.735 Df Runner[13950:d387c1] [com.apple.UIKit:Application] Deactivation reason added: 12; deactivation reasons: 2080 -> 6176; animating application lifecycle event: 1
+2026-10-26 14:24:54.735 Df Runner[13950:d387c1] [com.apple.UIKit:Application] Deactivation reason removed: 11; deactivation reasons: 6176 -> 4128; animating application lifecycle event: 1
+2026-10-26 14:24:54.736 Df Runner[13950:d387c1] [com.apple.FrontBoard:SceneExtension] Realizing settings extension <_UISceneIntelligenceSupportSettings> on FBSSceneSettings
+2026-10-26 14:24:54.736 Df Runner[13950:d387da] [com.apple.UIIntelligenceSupport:xpc] establishing connection to agent
+2026-10-26 14:24:54.736 Df Runner[13950:d387c1] [com.apple.UIKit:ScenePostSettingsUpdateResponse] <_UIScenePostSettingsUpdateResponseComponent: 0x1061ee940>: Scheduling <_UIScenePostSettingsUpdateWindowLayout: 0x10624c500>
+2026-10-26 14:24:54.736 Df Runner[13950:d387c1] [com.apple.UIKit:ResourceConditions] Recomputing aggregate memory pressure: perScene=["sceneID:com.jasonholtdigital.dart3dExample-default": _UIResourceConditions.MemoryPressure.normal], kernel=_UIResourceConditions.MemoryPressure.normal, result=_UIResourceConditions.MemoryPressure.normal
+2026-10-26 14:24:54.736 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 1, <UIWindowScene: 0x10a89c600> (6636514C-A8DB-4ED5-8585-657EA35B4A6F)
+2026-10-26 14:24:54.737 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 1, <UIWindowScene: 0x10a89c600> (6636514C-A8DB-4ED5-8585-657EA35B4A6F)
+2026-10-26 14:24:54.737 Df Runner[13950:d387c1] [com.apple.FrontBoard:SceneExtension] Ingesting properties from UIApplicationSceneSettings...
+2026-10-26 14:24:54.738 Df Runner[13950:d387da] [com.apple.xpc:session] [0x10aaf5270] Session created.
+2026-10-26 14:24:54.738 Df Runner[13950:d387da] [com.apple.xpc:session] [0x10aaf5270] Session created from connection [0x10ab4c780]
+2026-10-26 14:24:54.738 Df Runner[13950:d387da] [com.apple.xpc:connection] [0x10ab4c780] activating connection: mach=true listener=false peer=false name=com.apple.uiintelligencesupport.agent
+2026-10-26 14:24:54.738 Df Runner[13950:d387da] [com.apple.xpc:session] [0x10aaf5270] Session activated
+2026-10-26 14:24:54.740 Df Runner[13950:d387d9] [com.apple.UIIntelligenceSupport:xpc] Connection established with agent PID: 7352
+2026-10-26 14:24:54.742 Df Runner[13950:d387c1] [com.apple.FrontBoard:SceneExtension] Realizing settings extension <UIApplicationSceneSettings[derived]> on FBSSceneSettings
+2026-10-26 14:24:54.743 Df Runner[13950:d387c1] [com.apple.UIKit:ScenePostSettingsUpdateResponse] <_UIScenePostSettingsUpdateResponseComponent: 0x1061ee940>: Reducing <_UIScenePostSettingsUpdateWindowLayout: 0x10624c270> into <_UIScenePostSettingsUpdateWindowLayout: 0x10624c500>
+2026-10-26 14:24:54.743 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 1, <UIWindowScene: 0x10a89c600> (6636514C-A8DB-4ED5-8585-657EA35B4A6F)
+2026-10-26 14:24:54.746 Df Runner[13950:d387c1] [com.apple.xpc:connection] [0x10ab4d2c0] activating connection: mach=true listener=false peer=false name=com.apple.IOSurface.Remote
+2026-10-26 14:24:54.752 A  Runner[13950:d387d9] (RunningBoardServices) didChangeInheritances
+2026-10-26 14:24:54.752 Df Runner[13950:d387c1] [com.apple.network:activity] Create activity from XPC object <nw_activity 50:1 [AE2DB8A1-58CC-4C38-B90A-460ECC0EA651] (reporting strategy default)>
+2026-10-26 14:24:54.752 Df Runner[13950:d387c1] [com.apple.network:activity] Create activity from XPC object <nw_activity 50:2 [07E71A0E-E2B3-4E43-8256-08B9CF986791] (reporting strategy default)>
+2026-10-26 14:24:54.752 Df Runner[13950:d387c1] [com.apple.network:activity] Set activity <nw_activity 50:1 [AE2DB8A1-58CC-4C38-B90A-460ECC0EA651] (reporting strategy default)> as the global parent
+2026-10-26 14:24:54.760 A  Runner[13950:d387c1] (CoreFoundation) Updating Key-Value Observers Of Preferences
+2026-10-26 14:24:54.760 Df Runner[13950:d387c1] [com.apple.Accessibility:AXCommon] Read Per-App on Init: Smart invert = (null)
+2026-10-26 14:24:54.764 E  Runner[13950:d387c1] [com.apple.BoardServices:XPCErrors] non-launching port is incompatible with service identifier "com.apple.PointerUI.pointeruid.default-service"
+2026-10-26 14:24:54.764 Df Runner[13950:d387c1] [com.apple.UIKit:KeyboardFocusAssistant] Event deferring policy changed: finalScene:Y->Y (token: com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default)
+2026-10-26 14:24:54.764 Df Runner[13950:d387c1] [com.apple.UIKit:EventDeferring] [0x1062e3780] Scene target of event deferring environments did update: scene: 0x10a89c600; current systemShellManagesKeyboardFocus: 1; systemShellManagesKeyboardFocusForScene: 1; eligibleForRecordRemoval: 1;
+2026-10-26 14:24:54.764 Df Runner[13950:d387c1] [com.apple.UIKit:KeyWindow] Scene became target of keyboard event deferring environment: UIWindowScene: 0x10a89c600; scene identity: com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default
+2026-10-26 14:24:54.766 Df Runner[13950:d387c1] [com.apple.BackBoard:Display] [FBSDisplaySource 1-1] silently connecting raw configuration: <FBSDisplayConfiguration: 0x1060eca00; Main; mode: "402x874@3x 60Hz p3 SDR">
+2026-10-26 14:24:54.768 A  Runner[13950:d387da] (RunningBoardServices) didChangeInheritances
+2026-10-26 14:24:54.821 Df Runner[13950:d38816] (Flutter) dartnative: The Dart VM service is listening on http://127.0.0.1:65221/mQ9j49uUEvE=/
+2026-10-26 14:24:54.831 Df Runner[13950:d387c1] [com.apple.UIKit:UpdateScheduler] Target list changed: <CADisplay:LCD primary>
+2026-10-26 14:24:54.832 Df Runner[13950:d387c1] [com.apple.UIKit:AppLifecycle] sceneOfRecord: sceneID: sceneID:com.jasonholtdigital.dart3dExample-default  persistentID: 6636514C-A8DB-4ED5-8585-657EA35B4A6F
+2026-10-26 14:24:54.832 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 1, <UIWindowScene: 0x10a89c600> (6636514C-A8DB-4ED5-8585-657EA35B4A6F)
+2026-10-26 14:24:54.876 A  Runner[13950:d387e7] (RunningBoardServices) didChangeInheritances
+2026-10-26 14:24:54.893 A  Runner[13950:d387c1] (Security) SecItemCopyMatching_ios
+2026-10-26 14:24:54.894 Df Runner[13950:d387c1] [com.apple.securityd:secitemratelimit] Not internal release, disabling SIRL
+2026-10-26 14:24:54.894 Df Runner[13950:d387c1] [com.apple.securityd:thread-local-client-debug] SecSecurityClientGet new thread!
+2026-10-26 14:24:54.895 Df Runner[13950:d387c1] [com.apple.securityd:keychain] System Keychain Always Supported set via feature flag to disabled
+2026-10-26 14:24:54.895 Df Runner[13950:d387c1] [com.apple.xpc:connection] [0x10ab4c640] activating connection: mach=true listener=false peer=false name=com.apple.securityd
+2026-10-26 14:24:54.906 Df Runner[13950:d387c1] (Flutter) dartnative: [DN] Licence valid (community), expires 2027-09-14
+2026-10-26 14:24:54.909 Df Runner[13950:d387c1] (Flutter) dartnative: [DN] lifecycle → AppLifecycleState.inactive
+2026-10-26 14:24:54.941 Df Runner[13950:d387c1] (Flutter) dartnative: dart3d: showcase — u2-ios-control-dir: control capture · dir light · source / mask
+2026-10-26 14:24:55.084 Df Runner[13950:d387c1] [com.apple.xpc:connection] [0x10ab4f0c0] activating connection: mach=true listener=false peer=false name=com.apple.metal.simulator
+2026-10-26 14:24:55.087 Df Runner[13950:d387c1] [com.apple.xpc:connection] [0x10ab4f200] activating connection: mach=true listener=false peer=false name=com.apple.metal.simulator
+2026-10-26 14:24:55.087 Df Runner[13950:d387c1] [com.apple.xpc:connection] [0x10ab4f340] activating connection: mach=true listener=false peer=false name=com.apple.metal.simulator
+2026-10-26 14:24:55.089 E  Runner[13950:d387c1] [com.apple.UIKit:UIFocus] dart3d.SceneViewHost implements focusItemsInRect: - caching for linear focus movement is limited as long as this view is on screen.
+2026-10-26 14:24:55.479 Df Runner[13950:d387c1] [com.apple.FrontBoard:SceneExtension] Realizing settings extension SBUISecureRenderingSettingsExtension on FBSSceneSettings
+2026-10-26 14:24:55.686 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 1, <UIWindowScene: 0x10a89c600> (6636514C-A8DB-4ED5-8585-657EA35B4A6F)
+2026-10-26 14:24:55.687 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 1, <UIWindowScene: 0x10a89c600> (6636514C-A8DB-4ED5-8585-657EA35B4A6F)
+2026-10-26 14:24:55.688 Df Runner[13950:d387c1] [com.apple.UIKit:AppLifecycle] sceneOfRecord: sceneID: sceneID:com.jasonholtdigital.dart3dExample-default  persistentID: 6636514C-A8DB-4ED5-8585-657EA35B4A6F
+2026-10-26 14:24:55.688 Df Runner[13950:d387c1] [com.apple.UIKit:Application] Deactivation reason removed: 12; deactivation reasons: 4128 -> 32; animating application lifecycle event: 1
+2026-10-26 14:24:55.688 Df Runner[13950:d387c1] [com.apple.KeyboardArbiter:Client] Send setDeactivating: N (-DeactivationReason:SuspendedEventsOnly)
+2026-10-26 14:24:55.689 Df Runner[13950:d387c1] [com.apple.UIKit:Application] Deactivation reason removed: 5; deactivation reasons: 32 -> 0; animating application lifecycle event: 0
+2026-10-26 14:24:55.689 Df Runner[13950:d387c1] [com.apple.KeyboardArbiter:Client] applicationDidBecomeActive (force:N)
+2026-10-26 14:24:55.689 Df Runner[13950:d387c1] (Flutter) dartnative: [DN] lifecycle → AppLifecycleState.resumed
+2026-10-26 14:24:55.691 Df Runner[13950:d387c1] [com.apple.UIKit:ScenePostSettingsUpdateResponse] <_UIScenePostSettingsUpdateResponseComponent: 0x1061ee940>: Scheduling <_UIScenePostSettingsUpdateWindowLayout: 0x10624ce30>
+2026-10-26 14:24:55.691 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 1, <UIWindowScene: 0x10a89c600> (6636514C-A8DB-4ED5-8585-657EA35B4A6F)
+2026-10-26 14:24:55.691 Df Runner[13950:d387c1] [com.apple.UIKit:DisplayLink] Legacy remapping target changed from '(null)' to '335188BF-5C12-427F-B870-6A359DCB567D'
+2026-10-26 14:24:55.698 Df Runner[13950:d387c1] [com.apple.xpc:connection] [0x10d7dcb40] activating connection: mach=true listener=false peer=false name=com.apple.lsd.mapdb
+2026-10-26 14:24:55.903 Df Runner[13950:d387c1] [com.apple.UIKit:UIScreen] Evaluated capturing state as 0 on <UIScreen: 0x10d7dfc00> for initial
+2026-10-26 14:24:55.903 Df Runner[13950:d387c1] [com.apple.UIKit:UIScreen] Evaluated capturing state as 0 on <UIScreen: 0x10d7dfc00> for CADisplay KVO
+2026-10-26 14:24:55.903 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 0, <_UIKeyboardInputScene: 0x10a99d180> (KeyboardInputScene-com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default)
+2026-10-26 14:24:55.903 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Should send trait collection or coordinate space update, interface style 1 -> 1, <_UIKeyboardInputScene: 0x10a99d180> (KeyboardInputScene-com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default)
+2026-10-26 14:24:55.904 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 0, <_UIKeyboardInputScene: 0x10a99d180> (KeyboardInputScene-com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default)
+2026-10-26 14:24:55.904 Df Runner[13950:d387c1] [com.apple.UIKit:HomeAffordanceObservation] Initializing: <_UIHomeAffordanceSceneNotifier: 0x10a9121b0>; with scene: <_UIKeyboardInputScene: 0x10a99d180>
+2026-10-26 14:24:55.904 Df Runner[13950:d387c1] [com.apple.BacklightServices:scenes] 0x110c76430 setDelegate:<0x110c76490 _UIBacklightEnvironment> hasDelegate:YES for environment:KeyboardInputScene-com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default
+2026-10-26 14:24:55.905 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 0, <_UIKeyboardInputScene: 0x10a99d180> (KeyboardInputScene-com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default)
+2026-10-26 14:24:55.905 Df Runner[13950:d387c1] [com.apple.UIKit:EventDeferring] [0x110c26b00] Initialized with scene: <_UIKeyboardInputScene: 0x10a99d180>; behavior: <_UIEventDeferringBehavior_iOS: 0x10ab48840>; availableForProcess: 1, systemShellManagesKeyboardFocus: 1
+2026-10-26 14:24:55.905 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 0, <_UIKeyboardInputScene: 0x10a99d180> (KeyboardInputScene-com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default)
+2026-10-26 14:24:55.905 Df Runner[13950:d387c1] [com.apple.BackBoard:EventDelivery] policy observer <BKSHIDEventDeliveryPolicyObserver: 0x10a912140; process scope; policy: UNKNOWN> added
+2026-10-26 14:24:55.905 Df Runner[13950:d387c1] [com.apple.BackBoard:EventDelivery] [BKSHIDEventObserver] set observing:YES
+2026-10-26 14:24:55.905 Df Runner[13950:d387c1] [com.apple.BackBoard:EventDelivery] policyStatus:<BKSHIDEventDeliveryPolicyObserver: 0x10a912140; process scope; <target; generation: 34>> was:(null)
+2026-10-26 14:24:55.905 Df Runner[13950:d387db] [com.apple.BackBoard:EventDelivery] will update observations for 0 observers
+2026-10-26 14:24:55.905 Df Runner[13950:d387c1] [com.apple.BackBoard:EventDelivery] [BKSHIDEventObserver] 0x10a912140 _UIKeyWindowSceneObserver-0x110c764f0 setToken:com.apple.UIKit.KeyboardManagement.hosted/com.apple.InputUI.keyboard:KeyboardInputScene-com.apple.frontboard.systemappservices%2FFBSceneManager%3AsceneID%253Acom.jasonholtdigital.dart3dExample-default
+2026-10-26 14:24:55.905 Df Runner[13950:d387c1] [com.apple.BackBoard:EventDelivery] policyStatus:<0x10a912140; _UIKeyWindowSceneObserver-0x110c764f0; com.apple.UIKit.KeyboardManagement.hosted/com.apple.InputUI.keyboard:KeyboardInputScene-com.apple.frontboard.systemappservices%2FFBSceneManager%3AsceneID%253Acom.jasonholtdigital.dart3dExample-default; <none; generation: 0>> was:<target; generation: 34>
+2026-10-26 14:24:55.905 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 0, <_UIKeyboardInputScene: 0x10a99d180> (KeyboardInputScene-com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default)
+2026-10-26 14:24:55.905 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 0, <_UIKeyboardInputScene: 0x10a99d180> (KeyboardInputScene-com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default)
+2026-10-26 14:24:55.905 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 0, <_UIKeyboardInputScene: 0x10a99d180> (KeyboardInputScene-com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default)
+2026-10-26 14:24:55.905 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 0, <_UIKeyboardInputScene: 0x10a99d180> (KeyboardInputScene-com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default)
+2026-10-26 14:24:55.905 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 0, <_UIKeyboardInputScene: 0x10a99d180> (KeyboardInputScene-com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default)
+2026-10-26 14:24:55.905 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 0, <_UIKeyboardInputScene: 0x10a99d180> (KeyboardInputScene-com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default)
+2026-10-26 14:24:55.905 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 0, <_UIKeyboardInputScene: 0x10a99d180> (KeyboardInputScene-com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default)
+2026-10-26 14:24:55.906 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 0, <_UIKeyboardInputScene: 0x10a99d180> (KeyboardInputScene-com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default)
+2026-10-26 14:24:55.906 Df Runner[13950:d387c1] [com.apple.UIKit:AppLifecycle] sceneOfRecord: sceneID: sceneID:com.jasonholtdigital.dart3dExample-default  persistentID: 6636514C-A8DB-4ED5-8585-657EA35B4A6F
+2026-10-26 14:24:55.909 Df Runner[13950:d387c1] [com.apple.UIKit:ResourceConditions] Recomputing aggregate memory pressure: perScene=["sceneID:com.jasonholtdigital.dart3dExample-default": _UIResourceConditions.MemoryPressure.normal], kernel=_UIResourceConditions.MemoryPressure.normal, result=_UIResourceConditions.MemoryPressure.normal
+2026-10-26 14:24:55.909 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 0, <_UIKeyboardInputScene: 0x10a99d180> (KeyboardInputScene-com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default)
+2026-10-26 14:24:55.909 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 0, <_UIKeyboardInputScene: 0x10a99d180> (KeyboardInputScene-com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default)
+2026-10-26 14:24:55.909 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 0, <_UIKeyboardInputScene: 0x10a99d180> (KeyboardInputScene-com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default)
+2026-10-26 14:24:55.909 Df Runner[13950:d387c1] [com.apple.UIKit:ScenePostSettingsUpdateResponse] <_UIScenePostSettingsUpdateResponseComponent: 0x110c772d0>: Scheduling <_UIScenePostSettingsUpdateWindowLayout: 0x10624e720>
+2026-10-26 14:24:55.909 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Not push traits update to screen for new style 0, <_UIKeyboardInputScene: 0x10a99d180> (KeyboardInputScene-com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default)
+2026-10-26 14:24:55.909 Df Runner[13950:d387c1] [com.apple.UIKit:KeyboardScene] Notifying observers of geometry update -> app scene 1: {{0, 0}, {402, 874}}, keyboard scene: 1: {{0, 0}, {402, 874}}
+2026-10-26 14:24:55.909 Df Runner[13950:d387c1] [com.apple.Accessibility:AXCommon] Loading PDFKit
+2026-10-26 14:24:55.963 Df Runner[13950:d387dd] [com.apple.calls.callkit:Default] Call host has no calls
+2026-10-26 14:24:55.998 Df Runner[13950:d387c1] [com.apple.KeyboardArbiter:Client] applicationWillResume note:UIApplicationWillEnterForegroundNotification
+2026-10-26 14:24:56.002 Df Runner[13950:d387c1] [com.apple.KeyboardArbiter:Client] startConnection
+2026-10-26 14:24:56.016 Df Runner[13950:d387c1] [com.apple.UIKit:AppLifecycle] sceneOfRecord: sceneID: sceneID:com.jasonholtdigital.dart3dExample-default  persistentID: 6636514C-A8DB-4ED5-8585-657EA35B4A6F
+2026-10-26 14:24:56.016 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Scene did update interface style to 1, <_UIKeyboardInputScene: 0x10a99d180> (KeyboardInputScene-com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default)
+2026-10-26 14:24:56.016 Df Runner[13950:d387c1] [com.apple.UIKit:InterfaceStyle] Push traits update to screen for new style 1, <_UIKeyboardInputScene: 0x10a99d180> (KeyboardInputScene-com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default)
+2026-10-26 14:24:56.016 Df Runner[13950:d387c1] [com.apple.UIKit:KeyboardScene] Keyboard scene for com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default successfully connected: com.apple.UIKit.KeyboardManagement.hosted/com.apple.InputUI.keyboard:KeyboardInputScene-com.apple.frontboard.systemappservices%2FFBSceneManager%3AsceneID%253Acom.jasonholtdigital.dart3dExample-default
+2026-10-26 14:24:56.016 Df Runner[13950:d387c1] [com.apple.UIKit:KeyboardScene] reloadInputViews for keyboard scene com.apple.UIKit.KeyboardManagement.hosted/com.apple.InputUI.keyboard:KeyboardInputScene-com.apple.frontboard.systemappservices%2FFBSceneManager%3AsceneID%253Acom.jasonholtdigital.dart3dExample-default
+2026-10-26 14:24:56.016 Df Runner[13950:d387c1] [com.apple.UIKit:KeyboardSceneDelegate] forceReloadInputViews
+2026-10-26 14:24:56.017 Df Runner[13950:d387c1] [com.apple.UIKit:KeyboardSceneDelegate] Try reloading input views for responder:(nil) requiresKB:N force:Y scene-identity:com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default
+2026-10-26 14:24:56.017 Df Runner[13950:d387c1] [com.apple.UIKit:KeyboardSceneDelegate] Reloading input views for key-window scene responder:(nil) requiresKB:N force:Y scene-identity:com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.jasonholtdigital.dart3dExample-default
+2026-10-26 14:24:56.017 Df Runner[13950:d387c1] [com.apple.KeyboardArbiter:Client] startConnection callback handleKeyboardChange:N (hasFocus:Y expectingInitialState:Y disabled:N hasInfo:N)
+2026-10-26 14:24:56.032 Df Runner[13950:d387e7] [com.jasonholtdigital.dart3d:scene] protocol hello: Dart v1.0
+2026-10-26 14:24:56.038 Df Runner[13950:d387e7] [com.jasonholtdigital.dart3d:scene] renderTexture 8444939141786894342: 512x512 update=everyFrame
+2026-10-26 14:24:56.044 Df Runner[13950:d387e7] [com.jasonholtdigital.dart3d:scene] node 8444939141786894351: body=nil shape=false pos=0.0 cat=- mask=-
+2026-10-26 14:24:56.044 Df Runner[13950:d387e7] [com.jasonholtdigital.dart3d:scene] node 8444939141786894347: body=nil shape=false pos=6.0 cat=- mask=-
+2026-10-26 14:24:56.044 Df Runner[13950:d387e7] [com.jasonholtdigital.dart3d:scene] node 8444939141786894348: body=nil shape=false pos=6.0 cat=- mask=-
+2026-10-26 14:24:56.044 Df Runner[13950:d387e7] [com.jasonholtdigital.dart3d:scene] node 8444939141786894340: body=nil shape=false pos=5.0 cat=- mask=-
+2026-10-26 14:24:56.044 Df Runner[13950:d387e7] [com.jasonholtdigital.dart3d:scene] node 8444939141786894339: body=nil shape=false pos=0.7 cat=- mask=-
+2026-10-26 14:24:56.044 Df Runner[13950:d387e7] [com.jasonholtdigital.dart3d:scene] node 8444939141786894337: body=nil shape=false pos=0.0 cat=- mask=-
+2026-10-26 14:24:56.044 Df Runner[13950:d387e7] [com.jasonholtdigital.dart3d:scene] node 8444939141786894352: body=nil shape=false pos=18.689833 cat=- mask=-
+2026-10-26 14:24:56.044 Df Runner[13950:d387e7] [com.jasonholtdigital.dart3d:scene] node 8444939141786894350: body=nil shape=false pos=-0.02 cat=- mask=-
+2026-10-26 14:24:56.044 Df Runner[13950:d387e7] [com.jasonholtdigital.dart3d:scene] node 8444939141786894349: body=nil shape=false pos=0.0 cat=- mask=-
+2026-10-26 14:24:56.057 Df Runner[13950:d387c1] [com.apple.network:] networkd_settings_read_from_file_locked initialized networkd settings by reading plist directly
+2026-10-26 14:24:56.058 Df Runner[13950:d387c1] [com.apple.network:] networkd_settings_read_from_file_locked initialized networkd settings by reading plist directly
+2026-10-26 14:24:56.058 Df Runner[13950:d387c1] [com.apple.network:activity] <nw_activity 50:1 [AE2DB8A1-58CC-4C38-B90A-460ECC0EA651] (global parent) (reporting strategy default) complete (reason success)> complete with reason 2 (success), duration 3754ms
+2026-10-26 14:24:56.058 Df Runner[13950:d387c1] [com.apple.network:activity] <nw_activity 50:2 [07E71A0E-E2B3-4E43-8256-08B9CF986791] (reporting strategy default) complete (reason success)> complete with reason 2 (success), duration 3749ms
+2026-10-26 14:24:56.058 Df Runner[13950:d387c1] [com.apple.network:activity] Unsetting the global parent activity <nw_activity 50:1 [AE2DB8A1-58CC-4C38-B90A-460ECC0EA651] (global parent) (reporting strategy default) complete (reason success)>
+2026-10-26 14:24:56.058 Df Runner[13950:d387c1] [com.apple.network:activity] Unset the global parent activity
+2026-10-26 14:24:56.058 Df Runner[13950:d387c1] [com.apple.app_launch_measurement:ApplicationLaunch] alm_release_pageins_recording_assertion: releasing pageins recording assertion
+2026-10-26 14:24:56.070 E  Runner[13950:d387c1] [com.apple.UIKit:UIFocus] SCNView implements focusItemsInRect: - caching for linear focus movement is limited as long as this view is on screen.
+2026-10-26 14:24:56.124 E  Runner[13950:d387e7] [com.apple.UIKit:Assert] Modifying properties of a view's layer off the main thread is not allowed: view <SCNView: 0x110d24500> with no associated or ancestor view controller; backtrace: 
+(
+	0   UIKitCore                           0x0000000184d9e698 -[UIView(UIKitManual) _raiseExceptionForBackgroundThreadLayerPropertyModification] + 612
+	1   UIKitCore                           0x0000000184d9eac8 -[UIView(UIKitManual) actionForLayer:forKey:] + 572
+	2   QuartzCore                          0x000000018399a560 -[CALayer actionForKey:] + 148
+	3   QuartzCore                          0x0000000183993220 _ZN2CA5Layer12begin_changeEPNS_11TransactionEjP11objc_objectRS4_ + 188
+	4   QuartzCore                          0x0000000183993b70 _ZN2CA5Layer7set_bitEjjjbMS0_FvPNS_11TransactionEE + 184
+	5   SceneKit                            0x00000001d66da57c -[SCNView _updateOpacity] + 220
+	6   Foundation                          0x000000018053ab88 -[NSKeyValueObservance observeValueForKeyPath:ofObject:change:context:] + 400
+	7   Foundation                          0x00000001805438a8 NSKeyValueNotifyObserver + 248
+	8   Foundation                          0x0000000180fa8994 NSKeyValueDidChange + 380
+	9   Foundation                          0x00000001805462c0 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 672
+	10  Foundation                          0x00000001805467d4 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 60
+	11  Foundation                          0x000000018053fdd0 _NSSetObjectValueAndNotify + 352
+	12  dart3d                              0x0000000104f61c20 $s6dart3d18ShadowCatcherProbeC12beginCaptureyyF + 604
+	13  dart3d                              0x0000000104f46f64 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtF + 188
+	14  dart3d                              0x0000000104f492c4 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtFTo + 92
+	15  SceneKit                            0x00000001d66391cc -[SCNRenderer _willRenderScene:] + 304
+	16  SceneKit                            0x00000001d66b9cd4 _ZN3C3D9ScenePass7executeERKNS_10RenderArgsE + 84
+	17  SceneKit                            0x00000001d6538e14 _ZN3C3D13__renderSliceEPNS_11RenderGraphEPNS_10RenderPassERtRKNS0_9GraphNodeERPNS0_5StageENS_10RenderArgsEbRPU27objcproto16MTLCommandBuffer11objc_object + 1232
+	18  SceneKit                            0x00000001d653a304 _ZN3C3D11RenderGraph7executeEv + 3616
+	19  SceneKit                            0x00000001d663dc4c -[SCNRenderer _renderSceneWithEngineContext:sceneTime:] + 1136
+	20  SceneKit                            0x00000001d663dd98 -[SCNRenderer _drawSceneWithNewRenderer:] + 208
+	21  SceneKit                            0x00000001d663e258 -[SCNRenderer _drawScene:] + 40
+	22  SceneKit                            0x00000001d663e558 -[SCNRenderer _drawAtTime:] + 524
+	23  SceneKit                            0x00000001d66d996c -[SCNView _drawAtTime:] + 408
+	24  SceneKit                            0x00000001d6596620 __83-[NSObject(SCN_DisplayLinkExtensions) SCN_setupDisplayLinkWithQueue:screen:policy:]_block_invoke + 44
+	25  SceneKit                            0x00000001d67f7d98 -[SCNDisplayLink _displayLinkCallbackReturningImmediately] + 132
+	26  libdispatch.dylib                   0x00000001a668f0ec _dispatch_client_callout + 12
+	27  libdispatch.dylib                   0x00000001a6679078 _dispatch_continuation_pop + 776
+	28  libdispatch.dylib                   0x00000001a668c194 _dispatch_source_invoke + 1804
+	29  libdispatch.dylib                   0x00000001a667d48c _dispatch_lane_serial_drain + 304
+	30  libdispatch.dylib                   0x00000001a667e1fc _dispatch_lane_invoke + 396
+	31  libdispatch.dylib                   0x00000001a6689108 _dispatch_root_queue_drain_deferred_wlh + 288
+	32  libdispatch.dylib                   0x00000001a6688850 _dispatch_workloop_worker_thread + 692
+	33  libsystem_pthread.dylib             0x0000000104606c7c _pthread_wqthread + 288
+	34  libsystem_pthread.dylib             0x0000000104605a7c start_wqthread + 8
+)
+2026-10-26 14:24:56.125 E  Runner[13950:d387e7] [com.apple.UIKit:Assert] Modifying properties of a view's layer off the main thread is not allowed: view <SCNView: 0x110d24500> with no associated or ancestor view controller; backtrace: 
+(
+	0   UIKitCore                           0x0000000184d9e698 -[UIView(UIKitManual) _raiseExceptionForBackgroundThreadLayerPropertyModification] + 612
+	1   UIKitCore                           0x0000000184d9eac8 -[UIView(UIKitManual) actionForLayer:forKey:] + 572
+	2   QuartzCore                          0x000000018399a560 -[CALayer actionForKey:] + 148
+	3   QuartzCore                          0x0000000183993220 _ZN2CA5Layer12begin_changeEPNS_11TransactionEjP11objc_objectRS4_ + 188
+	4   QuartzCore                          0x0000000183993b70 _ZN2CA5Layer7set_bitEjjjbMS0_FvPNS_11TransactionEE + 184
+	5   SceneKit                            0x00000001d66da58c -[SCNView _updateOpacity] + 236
+	6   Foundation                          0x000000018053ab88 -[NSKeyValueObservance observeValueForKeyPath:ofObject:change:context:] + 400
+	7   Foundation                          0x00000001805438a8 NSKeyValueNotifyObserver + 248
+	8   Foundation                          0x0000000180fa8994 NSKeyValueDidChange + 380
+	9   Foundation                          0x00000001805462c0 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 672
+	10  Foundation                          0x00000001805467d4 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 60
+	11  Foundation                          0x000000018053fdd0 _NSSetObjectValueAndNotify + 352
+	12  dart3d                              0x0000000104f61c20 $s6dart3d18ShadowCatcherProbeC12beginCaptureyyF + 604
+	13  dart3d                              0x0000000104f46f64 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtF + 188
+	14  dart3d                              0x0000000104f492c4 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtFTo + 92
+	15  SceneKit                            0x00000001d66391cc -[SCNRenderer _willRenderScene:] + 304
+	16  SceneKit                            0x00000001d66b9cd4 _ZN3C3D9ScenePass7executeERKNS_10RenderArgsE + 84
+	17  SceneKit                            0x00000001d6538e14 _ZN3C3D13__renderSliceEPNS_11RenderGraphEPNS_10RenderPassERtRKNS0_9GraphNodeERPNS0_5StageENS_10RenderArgsEbRPU27objcproto16MTLCommandBuffer11objc_object + 1232
+	18  SceneKit                            0x00000001d653a304 _ZN3C3D11RenderGraph7executeEv + 3616
+	19  SceneKit                            0x00000001d663dc4c -[SCNRenderer _renderSceneWithEngineContext:sceneTime:] + 1136
+	20  SceneKit                            0x00000001d663dd98 -[SCNRenderer _drawSceneWithNewRenderer:] + 208
+	21  SceneKit                            0x00000001d663e258 -[SCNRenderer _drawScene:] + 40
+	22  SceneKit                            0x00000001d663e558 -[SCNRenderer _drawAtTime:] + 524
+	23  SceneKit                            0x00000001d66d996c -[SCNView _drawAtTime:] + 408
+	24  SceneKit                            0x00000001d6596620 __83-[NSObject(SCN_DisplayLinkExtensions) SCN_setupDisplayLinkWithQueue:screen:policy:]_block_invoke + 44
+	25  SceneKit                            0x00000001d67f7d98 -[SCNDisplayLink _displayLinkCallbackReturningImmediately] + 132
+	26  libdispatch.dylib                   0x00000001a668f0ec _dispatch_client_callout + 12
+	27  libdispatch.dylib                   0x00000001a6679078 _dispatch_continuation_pop + 776
+	28  libdispatch.dylib                   0x00000001a668c194 _dispatch_source_invoke + 1804
+	29  libdispatch.dylib                   0x00000001a667d48c _dispatch_lane_serial_drain + 304
+	30  libdispatch.dylib                   0x00000001a667e1fc _dispatch_lane_invoke + 396
+	31  libdispatch.dylib                   0x00000001a6689108 _dispatch_root_queue_drain_deferred_wlh + 288
+	32  libdispatch.dylib                   0x00000001a6688850 _dispatch_workloop_worker_thread + 692
+	33  libsystem_pthread.dylib             0x0000000104606c7c _pthread_wqthread + 288
+	34  libsystem_pthread.dylib             0x0000000104605a7c start_wqthread + 8
+)
+2026-10-26 14:24:56.126 E  Runner[13950:d387e7] [com.apple.UIKit:Assert] Modifying properties of a view's layer off the main thread is not allowed: view <dart3d.SceneViewHost: 0x1063a8000> with nearest ancestor view controller <dartnative_ios.DartNativeViewController: 0x1061d4a00>; backtrace: 
+(
+	0   UIKitCore                           0x0000000184d9e5b8 -[UIView(UIKitManual) _raiseExceptionForBackgroundThreadLayerPropertyModification] + 388
+	1   UIKitCore                           0x0000000184d9eac8 -[UIView(UIKitManual) actionForLayer:forKey:] + 572
+	2   QuartzCore                          0x000000018399a560 -[CALayer actionForKey:] + 148
+	3   QuartzCore                          0x0000000183993220 _ZN2CA5Layer12begin_changeEPNS_11TransactionEjP11objc_objectRS4_ + 188
+	4   QuartzCore                          0x0000000183993b70 _ZN2CA5Layer7set_bitEjjjbMS0_FvPNS_11TransactionEE + 184
+	5   SceneKit                            0x00000001d66da57c -[SCNView _updateOpacity] + 220
+	6   Foundation                          0x000000018053ab88 -[NSKeyValueObservance observeValueForKeyPath:ofObject:change:context:] + 400
+	7   Foundation                          0x00000001805438a8 NSKeyValueNotifyObserver + 248
+	8   Foundation                          0x0000000180fa8994 NSKeyValueDidChange + 380
+	9   Foundation                          0x00000001805462c0 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 672
+	10  Foundation                          0x00000001805467d4 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 60
+	11  Foundation                          0x000000018053fdd0 _NSSetObjectValueAndNotify + 352
+	12  dart3d                              0x0000000104f61c20 $s6dart3d18ShadowCatcherProbeC12beginCaptureyyF + 604
+	13  dart3d                              0x0000000104f46f64 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtF + 188
+	14  dart3d                              0x0000000104f492c4 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtFTo + 92
+	15  SceneKit                            0x00000001d66391cc -[SCNRenderer _willRenderScene:] + 304
+	16  SceneKit                            0x00000001d66b9cd4 _ZN3C3D9ScenePass7executeERKNS_10RenderArgsE + 84
+	17  SceneKit                            0x00000001d6538e14 _ZN3C3D13__renderSliceEPNS_11RenderGraphEPNS_10RenderPassERtRKNS0_9GraphNodeERPNS0_5StageENS_10RenderArgsEbRPU27objcproto16MTLCommandBuffer11objc_object + 1232
+	18  SceneKit                            0x00000001d653a304 _ZN3C3D11RenderGraph7executeEv + 3616
+	19  SceneKit                            0x00000001d663dc4c -[SCNRenderer _renderSceneWithEngineContext:sceneTime:] + 1136
+	20  SceneKit                            0x00000001d663dd98 -[SCNRenderer _drawSceneWithNewRenderer:] + 208
+	21  SceneKit                            0x00000001d663e258 -[SCNRenderer _drawScene:] + 40
+	22  SceneKit                            0x00000001d663e558 -[SCNRenderer _drawAtTime:] + 524
+	23  SceneKit                            0x00000001d66d996c -[SCNView _drawAtTime:] + 408
+	24  SceneKit                            0x00000001d6596620 __83-[NSObject(SCN_DisplayLinkExtensions) SCN_setupDisplayLinkWithQueue:screen:policy:]_block_invoke + 44
+	25  SceneKit                            0x00000001d67f7d98 -[SCNDisplayLink _displayLinkCallbackReturningImmediately] + 132
+	26  libdispatch.dylib                   0x00000001a668f0ec _dispatch_client_callout + 12
+	27  libdispatch.dylib                   0x00000001a6679078 _dispatch_continuation_pop + 776
+	28  libdispatch.dylib                   0x00000001a668c194 _dispatch_source_invoke + 1804
+	29  libdispatch.dylib                   0x00000001a667d48c _dispatch_lane_serial_drain + 304
+	30  libdispatch.dylib                   0x00000001a667e1fc _dispatch_lane_invoke + 396
+	31  libdispatch.dylib                   0x00000001a6689108 _dispatch_root_queue_drain_deferred_wlh + 288
+	32  libdispatch.dylib                   0x00000001a6688850 _dispatch_workloop_worker_thread + 692
+	33  libsystem_pthread.dylib             0x0000000104606c7c _pthread_wqthread + 288
+	34  libsystem_pthread.dylib             0x0000000104605a7c start_wqthread + 8
+)
+2026-10-26 14:24:56.127 E  Runner[13950:d387e7] [com.apple.UIKit:Assert] Modifying properties of a view's layer off the main thread is not allowed: view <dart3d.SceneViewHost: 0x1063a8000> with nearest ancestor view controller <dartnative_ios.DartNativeViewController: 0x1061d4a00>; backtrace: 
+(
+	0   UIKitCore                           0x0000000184d9e5b8 -[UIView(UIKitManual) _raiseExceptionForBackgroundThreadLayerPropertyModification] + 388
+	1   UIKitCore                           0x0000000184d9eac8 -[UIView(UIKitManual) actionForLayer:forKey:] + 572
+	2   QuartzCore                          0x000000018399a560 -[CALayer actionForKey:] + 148
+	3   QuartzCore                          0x0000000183993220 _ZN2CA5Layer12begin_changeEPNS_11TransactionEjP11objc_objectRS4_ + 188
+	4   QuartzCore                          0x0000000183993b70 _ZN2CA5Layer7set_bitEjjjbMS0_FvPNS_11TransactionEE + 184
+	5   SceneKit                            0x00000001d66da58c -[SCNView _updateOpacity] + 236
+	6   Foundation                          0x000000018053ab88 -[NSKeyValueObservance observeValueForKeyPath:ofObject:change:context:] + 400
+	7   Foundation                          0x00000001805438a8 NSKeyValueNotifyObserver + 248
+	8   Foundation                          0x0000000180fa8994 NSKeyValueDidChange + 380
+	9   Foundation                          0x00000001805462c0 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 672
+	10  Foundation                          0x00000001805467d4 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 60
+	11  Foundation                          0x000000018053fdd0 _NSSetObjectValueAndNotify + 352
+	12  dart3d                              0x0000000104f61c20 $s6dart3d18ShadowCatcherProbeC12beginCaptureyyF + 604
+	13  dart3d                              0x0000000104f46f64 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtF + 188
+	14  dart3d                              0x0000000104f492c4 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtFTo + 92
+	15  SceneKit                            0x00000001d66391cc -[SCNRenderer _willRenderScene:] + 304
+	16  SceneKit                            0x00000001d66b9cd4 _ZN3C3D9ScenePass7executeERKNS_10RenderArgsE + 84
+	17  SceneKit                            0x00000001d6538e14 _ZN3C3D13__renderSliceEPNS_11RenderGraphEPNS_10RenderPassERtRKNS0_9GraphNodeERPNS0_5StageENS_10RenderArgsEbRPU27objcproto16MTLCommandBuffer11objc_object + 1232
+	18  SceneKit                            0x00000001d653a304 _ZN3C3D11RenderGraph7executeEv + 3616
+	19  SceneKit                            0x00000001d663dc4c -[SCNRenderer _renderSceneWithEngineContext:sceneTime:] + 1136
+	20  SceneKit                            0x00000001d663dd98 -[SCNRenderer _drawSceneWithNewRenderer:] + 208
+	21  SceneKit                            0x00000001d663e258 -[SCNRenderer _drawScene:] + 40
+	22  SceneKit                            0x00000001d663e558 -[SCNRenderer _drawAtTime:] + 524
+	23  SceneKit                            0x00000001d66d996c -[SCNView _drawAtTime:] + 408
+	24  SceneKit                            0x00000001d6596620 __83-[NSObject(SCN_DisplayLinkExtensions) SCN_setupDisplayLinkWithQueue:screen:policy:]_block_invoke + 44
+	25  SceneKit                            0x00000001d67f7d98 -[SCNDisplayLink _displayLinkCallbackReturningImmediately] + 132
+	26  libdispatch.dylib                   0x00000001a668f0ec _dispatch_client_callout + 12
+	27  libdispatch.dylib                   0x00000001a6679078 _dispatch_continuation_pop + 776
+	28  libdispatch.dylib                   0x00000001a668c194 _dispatch_source_invoke + 1804
+	29  libdispatch.dylib                   0x00000001a667d48c _dispatch_lane_serial_drain + 304
+	30  libdispatch.dylib                   0x00000001a667e1fc _dispatch_lane_invoke + 396
+	31  libdispatch.dylib                   0x00000001a6689108 _dispatch_root_queue_drain_deferred_wlh + 288
+	32  libdispatch.dylib                   0x00000001a6688850 _dispatch_workloop_worker_thread + 692
+	33  libsystem_pthread.dylib             0x0000000104606c7c _pthread_wqthread + 288
+	34  libsystem_pthread.dylib             0x0000000104605a7c start_wqthread + 8
+)
+2026-10-26 14:24:56.131 Df Runner[13950:d387e7] [com.jasonholtdigital.dart3d:scene] U2 iOS catcher probe control/dir: 512x512, pixelFormat=bgra8Unorm_srgb, opaque white clear → sampleable Metal texture
+2026-10-26 14:24:56.153 E  Runner[13950:d387e7] [com.apple.UIKit:Assert] Modifying properties of a view's layer off the main thread is not allowed: view <SCNView: 0x110d24500> with no associated or ancestor view controller; backtrace: 
+(
+	0   UIKitCore                           0x0000000184d9e698 -[UIView(UIKitManual) _raiseExceptionForBackgroundThreadLayerPropertyModification] + 612
+	1   UIKitCore                           0x0000000184d9eac8 -[UIView(UIKitManual) actionForLayer:forKey:] + 572
+	2   QuartzCore                          0x000000018399a560 -[CALayer actionForKey:] + 148
+	3   QuartzCore                          0x0000000183993220 _ZN2CA5Layer12begin_changeEPNS_11TransactionEjP11objc_objectRS4_ + 188
+	4   QuartzCore                          0x0000000183993b70 _ZN2CA5Layer7set_bitEjjjbMS0_FvPNS_11TransactionEE + 184
+	5   SceneKit                            0x00000001d66da57c -[SCNView _updateOpacity] + 220
+	6   Foundation                          0x000000018053ab88 -[NSKeyValueObservance observeValueForKeyPath:ofObject:change:context:] + 400
+	7   Foundation                          0x00000001805438a8 NSKeyValueNotifyObserver + 248
+	8   Foundation                          0x0000000180fa8994 NSKeyValueDidChange + 380
+	9   Foundation                          0x00000001805462c0 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 672
+	10  Foundation                          0x00000001805467d4 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 60
+	11  Foundation                          0x000000018053fdd0 _NSSetObjectValueAndNotify + 352
+	12  dart3d                              0x0000000104f61c20 $s6dart3d18ShadowCatcherProbeC12beginCaptureyyF + 604
+	13  dart3d                              0x0000000104f46f64 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtF + 188
+	14  dart3d                              0x0000000104f492c4 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtFTo + 92
+	15  SceneKit                            0x00000001d66391cc -[SCNRenderer _willRenderScene:] + 304
+	16  SceneKit                            0x00000001d66b9cd4 _ZN3C3D9ScenePass7executeERKNS_10RenderArgsE + 84
+	17  SceneKit                            0x00000001d6538e14 _ZN3C3D13__renderSliceEPNS_11RenderGraphEPNS_10RenderPassERtRKNS0_9GraphNodeERPNS0_5StageENS_10RenderArgsEbRPU27objcproto16MTLCommandBuffer11objc_object + 1232
+	18  SceneKit                            0x00000001d653a304 _ZN3C3D11RenderGraph7executeEv + 3616
+	19  SceneKit                            0x00000001d663dc4c -[SCNRenderer _renderSceneWithEngineContext:sceneTime:] + 1136
+	20  SceneKit                            0x00000001d663dd98 -[SCNRenderer _drawSceneWithNewRenderer:] + 208
+	21  SceneKit                            0x00000001d663e258 -[SCNRenderer _drawScene:] + 40
+	22  SceneKit                            0x00000001d663e558 -[SCNRenderer _drawAtTime:] + 524
+	23  SceneKit                            0x00000001d66d996c -[SCNView _drawAtTime:] + 408
+	24  SceneKit                            0x00000001d6596620 __83-[NSObject(SCN_DisplayLinkExtensions) SCN_setupDisplayLinkWithQueue:screen:policy:]_block_invoke + 44
+	25  SceneKit                            0x00000001d67f7d98 -[SCNDisplayLink _displayLinkCallbackReturningImmediately] + 132
+	26  libdispatch.dylib                   0x00000001a668f0ec _dispatch_client_callout + 12
+	27  libdispatch.dylib                   0x00000001a6679078 _dispatch_continuation_pop + 776
+	28  libdispatch.dylib                   0x00000001a668c194 _dispatch_source_invoke + 1804
+	29  libdispatch.dylib                   0x00000001a667d48c _dispatch_lane_serial_drain + 304
+	30  libdispatch.dylib                   0x00000001a667e1fc _dispatch_lane_invoke + 396
+	31  libdispatch.dylib                   0x00000001a6689108 _dispatch_root_queue_drain_deferred_wlh + 288
+	32  libdispatch.dylib                   0x00000001a6688850 _dispatch_workloop_worker_thread + 692
+	33  libsystem_pthread.dylib             0x0000000104606c7c _pthread_wqthread + 288
+	34  libsystem_pthread.dylib             0x0000000104605a7c start_wqthread + 8
+)
+2026-10-26 14:24:56.154 E  Runner[13950:d387e7] [com.apple.UIKit:Assert] Modifying properties of a view's layer off the main thread is not allowed: view <SCNView: 0x110d24500> with no associated or ancestor view controller; backtrace: 
+(
+	0   UIKitCore                           0x0000000184d9e698 -[UIView(UIKitManual) _raiseExceptionForBackgroundThreadLayerPropertyModification] + 612
+	1   UIKitCore                           0x0000000184d9eac8 -[UIView(UIKitManual) actionForLayer:forKey:] + 572
+	2   QuartzCore                          0x000000018399a560 -[CALayer actionForKey:] + 148
+	3   QuartzCore                          0x0000000183993220 _ZN2CA5Layer12begin_changeEPNS_11TransactionEjP11objc_objectRS4_ + 188
+	4   QuartzCore                          0x0000000183993b70 _ZN2CA5Layer7set_bitEjjjbMS0_FvPNS_11TransactionEE + 184
+	5   SceneKit                            0x00000001d66da58c -[SCNView _updateOpacity] + 236
+	6   Foundation                          0x000000018053ab88 -[NSKeyValueObservance observeValueForKeyPath:ofObject:change:context:] + 400
+	7   Foundation                          0x00000001805438a8 NSKeyValueNotifyObserver + 248
+	8   Foundation                          0x0000000180fa8994 NSKeyValueDidChange + 380
+	9   Foundation                          0x00000001805462c0 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 672
+	10  Foundation                          0x00000001805467d4 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 60
+	11  Foundation                          0x000000018053fdd0 _NSSetObjectValueAndNotify + 352
+	12  dart3d                              0x0000000104f61c20 $s6dart3d18ShadowCatcherProbeC12beginCaptureyyF + 604
+	13  dart3d                              0x0000000104f46f64 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtF + 188
+	14  dart3d                              0x0000000104f492c4 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtFTo + 92
+	15  SceneKit                            0x00000001d66391cc -[SCNRenderer _willRenderScene:] + 304
+	16  SceneKit                            0x00000001d66b9cd4 _ZN3C3D9ScenePass7executeERKNS_10RenderArgsE + 84
+	17  SceneKit                            0x00000001d6538e14 _ZN3C3D13__renderSliceEPNS_11RenderGraphEPNS_10RenderPassERtRKNS0_9GraphNodeERPNS0_5StageENS_10RenderArgsEbRPU27objcproto16MTLCommandBuffer11objc_object + 1232
+	18  SceneKit                            0x00000001d653a304 _ZN3C3D11RenderGraph7executeEv + 3616
+	19  SceneKit                            0x00000001d663dc4c -[SCNRenderer _renderSceneWithEngineContext:sceneTime:] + 1136
+	20  SceneKit                            0x00000001d663dd98 -[SCNRenderer _drawSceneWithNewRenderer:] + 208
+	21  SceneKit                            0x00000001d663e258 -[SCNRenderer _drawScene:] + 40
+	22  SceneKit                            0x00000001d663e558 -[SCNRenderer _drawAtTime:] + 524
+	23  SceneKit                            0x00000001d66d996c -[SCNView _drawAtTime:] + 408
+	24  SceneKit                            0x00000001d6596620 __83-[NSObject(SCN_DisplayLinkExtensions) SCN_setupDisplayLinkWithQueue:screen:policy:]_block_invoke + 44
+	25  SceneKit                            0x00000001d67f7d98 -[SCNDisplayLink _displayLinkCallbackReturningImmediately] + 132
+	26  libdispatch.dylib                   0x00000001a668f0ec _dispatch_client_callout + 12
+	27  libdispatch.dylib                   0x00000001a6679078 _dispatch_continuation_pop + 776
+	28  libdispatch.dylib                   0x00000001a668c194 _dispatch_source_invoke + 1804
+	29  libdispatch.dylib                   0x00000001a667d48c _dispatch_lane_serial_drain + 304
+	30  libdispatch.dylib                   0x00000001a667e1fc _dispatch_lane_invoke + 396
+	31  libdispatch.dylib                   0x00000001a6689108 _dispatch_root_queue_drain_deferred_wlh + 288
+	32  libdispatch.dylib                   0x00000001a6688850 _dispatch_workloop_worker_thread + 692
+	33  libsystem_pthread.dylib             0x0000000104606c7c _pthread_wqthread + 288
+	34  libsystem_pthread.dylib             0x0000000104605a7c start_wqthread + 8
+)
+2026-10-26 14:24:56.155 E  Runner[13950:d387e7] [com.apple.UIKit:Assert] Modifying properties of a view's layer off the main thread is not allowed: view <dart3d.SceneViewHost: 0x1063a8000> with nearest ancestor view controller <dartnative_ios.DartNativeViewController: 0x1061d4a00>; backtrace: 
+(
+	0   UIKitCore                           0x0000000184d9e5b8 -[UIView(UIKitManual) _raiseExceptionForBackgroundThreadLayerPropertyModification] + 388
+	1   UIKitCore                           0x0000000184d9eac8 -[UIView(UIKitManual) actionForLayer:forKey:] + 572
+	2   QuartzCore                          0x000000018399a560 -[CALayer actionForKey:] + 148
+	3   QuartzCore                          0x0000000183993220 _ZN2CA5Layer12begin_changeEPNS_11TransactionEjP11objc_objectRS4_ + 188
+	4   QuartzCore                          0x0000000183993b70 _ZN2CA5Layer7set_bitEjjjbMS0_FvPNS_11TransactionEE + 184
+	5   SceneKit                            0x00000001d66da57c -[SCNView _updateOpacity] + 220
+	6   Foundation                          0x000000018053ab88 -[NSKeyValueObservance observeValueForKeyPath:ofObject:change:context:] + 400
+	7   Foundation                          0x00000001805438a8 NSKeyValueNotifyObserver + 248
+	8   Foundation                          0x0000000180fa8994 NSKeyValueDidChange + 380
+	9   Foundation                          0x00000001805462c0 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 672
+	10  Foundation                          0x00000001805467d4 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 60
+	11  Foundation                          0x000000018053fdd0 _NSSetObjectValueAndNotify + 352
+	12  dart3d                              0x0000000104f61c20 $s6dart3d18ShadowCatcherProbeC12beginCaptureyyF + 604
+	13  dart3d                              0x0000000104f46f64 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtF + 188
+	14  dart3d                              0x0000000104f492c4 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtFTo + 92
+	15  SceneKit                            0x00000001d66391cc -[SCNRenderer _willRenderScene:] + 304
+	16  SceneKit                            0x00000001d66b9cd4 _ZN3C3D9ScenePass7executeERKNS_10RenderArgsE + 84
+	17  SceneKit                            0x00000001d6538e14 _ZN3C3D13__renderSliceEPNS_11RenderGraphEPNS_10RenderPassERtRKNS0_9GraphNodeERPNS0_5StageENS_10RenderArgsEbRPU27objcproto16MTLCommandBuffer11objc_object + 1232
+	18  SceneKit                            0x00000001d653a304 _ZN3C3D11RenderGraph7executeEv + 3616
+	19  SceneKit                            0x00000001d663dc4c -[SCNRenderer _renderSceneWithEngineContext:sceneTime:] + 1136
+	20  SceneKit                            0x00000001d663dd98 -[SCNRenderer _drawSceneWithNewRenderer:] + 208
+	21  SceneKit                            0x00000001d663e258 -[SCNRenderer _drawScene:] + 40
+	22  SceneKit                            0x00000001d663e558 -[SCNRenderer _drawAtTime:] + 524
+	23  SceneKit                            0x00000001d66d996c -[SCNView _drawAtTime:] + 408
+	24  SceneKit                            0x00000001d6596620 __83-[NSObject(SCN_DisplayLinkExtensions) SCN_setupDisplayLinkWithQueue:screen:policy:]_block_invoke + 44
+	25  SceneKit                            0x00000001d67f7d98 -[SCNDisplayLink _displayLinkCallbackReturningImmediately] + 132
+	26  libdispatch.dylib                   0x00000001a668f0ec _dispatch_client_callout + 12
+	27  libdispatch.dylib                   0x00000001a6679078 _dispatch_continuation_pop + 776
+	28  libdispatch.dylib                   0x00000001a668c194 _dispatch_source_invoke + 1804
+	29  libdispatch.dylib                   0x00000001a667d48c _dispatch_lane_serial_drain + 304
+	30  libdispatch.dylib                   0x00000001a667e1fc _dispatch_lane_invoke + 396
+	31  libdispatch.dylib                   0x00000001a6689108 _dispatch_root_queue_drain_deferred_wlh + 288
+	32  libdispatch.dylib                   0x00000001a6688850 _dispatch_workloop_worker_thread + 692
+	33  libsystem_pthread.dylib             0x0000000104606c7c _pthread_wqthread + 288
+	34  libsystem_pthread.dylib             0x0000000104605a7c start_wqthread + 8
+)
+2026-10-26 14:24:56.157 E  Runner[13950:d387e7] [com.apple.UIKit:Assert] Modifying properties of a view's layer off the main thread is not allowed: view <dart3d.SceneViewHost: 0x1063a8000> with nearest ancestor view controller <dartnative_ios.DartNativeViewController: 0x1061d4a00>; backtrace: 
+(
+	0   UIKitCore                           0x0000000184d9e5b8 -[UIView(UIKitManual) _raiseExceptionForBackgroundThreadLayerPropertyModification] + 388
+	1   UIKitCore                           0x0000000184d9eac8 -[UIView(UIKitManual) actionForLayer:forKey:] + 572
+	2   QuartzCore                          0x000000018399a560 -[CALayer actionForKey:] + 148
+	3   QuartzCore                          0x0000000183993220 _ZN2CA5Layer12begin_changeEPNS_11TransactionEjP11objc_objectRS4_ + 188
+	4   QuartzCore                          0x0000000183993b70 _ZN2CA5Layer7set_bitEjjjbMS0_FvPNS_11TransactionEE + 184
+	5   SceneKit                            0x00000001d66da58c -[SCNView _updateOpacity] + 236
+	6   Foundation                          0x000000018053ab88 -[NSKeyValueObservance observeValueForKeyPath:ofObject:change:context:] + 400
+	7   Foundation                          0x00000001805438a8 NSKeyValueNotifyObserver + 248
+	8   Foundation                          0x0000000180fa8994 NSKeyValueDidChange + 380
+	9   Foundation                          0x00000001805462c0 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 672
+	10  Foundation                          0x00000001805467d4 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 60
+	11  Foundation                          0x000000018053fdd0 _NSSetObjectValueAndNotify + 352
+	12  dart3d                              0x0000000104f61c20 $s6dart3d18ShadowCatcherProbeC12beginCaptureyyF + 604
+	13  dart3d                              0x0000000104f46f64 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtF + 188
+	14  dart3d                              0x0000000104f492c4 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtFTo + 92
+	15  SceneKit                            0x00000001d66391cc -[SCNRenderer _willRenderScene:] + 304
+	16  SceneKit                            0x00000001d66b9cd4 _ZN3C3D9ScenePass7executeERKNS_10RenderArgsE + 84
+	17  SceneKit                            0x00000001d6538e14 _ZN3C3D13__renderSliceEPNS_11RenderGraphEPNS_10RenderPassERtRKNS0_9GraphNodeERPNS0_5StageENS_10RenderArgsEbRPU27objcproto16MTLCommandBuffer11objc_object + 1232
+	18  SceneKit                            0x00000001d653a304 _ZN3C3D11RenderGraph7executeEv + 3616
+	19  SceneKit                            0x00000001d663dc4c -[SCNRenderer _renderSceneWithEngineContext:sceneTime:] + 1136
+	20  SceneKit                            0x00000001d663dd98 -[SCNRenderer _drawSceneWithNewRenderer:] + 208
+	21  SceneKit                            0x00000001d663e258 -[SCNRenderer _drawScene:] + 40
+	22  SceneKit                            0x00000001d663e558 -[SCNRenderer _drawAtTime:] + 524
+	23  SceneKit                            0x00000001d66d996c -[SCNView _drawAtTime:] + 408
+	24  SceneKit                            0x00000001d6596620 __83-[NSObject(SCN_DisplayLinkExtensions) SCN_setupDisplayLinkWithQueue:screen:policy:]_block_invoke + 44
+	25  SceneKit                            0x00000001d67f7d98 -[SCNDisplayLink _displayLinkCallbackReturningImmediately] + 132
+	26  libdispatch.dylib                   0x00000001a668f0ec _dispatch_client_callout + 12
+	27  libdispatch.dylib                   0x00000001a6679078 _dispatch_continuation_pop + 776
+	28  libdispatch.dylib                   0x00000001a668c194 _dispatch_source_invoke + 1804
+	29  libdispatch.dylib                   0x00000001a667d48c _dispatch_lane_serial_drain + 304
+	30  libdispatch.dylib                   0x00000001a667e1fc _dispatch_lane_invoke + 396
+	31  libdispatch.dylib                   0x00000001a6689108 _dispatch_root_queue_drain_deferred_wlh + 288
+	32  libdispatch.dylib                   0x00000001a6688850 _dispatch_workloop_worker_thread + 692
+	33  libsystem_pthread.dylib             0x0000000104606c7c _pthread_wqthread + 288
+	34  libsystem_pthread.dylib             0x0000000104605a7c start_wqthread + 8
+)
+2026-10-26 14:24:56.163 E  Runner[13950:d387e7] [com.apple.UIKit:Assert] Modifying properties of a view's layer off the main thread is not allowed: view <SCNView: 0x110d24500> with nearest ancestor view controller <dartnative_ios.DartNativeViewController: 0x1061d4a00>; backtrace: 
+(
+	0   UIKitCore                           0x0000000184d9e5b8 -[UIView(UIKitManual) _raiseExceptionForBackgroundThreadLayerPropertyModification] + 388
+	1   UIKitCore                           0x0000000184d9eac8 -[UIView(UIKitManual) actionForLayer:forKey:] + 572
+	2   QuartzCore                          0x000000018399a560 -[CALayer actionForKey:] + 148
+	3   QuartzCore                          0x0000000183993220 _ZN2CA5Layer12begin_changeEPNS_11TransactionEjP11objc_objectRS4_ + 188
+	4   QuartzCore                          0x0000000183993b70 _ZN2CA5Layer7set_bitEjjjbMS0_FvPNS_11TransactionEE + 184
+	5   SceneKit                            0x00000001d66da57c -[SCNView _updateOpacity] + 220
+	6   Foundation                          0x000000018053ab88 -[NSKeyValueObservance observeValueForKeyPath:ofObject:change:context:] + 400
+	7   Foundation                          0x00000001805438a8 NSKeyValueNotifyObserver + 248
+	8   Foundation                          0x0000000180fa8994 NSKeyValueDidChange + 380
+	9   Foundation                          0x00000001805462c0 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 672
+	10  Foundation                          0x00000001805467d4 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 60
+	11  Foundation                          0x000000018053fdd0 _NSSetObjectValueAndNotify + 352
+	12  dart3d                              0x0000000104f61c20 $s6dart3d18ShadowCatcherProbeC12beginCaptureyyF + 604
+	13  dart3d                              0x0000000104f46f64 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtF + 188
+	14  dart3d                              0x0000000104f492c4 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtFTo + 92
+	15  SceneKit                            0x00000001d66391cc -[SCNRenderer _willRenderScene:] + 304
+	16  SceneKit                            0x00000001d66b9cd4 _ZN3C3D9ScenePass7executeERKNS_10RenderArgsE + 84
+	17  SceneKit                            0x00000001d6538e14 _ZN3C3D13__renderSliceEPNS_11RenderGraphEPNS_10RenderPassERtRKNS0_9GraphNodeERPNS0_5StageENS_10RenderArgsEbRPU27objcproto16MTLCommandBuffer11objc_object + 1232
+	18  SceneKit                            0x00000001d653a304 _ZN3C3D11RenderGraph7executeEv + 3616
+	19  SceneKit                            0x00000001d663dc4c -[SCNRenderer _renderSceneWithEngineContext:sceneTime:] + 1136
+	20  SceneKit                            0x00000001d663dd98 -[SCNRenderer _drawSceneWithNewRenderer:] + 208
+	21  SceneKit                            0x00000001d663e258 -[SCNRenderer _drawScene:] + 40
+	22  SceneKit                            0x00000001d663e558 -[SCNRenderer _drawAtTime:] + 524
+	23  SceneKit                            0x00000001d66d996c -[SCNView _drawAtTime:] + 408
+	24  SceneKit                            0x00000001d6596620 __83-[NSObject(SCN_DisplayLinkExtensions) SCN_setupDisplayLinkWithQueue:screen:policy:]_block_invoke + 44
+	25  SceneKit                            0x00000001d67f7d98 -[SCNDisplayLink _displayLinkCallbackReturningImmediately] + 132
+	26  libdispatch.dylib                   0x00000001a668f0ec _dispatch_client_callout + 12
+	27  libdispatch.dylib                   0x00000001a6679078 _dispatch_continuation_pop + 776
+	28  libdispatch.dylib                   0x00000001a668c194 _dispatch_source_invoke + 1804
+	29  libdispatch.dylib                   0x00000001a667d48c _dispatch_lane_serial_drain + 304
+	30  libdispatch.dylib                   0x00000001a667e1fc _dispatch_lane_invoke + 396
+	31  libdispatch.dylib                   0x00000001a6689108 _dispatch_root_queue_drain_deferred_wlh + 288
+	32  libdispatch.dylib                   0x00000001a6688850 _dispatch_workloop_worker_thread + 692
+	33  libsystem_pthread.dylib             0x0000000104606c7c _pthread_wqthread + 288
+	34  libsystem_pthread.dylib             0x0000000104605a7c start_wqthread + 8
+)
+2026-10-26 14:24:56.165 E  Runner[13950:d387e7] [com.apple.UIKit:Assert] Modifying properties of a view's layer off the main thread is not allowed: view <SCNView: 0x110d24500> with nearest ancestor view controller <dartnative_ios.DartNativeViewController: 0x1061d4a00>; backtrace: 
+(
+	0   UIKitCore                           0x0000000184d9e5b8 -[UIView(UIKitManual) _raiseExceptionForBackgroundThreadLayerPropertyModification] + 388
+	1   UIKitCore                           0x0000000184d9eac8 -[UIView(UIKitManual) actionForLayer:forKey:] + 572
+	2   QuartzCore                          0x000000018399a560 -[CALayer actionForKey:] + 148
+	3   QuartzCore                          0x0000000183993220 _ZN2CA5Layer12begin_changeEPNS_11TransactionEjP11objc_objectRS4_ + 188
+	4   QuartzCore                          0x0000000183993b70 _ZN2CA5Layer7set_bitEjjjbMS0_FvPNS_11TransactionEE + 184
+	5   SceneKit                            0x00000001d66da58c -[SCNView _updateOpacity] + 236
+	6   Foundation                          0x000000018053ab88 -[NSKeyValueObservance observeValueForKeyPath:ofObject:change:context:] + 400
+	7   Foundation                          0x00000001805438a8 NSKeyValueNotifyObserver + 248
+	8   Foundation                          0x0000000180fa8994 NSKeyValueDidChange + 380
+	9   Foundation                          0x00000001805462c0 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 672
+	10  Foundation                          0x00000001805467d4 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 60
+	11  Foundation                          0x000000018053fdd0 _NSSetObjectValueAndNotify + 352
+	12  dart3d                              0x0000000104f61c20 $s6dart3d18ShadowCatcherProbeC12beginCaptureyyF + 604
+	13  dart3d                              0x0000000104f46f64 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtF + 188
+	14  dart3d                              0x0000000104f492c4 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtFTo + 92
+	15  SceneKit                            0x00000001d66391cc -[SCNRenderer _willRenderScene:] + 304
+	16  SceneKit                            0x00000001d66b9cd4 _ZN3C3D9ScenePass7executeERKNS_10RenderArgsE + 84
+	17  SceneKit                            0x00000001d6538e14 _ZN3C3D13__renderSliceEPNS_11RenderGraphEPNS_10RenderPassERtRKNS0_9GraphNodeERPNS0_5StageENS_10RenderArgsEbRPU27objcproto16MTLCommandBuffer11objc_object + 1232
+	18  SceneKit                            0x00000001d653a304 _ZN3C3D11RenderGraph7executeEv + 3616
+	19  SceneKit                            0x00000001d663dc4c -[SCNRenderer _renderSceneWithEngineContext:sceneTime:] + 1136
+	20  SceneKit                            0x00000001d663dd98 -[SCNRenderer _drawSceneWithNewRenderer:] + 208
+	21  SceneKit                            0x00000001d663e258 -[SCNRenderer _drawScene:] + 40
+	22  SceneKit                            0x00000001d663e558 -[SCNRenderer _drawAtTime:] + 524
+	23  SceneKit                            0x00000001d66d996c -[SCNView _drawAtTime:] + 408
+	24  SceneKit                            0x00000001d6596620 __83-[NSObject(SCN_DisplayLinkExtensions) SCN_setupDisplayLinkWithQueue:screen:policy:]_block_invoke + 44
+	25  SceneKit                            0x00000001d67f7d98 -[SCNDisplayLink _displayLinkCallbackReturningImmediately] + 132
+	26  libdispatch.dylib                   0x00000001a668f0ec _dispatch_client_callout + 12
+	27  libdispatch.dylib                   0x00000001a6679078 _dispatch_continuation_pop + 776
+	28  libdispatch.dylib                   0x00000001a668c194 _dispatch_source_invoke + 1804
+	29  libdispatch.dylib                   0x00000001a667d48c _dispatch_lane_serial_drain + 304
+	30  libdispatch.dylib                   0x00000001a667e1fc _dispatch_lane_invoke + 396
+	31  libdispatch.dylib                   0x00000001a6689108 _dispatch_root_queue_drain_deferred_wlh + 288
+	32  libdispatch.dylib                   0x00000001a6688850 _dispatch_workloop_worker_thread + 692
+	33  libsystem_pthread.dylib             0x0000000104606c7c _pthread_wqthread + 288
+	34  libsystem_pthread.dylib             0x0000000104605a7c start_wqthread + 8
+)
+2026-10-26 14:24:56.166 E  Runner[13950:d387e7] [com.apple.UIKit:Assert] Modifying properties of a view's layer off the main thread is not allowed: view <dart3d.SceneViewHost: 0x1063a8000> with nearest ancestor view controller <dartnative_ios.DartNativeViewController: 0x1061d4a00>; backtrace: 
+(
+	0   UIKitCore                           0x0000000184d9e5b8 -[UIView(UIKitManual) _raiseExceptionForBackgroundThreadLayerPropertyModification] + 388
+	1   UIKitCore                           0x0000000184d9eac8 -[UIView(UIKitManual) actionForLayer:forKey:] + 572
+	2   QuartzCore                          0x000000018399a560 -[CALayer actionForKey:] + 148
+	3   QuartzCore                          0x0000000183993220 _ZN2CA5Layer12begin_changeEPNS_11TransactionEjP11objc_objectRS4_ + 188
+	4   QuartzCore                          0x0000000183993b70 _ZN2CA5Layer7set_bitEjjjbMS0_FvPNS_11TransactionEE + 184
+	5   SceneKit                            0x00000001d66da57c -[SCNView _updateOpacity] + 220
+	6   Foundation                          0x000000018053ab88 -[NSKeyValueObservance observeValueForKeyPath:ofObject:change:context:] + 400
+	7   Foundation                          0x00000001805438a8 NSKeyValueNotifyObserver + 248
+	8   Foundation                          0x0000000180fa8994 NSKeyValueDidChange + 380
+	9   Foundation                          0x00000001805462c0 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 672
+	10  Foundation                          0x00000001805467d4 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 60
+	11  Foundation                          0x000000018053fdd0 _NSSetObjectValueAndNotify + 352
+	12  dart3d                              0x0000000104f61c20 $s6dart3d18ShadowCatcherProbeC12beginCaptureyyF + 604
+	13  dart3d                              0x0000000104f46f64 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtF + 188
+	14  dart3d                              0x0000000104f492c4 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtFTo + 92
+	15  SceneKit                            0x00000001d66391cc -[SCNRenderer _willRenderScene:] + 304
+	16  SceneKit                            0x00000001d66b9cd4 _ZN3C3D9ScenePass7executeERKNS_10RenderArgsE + 84
+	17  SceneKit                            0x00000001d6538e14 _ZN3C3D13__renderSliceEPNS_11RenderGraphEPNS_10RenderPassERtRKNS0_9GraphNodeERPNS0_5StageENS_10RenderArgsEbRPU27objcproto16MTLCommandBuffer11objc_object + 1232
+	18  SceneKit                            0x00000001d653a304 _ZN3C3D11RenderGraph7executeEv + 3616
+	19  SceneKit                            0x00000001d663dc4c -[SCNRenderer _renderSceneWithEngineContext:sceneTime:] + 1136
+	20  SceneKit                            0x00000001d663dd98 -[SCNRenderer _drawSceneWithNewRenderer:] + 208
+	21  SceneKit                            0x00000001d663e258 -[SCNRenderer _drawScene:] + 40
+	22  SceneKit                            0x00000001d663e558 -[SCNRenderer _drawAtTime:] + 524
+	23  SceneKit                            0x00000001d66d996c -[SCNView _drawAtTime:] + 408
+	24  SceneKit                            0x00000001d6596620 __83-[NSObject(SCN_DisplayLinkExtensions) SCN_setupDisplayLinkWithQueue:screen:policy:]_block_invoke + 44
+	25  SceneKit                            0x00000001d67f7d98 -[SCNDisplayLink _displayLinkCallbackReturningImmediately] + 132
+	26  libdispatch.dylib                   0x00000001a668f0ec _dispatch_client_callout + 12
+	27  libdispatch.dylib                   0x00000001a6679078 _dispatch_continuation_pop + 776
+	28  libdispatch.dylib                   0x00000001a668c194 _dispatch_source_invoke + 1804
+	29  libdispatch.dylib                   0x00000001a667d48c _dispatch_lane_serial_drain + 304
+	30  libdispatch.dylib                   0x00000001a667e1fc _dispatch_lane_invoke + 396
+	31  libdispatch.dylib                   0x00000001a6689108 _dispatch_root_queue_drain_deferred_wlh + 288
+	32  libdispatch.dylib                   0x00000001a6688850 _dispatch_workloop_worker_thread + 692
+	33  libsystem_pthread.dylib             0x0000000104606c7c _pthread_wqthread + 288
+	34  libsystem_pthread.dylib             0x0000000104605a7c start_wqthread + 8
+)
+2026-10-26 14:24:56.167 E  Runner[13950:d387e7] [com.apple.UIKit:Assert] Modifying properties of a view's layer off the main thread is not allowed: view <dart3d.SceneViewHost: 0x1063a8000> with nearest ancestor view controller <dartnative_ios.DartNativeViewController: 0x1061d4a00>; backtrace: 
+(
+	0   UIKitCore                           0x0000000184d9e5b8 -[UIView(UIKitManual) _raiseExceptionForBackgroundThreadLayerPropertyModification] + 388
+	1   UIKitCore                           0x0000000184d9eac8 -[UIView(UIKitManual) actionForLayer:forKey:] + 572
+	2   QuartzCore                          0x000000018399a560 -[CALayer actionForKey:] + 148
+	3   QuartzCore                          0x0000000183993220 _ZN2CA5Layer12begin_changeEPNS_11TransactionEjP11objc_objectRS4_ + 188
+	4   QuartzCore                          0x0000000183993b70 _ZN2CA5Layer7set_bitEjjjbMS0_FvPNS_11TransactionEE + 184
+	5   SceneKit                            0x00000001d66da58c -[SCNView _updateOpacity] + 236
+	6   Foundation                          0x000000018053ab88 -[NSKeyValueObservance observeValueForKeyPath:ofObject:change:context:] + 400
+	7   Foundation                          0x00000001805438a8 NSKeyValueNotifyObserver + 248
+	8   Foundation                          0x0000000180fa8994 NSKeyValueDidChange + 380
+	9   Foundation                          0x00000001805462c0 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:maybeNewValuesDict:usingBlock:] + 672
+	10  Foundation                          0x00000001805467d4 -[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:] + 60
+	11  Foundation                          0x000000018053fdd0 _NSSetObjectValueAndNotify + 352
+	12  dart3d                              0x0000000104f61c20 $s6dart3d18ShadowCatcherProbeC12beginCaptureyyF + 604
+	13  dart3d                              0x0000000104f46f64 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtF + 188
+	14  dart3d                              0x0000000104f492c4 $s6dart3d13SceneViewHostC8renderer_010willRenderB06atTimeySo16SCNSceneRenderer_p_So0J0CSdtFTo + 92
+	15  SceneKit                            0x00000001d66391cc -[SCNRenderer _willRenderScene:] + 304
+	16  SceneKit                            0x00000001d66b9cd4 _ZN3C3D9ScenePass7executeERKNS_10RenderArgsE + 84
+	17  SceneKit                            0x00000001d6538e14 _ZN3C3D13__renderSliceEPNS_11RenderGraphEPNS_10RenderPassERtRKNS0_9GraphNodeERPNS0_5StageENS_10RenderArgsEbRPU27objcproto16MTLCommandBuffer11objc_object + 1232
+	18  SceneKit                            0x00000001d653a304 _ZN3C3D11RenderGraph7executeEv + 3616
+	19  SceneKit                            0x00000001d663dc4c -[SCNRenderer _renderSceneWithEngineContext:sceneTime:] + 1136
+	20  SceneKit                            0x00000001d663dd98 -[SCNRenderer _drawSceneWithNewRenderer:] + 208
+	21  SceneKit                            0x00000001d663e258 -[SCNRenderer _drawScene:] + 40
+	22  SceneKit                            0x00000001d663e558 -[SCNRenderer _drawAtTime:] + 524
+	23  SceneKit                            0x00000001d66d996c -[SCNView _drawAtTime:] + 408
+	24  SceneKit                            0x00000001d6596620 __83-[NSObject(SCN_DisplayLinkExtensions) SCN_setupDisplayLinkWithQueue:screen:policy:]_block_invoke + 44
+	25  SceneKit                            0x00000001d67f7d98 -[SCNDisplayLink _displayLinkCallbackReturningImmediately] + 132
+	26  libdispatch.dylib                   0x00000001a668f0ec _dispatch_client_callout + 12
+	27  libdispatch.dylib                   0x00000001a6679078 _dispatch_continuation_pop + 776
+	28  libdispatch.dylib                   0x00000001a668c194 _dispatch_source_invoke + 1804
+	29  libdispatch.dylib                   0x00000001a667d48c _dispatch_lane_serial_drain + 304
+	30  libdispatch.dylib                   0x00000001a667e1fc _dispatch_lane_invoke + 396
+	31  libdispatch.dylib                   0x00000001a6689108 _dispatch_root_queue_drain_deferred_wlh + 288
+	32  libdispatch.dylib                   0x00000001a6688850 _dispatch_workloop_worker_thread + 692
+	33  libsystem_pthread.dylib             0x0000000104606c7c _pthread_wqthread + 288
+	34  libsystem_pthread.dylib             0x0000000104605a7c start_wqthread + 8
+)
+2026-10-26 14:24:56.167 E  Runner[13950:d387c1] [com.apple.UIKit:UIFocus] SCNView implements focusItemsInRect: - caching for linear focus movement is limited as long as this view is on screen.
+2026-10-26 14:24:56.217 Df Runner[13950:d387e7] (CoreFoundation) *** Terminating app due to uncaught exception 'NSInvalidArgumentException', reason: '-[SCNCamera _fastCStringContents:]: unrecognized selector sent to instance 0x110ea5880'
+*** First throw call stack:
+(
+	0   CoreFoundation                      0x000000018027bc78 __exceptionPreprocess + 172
+	1   libobjc.A.dylib                     0x000000018007596c objc_exception_throw + 72
+	2   CoreFoundation                      0x00000001802916f0 +[NSObject(NSObject) instanceMethodSignatureForSelector:] + 0
+	3   CoreFoundation                      0x000000018027fec0 ___forwarding___ + 1196
+	4   CoreFoundation                      0x00000001802823dc __forwarding_prep_0___ + 92
+	5   SceneKit                            0x00000001d6761ad0 C3DFXPassGetCStringName + 32
+	6   SceneKit                            0x00000001d6601084 _ZN3C3D16CachedFXPassNameERPKcP11__C3DFXPassPv + 40
+	7   SceneKit                            0x00000001d6600df0 _ZNK3C3D4Pass8hashNameEv + 48
+	8   SceneKit                            0x00000001d6<…>

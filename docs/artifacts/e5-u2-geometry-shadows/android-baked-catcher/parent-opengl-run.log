@@ -1,0 +1,32 @@
+Launching lib/main.dart on A142 in release mode...
+Installing build/app/outputs/dn-apk/app-release.apk...              3.2s
+
+DartNative run key commands.
+h List all available interactive commands.
+c Clear the screen
+q Quit (terminate the application on the device).
+
+dartnative: dart3d: u2-catcher light=spot mode=baked softness=0
+dartnative: dart3d: showcase — u2-catcher: Baked shadow footprint · explicit refresh · live shadowOnly mode
+E/AndroidRuntime(24577): FATAL EXCEPTION: main
+E/AndroidRuntime(24577): Process: com.jasonholtdigital.dart3d_example, PID: 24577
+E/AndroidRuntime(24577): java.lang.NoSuchMethodError: no non-static method "LK/g;.accept(I)V"
+E/AndroidRuntime(24577): 	at com.google.android.filament.Scene.nForEach(Native Method)
+E/AndroidRuntime(24577): 	at com.google.android.filament.Scene.b(SourceFile:4)
+E/AndroidRuntime(24577): 	at n1.e0.g0(SourceFile:803)
+E/AndroidRuntime(24577): 	at n1.b0.doFrame(SourceFile:3209)
+E/AndroidRuntime(24577): 	at android.view.Choreographer$CallbackRecord.run(Choreographer.java:1870)
+E/AndroidRuntime(24577): 	at android.view.Choreographer$CallbackRecord.run(Choreographer.java:1881)
+E/AndroidRuntime(24577): 	at android.view.Choreographer.doCallbacks(Choreographer.java:1427)
+E/AndroidRuntime(24577): 	at android.view.Choreographer.doFrame(Choreographer.java:1305)
+E/AndroidRuntime(24577): 	at android.view.Choreographer$FrameDisplayEventReceiver.run(Choreographer.java:1848)
+E/AndroidRuntime(24577): 	at android.os.Handler.handleCallback(Handler.java:995)
+E/AndroidRuntime(24577): 	at android.os.Handler.dispatchMessage(Handler.java:103)
+E/AndroidRuntime(24577): 	at android.os.Looper.loopOnce(Looper.java:283)
+E/AndroidRuntime(24577): 	at android.os.Looper.loop(Looper.java:392)
+E/AndroidRuntime(24577): 	at android.app.ActivityThread.main(ActivityThread.java:9231)
+E/AndroidRuntime(24577): 	at java.lang.reflect.Method.invoke(Native Method)
+E/AndroidRuntime(24577): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:633)
+E/AndroidRuntime(24577): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1026)
+
+Application finished.

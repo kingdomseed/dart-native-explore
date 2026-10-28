@@ -14,7 +14,10 @@ import 'package:dartnative/dartnative.dart';
 import 'package:vector_math/vector_math.dart';
 
 import 'back_chevron.dart';
+import 'light_aim.dart';
 import 'showcase_loader.dart';
+import 'u2_catcher_scene.dart';
+import 'u2_geometry_scene.dart';
 
 /// Boot override for the U1 camera-controller pose (`orbit1..3`,
 /// `fly1..3`, `follow1..3`).
@@ -105,6 +108,13 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
   int _w17ModeIndex = max(0, _kW17ModeSequence.indexOf(_kBootW17Mode));
   Timer? _w17SweepTimer;
   int _w17SweepStep = 0;
+  U2LightMode _u2LightMode = U2LightMode.left;
+  String _u2CatcherMode = 'baked';
+  double _u2CatcherSoftness = 0;
+  bool _u2CatcherCasterMoved = false;
+  bool _u2CatcherLightMoved = false;
+  bool _u2CatcherGeometryWide = false;
+  bool _u2CatcherVariantSelected = false;
 
   /// The loaded item's fit radius — feeds the aspect-ratio widening
   /// in the layout pass.
@@ -168,6 +178,13 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
       _frameRadius = 0;
       _u1FollowSubjectId = null;
       _u1PickMarkerId = null;
+      _u2LightMode = U2LightMode.left;
+      _u2CatcherMode = 'baked';
+      _u2CatcherSoftness = 0;
+      _u2CatcherCasterMoved = false;
+      _u2CatcherLightMoved = false;
+      _u2CatcherGeometryWide = false;
+      _u2CatcherVariantSelected = false;
     });
 
     final scene = loadShowcaseScene(item, bytesFor: loadAssetBytes, log: dnLog);
@@ -240,6 +257,9 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
       _runDocRoundtrip(scene.document);
     } else {
       _controller.loadDocument(scene.document);
+    }
+    if (item.assetKey == kBuiltinU2Key) {
+      dnLog('dart3d: u2 light=${_u2LightMode.name}');
     }
     setState(() => _status = '${item.label} — ${item.note}');
     _installAnims();
@@ -533,6 +553,176 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
       _startW17SunSweep();
     }
     setState(() {});
+  }
+
+  void _cycleU2Light() {
+    final next = switch (_u2LightMode) {
+      U2LightMode.left => U2LightMode.right,
+      U2LightMode.right => U2LightMode.left,
+    };
+    final update = u2LightUpdate(_scene!.document, next);
+    _controller.setNodeTransforms([
+      NodeTransform(update.node, rotation: update.rotation),
+    ]);
+    setState(() => _u2LightMode = next);
+    dnLog('dart3d: u2 light=${next.name}');
+  }
+
+  void _moveU2CatcherCaster() {
+    final doc = _scene!.document;
+    final node = doc.nodes.values.singleWhere(
+      (candidate) => candidate.name == 'u2.catcher.caster',
+    );
+    final position = _u2CatcherCasterMoved
+        ? Vector3(0, 0.7, 0)
+        : Vector3(0.88, 0.7, 0.34);
+    _controller.setNodeTransforms([
+      NodeTransform(node.id, translation: position),
+    ]);
+    _u2CatcherCasterMoved = !_u2CatcherCasterMoved;
+    dnLog(
+      'dart3d: u2-catcher caster moved; baked output waits for explicit refresh',
+    );
+  }
+
+  void _moveU2CatcherLight() {
+    final doc = _scene!.document;
+    final node = doc.nodes.values.singleWhere(
+      (candidate) => candidate.name == 'u2.catcher.light',
+    );
+    final isSpot = node.components.single.type == 'spotLight';
+    final moved = !_u2CatcherLightMoved;
+    final writes = <NodeTransform>[];
+    if (isSpot) {
+      final position = moved ? Vector3(2, 5, -2) : Vector3(-2, 5, 2);
+      writes.add(
+        NodeTransform(
+          node.id,
+          translation: position,
+          rotation: aimAlong(Vector3.zero() - position),
+        ),
+      );
+    } else {
+      writes.add(
+        NodeTransform(
+          node.id,
+          rotation: aimAlong(
+            moved ? Vector3(0.55, -1, -0.18) : Vector3(-0.45, -1, 0.34),
+          ),
+        ),
+      );
+    }
+    _controller.setNodeTransforms(writes);
+    _u2CatcherLightMoved = moved;
+    dnLog(
+      'dart3d: u2-catcher light moved; baked output waits for explicit refresh',
+    );
+  }
+
+  void _refreshU2Catcher() {
+    final doc = _scene!.document;
+    upsertU2CatcherMaterial(
+      _controller,
+      doc,
+      u2CatcherMaterial(doc),
+    );
+    dnLog('dart3d: u2-catcher explicit upsert sent with unchanged properties');
+  }
+
+  void _toggleU2CatcherMode() {
+    final doc = _scene!.document;
+    final mode = _u2CatcherMode == 'baked' ? 'live' : 'baked';
+    final material = copyU2CatcherMaterial(
+      u2CatcherMaterial(doc),
+      mode: mode,
+    );
+    upsertU2CatcherMaterial(_controller, doc, material);
+    setState(() => _u2CatcherMode = mode);
+    dnLog('dart3d: u2-catcher mode=$mode explicit upsert sent');
+  }
+
+  void _toggleU2CatcherSoftness() {
+    final doc = _scene!.document;
+    final softness = _u2CatcherSoftness == 0 ? 0.14 : 0.0;
+    final material = copyU2CatcherMaterial(
+      u2CatcherMaterial(doc),
+      softness: softness,
+    );
+    upsertU2CatcherMaterial(_controller, doc, material);
+    setState(() => _u2CatcherSoftness = softness);
+    dnLog('dart3d: u2-catcher softness=$softness explicit upsert sent');
+  }
+
+  void _toggleU2CatcherMaterialType() {
+    final doc = _scene!.document;
+    final current = u2CatcherMaterial(doc);
+    final type = current.type == 'shadowCatcher'
+        ? 'physicallyBased'
+        : 'shadowCatcher';
+    final updated = copyU2CatcherMaterial(
+      current,
+      type: type,
+      mode: type == 'shadowCatcher' ? 'baked' : null,
+      softness: type == 'shadowCatcher' ? _u2CatcherSoftness : null,
+    );
+    upsertU2CatcherMaterial(_controller, doc, updated);
+    dnLog('dart3d: u2-catcher material=${updated.id.toToken()} type=$type');
+  }
+
+  void _upsertU2CatcherGeometry() {
+    final doc = _scene!.document;
+    final id = u2CatcherGeometryId(doc);
+    final current = doc.resources[id]! as GeometryResource;
+    final width = _u2CatcherGeometryWide ? 4.2 : 4.45;
+    upsertU2CatcherGeometry(
+      _controller,
+      doc,
+      copyU2CatcherGeometry(current, width: width),
+    );
+    setState(() => _u2CatcherGeometryWide = !_u2CatcherGeometryWide);
+    dnLog('dart3d: u2-catcher geometry=${id.toToken()} width=$width');
+  }
+
+  void _selectU2CatcherVariant() {
+    final defaultProbe = kBootU2CatcherPath == u2CatcherPathVariantDefault;
+    final variant = _u2CatcherVariantSelected
+        ? null
+        : defaultProbe
+        ? u2CatcherDefaultProbeVariant
+        : 'catcher';
+    selectU2CatcherVariant(_controller, _scene!.document, variant);
+    setState(() => _u2CatcherVariantSelected = !_u2CatcherVariantSelected);
+    dnLog('dart3d: u2-catcher variant=${variant ?? 'default'}');
+  }
+
+  void _rebuildU2CatcherComponents() {
+    final doc = _scene!.document;
+    rebuildU2CatcherComponents(_controller, doc);
+    dnLog(
+      'dart3d: u2-catcher components rebuilt node='
+      '${u2CatcherReceiverId(doc).toToken()}',
+    );
+  }
+
+  void _removeAndRestoreU2CatcherReceiver() {
+    final doc = _scene!.document;
+    removeAndRestoreU2CatcherReceiver(_controller, doc);
+    dnLog(
+      'dart3d: u2-catcher removeNode/addNode node='
+      '${u2CatcherReceiverId(doc).toToken()}',
+    );
+  }
+
+  Widget _u2CatcherButton(String title, VoidCallback onPressed) {
+    return Button(
+      title: title,
+      onPressed: onPressed,
+      shape: const StadiumBorder(),
+      color: const Color(0x2EFFFFFF),
+      foregroundColor: const Color(0xEEFFFFFF),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+      fontSize: 11,
+    );
   }
 
   void _startW17SunSweep() {
@@ -1060,6 +1250,12 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
     final item = _items[_index];
     final isU1 = item.assetKey == kBuiltinU1Key;
     final isW17 = item.assetKey == kBuiltinW17SkyKey;
+    final isU2 = item.assetKey == kBuiltinU2Key;
+    final isU2Catcher = item.assetKey == kBuiltinU2CatcherKey;
+    final u2CatcherVariantName =
+        kBootU2CatcherPath == u2CatcherPathVariantDefault
+        ? u2CatcherDefaultProbeVariant
+        : 'catcher';
     return Scaffold(
       brightness: Brightness.dark,
       body: Stack(
@@ -1224,6 +1420,75 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
                                 ),
                               ),
                             ),
+                          ),
+                        ],
+                        if (isU2 && _scene != null) ...[
+                          const SizedBox(height: 8),
+                          Button(
+                            title: 'Light: ${_u2LightMode.name}',
+                            onPressed: _cycleU2Light,
+                            shape: const StadiumBorder(),
+                            color: const Color(0x2EFFFFFF),
+                            foregroundColor: const Color(0xEEFFFFFF),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 5,
+                            ),
+                            fontSize: 12,
+                          ),
+                        ],
+                        if (isU2Catcher && _scene != null) ...[
+                          const SizedBox(height: 8),
+                          Wrap(
+                            alignment: WrapAlignment.center,
+                            spacing: 6,
+                            runSpacing: 4,
+                            children: [
+                              _u2CatcherButton('Caster', _moveU2CatcherCaster),
+                              _u2CatcherButton('Light', _moveU2CatcherLight),
+                              _u2CatcherButton('Refresh', _refreshU2Catcher),
+                              _u2CatcherButton(
+                                'Soft ${_u2CatcherSoftness == 0 ? '0' : '0.14'}',
+                                _toggleU2CatcherSoftness,
+                              ),
+                              _u2CatcherButton(
+                                'Mode: $_u2CatcherMode',
+                                _toggleU2CatcherMode,
+                              ),
+                              if (kBootU2CatcherPath ==
+                                      u2CatcherPathTypeUpsert ||
+                                  kBootU2CatcherPath ==
+                                      u2CatcherPathVariantDefault)
+                                _u2CatcherButton(
+                                  'Toggle material type',
+                                  _toggleU2CatcherMaterialType,
+                                ),
+                              if (kBootU2CatcherPath ==
+                                  u2CatcherPathGeometryUpsert)
+                                _u2CatcherButton(
+                                  'Geometry upsert',
+                                  _upsertU2CatcherGeometry,
+                                ),
+                              if (kBootU2CatcherPath == u2CatcherPathVariant ||
+                                  kBootU2CatcherPath ==
+                                      u2CatcherPathVariantDefault)
+                                _u2CatcherButton(
+                                  'Variant: ${_u2CatcherVariantSelected ? u2CatcherVariantName : 'default'}',
+                                  _selectU2CatcherVariant,
+                                ),
+                              if (kBootU2CatcherPath ==
+                                  u2CatcherPathComponentRebuild)
+                                _u2CatcherButton(
+                                  'Rebuild components',
+                                  _rebuildU2CatcherComponents,
+                                ),
+                              if (kBootU2CatcherPath ==
+                                  u2CatcherPathRemoveRebuild)
+                                _u2CatcherButton(
+                                  'Remove + add',
+                                  _removeAndRestoreU2CatcherReceiver,
+                                ),
+                            ],
                           ),
                         ],
                         if (_anims.isNotEmpty) ...[

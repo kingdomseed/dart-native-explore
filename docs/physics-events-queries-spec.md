@@ -1,5 +1,9 @@
 # W8 — physics events and queries
 
+Status (2026-10-28): landed (W8). The shapecast `d` approximation
+below was superseded in W23 by `sweepTestFraction × segmentLength`
+(`physics-schema.md`).
+
 Cross-SDK spec for contact events and physics queries, modeled on
 upstream `package:scene` (0.3.0) `physics/sim_types.dart`,
 `physics_world.dart`, and `flutter_scene`'s `physics/events.dart` +

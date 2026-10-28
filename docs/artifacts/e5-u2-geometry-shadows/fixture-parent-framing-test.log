@@ -1,0 +1,13 @@
+00:00 +0: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/example/test/u2_showcase_test.dart
+00:00 +0: U2 geometry showcase loads named geometry shapes and an inline instanced wedge
+00:00 +1: U2 geometry showcase left and right light updates travel in opposite X directions
+00:00 +2: U2 geometry showcase frames every fixture mesh and public pointer rays hit each shape
+00:00 +2 -1: U2 geometry showcase frames every fixture mesh and public pointer rays hit each shape [E]
+  Expected: a value less than <0.00001>
+    Actual: <1.4409283697605133>
+     Which: is not a value less than <0.00001>
+  
+  package:matcher                   expect
+  test/u2_showcase_test.dart 152:9  main.<fn>.<fn>
+  
+00:00 +2 -1: Some tests failed.

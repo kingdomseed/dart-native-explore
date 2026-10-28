@@ -1,0 +1,1 @@
+78c6f251c2687a2ee804e4b9db6982ad87bce528c94f45f59add9ddd610c5c51  dart3d/example/build/app/outputs/dn-apk/app-release.apk

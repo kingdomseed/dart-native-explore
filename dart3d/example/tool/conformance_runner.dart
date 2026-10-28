@@ -1,4 +1,4 @@
-/// W22 conformance harness (spec: docs/full-engine-program.md §W22).
+/// W22 conformance harness (results: docs/verification-matrix.md §W22).
 ///
 /// Walks the vendored Khronos glTF-Sample-Assets catalog
 /// (`assets/conformance/catalog.json` — distilled upstream at authoring

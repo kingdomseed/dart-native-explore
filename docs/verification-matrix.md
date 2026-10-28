@@ -1,14 +1,15 @@
-# dart3d verification matrix (W0)
+# dart3d verification matrix
 
-The example app (`dart3d/example`) is the verification vehicle for the
-completion program. `FeatureScene.build` emits one node per feature so a
-single scene exercises the whole harness; `docs/dart3d-completion-program.md`
-section W0 lists the live lanes. Durable screenshot copies live in
-`docs/artifacts/w1/` (W1 feature frames) and `docs/artifacts/w2/` (W2
-physics-probe frames).
+The evidence index for `docs/program-v2.md`'s T1–T4 gate: one section
+per merged unit, pointing at `docs/artifacts/<unit>/`. The example app
+(`dart3d/example`) is the verification vehicle; `FeatureScene.build`
+emits one node per feature so a single scene exercises the harness.
+The W0-era rows at the top are the original bring-up record.
 
-Surfaces: iOS simulator (iPhone 17 Pro, `9151BBE4-8453-4F3F-8FD6-17535A25A18E`)
-and Android phone A142 ("Pacman", serial `00064149A002033`).
+Surfaces (program-v2 T2): A142 Vulkan **and** GL, Fire tablet
+(KFTUWI), Wacom tablet (DTHA116), and one iPhone 17 Pro simulator —
+its UDID changes when simulators are recreated, so it is not recorded
+here (`xcrun simctl list devices available`).
 
 ## Matrix
 
@@ -21,7 +22,7 @@ and Android phone A142 ("Pacman", serial `00064149A002033`).
 | Ortho camera toggle | Toggle reloads the document with `projection:"orthographic"`; parallel edges stay parallel | pass — `usesOrthographicProjection` + `orthographicScale`←`orthoScale` (W6) | `docs/artifacts/w6/ios-ortho.png` | Same manifest field sent | pass — `Camera.Projection.ORTHO`, `orthoScale` half-height (W6) | `docs/artifacts/w6/android-post-diff.png` |
 | Statistics toggle | SCNView stats overlay appears/disappears with the switch | pass — `60fps`, draw/triangle counts overlay bottom bar | `docs/artifacts/w1/ios-w1c.png` | `showsStatistics` config delivered | pass — `TextView` overlay, fps/ms/entities/bodies (W6) | `docs/artifacts/w6/android-post-diff.png` |
 | Camera-control toggle | Drag orbits the scene while on | pass — `allowsCameraControl` on SCNView | `w0-camera.png` | `allowsCameraControl` config delivered | pass — filament-utils `Manipulator`, gesture→node write-back (W6) | `w0-camera.png` |
-| Textured material (checker box) | Box at (1.5,−0.1,0.9) shows the 64px checker, not flat white | pending — manifest and PNG payload are emitted; material slots land in W4, so expect flat white today | `w0-texture.png` | Same | pending — blocked on W4 | `w0-texture.png` |
+| Textured material (checker box) | Box at (1.5,−0.1,0.9) shows the 64px checker, not flat white | landed in W4 — see the W4/W21 sections and `docs/texture-material-spec.md` | `w0-texture.png` | Same | landed in W4 (same sections) | `w0-texture.png` |
 | Payload-geometry tetra | Orange tetrahedron renders at (0.6,−0.5,3.3) | pass — `p3t4` payload decodes verbatim; tetra renders mid-frame | `docs/artifacts/w3/ios-legacy-deferred.png` | Same | pass — tetra renders (dark under Filament lighting, shape correct) | `docs/artifacts/w3/android-legacy-deferred.png` |
 
 ## W2 — upstream physics schema (live-verified both platforms)
@@ -218,8 +219,9 @@ generic hinge, breakable pair).
 
 No new runtime behavior — the deliverable is the complete upstream
 codec inventory with per-platform feasibility verdicts plus the
-ordered follow-on program. Docs: `docs/extended-surface-audit.md`,
-`docs/extended-surface-program.md`.
+ordered follow-on program. Docs: `docs/extended-surface-audit.md`
+(the follow-on program file was removed 2026-10-28; the W12–W14
+sections below keep its unit numbers as provenance).
 
 | Lane | Result |
 |---|---|
@@ -262,7 +264,7 @@ upserts + node `skin` member.
 
 ## W12 — joint components + rectAreaLight + material variants + enabled + capability warnings (live-verified both platforms)
 
-`docs/extended-surface-program.md` W12. All five upstream joint
+Follow-on program W12 (file removed 2026-10-28). All five upstream joint
 component types (`fixedJoint`/`sphericalJoint`/`revoluteJoint`/
 `prismaticJoint`/`genericJoint`) decode on both platforms and translate
 onto the W9 command-joint wire shape — one constraint path serves both
@@ -301,7 +303,7 @@ implement.
 
 ## W13 — environment effects (live-verified both platforms)
 
-`docs/extended-surface-program.md` W13. `EnvironmentResource.effects`
+Follow-on program W13. `EnvironmentResource.effects`
 decodes into a `StageEffects` value type on both platforms — 14
 nested block structs at upstream defaults; a present `effects` key
 (even `{}`) wholesale-replaces `host.lastEffects`, an absent key
@@ -336,7 +338,7 @@ already publish first.
 
 ## W14 — render textures + views (live-verified both platforms)
 
-`docs/extended-surface-program.md` W14. `RenderTextureResource` → a
+Follow-on program W14. `RenderTextureResource` → a
 Filament `RenderTarget` (RGBA8 colour + DEPTH24 depth) drawn by
 per-entry `View`s, or iOS `SCNRenderer` passes into `MTLTexture`s.
 `views[]` entries resolve camera node + `rt:`/screen target,
@@ -461,7 +463,15 @@ zero `modified within a rendering callback` warnings; Android A142 —
 dash→fcar→logo→dice switches instant (`realize:` logs 3–333ms each),
 dice 7 settled total 42. `dn test` 150/150.
 
-## W18 — particles (harness landed; device verification pending)
+## W18 — particles (harness lane runs in T2 smokes; W18-specific visual lanes still owed, S0c)
+
+The `pending` cells below are the W18-era record. The harness —
+including `w18 lane complete` — has since run to completion in T2
+smokes on A142 and the iOS simulator (`docs/triage/integration.md`,
+E-unit evidence below), but the per-lane visual observations in this
+table were never backfilled; that is S0c's W18 item in program-v2.
+(The `InstanceBuffer` remark in the mesh row is retired — see the E1
+section.)
 
 `docs/particles-spec.md`. `w18Phase` fires at +192 s — after W15's
 lane closes and the auto-reroll is parked — and adds four emitters
@@ -563,7 +573,7 @@ directional light aimed opposite `sunDirection`), and implements rate-limited
 | T2 dice smoke | pass — dice rack loads cleanly with 0 errors (`ios-sim-dice.png`, `ios-sim-dice-run.log`) | pass — dice roll & settle (`readout=103` Vulkan, `readout=96` OpenGL), 0 crashes (`a142-{vulkan,opengl}-dice.{png,log}`) |
 | Unit tests | `dn analyze` + `dn test` (`dart3d`: 325, `example`: 227) | `./gradlew :dart3d:testReleaseUnitTest` passes |
 
-## E4 — W19 character controller (verification in progress)
+## E4 — W19 character controller (verified and merged)
 
 Evidence is in `docs/artifacts/e4-w19-character-controller/README.md`.
 The upstream codec drives Android `CharacterVirtual` and iOS sweep-and-slide.
@@ -581,7 +591,52 @@ character-reference release. No new wire operation is introduced.
 Package and example analyses are clean; 328 package and 228 example tests pass.
 The parent native task passes 151 tests with no skips and passes duplicate-class
 checking. Independent Codex source reviews report no material findings.
-The required device matrix is complete. Operator visual review remains before E4 merges.
+The required device matrix is complete. The operator approved the before/after
+screenshots and character-movement video (“Looks correct”) in [the PR #64
+comment](https://github.com/kingdomseed/dart-native-explore/pull/64#issuecomment-6410699749).
+PR #64 was squash-merged to `main` on 2026-10-26 at
+`4a75520fe0e1626aebb267328e1bf9d5a6797e58`. Three checks passed at tested head
+`805106d9fe6ead6204b133ab562ecad4e6190fbe`.
+
+## E5 — U2 geometry and shadows (verification in progress)
+
+Evidence: [E5 manifest](artifacts/e5-u2-geometry-shadows/README.md) and
+[final integrated checks](artifacts/e5-u2-geometry-shadows/final-verification/README.md).
+
+| Gate | Observed result |
+|---|---|
+| T1 Dart | Both analyses clean; 332 package tests and 250 example tests pass. |
+| Android JVM | 162 cases: 147 pass, 15 existing opt-in native-physics skips, zero failures/errors. |
+| A142 Vulkan T2 | Full harness W25 dice regression and W18 completion; real hero-to-dice roll settles at 63; no fatal marker. |
+| A142 OpenGL T2 | Same harness completion; real dice roll settles at 98; no fatal marker. Bright white regions in the dice image remain an uncalibrated visual observation. |
+| iOS simulator T2 | Same harness completion; real dice roll reports 79 then 85; final capture shows 85; no crash marker. App stopped and simulator shut down. |
+| Fire / Wacom T2 | NOT_RUN on final E5 source; tablets are not connected. |
+| U2 T3 | Geometry under two lights and spot shadows on all three feature lanes; baked cache load/freeze/refresh/softness and consumer proof in the platform manifests. Final Android spot-on captures and Vulkan tied-light/facing replay pass. |
+| Independent Codex review | Scoped geometry, iOS cache/consumer, Android defaults, instancing, directional-group, and facing corrections report PASS. Reviews distinguish source/artifact inspection from independent runtime. |
+| T4 | Operator approved the PR's before/after screenshots and cache-movement videos on 2026-10-27 (“Looks correct”); E5 remains open for tablet checks. |
+
+[PR #65](https://github.com/kingdomseed/dart-native-explore/pull/65) is draft
+pending the tablet gate. Review videos are published in
+[the E5 media release](https://github.com/kingdomseed/dart-native-explore/releases/tag/media-e5-u2).
+
+## E5b / E5c / E9 — unmerged, evidence not yet in this repo (2026-10-28)
+
+Bounded slices of U3, U4 and W34 were implemented and verified on the
+E5 head (`2f38e4e`) in the uncommitted worktree `t3-9d86c4eb`, with
+per-slice verdicts in `.audit/e5b-u3-decisions.tsv` (worktree
+`t3-852ea54b`). None of it is on a branch or in a PR yet; this section
+is the index until each unit lands with its own evidence directory.
+Status per `docs/program-v2.md` *Where we are* (2026-10-28):
+
+| Slice | Evidence (in that worktree) | State |
+|---|---|---|
+| U3 iOS tone operators | `docs/artifacts/e5b-u3-tone-mapping/` (probe worktrees) | Bounded PASS — five existing operators visibly distinct; no native change |
+| U3 `TextureAtlas` (Dart) | `dart3d/test/u3_texture_atlas_test.dart` | Bounded PASS — CPU utility only |
+| U3 sprite material | `docs/artifacts/e5b-u3-sprite/`, `e5b-u3-sprite-dart/` | Bounded PASS — Dart + iOS render-target regression; Android `NOT_RUN` |
+| U3 highlight state + outline | `docs/artifacts/e5b-u3-outline-state/`, `e5b-u3-outline-probe/` | State PASS (source + basic iOS); outline rendering **FAIL on first target** (267 contour pixels absent, mask current); Xcode capture took the wrong command buffer — cause unobserved |
+| U4 property animation | `docs/artifacts/e5c-u4-property-animation/` | Dart + iOS slices PASS (materials, alpha/sheen, owners, snapshots, lights); Android source/JVM PASS; Android live `NOT_RUN` |
+| W34 dev reload | `docs/artifacts/e9-w34-dev-reload/` (host-loopback, sidecar) | Bounded iOS PASS; direct in-app watch rejected; Android `NOT_RUN` |
+| W34 debug views | `docs/artifacts/e9-w34-dev-reload/` (screen-debug, material-families, baked/live catchers, channel transitions) | Bounded iOS PASS per slice; native particles unsupported by operator decision 2026-10-27; Android `NOT_RUN` |
 
 ## Notes
 

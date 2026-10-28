@@ -1,0 +1,27 @@
+light=spot
+backend=vulkan
+width=256
+height=256
+format=RGBA/UBYTE
+rowStrideBytes=1024
+bufferRowOrigin=top-left
+readPixelsOffsetOrigin=bottom-left
+maskChannel=R
+maskMeaning=occlusion=1-LightData.visibility; 0=unshadowed; 255=fully-shadowed
+captureAlphaMeaning=opaque source material alpha; expected=255 on receiver; clear alpha separate
+cameraEye=(0,6,0); target=(0,0,0); up=(0,0,-1)
+captureOrtho=-2.3..2.3; receiver=4.2x4.2; clip=0.1..12.0
+casterCenterWorld=(0.24,0.78,0.08)
+casterCenterPixelApprox=(141,132); origin=top-left
+channelRanges=RawMaskChannelRange(min=0, max=255), RawMaskChannelRange(min=0, max=255), RawMaskChannelRange(min=0, max=255), RawMaskChannelRange(min=255, max=255)
+maxRgbDifference=0
+maskBins(0,1-63,64-127,128-191,192-254,255)=53229, 445, 206, 132, 517, 11007
+sample.clear-nw=0,0:0,0,0,255
+sample.clear-ne=255,0:0,0,0,255
+sample.clear-sw=0,255:0,0,0,255
+sample.clear-se=255,255:0,0,0,255
+sample.receiver-nw=16,16:0,0,0,255
+sample.receiver-ne=240,16:0,0,0,255
+sample.receiver-sw=16,240:0,0,0,255
+sample.receiver-se=240,240:0,0,0,255
+sample.caster-projection=141,132:255,255,255,255

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.jasonholtdigital.dart3d.AnimClipsTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-27T01:44:13.452Z" hostname="Jasons-Mac-mini" time="0.013">
+  <properties/>
+  <testcase name="stop pauses and rewinds but keeps blending at its weight" classname="com.jasonholtdigital.dart3d.AnimClipsTest" time="0.007"/>
+  <testcase name="a 9-clip switch cycle via weight 0 leaves only the current clip" classname="com.jasonholtdigital.dart3d.AnimClipsTest" time="0.001"/>
+  <testcase name="a stop-only cycle dilutes the current clip (the #33 shape)" classname="com.jasonholtdigital.dart3d.AnimClipsTest" time="0.001"/>
+  <testcase name="a weight-0 clip contributes nothing" classname="com.jasonholtdigital.dart3d.AnimClipsTest" time="0.001"/>
+  <testcase name="play trumps stop and seeks clamp to endTime" classname="com.jasonholtdigital.dart3d.AnimClipsTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,14 @@
+Launching lib/main.dart on A142 in release mode...
+Installing ../../../../../../../../private/tmp/dart3d-e5-geometry-20261026/final-verification/vulkan-facing-tied.apk...         3.1s
+
+DartNative run key commands.
+h List all available interactive commands.
+c Clear the screen
+q Quit (terminate the application on the device).
+
+dartnative: dart3d: u2-catcher path=camera-facing light=directional-tied
+dartnative: dart3d: showcase — u2-catcher: Baked shadow footprint · explicit refresh · live shadowOnly mode
+dartnative: dart3d: u2-catcher caster moved; baked output waits for explicit refresh
+dartnative: dart3d: u2-catcher explicit upsert sent with unchanged properties
+
+Application finished.

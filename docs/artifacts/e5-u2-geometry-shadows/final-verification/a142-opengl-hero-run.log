@@ -1,0 +1,28 @@
+Launching lib/main.dart on A142 in release mode...
+Installing ../../../../../../../../private/tmp/dart3d-e5-geometry-20261026/final-verification/opengl-hero.apk...         3.3s
+
+DartNative run key commands.
+h List all available interactive commands.
+c Clear the screen
+q Quit (terminate the application on the device).
+
+dartnative: dart3d: showcase — dartnative_logo: 5 nodes · 1 geo · 1 mat · 1 tex · 1 anims
+dartnative: dart3d: hero — frameRadius 1.218 dist 12.496 aspect 2.225 glow 1 mat(s)
+dartnative: dart3d: hero — reframed for aspect 2.109 (size Size(870.8571166992188, 412.952392578125) padding EdgeInsets(l:0.0, t:28.190475463867188, r:0.0, b:0.0) viewPadding EdgeInsets(l:0.0, t:28.190475463867188, r:0.0, b:0.0))
+dartnative: [DN] _performRebuild: root native view changed 1 → 24, re-emitting grow:1
+dartnative: dart3d: dice table — 7 DartNative dice (logo inside), 31 nodes, 45 payloads, built in 1138 ms (dice 1114, compose from 1138)
+dartnative: dart3d: dice table ready after 1140 ms
+dartnative: dart3d: dice table handed to the view in 4 ms
+dartnative: dart3d: dice tray fit 871x413 insets EdgeInsets(l:34.0, t:80.0, r:184.0, b:58.0) → 4.50 px/u, camera 145, play x -88.3..54.9 z -32.1..27.2
+dartnative: dart3d: dice roll throw — strength 0.68 dir (1, 1) gates [1, 3]
+dartnative: dart3d: dice gates closed after 0.27 s
+dartnative: dart3d: dice cocked d10u (up 0.907) → nudge #1
+dartnative: dart3d: dice cocked d10u (up 0.913) → nudge #2
+dartnative: dart3d: dice cocked d10u (up 0.962) → nudge #3
+dartnative: dart3d: dice d4 turns -67° to read upright
+dartnative: dart3d: dice settled — d4=2 (up 1.000 at 35.0,4.3,9.2) d6=6 (up 1.000 at 36.2,6.9,-12.3) d8=5 (up 1.000 at 25.7,5.2,-22.6) d10t=70 (up 1.000 at 24.0,6.0,7.9) d10u=2 (up 1.000 at 44.6,6.0,16.0) d12=2 (up 1.000 at 6.7,7.8,-4.0) d20=11 (up 0.998 at 1.8,7.8,16.6) [3 nudges]
+dartnative: dart3d: dice readout d4 2 · d6 6 · d8 5 · d12 2 · d20 11 · d% 70+2 = 98
+dartnative: dart3d: dice settled — d4=2 (up 1.000 at 34.4,4.3,7.8) d6=6 (up 1.000 at 36.2,6.9,-12.3) d8=5 (up 1.000 at 25.7,5.2,-22.6) d10t=70 (up 1.000 at 20.6,6.0,4.8) d10u=2 (up 1.000 at 44.6,6.0,17.2) d12=2 (up 1.000 at 6.7,7.8,-4.0) d20=11 (up 0.998 at 1.8,7.8,16.6) [3 nudges]
+dartnative: dart3d: dice readout d4 2 · d6 6 · d8 5 · d12 2 · d20 11 · d% 70+2 = 98
+
+Application finished.

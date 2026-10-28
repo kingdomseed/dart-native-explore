@@ -872,8 +872,10 @@ object MeshFactory {
         }
     }
 
+    data class V2(val x: Float, val y: Float)
+
     /** Accumulates 15-float records + triangles into a [MeshData]. */
-    private class ProcBuilder {
+    private class ProcBuilder(private val reflectZ: Boolean = false) {
         val verts = ArrayList<Float>()
         val idx = ArrayList<Int>()
         val vertexCount get() = verts.size / FLOATS_PER_VERTEX
@@ -894,10 +896,15 @@ object MeshFactory {
                     else V3(0f, 1f, 0f)
                 tan = n.cross(axis).normalized(V3(1f, 0f, 0f))
             }
-            val bit = (n.cross(tan) * w).normalized()
+            val outputNormal = if (reflectZ) V3(n.x, n.y, -n.z) else n
+            val outputTangent = if (reflectZ) V3(tan.x, tan.y, -tan.z) else tan
+            val outputW = if (reflectZ) -w else w
+            val bit = (outputNormal.cross(outputTangent) * outputW).normalized()
             val q = packTangentFrame(
-                tan.x, tan.y, tan.z, bit.x, bit.y, bit.z, n.x, n.y, n.z)
-            verts.add(p.x); verts.add(p.y); verts.add(p.z)
+                outputTangent.x, outputTangent.y, outputTangent.z,
+                bit.x, bit.y, bit.z,
+                outputNormal.x, outputNormal.y, outputNormal.z)
+            verts.add(p.x); verts.add(p.y); verts.add(if (reflectZ) -p.z else p.z)
             verts.addAll(q.toList())
             verts.add(u); verts.add(v)
             verts.add(r); verts.add(g); verts.add(b); verts.add(a)
@@ -905,7 +912,14 @@ object MeshFactory {
             return i
         }
 
-        fun tri(a: Int, b: Int, c: Int) { idx.add(a); idx.add(b); idx.add(c) }
+        fun tri(a: Int, b: Int, c: Int) {
+            idx.add(a)
+            if (reflectZ) {
+                idx.add(c); idx.add(b)
+            } else {
+                idx.add(b); idx.add(c)
+            }
+        }
         fun quad(a: Int, b: Int, c: Int, d: Int) {
             tri(a, b, c); tri(b, d, c)
         }
@@ -1046,6 +1060,68 @@ object MeshFactory {
         }
         for (s in 0 until segments) {
             b.tri(center, rimBase + s + 1, rimBase + s)
+        }
+        return b.build()
+    }
+
+    fun wedge(size: V3): MeshData {
+        val hx = size.x / 2f
+        val hz = size.z / 2f
+        val l0 = V3(-hx, 0f, -hz)
+        val l1 = V3(hx, 0f, -hz)
+        val b0 = V3(-hx, 0f, hz)
+        val b1 = V3(hx, 0f, hz)
+        val t0 = V3(-hx, size.y, hz)
+        val t1 = V3(hx, size.y, hz)
+        val slopeNormal = V3(0f, size.z, -size.y).normalized()
+        val b = ProcBuilder(reflectZ = true)
+
+        fun quad(a: V3, bv: V3, c: V3, d: V3, n: V3) {
+            val base = b.vertexCount
+            b.emit(a, n, 0f, 1f)
+            b.emit(bv, n, 1f, 1f)
+            b.emit(c, n, 1f, 0f)
+            b.emit(d, n, 0f, 0f)
+            b.tri(base, base + 3, base + 1)
+            b.tri(base + 3, base + 2, base + 1)
+        }
+        fun triangle(a: V3, bv: V3, c: V3, n: V3) {
+            val base = b.vertexCount
+            b.emit(a, n, 0f, 0f)
+            b.emit(bv, n, 1f, 0f)
+            b.emit(c, n, 0f, 1f)
+            b.tri(base, base + 1, base + 2)
+        }
+
+        quad(l0, l1, t1, t0, slopeNormal)
+        quad(l0, b0, b1, l1, V3(0f, -1f, 0f))
+        quad(b0, t0, t1, b1, V3(0f, 0f, 1f))
+        triangle(l0, b0, t0, V3(-1f, 0f, 0f))
+        triangle(l1, t1, b1, V3(1f, 0f, 0f))
+        return b.build()
+    }
+
+    fun ring(innerRadius: Float, outerRadius: Float, segments: Int): MeshData {
+        val b = ProcBuilder(reflectZ = true)
+        val n = V3(0f, 1f, 0f)
+        for (s in 0..segments) {
+            val theta = (2 * PI * s / segments).toFloat()
+            val cos = cos(theta); val sin = sin(theta)
+            b.emit(V3(outerRadius * cos, 0f, outerRadius * sin), n,
+                s.toFloat() / segments, 1f)
+        }
+        val innerBase = b.vertexCount
+        for (s in 0..segments) {
+            val theta = (2 * PI * s / segments).toFloat()
+            val cos = cos(theta); val sin = sin(theta)
+            b.emit(V3(innerRadius * cos, 0f, innerRadius * sin), n,
+                s.toFloat() / segments, 0f)
+        }
+        for (s in 0 until segments) {
+            val o0 = s; val o1 = s + 1
+            val i0 = innerBase + s; val i1 = innerBase + s + 1
+            b.tri(o0, i1, o1)
+            b.tri(o0, i0, i1)
         }
         return b.build()
     }
@@ -1265,12 +1341,23 @@ object MeshFactory {
             sampleParams = subdividedParams(pts.size - 1))
     }
 
-    private fun stitchRings(b: ProcBuilder, ringBases: List<Int>, ringSize: Int) {
+    private fun stitchRings(
+        b: ProcBuilder,
+        ringBases: List<Int>,
+        ringSize: Int,
+        reverseWinding: Boolean = false,
+    ) {
         for (s in 0 until ringBases.size - 1) {
             val base = ringBases[s]
             val nextBase = ringBases[s + 1]
             for (j in 0 until ringSize - 1) {
-                b.quad(base + j, base + j + 1, nextBase + j, nextBase + j + 1)
+                if (reverseWinding) {
+                    b.tri(base + j, nextBase + j, base + j + 1)
+                    b.tri(base + j + 1, nextBase + j, nextBase + j + 1)
+                } else {
+                    b.quad(base + j, base + j + 1,
+                        nextBase + j, nextBase + j + 1)
+                }
             }
         }
     }
@@ -1364,6 +1451,99 @@ object MeshFactory {
         }
         stitchRings(b, ringBases, 2)
         return b.build()
+    }
+
+    fun extrude(
+        points: List<V3>, profile: List<V2>, stations: Int, caps: Boolean,
+    ): MeshData {
+        val documentPoints = points.map { V3(it.x, it.y, -it.z) }
+        val path = catmullRomPath(documentPoints, closed = false)
+        val frames = path.evenlySpacedFrames(stations)
+        val length = path.length
+        val clockwise = profileSignedArea(profile) < 0f
+        val normals = profileNormals(profile)
+        val b = ProcBuilder(reflectZ = true)
+        val ringBases = ArrayList<Int>(stations)
+        for (i in 0 until stations) {
+            val frame = frames[i]
+            val v = length * i / (stations - 1)
+            ringBases.add(b.vertexCount)
+            for (k in 0..profile.size) {
+                val index = k % profile.size
+                val point = profile[index]
+                val profileNormal = normals[index]
+                val position = frame.position + frame.normal * point.x +
+                    frame.binormal * point.y
+                val normal = (frame.normal * profileNormal.x +
+                    frame.binormal * profileNormal.y).normalized()
+                b.emit(position, normal, k.toFloat() / profile.size, v)
+            }
+        }
+        stitchRings(
+            b, ringBases, profile.size + 1, reverseWinding = clockwise)
+        if (caps) {
+            extrudeCap(b, frames.first(), profile, atEnd = false,
+                clockwise = clockwise)
+            extrudeCap(b, frames.last(), profile, atEnd = true,
+                clockwise = clockwise)
+        }
+        return b.build()
+    }
+
+    private fun profileSignedArea(profile: List<V2>): Float {
+        var doubledArea = 0f
+        for (k in profile.indices) {
+            val a = profile[k]
+            val next = profile[(k + 1) % profile.size]
+            doubledArea += a.x * next.y - next.x * a.y
+        }
+        return doubledArea
+    }
+
+    private fun profileNormals(profile: List<V2>): List<V2> {
+        val sign = if (profileSignedArea(profile) >= 0f) 1f else -1f
+        fun edgeNormal(x: Float, y: Float): V2 = V2(y * sign, -x * sign)
+        fun normalized(value: V2): V2 {
+            val length = sqrt(value.x * value.x + value.y * value.y)
+            return if (length > 1e-8f) V2(value.x / length, value.y / length)
+                else value
+        }
+        return profile.indices.map { k ->
+            val previous = profile[(k - 1 + profile.size) % profile.size]
+            val current = profile[k]
+            val next = profile[(k + 1) % profile.size]
+            val incoming = edgeNormal(current.x - previous.x,
+                current.y - previous.y)
+            val outgoing = edgeNormal(next.x - current.x,
+                next.y - current.y)
+            var normal = V2(incoming.x + outgoing.x, incoming.y + outgoing.y)
+            if (normal.x * normal.x + normal.y * normal.y < 1e-12f) {
+                normal = outgoing
+            }
+            if (normal.x * normal.x + normal.y * normal.y < 1e-12f) {
+                normal = V2(1f, 0f)
+            }
+            normalized(normal)
+        }
+    }
+
+    private fun extrudeCap(
+        b: ProcBuilder, frame: PathFrame, profile: List<V2>, atEnd: Boolean,
+        clockwise: Boolean,
+    ) {
+        val centerX = profile.sumOf { it.x.toDouble() }.toFloat() / profile.size
+        val centerY = profile.sumOf { it.y.toDouble() }.toFloat() / profile.size
+        fun lift(x: Float, y: Float) = frame.position + frame.normal * x +
+            frame.binormal * y
+        val normal = if (atEnd) frame.tangent else frame.tangent * -1f
+        val center = b.emit(lift(centerX, centerY), normal, centerX, centerY)
+        val ring = profile.map { b.emit(lift(it.x, it.y), normal, it.x, it.y) }
+        for (k in profile.indices) {
+            val next = (k + 1) % profile.size
+            val reverseWinding = (!atEnd) != clockwise
+            if (reverseWinding) b.tri(center, ring[next], ring[k])
+            else b.tri(center, ring[k], ring[next])
+        }
     }
 
     // MARK: - Camera-facing expansion (W26 lines / billboards)

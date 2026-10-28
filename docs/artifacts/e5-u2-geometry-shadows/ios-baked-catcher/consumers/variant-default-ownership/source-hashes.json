@@ -1,0 +1,22 @@
+{
+  "dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/FsceneRealizer.kt": "a86edc3f0d3e759e16479d63443109baf0e38e0da96e31e14ce360debffe53af",
+  "dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/MeshFactory.kt": "b8af83f4250ed1370333ac4ae32646b591bb12abf993913282cd8b8690e18a40",
+  "dart3d/android/src/test/kotlin/com/jasonholtdigital/dart3d/MeshFactoryTest.kt": "60c856500542f4f8226b26acb362bcd43f17a21db7d77342d2ef4eb5ee13d4e9",
+  "dart3d/example/dn_plugins.lock": "73c5209e393e2c670769b2dfe4d09d72b79870c5218ede82e2a6d9c659c0f2a6",
+  "dart3d/example/ios/Podfile.lock": "47d5269141917cc2cfad542d6e2c60dc8c3f364e5700ba1354f44208a9e31522",
+  "dart3d/example/lib/showcase_loader.dart": "667e0bc5d9b3f4ead9fe8ba9afe0fbf89151c07fb7f79730b0367cf6dd239c97",
+  "dart3d/example/lib/showcase_scene.dart": "66332f10ff2f6e56a63816c916546d3946818dc7f552d8d2ac8504afd0d57d36",
+  "dart3d/example/lib/u2_catcher_scene.dart": "84d1a909162a92d92739a388d2ed49ed99ddb7fadd0227042eb302d94fa07215",
+  "dart3d/example/lib/u2_geometry_scene.dart": "5454d467e0d8acbdea4bc51e4e3913287b9d8546cb515c0be1302a592bc5aff8",
+  "dart3d/example/test/u2_catcher_showcase_test.dart": "6d87556344ef17399ac586de061a2e288a4136dc0be56b07c8711af87c7e01de",
+  "dart3d/example/test/u2_shadow_showcase_test.dart": "f3ebb27175d21500c8e5fe74f51c6c89099442efa69449ab73d38279ed2a2f4a",
+  "dart3d/example/test/u2_showcase_test.dart": "ef553e4fff7a0c3bac3e7f8a6a92057a576c6643e7fc5ef92602ba01316cf284",
+  "dart3d/example/test/w26_geometry_test.dart": "fe128269c2d9c759b4f598331faeda5d229bb649a6835cb20468e3a7672d51da",
+  "dart3d/ios/Classes/BakedShadowCatchers.swift": "93222d3027252138eb0ecf54596ff4b6db9d8c8d39e86ec9e6b1d9b6e7a68308",
+  "dart3d/ios/Classes/FsceneRealizer.swift": "9c087619858537049514c0fca19085d7ce28bf4c672d74dbf1ea3c2943c470ab",
+  "dart3d/ios/Classes/GeometryFactory.swift": "b76abe5558f12d75df1b3883d1d71ed2638e14862bd217a992c93725a92b8438",
+  "dart3d/ios/Classes/SceneViewHost.swift": "9fa68e47d1166e4c43f923e4817707faf925bc8ccd91952b604b067591669e9e",
+  "dart3d/lib/src/geometry/proc.dart": "803c12ecabbb29475e834e5ed5443fb8761ca6ade73b7b8dcd8cc713c54f40b0",
+  "dart3d/lib/src/raycast.dart": "4d5b2ae714f97fc4437b03430a839411e46673c2f27eb10c54acb88676121325",
+  "dart3d/test/u2_geometry_raycast_test.dart": "fecc66bf0717ebb116770c47a08b388de9b8ef51539f3cc2f8a41bab41942c32"
+}

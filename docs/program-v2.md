@@ -1,10 +1,10 @@
 # dart3d program v2 — stabilize, then finish the engine and ship
 
-Supersedes the execution protocol and unit ordering of
-`docs/full-engine-program.md` (W15–W34). The per-unit scope text in that
-file stays the reference for *what* each remaining unit covers, except
-where this file re-scopes it. Why the reset: see
-`docs/program-audit-2026-09-28.md`.
+This is the only program document. It superseded the earlier
+W15–W34 program files (removed 2026-10-28; recoverable from git
+history), so the unit scope notes in the Track E table below are the
+scope of record — expand a unit's row here before starting it if it
+needs more. Why the reset: see `docs/program-audit-2026-09-28.md`.
 
 ## Goals
 
@@ -38,12 +38,69 @@ goes into the backlog, not into a branch.
    guides and a CHANGELOG, written for someone who has never seen the
    repo (R8).
 
-## Where we are (2026-10-05)
+## Where we are (2026-10-28)
 
-**Landed since the reset.** S0a/b/e/f, the Vulkan relaunch fix, the P4
-hero (#31), `switchAnimation` (#34), the Track V re-cut (#37; upstream
-0.24 is still unpublished), and the example's dice experience through
-DR2 with the DartNative set (#36, #38–#42).
+**On `main` (`4a75520`).** Track S through S0h/S0j as recorded below,
+plus Track E's first four units: E1 Filament 1.77.3 + GPU instancing
+(#58), E2/U1 cameras + picking (#60), E3/W17 sky + environment (#62),
+E4/W19 character controller (#64). Open follow-ups from those units:
+#61 (E2 raycast/controllers) and #63 (E3 sky). The S0 detail that used
+to live here is in the Track S checkboxes and `docs/artifacts/s0*/`.
+
+**In review: E5/U2** — [PR #65](https://github.com/kingdomseed/dart-native-explore/pull/65)
+(draft, branch `e5-u2-geometry-shadows`, head `2f38e4e`). Wedge/Ring/
+Extrude, spot shadows and baked shadow catchers are implemented on
+both natives; T1, A142 Vulkan+GL T2 and iOS-sim T2/T3 pass; the
+operator approved the screenshots/video on 2026-10-27 (T4). The only
+open gate is Fire/Wacom T2, `NOT_RUN` because the tablets were not
+connected (`docs/verification-matrix.md` §E5). It also closes #59.
+
+**Implemented but uncommitted: E5b, E5c and E9 slices.** The
+2026-10-27/28 swarm built on the E5 head in the worktree
+`t3-9d86c4eb` (branch `t3/sprite-material-fixture`): 28 modified files
+plus new Dart/native sources, tests, example scenes and evidence under
+`docs/artifacts/e5b-*`, `e5c-*` and `e9-*` — none of it committed, no
+PRs. The decision log is `.audit/e5b-u3-decisions.tsv` in worktree
+`t3-852ea54b` (85 rows). Bounded slices accepted there, each with
+scoped Codex review; no unit is closed:
+
+- **E5b/U3** — iOS five-tone fixture PASS (existing operators, no
+  native change); Dart `TextureAtlas` utility PASS; sprite material
+  (Dart + bounded iOS render-target regression) PASS; highlight
+  *state* foundation PASS on source and basic iOS. **Blocker:**
+  iOS selection-outline *rendering* fails its first-target gate —
+  the first Set target has 205 current mask pixels but all 267
+  expected contour pixels are absent, output identical to Off;
+  later targets pass. The 2026-10-28 Xcode GPU capture took the
+  main-view command buffer, not the target's, so the cause is still
+  unobserved (`docs/artifacts/e5b-u3-outline-probe/ios-xcode-command-capture/`
+  in that worktree). Android outline/sprite rendering: `NOT_RUN`.
+- **E5c/U4** — property-animation contract and Dart layer PASS; iOS
+  slices PASS (basic owners, materials, alpha + sheen corrections,
+  ownership, snapshots/late textures, point/spot/area lights);
+  Android source, release Kotlin compile and JVM tests PASS.
+  Android live/device proof: `NOT_RUN`.
+- **E9/W34** — dev-reload library (host loopback + image sidecar)
+  bounded iOS PASS, direct in-app file-watch rejected by probe;
+  iOS debug-view slices PASS (PBR channels, unlit/sprite, baked and
+  live catchers, channel transitions). Operator decision
+  2026-10-27: debug channels cover mesh/material draws; native
+  particles are unsupported (see the E9 row). Android debug views
+  and reload, latency, T2/T4: open.
+
+This state breaks the operating rule that program state lives in
+this file and the verification matrix, not in agent-local folders:
+130 worktrees exist and 120 are dirty, almost all single-purpose
+probe leftovers at the E2/E4/E5 heads. Only `t3-9d86c4eb` (accepted
+stack) and `t3-852ea54b` (outline probe + audit log) carry work that
+must survive; the rest need operator-approved cleanup, not silent
+deletion.
+
+**Upstream moved.** flutter_scene 0.24.0 / scene 0.4.0 published
+2026-10-05; latest is 0.24.3 / 0.4.1 (checked 2026-10-28 via
+`gh api repos/bdero/flutter_scene/{tags,releases}` and pub.dev).
+V0's re-diff of the published tags against the `b473543a` preview
+is therefore due, and D1's final pin can now be set.
 
 **Sidelined.** The P2 game rooms (Blender look-dev) stopped after round
 3 and stay on `p3-game-rooms-wip` (operator, 2026-10-02). The operator's
@@ -54,68 +111,40 @@ from look-dev — the DartNative set's spec and reference renders — is on
 
 **Next, in order.** Engine first, then release. Product work waits.
 
-1. **Stabilize** — S0h cold start is closed: material packages ship
-   precompiled and are cached on disk. First frame, first launch /
-   later launches: A142 0.57 / 0.52 s (was 11.2 s), Fire tablet 1.25 /
-   0.89 s (was 18.1 s), Wacom tablet 0.83 / 0.56 s
-   (`docs/artifacts/s0h-cold-start/`,
-   `docs/artifacts/s0-three-device-baseline/`). Next: S0g and the S0c
-   backfill. Fire tablet baseline: `docs/artifacts/s0-fire-tablet-baseline/`.
-   Frame rate (S0j): a third device, the Wacom DTHA116 (Mali-G57 MC2,
-   8 GB), ran the dice at 13 fps because the tier was picked by memory.
-   The tier is now picked by GPU name first, then memory (#49): dice racked / rolling are 44 / 44
-   fps on the Fire tablet, 51 / 44 on the Wacom and 50 / 50 on the
-   A142. Open from that: 60 fps at rest is not reached on either
-   tablet, the low profile's shadows are hard, LOW always takes OpenGL
-   although Vulkan is faster on the Wacom, and only two rows of the GPU
-   table are measured.
-   Open from the tablet run: dice at an edge can still cover the rim
-   line.
-   Native lifetime (S0g, #50): before #50 the app ran out of Java heap
-   after 22 visits to the dice screen on the Fire tablet. #50 closes
-   every jolt-jni object it creates (22 sites leaked per scene load),
-   fences all Filament builders and frees a released view's document;
-   50 visits and 200 rolls then complete. **Memory per visit is still
-   not flat in the app**: DartNative's view registry keeps the hero
-   screen's view tree (its scroll view's content is never
-   unregistered), and the Dart heap grows about 7 MB per visit for a
-   reason not yet found. With the scroll view out, the native heap
-   ends +4.4 MB after 50 visits against +18.5 MB on `main`
-   (`docs/artifacts/s0g-android-lifetime/`).
-   Physics across a re-realize (S0g, in review, branch
-   `s0g-android-physics-rerealize`): bodies keep their motion and sleep
-   state on Android, and the harness's W25 settle lane passes for the
-   first time (`docs/artifacts/s0g-physics-rerealize/`). On iOS the
-   two ordering fixes have now run (2026-10-05, below); carrying body
-   state across a re-realize is still not built there.
-   Look parity (S0g, in review, #57, branch `s0g-look-parity`): one
-   document now gives the same picture on the iPhone simulator and
-   the A142 within a stated tolerance, measured patch by patch on a
-   reference board, and the example has no per-platform numbers left.
-   Eleven causes were found and fixed, most of them on iOS (linear
-   colours read as sRGB, colour textures sampled undecoded, no tone
-   mapper, a different bloom), two in what the wire's numbers meant
-   (light units, a gradient sky dimmed by the environment on
-   Android). What does not match, and why, is listed for S1 in
-   `docs/artifacts/s0g-look-parity/`.
-   iOS debt (2026-10-05, `docs/artifacts/ios-debt-2026-10/`): one
-   simulator is allowed again, and everything merged on Android
-   evidence since 2026-09-29 ran on it — hero, Showcase, the harness
-   to completion, and the dice lanes. Three defects found and fixed:
-   the dice table was built on the UI isolate (the background build
-   threw), the dice cast no shadows on iOS (SceneKit's 100-unit shadow
-   range and single shadow sample), and blended meshes cast none at
-   all (each die showed its logo's shadow instead of its own).
-2. **S1 renderer spike**, then **Track E** in its table order (E1 → E12).
-3. **Track V** — the 0.24 delta, re-pinned when upstream publishes.
-4. **Track R** — API pass, consumer build, agent skills, README and
-   docs, publish.
+1. **Land E5.** Connect the Fire and Wacom tablets, run the E5 T2
+   smoke on the PR #65 head, record it in the verification matrix,
+   undraft; the operator merges. (Confirm each device's foreground
+   app before any `adb` input, per `AGENTS.md` §Devices.)
+2. **Package the uncommitted stack.** Split `t3-9d86c4eb`'s tree
+   into one branch/PR per unit (E5b, E5c, E9) on the new `main`,
+   with their evidence; copy the audit log's verdicts into the PRs.
+   Triage and, with operator approval, remove the remaining probe
+   worktrees. Nothing new starts until the accepted slices are
+   committed — they currently exist in exactly one working tree.
+3. **Close E5b's outline blocker.** Read-only first-technique
+   investigation: capture the *target's* command buffer (the Xcode
+   capture took the main view's), find why the first Set draw
+   produces no contour, fix at the owning layer, then run the U3
+   T3 row on A142 Vulkan+GL and iOS (Android is `NOT_RUN` today).
+4. **Finish E5c/E9 device gates.** Android live proof for U4;
+   Android debug views + reload for E9; then each unit's T2/T3/T4.
+5. **S1 renderer spike** (≤ 3 days, still not run) — it alone
+   blocks E6/W28, and with it E7, E8 and most of Track V. Run it
+   before starting any further E unit beyond E9/E10/E11.
+6. **V0 re-diff** against the published 0.24 tags; set D1's pin
+   (0.24.0 vs latest patch is the operator's call); amend V1–V8.
+7. **Remaining Track E** in table order (E6 → E12, with E10/E11
+   free to run before E6), then **Track V**, then **Track R**.
+   Track S leftovers ride along as their checkboxes state: S0c T3
+   backfill per touched lane, S0d inside R8, S0j's 60 fps-at-rest
+   and GPU-table rows, S0g's per-visit app memory growth.
 
 Not every open S0 box blocks Track E or R: S0d is folded into R8 (so
-it is exempt from Track R's "after S0"), S0c is
-backfilled as each lane's unit is touched, and the S0g look-parity
-items (light units, colour saturation) are in review (#57). The rest
-of S0 does block E.
+it is exempt from Track R's "after S0"), and S0c is
+backfilled as each lane's unit is touched. The S0g items that did
+block E (native lifetime, re-realize, look parity) merged in
+#50/#52/#57, which is how E1–E5 proceeded; the S0g/S0j remainders
+(app memory growth, 60 fps at rest) do not gate Track E units.
 
 **Paused until the engine is done.** P3 DR3 and later (notation, audio,
 juice; DR3 needs P1's parser contract first), P5 demos, P7 design pass,
@@ -169,18 +198,34 @@ off). Evidence for everything below: `docs/artifacts/ios-debt-2026-10/`.
 - **KTX2 colour textures on iOS** (#57): they load through a different
   call than the one found to ignore its sRGB option, and were not
   measured.
+- **E5 on the Fire and Wacom tablets** (2026-10-28): T2 `NOT_RUN` on
+  the final E5 source; the tablets were not connected. PR #65 stays
+  draft until it runs.
+- **Android device proof for the uncommitted E5b/E5c/E9 slices**
+  (2026-10-28): U3 outline/sprite rendering, U4 live values, and W34
+  debug views + reload are iOS-simulator and source/JVM evidence
+  only; the A142 was unavailable (account screen) during those runs
+  and was not driven. Their T2/T3 Android halves are owed before
+  any of the three units merges.
+- **iOS selection outline, first target** (2026-10-28): the first
+  outlined target renders no contour (267 expected pixels absent)
+  although its mask is current; the Xcode GPU capture took the
+  main-view command buffer, so the failing pass is unobserved.
 
-**Review.** Codex code review is out of quota; PRs since #36 were
-reviewed by an Opus reviewer agent, each finding checked against the
-code before fixing (verdicts are in the PR comments). Codex's inline
-comments on #44–#49 got their verdicts on 2026-10-05, in the two S0g
-PRs and in `docs/artifacts/s0-codex-followups/`.
+**Review.** Through #57, PRs were reviewed by an Opus reviewer agent
+(Codex code review was out of quota; verdicts are in the PR comments,
+and Codex's inline comments on #44–#49 got theirs on 2026-10-05). For
+E1–E5 and the uncommitted E5b/E5c/E9 slices, scoped Codex reviews ran
+again (2026-10-18 → 2026-10-28); their PASS/CHANGES_REQUIRED verdicts
+are recorded per slice in the PRs and, for the uncommitted stack, in
+`.audit/e5b-u3-decisions.tsv` (worktree `t3-852ea54b`) — to be copied
+into those units' PRs when packaged.
 
 ## Decisions (made here, change only with the operator)
 
 | # | Decision | Why |
 |---|---|---|
-| D1 | **Two-stage parity pin.** Milestone: flutter_scene 0.23.0 / scene 0.3.0, commit `0dc6ee80` (bdero/flutter_scene), `.fscene` v5, `.fsceneb` v2 — finish the existing work (Tracks S, E) against this first. **Final goal: flutter_scene 0.24 / scene 0.4** (Track V), pinned to the published 0.24.0/0.4.0 tags when they ship; until then unreleased master is the preview reference — `b473543a`, 2026-09-30, per V0 (the tags are not published; release branch `bdero/release-0.24` @ `168fad28` is a stale candidate). | The old plan cited a `/tmp` monorepo that no longer exists; "parity" had no fixed target. |
+| D1 | **Two-stage parity pin.** Milestone: flutter_scene 0.23.0 / scene 0.3.0, commit `0dc6ee80` (bdero/flutter_scene), `.fscene` v5, `.fsceneb` v2 — finish the existing work (Tracks S, E) against this first. **Final goal: flutter_scene 0.24 / scene 0.4** (Track V). The tags shipped 2026-10-05 (`flutter_scene-0.24.0`, `scene-0.4.0`; latest patches 0.24.3 / 0.4.1 as of 2026-10-28), so V0's re-diff against the `b473543a` preview is due and the pin (0.24.0 vs latest patch) is the operator's call at re-diff time. | The old plan cited a `/tmp` monorepo that no longer exists; "parity" had no fixed target. |
 | D2 | **Keep SceneKit on iOS for now; run a time-boxed Filament-on-Metal spike (S1) before W28.** | SceneKit is soft-deprecated (WWDC25) but the iOS 27 SDK carries no deprecation annotations. A single Filament renderer would collapse the iOS halves of W28/W20/W31 into the Android implementation, but costs a rewrite of SceneKit-provided pieces (particles, floor mirror, physics via Jolt C++). Decide with data, not now. RealityKit is ruled out (weaker shader control, no decal/planar primitives). |
 | D3 | **Upgrade Filament 1.71.6 → 1.77.3 in lockstep (filament-android, filament-utils-android, filamat-android, gltfio-android);** replace CPU-baked instancing with GPU `InstanceBuffer` instancing (**done in E1**). | `RenderableManager.Builder.instances(n, instanceBuffer)` + `getInstanceIndex()` + `uniform float4 instanceColors[64]` realizes conformal `d3:instances` and `meshParticleEmitter` buckets on GPU (`docs/artifacts/e1-filament-instancing/`). Precompiled `.filamat` assets re-baked for 1.77.3. |
 | D4 | **Mirror upstream vocabulary; invent `d3:` extensions only where upstream has no wire form**, and model them on upstream's runtime API. | Keeps `.fscene` interchange. Applies to W19 (upstream `CharacterController` codec exists → use it, drop the invented `characterMove` op) and W27 (`DecalNode` is runtime-only upstream → `d3:decal` modeled on it). |
@@ -190,13 +235,18 @@ PRs and in `docs/artifacts/s0-codex-followups/`.
 | D8 | **In scope, newly added:** camera controllers + pointer picking (U1), Wedge/Ring/Extrude + spot shadows + shadow-catcher bake (U2; 0.23.0 ships `spot_shadow.dart` only — point-light shadows are 0.24, V3), rendering extras (U3: selection outline, iOS tone-mapper selection, sprites + texture atlas), animation property resolver (U4). | Upstream 0.23.0 surface no unit covered; picking and orbit cameras are also what the dice app and demos need. |
 | D9 | **Out of scope as engine parity:** upstream declarative widgets (`widgets/declarative.dart`, `render_texture_view.dart` — Flutter-widget API, replaced by dart3d's own `SceneView`/`SceneController` on DartNative) and upstream profiling (`memory_report.dart`, `render_profile.dart` — Impeller-internal; dart3d exposes native stats instead, tracked in E9 debug views). | They describe the host framework, not the scene contract. |
 
-**Open for the operator (defaults apply unless changed):**
+**Former open questions, resolved 2026-10-28** (operator-delegated,
+parity-first: match flutter_scene quality/parity natively before
+product work):
 
-- **O1 — the no-demo rule.** Default: *lift it for Track P only.* Engine
-  units still don't polish the showcase, but the dice app and demo run in
-  parallel with Track E instead of waiting for the engine to close.
-- **O2 — device budget.** Default: the A142 and the iPhone 17 Pro sim are
-  the gate devices; the iPad is optional coverage.
+- **O1 — the no-demo rule: not lifted.** The definition of done
+  stands: no side quests until the engine is done. Track P stays
+  paused (see *Paused until the engine is done*); engine units don't
+  polish the showcase, and the dice app/demos wait for Tracks E/V.
+- **O2 — device budget: the T2 gate set.** A142 (Vulkan + GL), Fire
+  tablet, Wacom tablet and one iPhone 17 Pro simulator, as the
+  verification gate below already requires; the iPad and physical
+  iOS devices stay uncleared.
 
 ## Verification gate (replaces the 10-lane swarm)
 
@@ -286,10 +336,16 @@ Rules:
       `verification-matrix.md`
 - [ ] S0d Doc truth pass: `extended-surface-audit.md`,
       `environment-ibl-spec.md`, `texture-material-spec.md`, README
-      exclusions; mark `full-engine-program.md` superseded
+      exclusions; remove the superseded program files (done
+      2026-10-28). *Partially
+      done 2026-10-28* (two-auditor alignment pass over all 31 docs:
+      superseded banners, stale-fact trims and exclusion-section
+      stamps in exactly these files); the full README rewrite remains
+      R8's.
 - [x] S0e Android `disposeView` teardown (in #16)
 - [ ] S0g Stabilization follow-ups (`docs/triage/integration.md`
-      §Follow-ups): **#18 Vulkan warm-relaunch crash (P1)**; dice readout
+      §Follow-ups): ~~#18 Vulkan warm-relaunch crash (P1)~~ (fix landed;
+      the issue is closed); dice readout
       (inverse quaternion + mirrored face normals — root cause confirmed);
       ~~native light-unit unification (then delete the example's iOS 0.26
       scale)~~; ~~iOS colour saturation vs Android~~; root-cause the Mali page
@@ -319,7 +375,7 @@ Rules:
       hazards that need unusual documents are listed, not fixed
       (`docs/triage/android.md` §S0g native object lifetime). Evidence:
       `docs/artifacts/s0g-android-lifetime/`
-      *Physics across a re-realize — in review* (2026-10-05, branch
+      *Physics across a re-realize — landed* (#52, 2026-10-05, branch
       `s0g-android-physics-rerealize`). Done on Android: kinematic and
       dynamic bodies keep pose, linear and angular velocity and sleep
       state across a payload-arrival re-realize (`BodyCarry`); the
@@ -333,7 +389,7 @@ Rules:
       `s0g-ios-dynamic-body-reseat` (#55) merged the same day after
       running there. **Open, iOS:** the body state (described, not
       built). Evidence: `docs/artifacts/s0g-physics-rerealize/`
-      *Look parity — in review* (#57, 2026-10-05). The wire's light,
+      *Look parity — landed* (#57, 2026-10-05). The wire's light,
       environment and exposure numbers mean what upstream's do on both
       natives (`docs/android-parity-spec.md` §Light units); iOS
       resolves its image in a pass of its own (inverse of SceneKit's
@@ -401,19 +457,19 @@ Rules:
 | E1 ✅ | **Filament upgrade + GPU instancing** (done) | D3 landed on Filament 1.77.3 (`InstanceBuffer` for `d3:instances` + `meshParticleEmitter`, precompiled `.filamat` packages re-baked, `D3FrameInfo` struct updated). 10k-instance realize: 1,909 ms + OOM → 27 ms + 89.8 fps GL / 79.8 fps VK on A142; W26 visual MAE 0.38% vs pre-upgrade (`docs/artifacts/e1-filament-instancing/`). | L | done |
 | E2 ✅ | **U1 camera controllers + picking** (done) | Orbit/fly/follow controllers, `SceneCamera` unproject/project, CPU BVH + `raycastDocument` / `ScenePointer` hit tests across procedural, payload, `d3:procMesh`, skinned, billboard, and `d3:instances` draws. Live-verified on iOS sim + A142 Vulkan/GL (`docs/artifacts/e2-cameras-picking/`). | M | done |
 | E3 ✅ | **W17 sky / environment** (done) | Native Preetham Rayleigh/Mie `physical` sky equirect generator (1k in 91.5 ms VK / 129.2 ms GL on A142), `skyEnvironment` relighting + `sunLight` directional light, and rate-limited 3-step progressive IBL prefiltering (`max=22.3 ms` <= 33 ms during 60-step sun sweep on A142; step 1→2→3 MAE `1.03% → 0.31% → 0.05%`; `docs/artifacts/e3-w17-sky/`). | M–L | done |
-| E4 | **W19 character controller** | Upstream `CharacterController` codec (D4); Android `CharacterVirtual` + `CustomCharacterContactListener` in Kotlin with pinned Jolt JNI 6.0.0 landing-width and reference-lifetime extensions; iOS sweep-and-slide. | L | — |
-| E5 | **U2 geometry + shadow breadth** (new) | Wedge/Ring/Extrude; spot-light shadows (point shadows are the 0.24 delta, V3); shadow-catcher bake mode. | M | — |
-| E5b | **U3 rendering extras** (new) | Selection outline, iOS tone-mapper selection, sprites + texture atlas. | M | E2 |
-| E5c | **U4 animation property resolver** (new) | Animate non-transform properties (material, light, camera params). | M | — |
+| E4 ✅ | **W19 character controller** | Upstream `CharacterController` codec (D4); Android `CharacterVirtual` + `CustomCharacterContactListener` in Kotlin with pinned Jolt JNI 6.0.0 landing-width and reference-lifetime extensions; iOS sweep-and-slide. | L | done |
+| E5 🚧 | **U2 geometry + shadow breadth** (new) | Wedge/Ring/Extrude; spot-light shadows (point shadows are the 0.24 delta, V3); shadow-catcher bake mode. Implemented both natives in PR #65 (draft); T4 approved 2026-10-27; only Fire/Wacom T2 outstanding (`docs/artifacts/e5-u2-geometry-shadows/`). | M | PR #65 |
+| E5b 🚧 | **U3 rendering extras** (new) | Selection outline, iOS tone-mapper selection, sprites + texture atlas. Slices implemented uncommitted on the E5 head (see *Where we are*): tone fixture, `TextureAtlas`, sprite material and highlight state accepted bounded; iOS outline rendering blocked on the first-target failure; Android rendering `NOT_RUN`. | M | E2 ✅, E5 packaging |
+| E5c 🚧 | **U4 animation property resolver** (new) | Animate non-transform properties (material, light, camera params). Implemented uncommitted on the E5 head: Dart contract + iOS slices + Android source/JVM accepted bounded; Android live proof `NOT_RUN`. | M | E5 packaging |
 | E6 | **W28 shader contract** | Prototype first. Scope after S1: one translator (Filament only) or two (Filament + SceneKit modifiers). | XL | S1 |
 | E7 | **W27 decals** | `d3:decal` modeled on upstream 0.24 `DecalNode` (D4); rides W28. | L | E6 |
 | E8 | **W20 environment volumes** | Filament: one IndirectLight per scene → camera-in-volume switching is the ceiling; accept `SCNFloor` mirror on iOS if S1 = no-go. | XL | E3, E6 |
-| E9 | **W34 debug views + dev reload** | iOS sim first (Dart `dart:io` watch + `dn run` reload); Android via host watcher + `adb reverse` push (release-only engine). Shader hot reload lives in W28, not here. | M–L | — |
+| E9 🚧 | **W34 debug views + dev reload** | Reload: host watcher + loopback delivery (direct in-app iOS file-watch rejected by probe, 2026-10-27); Android via host watcher + `adb reverse` push (release-only engine). Debug channels cover mesh/material draws; native particles are unsupported, as approved by the operator on 2026-10-27. iOS slices implemented uncommitted on the E5 head; Android halves open. Shader hot reload lives in W28, not here. | M–L | E5 packaging |
 | E10 | **W33a external textures / W33b semantics** | Android: ACQUIRED `Stream` (NATIVE is deprecated); iOS: AVPlayer as material contents. W33c blocked (D6). | M + M | — |
 | E11 | **W32 audio → `dart3d_audio`** | D5. iOS SCNAudio/AVAudioEngine; Android Oboe. | L | — |
 | E12 | **W31 splats** | Needs E1. CPU sort + index re-upload on Android unless a C++ path is accepted. Target count set by a measurement, not assumed. | XL | E1 |
 
-### Track P — product (parallel with E if O1 = lift)
+### Track P — product (paused until the engine is done; O1 resolved 2026-10-28)
 
 Demo plan and upstream mapping: `docs/design/demo-program.md` (operator
 decisions in §8). Principle: today's harness lanes and dice table are
@@ -430,8 +486,9 @@ scaffolding, not the demo.
 - [ ] P2 **Standalone dice-roller app** — dice rolling only, mobile only,
       built on dart3d, operator's portfolio (possibly published free or
       paid). Separate project. Carries the **11 themed sets + environments**
-      from look-dev (`docs/design/dice-lookdev.md`, branch
-      `p3-dice-lookdev`) and a **cinematic intro**: start in a side camera
+      from look-dev (full document on the sidelined branch
+      `p3-game-rooms-wip`; `main`'s `docs/design/dice-lookdev.md` was
+      trimmed to the DartNative set, 2026-10-28) and a **cinematic intro**: start in a side camera
       view exploring the themed environment, fly to the table, then roll
       top-down. Starts after the example's dice experience reaches DR3.
       **Game rooms (look-dev, Blender only)** on `p3-game-rooms-wip`:
@@ -459,8 +516,8 @@ scaffolding, not the demo.
       crystal-shard d4 (procedural, look-dev geometry), screen-fitted
       walls + ceiling in the frustum planes (safe areas, rotation),
       top-down 35° camera at 15% d20, labeled Reset, upstream physics
-      numbers; A142 evidence `docs/artifacts/p3-dr1/`; iOS device check
-      pending.
+      numbers; A142 evidence `docs/artifacts/p3-dr1/`; iOS simulator
+      check paid 2026-10-05 (see *Verification debt*).
       **DR2 (the throw)** — merged #38: d4 numerals read along
       the crystal and the d4 turns upright after settling; cocked-die
       detection (per-die tolerance, catches d20 edge-rests) + physical
@@ -470,7 +527,8 @@ scaffolding, not the demo.
       spin, per-die spin retune; long-press pick-up to a hover plane +
       fling toss; sweep from a die. Input is `GestureDetector` on the
       scene view (`Listener` hides/doesn't reach it on Android). A142
-      evidence `docs/artifacts/p3-dr2/`; iOS device check pending.
+      evidence `docs/artifacts/p3-dr2/`; iOS simulator check paid
+      2026-10-05 (see *Verification debt*).
       **DartNative set** — merged #39: the example's dice
       are the look-dev DartNative set, built procedurally in Dart
       (`dice_polyhedra.dart` geometry + numbering, `dice_numerals.dart`
@@ -487,29 +545,31 @@ scaffolding, not the demo.
       numerals) — fixed natively (explicit `CullingMode.BACK`). Two
       point lights hung the A142's GPU (Vulkan, 60 s frames) — not
       used. A142 evidence `docs/artifacts/p3-dartnative-set/`; iOS
-      device check pending.
+      simulator check paid 2026-10-05 (see *Verification debt*).
       Operator tweaks after #39: no dark band behind the numerals (#40);
       every numeral fits inside its face's inlay, one size for one-digit
       and one for two-digit numerals per die (#41); no dot by the 9, the
       6 keeps its dot (#42).
-      **Next: DR3** — notation + count-up + audio. Open with the
+      **Next when P3 unpauses: DR3** — notation + count-up + audio. Open with the
       operator: the indigo table may still read as black; the toss needs
       a real-finger check.
 - [ ] P4 Hero launch scene + 3D DartNative logo. Logo landed (#26).
       Hero (M0) landed on `p4-hero-scene` (#31; spec
       `docs/design/hero-scene-brief.md`; `lib/hero_screen.dart`,
       `hero_scene.dart`, `hero_motion.dart`; evidence
-      `docs/artifacts/p4-hero/`). Interim orbit is Dart-driven (one
-      pivot transform per frame) until E2's orbit controller lands.
+      `docs/artifacts/p4-hero/`). Its orbit is still Dart-driven (one
+      pivot transform per frame); swapping in E2's orbit controller
+      (landed #60) is unplanned cleanup, not a gate.
       The per-platform `DnLogoStage.heroIos`/`heroAndroid` stopgap is
       gone (#57): one `DnLogoStage.hero`.
-- [ ] P5 Demo program M2–M18 (demo-program §4 + §8): showroom, physics
+- [ ] P5 Demo program M2–M15 (demo-program §4): showroom, physics
       playground, road trip, campfire, explosions, material gallery, …;
-      engine-gated demos follow their units. New flagships: **M16 pirate
-      ship on water** (E6) and **M17 Frankfurt street-corner diorama with a
-      streetcar** (OSM footprints + Blender + Kenney; never commit the
-      private address), and **M18 steampunk feudal-Japan
-      diorama** (inspired by Owlcat's trailer; original art only).
+      engine-gated demos follow their units. The no-upstream-counterpart
+      ideas (M16 pirate ship, M17 Frankfurt street-corner, M18 steampunk
+      feudal-Japan dioramas) are **backlog, not plan commitments**
+      (resolved 2026-10-28, parity-first): they stay recorded in
+      demo-program §8 and are reconsidered only after the engine is
+      done.
 - [ ] P6 License-clean replacements for Dash and fcar before any public
       demo build (Kenney CC0 / Khronos samples / own Blender models).
 - [ ] P7 Full UI design pass with Claude Design — at the END of the demo
@@ -523,9 +583,17 @@ below; each item carries its upstream PR/commit, size, the dart3d files
 it touches, its Track E dependency, and whether it is in the release
 candidate (**RC✓**) or only on master (**master-only**).
 
+**Update (2026-10-28): the tags shipped.** `scene-0.4.0` and
+`flutter_scene-0.24.0` were released 2026-10-05; latest patches are
+`scene-0.4.1` (2026-10-05) and `flutter_scene-0.24.3` (2026-10-09),
+and pub.dev serves 0.4.1 / 0.24.3. V0 is therefore re-opened below:
+diff the published tags against the `b473543a` preview and amend
+V1–V8. The 2026-09-30 findings that follow describe the pre-release
+state they were measured in.
+
 **V0 findings (2026-09-30):** checked with `gh api repos/bdero/flutter_scene/{tags,releases,branches}` and the pub.dev API.
 
-- **0.24.0 / 0.4.0 are not published.** Newest tags and releases:
+- **0.24.0 / 0.4.0 are not published** (as of 2026-09-30). Newest tags and releases:
   `flutter_scene-0.23.0` and `scene-0.3.0`, both at
   `0dc6ee8062a4aaaffb2d1f91e3aeb3005d5b54e4` (released 2026-08-25).
   pub.dev latest is `flutter_scene 0.23.0` and `scene 0.3.0`.
@@ -559,8 +627,8 @@ candidate (**RC✓**) or only on master (**master-only**).
   `Scene.debug`, `Node.renderOrder` and `shadowCasterChannelMask` on spot
   and point lights. None of them has a codec on master, so the D4 rule
   (`d3:` extension modeled on the runtime API) applies to each one dart3d realizes.
-- **Next step:** when the tags ship, diff `flutter_scene-0.24.0` against
-  `b473543a` and amend this list. V0 stays open until then.
+- **Next step (due since 2026-10-05):** diff `flutter_scene-0.24.0`
+  against `b473543a` and amend this list. V0 stays open until then.
 
 Sizes: S ≤ 1 day, M ≤ 1 week, L ≤ 3 weeks, XL > 3 weeks.
 "Natives" = `dart3d/ios/Classes/FsceneRealizer.swift` +
@@ -583,7 +651,10 @@ unless the row names other files.
 
 **Items:**
 
-- [x] **V0 Re-diff** (this section). Re-open to re-diff when the tags ship.
+- [ ] **V0 Re-diff** (this section). First pass done 2026-09-30 against
+      the `b473543a` preview; **re-opened 2026-10-28** because the
+      0.24.0/0.4.0 tags shipped 2026-10-05 — diff them (and the
+      0.24.3/0.4.1 patches) against the preview and amend V1–V8.
 - [ ] **V1 Wire additions** (scene 0.4 + codec keys; Dart mirror + both natives)
 
   | # | Upstream delta | PR / commit | Size | dart3d files | Depends | RC |

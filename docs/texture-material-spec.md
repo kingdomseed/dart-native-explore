@@ -1,5 +1,11 @@
 # Texture and material payload spec (W4)
 
+Status (2026-10-28): landed (W4), extended since — KTX2 decodes in
+W21/W22 (iOS non-supercompressed only) and uv1 is carried; the
+"deferred"/"channel 0 only" notes and the Filament 1.71.6 support
+matrix below describe the W4 head. Current support is in
+`verification-matrix.md`.
+
 How `dart3d` realizes `TextureResource` chunks and material texture
 slots on SceneKit (iOS) and Filament (Android), tracking
 `scene-0.3.0`/`flutter_scene-0.23.0` wire vocabulary. Extends the

@@ -1,0 +1,22 @@
+Launching lib/main.dart on A142 in release mode...
+Running Gradle task 'assembleRelease'...                        
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/private/tmp/dart3d-e5-geometry-20261026/gradle-home/wrapper/dists/gradle-9.3.1-all/9ot9r568e8zfvvd4mn8rbu1j0/gradle-9.3.1/lib/native-platform-0.22-milestone-29.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+Running Gradle task 'assembleRelease'...                            6.8s
+✓ Built build/app/outputs/dn-apk/app-release.apk (110.9MB)
+Installing build/app/outputs/dn-apk/app-release.apk...              3.4s
+
+DartNative run key commands.
+h List all available interactive commands.
+c Clear the screen
+q Quit (terminate the application on the device).
+
+dartnative: dart3d: showcase — u2-catcher-nearfar-directional: Capture probe: near/far clip · directional light
+dartnative: dart3d: showcase — u2-catcher-nearfar-spot: Capture probe: near/far clip · spot light
+dartnative: dart3d: showcase — u2-catcher-layer-directional: Capture probe: layer filter · directional light
+dartnative: dart3d: showcase — u2-catcher-layer-spot: Capture probe: layer filter · spot light
+
+Application finished.

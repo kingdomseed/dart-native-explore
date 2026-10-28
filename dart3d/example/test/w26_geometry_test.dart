@@ -34,6 +34,23 @@ int uniquePositions(D3MeshData m) => {
     ].join(','),
 }.length;
 
+Vector3 normal(D3MeshData m, int i) =>
+    Vector3(m.normals[i * 3], m.normals[i * 3 + 1], m.normals[i * 3 + 2]);
+
+void expectWindingMatchesNormals(D3MeshData mesh) {
+  for (var t = 0; t < mesh.triangleCount; t++) {
+    final a = vertex(mesh, mesh.indices[t * 3]);
+    final b = vertex(mesh, mesh.indices[t * 3 + 1]);
+    final c = vertex(mesh, mesh.indices[t * 3 + 2]);
+    final geometric = (b - a).cross(c - a);
+    final average =
+        normal(mesh, mesh.indices[t * 3]) +
+        normal(mesh, mesh.indices[t * 3 + 1]) +
+        normal(mesh, mesh.indices[t * 3 + 2]);
+    expect(geometric.dot(average), greaterThan(0), reason: 'triangle $t');
+  }
+}
+
 void main() {
   group('icosphere (real subdivided icosahedron)', () {
     test('subdivision 0 is the base icosahedron', () {
@@ -75,6 +92,197 @@ void main() {
   });
 
   group('primitive generators', () {
+    test('wedge has the upstream ramp slope and ground base', () {
+      final proc = D3WedgeProc(size: Vector3(2, 3, 4));
+      final mesh = proc.build();
+
+      expect(mesh.vertexCount, 18);
+      expect(mesh.triangleCount, 8);
+      expect(vertex(mesh, 0).distanceTo(Vector3(-1, 0, -2)), closeTo(0, 1e-6));
+      expect(vertex(mesh, 2).distanceTo(Vector3(1, 3, 2)), closeTo(0, 1e-6));
+      for (var i = 0; i < 4; i++) {
+        expect(
+          normal(mesh, i).distanceTo(Vector3(0, 0.8, -0.6)),
+          closeTo(0, 1e-6),
+        );
+      }
+      for (var i = 4; i < 8; i++) {
+        expect(vertex(mesh, i).y, 0);
+        expect(
+          normal(mesh, i).distanceTo(Vector3(0, -1, 0)),
+          closeTo(0, 1e-6),
+        );
+      }
+      expect(mesh.bounds.min.x, -1);
+      expect(mesh.bounds.max.x, 1);
+      expect(mesh.bounds.min.y, 0);
+      expect(mesh.bounds.max.y, 3);
+      expect(mesh.bounds.min.z, -2);
+      expect(mesh.bounds.max.z, 2);
+      expectWindingMatchesNormals(mesh);
+    });
+
+    test('ring keeps an open center and faces +Y', () {
+      const segments = 8;
+      const innerRadius = 0.25;
+      const outerRadius = 0.5;
+      final mesh = D3RingProc(
+        innerRadius: innerRadius,
+        outerRadius: outerRadius,
+        segments: segments,
+      ).build();
+
+      expect(mesh.vertexCount, 2 * (segments + 1));
+      expect(mesh.triangleCount, 2 * segments);
+      for (var i = 0; i <= segments; i++) {
+        final outer = vertex(mesh, i);
+        final inner = vertex(mesh, segments + 1 + i);
+        expect(
+          math.sqrt(outer.x * outer.x + outer.z * outer.z),
+          closeTo(outerRadius, 1e-6),
+        );
+        expect(
+          math.sqrt(inner.x * inner.x + inner.z * inner.z),
+          closeTo(innerRadius, 1e-6),
+        );
+      }
+      for (var i = 0; i < mesh.vertexCount; i++) {
+        expect(
+          normal(mesh, i).distanceTo(Vector3(0, 1, 0)),
+          closeTo(0, 1e-6),
+        );
+      }
+      expect(mesh.bounds.min.x, -outerRadius);
+      expect(mesh.bounds.max.x, outerRadius);
+      expect(mesh.bounds.min.y, 0);
+      expect(mesh.bounds.max.y, 0);
+      expect(mesh.bounds.min.z, -outerRadius);
+      expect(mesh.bounds.max.z, outerRadius);
+      expectWindingMatchesNormals(mesh);
+    });
+
+    test('extrude follows a bent path with convex caps and arc-length UVs', () {
+      const stations = 9;
+      final profile = [
+        Vector2(-0.1, -0.1),
+        Vector2(0.1, -0.1),
+        Vector2(0.1, 0.1),
+        Vector2(-0.1, 0.1),
+      ];
+      final proc = D3ExtrudeProc(
+        points: [
+          Vector3(0, 0, 0),
+          Vector3(1, 1, 0),
+          Vector3(2, 1, 1),
+          Vector3(3, 0, 1),
+        ],
+        profile: profile,
+        stations: stations,
+      );
+      final mesh = proc.build();
+      const ringSize = 5;
+
+      expect(mesh.vertexCount, stations * ringSize + 2 * ringSize);
+      expect(mesh.triangleCount, (stations - 1) * 4 * 2 + 2 * 4);
+      expect(mesh.positions.every((value) => value.isFinite), isTrue);
+      for (var i = 0; i < mesh.vertexCount; i++) {
+        expect(normal(mesh, i).length, closeTo(1, 1e-5), reason: 'normal $i');
+      }
+      expect(mesh.uvs[0], 0);
+      expect(mesh.uvs[(ringSize - 1) * 2], 1);
+      final lastSideVertex = (stations - 1) * ringSize;
+      expect(
+        mesh.uvs[lastSideVertex * 2 + 1],
+        closeTo(proc.path.length, 1e-5),
+      );
+      expect(proc.bounds.max.y, greaterThan(1.1));
+      for (var i = 0; i < mesh.vertexCount; i++) {
+        final p = vertex(mesh, i);
+        expect(
+          p.x,
+          inInclusiveRange(proc.bounds.min.x - 1e-5, proc.bounds.max.x + 1e-5),
+        );
+        expect(
+          p.y,
+          inInclusiveRange(proc.bounds.min.y - 1e-5, proc.bounds.max.y + 1e-5),
+        );
+        expect(
+          p.z,
+          inInclusiveRange(proc.bounds.min.z - 1e-5, proc.bounds.max.z + 1e-5),
+        );
+      }
+      expectWindingMatchesNormals(mesh);
+    });
+
+    test('extrude keeps outward normals and caps for either convex winding', () {
+      const rootFiveX = 0.4472135954999579;
+      const rootFiveY = 0.8944271909999159;
+      final profiles = [
+        (
+          points: [
+            Vector2(0, 0),
+            Vector2(1, 0),
+            Vector2(1, 2),
+            Vector2(0, 2),
+          ],
+          outwardAtOne: Vector3(-rootFiveX, -rootFiveY, 0),
+        ),
+        (
+          points: [
+            Vector2(0, 0),
+            Vector2(0, 2),
+            Vector2(1, 2),
+            Vector2(1, 0),
+          ],
+          outwardAtOne: Vector3(rootFiveX, rootFiveY, 0),
+        ),
+      ];
+
+      for (final profileCase in profiles) {
+        final mesh = D3ExtrudeProc(
+          points: [Vector3(0, 0, -1), Vector3(0, 0, 1)],
+          profile: profileCase.points,
+          stations: 2,
+        ).build();
+        const sideVertexCount = 2 * 5;
+        const capTriangleCount = 4;
+
+        expectWindingMatchesNormals(mesh);
+        expect(
+          normal(mesh, 1).distanceTo(profileCase.outwardAtOne),
+          closeTo(0, 1e-6),
+        );
+        expect(normal(mesh, sideVertexCount).z, closeTo(-1, 1e-6));
+        expect(normal(mesh, sideVertexCount + 5).z, closeTo(1, 1e-6));
+        for (var i = 0; i < profileCase.points.length; i++) {
+          final uv = (sideVertexCount + 1 + i) * 2;
+          expect(mesh.uvs[uv], closeTo(profileCase.points[i].x, 1e-6));
+          expect(mesh.uvs[uv + 1], closeTo(profileCase.points[i].y, 1e-6));
+        }
+        for (var i = 0; i < capTriangleCount; i++) {
+          final startTriangle = 8 + i;
+          final startA = vertex(mesh, mesh.indices[startTriangle * 3]);
+          final startB = vertex(mesh, mesh.indices[startTriangle * 3 + 1]);
+          final startC = vertex(mesh, mesh.indices[startTriangle * 3 + 2]);
+          expect(
+            (startB - startA).cross(startC - startA).z,
+            lessThan(0),
+            reason: 'start cap triangle $startTriangle faces -Z',
+          );
+
+          final endTriangle = 12 + i;
+          final endA = vertex(mesh, mesh.indices[endTriangle * 3]);
+          final endB = vertex(mesh, mesh.indices[endTriangle * 3 + 1]);
+          final endC = vertex(mesh, mesh.indices[endTriangle * 3 + 2]);
+          expect(
+            (endB - endA).cross(endC - endA).z,
+            greaterThan(0),
+            reason: 'end cap triangle $endTriangle faces +Z',
+          );
+        }
+      }
+    });
+
     test('cylinder emits side grid plus both caps', () {
       // (1+1) rings × 9 cols = 18 side verts; each cap = 1 + 9.
       final m = buildCylinder(
@@ -558,15 +766,53 @@ void main() {
         },
       });
     });
+
+    test('new primitive specs flow through procMesh and inline instances', () {
+      final procs = <D3Proc>[
+        D3WedgeProc(size: Vector3(2, 3, 4)),
+        D3RingProc(innerRadius: 0.2, outerRadius: 0.7, segments: 12),
+        D3ExtrudeProc(
+          points: [Vector3(0, 0, 0), Vector3(1, 0, 0)],
+          profile: [Vector2(-1, -1), Vector2(1, -1), Vector2(0, 1)],
+          stations: 8,
+          caps: false,
+        ),
+      ];
+      final doc = SceneDocument();
+      for (var i = 0; i < procs.length; i++) {
+        final proc = procs[i];
+        final node = doc.addNode(
+          NodeSpec(
+            id: LocalId(12, i + 1),
+            components: [
+              d3ProcMeshComponent(proc),
+              D3InstancesSpec(
+                proc: proc,
+                transforms: D3InstanceTransforms.inline([Matrix4.identity()]),
+              ).toComponent(),
+            ],
+          ),
+          root: true,
+        );
+        final components =
+            encodeNodeCommandSpec(node, doc)['components']! as List;
+        final procProps = (components[0] as Map)['properties'] as Map;
+        final instanceProps = (components[1] as Map)['properties'] as Map;
+        expect(procProps['shape'], {'s': proc.shape});
+        expect(instanceProps['shape'], {'s': proc.shape});
+      }
+    });
   });
 
   group('bounds', () {
     test('every vocabulary shape resolves local bounds', () {
       final shapes = <D3Proc>[
         D3CuboidProc(extents: Vector3(2, 2, 2)),
+        D3WedgeProc(size: Vector3(2, 1, 3)),
         D3PlaneProc(width: 4, depth: 4),
         D3SphereProc(radius: 1),
         D3TorusProc(radius: 1, tubeRadius: 0.2),
+        D3RingProc(),
         D3IcosphereProc(radius: 1),
         D3CylinderProc(height: 2),
         D3ConeProc(height: 2),
@@ -574,6 +820,10 @@ void main() {
         D3DiscProc(radius: 1),
         D3TubeProc(points: [Vector3(0, 0, 0), Vector3(2, 0, 0)]),
         D3RibbonProc(points: [Vector3(0, 0, 0), Vector3(2, 0, 0)]),
+        D3ExtrudeProc(
+          points: [Vector3(0, 0, 0), Vector3(2, 0, 0)],
+          profile: [Vector2(-0.1, -0.1), Vector2(0.1, -0.1), Vector2(0, 0.1)],
+        ),
         D3PolylineProc(points: [Vector3(0, 0, 0), Vector3(2, 0, 0)]),
         D3LineSegmentsProc(points: [Vector3(0, 0, 0), Vector3(2, 0, 0)]),
         D3BillboardProc(),

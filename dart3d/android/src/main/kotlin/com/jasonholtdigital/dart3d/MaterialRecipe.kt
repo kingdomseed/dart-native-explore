@@ -41,6 +41,8 @@ internal class MaterialRecipe {
         step("culling $v") { it.culling(v) }
     fun doubleSided(v: Boolean) =
         step("doubleSided $v") { it.doubleSided(v) }
+    fun customSurfaceShading(v: Boolean) =
+        step("customSurfaceShading $v") { it.customSurfaceShading(v) }
     fun instanced(v: Boolean) =
         step("instanced $v") { Dart3dJni.nativeMaterialBuilderInstanced(it, v) }
     fun depthWrite(v: Boolean) = step("depthWrite $v") { it.depthWrite(v) }

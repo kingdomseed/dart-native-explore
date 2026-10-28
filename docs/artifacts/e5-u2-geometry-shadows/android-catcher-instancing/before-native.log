@@ -1,0 +1,56 @@
+--------- beginning of main
+10-26 23:12:59.551 16994 16994 I dart3d  : start +102ms plugin registered
+10-26 23:12:59.551 16994 16994 I dart3d  : dart3d provider registered (disposeView=true)
+10-26 23:12:59.572 16994 16994 I dart3d  : GPU: Mali-G610 MC4
+10-26 23:12:59.678 16994 16994 I dart3d  : Dart3dSetDispatcher: slot armed
+10-26 23:12:59.678 16994 16994 I dart3d  : Dart3dSetBackend: 1
+10-26 23:12:59.705 16994 16994 I Filament: FEngine (64 bits) created at 0xb400007309289210 (threading is enabled)
+10-26 23:12:59.706 16994 17054 I Filament: FEngine resolved backend: OpenGL
+10-26 23:12:59.726 16994 17054 I Filament: [ARM], [Mali-G610 MC4], [OpenGL ES 3.2 v1.r38p1], [OpenGL ES GLSL ES 3.20]
+10-26 23:12:59.727 16994 17054 I Filament: Feature level: 2
+10-26 23:12:59.727 16994 17054 I Filament: Active workarounds: 
+10-26 23:12:59.727 16994 17054 I Filament: vao_doesnt_store_element_array_buffer_binding
+10-26 23:12:59.727 16994 17054 I Filament: dont_use_timer_query
+10-26 23:12:59.727 16994 17054 I Filament: allow_read_only_ancillary_feedback_loop
+10-26 23:12:59.727 16994 17054 I Filament: disable_framebuffer_fetch_extension
+10-26 23:12:59.727 16994 17054 I Filament: disable_es2_srgb_ext
+10-26 23:12:59.732 16994 16994 I Filament: Backend feature level: 2
+10-26 23:12:59.732 16994 16994 I Filament: FEngine feature level: 1
+10-26 23:12:59.737 16994 16994 I dart3d  : Filament engine backend: OPENGL (pref=1, tier=STANDARD)
+10-26 23:12:59.737 16994 16994 I dart3d  : start +288ms engine created
+10-26 23:12:59.757 16994 16994 I dart3d  : start +308ms base materials loaded
+10-26 23:12:59.847 16994 16994 I dart3d  : perf view: backend=OPENGL viewport=0x0 msaa=0 aa=FXAA post=true hdr=HIGH bloom=false(levels=6 res=384 q=LOW) ssao=false taa=false ssr=false dsr=false(0.5..1.0) dither=TEMPORAL quality=default physics=60Hzx8 entities=0 bodies=0
+10-26 23:12:59.847 16994 16994 I dart3d  : protocol hello: Dart v1.0
+10-26 23:12:59.848 16994 16994 I dart3d  : antialiasingMode=4 → MSAA enabled=true sampleCount=4 aa=FXAA
+10-26 23:12:59.848 16994 16994 I dart3d  : quality=default → shadows=true aaSrc=4 tier=STANDARD shadowType=DPCF
+10-26 23:12:59.850 16994 16994 W dart3d  : shadowCatcher 'softness' unsupported on Filament's shadowMultiplier path; ignored
+10-26 23:12:59.850 16994 16994 W dart3d  : shadowCatcher 'mode' unsupported on Filament's shadowMultiplier path; ignored
+10-26 23:12:59.856 16994 16994 D AndroidRuntime: Shutting down VM
+--------- beginning of crash
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: FATAL EXCEPTION: main
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: Process: com.jasonholtdigital.dart3d_example, PID: 16994
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: java.lang.IllegalArgumentException: Precondition
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: in getFieldInfo:169
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: reason: uniform named "useInstanceColors" not found
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: 	at com.google.android.filament.MaterialInstance.nSetParameter(Native Method)
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: 	at com.google.android.filament.MaterialInstance.f(SourceFile:4)
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: 	at n1.q0.q(SourceFile:2848)
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: 	at n1.q0.n(SourceFile:1652)
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: 	at n1.q0.u(SourceFile:200)
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: 	at n1.D0.j(SourceFile:1159)
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: 	at n1.V.a(SourceFile:1509)
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: 	at n1.x.invoke(SourceFile:8)
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: 	at n1.S.doFrame(SourceFile:3738)
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: 	at android.view.Choreographer$CallbackRecord.run(Choreographer.java:1870)
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: 	at android.view.Choreographer$CallbackRecord.run(Choreographer.java:1881)
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: 	at android.view.Choreographer.doCallbacks(Choreographer.java:1427)
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: 	at android.view.Choreographer.doFrame(Choreographer.java:1305)
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: 	at android.view.Choreographer$FrameDisplayEventReceiver.run(Choreographer.java:1848)
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:995)
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:103)
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: 	at android.os.Looper.loopOnce(Looper.java:283)
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:392)
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: 	at android.app.ActivityThread.main(ActivityThread.java:9231)
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:633)
+10-26 23:12:59.857 16994 16994 E AndroidRuntime: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1026)

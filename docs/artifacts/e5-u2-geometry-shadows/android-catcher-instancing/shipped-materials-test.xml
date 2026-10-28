@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.jasonholtdigital.dart3d.ShippedMaterialsTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-26T22:15:21.951Z" hostname="Jasons-Mac-mini" time="0.006">
+  <properties/>
+  <testcase name="the shipped index names each package's key" classname="com.jasonholtdigital.dart3d.ShippedMaterialsTest" time="0.002"/>
+  <testcase name="the plugin ships every fixed package for the pinned Filament" classname="com.jasonholtdigital.dart3d.ShippedMaterialsTest" time="0.002"/>
+  <testcase name="the plugin ships nothing but the fixed set" classname="com.jasonholtdigital.dart3d.ShippedMaterialsTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

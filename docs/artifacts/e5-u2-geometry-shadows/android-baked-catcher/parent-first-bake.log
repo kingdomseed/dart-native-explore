@@ -1,0 +1,10 @@
+compiling the fixed set on 00064149A002033 (about a minute) ...
+10-27 01:10:39.815 24080 24080 I dart3d  : bake: exporting material packages to /storage/emulated/0/Android/data/com.jasonholtdigital.dart3d_example/files/dart3d-materials
+10-27 01:10:45.843 24080 24080 I dart3d  : bake: variants compiling (1 in flight)
+10-27 01:10:50.903 24080 24209 I dart3d  : bake: variants idle
+10-27 01:11:03.089 24080 24101 I dart3d  : bake: fixed set exported (26 packages)
+/sdcard/Android/data/com.jasonholtdigital.dart3d_example/files/dart3d-materials/: 29 files pulled, 0 skipped. 16.5 MB/s (2037073 bytes in 0.118s)
+plugin: 26 packages in /Users/jasonholt/.t3/worktrees/dart-native-explore/codex-e2-resume-20261022/dart3d/android/src/main/assets/dart3d/materials
+app variants compiled but not collected (no --app-assets):
+  395cf469d0449723ce4adfcaa98ceb83 lit|false|OPAQUE|e1|s17|VULKAN
+  efd40643152d33c30c7ca807950c63dc lit|false|OPAQUE|e1|s17|OPENGL

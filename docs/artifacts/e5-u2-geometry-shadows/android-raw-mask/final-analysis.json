@@ -1,0 +1,210 @@
+{
+  "cases": {
+    "raw-mask-directional-opengl": {
+      "bytes": 262144,
+      "channel_ranges": [
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          255
+        ],
+        [
+          255,
+          255
+        ]
+      ],
+      "max_rgb_difference": 0,
+      "zero_mask_pixels": 59281,
+      "full_mask_pixels": 6062,
+      "uncovered_rim_R_range": [
+        0,
+        0
+      ],
+      "uncovered_rim_A_range": [
+        255,
+        255
+      ],
+      "receiver_interior_A_range": [
+        255,
+        255
+      ],
+      "threshold128_bbox": [
+        69,
+        75,
+        165,
+        146
+      ]
+    },
+    "raw-mask-directional-vulkan": {
+      "bytes": 262144,
+      "channel_ranges": [
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          255
+        ],
+        [
+          255,
+          255
+        ]
+      ],
+      "max_rgb_difference": 0,
+      "zero_mask_pixels": 59281,
+      "full_mask_pixels": 6062,
+      "uncovered_rim_R_range": [
+        0,
+        0
+      ],
+      "uncovered_rim_A_range": [
+        255,
+        255
+      ],
+      "receiver_interior_A_range": [
+        255,
+        255
+      ],
+      "threshold128_bbox": [
+        69,
+        75,
+        165,
+        146
+      ]
+    },
+    "raw-mask-spot-opengl": {
+      "bytes": 262144,
+      "channel_ranges": [
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          255
+        ],
+        [
+          255,
+          255
+        ]
+      ],
+      "max_rgb_difference": 0,
+      "zero_mask_pixels": 53217,
+      "full_mask_pixels": 11038,
+      "uncovered_rim_R_range": [
+        0,
+        0
+      ],
+      "uncovered_rim_A_range": [
+        255,
+        255
+      ],
+      "receiver_interior_A_range": [
+        255,
+        255
+      ],
+      "threshold128_bbox": [
+        116,
+        101,
+        244,
+        211
+      ]
+    },
+    "raw-mask-spot-vulkan": {
+      "bytes": 262144,
+      "channel_ranges": [
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          255
+        ],
+        [
+          255,
+          255
+        ]
+      ],
+      "max_rgb_difference": 0,
+      "zero_mask_pixels": 53229,
+      "full_mask_pixels": 11007,
+      "uncovered_rim_R_range": [
+        0,
+        0
+      ],
+      "uncovered_rim_A_range": [
+        255,
+        255
+      ],
+      "receiver_interior_A_range": [
+        255,
+        255
+      ],
+      "threshold128_bbox": [
+        116,
+        101,
+        244,
+        211
+      ]
+    }
+  },
+  "backend_comparison": {
+    "directional": {
+      "same": {
+        "mean_abs_byte_delta": 0.0140838623046875,
+        "threshold128_intersection_over_union": 1.0
+      },
+      "flipY": {
+        "mean_abs_byte_delta": 25.915542602539062,
+        "threshold128_intersection_over_union": 0.3007154882154882
+      },
+      "flipX": {
+        "mean_abs_byte_delta": 12.936447143554688,
+        "threshold128_intersection_over_union": 0.5767857142857142
+      },
+      "flipXY": {
+        "mean_abs_byte_delta": 27.095291137695312,
+        "threshold128_intersection_over_union": 0.28024026512013256
+      }
+    },
+    "spot": {
+      "same": {
+        "mean_abs_byte_delta": 0.199737548828125,
+        "threshold128_intersection_over_union": 0.9958126815928902
+      },
+      "flipY": {
+        "mean_abs_byte_delta": 54.619293212890625,
+        "threshold128_intersection_over_union": 0.2487301502432765
+      },
+      "flipX": {
+        "mean_abs_byte_delta": 79.56268310546875,
+        "threshold128_intersection_over_union": 0.06590297111040117
+      },
+      "flipXY": {
+        "mean_abs_byte_delta": 80.69012451171875,
+        "threshold128_intersection_over_union": 0.05865554598612937
+      }
+    }
+  }
+}
