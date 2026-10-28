@@ -441,6 +441,12 @@ void main() {
       expect(m.bounds.max.x, closeTo(1.0, 1e-6));
       expect(m.bounds.max.y, closeTo(0.5, 1e-6));
     });
+
+    test('billboard UV origin is its top-left corner', () {
+      final mesh = D3BillboardProc(size: Vector2(2, 2)).build();
+      expect(mesh.positions, [-1, -1, 0, 1, -1, 0, -1, 1, 0, 1, 1, 0]);
+      expect(mesh.uvs, [0, 1, 1, 1, 0, 0, 1, 0]);
+    });
   });
 
   group('polyline expansion', () {

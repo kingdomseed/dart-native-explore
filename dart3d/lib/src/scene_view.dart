@@ -32,6 +32,35 @@ const String kSceneViewTypeKey = 'com.jasonholtdigital.dart3d/sceneView';
 /// the backend preference (`Dart3dSetBackend`) changes that.
 enum SceneQuality { low, medium, high }
 
+/// A resolved material input shown on the screen, independently of lighting.
+enum SceneDebugChannel { none, normals, metallic, roughness, baseColor, depth }
+
+/// Screen-only inspection. Authored render textures and documents stay unchanged.
+///
+/// Normals are mapped view-space normals. Depth is positive axial eye distance
+/// displayed as `d / (1 + d)`. Channels use identity linear output and one sRGB
+/// transfer. Native iOS particles are excluded while a channel is selected.
+/// This initial implementation covers iOS PBR meshes; other families and Android
+/// remain outside its verified coverage. Wireframe overlays triangle edges on fill.
+final class SceneDebugView {
+  final SceneDebugChannel channel;
+  final bool wireframe;
+
+  const SceneDebugView({
+    this.channel = SceneDebugChannel.none,
+    this.wireframe = false,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      other is SceneDebugView &&
+      channel == other.channel &&
+      wireframe == other.wireframe;
+
+  @override
+  int get hashCode => Object.hash(channel, wireframe);
+}
+
 /// A 3D scene rendered by the platform's native 3D stack.
 ///
 /// The widget owns no scene content — a [SceneController] does. Place the
@@ -72,6 +101,9 @@ class SceneView extends StatefulWidget {
   /// shadows to per-light `castsShadow`.
   final SceneQuality? quality;
 
+  /// The view-owned screen inspection choice. Never stored in the document.
+  final SceneDebugView debugView;
+
   /// Creates a scene view.
   const SceneView({
     super.key,
@@ -81,6 +113,7 @@ class SceneView extends StatefulWidget {
     this.backgroundColor,
     this.antialiasingMode = 4,
     this.quality,
+    this.debugView = const SceneDebugView(),
   });
 
   @override
@@ -96,6 +129,7 @@ class _SceneViewState extends State<SceneView> {
     backgroundColor: widget.backgroundColor,
     antialiasingMode: widget.antialiasingMode,
     quality: widget.quality,
+    debugView: widget.debugView,
   );
 }
 
@@ -120,6 +154,9 @@ class SceneViewLeaf extends Widget {
   /// See [SceneView.quality].
   final SceneQuality? quality;
 
+  /// See [SceneView.debugView].
+  final SceneDebugView debugView;
+
   /// Creates the leaf widget.
   const SceneViewLeaf({
     super.key,
@@ -129,6 +166,7 @@ class SceneViewLeaf extends Widget {
     this.backgroundColor,
     this.antialiasingMode = 4,
     this.quality,
+    this.debugView = const SceneDebugView(),
   });
 }
 
@@ -166,10 +204,7 @@ class SceneViewElement extends NativeElement {
     super.mount(parent, reconciler);
     _reconciler = reconciler;
     sendMutation(D3Protocol.hello, D3Protocol.helloBytes());
-    sendMutation(
-      D3Protocol.viewConfig,
-      D3Protocol.viewConfigBytes(_config()),
-    );
+    sendMutation(D3Protocol.viewConfig, D3Protocol.viewConfigBytes(_config()));
     _leaf.controller.attachElement(this);
   }
 
@@ -181,7 +216,8 @@ class SceneViewElement extends NativeElement {
         _leaf.showsStatistics != old.showsStatistics ||
         _leaf.backgroundColor != old.backgroundColor ||
         _leaf.antialiasingMode != old.antialiasingMode ||
-        _leaf.quality != old.quality) {
+        _leaf.quality != old.quality ||
+        _leaf.debugView != old.debugView) {
       sendMutation(
         D3Protocol.viewConfig,
         D3Protocol.viewConfigBytes(_config()),
@@ -216,8 +252,11 @@ class SceneViewElement extends NativeElement {
     // Always sent — 'default' clears a previously-set tier (org.json
     // drops null values, so absence can't carry "unset").
     'quality': _leaf.quality?.name ?? 'default',
-    if (_leaf.backgroundColor != null)
-      'backgroundColor': _leaf.backgroundColor,
+    'debugView': {
+      'channel': _leaf.debugView.channel.name,
+      'wireframe': _leaf.debugView.wireframe,
+    },
+    if (_leaf.backgroundColor != null) 'backgroundColor': _leaf.backgroundColor,
   };
 }
 

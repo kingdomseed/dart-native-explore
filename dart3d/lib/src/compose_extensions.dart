@@ -21,6 +21,7 @@ library;
 
 import 'package:vector_math/vector_math.dart';
 
+import 'animation.dart';
 import 'diff_apply.dart';
 import 'scene_model.dart';
 
@@ -36,9 +37,9 @@ SceneDocument composeSceneWithExtensions(
   final stash = _Stash();
   final out = composeScene(
     stash.stand(document),
-    resolve: (ref) => stash.stand(resolve(ref)),
+    resolve: (ref) => stash.stand(_propertyFreePrefab(resolve(ref))),
   );
-  return stash.harvest(out);
+  return _restoreHostAnimations(document, stash.harvest(out));
 }
 
 /// [composeSceneAsync] that keeps [d3ExtensionResources]; see
@@ -51,9 +52,38 @@ Future<SceneDocument> composeSceneAsyncWithExtensions(
   final stash = _Stash();
   final out = await composeSceneAsync(
     stash.stand(document),
-    load: (ref) async => stash.stand(await load(ref)),
+    load: (ref) async => stash.stand(_propertyFreePrefab(await load(ref))),
   );
-  return stash.harvest(out);
+  return _restoreHostAnimations(document, stash.harvest(out));
+}
+
+SceneDocument _propertyFreePrefab(SceneDocument prefab) {
+  if (prefab.animations.values.any(
+    (a) => a is Dart3dAnimationSpec && a.propertyChannels.isNotEmpty,
+  )) {
+    throw UnsupportedError(
+      'property-bearing prefab animations require private target/resource/payload/animation ID remapping',
+    );
+  }
+  return prefab;
+}
+
+SceneDocument _restoreHostAnimations(
+  SceneDocument host,
+  SceneDocument composed,
+) {
+  for (final entry in host.animations.entries) {
+    final original = entry.value;
+    final ordinary = composed.animations[entry.key];
+    if (original is! Dart3dAnimationSpec || ordinary == null) continue;
+    composed.animations[entry.key] = Dart3dAnimationSpec(
+      ordinary.id,
+      name: ordinary.name,
+      channels: ordinary.channels,
+      propertyChannels: original.propertyChannels,
+    );
+  }
+  return composed;
 }
 
 bool _hasEager(SceneDocument doc) => doc.nodes.values.any(

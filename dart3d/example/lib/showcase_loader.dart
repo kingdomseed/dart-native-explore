@@ -10,6 +10,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:dart3d/dart3d.dart' show D3SpriteBlendMode;
 import 'package:dart3d/src/doc_layer.dart';
 import 'package:dart3d/src/fsceneb_reader.dart';
 import 'package:dart3d/src/geometry/instances.dart';
@@ -25,6 +26,13 @@ import 'dn_logo_stage.dart';
 import 'light_aim.dart';
 import 'u2_catcher_scene.dart';
 import 'u2_geometry_scene.dart';
+import 'u3_atlas_probe.dart';
+import 'u3_tone_scene.dart';
+import 'u3_sprite_scene.dart';
+import 'u4_property_scene.dart';
+import 'u4_material_scene.dart';
+import 'u4_owner_scene.dart';
+import 'u4_snapshot_scene.dart';
 
 /// One showcase entry: the cycler label, its bundle key, and the
 /// capability line shown under it.
@@ -160,7 +168,40 @@ const showcaseItems = [
     cameraDir: (-0.4, 0.9, -1.0),
     frameMargin: 1.6,
   ),
+  ShowcaseItem(
+    'u3-atlas-probe',
+    kBuiltinU3AtlasProbeKey,
+    'Image atlas UV probe',
+  ),
+  ShowcaseItem('u3-tone', kBuiltinU3ToneKey, 'iOS five-tone HDR comparison'),
+  ShowcaseItem('u3-sprite', kBuiltinU3SpriteKey, 'Standalone sprite material'),
+  ShowcaseItem('u4-snapshots', kBuiltinU4SnapshotsKey, 'Current · snapshot'),
+  ShowcaseItem('u4-owners', kBuiltinU4OwnersKey, 'Canonical · default · rebind'),
+  ShowcaseItem(
+    'u4-materials',
+    kBuiltinU4MaterialsKey,
+    'Textured shared pair · PBR · reference · alpha · snapshot',
+  ),
+  ShowcaseItem(
+    'u4',
+    kBuiltinU4Key,
+    'Property animation: shared color / light / camera',
+  ),
 ];
+
+const String kBuiltinU4MaterialsKey = 'builtin:u4-materials';
+
+const String kBuiltinU4SnapshotsKey = 'builtin:u4-snapshots';
+
+const String kBuiltinU4OwnersKey = 'builtin:u4-owners';
+
+const String kBuiltinU4Key = 'builtin:u4';
+
+const String kBuiltinU3SpriteKey = 'builtin:u3-sprite';
+
+const String kBuiltinU3AtlasProbeKey = 'builtin:u3-atlas-probe';
+
+const String kBuiltinU3ToneKey = 'builtin:u3-tone';
 
 /// The synthetic asset key for the W21 materials conformance scene —
 /// no bundled file; [loadShowcaseScene] builds the document
@@ -256,6 +297,110 @@ ShowcaseScene? loadShowcaseScene(
   void Function(String message)? log,
 }) {
   final bytesOf = bytesFor ?? (_) => null;
+  if (item.assetKey == kBuiltinU4SnapshotsKey) {
+    final doc = buildU4SnapshotDocument();
+    return ShowcaseScene(
+      document: doc,
+      cameraNode: u4SnapshotNode(doc, 'camera').id,
+      cameraTarget: Vector3.zero(),
+      cameraDir: Vector3(0, 0, -1),
+      frameRadius: 0,
+      summary: 'Left → right: current · snapshot',
+    );
+  }
+  if (item.assetKey == kBuiltinU4OwnersKey) {
+    final doc = buildU4OwnerDocument();
+    return ShowcaseScene(
+      document: doc,
+      cameraNode: u4OwnerNode(doc, 'camera').id,
+      cameraTarget: Vector3.zero(),
+      cameraDir: Vector3(0, 0, -1),
+      frameRadius: 0,
+      summary: 'Left → right: canonical · default · rebind',
+    );
+  }
+  if (item.assetKey == kBuiltinU4MaterialsKey) {
+    final doc = buildU4MaterialDocument();
+    return ShowcaseScene(
+      document: doc,
+      cameraNode: u4MaterialNode(doc, 'camera').id,
+      cameraTarget: Vector3.zero(),
+      cameraDir: Vector3(0, 0, -1),
+      frameRadius: 0,
+      summary: kBootU4Sheen
+          ? 'Shared pair · sheen/ref · alpha/snapshot'
+          : 'Shared pair · PBR/ref · alpha/snapshot',
+    );
+  }
+  if (item.assetKey == kBuiltinU4Key) {
+    final doc = buildU4PropertyDocument(
+      camera: kBootU4Camera,
+      lightKind: kBootU4Light,
+    );
+    if (!kBootU4Camera && kBootU4Light != U4LightKind.directional) {
+      log?.call('dart3d: u4 requested light=${kBootU4Light.name} rest=1');
+    }
+    return ShowcaseScene(
+      document: doc,
+      cameraNode: u4Node(doc, 'camera').id,
+      cameraTarget: Vector3.zero(),
+      cameraDir: Vector3(0, 0, -1),
+      frameRadius: 0,
+      summary: kBootU4Camera
+          ? 'Camera FOV · fixed pose'
+          : kBootU4Light == U4LightKind.directional
+          ? 'Shared color pair · neutral lit face'
+          : 'Shared color pair · ${kBootU4Light.name} light',
+    );
+  }
+  if (item.assetKey == kBuiltinU3SpriteKey) {
+    final doc = buildU3SpriteDocument(
+      blend: D3SpriteBlendMode.values.byName(kBootU3SpriteBlend),
+      tinted: kBootU3SpriteTint,
+      untextured: kBootU3SpriteUntextured,
+      renderTexture: kBootU3SpriteRenderTexture,
+    );
+    log?.call('dart3d: u3-sprite frame=0 blend=$kBootU3SpriteBlend paused');
+    return ShowcaseScene(
+      document: doc,
+      cameraNode: u3SpriteNode(doc, 'camera').id,
+      cameraTarget: Vector3.zero(),
+      cameraDir: Vector3(0, 0, -1),
+      frameRadius: 0,
+      summary: 'Sheet / selected / fixed; overlap / shadow controls',
+    );
+  }
+  if (item.assetKey == kBuiltinU3AtlasProbeKey) {
+    final doc = buildU3AtlasProbeDocument();
+    log?.call(
+      'dart3d: u3-atlas-probe frame=0 expected=0 red paused fixed-camera',
+    );
+    return ShowcaseScene(
+      document: doc,
+      cameraNode: doc.nodes.values
+          .singleWhere((node) => node.name == 'u3.atlas.camera')
+          .id,
+      cameraTarget: Vector3.zero(),
+      cameraDir: Vector3(0, 0, -1),
+      frameRadius: 0,
+      summary: 'Top: sheet · below: selected cell',
+    );
+  }
+  if (item.assetKey == kBuiltinU3ToneKey) {
+    final tone = U3Tone.values.byName(kBootU3Tone);
+    final doc = buildU3ToneDocument(tone: tone);
+    log?.call('dart3d: u3-tone tone=${tone.name} exposure=1 fixed-camera');
+    return ShowcaseScene(
+      document: doc,
+      cameraNode: doc.nodes.values
+          .singleWhere((node) => node.name == 'u3.tone.camera')
+          .id,
+      cameraTarget: Vector3.zero(),
+      cameraDir: Vector3(0, 0, -1),
+      frameRadius: 0,
+      summary: 'Gray 0.018..12 · RGB/orange at 2/8',
+    );
+  }
   SceneDocument doc;
   try {
     if (item.assetKey == kBuiltinMaterialsKey ||

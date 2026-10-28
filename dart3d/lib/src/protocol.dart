@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'animation.dart';
 import 'diff_apply.dart';
 import 'scene_model.dart';
 
@@ -22,7 +23,13 @@ import 'scene_model.dart';
 /// |     |                 | absent fields keep the node's previous values  |
 /// |  5  | `command`       | utf8 JSON op (see below)                            |
 /// |  6  | `viewConfig`    | utf8 JSON `{allowsCameraControl, showsStatistics,   |
-/// |     |                 |  backgroundColor, antialiasingMode}`                |
+/// |     |                 |  backgroundColor, antialiasingMode, quality,         |
+/// |     |                 |  debugView}`                                        |
+///
+/// `debugView` is always `{channel:<SceneDebugChannel name>,wireframe:<bool>}`,
+/// including explicit off `{channel:"none",wireframe:false}`. Missing debugView
+/// is backward-compatible off. Present malformed values are protocol failures.
+/// It configures screen presentation only and is never a document field.
 ///
 /// `command` ops come in two groups. Structural edits between snapshots —
 /// `addNode`, `removeNode`, `updateNode`, `upsertResource`,
@@ -313,8 +320,12 @@ abstract final class D3Protocol {
   /// `viewport` (its private `_encodeView` emits upstream fields only)
   /// and W26 procedural-shape geometry resources — so the manifest
   /// goes through [writeFsceneWithExtensions], which re-adds both.
-  static Uint8List loadSceneBytes(SceneDocument doc) =>
-      Uint8List.fromList(utf8.encode(writeFsceneWithExtensions(doc)));
+  static Uint8List loadSceneBytes(SceneDocument doc) {
+    for (final animation in doc.animations.values) {
+      validatePropertyAnimation(animation, doc.payload);
+    }
+    return Uint8List.fromList(utf8.encode(writeFsceneWithExtensions(doc)));
+  }
 
   /// `[8B payloadId][raw bytes]` for one [PayloadSpec].
   static Uint8List payloadBytes(PayloadSpec payload) {
