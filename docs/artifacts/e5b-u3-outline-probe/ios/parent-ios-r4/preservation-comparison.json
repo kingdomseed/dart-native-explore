@@ -1,0 +1,22 @@
+{
+  "skin": {
+    "region": [
+      0,
+      330,
+      1206,
+      2100
+    ],
+    "changedPixels": 0,
+    "totalPixels": 2134620
+  },
+  "payload": {
+    "region": [
+      0,
+      330,
+      1206,
+      2100
+    ],
+    "changedPixels": 0,
+    "totalPixels": 2134620
+  }
+}

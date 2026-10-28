@@ -25,6 +25,7 @@ import 'dn_logo_stage.dart';
 import 'light_aim.dart';
 import 'u2_catcher_scene.dart';
 import 'u2_geometry_scene.dart';
+import 'u3_outline_probe.dart';
 
 /// One showcase entry: the cycler label, its bundle key, and the
 /// capability line shown under it.
@@ -160,6 +161,12 @@ const showcaseItems = [
     cameraDir: (-0.4, 0.9, -1.0),
     frameMargin: 1.6,
   ),
+  ShowcaseItem(
+    'u3-outline',
+    u3OutlineKey,
+    'THROWAWAY mask · skin · 2 slots · 130 instances',
+    cameraDir: (0, 0.08, -1),
+  ),
 ];
 
 /// The synthetic asset key for the W21 materials conformance scene —
@@ -269,6 +276,8 @@ ShowcaseScene? loadShowcaseScene(
       doc = buildGeometryDocument();
     } else if (item.assetKey == kBuiltinU1Key) {
       doc = buildU1CamerasPickingDocument();
+    } else if (item.assetKey == u3OutlineKey) {
+      doc = buildU3OutlineProbe(buildU1CamerasPickingDocument());
     } else if (item.assetKey == kBuiltinW17SkyKey) {
       doc = buildW17SkyDocument(mode: _kBootW17Mode);
     } else if (item.assetKey == kBuiltinW19CharacterKey) {

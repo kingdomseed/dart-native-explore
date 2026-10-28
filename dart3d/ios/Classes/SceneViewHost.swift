@@ -55,6 +55,13 @@ final class SceneViewHost: SCNView {
     private(set) var shadowCatcherBindingsById:
         [UInt64: [ShadowCatcherMaterialBinding]] = [:]
     let bakedShadowCatcherRegistry = BakedShadowCatcherRegistry()
+    private let selectionOutlineProbe = SelectionOutlineProbe()
+    var outlineProbeEnabled = false
+
+    func invalidateProbeResolve() {
+        resolveTechnique = nil
+        applyToneMap()
+    }
 
     /// Raw manifest entry per resource id, for surgical re-decodes;
     /// slot rebinding also reads material factors back out of it.
@@ -417,7 +424,8 @@ final class SceneViewHost: SCNView {
         if resolveTechnique == nil || resolveChain != chain,
            let device = device ?? MTLCreateSystemDefaultDevice() {
             resolveTechnique =
-                ToneMapTechnique.make(device: device, bloom: chain)
+                ToneMapTechnique.make(device: device, bloom: chain,
+                                      outlineProbe: outlineProbeEnabled)
             resolveChain = chain
             if resolveTechnique == nil {
                 logOnce("stage.toneMapping.technique",
@@ -5537,6 +5545,7 @@ extension SceneViewHost: SCNSceneRendererDelegate {
         bakedShadowCatcherRegistry.renderDirty(at: time, host: self)
         renderDueTargets(at: time)
         syncScreenSubviews()
+        selectionOutlineProbe.capture(at: time, host: self)
     }
 
     /// W26: rebuilds each `cameraFacing` entry's geometry expanded

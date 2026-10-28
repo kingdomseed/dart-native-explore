@@ -78,6 +78,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     val scene: Scene = guarded { engine.createScene() }
     private val view: View = guarded { engine.createView() }
     internal val bakedShadowCatchers = BakedShadowCatcherPass(this)
+    private val selectionOutlineProbe = SelectionOutlineProbe(this)
     private var swapChain: SwapChain? = null
 
     private val surfaceView = guarded { SurfaceView(context) }
@@ -2300,6 +2301,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             for ((_, m) in materialInstances) engine.destroyMaterialInstance(m)
             materialInstances = HashMap()
             bakedShadowCatchers.dispose()
+            selectionOutlineProbe.dispose()
             // W14: per-entry Views/Cameras and rt recs die here — the
             // rec owns its textures, so the texture sweep skips rt
             // keys (the shared `view` lets go of rec cameras first).
@@ -3429,6 +3431,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      * `view` is restored to the default pass exactly.
      */
     private fun applyViews(recs: List<RenderTargets.ViewRec>) {
+        selectionOutlineProbe.clearPasses()
         // The shared screen view must never hold a dying camera.
         view.camera = camera
         for (rec in viewRecs) destroyViewObjects(rec)
@@ -5696,6 +5699,21 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         val sc = swapChain ?: return false
         bakedShadowCatchers.renderDirty(
             renderer, FsceneRealizer.surgicalContext(this))
+        if (nodesById.values.any { it.name?.startsWith("__outline_probe__:") == true }) {
+            val probeCameras = if (screenViews.isEmpty()) {
+                listOf(view.camera!! to view.viewport)
+            } else {
+                screenViews.mapNotNull { rec -> rec.camera?.let {
+                    it to (rec.viewport?.let { vp -> viewportOf(vp) }
+                        ?: Viewport(0, 0, viewportW, viewportH))
+                } }
+            }
+            selectionOutlineProbe.capture(renderer, probeCameras,
+                if (screenViews.isEmpty()) listOf(0xFF)
+                else screenViews.filter { it.camera != null }.map { it.layerMask })
+        } else {
+            selectionOutlineProbe.clearPasses()
+        }
         if (renderer.beginFrame(sc, tNanos)) {
             // W14: due offscreen passes first — a material sampling an
             // rt reads this frame's output in the screen passes below.
@@ -5722,7 +5740,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             // renders the default pass — the pre-W14 path.
             if (screenViews.isEmpty()) {
                 renderer.render(view)
+                selectionOutlineProbe.composite(renderer, 0)
             } else {
+                var probeIndex = 0
                 for (rec in screenViews) {
                     val cam = rec.camera ?: continue
                     view.camera = cam
@@ -5733,6 +5753,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     view.antiAliasing = rec.aa
                     view.dynamicResolutionOptions = rec.dsr
                     renderer.render(view)
+                    selectionOutlineProbe.composite(renderer, probeIndex++)
                 }
             }
             renderer.endFrame()

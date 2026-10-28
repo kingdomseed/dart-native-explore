@@ -402,7 +402,10 @@ enum ToneMapTechnique {
     private static let librariesLock = NSLock()
     private static var libraries: [ObjectIdentifier: MTLLibrary] = [:]
 
-    private static func library(for device: MTLDevice) -> MTLLibrary? {
+    private static func library(for device: MTLDevice, outlineProbe: Bool) -> MTLLibrary? {
+        if outlineProbe {
+            return try? device.makeLibrary(source: source + SelectionOutlineProbe.shader, options: nil)
+        }
         let id = ObjectIdentifier(device)
         librariesLock.lock()
         defer { librariesLock.unlock() }
@@ -436,10 +439,11 @@ enum ToneMapTechnique {
     /// A technique with the resolve pass, and before it the passes of
     /// a bloom chain when [bloom] is given; nil when the shader
     /// library cannot be built on [device].
-    static func make(device: MTLDevice, bloom: BloomChain? = nil)
+    static func make(device: MTLDevice, bloom: BloomChain? = nil,
+                     outlineProbe: Bool = false)
         -> SCNTechnique?
     {
-        guard let lib = library(for: device) else { return nil }
+        guard let lib = library(for: device, outlineProbe: outlineProbe) else { return nil }
         var symbols: [String: Any] = ["d3LutSymbol": ["type": "sampler2D"]]
         for name in vectorSymbols {
             symbols[name + "Symbol"] = ["type": "vec4"]
@@ -508,6 +512,9 @@ enum ToneMapTechnique {
         passes["d3_resolve"] = quad(
             "d3_resolve_fragment", inputs: resolveInputs, output: "COLOR")
         sequence.append("d3_resolve")
+        if outlineProbe {
+            SelectionOutlineProbe.append(passes: &passes, sequence: &sequence, symbols: &symbols)
+        }
         var definition: [String: Any] = [
             "passes": passes,
             "sequence": sequence,

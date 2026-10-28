@@ -1,0 +1,10 @@
+{
+  "dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/Dart3dView.kt": "4a7b70da6362b1db3f80dc6784ab7363a73fc97a9fda0ddfd71a1471c8a7f3e7",
+  "dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/SelectionOutlineProbe.kt": "74fd66acbc79c0488932d86325f344bad62a0a94b8881c8fa91c314f2b53f0a8",
+  "dart3d/example/lib/showcase_loader.dart": "6ce790cfb0b5b14b8bfe54dbb9b9d01fd0d99b41d007f240465a8f8c616f152a",
+  "dart3d/example/lib/showcase_scene.dart": "edd9010c0288a63578b4ed93cb792773adc0e016be3f2b5c1eb2dac0edef8063",
+  "dart3d/example/lib/u3_outline_probe.dart": "0ba8b7563fbd02ca89b18a78c49bf1f8ce695b7ad0b4094a19761bda0a86e5fd",
+  "dart3d/ios/Classes/SceneViewHost.swift": "02895744c77a3c5432d01f1ff0cae64f09394807dccd76b0fa8b1b15c2056dd9",
+  "dart3d/ios/Classes/SelectionOutlineProbe.swift": "ab68905966ead99fc95170f6ec97af2ba1c35df3d916f36a331a45d518f57e11",
+  "dart3d/ios/Classes/ToneMapping.swift": "8a3635f222c304ed6dc4e13df3350ee004829c1544cc98f9314c6c941efe9e6f"
+}

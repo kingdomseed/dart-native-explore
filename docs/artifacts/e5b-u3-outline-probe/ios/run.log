@@ -1,0 +1,103 @@
+Launching lib/main.dart on iPhone 17 Pro in debug mode...
+Running Xcode build...                                          
+Xcode build done.                                            9.4s
+Syncing files to device iPhone 17 Pro...                        
+dartnative: [DN] Licence valid (community), expires 2027-09-14
+dartnative: [DN] lifecycle → AppLifecycleState.resumed
+Syncing files to device iPhone 17 Pro...                            46ms
+
+DartNative run key commands.
+r Hot reload. 🔥🔥🔥
+R Hot restart.
+h List all available interactive commands.
+d Detach (terminate "dn run" but leave application running).
+c Clear the screen
+q Quit (terminate the application on the device).
+
+A Dart VM Service on iPhone 17 Pro is available at: http://127.0.0.1:58461/kISTBea8cCA=/
+The DartNative DevTools debugger and profiler on iPhone 17 Pro is available at: http://127.0.0.1:58461/kISTBea8cCA=/devtools/?uri=ws://127.0.0.1:58461/kISTBea8cCA=/ws
+dartnative: dart3d: showcase — u3-outline: 9 nodes · 7 geo · 8 mat · 1 skins · 1 anims
+dartnative: dart3d: __outline_probe__:skin:outline pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:mask pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:control pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:off pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:outline pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:mask pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:control pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:off pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:outline pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:mask pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:control pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:off pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:payload:off pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:payload:outline pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:payload:mask pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:payload:control pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:payload:off pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:payload:outline pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:payload:mask pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:payload:control pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:payload:off pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:payload:outline pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:payload:mask pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:payload:control pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:payload:off pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:instances:off pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:instances:outline pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:instances:mask pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:instances:control pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:instances:off pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:instances:outline pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:instances:mask pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:instances:control pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:instances:off pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:instances:outline pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:instances:mask pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:instances:control pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:instances:off pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:off pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:outline pose=1.0 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:mask pose=1.0 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:control pose=1.0 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:off pose=1.0 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:outline pose=1.0 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:mask pose=1.0 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:control pose=1.0 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:off pose=1.0 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:outline pose=1.0 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:mask pose=1.0 moving=false far=true
+dartnative: dart3d: __outline_probe__:skin:control pose=1.0 moving=false far=true
+dartnative: dart3d: __outline_probe__:skin:off pose=1.0 moving=false far=true
+dartnative: dart3d: __outline_probe__:skin:outline pose=1.0 moving=false far=true
+dartnative: dart3d: __outline_probe__:skin:mask pose=1.0 moving=false far=true
+dartnative: dart3d: __outline_probe__:skin:control pose=1.0 moving=false far=true
+dartnative: dart3d: __outline_probe__:skin:off pose=1.0 moving=false far=true
+dartnative: dart3d: __outline_probe__:skin:outline pose=1.0 moving=false far=true
+dartnative: dart3d: __outline_probe__:skin:mask pose=1.0 moving=false far=true
+dartnative: dart3d: __outline_probe__:skin:control pose=1.0 moving=false far=true
+dartnative: dart3d: __outline_probe__:skin:off pose=1.0 moving=false far=true
+dartnative: dart3d: __outline_probe__:skin:outline pose=1.0 moving=false far=true
+dartnative: dart3d: __outline_probe__:skin:mask pose=1.0 moving=true far=false
+dartnative: dart3d: __outline_probe__:skin:control pose=1.0 moving=true far=false
+dartnative: dart3d: __outline_probe__:skin:off pose=1.0 moving=true far=false
+dartnative: dart3d: __outline_probe__:skin:outline pose=1.0 moving=true far=false
+dartnative: dart3d: __outline_probe__:skin:mask pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:control pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:off pose=0.5 moving=false far=false
+dartnative: dart3d: __outline_probe__:skin:outline pose=0.5 moving=false far=true
+dartnative: dart3d: __outline_probe__:skin:mask pose=0.5 moving=false far=true
+dartnative: dart3d: __outline_probe__:skin:control pose=0.5 moving=false far=true
+dartnative: dart3d: __outline_probe__:skin:off pose=0.5 moving=false far=true
+dartnative: dart3d: __outline_probe__:skin:outline pose=0.5 moving=false far=true
+dartnative: dart3d: __outline_probe__:skin:mask pose=0.5 moving=false far=true
+dartnative: dart3d: __outline_probe__:skin:control pose=0.5 moving=false far=true
+dartnative: dart3d: __outline_probe__:skin:off pose=0.5 moving=false far=true
+dartnative: dart3d: __outline_probe__:skin:outline pose=0.5 moving=false far=true
+dartnative: dart3d: u2-catcher light=spot mode=baked softness=0
+dartnative: dart3d: showcase — u2-catcher: Baked shadow footprint · explicit refresh · live shadowOnly mode
+dartnative: dart3d: u2-shadow castsShadow=true
+dartnative: dart3d: showcase — u2-shadow: Spot shadow · elevated cuboid · neutral receiver
+dartnative: dart3d: showcase — u2: Wedge · annulus ring · bent extrude CCW/CW · 2 inline wedges
+dartnative: dart3d: u2 light=left
+
+Application finished.

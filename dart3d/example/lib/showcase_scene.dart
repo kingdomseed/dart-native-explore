@@ -18,6 +18,7 @@ import 'light_aim.dart';
 import 'showcase_loader.dart';
 import 'u2_catcher_scene.dart';
 import 'u2_geometry_scene.dart';
+import 'u3_outline_probe.dart';
 
 /// Boot override for the U1 camera-controller pose (`orbit1..3`,
 /// `fly1..3`, `follow1..3`).
@@ -115,6 +116,11 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
   bool _u2CatcherLightMoved = false;
   bool _u2CatcherGeometryWide = false;
   bool _u2CatcherVariantSelected = false;
+  String _u3Target = u3BootTarget;
+  String _u3Mode = u3BootMode;
+  bool _u3Far = u3BootFar;
+  bool _u3Moving = u3BootMoving;
+  double _u3Pose = double.parse(u3BootPose);
 
   /// The loaded item's fit radius — feeds the aspect-ratio widening
   /// in the layout pass.
@@ -185,6 +191,11 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
       _u2CatcherLightMoved = false;
       _u2CatcherGeometryWide = false;
       _u2CatcherVariantSelected = false;
+      _u3Target = u3BootTarget;
+      _u3Mode = u3BootMode;
+      _u3Far = u3BootFar;
+      _u3Moving = u3BootMoving;
+      _u3Pose = double.parse(u3BootPose);
     });
 
     final scene = loadShowcaseScene(item, bytesFor: loadAssetBytes, log: dnLog);
@@ -1119,7 +1130,48 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
       _animIndex = idle < 0 ? 0 : idle;
     });
     _controller.playAnimation(anims[_animIndex].id, loop: true);
+    if (_items[_index].assetKey == u3OutlineKey) _writeU3Animation();
   }
+
+  void _writeU3Animation() {
+    _controller.playAnimation(
+      _anims.single.id,
+      loop: true,
+      timeScale: _u3Moving ? 1 : 0,
+      time: _u3Pose,
+    );
+  }
+
+  void _writeU3Selector() {
+    final control = _scene!.document.nodes.values.singleWhere(
+      (node) => node.name.startsWith('__outline_probe__:'),
+    );
+    control.name = '__outline_probe__:$_u3Target:$_u3Mode';
+    _controller.applyCommands([
+      {
+        'op': 'updateNode',
+        'node': control.id.toToken(),
+        'flags': ['name'],
+        'spec': encodeNodeCommandSpec(control, _scene!.document),
+      },
+    ]);
+    dnLog(
+      'dart3d: ${control.name} pose=$_u3Pose moving=$_u3Moving far=$_u3Far',
+    );
+    setState(() {});
+  }
+
+  Widget _u3Control(String text, VoidCallback action) => GestureDetector(
+    onTap: action,
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      color: const Color(0x2EFFFFFF),
+      child: Text(
+        text,
+        style: const TextStyle(fontSize: 12, color: Color(0xFFFFFFFF)),
+      ),
+    ),
+  );
 
   void _stepScene(int dir) {
     _index = (_index + dir) % _items.length;
@@ -1160,6 +1212,10 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
     final orbit = _orbitController;
     if (orbit == null) return;
     final needed = _frameRadius * 1.2 / (tan(0.8 / 2) * aspect);
+    if (_items[_index].assetKey == u3OutlineKey) {
+      orbit.distance = max(_frameRadius * 2.8, needed) * (_u3Far ? 1.8 : 1);
+      return;
+    }
     if (needed > orbit.distance) {
       orbit.distance = needed;
     }
@@ -1252,6 +1308,7 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
     final isW17 = item.assetKey == kBuiltinW17SkyKey;
     final isU2 = item.assetKey == kBuiltinU2Key;
     final isU2Catcher = item.assetKey == kBuiltinU2CatcherKey;
+    final isU3 = item.assetKey == u3OutlineKey;
     final u2CatcherVariantName =
         kBootU2CatcherPath == u2CatcherPathVariantDefault
         ? u2CatcherDefaultProbeVariant
@@ -1370,6 +1427,55 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
                               fontSize: 11,
                               color: Color(0x99FFFFFF),
                             ),
+                          ),
+                        ],
+                        if (isU3) ...[
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 5,
+                            runSpacing: 5,
+                            children: [
+                              _u3Control(_u3Mode, () {
+                                const modes = [
+                                  'off',
+                                  'outline',
+                                  'mask',
+                                  'control',
+                                ];
+                                _u3Mode =
+                                    modes[(modes.indexOf(_u3Mode) + 1) %
+                                        modes.length];
+                                _writeU3Selector();
+                              }),
+                              _u3Control(_u3Target, () {
+                                const targets = [
+                                  'skin',
+                                  'payload',
+                                  'instances',
+                                ];
+                                _u3Target =
+                                    targets[(targets.indexOf(_u3Target) + 1) %
+                                        targets.length];
+                                _writeU3Selector();
+                              }),
+                              _u3Control(_u3Far ? 'far' : 'near', () {
+                                _u3Far = !_u3Far;
+                                _fitBoom(_viewAspect ?? 1);
+                                _writeCamera();
+                                setState(() {});
+                              }),
+                              _u3Control(_u3Moving ? 'moving' : 'frozen', () {
+                                _u3Moving = !_u3Moving;
+                                _writeU3Animation();
+                                setState(() {});
+                              }),
+                              _u3Control('pose $_u3Pose', () {
+                                _u3Pose = _u3Pose == 0.5 ? 1 : 0.5;
+                                _u3Moving = false;
+                                _writeU3Animation();
+                                setState(() {});
+                              }),
+                            ],
                           ),
                         ],
                         if (isU1) ...[
@@ -1491,7 +1597,7 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
                             ],
                           ),
                         ],
-                        if (_anims.isNotEmpty) ...[
+                        if (_anims.isNotEmpty && !isU3) ...[
                           const SizedBox(height: 8),
                           GestureDetector(
                             onTap: _cycleAnim,
