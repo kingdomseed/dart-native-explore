@@ -1,6 +1,6 @@
 // W12 checks: the `selectVariant` op wire shape and the
 // `featuresRequired`/`featuresUsed` capability pass — pinned by
-// docs/extended-surface-program.md §W12. Same constraint as the
+// the W12 spec (docs/w12-component-parity-spec.md). Same constraint as the
 // W3–W11 tests: package:dart3d/dart3d.dart is unreachable under
 // `dart test` (the barrel transitively imports package:dartnative,
 // which needs DartNative's patched SDK), so this pulls the pure-Dart

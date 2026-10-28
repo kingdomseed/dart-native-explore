@@ -1,7 +1,16 @@
 # dart3d demo program: matching upstream flutter_scene 0.24's demos
 
+> **Paused (operator, 2026-10-02).** Track P is on hold until the engine
+> is done (`docs/program-v2.md`, *Definition of done* and *Paused until
+> the engine is done*): P3 DR3 and later, all P5 demos (M2–M18) and P7
+> do not start, whatever "now" or build order below says. Keep this file
+> as the backlog design for when program-v2 unpauses Track P; the
+> upstream inventory (§2–§3) also feeds V8. Status notes were freshened
+> 2026-10-28; the plan text is otherwise as written 2026-09-29.
+
 Status: design and planning only. No code in this change. Written 2026-09-29.
-Owner track: **P** (product). `docs/program-v2.md` rule O1 applies: engine
+Owner track: **P** (product), paused until the engine is done
+(program-v2 O1, resolved 2026-10-28): engine
 units never polish demos, and demos never change engine behavior. A demo
 that needs something the engine lacks files it as an engine ask (§7),
 tagged with the unit that owns it.
@@ -28,8 +37,8 @@ today), `docs/triage/*.md` (known gaps).
 |---|---|
 | Repo | `github.com/bdero/flutter_scene`, cloned to the session scratchpad |
 | Master HEAD | `266781272e7092a815fe002da0abadf17aa3928c`, 2026-09-28 ("Note the cached shadow crash fix in the changelog.") |
-| Latest tags | `flutter_scene-0.23.0`, `scene-0.3.0`. **No 0.24.0 / 0.4.0 tag yet.** |
-| 0.24 state | Both CHANGELOGs already open with unreleased `## 0.24.0` / `## 0.4.0` sections. The pubspecs still say 0.23.0 / 0.3.0. The example app pins `^0.23.0`. |
+| Latest tags | As of 2026-09-28: `flutter_scene-0.23.0`, `scene-0.3.0`. **Superseded: 0.24.0 / 0.4.0 shipped 2026-10-05 (latest 0.24.3 / 0.4.1); the V0 re-diff in program-v2 owns the current pin.** |
+| 0.24 state | (2026-09-28 snapshot) Both CHANGELOGs already open with unreleased `## 0.24.0` / `## 0.4.0` sections. The pubspecs still say 0.23.0 / 0.3.0. The example app pins `^0.23.0`. |
 | Other packages | rapier 0.5.1, box3d 0.2.1, soloud 0.1.2, fmod 0.1.2, net 0.2.1, input 0.1.0-dev |
 
 Implication for V0: the program-v2 master preview (`b02c99989`, 09-27) is
@@ -54,7 +63,8 @@ this document treats master `26678127` as the demo reference.
 - Progressive radiance prefilter (V6), `dfg.bin` (Impeller-internal, N/A),
   `-split<N>` mesh grid split on import (scene 0.4 utility; free through
   the importer), and glTF samplers honored.
-- Kit: `rotatesToMovement`/`yaw` (V6), `DebugDraw.colliders`, SceneView
+- Kit: `rotatesToMovement`/`yaw` (kit surface — out of scope under
+  decision D7, dropped in program-v2's V0 corrections), `DebugDraw.colliders`, SceneView
   wall clock, and audio listener following the camera (V6).
 
 ---
@@ -76,7 +86,7 @@ applies a tuned post-FX preset to each example.
 | # | Upstream example (file, lines) | W/F | What it shows | dart3d mapping |
 |---|---|---|---|---|
 | 1 | **Dice Shadows** (`example_dice_shadows.dart` 3567 + `lib/dice/` 3182) | W | Upstream's dice roller. §3 covers it in depth. | **Partial / partly blocked.** Physics, shadows, PBR, particles, trails and bloom are OK. Overlay-on-widgets is blocked (§7 X1). Glass refracting widgets is blocked (decision D6). Sound needs E11, or dartnative_audio in the interim. Outline highlight needs E5b. Screen distortion is an ask (X2). |
-| 2 | Car (`example_car` 249) | W | Showroom car with doors/hood/trunk, steering wheels, blurred env background | **OK (approx.)**. `fcar.fsceneb` is already in the Showcase, and door poses go through `setNodeTransforms`. Equirect IBL is OK (W7). Env blur on the background is unverified. Lens flare is approximate on iOS and ignored with bloom on Android. Contact shadows are skipped on iOS. Orbit camera needs [E2]; the Showcase boom is the interim. |
+| 2 | Car (`example_car` 249) | W | Showroom car with doors/hood/trunk, steering wheels, blurred env background | **OK (approx.)**. `fcar.fsceneb` is already in the Showcase, and door poses go through `setNodeTransforms`. Equirect IBL is OK (W7). Env blur on the background is unverified. Lens flare is approximate on iOS and ignored with bloom on Android. Contact shadows are skipped on iOS. Orbit camera available since E2 (#60). `fcar` is dev-Showcase only — P6 replacement required before any published demo (§6). |
 | 3 | Animation (127) | F | Skeletal clip blending | **Partial.** Clips play (W8/W30). Weighted cross-blend through `anim` ops needs checking. The declarative `SceneModel` API is N/A (decision D9). |
 | 4 | Flutter Logo (91) | F | Baked logo over a grid | **Done, differently.** Replaced by the 3D DartNative logo (P4, `dn_logo.fsceneb`). |
 | 5 | Multiplayer (600+245) | W/F | Server-authoritative Rapier arena | **N/A** (decision D7, networking). |
@@ -89,12 +99,12 @@ applies a tuned post-FX preset to each example.
 | 12 | Cloth (590 + `cloth/` 2271) | W | CPU XPBD flag/drape/curtain | **Partial, demo-side.** The solver is example-local Dart and portable as-is. It needs a per-frame vertex update path; `upsertPayload` per frame is the only one today and has no perf number. Double-sided shadows need [V1 `shadowCastingMode`]. Ask X4. |
 | 13 | Gameplay Kit (1598) | W/F | Character & camera, day/night, water and buoyancy, flocking, pooling, debug draw | **App-level (decision D7)** on top of [E4 character], [E3 sky], and [E6 water vertex `.fmat`]. Flocking, pooling and Poisson are pure Dart and portable now. |
 | 14 | **Particles: campfire** (4000) | **W, flagship** | Flipbook flames, curl smoke, embers with trails, flickering light, grass, forest | **Partial.** `particleEmitter` (flipbook, curl, bursts) and trails are OK (W18/W16), as are bloom and fog. Grass and heat `.fmat` need [E6]. Point-light shadows need [V3]. God rays are a platform limit on both. iOS ignores `seed`/`bursts`/`turbulence` (W18 delta). |
-| 15 | **Explosions** (576) | W | Every particle renderer, instanced debris, shockwave ring | **Partial.** Sprites, trails and bloom are OK. Mesh debris degrades to sprites on iOS, and Android is CPU-baked until [E1]. The unlit shockwave ring is OK as procedural geometry. |
+| 15 | **Explosions** (576) | W | Every particle renderer, instanced debris, shockwave ring | **Partial.** Sprites, trails and bloom are OK. Mesh debris degrades to sprites on iOS; Android uses GPU instancing since E1 (#58). The unlit shockwave ring is OK as procedural geometry. |
 | 16 | Gaussian Splats (551) | W | Strawberry and classroom captures, crop box | **Blocked [E12/W31].** |
 | 17 | Geometry LOD (292) | F | Screen-size LOD field | **OK** (W16; no cross-fade). |
 | 18 | SSR (424) | W/F | Reflective floor | **Partial.** Android only; SSR is a declared limit on iOS (W25). |
 | 19 | Auto Exposure (403) | F | Walk from a dim room into sunlight | **OK (approx.).** Android metering is a declared limit. |
-| 20 | Navigation Route (750) | W/F | Infotainment car on painted road ribbons, follow camera | **OK.** `d3:procMesh` ribbon, polyline and dashes (W26), `fcar`. Follow camera needs [E2]; a manual boom is the interim. |
+| 20 | Navigation Route (750) | W/F | Infotainment car on painted road ribbons, follow camera | **OK.** `d3:procMesh` ribbon, polyline and dashes (W26), `fcar` (dev-only, P6). Follow camera available since E2 (#60). |
 | 21 | Toon (289), Raw shader (217) | F | `ShaderMaterial` frag / vert+frag | **Blocked [E6/W28].** Raw GLSL has no wire form, so dart3d would only support `.fmat`. |
 | 22 | Debug views (319) | F | Surface debug channels | **Blocked [E9 + V6].** |
 | 23 | Toon (.fmat) (281) | F | `.fmat` typed params, hot reload | **Blocked [E6]** (hot reload in W28). |
@@ -110,9 +120,9 @@ data-texture upload) or a renewed explicit exclusion for V8. |
 | 28 | Audio (272) | F | Spatial music, tap plucks, buses | **Blocked [E11]**, spatial panning [V6]. |
 | 29 | Widget Texture (546), Widget Input inset (258) | W / F | Live widgets on a CRT mesh | **Blocked (decision D6)**. DartNative has no offscreen widget capture. |
 | 30 | External Texture (492) | F | Video/camera as material | **Blocked [E10/W33a].** |
-| 31 | Accessibility (586) | F | Pickable labelled car parts, outline, semantics | **Partial.** Picking needs [E2], outline [E5b/U3], semantics [E10/W33b]. The widget panel part is blocked (decision D6). |
+| 31 | Accessibility (586) | F | Pickable labelled car parts, outline, semantics | **Partial.** Picking landed in E2 (#60); outline [E5b/U3], semantics [E10/W33b]. The widget panel part is blocked (decision D6). |
 | 32 | Render Targets (316) | F | Minimap RT, per-view AA | **OK** (`renderTexture`, W13/W24). |
-| 33 | Physics: Dash (1137 + `character/` 831) | W/F | Third-person character, stairs, platforms, plank bridge, seesaw, cloth corridor | **Blocked on [E4]** for the character. Joints are OK (W23). The cloth corridor needs X4. |
+| 33 | Physics: Dash (1137 + `character/` 831) | W/F | Third-person character, stairs, platforms, plank bridge, seesaw, cloth corridor | Character controller landed as E4 (#64). Joints are OK (W23). The cloth corridor needs X4. |
 | 34 | Physics (box3d) (384) | F | Box stack, pendulum rope, kinematic spinner, tap to drop | **OK.** Backend-neutral: joints, raycast and kinematic bodies are realized (W23). |
 | 35 | Car Physics (459 + `raycast_vehicle` 300) | W | Drivable raycast-wheel car through crates | **Partial.** A Dart port needs 4 raycasts per step through async queries, which is too slow for a stable 60 Hz. Needs a native vehicle (Jolt `VehicleConstraint`, `SCNPhysicsVehicle`); ask X3. |
 | 36 | Shapes (850) | F | Pick a primitive, drop it with a matching collider, IBL switcher | **OK** (procedural geometry and colliders, W26/W23). |
@@ -128,7 +138,8 @@ data-texture upload) or a renewed explicit exclusion for V8. |
 app-level. SpringArm, CameraShake, BoundsFraming, DayNight, WaterSurface,
 Steering, NodePool, PoissonDisc and DebugDraw are pure Dart over node
 transforms, so a demo can port the logic it needs into
-`dart3d/example` (or a later `dart3d_kit`) once E2/E3/E4 land.
+`dart3d/example` once E2/E3/E4 land. (No `dart3d_kit` package will be
+built — kit stays app-level under decision D7; resolved 2026-10-28.)
 SoundManager and SurfaceFootstepAudio are unused upstream.
 
 **Score (43 picker rows plus the dice roller):**
@@ -251,8 +262,8 @@ reveal, a wind-up slam), and rare rolls pay out much bigger.
 | Rigid bodies, CCD, box colliders, 60 Hz fixed step | OK (Jolt) | OK (SCNPhysics) | — |
 | Toggle a wall between trigger and solid mid-roll | `isTrigger` in the collider vocab; runtime toggle needs a check | same | P-side check; fallback is to spawn inside |
 | Impact strength for audio | **iOS:** W23 contact events carry impulse — use it. **Android:** jolt-jni exposes no impulse (`JoltWorld.kt`; contacts serialize `"imp":0`), so derive strength from the bodies' relative normal velocity at contact (velocity delta across the contact-added event); one point per manifold is enough for audio. | iOS impulse / Android velocity-delta | same loudness curve fed by either source |
-| Settle detection | settle events exist (W23/W25). W25's settle lane is still open (S0g). | same | S0g |
-| Face readout | **bug**: inverse quaternion plus mirrored face normals (`triage/integration.md`) | same | **S0g**, fix first |
+| Settle detection | settle events exist (W23/W25); the W25 settle lane passes since S0g (#52). | same | done |
+| Face readout | fixed (DR1, #36: matrix read + mirrored face normals) | same | done |
 | Cascaded directional shadows | fixed in #16; verify on the dice lane | OK (iOS skips cascades) | S0c T3 |
 | Shadow catcher (live) | OK (W24) | OK | — |
 | Point/spot shadows (lamp modes, sticker flash) | spot [E5], point [V3] | same | E5, V3 |
@@ -268,7 +279,7 @@ reveal, a wind-up slam), and rare rolls pay out much bigger.
 | Outline highlight | [E5b/U3] | [E5b/U3] | E5b |
 | Particles: bursts, stretched sparks, glitter | OK (CPU sim) | bursts/turbulence ignored (W18 delta) | limit; use one-shot emitters on iOS |
 | Trails | OK (W16) | OK | — |
-| Instanced confetti (110 cuboids with per-instance colour and shadows) | CPU-baked until [E1] | CPU-baked | E1, or a 110-node pool (fine at this count) |
+| Instanced confetti (110 cuboids with per-instance colour and shadows) | GPU-instanced since E1 (#58) | CPU-baked | E1 done, or a 110-node pool (fine at this count) |
 | Runtime IBL from an image | equirect via payload (W7) | same | — |
 | **Transparent SceneView over native widgets** | **no**: `SurfaceView` is opaque and would need `setZOrderOnTop` or `TextureView` | host `SCNView` is opaque (`backgroundColor = .black`) | **ask X1** |
 | `WidgetTexture` backdrop (glass refracting UI) and `WidgetComponent` clock | **blocked** | **blocked** | decision D6 (W33c) |
@@ -313,7 +324,7 @@ including T2/T4 evidence.
 | **M6** | **Explosions**: a tap-to-detonate button inside M5 or M3 | Explosions | as M5; mesh debris after E1 (iOS stays sprites) | after M5 v1 | Visceral one-tap payoff; reuses M1's shockwave/confetti code | S |
 | **M7** | **Material Gallery**: curated Khronos glTF-Sample-Assets (FlightHelmet, ABeautifulGame, sheen/clearcoat/transmission tests, DamagedHelmet), env switcher, **upstream reference image side by side** | Stress Tests, Configurator, README "HelmetPhase2" | OK now (W21/W22 `loadGlb`); limits shown per model | **now** | Proves material fidelity; the side-by-side is the credibility piece for dartpub.dev. Doubles as V8 prep. | M |
 | **M8** | **Adventure**: a third-person character (license-clean replacement for Dash, e.g. a Kenney CC0 character — P6), spring-arm camera, platforms, bridge, seesaw, water with buoyancy, day/night | Gameplay Kit, Physics (Dash) | **E4** (character), E2 (spring arm/follow), E3 (sky), **E6** (water vertex `.fmat`) | **after E4 and E6** (water + buoyancy are core; no interim water path) | Playable game on a phone: the "tons of incredible 3D" moment | L |
-| **M9** | **Shader Lab**: toon Dash, Gerstner ocean, endless runner, Menger sky, Materialize helmet | Toon, Custom vertices, Custom Skybox, Materialize | **E6**, V5 (additive/depth/unlit), E3 (sky → IBL) | after E6 (+V5 for Materialize) | Custom shading is what separates a 3D engine from a model viewer | L |
+| **M9** | **Shader Lab**: toon character (the P6 license-clean replacement, not Dash), Gerstner ocean, endless runner, Menger sky, Materialize helmet | Toon, Custom vertices, Custom Skybox, Materialize | **E6**, V5 (additive/depth/unlit), E3 (sky → IBL) | after E6 (+V5 for Materialize) | Custom shading is what separates a 3D engine from a model viewer | L |
 | **M10** | **Mirror Hall**: planar mirror floor, reflection-probe room, SSR comparison | Planar Mirror, Reflection Probes, SSR | E6 + E8 (iOS `SCNFloor` ok), SSR Android-only | after E8 | Reflections are a classic wow; also shows platform honesty | M |
 | **M11** | **Splats**: strawberry macro and a room capture with a PBR sphere | Gaussian Splats | **E12** (after E1) | after E12 | Cutting-edge; README gallery shot | M |
 | **M12** | **Car Physics**: drivable car through crates, on-screen joystick | Car Physics | **X3** native vehicle (or E4-era perf proof of Dart raycasts) | after X3 | Driving the showroom car is the second "game" moment | M |
@@ -531,17 +542,18 @@ T4.
 
 ## 7. Engine asks raised by the demos (for the Track E/V owners)
 
-These are **not** in program-v2's unit list. They come from demos, so by
-the O1 rule they are proposals for the operator to schedule, not work a
-demo lane does.
+These are **not** in program-v2's unit list. They came from demos, so
+they were proposals, not work a demo lane does. **Decided 2026-10-28**
+(operator-delegated, parity-first — engine scope is the flutter_scene
+document/runtime surface in Tracks E/V, nothing demo-invented):
 
-| Ask | Needed by | What | Notes |
+| Ask | Needed by | What | Decision |
 |---|---|---|---|
-| **X1: transparent SceneView** | M1 look (b); any AR-style overlay | Clear-to-alpha host view composited over DartNative widgets. Android: `TextureView` or `SurfaceView.setZOrderOnTop` + `PixelFormat.TRANSLUCENT` with a Filament clear alpha. iOS: `SCNView.backgroundColor = .clear`, `isOpaque = false`. | This is upstream's signature dice trick ("shadows on your UI"). It also needs input pass-through to the widgets underneath. Size M. Candidate for U3/E5b scope. |
-| **X2: screen distortion** | M1 DR4, M6 | 0.24 `Scene.screenDistortion` pulses (a radial refraction post pass) | 0.24 surface, now tracked as **V6b** in program-v2 (realize or record an operator-approved exclusion before V8). |
-| **X3: native vehicle** | M12 | `d3:vehicle` modelled on upstream's example-local raycast vehicle: Jolt `VehicleConstraint`, `SCNPhysicsVehicle` | decision D4 allows `d3:` only where upstream has no wire form; upstream's vehicle is app code, so this is an extension. Operator call. |
-| **X4: streamed dynamic vertices** | M13 cloth, M8 water (CPU path) | A per-frame vertex update path (position/normal buffer replace) with a perf number on the A142 | Might already be fine through `upsertPayload`; measure first (S-sized spike). |
-| **X5: physics time scale** | M1 slow-mo, M6 | Scale the physics step (Jolt substep dt, `SCNPhysicsWorld.speed`) | Small. Both natives have the knob. |
+| **X1: transparent SceneView** | M1 look (b); any AR-style overlay | Clear-to-alpha host view composited over DartNative widgets. Android: `TextureView` or `SurfaceView.setZOrderOnTop` + `PixelFormat.TRANSLUCENT` with a Filament clear alpha. iOS: `SCNView.backgroundColor = .clear`, `isOpaque = false`. | **Declined as engine scope.** Host compositing, not scene-contract surface (adjacent to blocked D6). If a demo ever needs the look, §5.4's in-scene cards fake it without engine work. |
+| **X2: screen distortion** | M1 DR4, M6 | 0.24 `Scene.screenDistortion` pulses (a radial refraction post pass) | 0.24 surface, tracked as **V6b** in program-v2 (realize or record an operator-approved exclusion before V8). Unchanged. |
+| **X3: native vehicle** | M12 | `d3:vehicle` modelled on upstream's example-local raycast vehicle: Jolt `VehicleConstraint`, `SCNPhysicsVehicle` | **Declined as engine scope.** Upstream's vehicle is app code with no wire form; D4 does not license inventing one for a demo. A future app builds it on physics queries app-side. |
+| **X4: streamed dynamic vertices** | M13 cloth, M8 water (CPU path) | A per-frame vertex update path (position/normal buffer replace) with a perf number on the A142 | **Deferred to V8 triage** (like V6g): only if a parity-corpus example needs more than `upsertPayload` provides, measured first. No new unit now. |
+| **X5: physics time scale** | M1 slow-mo, M6 | Scale the physics step (Jolt substep dt, `SCNPhysicsWorld.speed`) | **Post-engine backlog.** Demo juice, not parity surface; revisit when Track P unpauses. |
 | (existing) E2, E5, E5b, E6, E11, E12, V1, V3, V4 | see §4.2 | — | Demos consume them. Priority from the demo view: **E6 > E2 > E5b > E11 > E4 > E5 > V3 > E12.** |
 
 ---
@@ -563,7 +575,9 @@ demo lane does.
    (Khronos glTF samples with per-model licenses, CC0 packs such as Kenney /
    Poly Pizza, Poly Haven, or our own Blender models built reproducibly like
    the DN logo). Replace them in the Showcase before any public demo build.
-4. **New flagship demo ideas** (beyond upstream's corpus):
+4. **New flagship demo ideas** (beyond upstream's corpus) — *backlog,
+   not plan commitments* (program-v2 P5, resolved 2026-10-28):
+   reconsidered only after the engine is done:
    - **M16 Pirate ship on water** — stylized ocean (Gerstner/FFT-style waves
      via E6 shader contract, or a vertex-animated mesh via X4 until then),
      buoyant ship bobbing (physics or scripted), sky + sun (E3), foam/spray
@@ -596,15 +610,16 @@ view) remain open for when the dice work reaches DR3/DR4.
 
 ## 9. Original open questions (answered in §8)
 
-1. Should the dice roller stay in `dart3d/example` as the plugin demo,
-   with the Mythic app (P2) reusing it? Or should it be built directly in
-   P2's app with the example keeping a smaller copy?
-   Recommendation: build it in the example first (DR1–DR3), then extract it
-   into P2.
-2. `mythic_dice_core` extraction (§5.3): yes, or copy?
+1. ~~Should the dice roller stay in `dart3d/example` as the plugin demo,
+   with the Mythic app (P2) reusing it?~~ Answered (§8.1): build it in
+   the example; **no extraction planning** — the "then extract into P2"
+   recommendation is dropped.
+2. ~~`mythic_dice_core` extraction (§5.3): yes, or copy?~~ Answered
+   (§8.1): no extraction or package split planned.
 3. Can `CallbackDiceRoller` be made async in `mythic_dice_parser`
    (explode → physical re-throw)?
-4. Schedule X1 (transparent view)? Without it, M1 does "over the app"
+4. ~~Schedule X1 (transparent view)?~~ Decided 2026-10-28: declined as
+   engine scope (§7). Without it, M1 does "over the app"
    with in-scene cards, which is still physical and breakable.
 5. Dash and fcar provenance: drop them from published demos, or ask
    upstream?

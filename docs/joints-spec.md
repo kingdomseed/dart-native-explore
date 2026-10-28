@@ -1,5 +1,11 @@
 # W9 — joints and extended physics
 
+Status (2026-10-28): landed (W9). Note: upstream also serializes
+joints as one-sided node *components* — decoded since W12 (see
+`w12-component-parity-spec.md` §1), so "runtime-only" below describes
+only this op family. iOS `collide:false` semantics were resolved in
+W23 (`physics-schema.md`).
+
 Cross-SDK spec for physics joints, modeled on upstream
 `package:scene` (0.3.0) `physics/joint_desc.dart` and
 `physics/simulation.dart`. **Upstream joints are runtime-only** —

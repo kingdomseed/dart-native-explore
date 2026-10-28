@@ -1,6 +1,10 @@
 # Hero scene brief — dart3d launch screen (P4)
 
-Status: design brief, research only, no code. Written 2026-09-29.
+Status: implemented (#26 logo, #31 hero; E2's orbit controller has
+also landed). Kept as the design record; pre-implementation wording
+below is as written.
+
+Original status: design brief, research only, no code. Written 2026-09-29.
 Scope: the new launch "hero" for `dart3d/example`. It shows a 3D DartNative
 logo on a dark stage, with a slow camera drift and a subtle glow pulse.
 Over it sit a headline, three value props, and a way into the
@@ -23,8 +27,8 @@ Sources checked 2026-09-29:
   The first gradient's stops are the same in all three.
 - Widget support: `dartnative/docs/widgets.md`, `dartnative/skills/dart-native/SKILL.md`
 - dart3d realization: `dart3d/README.md`, `docs/texture-material-spec.md`,
-  `docs/environment-ibl-spec.md`, `docs/extended-surface-program.md`
-  (W13/W25 effects matrix), `docs/verification-matrix.md` (W7, W13),
+  `docs/environment-ibl-spec.md`, the W13/W25 effects entries in
+  `docs/verification-matrix.md` (W7, W13),
   `docs/program-audit-2026-09-28.md`
 
 ---
@@ -278,9 +282,9 @@ glow, native controls, expo-out entrances, and very little ambient motion.
   - `metallic 0.0`, `roughness 0.28`.
   - `clearcoat 1.0`, `clearcoatRoughness 0.08`. KHR clearcoat is
     realized on both platforms: SceneKit `clearCoat` and Filament
-    `clearCoat` (`texture-material-spec.md:211-216`). The device lane
-    (`full-engine-program.md:160`, `w22-clearcoat.png`) is still
-    unchecked. It arrives through the glTF extension path, so confirm
+    `clearCoat` (`texture-material-spec.md:211-216`). The W22 clearcoat
+    device lane (`w22-clearcoat.png`) was still unchecked at brief
+    time. It arrives through the glTF extension path, so confirm
     that the `.glb → .fsceneb` conversion (or runtime `loadGlb`) keeps
     it. If it's dropped, raise the roughness contrast instead.
   - `emissive = #FFFFFF`, `emissiveTexture` = the same gradient,
@@ -556,7 +560,8 @@ Rules for the hero:
 - `BackdropFilter` over a live 3D surface: if the scrim ever needs blur,
   test on both platforms first. The default plan uses a gradient scrim,
   with no blur.
-- How to detect reduced motion in DartNative (`MediaQuery.disableAnimations`
-  or equivalent).
+- ~~How to detect reduced motion in DartNative~~ — closed: reduced
+  motion is not planned for the example (operator 2026-09-29,
+  program-v2 S0i).
 - Decide Geist vs system font (guardrail 5).
 - Permission or attribution for the logo (guardrail 4).

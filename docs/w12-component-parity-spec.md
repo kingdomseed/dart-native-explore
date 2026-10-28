@@ -1,5 +1,9 @@
 # W12 — Component parity: joint components, rectAreaLight, materialsVariants, `enabled`, feature gating
 
+Status (2026-10-28): landed (W12). The feature set below was the
+W12 head; `prefabInstances`/`streaming` (W15) and `renderTextures`
+(W14) have since landed.
+
 W11 verified skins/animation/morphs end-to-end. This wave closes five
 small parity items from the W10 audit — all decode work riding existing
 machinery. Upstream sources: `flutter_scene-0.23.0/lib/src/fscene/realize/

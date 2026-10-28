@@ -1,7 +1,7 @@
 // Component-level wire ops and the document capability pass.
 //
 // Pure-Dart (no dartnative import) so the shapes are reachable under
-// `dart test` — see docs/extended-surface-program.md §W12.
+// `dart test` (the W12 constraint).
 
 import 'scene_model.dart';
 

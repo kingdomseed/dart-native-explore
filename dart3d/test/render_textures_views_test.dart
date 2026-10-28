@@ -1,7 +1,7 @@
 // W14 render-texture + views checks: the `renderTexture` resource and
 // `views` manifest encodings, the `updateViews`/`render` command ops,
 // and the `updateStage` quality knobs — pinned by
-// docs/extended-surface-program.md §W14. Same constraint as the
+// the W14 render-texture contract (docs/verification-matrix.md §W14). Same constraint as the
 // W3–W13 tests: package:dart3d/dart3d.dart is unreachable under
 // `dart test` (the barrel transitively imports package:dartnative,
 // which needs DartNative's patched SDK), so this pulls the pure-Dart

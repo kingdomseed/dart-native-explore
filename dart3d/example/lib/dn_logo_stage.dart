@@ -220,9 +220,8 @@ void addDnLogoLights(
 
 /// The stage environment: a near-black indigo gradient backdrop, the
 /// studio IBL dimmed, and a gentle bloom + vignette. Everything here
-/// realizes on both natives (docs/extended-surface-program.md: bloom
-/// and vignette applied on iOS and Android; gradient sky + studio IBL
-/// per docs/environment-ibl-spec.md).
+/// realizes on both natives (bloom and vignette applied on iOS and
+/// Android; gradient sky + studio IBL per docs/environment-ibl-spec.md).
 EnvironmentResource dnLogoEnvironment(
   SceneDocument doc, {
   DnLogoStage stage = DnLogoStage.showcase,

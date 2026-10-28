@@ -1,6 +1,10 @@
 # W7 — Environment and image-based lighting
 
-Status: spec. Implements `docs/dart3d-completion-program.md` W7.
+Status: landed (W7), extended by E3/W17 (physical sky,
+`skyEnvironment`, progressive prefilter). Light/environment *units*
+are owned by `docs/android-parity-spec.md` §Light units (S0g) — where
+the recipes below disagree with it (the `× 30000` mapping, iOS
+tone-mapping), §Light units and the code win.
 
 The visible Android gap: Filament renders direct light only — no
 ambient term — so everything not lit by the key light reads flat and
@@ -49,8 +53,8 @@ Android; `scene.lightingEnvironment` on iOS) with rate-limited,
 `256×128` converged cube+SH3) during sun sweeps, plus optional
 `sunLight` (`SunLightSpec`) driving a shadow-casting directional sun
 light opposite `sunDirection`. `effects` — implemented in W13
-(`StageEffects` on both platforms; per-block support matrix in
-`extended-surface-program.md`).
+(`StageEffects` on both platforms; per-block support is recorded in
+`verification-matrix.md`).
 
 ## The studio environment
 
@@ -85,8 +89,9 @@ pixel-identical env on both platforms.
   **studio**, not empty. `empty` is an explicit black env.
 - `exposure` → `camera.exposureOffset = log2(exposure)` with
   `wantsHDR = true` on the view's camera.
-- `toneMapping` — iOS has no operator choice; log-once the name,
-  use SCN's default filmic. Record the approximation in the matrix.
+- `toneMapping` — superseded: iOS resolves through its own pass with
+  named operators (`pbrNeutral`, `aces`, `reinhard`, `linear`, `agx`)
+  since look parity (#57); see §Light units in the parity spec.
 
 ## Android realization
 
@@ -103,12 +108,11 @@ pixel-identical env on both platforms.
   coefficients — port upstream's `_projectEquirectToSphericalHarmonics`
   (same source pixels; do NOT approximate with the specular map — SH
   is the upstream-true irradiance).
-  **Filament measures `IndirectLight`/`Skybox` intensity in lux** and
-  the C++ default is 30000 — a unitless upstream `environmentIntensity`
-  bound raw reads as ~15 stops under-exposed: black skybox, ~invisible
-  IBL (the W7 bring-up bug). `× 30000` is the durable mapping, not a
-  fudge: the env equirect holds ~unit-range radiance and 30000 lx is
-  Filament's reference indoor level.
+  ~~**Filament measures `IndirectLight`/`Skybox` intensity in lux** …
+  `× 30000` is the durable mapping~~ — superseded by S0g light-unit
+  unification (#57): camera exposure is set so wire numbers pass
+  unscaled, and no `× 30000` factor remains in the Android code. See
+  §Light units in the parity spec.
 - `skybox.source=environment` → `Skybox.Builder().environment(cube)
   .intensity(sky.intensity × environmentIntensity × 30000)`;
   `blurriness` → CPU box-blur on a dedicated equirect→cube (Filament's
@@ -181,8 +185,8 @@ W4 textures), then re-run `decodeStage`.
 
 Evidence under `docs/artifacts/w7/`; results into the matrix.
 
-## Deferred
+## Deferred (as of W7; updated 2026-10-28)
 
-`skyEnvironment` procedural sky; `fmat`/`physical` sky sources;
-`effects` post stack (bloom/AO/SSR/TAA/fog → W10); EXR on iOS;
-environment volumes (spatial env blending).
+`skyEnvironment` + `physical` sky landed in E3/W17; the `effects`
+post stack landed in W13/W25. Still open: `fmat` sky sources (E6),
+EXR on iOS, environment volumes (E8).

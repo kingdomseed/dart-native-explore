@@ -1,5 +1,9 @@
 # W5 — structural commands
 
+Status (2026-10-28): landed (W5). The "out of W5 scope" notes below
+(skins/animations not on the wire, stage/env in W7) are historical —
+both landed in W7/W11.
+
 Live scene mutation without `loadScene`. The wire commands are the
 transport for upstream's `diffScene`/`reloadScene` semantics
 (`scene-0.3.0/lib/src/diff.dart`,

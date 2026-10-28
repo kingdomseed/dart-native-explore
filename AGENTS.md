@@ -32,7 +32,8 @@ named `mythic_scene` or anything infringing on `flutter_scene` naming.
 ## Licensing (verified 2026-09-14)
 
 - Official demos (playground, tutorials/*, plugins/*/example) run FREE with
-  no account/key — license token expires 2026-09-17, renewable by re-running.
+  no account/key — the license token is short-lived (the 2026-09-14 one
+  expired 2026-09-17) and renewable by re-running.
 - Own apps run on a trial token; shipping requires subscription at
   dartpub.dev/framework → `dnk_...` key → `dn config --license-key` or
   `--dart-define=DN_LICENSE_KEY=dnk_...`.
@@ -41,17 +42,25 @@ named `mythic_scene` or anything infringing on `flutter_scene` naming.
 ## Program state
 
 - Active plan: `docs/program-v2.md` (tracks S/E/P/R/V, verification tiers
-  T1–T4, decisions D1–D9). Start at its **Where we are** section. Why it was reset: `docs/program-audit-2026-09-28.md`.
-- `docs/full-engine-program.md` is superseded; use it only for W17–W34 scope text.
+  T1–T4, decisions D1–D9). Start at its **Where we are** section (updated
+  2026-10-28: E1–E4 on `main`, E5 in draft PR #65 awaiting Fire/Wacom T2,
+  E5b/E5c/E9 slices implemented but uncommitted in worktree
+  `t3-9d86c4eb`). Why it was reset: `docs/program-audit-2026-09-28.md`.
+- The old program files (`PLAN.md`, `docs/dart3d-completion-program.md`,
+  `docs/extended-surface-program.md`, `docs/full-engine-program.md`) were
+  removed 2026-10-28 — program-v2 is the sole plan; recover the old files
+  from git history if ever needed.
 - Parity: milestone flutter_scene 0.23.0 / scene 0.3.0 (bdero/flutter_scene
   `0dc6ee80`); final goal flutter_scene 0.24 / scene 0.4 (Track V), after
-  the existing work is finished.
+  the existing work is finished. Upstream 0.24.0/0.4.0 shipped 2026-10-05
+  (latest 0.24.3/0.4.1); the V0 re-diff is due.
 
 ## Repo layout
 
 - `dartnative/` — clone of github.com/DartNative/dartnative (docs, playground,
   34 plugin examples, `skills/dart-native` + `skills/dart-native-porting`
-  LLM porting docs, `tutorials/build_a_plugin`).
+  LLM porting docs, `tutorials/build_a_plugin`). Present in the main
+  checkout; agent worktrees may not have it.
 - `.devin/skills/` — copies of DartNative's two official LLM skills
   (`dart-native` widget/API guide, `dart-native-porting` Flutter→DartNative
   playbook). They reference docs by repo-relative path — read those under
@@ -129,14 +138,16 @@ named `mythic_scene` or anything infringing on `flutter_scene` naming.
   Android engine artifacts.
 - Manual `adb install` hits the license gate — always launch via `dn run`.
 
-## Scene-layer findings (for the plugin work ahead)
+## Scene-layer findings (background; dart3d took the second path)
 
 - No 3D plugin exists among the 34. flutter_scene/thermion CANNOT port
   (they need Flutter's renderer, which Zero deleted).
-- Two viable scene paths: `dartnative_skia` `CanvasSurface` (GPU canvas,
-  SkSL shaders, Metal/Vulkan — fake-3D/raymarched dice, no native code) or a
-  custom view plugin hosting SceneKit SCNView on iOS / GLSurfaceView+Filament
-  on Android (real 3D + physics). Plugin contract: `docs/plugin_development.md`
+- The two scene paths found at evaluation time: `dartnative_skia`
+  `CanvasSurface` (GPU canvas, SkSL shaders, Metal/Vulkan — fake-3D/
+  raymarched dice, no native code) or a custom view plugin hosting
+  SceneKit SCNView on iOS / GLSurfaceView+Filament on Android (real 3D
+  + physics) — **dart3d is the second**. Plugin contract:
+  `dartnative/docs/plugin_development.md`
   (ViewType.claim → NativeElement → PluginMutation bytes → Swift @_cdecl
   provider / Kotlin DNAndroidPluginProvider).
 - DartNative is iOS/Android only — no desktop, no web.

@@ -1,5 +1,12 @@
 # W18 — Particles: `particleEmitter` + `meshParticleEmitter`
 
+Status (2026-10-28): landed (W18). Upstream sources were read at
+`flutter_scene-0.22.2`; the codec and CPU sim are byte-identical in
+the D1 milestone pin 0.23.0 (diffed 2026-10-28). The "no
+`InstanceBuffer`" deviation below is **retired**: since E1 (Filament
+1.77.3) Android mesh particles use GPU `InstanceBuffer` instancing,
+same as `d3:instances`.
+
 Upstream sources: `flutter_scene-0.22.2` — `lib/src/fscene/realize/
 particle_emitter_codec.dart` (wire), `lib/src/particles/*` (the CPU
 sim), `lib/src/geometry/billboard_geometry.dart` +

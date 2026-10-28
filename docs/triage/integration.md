@@ -225,10 +225,11 @@ so that iOS evidence carries over.
 
 ## Follow-ups
 
-1. **Light-unit contract (native, both):** see §Light units. Delete
-   `kIosDirectionalScale` afterwards.
-2. **iOS colour saturation** vs Android (dash, glb): check sRGB/texture
-   decode and the tone mapper.
+1. ~~**Light-unit contract (native, both):** see §Light units. Delete
+   `kIosDirectionalScale` afterwards.~~ Done in #57 (S0g look parity).
+2. ~~**iOS colour saturation** vs Android (dash, glb): check sRGB/texture
+   decode and the tone mapper.~~ Done in #57; the physical-iOS-device
+   remainder is tracked in program-v2's verification debt.
 3. **Mechanism of the materials-lane GPU page fault**: see §Materials
    lane. Then restore the catcher/particle prewarm if it's safe.
 4. ~~**Audit all Filament Java Builders and buffer descriptors for GC
