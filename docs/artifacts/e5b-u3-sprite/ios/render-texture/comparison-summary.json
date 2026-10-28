@@ -1,0 +1,32 @@
+[
+  {
+    "phase": "alpha",
+    "maximumEncodedChannelError": 2.0,
+    "withinTolerance": true
+  },
+  {
+    "phase": "additive",
+    "maximumEncodedChannelError": 1.0,
+    "withinTolerance": true
+  },
+  {
+    "phase": "additive-tinted",
+    "maximumEncodedChannelError": 1.0,
+    "withinTolerance": true
+  },
+  {
+    "phase": "additive-tinted-untextured",
+    "maximumEncodedChannelError": 1.0,
+    "withinTolerance": true
+  },
+  {
+    "phase": "alpha-tinted-untextured",
+    "maximumEncodedChannelError": 1.0,
+    "withinTolerance": true
+  },
+  {
+    "phase": "alpha-tinted",
+    "maximumEncodedChannelError": 1.0,
+    "withinTolerance": true
+  }
+]

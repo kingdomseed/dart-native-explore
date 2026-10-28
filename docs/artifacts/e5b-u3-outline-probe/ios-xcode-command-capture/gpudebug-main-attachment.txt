@@ -1,0 +1,12 @@
+loadAction:                 DontCare
+storeAction:                Store
+label:                      (none)
+dimensions:                 1206x2058
+pixelFormat:                BGRA8Unorm_sRGB
+textureType:                2D
+storageMode:                Private
+allocatedSize:              0 bytes
+usage:                      ShaderRead, RenderTarget
+compressionType:            Lossless
+allowGPUOptimizedContents:  yes
+  Use --all for more details.

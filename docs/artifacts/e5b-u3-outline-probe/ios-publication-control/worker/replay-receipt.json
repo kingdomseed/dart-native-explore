@@ -1,0 +1,54 @@
+{
+  "plainArchiveReplayNotCheckout": true,
+  "runtime70BeforeEntries": 70,
+  "forwardFinal70ControlEntries": 70,
+  "reverseActualRuntime70Entries": 70,
+  "archiveEntriesVerified": 70,
+  "commands": [
+    {
+      "command": [
+        "git",
+        "apply",
+        "--check",
+        "/private/tmp/dart3d-u3-outline-publication-diagnosis-20261028/r1/worker/control-only.patch"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "apply",
+        "/private/tmp/dart3d-u3-outline-publication-diagnosis-20261028/r1/worker/control-only.patch"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "apply",
+        "--check",
+        "--reverse",
+        "/private/tmp/dart3d-u3-outline-publication-diagnosis-20261028/r1/worker/control-only.patch"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "apply",
+        "--reverse",
+        "/private/tmp/dart3d-u3-outline-publication-diagnosis-20261028/r1/worker/control-only.patch"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "scratchRemoved": true
+}

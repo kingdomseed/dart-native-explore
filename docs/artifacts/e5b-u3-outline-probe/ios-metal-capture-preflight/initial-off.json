@@ -1,0 +1,12 @@
+{
+  "sha256": "b330c9051c95b8c02c2acb8bbcac4443fd0e8fe1a9ddaf68de631ca8d4113388",
+  "bytes": 27648,
+  "colorsBGRA": {
+    "0,0,0,0": 6695,
+    "206,181,162,255": 217
+  },
+  "dueDraws": 1,
+  "highlightBatches": 0,
+  "targetInstallEvents": 0,
+  "note": "Only initial Off was drawn; Set/Clear and GPU command capture were not run."
+}

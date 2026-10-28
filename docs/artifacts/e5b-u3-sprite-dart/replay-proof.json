@@ -1,0 +1,46 @@
+{
+  "head": "2f38e4e33f0b1cb678bc408a42d069c796cefc12",
+  "baselineArchive": "/private/tmp/dart3d-e5b-atlas-frame-probe-20261027/corrected-source.tgz",
+  "baselineArchiveSha256": "f98021982bf05e8e5fb311ade1ff5485e4218369dc5182533492587dc82f54a6",
+  "importedHashesVerified": 14,
+  "ownedFiles": {
+    "dart3d/lib/src/sprite_material.dart": "b5fa2ed966a4152f9c67e9b099f8a8c5359403f6e4cecaa1344d4e26b0187bd2",
+    "dart3d/lib/dart3d.dart": "72786f47dabda82fd3c84d285a2538df0b37686ff300e217e9aa30ad0953dc06",
+    "dart3d/test/u3_sprite_material_test.dart": "c16a1d53e069d8f0d29adb97d97cefb94ccabc41ca004677b0924f4f9cc0ce63",
+    "dart3d/example/lib/u3_sprite_scene.dart": "61b37e72b6f1849004dc89ca6cbe2161be3027609ed02965837f7dd9c0784f65",
+    "dart3d/example/lib/showcase_loader.dart": "d20aa675423bbc5008a571487d0d9af0abc3a5c06cc0b2b4d6359d36ca5410a6",
+    "dart3d/example/lib/showcase_scene.dart": "180883af63d921f5d30dda31d620fb6781316151766e98aa2315da49b28f21cf",
+    "dart3d/example/test/u3_sprite_showcase_test.dart": "5e56742a0f48a9d4bdcec88b8d09c78a3af9deef7e5e666b1020413b8e2ac71f"
+  },
+  "unownedImportedFilesByteIdentical": {
+    "dart3d/example/lib/u3_atlas_probe.dart": "1559269a56d339a783477932b40cf075ca8aaf743b670c8a95c2bdbe3bc461f4",
+    "dart3d/example/test/u3_atlas_probe_test.dart": "b02470b4432bbab2e45004c264a9da0562534b701a50efcad1936dd19d6eb0e8",
+    "dart3d/example/lib/u3_tone_scene.dart": "49fb0125d0a9a3ef42aa8c8af3b6e76803062163c6bd6ef82283f7931d429180",
+    "dart3d/example/test/u3_tone_showcase_test.dart": "f15f189a0dec64cad7e2cd8bdd1a9915ecf4830351ddadee5e091263699f46b2",
+    "dart3d/lib/src/texture_atlas.dart": "966b30274add1b2b3befbcecd23437d459f0e2b9b3fa1abce6ca5cb080a2e8df",
+    "dart3d/test/u3_texture_atlas_test.dart": "39edc79b01a11b6694e7d79886c1a29d05802bc7df07e7fb8cc486ffc0ed6516",
+    "dart3d/lib/src/geometry/proc.dart": "29b148e7ec4e47c1c526e0f6036127b27d14c24f87744e6a1fa23ddca6ba2568",
+    "dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/MeshFactory.kt": "b84e593f816aa420b3032719900f9cd62803faa89b07ddd55c717613689f0a56",
+    "dart3d/ios/Classes/GeometryFactory.swift": "e0adfcda6bd5160e8110c887b9af6764281683b9f1fb74bd03c5e599c39d61fb",
+    "dart3d/example/test/w26_geometry_test.dart": "18f357714a557463dc9c3883500a90a9e7c088a56ccf1fa5c9e22aefd08e920c",
+    "dart3d/android/src/test/kotlin/com/jasonholtdigital/dart3d/MeshFactoryTest.kt": "04b465c1e4061623d86d6f62017e7aacf0a4bb91d598427c6367d93dea55fc8d"
+  },
+  "patchSha256": "b6778b05968c092e495a70e6414bdf8b1d09f3dd0f5bb1336fa780af73199466",
+  "ownedArchiveSha256": "f9d9888823246d1a6b4fb568593d475cbf47e9f56b137cedf69a027108fbf30f",
+  "replay": {
+    "method": "Extract supplied baseline into plain artifact directory; patch -p1; compare all seven owned hashes and eleven unowned hashes",
+    "exitCode": 0,
+    "ownedHashesMatch": true,
+    "unownedHashesMatch": true
+  },
+  "locks": {
+    "dart3d/pubspec.lock": {
+      "sha256": "868933c6c9bdd80476a9d1b6d380078eb8ecf45960820d8414beebd55a0b555f",
+      "unchangedFromHead": true
+    },
+    "dart3d/example/pubspec.lock": {
+      "sha256": "4ab8d1150fe7606c532dccb84d07eb0cc4062b5d4b2481c07fd27c135241936c",
+      "unchangedFromHead": true
+    }
+  }
+}

@@ -1,0 +1,11 @@
+Transcribed from the parent exec session 87521, not a raw shell log.
+2026-10-27, iPhone 17 Pro C24F3C6D-A3A9-4FB7-978E-36E67EF55354
+/Users/jasonholt/zero/bin/dn run -d C24F3C6D-A3A9-4FB7-978E-36E67EF55354 --no-pub --dart-define=DART3D_MODEL=u3-sprite --dart-define=DART3D_QUALITY=medium
+Launching lib/main.dart on iPhone 17 Pro in debug mode...
+Xcode build done. 17.3s
+dartnative: [DN] Licence valid (community), expires 2027-09-14
+dartnative: [DN] lifecycle → AppLifecycleState.resumed
+dartnative: dart3d: u3-sprite frame=0 blend=alpha paused
+Syncing files to device iPhone 17 Pro... 54ms
+Parent drove the image-backed material sequence and stopped with q.
+Application finished.

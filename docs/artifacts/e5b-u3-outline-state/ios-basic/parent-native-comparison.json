@@ -1,0 +1,72 @@
+{
+  "source": "/private/tmp/dart3d-e5b-highlight-native-probe-20261027/r1/parent-native.log",
+  "expectedRecords": 9,
+  "actualRecords": 9,
+  "exactOrderedMatch": true,
+  "checks": [
+    {
+      "index": 0,
+      "expected": "U3HighlightState op=clearScene count=0 colors={}",
+      "observed": "U3HighlightState op=clearScene count=0 colors={}",
+      "matches": true
+    },
+    {
+      "index": 1,
+      "expected": "U3HighlightState op=apply count=2 colors={128861903781889=[1.0,0.25,0.0,1.0];128861903781890=[0.0,0.5,1.0,0.5]}",
+      "observed": "U3HighlightState op=apply count=2 colors={128861903781889=[1.0,0.25,0.0,1.0];128861903781890=[0.0,0.5,1.0,0.5]}",
+      "matches": true
+    },
+    {
+      "index": 2,
+      "expected": "U3HighlightState op=apply count=2 colors={128861903781890=[0.0,0.5,1.0,0.5];128861903781891=[0.25,1.0,0.0,0.0]}",
+      "observed": "U3HighlightState op=apply count=2 colors={128861903781890=[0.0,0.5,1.0,0.5];128861903781891=[0.25,1.0,0.0,0.0]}",
+      "matches": true
+    },
+    {
+      "index": 3,
+      "expected": "U3HighlightState op=apply count=2 colors={128861903781890=[0.0,0.5,1.0,0.5];128861903781891=[0.25,1.0,0.0,0.25]}",
+      "observed": "U3HighlightState op=apply count=2 colors={128861903781890=[0.0,0.5,1.0,0.5];128861903781891=[0.25,1.0,0.0,0.25]}",
+      "matches": true
+    },
+    {
+      "index": 4,
+      "expected": "U3HighlightState op=removeNodes count=1 colors={128861903781891=[0.25,1.0,0.0,0.25]}",
+      "observed": "U3HighlightState op=removeNodes count=1 colors={128861903781891=[0.25,1.0,0.0,0.25]}",
+      "matches": true
+    },
+    {
+      "index": 5,
+      "expected": "U3HighlightState op=apply count=1 colors={128861903781891=[0.5,1.0,0.0,0.25]}",
+      "observed": "U3HighlightState op=apply count=1 colors={128861903781891=[0.5,1.0,0.0,0.25]}",
+      "matches": true
+    },
+    {
+      "index": 6,
+      "expected": "U3HighlightState op=apply count=1 colors={128861903781891=[0.75,1.0,0.0,0.25]}",
+      "observed": "U3HighlightState op=apply count=1 colors={128861903781891=[0.75,1.0,0.0,0.25]}",
+      "matches": true
+    },
+    {
+      "index": 7,
+      "expected": "U3HighlightState op=apply count=2 colors={128861903781890=[1.0,0.0,1.0,0.5];128861903781891=[0.75,1.0,0.0,0.25]}",
+      "observed": "U3HighlightState op=apply count=2 colors={128861903781890=[1.0,0.0,1.0,0.5];128861903781891=[0.75,1.0,0.0,0.25]}",
+      "matches": true
+    },
+    {
+      "index": 8,
+      "expected": "U3HighlightState op=clearScene count=0 colors={}",
+      "observed": "U3HighlightState op=clearScene count=0 colors={}",
+      "matches": true
+    }
+  ],
+  "extraRecords": [],
+  "scope": "Actual iOS ingress, patch, transform retention, subtree removal, same-ID re-add and explicit replacement only.",
+  "notRun": [
+    "streamed reparenting",
+    "deferred replay",
+    "host teardown",
+    "Android",
+    "rendering",
+    "performance"
+  ]
+}

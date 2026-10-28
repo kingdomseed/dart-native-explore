@@ -1,0 +1,74 @@
+[
+  {
+    "nativePath": "/Users/jasonholt/Library/Developer/CoreSimulator/Devices/C24F3C6D-A3A9-4FB7-978E-36E67EF55354/data/Containers/Data/Application/10014EB5-DA13-4D0D-BCE6-CA7A18AF71C1/tmp/u3-outline-alpha-input-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-554635.1000000001.json",
+    "copiedPath": "/private/tmp/dart3d-u3-xcode-capture-20261028/r1/parent/baseline/raw/u3-outline-alpha-input-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-554635.1000000001.json",
+    "bytes": 246,
+    "sha256": "c89f94b80c893a43a047499b197bee7c5f742105d0839ac439d7a385b0ee2b18"
+  },
+  {
+    "nativePath": "/Users/jasonholt/Library/Developer/CoreSimulator/Devices/C24F3C6D-A3A9-4FB7-978E-36E67EF55354/data/Containers/Data/Application/10014EB5-DA13-4D0D-BCE6-CA7A18AF71C1/tmp/u3-outline-alpha-input-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-554635.1000000001.rgba",
+    "copiedPath": "/private/tmp/dart3d-u3-xcode-capture-20261028/r1/parent/baseline/raw/u3-outline-alpha-input-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-554635.1000000001.rgba",
+    "bytes": 27648,
+    "sha256": "b2863eb80ce64f80d929f87f59304430ff98418d2233a9d3164442427233c0d1"
+  },
+  {
+    "nativePath": "/Users/jasonholt/Library/Developer/CoreSimulator/Devices/C24F3C6D-A3A9-4FB7-978E-36E67EF55354/data/Containers/Data/Application/10014EB5-DA13-4D0D-BCE6-CA7A18AF71C1/tmp/u3-outline-alpha-output-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-554635.1000000001.json",
+    "copiedPath": "/private/tmp/dart3d-u3-xcode-capture-20261028/r1/parent/baseline/raw/u3-outline-alpha-output-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-554635.1000000001.json",
+    "bytes": 247,
+    "sha256": "7f806c1dbd1dd132d3739a2688bd0399238574c2d9756c89d66c4b742269cc64"
+  },
+  {
+    "nativePath": "/Users/jasonholt/Library/Developer/CoreSimulator/Devices/C24F3C6D-A3A9-4FB7-978E-36E67EF55354/data/Containers/Data/Application/10014EB5-DA13-4D0D-BCE6-CA7A18AF71C1/tmp/u3-outline-alpha-output-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-554635.1000000001.rgba",
+    "copiedPath": "/private/tmp/dart3d-u3-xcode-capture-20261028/r1/parent/baseline/raw/u3-outline-alpha-output-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-554635.1000000001.rgba",
+    "bytes": 27648,
+    "sha256": "5acce7bbe5ef1df970dec47a0bb0c48206f60635ee785306b45b2171fdb89044"
+  },
+  {
+    "nativePath": "/Users/jasonholt/Library/Developer/CoreSimulator/Devices/C24F3C6D-A3A9-4FB7-978E-36E67EF55354/data/Containers/Data/Application/10014EB5-DA13-4D0D-BCE6-CA7A18AF71C1/tmp/u3-outline-mask-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-554635.1000000001.json",
+    "copiedPath": "/private/tmp/dart3d-u3-xcode-capture-20261028/r1/parent/baseline/raw/u3-outline-mask-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-554635.1000000001.json",
+    "bytes": 240,
+    "sha256": "5dad9ba9d317540f7fde2ab2f7d7a1c152720d8956f2d31d06051c9e70c7ead5"
+  },
+  {
+    "nativePath": "/Users/jasonholt/Library/Developer/CoreSimulator/Devices/C24F3C6D-A3A9-4FB7-978E-36E67EF55354/data/Containers/Data/Application/10014EB5-DA13-4D0D-BCE6-CA7A18AF71C1/tmp/u3-outline-mask-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-554635.1000000001.rgba",
+    "copiedPath": "/private/tmp/dart3d-u3-xcode-capture-20261028/r1/parent/baseline/raw/u3-outline-mask-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-554635.1000000001.rgba",
+    "bytes": 55296,
+    "sha256": "11490777a76c2fb7be6427055391fd3eb6379992ae8699026df6b98ff0f186e3"
+  },
+  {
+    "nativePath": "/Users/jasonholt/Library/Developer/CoreSimulator/Devices/C24F3C6D-A3A9-4FB7-978E-36E67EF55354/data/Containers/Data/Application/10014EB5-DA13-4D0D-BCE6-CA7A18AF71C1/tmp/u3-outline-stored-8445216278846636033-set-8445216278846636034-set-target-8445217361178394631-dirty-false-time-554515.5500000002.json",
+    "copiedPath": "/private/tmp/dart3d-u3-xcode-capture-20261028/r1/parent/baseline/raw/u3-outline-stored-8445216278846636033-set-8445216278846636034-set-target-8445217361178394631-dirty-false-time-554515.5500000002.json",
+    "bytes": 269,
+    "sha256": "a6fd9bac85eb4a7c11e90e5df7f5be082a79e881202e672269f50a0c738a9176"
+  },
+  {
+    "nativePath": "/Users/jasonholt/Library/Developer/CoreSimulator/Devices/C24F3C6D-A3A9-4FB7-978E-36E67EF55354/data/Containers/Data/Application/10014EB5-DA13-4D0D-BCE6-CA7A18AF71C1/tmp/u3-outline-stored-8445216278846636033-set-8445216278846636034-set-target-8445217361178394631-dirty-false-time-554515.5500000002.rgba",
+    "copiedPath": "/private/tmp/dart3d-u3-xcode-capture-20261028/r1/parent/baseline/raw/u3-outline-stored-8445216278846636033-set-8445216278846636034-set-target-8445217361178394631-dirty-false-time-554515.5500000002.rgba",
+    "bytes": 27648,
+    "sha256": "b330c9051c95b8c02c2acb8bbcac4443fd0e8fe1a9ddaf68de631ca8d4113388"
+  },
+  {
+    "nativePath": "/Users/jasonholt/Library/Developer/CoreSimulator/Devices/C24F3C6D-A3A9-4FB7-978E-36E67EF55354/data/Containers/Data/Application/10014EB5-DA13-4D0D-BCE6-CA7A18AF71C1/tmp/u3-outline-target-target-8445217361178394631-view-0-mode-0-cameraCase-0-aa-1-time-554369.7000000001.json",
+    "copiedPath": "/private/tmp/dart3d-u3-xcode-capture-20261028/r1/parent/baseline/raw/u3-outline-target-target-8445217361178394631-view-0-mode-0-cameraCase-0-aa-1-time-554369.7000000001.json",
+    "bytes": 241,
+    "sha256": "a1b2a5c97bd0dcd4f32d25b4ba2fec68c0c848d22ffb072cd9ddafbf77f74d33"
+  },
+  {
+    "nativePath": "/Users/jasonholt/Library/Developer/CoreSimulator/Devices/C24F3C6D-A3A9-4FB7-978E-36E67EF55354/data/Containers/Data/Application/10014EB5-DA13-4D0D-BCE6-CA7A18AF71C1/tmp/u3-outline-target-target-8445217361178394631-view-0-mode-0-cameraCase-0-aa-1-time-554369.7000000001.rgba",
+    "copiedPath": "/private/tmp/dart3d-u3-xcode-capture-20261028/r1/parent/baseline/raw/u3-outline-target-target-8445217361178394631-view-0-mode-0-cameraCase-0-aa-1-time-554369.7000000001.rgba",
+    "bytes": 27648,
+    "sha256": "b330c9051c95b8c02c2acb8bbcac4443fd0e8fe1a9ddaf68de631ca8d4113388"
+  },
+  {
+    "nativePath": "/Users/jasonholt/Library/Developer/CoreSimulator/Devices/C24F3C6D-A3A9-4FB7-978E-36E67EF55354/data/Containers/Data/Application/10014EB5-DA13-4D0D-BCE6-CA7A18AF71C1/tmp/u3-outline-target-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-554635.1000000001.json",
+    "copiedPath": "/private/tmp/dart3d-u3-xcode-capture-20261028/r1/parent/baseline/raw/u3-outline-target-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-554635.1000000001.json",
+    "bytes": 241,
+    "sha256": "0852cf3d172bc3e1a47914cd4250eb0d1216d9d7a8f88b834f151e1bdbc8bddf"
+  },
+  {
+    "nativePath": "/Users/jasonholt/Library/Developer/CoreSimulator/Devices/C24F3C6D-A3A9-4FB7-978E-36E67EF55354/data/Containers/Data/Application/10014EB5-DA13-4D0D-BCE6-CA7A18AF71C1/tmp/u3-outline-target-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-554635.1000000001.rgba",
+    "copiedPath": "/private/tmp/dart3d-u3-xcode-capture-20261028/r1/parent/baseline/raw/u3-outline-target-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-554635.1000000001.rgba",
+    "bytes": 27648,
+    "sha256": "b330c9051c95b8c02c2acb8bbcac4443fd0e8fe1a9ddaf68de631ca8d4113388"
+  }
+]

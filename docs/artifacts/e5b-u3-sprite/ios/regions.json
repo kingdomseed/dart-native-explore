@@ -1,0 +1,10 @@
+{
+  "backdrop": [450, 680, 9, 9],
+  "selectedZeroAlpha": [559, 630, 9, 9],
+  "selectedHalfAlpha": [559, 690, 9, 9],
+  "selectedOpaque": [559, 765, 9, 9],
+  "untexturedHalfAlpha": [288, 1008, 9, 9],
+  "overlapBackOnly": [625, 1008, 9, 9],
+  "overlapFrontOnly": [865, 1008, 9, 9],
+  "overlapBoth": [735, 1008, 9, 9]
+}

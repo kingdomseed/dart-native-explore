@@ -1759,7 +1759,7 @@ object MeshFactory {
             val rx = sx * cosR - sy * sinR
             val ry = sx * sinR + sy * cosR
             b.emit(r * rx + u * ry, n,
-                dx + 0.5f, dy + 0.5f, color[0], color[1], color[2], color[3])
+                dx + 0.5f, 0.5f - dy, color[0], color[1], color[2], color[3])
         }
         b.quad(0, 1, 2, 3)
         return b.build()
@@ -2038,7 +2038,7 @@ object MeshFactory {
                 val rx = sx * cosR - sy * sinR
                 val ry = sx * sinR + sy * cosR
                 b.emit(c + r * rx + u * ry, n,
-                    dx + 0.5f, dy + 0.5f, col[0], col[1], col[2], col[3])
+                    dx + 0.5f, 0.5f - dy, col[0], col[1], col[2], col[3])
             }
             b.quad(v0, v0 + 1, v0 + 2, v0 + 3)
         }

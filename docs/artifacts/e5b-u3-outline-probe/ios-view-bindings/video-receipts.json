@@ -1,0 +1,124 @@
+[
+  {
+    "path": "/private/tmp/dart3d-u3-outline-view-probe-20261028/r1/parent/before/journey.mp4",
+    "sha256": "045ef52da4e05fa1c4f698f1e7a3bb2b61037d671dcab2418faf66da4f77163a",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 1206,
+          "height": 2622,
+          "duration": "31.198333",
+          "nb_read_frames": "5715"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "program": "ffprobe",
+        "args": [
+          "-v",
+          "error",
+          "-threads",
+          "2",
+          "-count_frames",
+          "-select_streams",
+          "v:0",
+          "-show_entries",
+          "stream=width,height,duration,nb_read_frames",
+          "-of",
+          "json",
+          "/private/tmp/dart3d-u3-outline-view-probe-20261028/r1/parent/before/journey.mp4"
+        ],
+        "exitCode": 0,
+        "startUTC": "2026-10-28T02:56:20.078914Z",
+        "endUTC": "2026-10-28T02:56:26.517140Z"
+      },
+      {
+        "program": "ffmpeg",
+        "args": [
+          "-v",
+          "warning",
+          "-threads",
+          "2",
+          "-i",
+          "/private/tmp/dart3d-u3-outline-view-probe-20261028/r1/parent/before/journey.mp4",
+          "-map",
+          "0:v:0",
+          "-an",
+          "-fps_mode",
+          "passthrough",
+          "-f",
+          "null",
+          "-"
+        ],
+        "exitCode": 0,
+        "startUTC": "2026-10-28T02:56:26.517202Z",
+        "endUTC": "2026-10-28T02:56:32.761719Z"
+      }
+    ],
+    "warningLines": 3
+  },
+  {
+    "path": "/private/tmp/dart3d-u3-outline-view-probe-20261028/r1/parent/split/journey.mp4",
+    "sha256": "47e7b6aa659f7a974a22c09f7ac40ab11d936eb1b988dc45721ae57df82ed4a2",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 1206,
+          "height": 2622,
+          "duration": "202.983333",
+          "nb_read_frames": "36656"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "program": "ffprobe",
+        "args": [
+          "-v",
+          "error",
+          "-threads",
+          "2",
+          "-count_frames",
+          "-select_streams",
+          "v:0",
+          "-show_entries",
+          "stream=width,height,duration,nb_read_frames",
+          "-of",
+          "json",
+          "/private/tmp/dart3d-u3-outline-view-probe-20261028/r1/parent/split/journey.mp4"
+        ],
+        "exitCode": 0,
+        "startUTC": "2026-10-28T02:56:32.919379Z",
+        "endUTC": "2026-10-28T02:57:13.464206Z"
+      },
+      {
+        "program": "ffmpeg",
+        "args": [
+          "-v",
+          "warning",
+          "-threads",
+          "2",
+          "-i",
+          "/private/tmp/dart3d-u3-outline-view-probe-20261028/r1/parent/split/journey.mp4",
+          "-map",
+          "0:v:0",
+          "-an",
+          "-fps_mode",
+          "passthrough",
+          "-f",
+          "null",
+          "-"
+        ],
+        "exitCode": 0,
+        "startUTC": "2026-10-28T02:57:13.464245Z",
+        "endUTC": "2026-10-28T02:57:54.711211Z"
+      }
+    ],
+    "warningLines": 8
+  }
+]

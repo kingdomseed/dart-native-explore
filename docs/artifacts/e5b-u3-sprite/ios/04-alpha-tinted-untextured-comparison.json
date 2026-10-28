@@ -1,0 +1,147 @@
+{
+  "phase": "alpha-tinted-untextured",
+  "equation": "C * a + B * (1 - a)",
+  "encoding": "sRGB transfer applied to linear model values",
+  "tolerance": 3,
+  "maximumEncodedChannelError": 1.0,
+  "withinTolerance": true,
+  "coverageAlpha": "NOT_MEASURED: opaque screenshots cannot establish coverage",
+  "regions": {
+    "backdrop": {
+      "observedRgb": [
+        80.0,
+        97.0,
+        111.0
+      ],
+      "expectedRgb": [
+        80,
+        97,
+        111
+      ],
+      "absoluteError": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "selectedZeroAlpha": {
+      "observedRgb": [
+        104.0,
+        122.0,
+        126.0
+      ],
+      "expectedRgb": [
+        105,
+        122,
+        126
+      ],
+      "absoluteError": [
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    "selectedHalfAlpha": {
+      "observedRgb": [
+        104.0,
+        122.0,
+        126.0
+      ],
+      "expectedRgb": [
+        105,
+        122,
+        126
+      ],
+      "absoluteError": [
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    "selectedOpaque": {
+      "observedRgb": [
+        104.0,
+        122.0,
+        126.0
+      ],
+      "expectedRgb": [
+        105,
+        122,
+        126
+      ],
+      "absoluteError": [
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    "untexturedHalfAlpha": {
+      "observedRgb": [
+        104.0,
+        163.0,
+        191.0
+      ],
+      "expectedRgb": [
+        105,
+        162,
+        192
+      ],
+      "absoluteError": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "overlapBackOnly": {
+      "observedRgb": [
+        157.0,
+        93.0,
+        118.0
+      ],
+      "expectedRgb": [
+        158,
+        93,
+        118
+      ],
+      "absoluteError": [
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    "overlapFrontOnly": {
+      "observedRgb": [
+        84.0,
+        152.0,
+        131.0
+      ],
+      "expectedRgb": [
+        85,
+        151,
+        132
+      ],
+      "absoluteError": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "overlapBoth": {
+      "observedRgb": [
+        129.0,
+        150.0,
+        135.0
+      ],
+      "expectedRgb": [
+        129,
+        150,
+        134
+      ],
+      "absoluteError": [
+        0.0,
+        0.0,
+        1.0
+      ]
+    }
+  }
+}

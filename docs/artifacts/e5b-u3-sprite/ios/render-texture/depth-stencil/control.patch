@@ -1,0 +1,41 @@
+diff --git a/dart3d/ios/Classes/RenderTargets.swift b/dart3d/ios/Classes/RenderTargets.swift
+index 4f8ef6d..6bfaeef 100644
+--- a/dart3d/ios/Classes/RenderTargets.swift
++++ b/dart3d/ios/Classes/RenderTargets.swift
+@@ -134,7 +134,7 @@ extension FsceneRealizer.Context {
+         colorDesc.usage = [.renderTarget, .shaderRead]
+         colorDesc.storageMode = .private
+         let depthDesc = MTLTextureDescriptor.texture2DDescriptor(
+-            pixelFormat: .depth32Float, width: w, height: h,
++            pixelFormat: .depth32Float_stencil8, width: w, height: h,
+             mipmapped: false)
+         depthDesc.usage = .renderTarget
+         depthDesc.storageMode = .private
+@@ -346,7 +346,7 @@ extension SceneViewHost {
+                 pixelFormat: rec.colorTex.pixelFormat,
+                 width: rec.width, height: rec.height, samples: samples)
+             view.msaaDepthTex = msaaTexture(
+-                pixelFormat: .depth32Float,
++                pixelFormat: .depth32Float_stencil8,
+                 width: rec.width, height: rec.height, samples: samples)
+             view.msaaSamples = samples
+         } else if samples <= 1 {
+@@ -385,10 +385,18 @@ extension SceneViewHost {
+             pass.depthAttachment.storeAction = .dontCare
+         }
+         guard let cb = queue.makeCommandBuffer() else { return }
++        pass.stencilAttachment.texture = pass.depthAttachment.texture
++        pass.stencilAttachment.loadAction = .clear
++        pass.stencilAttachment.clearStencil = 0
++        pass.stencilAttachment.storeAction = .dontCare
+         renderer.render(
+             withViewport: CGRect(x: 0, y: 0,
+                                  width: rec.width, height: rec.height),
+             commandBuffer: cb, passDescriptor: pass)
++        logOnce("u3.rt.depthStencil", "u3 RT control: depth-stencil attachment; "
++            + "depth=\(renderer.depthPixelFormat.rawValue) "
++            + "stencil=\(renderer.stencilPixelFormat.rawValue) "
++            + "samples=\(samples)")
+         cb.commit()
+     }
+ 

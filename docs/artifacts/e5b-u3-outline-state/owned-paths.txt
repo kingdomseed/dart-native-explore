@@ -1,0 +1,6 @@
+dart3d/lib/src/scene_controller.dart
+dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/Dart3dView.kt
+dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/SelectionOutline.kt
+dart3d/ios/Classes/SceneViewHost.swift
+dart3d/ios/Classes/SelectionOutline.swift
+dart3d/test/u3_node_highlights_test.dart

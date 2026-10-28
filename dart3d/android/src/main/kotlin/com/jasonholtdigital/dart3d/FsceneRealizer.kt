@@ -362,7 +362,7 @@ object FsceneRealizer {
      * material resource warn-onces as unhandled: that warn is what
      * the conformance matrix's `warn` row means. */
     private val handledMaterialProps = setOf(
-        "baseColor", "baseColorTexture",
+        "baseColor", "baseColorTexture", "blendMode",
         "metallic", "roughness", "metallicRoughnessTexture",
         "normalTexture", "normalScale",
         "occlusionTexture", "occlusionStrength",
@@ -1722,6 +1722,7 @@ object FsceneRealizer {
             val matKey = p.tag("material").d3Ref()
             val inst = matKey?.let { materials[it] }
                 ?: host.litMaterial.defaultInstance
+            val sprite = shape == "billboard" && host.isSpriteMaterial(inst)
             matKey?.let {
                 materialConsumers.getOrPut(it) { ArrayList() }
                     .add(Pair(rec.entity, 0))
@@ -1730,8 +1731,8 @@ object FsceneRealizer {
                 .boundingBox(Box(gm.bounds[0], gm.bounds[1], gm.bounds[2],
                     gm.bounds[3], gm.bounds[4], gm.bounds[5]))
                 .layerMask(0xFF, rec.layers and 0xFF)
-                .castShadows(true)
-                .receiveShadows(true)
+                .castShadows(!sprite)
+                .receiveShadows(!sprite)
                 .geometry(0, gm.primitiveType, gm.vertexBuffer,
                     gm.indexBuffer)
                 .material(0, inst)
@@ -2120,8 +2121,19 @@ object FsceneRealizer {
                 val ri = rm.getInstance(rec.entity)
                 if (primitive < rm.getPrimitiveCount(ri)) {
                     rm.setMaterialInstanceAt(ri, primitive, target)
+                    applyBillboardShadows(nodeKey, ri, target)
                 }
             }
+        }
+
+        private fun applyBillboardShadows(
+            nodeKey: Long, renderable: Int, material: MaterialInstance,
+        ) {
+            if (cameraFacing[nodeKey]?.shape != "billboard") return
+            val shadows = !host.isSpriteMaterial(material)
+            val rm = host.engine.renderableManager
+            rm.setCastShadows(renderable, shadows)
+            rm.setReceiveShadows(renderable, shadows)
         }
 
         fun applyMaterialConsumer(
@@ -2148,6 +2160,7 @@ object FsceneRealizer {
                 val ri = rm.getInstance(entity)
                 if (primitive < rm.getPrimitiveCount(ri)) {
                     rm.setMaterialInstanceAt(ri, primitive, target)
+                    applyBillboardShadows(owner.key, ri, target)
                 }
             }
         }
@@ -6372,6 +6385,27 @@ object FsceneRealizer {
     ): MaterialInstance {
         val type = r.optString("type").ifEmpty { "physicallyBased" }
         val props = r.optJSONObject("properties") ?: JSONObject()
+        if (type == "d3:sprite") {
+            val mi = host.spriteMaterial.createInstance()
+            val tint = props.tag("baseColor").d3Color()
+                ?: floatArrayOf(1f, 1f, 1f, 1f)
+            mi.setParameter("tint", tint[0], tint[1], tint[2], tint[3])
+            val rect = props.tag("baseColorTextureTransform").d3Map()
+            val offset = rect?.tag("offset").d3Vec2()
+            val scale = rect?.tag("scale").d3Vec2()
+            mi.setParameter("spriteRect",
+                offset?.get(0)?.toFloat() ?: 0f,
+                offset?.get(1)?.toFloat() ?: 0f,
+                scale?.get(0)?.toFloat() ?: 1f,
+                scale?.get(1)?.toFloat() ?: 1f)
+            mi.setParameter("additive",
+                if (props.tag("blendMode").d3String() == "additive") 1f else 0f)
+            mi.setDepthCulling(true)
+            bindTextureSlot(host, mi, props, textures, samplers,
+                "baseColorTexture", "spriteMap", host.fallbackWhite, consumers)
+            warnUnhandledMaterialProps(key, props)
+            return mi
+        }
         if (type == "shadowCatcher") {
             val baked = catcherSettings?.mode == ShadowCatcherMode.BAKED
             val base = if (baked) host.bakedCatcherMaterial
@@ -6635,7 +6669,7 @@ object FsceneRealizer {
         // W14: a per-resource sampler (a renderTexture's filter/wrap)
         // wins over the shared host sampler.
         mi.setParameter(param, tex,
-            texKey?.let { samplers[it] } ?: host.textureSampler)
+            host.materialTextureSampler(param, texKey?.let { samplers[it] }))
         if (texKey != null && consumers != null) {
             consumers.getOrPut(texKey) { ArrayList() }.add(mi to param)
         }

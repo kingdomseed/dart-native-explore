@@ -397,6 +397,35 @@ enum ToneMapTechnique {
         }
         return float4(mapped, packed.a);
     }
+
+    struct U3OutlineParams { float4 u3Mode; };
+    fragment float4 u3_views_outline(
+        D3ResolveOut in [[stage_in]],
+        texture2d<float> colorSampler [[texture(0)]],
+        texture2d<float> u3Mask [[texture(1)]],
+        constant U3OutlineParams& p [[buffer(0)]]) {
+        constexpr sampler s(filter::linear, address::clamp_to_edge);
+        float4 base = colorSampler.sample(s, in.uv);
+        if (p.u3Mode.x < 1.5) return base;
+        float4 center = u3Mask.sample(s, in.uv);
+        float2 texel = 1.0 / float2(u3Mask.get_width(), u3Mask.get_height());
+        float bestCoverage = 0.0;
+        float3 outlineColor = float3(0.0);
+        for (int y = -4; y <= 4; y++) {
+            for (int x = -4; x <= 4; x++) {
+                float2 d = float2(x, y);
+                if (dot(d, d) > 9.0) continue;
+                float4 neighbor = u3Mask.sample(s, in.uv + d * texel);
+                if (neighbor.a > bestCoverage) {
+                    bestCoverage = neighbor.a;
+                    outlineColor = neighbor.rgb;
+                }
+            }
+        }
+        if (center.a < 0.001 && bestCoverage > 0.001)
+            return float4(outlineColor, 1.0);
+        return base;
+    }
     """
 
     private static let librariesLock = NSLock()
@@ -436,7 +465,9 @@ enum ToneMapTechnique {
     /// A technique with the resolve pass, and before it the passes of
     /// a bloom chain when [bloom] is given; nil when the shader
     /// library cannot be built on [device].
-    static func make(device: MTLDevice, bloom: BloomChain? = nil)
+    static func make(device: MTLDevice, bloom: BloomChain? = nil,
+                     outline: Bool = false, compositeOnly: Bool = false,
+                     syntheticInput: Bool = false)
         -> SCNTechnique?
     {
         guard let lib = library(for: device) else { return nil }
@@ -505,9 +536,23 @@ enum ToneMapTechnique {
             }
             resolveInputs["d3BloomSum"] = sum
         }
-        passes["d3_resolve"] = quad(
-            "d3_resolve_fragment", inputs: resolveInputs, output: "COLOR")
-        sequence.append("d3_resolve")
+        if !compositeOnly {
+            passes["d3_resolve"] = quad(
+                "d3_resolve_fragment", inputs: resolveInputs, output: "COLOR")
+            sequence.append("d3_resolve")
+        }
+        if outline {
+            symbols["u3MaskSymbol"] = ["type": "sampler2D"]
+            symbols["u3ModeSymbol"] = ["type": "vec4"]
+            if syntheticInput { symbols["u3BaseSymbol"] = ["type": "sampler2D"] }
+            var tail = quad("u3_views_outline", inputs: [
+                "colorSampler": syntheticInput ? "u3BaseSymbol" : "COLOR",
+                "u3Mask": "u3MaskSymbol", "u3Mode": "u3ModeSymbol"], output: "COLOR")
+            tail["depthStates"] = ["enableRead": false, "enableWrite": false]
+            tail["blendStates"] = ["enable": false]
+            passes["u3_views_outline"] = tail
+            sequence.append("u3_views_outline")
+        }
         var definition: [String: Any] = [
             "passes": passes,
             "sequence": sequence,

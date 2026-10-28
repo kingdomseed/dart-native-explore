@@ -1,0 +1,67 @@
+{
+  "crop": [
+    0,
+    100,
+    402,
+    650
+  ],
+  "records": [
+    {
+      "file": "parent-00-ready.png",
+      "width": 402,
+      "height": 874,
+      "blueObjectPixels": 19422,
+      "changedSceneRgbPixelsAgainstReady": 0
+    },
+    {
+      "file": "parent-01-assigned.png",
+      "width": 402,
+      "height": 874,
+      "blueObjectPixels": 19422,
+      "changedSceneRgbPixelsAgainstReady": 0
+    },
+    {
+      "file": "parent-02-patched.png",
+      "width": 402,
+      "height": 874,
+      "blueObjectPixels": 19422,
+      "changedSceneRgbPixelsAgainstReady": 0
+    },
+    {
+      "file": "parent-03-moved.png",
+      "width": 402,
+      "height": 874,
+      "blueObjectPixels": 19568,
+      "changedSceneRgbPixelsAgainstReady": 5134
+    },
+    {
+      "file": "parent-04-removed.png",
+      "width": 402,
+      "height": 874,
+      "blueObjectPixels": 6426,
+      "changedSceneRgbPixelsAgainstReady": 13230
+    },
+    {
+      "file": "parent-05-readded.png",
+      "width": 402,
+      "height": 874,
+      "blueObjectPixels": 19422,
+      "changedSceneRgbPixelsAgainstReady": 0
+    },
+    {
+      "file": "parent-06-selected-again.png",
+      "width": 402,
+      "height": 874,
+      "blueObjectPixels": 19422,
+      "changedSceneRgbPixelsAgainstReady": 0
+    },
+    {
+      "file": "parent-07-reloaded.png",
+      "width": 402,
+      "height": 874,
+      "blueObjectPixels": 19422,
+      "changedSceneRgbPixelsAgainstReady": 0
+    }
+  ],
+  "scope": "Uncalibrated encoded screenshot inventory and unchanged RGB only. No outline rendering claim."
+}

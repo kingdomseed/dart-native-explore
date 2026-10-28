@@ -2141,7 +2141,7 @@ D3MeshData buildBillboard({
     b.emit(
       r * rx + u * ry,
       n: n,
-      uv: Vector2(dx + 0.5, dy + 0.5),
+      uv: Vector2(dx + 0.5, 0.5 - dy),
       color: color,
     );
   }

@@ -1,0 +1,40 @@
+Starting a Gradle Daemon (subsequent builds will be faster)
+> Task :gradle:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle:compileKotlin UP-TO-DATE
+> Task :gradle:compileJava NO-SOURCE
+> Task :gradle:compileGroovy NO-SOURCE
+> Task :gradle:pluginDescriptors UP-TO-DATE
+> Task :gradle:processResources UP-TO-DATE
+> Task :gradle:classes UP-TO-DATE
+> Task :gradle:jar UP-TO-DATE
+> Task :dart3d:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :dart3d:preBuild UP-TO-DATE
+> Task :dart3d:preReleaseBuild UP-TO-DATE
+> Task :dart3d:generateReleaseBuildConfig
+> Task :dart3d:generateReleaseResValues
+> Task :dart3d:generateReleaseResources
+> Task :dart3d:packageReleaseResources
+> Task :dart3d:parseReleaseLocalResources
+> Task :dart3d:generateReleaseRFile
+
+> Task :dart3d:compileReleaseKotlin
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/t3-21218517/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/Dart3dView.kt:2074:17 'field filterWidth: Float' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/t3-21218517/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/EnvironmentFactory.kt:1023:45 'constructor(p0: Buffer, p1: Texture.Format, p2: Texture.Type): Texture.PixelBufferDescriptor' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/t3-21218517/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/EnvironmentFactory.kt:1030:45 'constructor(p0: Buffer, p1: Texture.Format, p2: Texture.Type): Texture.PixelBufferDescriptor' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/t3-21218517/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/EnvironmentFactory.kt:1231:25 'constructor(p0: Buffer, p1: Texture.Format, p2: Texture.Type): Texture.PixelBufferDescriptor' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/t3-21218517/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/FsceneRealizer.kt:6144:17 Condition is always 'true'.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/t3-21218517/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/TextureFactory.kt:274:41 'constructor(p0: Buffer, p1: Texture.Format, p2: Texture.Type): Texture.PixelBufferDescriptor' is deprecated. Deprecated in Java.
+w: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/t3-21218517/dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/TextureFactory.kt:300:41 'constructor(p0: Buffer, p1: Texture.Format, p2: Texture.Type): Texture.PixelBufferDescriptor' is deprecated. Deprecated in Java.
+
+[Incubating] Problems report is available at: file:///Users/jasonholt/.t3/worktrees/dart-native-explore/t3-21218517/dart3d/example/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.3.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 18s
+11 actionable tasks: 7 executed, 4 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.3.1/userguide/configuration_cache_enabling.html
+Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.

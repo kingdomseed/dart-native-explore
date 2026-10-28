@@ -1,0 +1,52 @@
+{
+  "baseline": {
+    "pid": "71924",
+    "full_log_pid_rows": 25014,
+    "due": [
+      "2026-10-28 04:37:47.812 Df Runner[71924:13e8540] [com.jasonholtdigital.dart3d:scene] U3OV due target=8445217361178394631 dirty=true scheduled=false time=542630.3833333334",
+      "2026-10-28 04:38:15.644 Df Runner[71924:13e8544] [com.jasonholtdigital.dart3d:scene] U3OV due target=8445217361178394631 dirty=true scheduled=false time=542658.2500000001",
+      "2026-10-28 04:38:19.177 Df Runner[71924:13e8545] [com.jasonholtdigital.dart3d:scene] U3OV due target=8445217361178394631 dirty=true scheduled=false time=542661.7833333334",
+      "2026-10-28 04:38:22.911 Df Runner[71924:13e8543] [com.jasonholtdigital.dart3d:scene] U3OV due target=8445217361178394631 dirty=true scheduled=false time=542665.5166666668",
+      "2026-10-28 04:38:26.445 Df Runner[71924:13e8543] [com.jasonholtdigital.dart3d:scene] U3OV due target=8445217361178394631 dirty=true scheduled=false time=542669.0500000002"
+    ],
+    "highlights": [
+      "2026-10-28 04:38:13.833 Df Runner[71924:13e8637] [com.jasonholtdigital.dart3d:scene] U3OV public-highlights 8445216278846636033:set,8445216278846636034:set",
+      "2026-10-28 04:38:17.427 Df Runner[71924:13e8542] [com.jasonholtdigital.dart3d:scene] U3OV public-highlights 8445216278846636033:clear,8445216278846636034:clear",
+      "2026-10-28 04:38:20.994 Df Runner[71924:13e8544] [com.jasonholtdigital.dart3d:scene] U3OV public-highlights 8445216278846636033:set,8445216278846636034:set",
+      "2026-10-28 04:38:24.661 Df Runner[71924:13e853f] [com.jasonholtdigital.dart3d:scene] U3OV public-highlights 8445216278846636033:clear,8445216278846636034:clear"
+    ],
+    "installation": [
+      "2026-10-28 04:38:15.644 Df Runner[71924:13e8544] [com.jasonholtdigital.dart3d:scene] U3OV target-technique-install target=8445217361178394631 view=0 bindBeforeInstall=false mode=2 time=542658.2500000001"
+    ],
+    "error_query_matches": [],
+    "query": "fatal|shader.*error|Cannot modify|cross.scene mutation|SCNTransaction|unrecognized selector|UI API called|U3OV GPU-ERROR|U3OV BLOCKED",
+    "case_insensitive": true,
+    "complete_4byte_textures_reconstructed": 17,
+    "truncated_half_float_rows": 288
+  },
+  "control": {
+    "pid": "75848",
+    "full_log_pid_rows": 25773,
+    "due": [
+      "2026-10-28 04:39:02.033 Df Runner[75848:13eb220] [com.jasonholtdigital.dart3d:scene] U3OV due target=8445217361178394631 dirty=true scheduled=false time=542704.6166666668",
+      "2026-10-28 04:39:37.377 Df Runner[75848:13eb21a] [com.jasonholtdigital.dart3d:scene] U3OV due target=8445217361178394631 dirty=true scheduled=false time=542739.9833333334",
+      "2026-10-28 04:39:41.195 Df Runner[75848:13eb220] [com.jasonholtdigital.dart3d:scene] U3OV due target=8445217361178394631 dirty=true scheduled=false time=542743.8000000002",
+      "2026-10-28 04:39:45.011 Df Runner[75848:13eb21c] [com.jasonholtdigital.dart3d:scene] U3OV due target=8445217361178394631 dirty=true scheduled=false time=542747.6166666668",
+      "2026-10-28 04:39:48.744 Df Runner[75848:13eb5aa] [com.jasonholtdigital.dart3d:scene] U3OV due target=8445217361178394631 dirty=true scheduled=false time=542751.3500000001"
+    ],
+    "highlights": [
+      "2026-10-28 04:39:34.188 Df Runner[75848:13eb21d] [com.jasonholtdigital.dart3d:scene] U3OV public-highlights 8445216278846636033:set,8445216278846636034:set",
+      "2026-10-28 04:39:39.295 Df Runner[75848:13eb21c] [com.jasonholtdigital.dart3d:scene] U3OV public-highlights 8445216278846636033:clear,8445216278846636034:clear",
+      "2026-10-28 04:39:43.145 Df Runner[75848:13eb21a] [com.jasonholtdigital.dart3d:scene] U3OV public-highlights 8445216278846636033:set,8445216278846636034:set",
+      "2026-10-28 04:39:46.878 Df Runner[75848:13eb21c] [com.jasonholtdigital.dart3d:scene] U3OV public-highlights 8445216278846636033:clear,8445216278846636034:clear"
+    ],
+    "installation": [
+      "2026-10-28 04:39:37.378 Df Runner[75848:13eb21a] [com.jasonholtdigital.dart3d:scene] U3OV target-technique-install target=8445217361178394631 view=0 bindBeforeInstall=true mode=2 time=542739.9833333334"
+    ],
+    "error_query_matches": [],
+    "query": "fatal|shader.*error|Cannot modify|cross.scene mutation|SCNTransaction|unrecognized selector|UI API called|U3OV GPU-ERROR|U3OV BLOCKED",
+    "case_insensitive": true,
+    "complete_4byte_textures_reconstructed": 17,
+    "truncated_half_float_rows": 288
+  }
+}

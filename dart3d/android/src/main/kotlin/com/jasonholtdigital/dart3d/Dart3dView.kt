@@ -369,6 +369,16 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         TextureSampler.MagFilter.LINEAR,
         TextureSampler.WrapMode.REPEAT)
 
+    private val spriteTextureSampler = TextureSampler(
+        TextureSampler.MinFilter.LINEAR,
+        TextureSampler.MagFilter.LINEAR,
+        TextureSampler.WrapMode.CLAMP_TO_EDGE)
+
+    internal fun materialTextureSampler(
+        param: String, resourceSampler: TextureSampler?,
+    ): TextureSampler = resourceSampler
+        ?: if (param == "spriteMap") spriteTextureSampler else textureSampler
+
     /**
      * Neutral 1×1 fallbacks — bound on every texture-less slot so the
      * shader's factor×texture math reads as factor-only. `fallbackWhite`
@@ -1110,6 +1120,17 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     internal var particleRuntimes:
         MutableMap<Long, MutableList<ParticleRuntime>> = HashMap()
         private set
+
+    private var spriteMaterialBacking: Material? = null
+
+    internal val spriteMaterial: Material
+        get() = spriteMaterialBacking ?: loadFixed(MaterialPackages.spriteSpec(
+            MaterialPackages.apiFor(engine.backend))).also {
+                spriteMaterialBacking = it
+            }
+
+    internal fun isSpriteMaterial(instance: MaterialInstance): Boolean =
+        instance.material.nativeObject == spriteMaterialBacking?.nativeObject
 
     /**
      * Compiled sprite materials — one per wire `blendMode` since
@@ -2300,6 +2321,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             for ((_, m) in materialInstances) engine.destroyMaterialInstance(m)
             materialInstances = HashMap()
             bakedShadowCatchers.dispose()
+            selectionOutlineRenderer.dispose()
             // W14: per-entry Views/Cameras and rt recs die here — the
             // rec owns its textures, so the texture sweep skips rt
             // keys (the shared `view` lets go of rec cameras first).
@@ -2337,6 +2359,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             particleAdditiveMaterial?.let { engine.destroyMaterial(it) }
             particleAlphaMaterial = null
             particleAdditiveMaterial = null
+            spriteMaterialBacking?.let { engine.destroyMaterial(it) }
+            spriteMaterialBacking = null
             for ((_, m) in materialVariants) engine.destroyMaterial(m)
             materialVariants.clear()
             engine.destroyRenderer(renderer)
@@ -2375,6 +2399,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      * view tree, so what it still holds is what that costs.
      */
     private fun dropDocumentState() {
+        selectionOutline.clearScene()
         payloadStore.clear()
         opPayloadSpecs.clear()
         pendingPayloadRefs.clear()
@@ -2539,6 +2564,8 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     }
 
     private fun applyLoadScene(data: ByteArray) {
+        selectionOutline.clearScene()
+        selectionOutlineRenderer.clearPasses()
         lastManifest = data
         // Payload ids are document-local (session,index) — a previous
         // document's bytes would shadow this doc's chunks at colliding
@@ -2737,6 +2764,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      */
     private val surgicalJournal = ArrayList<JournalEntry>()
     private var replayingJournal = false
+
+    private val selectionOutline = SelectionOutline()
+    private val selectionOutlineRenderer = SelectionOutlineRenderer(this)
 
     private val transformWrites = TransformWrites()
 
@@ -2957,6 +2987,40 @@ class Dart3dView(context: Context) : FrameLayout(context) {
     private fun applyCommandJson(json: JSONObject) {
         val op = json.optString("op")
         when (op) {
+            "setNodeHighlights" -> {
+                if (replayingJournal) return
+                val updates = json.optJSONArray("updates") ?: run {
+                    logCommandOnce("highlights.malformed", "setNodeHighlights: missing updates")
+                    return
+                }
+                val changes = ArrayList<SelectionOutline.Change>()
+                for (i in 0 until updates.length()) {
+                    val update = updates.optJSONObject(i)
+                    val key = update?.let { jsonKey(it) }
+                    if (update == null || key == null || !update.has("color")) {
+                        logCommandOnce("highlights.malformed", "setNodeHighlights: invalid update")
+                        continue
+                    }
+                    val color = if (update.isNull("color")) null else {
+                        val rgba = update.optJSONArray("color")
+                        val values = if (rgba?.length() == 4)
+                            (0..3).mapNotNull { (rgba.opt(it) as? Number)?.toFloat() }
+                            else emptyList()
+                        if (values.size != 4 || values.any { !it.isFinite() }) {
+                            logCommandOnce("highlights.malformed", "setNodeHighlights: invalid color")
+                            continue
+                        }
+                        SelectionOutline.LinearRgba(values[0], values[1], values[2], values[3])
+                    }
+                    if (color != null && key !in nodesById) {
+                        logCommandOnce("highlights.missing.$key",
+                            "setNodeHighlights: node $key not live; ignoring")
+                        continue
+                    }
+                    changes.add(SelectionOutline.Change(key, color))
+                }
+                selectionOutline.apply(changes)
+            }
             "removeNode" -> {
                 Log.i(TAG, "cmd removeNode")
                 val key = jsonKey(json) ?: return
@@ -2976,6 +3040,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     }
                 }
                 val doomed = ids.toSet()
+                if (!replayingJournal) selectionOutline.removeNodes(doomed)
                 val destroyedEntities = HashSet<Int>()
                 val rmCtx = FsceneRealizer.surgicalContext(this)
                 for (id in ids) {
@@ -3409,6 +3474,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             n++
         }
         if (old != null) {
+            selectionOutlineRenderer.clearPasses()
             engine.destroyRenderTarget(old.rt)
             engine.destroyTexture(old.colorTex)
             old.depthTex?.let { engine.destroyTexture(it) }
@@ -3429,6 +3495,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
      * `view` is restored to the default pass exactly.
      */
     private fun applyViews(recs: List<RenderTargets.ViewRec>) {
+        selectionOutlineRenderer.clearPasses()
         // The shared screen view must never hold a dying camera.
         view.camera = camera
         for (rec in viewRecs) destroyViewObjects(rec)
@@ -3632,10 +3699,9 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                 resources.textures[key] = r.texture
                 pendingPayloadRefs.remove(key)
                 var n = 0
-                val sampler =
-                    resources.textureSamplers[key] ?: textureSampler
                 for ((mi, param) in resources.textureConsumers[key].orEmpty()) {
-                    mi.setParameter(param, r.texture, sampler)
+                    mi.setParameter(param, r.texture,
+                        materialTextureSampler(param, resources.textureSamplers[key]))
                     n++
                 }
                 Log.i(TAG, "upsertResource texture $key: rebound $n consumer(s)")
@@ -4003,11 +4069,11 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                         resources.textures[texKey] = r.texture
                         pendingPayloadRefs.remove(texKey)
                         var n = 0
-                        val sampler = resources.textureSamplers[texKey]
-                            ?: textureSampler
                         for ((mi, param) in
                             resources.textureConsumers[texKey].orEmpty()) {
-                            mi.setParameter(param, r.texture, sampler)
+                            mi.setParameter(param, r.texture,
+                                materialTextureSampler(param,
+                                    resources.textureSamplers[texKey]))
                             n++
                         }
                         Log.i(TAG, "upsertPayload $key: texture $texKey" +
@@ -5345,6 +5411,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     // streamed subtrees with the rest of the scene —
                     // rebuild each from its recorded load batch.
                     replayStreamedSubtrees()
+                    selectionOutline.retainNodes(nodesById.keys)
                     restoreTransformWrites(written)
                     restoreBodyMotion(moving)
                     // install() zeroes the settle bookkeeping for a new
@@ -5696,16 +5763,45 @@ class Dart3dView(context: Context) : FrameLayout(context) {
         val sc = swapChain ?: return false
         bakedShadowCatchers.renderDirty(
             renderer, FsceneRealizer.surgicalContext(this))
+        val dueTargets = renderTargets.entries.filter { (_, rec) ->
+            rec.views.isNotEmpty() && RenderTargets.due(rec, tNanos)
+        }
+        val outlineRequests = ArrayList<SelectionOutlineRenderer.Request>()
+        for ((_, rec) in dueTargets) {
+            for (v in rec.views) {
+                val cam = v.camera ?: continue
+                val rv = v.view ?: continue
+                outlineRequests.add(SelectionOutlineRenderer.Request(
+                    rec.rt, rec.spec.width, rec.spec.height,
+                    cam, rv.viewport, v.layerMask and 0xFF))
+            }
+        }
+        if (screenViews.isEmpty()) {
+            view.camera?.let { cam ->
+                outlineRequests.add(SelectionOutlineRenderer.Request(
+                    null, viewportW, viewportH, cam, view.viewport, 0xFF))
+            }
+        } else {
+            for (rec in screenViews) {
+                val cam = rec.camera ?: continue
+                val vp = rec.viewport?.let { viewportOf(it) }
+                    ?: Viewport(0, 0, viewportW, viewportH)
+                outlineRequests.add(SelectionOutlineRenderer.Request(
+                    null, viewportW, viewportH, cam, vp, rec.layerMask and 0xFF))
+            }
+        }
+        selectionOutlineRenderer.capture(renderer, selectionOutline, outlineRequests)
         if (renderer.beginFrame(sc, tNanos)) {
+            var outlinePassIndex = 0
             // W14: due offscreen passes first — a material sampling an
             // rt reads this frame's output in the screen passes below.
             // An rt's views render in `order` (sorted at apply).
-            for ((_, rec) in renderTargets) {
-                if (rec.views.isEmpty() ||
-                    !RenderTargets.due(rec, tNanos)) continue
+            for ((_, rec) in dueTargets) {
                 for (v in rec.views) {
+                    if (v.camera == null) continue
                     v.view?.let {
                         renderer.render(it)
+                        selectionOutlineRenderer.composite(renderer, outlinePassIndex++)
                         logCommandOnce("w14.rtpass.${rec.spec.width}",
                             "rt pass rendered ${rec.spec.width}x" +
                                 "${rec.spec.height}")
@@ -5722,6 +5818,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
             // renders the default pass — the pre-W14 path.
             if (screenViews.isEmpty()) {
                 renderer.render(view)
+                selectionOutlineRenderer.composite(renderer, outlinePassIndex++)
             } else {
                 for (rec in screenViews) {
                     val cam = rec.camera ?: continue
@@ -5733,6 +5830,7 @@ class Dart3dView(context: Context) : FrameLayout(context) {
                     view.antiAliasing = rec.aa
                     view.dynamicResolutionOptions = rec.dsr
                     renderer.render(view)
+                    selectionOutlineRenderer.composite(renderer, outlinePassIndex++)
                 }
             }
             renderer.endFrame()
