@@ -1,0 +1,56 @@
+{
+  "commands": [
+    {
+      "cwd": "dart3d/example",
+      "argv": "/Users/jasonholt/zero/bin/dn test --no-pub test/dev_reload_test.dart --reporter expanded",
+      "log": "focused-final.log",
+      "exit_code": 0,
+      "passed": 28
+    },
+    {
+      "cwd": "dart3d",
+      "argv": "/Users/jasonholt/zero/bin/dn test --no-pub test/u3_node_highlights_test.dart test/u3_sprite_material_test.dart test/u3_texture_atlas_test.dart test/u4_controller_test.dart test/u4_payload_arrival_test.dart test/u4_property_animation_test.dart test/structural_commands_test.dart test/scene_codec_fixture_test.dart --reporter expanded",
+      "log": "package-regressions.log",
+      "exit_code": 0,
+      "passed": 86
+    },
+    {
+      "cwd": "dart3d/example",
+      "argv": "/Users/jasonholt/zero/bin/dn test --no-pub test/fsceneb_reader_test.dart test/u3_atlas_probe_test.dart test/u3_sprite_showcase_test.dart test/u3_tone_showcase_test.dart test/u4_material_showcase_test.dart test/u4_owner_showcase_test.dart test/u4_showcase_test.dart test/u4_snapshot_showcase_test.dart --reporter expanded",
+      "log": "example-regressions.log",
+      "exit_code": 0,
+      "passed": 53
+    },
+    {
+      "cwd": "dart3d",
+      "argv": "/Users/jasonholt/zero/bin/dn analyze --no-pub",
+      "log": "package-analysis.log",
+      "exit_code": 0
+    },
+    {
+      "cwd": "dart3d/example",
+      "argv": "/Users/jasonholt/zero/bin/dn analyze --no-pub",
+      "log": "example-analysis.log",
+      "exit_code": 0
+    },
+    {
+      "cwd": "repository root",
+      "argv": "git diff --check",
+      "log": "diff-check.log",
+      "exit_code": 0
+    }
+  ],
+  "initial_failures": {
+    "focused-initial.log": "Invocation from repository root failed before compile because no pubspec exists there. This is not a runtime red baseline.",
+    "focused-first.log": "Runtime test corrections: list equality inside record, deliberately incomplete contentLength, error-zone cleanup timeout, and wrong CLI script path. Initial stalled process was terminated after no output and zero CPU. Two owned fixtures removed.",
+    "example-analysis-first.log": "One brace lint in test, corrected."
+  },
+  "total_passing_tests": 167,
+  "native_build": "NOT_RUN",
+  "native_execution": "NOT_RUN",
+  "pixels": "NOT_RUN",
+  "latency": "NOT_RUN",
+  "Android": "NOT_RUN",
+  "T2": "NOT_RUN",
+  "T4": "NOT_RUN"
+}

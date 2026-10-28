@@ -1,0 +1,19 @@
+--- a/dart3d/ios/Classes/RenderTargets.swift
++++ b/dart3d/ios/Classes/RenderTargets.swift
+@@ -385,11 +385,11 @@
+             pass.depthAttachment.storeAction = .dontCare
+         }
+         guard let cb = queue.makeCommandBuffer() else { return }
+-        renderer.render(
+-            withViewport: CGRect(x: 0, y: 0,
+-                                 width: rec.width, height: rec.height),
+-            commandBuffer: cb, passDescriptor: pass)
+-        cb.commit()
++        _ = cb
++        logOnce("u3.rt.omitEncode", "u3 RT control: encoding omitted; "
++            + "cameraMask=\(cam.categoryBitMask) "
++            + "presentationMask=\(camNode.presentation.camera?.categoryBitMask ?? 0) "
++            + "samples=\(samples)")
+     }
+ 
+     /// Offscreen AA resolution — view mode (non-'auto') > stage

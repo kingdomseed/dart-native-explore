@@ -1,0 +1,252 @@
+{
+  "meaning": "Encoded screenshot observations, not raw linear shader values or calibrated normals.",
+  "sceneCropXYWH": [
+    0,
+    100,
+    402,
+    650
+  ],
+  "comparisons": {
+    "01-mapped-r2.png": {
+      "changedPixelsVsInitialOff": 51979,
+      "maximumChannelDifference": 185,
+      "nonblackPixels": 51979
+    },
+    "01-mapped-steady-r2.png": {
+      "changedPixelsVsInitialOff": 51979,
+      "maximumChannelDifference": 185,
+      "nonblackPixels": 51979
+    },
+    "02-geometry-r2.png": {
+      "changedPixelsVsInitialOff": 51979,
+      "maximumChannelDifference": 215,
+      "nonblackPixels": 51979
+    },
+    "03-transfer-r2.png": {
+      "changedPixelsVsInitialOff": 51979,
+      "maximumChannelDifference": 199,
+      "nonblackPixels": 51979
+    },
+    "04-mapped-return-r2.png": {
+      "changedPixelsVsInitialOff": 51979,
+      "maximumChannelDifference": 185,
+      "nonblackPixels": 51979
+    },
+    "05-off-restored-r2.png": {
+      "changedPixelsVsInitialOff": 0,
+      "maximumChannelDifference": 0,
+      "nonblackPixels": 51979
+    },
+    "06-wire-on-r2.png": {
+      "changedPixelsVsInitialOff": 1364,
+      "maximumChannelDifference": 110,
+      "nonblackPixels": 52054
+    },
+    "07-wire-off-restored-r2.png": {
+      "changedPixelsVsInitialOff": 0,
+      "maximumChannelDifference": 0,
+      "nonblackPixels": 51979
+    }
+  },
+  "rgbSamples": {
+    "00-off-r2.png": {
+      "120,320": [
+        129,
+        106,
+        74
+      ],
+      "260,330": [
+        71,
+        57,
+        38
+      ],
+      "140,470": [
+        155,
+        129,
+        93
+      ],
+      "290,475": [
+        166,
+        137,
+        99
+      ]
+    },
+    "01-mapped-r2.png": {
+      "120,320": [
+        176,
+        237,
+        237
+      ],
+      "260,330": [
+        113,
+        127,
+        223
+      ],
+      "140,470": [
+        172,
+        187,
+        253
+      ],
+      "290,475": [
+        229,
+        187,
+        245
+      ]
+    },
+    "01-mapped-steady-r2.png": {
+      "120,320": [
+        176,
+        237,
+        237
+      ],
+      "260,330": [
+        113,
+        127,
+        223
+      ],
+      "140,470": [
+        172,
+        187,
+        253
+      ],
+      "290,475": [
+        229,
+        187,
+        245
+      ]
+    },
+    "02-geometry-r2.png": {
+      "120,320": [
+        172,
+        187,
+        253
+      ],
+      "260,330": [
+        172,
+        187,
+        253
+      ],
+      "140,470": [
+        172,
+        187,
+        253
+      ],
+      "290,475": [
+        172,
+        187,
+        253
+      ]
+    },
+    "03-transfer-r2.png": {
+      "120,320": [
+        100,
+        187,
+        237
+      ],
+      "260,330": [
+        100,
+        187,
+        237
+      ],
+      "140,470": [
+        100,
+        187,
+        237
+      ],
+      "290,475": [
+        100,
+        187,
+        237
+      ]
+    },
+    "04-mapped-return-r2.png": {
+      "120,320": [
+        176,
+        237,
+        237
+      ],
+      "260,330": [
+        113,
+        127,
+        223
+      ],
+      "140,470": [
+        172,
+        187,
+        253
+      ],
+      "290,475": [
+        229,
+        187,
+        245
+      ]
+    },
+    "05-off-restored-r2.png": {
+      "120,320": [
+        129,
+        106,
+        74
+      ],
+      "260,330": [
+        71,
+        57,
+        38
+      ],
+      "140,470": [
+        155,
+        129,
+        93
+      ],
+      "290,475": [
+        166,
+        137,
+        99
+      ]
+    },
+    "06-wire-on-r2.png": {
+      "120,320": [
+        129,
+        106,
+        74
+      ],
+      "260,330": [
+        71,
+        57,
+        38
+      ],
+      "140,470": [
+        155,
+        129,
+        93
+      ],
+      "290,475": [
+        166,
+        137,
+        99
+      ]
+    },
+    "07-wire-off-restored-r2.png": {
+      "120,320": [
+        129,
+        106,
+        74
+      ],
+      "260,330": [
+        71,
+        57,
+        38
+      ],
+      "140,470": [
+        155,
+        129,
+        93
+      ],
+      "290,475": [
+        166,
+        137,
+        99
+      ]
+    }
+  },
+  "initialMappedVsReturnSceneChangedPixels": 0
+}

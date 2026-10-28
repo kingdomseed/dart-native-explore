@@ -1,0 +1,217 @@
+{
+  "fscene": 5,
+  "documentId": "Q8PFZNM7C137H72KTMW0NR0SK4",
+  "stage": {
+    "environmentRef": "env:0007AD000000G"
+  },
+  "resources": {
+    "mat:0007AD0000000": {
+      "kind": "material",
+      "type": "unlit",
+      "name": "u4.shared",
+      "properties": {
+        "baseColor": {
+          "c": [1.0, 1.0, 1.0, 1.0]
+        }
+      }
+    },
+    "mat:0007AD0000002": {
+      "kind": "material",
+      "type": "physicallyBased",
+      "name": "u4.neutral",
+      "properties": {
+        "baseColor": {
+          "c": [0.45, 0.45, 0.45, 1.0]
+        },
+        "roughness": {
+          "d": 1.0
+        },
+        "metallic": {
+          "d": 0.0
+        }
+      }
+    },
+    "geo:0007AD0000004": {
+      "kind": "geometry",
+      "procedural": {
+        "shape": "cuboid",
+        "extents": [0.699999988079071, 0.699999988079071, 0.10000000149011612]
+      }
+    },
+    "env:0007AD000000G": {
+      "kind": "environment",
+      "name": "u4.empty",
+      "environment": {
+        "type": "empty"
+      },
+      "environmentIntensity": 0.0,
+      "exposure": 1.0,
+      "toneMapping": "linear",
+      "effects": {}
+    }
+  },
+  "nodes": {
+    "n:0007AD0000006": {
+      "name": "u4.shared.left",
+      "transform": {
+        "trs": {
+          "t": [-0.949999988079071, 1.25, 0.0],
+          "r": [0.0, 0.0, 0.0, 1.0],
+          "s": [1.0, 1.0, 1.0]
+        }
+      },
+      "components": [
+        {
+          "type": "mesh",
+          "properties": {
+            "geometry": {
+              "rref": "geo:0007AD0000004"
+            },
+            "material": {
+              "rref": "mat:0007AD0000000"
+            }
+          }
+        }
+      ]
+    },
+    "n:0007AD0000008": {
+      "name": "u4.shared.right",
+      "transform": {
+        "trs": {
+          "t": [0.0, 1.25, 0.0],
+          "r": [0.0, 0.0, 0.0, 1.0],
+          "s": [1.0, 1.0, 1.0]
+        }
+      },
+      "components": [
+        {
+          "type": "mesh",
+          "properties": {
+            "geometry": {
+              "rref": "geo:0007AD0000004"
+            },
+            "material": {
+              "rref": "mat:0007AD0000000"
+            }
+          }
+        }
+      ]
+    },
+    "n:0007AD000000A": {
+      "name": "u4.lit",
+      "transform": {
+        "trs": {
+          "t": [0.949999988079071, 1.25, 0.0],
+          "r": [0.0, 0.0, 0.0, 1.0],
+          "s": [1.0, 1.0, 1.0]
+        }
+      },
+      "components": [
+        {
+          "type": "mesh",
+          "properties": {
+            "geometry": {
+              "rref": "geo:0007AD0000004"
+            },
+            "material": {
+              "rref": "mat:0007AD0000002"
+            }
+          }
+        }
+      ]
+    },
+    "n:0007AD000000C": {
+      "name": "u4.light",
+      "transform": {
+        "trs": {
+          "t": [0.0, 0.0, 0.0],
+          "r": [0.0, 0.0, 0.0, 1.0],
+          "s": [1.0, 1.0, 1.0]
+        }
+      },
+      "components": [
+        {
+          "type": "directionalLight",
+          "properties": {
+            "color": {
+              "c": [1.0, 1.0, 1.0, 1.0]
+            },
+            "intensity": {
+              "d": 1.0
+            },
+            "castsShadow": {
+              "b": false
+            }
+          }
+        }
+      ]
+    },
+    "n:0007AD000000E": {
+      "name": "u4.camera",
+      "transform": {
+        "trs": {
+          "t": [0.0, 0.0, -10.0],
+          "r": [0.0, 0.0, 0.0, 1.0],
+          "s": [1.0, 1.0, 1.0]
+        }
+      },
+      "components": [
+        {
+          "type": "camera",
+          "properties": {
+            "projection": {
+              "s": "perspective"
+            },
+            "fovRadiansY": {
+              "d": 1.0471975511965976
+            },
+            "near": {
+              "d": 0.1
+            },
+            "far": {
+              "d": 30.0
+            }
+          }
+        }
+      ]
+    }
+  },
+  "roots": [
+    "n:0007AD0000006",
+    "n:0007AD0000008",
+    "n:0007AD000000A",
+    "n:0007AD000000C",
+    "n:0007AD000000E"
+  ],
+  "animations": {
+    "anim:0007AD000000T": {
+      "name": "u4.camera",
+      "channels": [],
+      "d3:properties": [
+        {
+          "kind": "cameraFovRadiansY",
+          "node": "n:0007AD000000E",
+          "timeline": "chunk:0007AD000000J",
+          "keyframes": "chunk:0007AD000000R"
+        }
+      ]
+    }
+  },
+  "payloads": {
+    "chunk:0007AD000000J": {
+      "encoding": "floats"
+    },
+    "chunk:0007AD000000M": {
+      "encoding": "floats"
+    },
+    "chunk:0007AD000000P": {
+      "encoding": "floats"
+    },
+    "chunk:0007AD000000R": {
+      "encoding": "floats"
+    }
+  },
+  "featuresRequired": [
+    "d3:propertyAnimation"
+  ]
+}

@@ -1,0 +1,1 @@
+Candidate57 matches observed57 plus exactly two-file cleanup delta. Host change is one comment deletion; all runtime application logic, receiver, entrypoint and fixture are byte-identical. Test assertions now observe actual disposed controller; no fresh unused replacement. Forward cleanup and reverse full-probe replay pass. Scratch removed.

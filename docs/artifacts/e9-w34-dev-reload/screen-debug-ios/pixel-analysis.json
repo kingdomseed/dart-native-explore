@@ -1,0 +1,156 @@
+{
+  "basis": "Encoded 402x874 agent-device screenshots, not raw GPU values or calibrated colorimetry.",
+  "monitorRectXYWH": [
+    160,
+    450,
+    80,
+    115
+  ],
+  "sceneRectXYWH": [
+    0,
+    70,
+    402,
+    610
+  ],
+  "r2AuthoredTargetComparisons": {
+    "03-base-after-normal-capture": {
+      "changedPixels": 0,
+      "maximumEncodedChannelDifference": 0
+    },
+    "05-base-after-metal-capture": {
+      "changedPixels": 0,
+      "maximumEncodedChannelDifference": 0
+    },
+    "07-base-after-rough-capture": {
+      "changedPixels": 0,
+      "maximumEncodedChannelDifference": 0
+    },
+    "09-base-after-depth-capture": {
+      "changedPixels": 0,
+      "maximumEncodedChannelDifference": 0
+    },
+    "11-base-after-wire-capture": {
+      "changedPixels": 0,
+      "maximumEncodedChannelDifference": 0
+    }
+  },
+  "r3AuthoredTargetComparison": {
+    "changedPixels": 0,
+    "maximumEncodedChannelDifference": 0
+  },
+  "r3OffRestoration": {
+    "changedPixels": 0,
+    "maximumEncodedChannelDifference": 0
+  },
+  "r2EditedOffRestoration": {
+    "changedPixels": 0,
+    "maximumEncodedChannelDifference": 0
+  },
+  "r2EditVsOriginal": {
+    "changedPixels": 40337,
+    "maximumEncodedChannelDifference": 89
+  },
+  "r3WireDifference": {
+    "changedPixels": 1759,
+    "maximumEncodedChannelDifference": 64
+  },
+  "r3WireOccluderInterior": {
+    "changedPixels": 0,
+    "maximumEncodedChannelDifference": 0
+  },
+  "literalValues": [
+    0.125,
+    0.5,
+    0.875
+  ],
+  "idealSrgbRoundedCodes": [
+    99,
+    188,
+    240
+  ],
+  "literalEncodedRgb": {
+    "05-metallic": [
+      [
+        100,
+        100,
+        100
+      ],
+      [
+        187,
+        187,
+        187
+      ],
+      [
+        237,
+        237,
+        237
+      ]
+    ],
+    "06-roughness": [
+      [
+        100,
+        100,
+        100
+      ],
+      [
+        187,
+        187,
+        187
+      ],
+      [
+        237,
+        237,
+        237
+      ]
+    ],
+    "07-base": [
+      [
+        100,
+        100,
+        100
+      ],
+      [
+        187,
+        187,
+        187
+      ],
+      [
+        237,
+        237,
+        237
+      ]
+    ]
+  },
+  "r3Depth": {
+    "nearXY": [
+      240,
+      200
+    ],
+    "nearRgb": [
+      211,
+      211,
+      211
+    ],
+    "farXY": [
+      160,
+      200
+    ],
+    "farRgb": [
+      237,
+      237,
+      237
+    ]
+  },
+  "r2OriginalDepth": {
+    "nearRgb": [
+      237,
+      237,
+      237
+    ],
+    "farRgb": [
+      237,
+      237,
+      237
+    ]
+  }
+}

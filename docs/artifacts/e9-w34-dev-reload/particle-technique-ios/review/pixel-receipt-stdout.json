@@ -1,0 +1,346 @@
+{
+  "decoder": "independent Python standard-library PNG unfilter/zlib; CRC checked; RGB bytes without color management",
+  "scene_crop_xywh": [
+    0,
+    100,
+    402,
+    620
+  ],
+  "mesh_roi_xywh": [
+    30,
+    295,
+    140,
+    150
+  ],
+  "image_dimensions": {
+    "parent-runtime/04-wire-off-mode.png": [
+      402,
+      874
+    ],
+    "parent-runtime/05-restored-frozen.png": [
+      402,
+      874
+    ],
+    "parent-runtime/03-off-return.png": [
+      402,
+      874
+    ],
+    "parent-runtime/01-frozen-off.png": [
+      402,
+      874
+    ],
+    "parent-runtime/06-resumed.png": [
+      402,
+      874
+    ],
+    "parent-runtime/00-live.png": [
+      402,
+      874
+    ],
+    "parent-runtime/01-frozen-steady.png": [
+      402,
+      874
+    ],
+    "parent-runtime/02-constant.png": [
+      402,
+      874
+    ],
+    "parent-runtime-r2/03-off-return.png": [
+      402,
+      874
+    ],
+    "parent-runtime-r2/04-resumed.png": [
+      402,
+      874
+    ],
+    "parent-runtime-r2/video-contact-sheet.png": [
+      804,
+      874
+    ],
+    "parent-runtime-r2/01-frozen-off.png": [
+      402,
+      874
+    ],
+    "parent-runtime-r2/00-live.png": [
+      402,
+      874
+    ],
+    "parent-runtime-r2/02-constant.png": [
+      402,
+      874
+    ]
+  },
+  "r2": {
+    "00-live.png": {
+      "scene_changed_vs_frozen": 12340,
+      "mesh_roi_changed_vs_frozen": 0,
+      "magenta_scene_pixels_strict_r_gt240_g_lt20_b_gt240": 0,
+      "magenta_scene_pixels_parent_r_gt220_g_lt50_b_gt220": 0,
+      "samples": {
+        "80,360": [
+          71,
+          57,
+          39
+        ],
+        "300,360": [
+          83,
+          121,
+          137
+        ],
+        "270,255": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "01-frozen-off.png": {
+      "scene_changed_vs_frozen": 0,
+      "mesh_roi_changed_vs_frozen": 0,
+      "magenta_scene_pixels_strict_r_gt240_g_lt20_b_gt240": 0,
+      "magenta_scene_pixels_parent_r_gt220_g_lt50_b_gt220": 0,
+      "samples": {
+        "80,360": [
+          71,
+          57,
+          39
+        ],
+        "300,360": [
+          83,
+          121,
+          137
+        ],
+        "270,255": [
+          179,
+          245,
+          211
+        ]
+      }
+    },
+    "02-constant.png": {
+      "scene_changed_vs_frozen": 249240,
+      "mesh_roi_changed_vs_frozen": 21000,
+      "magenta_scene_pixels_strict_r_gt240_g_lt20_b_gt240": 21318,
+      "magenta_scene_pixels_parent_r_gt220_g_lt50_b_gt220": 21320,
+      "samples": {
+        "80,360": [
+          255,
+          0,
+          255
+        ],
+        "300,360": [
+          255,
+          0,
+          255
+        ],
+        "270,255": [
+          179,
+          244,
+          211
+        ]
+      }
+    },
+    "03-off-return.png": {
+      "scene_changed_vs_frozen": 0,
+      "mesh_roi_changed_vs_frozen": 0,
+      "magenta_scene_pixels_strict_r_gt240_g_lt20_b_gt240": 0,
+      "magenta_scene_pixels_parent_r_gt220_g_lt50_b_gt220": 0,
+      "samples": {
+        "80,360": [
+          71,
+          57,
+          39
+        ],
+        "300,360": [
+          83,
+          121,
+          137
+        ],
+        "270,255": [
+          179,
+          245,
+          211
+        ]
+      }
+    },
+    "04-resumed.png": {
+      "scene_changed_vs_frozen": 13630,
+      "mesh_roi_changed_vs_frozen": 0,
+      "magenta_scene_pixels_strict_r_gt240_g_lt20_b_gt240": 0,
+      "magenta_scene_pixels_parent_r_gt220_g_lt50_b_gt220": 0,
+      "samples": {
+        "80,360": [
+          71,
+          57,
+          39
+        ],
+        "300,360": [
+          83,
+          121,
+          137
+        ],
+        "270,255": [
+          0,
+          0,
+          0
+        ]
+      }
+    }
+  },
+  "r2_green_interiors": {
+    "region_xywh": [
+      220,
+      180,
+      160,
+      380
+    ],
+    "selection": "baseline g>r+25 and g>b+15, all nine RGB pixels in 3x3 equal center; selected on baseline only",
+    "selected": 10361,
+    "still_green": 10361,
+    "became_magenta": 0,
+    "max_channel_delta": 1
+  },
+  "r2_all_baseline_green": {
+    "selected": 11675,
+    "still_green": 11633,
+    "became_magenta": 0
+  },
+  "r1": {
+    "00-live.png": {
+      "scene_changed_vs_frozen": 12792,
+      "magenta_scene_pixels_strict_r_gt240_g_lt20_b_gt240": 0,
+      "magenta_scene_pixels_parent_r_gt220_g_lt50_b_gt220": 0,
+      "samples": {
+        "80,360": [
+          71,
+          57,
+          39
+        ],
+        "300,360": [
+          83,
+          121,
+          137
+        ]
+      }
+    },
+    "01-frozen-off.png": {
+      "scene_changed_vs_frozen": 0,
+      "magenta_scene_pixels_strict_r_gt240_g_lt20_b_gt240": 0,
+      "magenta_scene_pixels_parent_r_gt220_g_lt50_b_gt220": 0,
+      "samples": {
+        "80,360": [
+          71,
+          57,
+          39
+        ],
+        "300,360": [
+          83,
+          121,
+          137
+        ]
+      }
+    },
+    "01-frozen-steady.png": {
+      "scene_changed_vs_frozen": 0,
+      "magenta_scene_pixels_strict_r_gt240_g_lt20_b_gt240": 0,
+      "magenta_scene_pixels_parent_r_gt220_g_lt50_b_gt220": 0,
+      "samples": {
+        "80,360": [
+          71,
+          57,
+          39
+        ],
+        "300,360": [
+          83,
+          121,
+          137
+        ]
+      }
+    },
+    "02-constant.png": {
+      "scene_changed_vs_frozen": 249240,
+      "magenta_scene_pixels_strict_r_gt240_g_lt20_b_gt240": 0,
+      "magenta_scene_pixels_parent_r_gt220_g_lt50_b_gt220": 0,
+      "samples": {
+        "80,360": [
+          33,
+          33,
+          33
+        ],
+        "300,360": [
+          179,
+          244,
+          211
+        ]
+      }
+    },
+    "03-off-return.png": {
+      "scene_changed_vs_frozen": 0,
+      "magenta_scene_pixels_strict_r_gt240_g_lt20_b_gt240": 0,
+      "magenta_scene_pixels_parent_r_gt220_g_lt50_b_gt220": 0,
+      "samples": {
+        "80,360": [
+          71,
+          57,
+          39
+        ],
+        "300,360": [
+          83,
+          121,
+          137
+        ]
+      }
+    },
+    "04-wire-off-mode.png": {
+      "scene_changed_vs_frozen": 1276,
+      "magenta_scene_pixels_strict_r_gt240_g_lt20_b_gt240": 0,
+      "magenta_scene_pixels_parent_r_gt220_g_lt50_b_gt220": 0,
+      "samples": {
+        "80,360": [
+          71,
+          57,
+          39
+        ],
+        "300,360": [
+          83,
+          121,
+          137
+        ]
+      }
+    },
+    "05-restored-frozen.png": {
+      "scene_changed_vs_frozen": 0,
+      "magenta_scene_pixels_strict_r_gt240_g_lt20_b_gt240": 0,
+      "magenta_scene_pixels_parent_r_gt220_g_lt50_b_gt220": 0,
+      "samples": {
+        "80,360": [
+          71,
+          57,
+          39
+        ],
+        "300,360": [
+          83,
+          121,
+          137
+        ]
+      }
+    },
+    "06-resumed.png": {
+      "scene_changed_vs_frozen": 18091,
+      "magenta_scene_pixels_strict_r_gt240_g_lt20_b_gt240": 0,
+      "magenta_scene_pixels_parent_r_gt220_g_lt50_b_gt220": 0,
+      "samples": {
+        "80,360": [
+          71,
+          57,
+          39
+        ],
+        "300,360": [
+          83,
+          121,
+          137
+        ]
+      }
+    }
+  }
+}

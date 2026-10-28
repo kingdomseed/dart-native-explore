@@ -1,0 +1,503 @@
+--- a/dart3d/example/lib/showcase_loader.dart
++++ b/dart3d/example/lib/showcase_loader.dart
+@@ -187,8 +187,16 @@
+     kBuiltinU4Key,
+     'Property animation: shared color / light / camera',
+   ),
++  if (String.fromEnvironment('DART3D_MODEL') == 'w34-reload-probe')
++    ShowcaseItem(
++      'w34-reload-probe',
++      kW34ReloadProbeKey,
++      'Authored file reload probe',
++    ),
+ ];
+ 
++const kW34ReloadProbeKey = 'builtin:w34-reload-probe';
++
+ const String kBuiltinU4MaterialsKey = 'builtin:u4-materials';
+ 
+ const String kBuiltinU4SnapshotsKey = 'builtin:u4-snapshots';
+--- a/dart3d/example/lib/showcase_scene.dart
++++ b/dart3d/example/lib/showcase_scene.dart
+@@ -24,6 +24,7 @@
+ import 'u4_property_scene.dart';
+ import 'u4_owner_scene.dart';
+ import 'u4_snapshot_scene.dart';
++import 'w34_reload_probe.dart';
+ 
+ /// Boot override for the U1 camera-controller pose (`orbit1..3`,
+ /// `fly1..3`, `follow1..3`).
+@@ -155,6 +156,7 @@
+   double _lastViewH = 600;
+   bool _loadedOnce = false;
+   String _status = 'loading…';
++  W34ReloadProbe? _reloadProbe;
+ 
+   int _initialIndex() {
+     final label = widget.initialLabel;
+@@ -181,6 +183,8 @@
+   }
+ 
+   void _load(ShowcaseItem item) {
++    unawaited(_reloadProbe?.dispose());
++    _reloadProbe = null;
+     _propertyControls = null;
+     _lightControls = null;
+     _ownerControls = null;
+@@ -210,6 +214,20 @@
+       _u2CatcherVariantSelected = false;
+     });
+ 
++    if (item.assetKey == kW34ReloadProbeKey) {
++      _scene = null;
++      _orbitController = null;
++      _activeCameraController = null;
++      _scenePointer = null;
++      _aspectFramed = true;
++      _reloadProbe = W34ReloadProbe(
++        source: kW34ReloadSource,
++        controller: _controller,
++        log: dnLog,
++        onStatus: (status) => setState(() => _status = status),
++      )..start();
++      return;
++    }
+     final scene = loadShowcaseScene(item, bytesFor: loadAssetBytes, log: dnLog);
+     if (scene == null) {
+       setState(() => _status = '${item.label}: load failed — see log');
+@@ -867,6 +885,7 @@
+ 
+   @override
+   void dispose() {
++    unawaited(_reloadProbe?.dispose());
+     _spriteControls?.dispose();
+     _atlasTimer?.cancel();
+     _w17SweepTimer?.cancel();
+@@ -1474,7 +1493,9 @@
+                             !_status.contains('failed')) ...[
+                           const SizedBox(height: 2),
+                           Text(
+-                            _scene == null ? item.note : _scene!.summary,
++                            item.assetKey == kW34ReloadProbeKey
++                                ? _status
++                                : _scene == null ? item.note : _scene!.summary,
+                             textAlign: TextAlign.center,
+                             maxLines: 2,
+                             style: const TextStyle(
+--- /dev/null
++++ b/dart3d/example/lib/w34_reload_probe.dart
+@@ -0,0 +1,117 @@
++import 'dart:async';
++import 'dart:io';
++
++import 'package:dart3d/dart3d.dart';
++
++const kW34ReloadSource = String.fromEnvironment('DART3D_RELOAD_SOURCE');
++
++/// Disposable authored-file experiment. No transport or retry owns this path.
++final class W34ReloadProbe {
++  W34ReloadProbe({
++    required this.source,
++    required this.controller,
++    required this.log,
++    required this.onStatus,
++  });
++
++  final String source;
++  final SceneController controller;
++  final void Function(String) log;
++  final void Function(String) onStatus;
++  StreamSubscription<FileSystemEvent>? _watch;
++  SceneDocument? _document;
++
++  void start() {
++    log('w34 source=$source');
++    final file = File(source);
++    if (source.isEmpty || !file.isAbsolute || !source.endsWith('.fscene')) {
++      _error(
++        ArgumentError(
++          'DART3D_RELOAD_SOURCE must be an absolute .fscene path: $source',
++        ),
++      );
++      return;
++    }
++    try {
++      // Watching the parent retains observation across editor rename saves.
++      // Reads still target only the explicitly supplied authored file.
++      _watch = file.parent.watch().listen(
++        (event) {
++          if (event.path != source &&
++              !(event is FileSystemMoveEvent && event.destination == source)) {
++            return;
++          }
++          log('w34 watch type=${event.type} path=${event.path} event=$event');
++          _read(file);
++        },
++        onError: (Object error) => _error(error),
++        onDone: () {
++          log('w34 watch ended source=$source');
++          onStatus('File watch ended');
++        },
++      );
++      log('w34 watch subscribed source=$source');
++      _read(file);
++    } on FileSystemException catch (error) {
++      _error(error);
++    }
++  }
++
++  void _read(File file) {
++    SceneDocument next;
++    try {
++      final text = file.readAsStringSync();
++      log('w34 read source=$source characters=${text.length}');
++      next = readFsceneLogged(text, log: log);
++    } on FileSystemException catch (error) {
++      _error(error);
++      return;
++    } on FormatException catch (error) {
++      _error(error);
++      return;
++    } on FsceneFormatException catch (error) {
++      _error(error);
++      return;
++    } on FsceneVersionException catch (error) {
++      _error(error);
++      return;
++    } on FsceneUnsupportedFeatureException catch (error) {
++      _error(error);
++      return;
++    } on TypeError catch (error) {
++      // The JSON decoder casts authored fields; a wrong field type is input.
++      _error(error);
++      return;
++    } on ArgumentError catch (error) {
++      _error(error);
++      return;
++    }
++    final previous = _document;
++    final List<String> operations;
++    if (previous == null) {
++      controller.loadDocument(next);
++      operations = ['loadScene'];
++    } else {
++      operations = controller
++          .applyDiff(diffScene(previous, next), next)
++          .map((op) => op['op'] as String)
++          .toList();
++    }
++    _document = next;
++    log(
++      'w34 applied-request time=${DateTime.now().toUtc().toIso8601String()} '
++      'source=$source ops=$operations',
++    );
++    onStatus('Current file loaded');
++  }
++
++  void _error(Object error) {
++    log('w34 error source=$source $error');
++    onStatus('$error');
++  }
++
++  Future<void> dispose() async {
++    await _watch?.cancel();
++    _watch = null;
++  }
++}
+--- /dev/null
++++ b/dart3d/example/test/w34_reload_probe_test.dart
+@@ -0,0 +1,158 @@
++// ignore_for_file: implementation_imports
++import 'dart:async';
++import 'dart:convert';
++import 'dart:io';
++import 'dart:typed_data';
++
++import 'package:dart3d/dart3d.dart';
++import 'package:dart3d/src/protocol.dart';
++import 'package:dart3d/src/scene_view.dart';
++import 'package:dart3d_example/w34_reload_probe.dart';
++import 'package:test/test.dart';
++
++import '../tool/w34_reload_source.dart' as host;
++
++class RecordingElement extends SceneViewElement {
++  RecordingElement(SceneController controller)
++    : super(SceneViewLeaf(controller: controller));
++  final sent = <({int tag, Uint8List bytes})>[];
++  @override
++  void sendMutation(int tag, Uint8List bytes) {
++    sent.add((tag: tag, bytes: Uint8List.fromList(bytes)));
++  }
++}
++
++void main() {
++  test(
++    'actual file events mutate controller incrementally, retain errors and recover',
++    () async {
++      final file = File(
++        '/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene',
++      );
++      addTearDown(() {
++        if (file.existsSync()) file.deleteSync();
++      });
++      host.main(['initial', file.path]);
++      final controller = SceneController();
++      final element = RecordingElement(controller);
++      controller.attachElement(element);
++      addTearDown(controller.dispose);
++      final statuses = StreamController<String>.broadcast(sync: true);
++      addTearDown(statuses.close);
++      final logs = <String>[];
++      final probe = W34ReloadProbe(
++        source: file.path,
++        controller: controller,
++        log: (message) {
++          logs.add(message);
++          print(message);
++        },
++        onStatus: statuses.add,
++      );
++      addTearDown(probe.dispose);
++      probe.start();
++      expect(element.sent.map((m) => m.tag), [D3Protocol.loadScene]);
++      final original = writeFsceneWithExtensions(controller.document!);
++      final camera = controller.document!.nodes.values.singleWhere(
++        (n) => n.name == 'w34.camera',
++      );
++      final cameraTransform = encodeNodeCommandSpec(
++        camera,
++        controller.document!,
++      );
++
++      Future<void> save(void Function() edit) async {
++        element.sent.clear();
++        final loaded = statuses.stream.firstWhere(
++          (s) => s == 'Current file loaded',
++        );
++        edit();
++        await loaded.timeout(const Duration(seconds: 15));
++      }
++
++      List<String> operationNames() => element.sent.expand((m) {
++        expect(m.tag, D3Protocol.command);
++        final message =
++            jsonDecode(utf8.decode(m.bytes)) as Map<String, dynamic>;
++        return (message['ops'] as List).map((op) => op['op'] as String);
++      }).toList();
++
++      await save(() => host.main(['material', file.path]));
++      expect(operationNames(), ['upsertResource', 'updateNode']);
++      final blue =
++          controller.document!.resources.values
++                  .whereType<MaterialResource>()
++                  .single
++                  .properties['baseColor']
++              as ColorValue;
++      expect([blue.r, blue.g, blue.b], [0.03, 0.15, 0.7]);
++
++      await save(() => host.main(['environment', file.path]));
++      expect(operationNames(), ['upsertResource', 'updateStage']);
++      expect(
++        controller.document!.resources.values
++            .whereType<EnvironmentResource>()
++            .single
++            .exposure,
++        0.2,
++      );
++      final valid = controller.document;
++      element.sent.clear();
++      final error = statuses.stream.firstWhere(
++        (s) => s != 'Current file loaded',
++      );
++      file.writeAsStringSync('{', flush: true);
++      expect(
++        await error.timeout(const Duration(seconds: 15)),
++        contains('Exception'),
++      );
++      expect(controller.document, same(valid));
++      expect(element.sent, isEmpty);
++
++      await save(() => host.main(['baseline', file.path]));
++      expect(operationNames(), containsAll(['upsertResource', 'updateStage']));
++      expect(writeFsceneWithExtensions(controller.document!), original);
++      expect(
++        encodeNodeCommandSpec(
++          controller.document!.nodes[camera.id]!,
++          controller.document!,
++        ),
++        cameraTransform,
++      );
++      expect(logs.any((line) => line.startsWith('w34 watch type=')), isTrue);
++
++      await probe.dispose();
++      element.sent.clear();
++      host.main(['material', file.path]);
++      // Drain the real watch delivery interval after cancellation.
++      await Future<void>.delayed(const Duration(seconds: 1));
++      expect(element.sent, isEmpty);
++      expect(writeFsceneWithExtensions(controller.document!), original);
++    },
++  );
++
++  test(
++    'explicit source rejects absent, relative and unreadable inputs without loading',
++    () async {
++      for (final source in [
++        '',
++        'relative.fscene',
++        '/private/tmp/dart3d-e9-reload-probe-20261027/r1/missing/source.fscene',
++      ]) {
++        final controller = SceneController();
++        final statuses = <String>[];
++        final probe = W34ReloadProbe(
++          source: source,
++          controller: controller,
++          log: print,
++          onStatus: statuses.add,
++        );
++        probe.start();
++        expect(statuses, isNotEmpty);
++        expect(controller.document, isNull);
++        await probe.dispose();
++        controller.dispose();
++      }
++    },
++  );
++}
+--- /dev/null
++++ b/dart3d/example/tool/w34_reload_source.dart
+@@ -0,0 +1,133 @@
++// ignore_for_file: implementation_imports
++import 'dart:io';
++import 'dart:typed_data';
++
++import 'package:dart3d/src/doc_layer.dart';
++import 'package:dart3d/src/diff_apply.dart';
++import 'package:dart3d/src/scene_model.dart';
++import 'package:vector_math/vector_math.dart';
++
++void main(List<String> args) {
++  if (args.length != 2 ||
++      !['initial', 'material', 'environment', 'baseline'].contains(args[0]) ||
++      !RegExp(
++        r'^/private/tmp/dart3d-e9-reload-probe-20261027/r1/[^/]+\.fscene$',
++      ).hasMatch(args[1])) {
++    throw ArgumentError(
++      'Usage: w34_reload_source.dart initial|material|environment|baseline '
++      '/private/tmp/dart3d-e9-reload-probe-20261027/r1/<name>.fscene',
++    );
++  }
++  final file = File(args[1]);
++  final doc = args[0] == 'initial' || args[0] == 'baseline'
++      ? buildW34ReloadDocument()
++      : readFsceneLogged(file.readAsStringSync());
++  if (args[0] == 'material') {
++    doc.resources.values
++        .whereType<MaterialResource>()
++        .single
++        .properties['baseColor'] = const ColorValue(
++      0.03,
++      0.15,
++      0.7,
++      1,
++    );
++  }
++  if (args[0] == 'environment') {
++    doc.resources.values.whereType<EnvironmentResource>().single.exposure = 0.2;
++  }
++  final text = writeFsceneWithExtensions(doc);
++  readFsceneLogged(text);
++  file.writeAsStringSync(text, flush: true);
++  stdout.writeln(
++    'w34 host save=${args[0]} path=${file.path} '
++    'time=${DateTime.now().toUtc().toIso8601String()} strategy=in-place',
++  );
++}
++
++SceneDocument buildW34ReloadDocument() {
++  final doc = SceneDocument(
++    documentId: DocumentId(
++      Uint8List.fromList(List.generate(16, (i) => i + 34)),
++    ),
++    allocator: IdAllocator(session: 0x773334),
++  );
++  final material = doc.addResource(
++    MaterialResource(
++      doc.newId(),
++      name: 'w34.color',
++      type: 'physicallyBased',
++      properties: {
++        'baseColor': const ColorValue(0.7, 0.08, 0.03, 1),
++        'roughness': const DoubleValue(0.8),
++        'metallic': const DoubleValue(0),
++      },
++    ),
++  );
++  final geometry = doc.addResource(
++    GeometryResource(
++      doc.newId(),
++      procedural: CuboidGeometrySpec(extents: Vector3(1.8, 1.8, 1.8)),
++    ),
++  );
++  doc.createNode(
++    name: 'w34.cube',
++    transform: TrsTransform(
++      rotation: Quaternion.axisAngle(Vector3(0, 1, 0), 0.4),
++    ),
++    components: [
++      ComponentSpec(
++        'mesh',
++        properties: {
++          'geometry': ResourceRefValue(geometry.id),
++          'material': ResourceRefValue(material.id),
++        },
++      ),
++    ],
++    root: true,
++  );
++  doc.createNode(
++    name: 'w34.light',
++    components: [
++      ComponentSpec(
++        'directionalLight',
++        properties: {
++          'color': const ColorValue(1, 1, 1, 1),
++          'intensity': const DoubleValue(2),
++          'castsShadow': const BoolValue(false),
++        },
++      ),
++    ],
++    root: true,
++  );
++  doc.createNode(
++    name: 'w34.camera',
++    transform: TrsTransform(translation: Vector3(0, 0, -7)),
++    components: [
++      ComponentSpec(
++        'camera',
++        properties: {
++          'projection': const StringValue('perspective'),
++          'fovRadiansY': const DoubleValue(0.8),
++          'near': const DoubleValue(0.1),
++          'far': const DoubleValue(30),
++        },
++      ),
++    ],
++    root: true,
++  );
++  doc.stage.environmentRef = doc
++      .addResource(
++        EnvironmentResource(
++          doc.newId(),
++          name: 'w34.environment',
++          environment: const EmptyEnvironment(),
++          environmentIntensity: 0,
++          exposure: 1,
++          toneMapping: 'linear',
++          effects: EnvironmentEffectsSpec(),
++        ),
++      )
++      .id;
++  return doc;
++}

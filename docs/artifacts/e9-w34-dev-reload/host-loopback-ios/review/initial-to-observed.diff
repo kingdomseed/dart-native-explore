@@ -1,0 +1,10 @@
+--- a/dart3d/example/lib/w34_reload_main.dart
++++ b/dart3d/example/lib/w34_reload_main.dart
+@@ -53,6 +53,7 @@
+     brightness: Brightness.dark,
+     backgroundColor: const Color(0xFF111111),
+     body: Column(
++      crossAxisAlignment: CrossAxisAlignment.stretch,
+       children: [
+         Expanded(
+           child: SceneView(controller: _controller, quality: SceneQuality.high),

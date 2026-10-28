@@ -1227,7 +1227,7 @@ enum GeometryFactory {
             let rx = dx * cosR - dy * sinR
             let ry = dx * sinR + dy * cosR
             b.emit(r * (rx * sizeX) + u * (ry * sizeY), n,
-                   dx + 0.5, dy + 0.5, color)
+                   dx + 0.5, 0.5 - dy, color)
         }
         b.quad(0, 1, 2, 3)
         return b.parts
@@ -1361,7 +1361,7 @@ enum GeometryFactory {
                 let rx = dx * cosR - dy * sinR
                 let ry = dx * sinR + dy * cosR
                 b.emit(c + r * (rx * sizeX) + u * (ry * sizeY), n,
-                       dx + 0.5, dy + 0.5, col)
+                       dx + 0.5, 0.5 - dy, col)
             }
             b.quad(v0, v0 + 1, v0 + 2, v0 + 3)
         }

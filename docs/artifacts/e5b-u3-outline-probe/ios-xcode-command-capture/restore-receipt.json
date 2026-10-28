@@ -1,0 +1,18 @@
+{
+  "accepted66Restored": true,
+  "allPriorFilesRestored": 5206,
+  "replacedNativeFiles": [
+    "dart3d/ios/Classes/RenderTargets.swift",
+    "dart3d/ios/Classes/SceneViewHost.swift",
+    "dart3d/ios/Classes/SelectionOutline.swift",
+    "dart3d/ios/Classes/ToneMapping.swift"
+  ],
+  "removedOwnProbeAdditions": [
+    "dart3d/example/lib/u3_outline_views_main.dart",
+    "dart3d/example/lib/u3_outline_views_scene.dart",
+    "dart3d/example/test/u3_outline_views_test.dart",
+    "dart3d/ios/Classes/SelectionOutlineViewsProbe.swift"
+  ],
+  "runtimePacketRetained": "runtime-source/source.tgz",
+  "scratchRemoved": true
+}

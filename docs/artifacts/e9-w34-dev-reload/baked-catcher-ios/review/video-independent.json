@@ -1,0 +1,114 @@
+{
+  "sha256": "ddfcddab1af120708a425e755e34b1b66992eec6d8909055d1d8259c87df15c3",
+  "probe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "width": 1206,
+        "height": 2622,
+        "nb_frames": "6631",
+        "nb_read_frames": "6631"
+      }
+    ],
+    "format": {
+      "duration": "65.480000"
+    }
+  },
+  "fullDecodes": [
+    {
+      "label": "video-null",
+      "command": [
+        "ffmpeg",
+        "-v",
+        "warning",
+        "-threads",
+        "2",
+        "-i",
+        "/private/tmp/dart3d-w34-ios-baked-catcher-20261028/r1/parent/after/journey.mp4",
+        "-map",
+        "0:v:0",
+        "-progress",
+        "/private/tmp/dart3d-w34-ios-baked-catcher-review-20261028/r1/video-null-progress.txt",
+        "-f",
+        "null",
+        "-"
+      ],
+      "exit": 0,
+      "warningLines": 2658,
+      "progress": [
+        "frame=6631",
+        "fps=550.77",
+        "stream_0_0_q=-0.0",
+        "bitrate=N/A",
+        "total_size=N/A",
+        "out_time_us=65483333",
+        "out_time_ms=65483333",
+        "out_time=00:01:05.483333",
+        "dup_frames=0",
+        "drop_frames=0",
+        "speed=5.44x",
+        "progress=end"
+      ]
+    },
+    {
+      "label": "video-raw",
+      "command": [
+        "ffmpeg",
+        "-v",
+        "warning",
+        "-threads",
+        "2",
+        "-i",
+        "/private/tmp/dart3d-w34-ios-baked-catcher-20261028/r1/parent/after/journey.mp4",
+        "-map",
+        "0:v:0",
+        "-progress",
+        "/private/tmp/dart3d-w34-ios-baked-catcher-review-20261028/r1/video-raw-progress.txt",
+        "-fps_mode",
+        "passthrough",
+        "-f",
+        "rawvideo",
+        "-pix_fmt",
+        "rgba",
+        "-"
+      ],
+      "exit": 0,
+      "warningLines": 2670,
+      "progress": [
+        "frame=6631",
+        "fps=562.55",
+        "stream_0_0_q=-0.0",
+        "bitrate=10246563.2kbits/s",
+        "total_size=83872389168",
+        "out_time_us=65483333",
+        "out_time_ms=65483333",
+        "out_time=00:01:05.483333",
+        "dup_frames=0",
+        "drop_frames=0",
+        "speed=5.56x",
+        "progress=end"
+      ]
+    }
+  ],
+  "sampleCommand": [
+    "ffmpeg",
+    "-v",
+    "warning",
+    "-threads",
+    "2",
+    "-i",
+    "/private/tmp/dart3d-w34-ios-baked-catcher-20261028/r1/parent/after/journey.mp4",
+    "-vf",
+    "fps=1/2,scale=201:437",
+    "-f",
+    "rawvideo",
+    "-pix_fmt",
+    "rgb24",
+    "-"
+  ],
+  "sampleCount": 33,
+  "columns": 6,
+  "samplePeriodSeconds": 2,
+  "warningFree": false
+}

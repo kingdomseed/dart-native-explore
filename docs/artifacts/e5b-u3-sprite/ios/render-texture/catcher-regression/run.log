@@ -1,0 +1,24 @@
+Launching lib/main.dart on iPhone 17 Pro in debug mode...
+Running Xcode build...                                          
+Xcode build done.                                            5.4s
+dartnative: [DN] Licence valid (community), expires 2027-09-14
+dartnative: [DN] lifecycle → AppLifecycleState.inactive
+dartnative: dart3d: u2-catcher light=spot mode=baked softness=0
+dartnative: dart3d: showcase — u2-catcher: Baked shadow footprint · explicit refresh · live shadowOnly mode
+Syncing files to device iPhone 17 Pro...                            15ms
+
+DartNative run key commands.
+r Hot reload. 🔥🔥🔥
+R Hot restart.
+h List all available interactive commands.
+d Detach (terminate "dn run" but leave application running).
+c Clear the screen
+q Quit (terminate the application on the device).
+
+A Dart VM Service on iPhone 17 Pro is available at: http://127.0.0.1:63211/wJoC-cKpwNg=/
+The DartNative DevTools debugger and profiler on iPhone 17 Pro is available at: http://127.0.0.1:63211/wJoC-cKpwNg=/devtools/?uri=ws://127.0.0.1:63211/wJoC-cKpwNg=/ws
+dartnative: [DN] lifecycle → AppLifecycleState.resumed
+dartnative: dart3d: u2-catcher caster moved; baked output waits for explicit refresh
+dartnative: dart3d: u2-catcher explicit upsert sent with unchanged properties
+
+Application finished.

@@ -1,0 +1,102 @@
+{
+  "video": "/private/tmp/dart3d-w34-ios-channel-transitions-20261028/r1/parent/clean/journey.mp4",
+  "sha256": "8716ca30768048571f49744a05e4d503b4450b38acc7077ecbfbfa0d77f6b494",
+  "streams": [
+    {
+      "width": 1206,
+      "height": 2622,
+      "duration": "21.163333",
+      "nb_read_frames": "2495"
+    }
+  ],
+  "commands": [
+    {
+      "program": "ffprobe",
+      "args": [
+        "-v",
+        "error",
+        "-threads",
+        "2",
+        "-count_frames",
+        "-select_streams",
+        "v:0",
+        "-show_entries",
+        "stream=width,height,duration,nb_read_frames:frame=best_effort_timestamp_time",
+        "-of",
+        "json",
+        "/private/tmp/dart3d-w34-ios-channel-transitions-20261028/r1/parent/clean/journey.mp4"
+      ],
+      "start": "2026-10-28T00:46:31.098735Z",
+      "end": "2026-10-28T00:46:34.506815Z",
+      "exitCode": 0,
+      "stderrLog": "probe-errors.log"
+    },
+    {
+      "program": "ffmpeg",
+      "args": [
+        "-v",
+        "error",
+        "-y",
+        "-threads",
+        "2",
+        "-i",
+        "/private/tmp/dart3d-w34-ios-channel-transitions-20261028/r1/parent/clean/journey.mp4",
+        "-vf",
+        "scale=402:874:flags=neighbor,crop=42:35:180:360",
+        "-pix_fmt",
+        "rgb24",
+        "-fps_mode",
+        "passthrough",
+        "-f",
+        "rawvideo",
+        "/private/tmp/dart3d-w34-ios-channel-transitions-20261028/r1/parent/clean/roi.rgb"
+      ],
+      "start": "2026-10-28T00:46:34.517375Z",
+      "end": "2026-10-28T00:46:37.512895Z",
+      "exitCode": 0,
+      "stderrLog": "roi-decode.log"
+    },
+    {
+      "program": "/Users/jasonholt/zero/bin/cache/dart-sdk/bin/dart",
+      "args": [
+        "/private/tmp/dart3d-w34-ios-channel-transitions-20261028/r1/parent/analyze-roi.dart",
+        "/private/tmp/dart3d-w34-ios-channel-transitions-20261028/r1/parent/clean"
+      ],
+      "start": "2026-10-28T00:46:37.512989Z",
+      "end": "2026-10-28T00:46:37.632263Z",
+      "exitCode": 0,
+      "stderrLog": "roi-script-errors.log"
+    }
+  ],
+  "roiSummary": {
+    "crop": [
+      180,
+      360,
+      42,
+      35
+    ],
+    "scaledVideo": [
+      402,
+      874
+    ],
+    "threshold": "maximum RGB byte < 20",
+    "frames": 2495,
+    "darkFrames": 3,
+    "intervals": [
+      {
+        "firstFrame": 66,
+        "lastFrame": 67,
+        "start": 1.016667,
+        "lastTimestamp": 1.023333,
+        "frames": 2
+      },
+      {
+        "firstFrame": 2301,
+        "lastFrame": 2301,
+        "start": 19.713333,
+        "lastTimestamp": 19.713333,
+        "frames": 1
+      }
+    ]
+  }
+}

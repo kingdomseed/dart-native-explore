@@ -1,0 +1,319 @@
+{
+  "pass": true,
+  "states": 11,
+  "maximumFactorError": 5.000000002919336e-8,
+  "factorTolerance": 0.000001,
+  "materialObjectsObserved": 7,
+  "textureObjectsObserved": 3,
+  "boundary": "Read-only post-sampler assigned-slot observations. No calibrated pixel color or latency claim. Snapshot texture remains captured until explicit refresh.",
+  "observed": [
+    {
+      "time": 0.0,
+      "weight": 1.0,
+      "current": {
+        "id": "0x0000000106e94c80",
+        "kind": "ordinary",
+        "factor": [
+          1.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "textureType": "UICachedDeviceWhiteColor",
+        "texture": "0x0000000102236df0"
+      },
+      "snapshot": {
+        "id": "0x0000000106e94640",
+        "kind": "ordinary",
+        "factor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "textureType": "UICachedDeviceWhiteColor",
+        "texture": "0x0000000102236df0"
+      }
+    },
+    {
+      "time": 0.0,
+      "weight": 0.25,
+      "current": {
+        "id": "0x0000000106e94c80",
+        "kind": "ordinary",
+        "factor": [
+          1.0,
+          0.75,
+          0.75,
+          1.0
+        ],
+        "textureType": "UICachedDeviceWhiteColor",
+        "texture": "0x0000000102236df0"
+      },
+      "snapshot": {
+        "id": "0x0000000106e94640",
+        "kind": "ordinary",
+        "factor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "textureType": "UICachedDeviceWhiteColor",
+        "texture": "0x0000000102236df0"
+      }
+    },
+    {
+      "time": 1.0,
+      "weight": 0.25,
+      "current": {
+        "id": "0x0000000106e94c80",
+        "kind": "ordinary",
+        "factor": [
+          0.875,
+          0.75,
+          0.875,
+          1.0
+        ],
+        "textureType": "UICachedDeviceWhiteColor",
+        "texture": "0x0000000102236df0"
+      },
+      "snapshot": {
+        "id": "0x0000000106e94640",
+        "kind": "ordinary",
+        "factor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "textureType": "UICachedDeviceWhiteColor",
+        "texture": "0x0000000102236df0"
+      }
+    },
+    {
+      "time": 1.0,
+      "weight": 0.25,
+      "current": {
+        "id": "0x0000000106e94c80",
+        "kind": "ordinary",
+        "factor": [
+          0.875,
+          0.75,
+          0.875,
+          1.0
+        ],
+        "textureType": "MTLSimTexture",
+        "texture": "0x0000000102331f80"
+      },
+      "snapshot": {
+        "id": "0x0000000106e94640",
+        "kind": "ordinary",
+        "factor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "textureType": "UICachedDeviceWhiteColor",
+        "texture": "0x0000000102236df0"
+      }
+    },
+    {
+      "time": 1.0,
+      "weight": 0.25,
+      "current": {
+        "id": "0x000000011490a940",
+        "kind": "sprite",
+        "factor": [
+          0.275,
+          0.3,
+          0.57500005,
+          1.0
+        ],
+        "textureType": "UICachedDeviceWhiteColor",
+        "texture": "0x0000000102236df0"
+      },
+      "snapshot": {
+        "id": "0x000000011490bac0",
+        "kind": "sprite",
+        "factor": [
+          0.275,
+          0.3,
+          0.57500005,
+          1.0
+        ],
+        "textureType": "UICachedDeviceWhiteColor",
+        "texture": "0x0000000102236df0"
+      }
+    },
+    {
+      "time": 2.0,
+      "weight": 0.25,
+      "current": {
+        "id": "0x000000011490a940",
+        "kind": "sprite",
+        "factor": [
+          0.15,
+          0.3,
+          0.70000005,
+          1.0
+        ],
+        "textureType": "UICachedDeviceWhiteColor",
+        "texture": "0x0000000102236df0"
+      },
+      "snapshot": {
+        "id": "0x000000011490bac0",
+        "kind": "sprite",
+        "factor": [
+          0.275,
+          0.3,
+          0.57500005,
+          1.0
+        ],
+        "textureType": "UICachedDeviceWhiteColor",
+        "texture": "0x0000000102236df0"
+      }
+    },
+    {
+      "time": 2.0,
+      "weight": 0.25,
+      "current": {
+        "id": "0x000000011490a940",
+        "kind": "sprite",
+        "factor": [
+          0.15,
+          0.3,
+          0.70000005,
+          1.0
+        ],
+        "textureType": "MTLSimTexture",
+        "texture": "0x0000000102332880"
+      },
+      "snapshot": {
+        "id": "0x000000011490bac0",
+        "kind": "sprite",
+        "factor": [
+          0.275,
+          0.3,
+          0.57500005,
+          1.0
+        ],
+        "textureType": "UICachedDeviceWhiteColor",
+        "texture": "0x0000000102236df0"
+      }
+    },
+    {
+      "time": 2.0,
+      "weight": 0.25,
+      "current": {
+        "id": "0x0000000106f83980",
+        "kind": "sprite",
+        "factor": [
+          0.15,
+          0.3,
+          0.70000005,
+          1.0
+        ],
+        "textureType": "MTLSimTexture",
+        "texture": "0x0000000102332880"
+      },
+      "snapshot": {
+        "id": "0x0000000106f82e40",
+        "kind": "sprite",
+        "factor": [
+          0.15,
+          0.3,
+          0.70000005,
+          1.0
+        ],
+        "textureType": "MTLSimTexture",
+        "texture": "0x0000000102332880"
+      }
+    },
+    {
+      "time": 1.0,
+      "weight": 0.25,
+      "current": {
+        "id": "0x0000000106f83980",
+        "kind": "sprite",
+        "factor": [
+          0.275,
+          0.3,
+          0.57500005,
+          1.0
+        ],
+        "textureType": "MTLSimTexture",
+        "texture": "0x0000000102332880"
+      },
+      "snapshot": {
+        "id": "0x0000000106f82e40",
+        "kind": "sprite",
+        "factor": [
+          0.15,
+          0.3,
+          0.70000005,
+          1.0
+        ],
+        "textureType": "MTLSimTexture",
+        "texture": "0x0000000102332880"
+      }
+    },
+    {
+      "time": 1.0,
+      "weight": 0.25,
+      "current": {
+        "id": "0x0000000106f83980",
+        "kind": "sprite",
+        "factor": [
+          0.275,
+          0.3,
+          0.57500005,
+          1.0
+        ],
+        "textureType": "MTLSimTexture",
+        "texture": "0x0000000102332880"
+      },
+      "snapshot": {
+        "id": "0x0000000106e948c0",
+        "kind": "ordinary",
+        "factor": [
+          0.0,
+          1.0,
+          0.0,
+          1.0
+        ],
+        "textureType": "UICachedDeviceWhiteColor",
+        "texture": "0x0000000102236df0"
+      }
+    },
+    {
+      "time": 1.0,
+      "weight": 0.25,
+      "current": {
+        "id": "0x0000000106f83980",
+        "kind": "sprite",
+        "factor": [
+          0.275,
+          0.3,
+          0.57500005,
+          1.0
+        ],
+        "textureType": "MTLSimTexture",
+        "texture": "0x0000000102332880"
+      },
+      "snapshot": {
+        "id": "0x0000000106f82e40",
+        "kind": "sprite",
+        "factor": [
+          0.15,
+          0.3,
+          0.70000005,
+          1.0
+        ],
+        "textureType": "MTLSimTexture",
+        "texture": "0x0000000102332880"
+      }
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+[
+  {
+    "at": "2026-10-27T21:44:02.139Z",
+    "label": "baseColor",
+    "ref": "@e15",
+    "snapshot": "Page: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 23 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.literal.0.125\"\n@e6 [other] \"w34.literal.0.5\"\n@e7 [other] \"w34.literal.0.875\"\n@e8 [other] \"w34.camera\"\n@e9 [other] \"w34.light\"\n@e10 [other] \"w34.authoredTarget\"\n@e11 [button] \"Off\"\n@e12 [button] \"normals\"\n@e13 [button] \"metallic\"\n@e14 [button] \"roughness\"\n@e15 [button] \"baseColor\"\n@e16 [button] \"depth\"\n@e17 [button] \"Wire off\"\n@e18 [button] \"Factors A\"\n@e19 [button] \"opaque\"\n@e20 [button] \"Capture\"\n@e21 [button] \"Reload\"\n@e22 [text] \"PBR only. Native particles excluded in channel views.\nDepth d/(1+d). Literals 0.125 / 0.5 / 0.875.\nCapture saves authored target. Inspect lower panel in baseColor.\"\n@e23 [toolbar] \"Toolbar\"\n",
+    "result": "Tapped @e15 (201, 761)\n"
+  },
+  {
+    "at": "2026-10-27T21:44:03.114Z",
+    "label": "Capture",
+    "ref": "@e20",
+    "snapshot": "Page: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 23 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.literal.0.125\"\n@e6 [other] \"w34.literal.0.5\"\n@e7 [other] \"w34.literal.0.875\"\n@e8 [other] \"w34.camera\"\n@e9 [other] \"w34.light\"\n@e10 [other] \"w34.authoredTarget\"\n@e11 [button] \"Off\"\n@e12 [button] \"normals\"\n@e13 [button] \"metallic\"\n@e14 [button] \"roughness\"\n@e15 [button] \"baseColor\"\n@e16 [button] \"depth\"\n@e17 [button] \"Wire off\"\n@e18 [button] \"Factors A\"\n@e19 [button] \"opaque\"\n@e20 [button] \"Capture\"\n@e21 [button] \"Reload\"\n@e22 [text] \"PBR only. Native particles excluded in channel views.\nDepth d/(1+d). Literals 0.125 / 0.5 / 0.875.\nCapture saves authored target. Inspect lower panel in baseColor.\"\n@e23 [toolbar] \"Toolbar\"\n",
+    "result": "Tapped @e20 (278, 805)\n"
+  },
+  {
+    "at": "2026-10-27T21:44:04.983Z",
+    "label": "normals",
+    "ref": "@e12",
+    "snapshot": "Page: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 23 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.literal.0.125\"\n@e6 [other] \"w34.literal.0.5\"\n@e7 [other] \"w34.literal.0.875\"\n@e8 [other] \"w34.camera\"\n@e9 [other] \"w34.light\"\n@e10 [other] \"w34.authoredTarget\"\n@e11 [button] \"Off\"\n@e12 [button] \"normals\"\n@e13 [button] \"metallic\"\n@e14 [button] \"roughness\"\n@e15 [button] \"baseColor\"\n@e16 [button] \"depth\"\n@e17 [button] \"Wire off\"\n@e18 [button] \"Factors A\"\n@e19 [button] \"opaque\"\n@e20 [button] \"Capture\"\n@e21 [button] \"Reload\"\n@e22 [text] \"PBR only. Native particles excluded in channel views.\nDepth d/(1+d). Literals 0.125 / 0.5 / 0.875.\nCapture saves authored target. Inspect lower panel in baseColor.\"\n@e23 [toolbar] \"Toolbar\"\n",
+    "result": "Tapped @e12 (201, 717)\n"
+  },
+  {
+    "at": "2026-10-27T21:44:06.747Z",
+    "label": "Capture",
+    "ref": "@e20",
+    "snapshot": "Page: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 23 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.literal.0.125\"\n@e6 [other] \"w34.literal.0.5\"\n@e7 [other] \"w34.literal.0.875\"\n@e8 [other] \"w34.camera\"\n@e9 [other] \"w34.light\"\n@e10 [other] \"w34.authoredTarget\"\n@e11 [button] \"Off\"\n@e12 [button] \"normals\"\n@e13 [button] \"metallic\"\n@e14 [button] \"roughness\"\n@e15 [button] \"baseColor\"\n@e16 [button] \"depth\"\n@e17 [button] \"Wire off\"\n@e18 [button] \"Factors A\"\n@e19 [button] \"opaque\"\n@e20 [button] \"Capture\"\n@e21 [button] \"Reload\"\n@e22 [text] \"PBR only. Native particles excluded in channel views.\nDepth d/(1+d). Literals 0.125 / 0.5 / 0.875.\nCapture saves authored target. Inspect lower panel in baseColor.\"\n@e23 [toolbar] \"Toolbar\"\n",
+    "result": "Tapped @e20 (278, 805)\n"
+  },
+  {
+    "at": "2026-10-27T21:44:07.684Z",
+    "label": "baseColor",
+    "ref": "@e15",
+    "snapshot": "Page: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 23 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.literal.0.125\"\n@e6 [other] \"w34.literal.0.5\"\n@e7 [other] \"w34.literal.0.875\"\n@e8 [other] \"w34.camera\"\n@e9 [other] \"w34.light\"\n@e10 [other] \"w34.authoredTarget\"\n@e11 [button] \"Off\"\n@e12 [button] \"normals\"\n@e13 [button] \"metallic\"\n@e14 [button] \"roughness\"\n@e15 [button] \"baseColor\"\n@e16 [button] \"depth\"\n@e17 [button] \"Wire off\"\n@e18 [button] \"Factors A\"\n@e19 [button] \"opaque\"\n@e20 [button] \"Capture\"\n@e21 [button] \"Reload\"\n@e22 [text] \"PBR only. Native particles excluded in channel views.\nDepth d/(1+d). Literals 0.125 / 0.5 / 0.875.\nCapture saves authored target. Inspect lower panel in baseColor.\"\n@e23 [toolbar] \"Toolbar\"\n",
+    "result": "Tapped @e15 (201, 761)\n"
+  },
+  {
+    "at": "2026-10-27T21:44:09.440Z",
+    "label": "metallic",
+    "ref": "@e13",
+    "snapshot": "Page: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 23 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.literal.0.125\"\n@e6 [other] \"w34.literal.0.5\"\n@e7 [other] \"w34.literal.0.875\"\n@e8 [other] \"w34.camera\"\n@e9 [other] \"w34.light\"\n@e10 [other] \"w34.authoredTarget\"\n@e11 [button] \"Off\"\n@e12 [button] \"normals\"\n@e13 [button] \"metallic\"\n@e14 [button] \"roughness\"\n@e15 [button] \"baseColor\"\n@e16 [button] \"depth\"\n@e17 [button] \"Wire off\"\n@e18 [button] \"Factors A\"\n@e19 [button] \"opaque\"\n@e20 [button] \"Capture\"\n@e21 [button] \"Reload\"\n@e22 [text] \"PBR only. Native particles excluded in channel views.\nDepth d/(1+d). Literals 0.125 / 0.5 / 0.875.\nCapture saves authored target. Inspect lower panel in baseColor.\"\n@e23 [toolbar] \"Toolbar\"\n",
+    "result": "Tapped @e13 (330, 717)\n"
+  },
+  {
+    "at": "2026-10-27T21:44:11.204Z",
+    "label": "roughness",
+    "ref": "@e14",
+    "snapshot": "Page: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 23 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.literal.0.125\"\n@e6 [other] \"w34.literal.0.5\"\n@e7 [other] \"w34.literal.0.875\"\n@e8 [other] \"w34.camera\"\n@e9 [other] \"w34.light\"\n@e10 [other] \"w34.authoredTarget\"\n@e11 [button] \"Off\"\n@e12 [button] \"normals\"\n@e13 [button] \"metallic\"\n@e14 [button] \"roughness\"\n@e15 [button] \"baseColor\"\n@e16 [button] \"depth\"\n@e17 [button] \"Wire off\"\n@e18 [button] \"Factors A\"\n@e19 [button] \"opaque\"\n@e20 [button] \"Capture\"\n@e21 [button] \"Reload\"\n@e22 [text] \"PBR only. Native particles excluded in channel views.\nDepth d/(1+d). Literals 0.125 / 0.5 / 0.875.\nCapture saves authored target. Inspect lower panel in baseColor.\"\n@e23 [toolbar] \"Toolbar\"\n",
+    "result": "Tapped @e14 (72, 761)\n"
+  },
+  {
+    "at": "2026-10-27T21:44:12.939Z",
+    "label": "baseColor",
+    "ref": "@e15",
+    "snapshot": "Page: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 23 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.literal.0.125\"\n@e6 [other] \"w34.literal.0.5\"\n@e7 [other] \"w34.literal.0.875\"\n@e8 [other] \"w34.camera\"\n@e9 [other] \"w34.light\"\n@e10 [other] \"w34.authoredTarget\"\n@e11 [button] \"Off\"\n@e12 [button] \"normals\"\n@e13 [button] \"metallic\"\n@e14 [button] \"roughness\"\n@e15 [button] \"baseColor\"\n@e16 [button] \"depth\"\n@e17 [button] \"Wire off\"\n@e18 [button] \"Factors A\"\n@e19 [button] \"opaque\"\n@e20 [button] \"Capture\"\n@e21 [button] \"Reload\"\n@e22 [text] \"PBR only. Native particles excluded in channel views.\nDepth d/(1+d). Literals 0.125 / 0.5 / 0.875.\nCapture saves authored target. Inspect lower panel in baseColor.\"\n@e23 [toolbar] \"Toolbar\"\n",
+    "result": "Tapped @e15 (201, 761)\n"
+  },
+  {
+    "at": "2026-10-27T21:44:14.670Z",
+    "label": "Wire off",
+    "ref": "@e17",
+    "snapshot": "Page: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 23 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.literal.0.125\"\n@e6 [other] \"w34.literal.0.5\"\n@e7 [other] \"w34.literal.0.875\"\n@e8 [other] \"w34.camera\"\n@e9 [other] \"w34.light\"\n@e10 [other] \"w34.authoredTarget\"\n@e11 [button] \"Off\"\n@e12 [button] \"normals\"\n@e13 [button] \"metallic\"\n@e14 [button] \"roughness\"\n@e15 [button] \"baseColor\"\n@e16 [button] \"depth\"\n@e17 [button] \"Wire off\"\n@e18 [button] \"Factors A\"\n@e19 [button] \"opaque\"\n@e20 [button] \"Capture\"\n@e21 [button] \"Reload\"\n@e22 [text] \"PBR only. Native particles excluded in channel views.\nDepth d/(1+d). Literals 0.125 / 0.5 / 0.875.\nCapture saves authored target. Inspect lower panel in baseColor.\"\n@e23 [toolbar] \"Toolbar\"\n",
+    "result": "Tapped @e17 (47, 805)\n"
+  },
+  {
+    "at": "2026-10-27T21:44:16.427Z",
+    "label": "Off",
+    "ref": "@e11",
+    "snapshot": "Page: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 23 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.literal.0.125\"\n@e6 [other] \"w34.literal.0.5\"\n@e7 [other] \"w34.literal.0.875\"\n@e8 [other] \"w34.camera\"\n@e9 [other] \"w34.light\"\n@e10 [other] \"w34.authoredTarget\"\n@e11 [button] \"Off\"\n@e12 [button] \"normals\"\n@e13 [button] \"metallic\"\n@e14 [button] \"roughness\"\n@e15 [button] \"baseColor\"\n@e16 [button] \"depth\"\n@e17 [button] \"Wire on\"\n@e18 [button] \"Factors A\"\n@e19 [button] \"opaque\"\n@e20 [button] \"Capture\"\n@e21 [button] \"Reload\"\n@e22 [text] \"PBR only. Native particles excluded in channel views.\nDepth d/(1+d). Literals 0.125 / 0.5 / 0.875.\nCapture saves authored target. Inspect lower panel in baseColor.\"\n@e23 [toolbar] \"Toolbar\"\n",
+    "result": "Tapped @e11 (72, 717)\n"
+  },
+  {
+    "at": "2026-10-27T21:44:18.174Z",
+    "label": "Wire on",
+    "ref": "@e17",
+    "snapshot": "Page: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 23 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.literal.0.125\"\n@e6 [other] \"w34.literal.0.5\"\n@e7 [other] \"w34.literal.0.875\"\n@e8 [other] \"w34.camera\"\n@e9 [other] \"w34.light\"\n@e10 [other] \"w34.authoredTarget\"\n@e11 [button] \"Off\"\n@e12 [button] \"normals\"\n@e13 [button] \"metallic\"\n@e14 [button] \"roughness\"\n@e15 [button] \"baseColor\"\n@e16 [button] \"depth\"\n@e17 [button] \"Wire on\"\n@e18 [button] \"Factors A\"\n@e19 [button] \"opaque\"\n@e20 [button] \"Capture\"\n@e21 [button] \"Reload\"\n@e22 [text] \"PBR only. Native particles excluded in channel views.\nDepth d/(1+d). Literals 0.125 / 0.5 / 0.875.\nCapture saves authored target. Inspect lower panel in baseColor.\"\n@e23 [toolbar] \"Toolbar\"\n",
+    "result": "Tapped @e17 (47, 805)\n"
+  }
+]

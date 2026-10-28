@@ -1,0 +1,205 @@
+{
+  "meaning": "Encoded screenshots. Crop excludes status/header/footer. No raw shader calibration.",
+  "sceneCropXYWH": [
+    0,
+    100,
+    402,
+    620
+  ],
+  "meshROI": [
+    30,
+    295,
+    140,
+    150
+  ],
+  "images": {
+    "00-live.png": {
+      "sceneChangedPixelsVsFrozen": 12792,
+      "meshROIChangedPixels": 0,
+      "sceneMagentaPixelCount": 0,
+      "rgbSamples": {
+        "80,360": [
+          71,
+          57,
+          39
+        ],
+        "270,255": [
+          0,
+          0,
+          0
+        ],
+        "300,360": [
+          83,
+          121,
+          137
+        ]
+      }
+    },
+    "01-frozen-off.png": {
+      "sceneChangedPixelsVsFrozen": 0,
+      "meshROIChangedPixels": 0,
+      "sceneMagentaPixelCount": 0,
+      "rgbSamples": {
+        "80,360": [
+          71,
+          57,
+          39
+        ],
+        "270,255": [
+          179,
+          245,
+          211
+        ],
+        "300,360": [
+          83,
+          121,
+          137
+        ]
+      }
+    },
+    "01-frozen-steady.png": {
+      "sceneChangedPixelsVsFrozen": 0,
+      "meshROIChangedPixels": 0,
+      "sceneMagentaPixelCount": 0,
+      "rgbSamples": {
+        "80,360": [
+          71,
+          57,
+          39
+        ],
+        "270,255": [
+          179,
+          245,
+          211
+        ],
+        "300,360": [
+          83,
+          121,
+          137
+        ]
+      }
+    },
+    "02-constant.png": {
+      "sceneChangedPixelsVsFrozen": 249240,
+      "meshROIChangedPixels": 21000,
+      "sceneMagentaPixelCount": 0,
+      "rgbSamples": {
+        "80,360": [
+          33,
+          33,
+          33
+        ],
+        "270,255": [
+          179,
+          244,
+          211
+        ],
+        "300,360": [
+          179,
+          244,
+          211
+        ]
+      }
+    },
+    "03-off-return.png": {
+      "sceneChangedPixelsVsFrozen": 0,
+      "meshROIChangedPixels": 0,
+      "sceneMagentaPixelCount": 0,
+      "rgbSamples": {
+        "80,360": [
+          71,
+          57,
+          39
+        ],
+        "270,255": [
+          179,
+          245,
+          211
+        ],
+        "300,360": [
+          83,
+          121,
+          137
+        ]
+      }
+    },
+    "04-wire-off-mode.png": {
+      "sceneChangedPixelsVsFrozen": 1276,
+      "meshROIChangedPixels": 887,
+      "sceneMagentaPixelCount": 0,
+      "rgbSamples": {
+        "80,360": [
+          71,
+          57,
+          39
+        ],
+        "270,255": [
+          179,
+          245,
+          211
+        ],
+        "300,360": [
+          83,
+          121,
+          137
+        ]
+      }
+    },
+    "05-restored-frozen.png": {
+      "sceneChangedPixelsVsFrozen": 0,
+      "meshROIChangedPixels": 0,
+      "sceneMagentaPixelCount": 0,
+      "rgbSamples": {
+        "80,360": [
+          71,
+          57,
+          39
+        ],
+        "270,255": [
+          179,
+          245,
+          211
+        ],
+        "300,360": [
+          83,
+          121,
+          137
+        ]
+      }
+    },
+    "06-resumed.png": {
+      "sceneChangedPixelsVsFrozen": 18091,
+      "meshROIChangedPixels": 0,
+      "sceneMagentaPixelCount": 0,
+      "rgbSamples": {
+        "80,360": [
+          71,
+          57,
+          39
+        ],
+        "270,255": [
+          0,
+          0,
+          0
+        ],
+        "300,360": [
+          83,
+          121,
+          137
+        ]
+      }
+    }
+  },
+  "greenParticleInteriorComparison": {
+    "regionXYWH": [
+      220,
+      180,
+      160,
+      380
+    ],
+    "baselineGreenInteriorPixels": 10981,
+    "remainingGreenInConstant": 10981,
+    "magentaInConstantAtThosePixels": 0,
+    "maximumChannelDifference": 1
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "head": "2f38e4e33f0b1cb678bc408a42d069c796cefc12",
+  "baselineArchiveSha256": "562c40177e9661a3deebe56828ac9dcf9dec8c6c58301924d552dbcc5370b4f0",
+  "sourceArchiveSha256": "1dc88f84b6f0397c96c6c92f774671f0fb131f5c04d7407ba9aeccff4a2936bd",
+  "patchSha256": "3cdb871b5dadc3f4fe7a2e4625e6599b27e519d290aa27b09456b9d080804c98",
+  "changedPaths": [
+    "dart3d/ios/Classes/FsceneRealizer.swift"
+  ],
+  "unownedOverlayPreserved": 65,
+  "preexistingOtherFilesPreserved": 3177,
+  "locks": {
+    "dart3d/example/ios/Podfile.lock": "47d5269141917cc2cfad542d6e2c60dc8c3f364e5700ba1354f44208a9e31522",
+    "dart3d/pubspec.lock": "868933c6c9bdd80476a9d1b6d380078eb8ecf45960820d8414beebd55a0b555f",
+    "dart3d/example/pubspec.lock": "4ab8d1150fe7606c532dccb84d07eb0cc4062b5d4b2481c07fd27c135241936c",
+    "dart3d/example/lib/dartnative_plugin_registrant.dart": "c0f873e11de99a1485dd67fd82bc563a61f3c66cc8280b705019ce48cfdbe09f",
+    "dart3d/example/dn_plugins.lock": "73c5209e393e2c670769b2dfe4d09d72b79870c5218ede82e2a6d9c659c0f2a6",
+    "probe/pubspec.lock": "1606c33221efeb86ab121be4ef9ef82377f400de9ca7ab838b7822971f285121"
+  },
+  "runtimeNativeHashMatchesProduction": true,
+  "forwardReverseAll66Replay": true,
+  "scratchRemoved": true,
+  "normalTarget": "DN_TARGET=lib/main.dart",
+  "remainingW34Defines": []
+}

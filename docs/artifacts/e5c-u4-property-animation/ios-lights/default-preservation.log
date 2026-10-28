@@ -1,0 +1,5 @@
+Both real builders temporarily received the same fixed DocumentId Q8PFZNM7C137H72KTMW0NR0SK4 at construction. No allocator, ordering, pose, property, payload, clip or controls changes were made for export.
+Normal before/after serialized bytes identical. Camera before/after serialized bytes identical.
+Both payload ID/byte receipts identical.
+Temporary DocumentId and export code removed.
+Existing U4PropertyControls class source byte-identical to baseline.

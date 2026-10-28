@@ -1,0 +1,318 @@
+{
+  "meaning": "Independent offline recomputation of encoded screenshot RGB; no calibrated normal claim.",
+  "sceneCropXYWH": [
+    0,
+    100,
+    402,
+    650
+  ],
+  "pngSHA256": {
+    "00-off-r2.png": "01a6ed9bc114a88de27c340085715ed8403450b6dc4bc0b8f7f1e9de3caf80fd",
+    "01-mapped-r2.png": "a24590548f9d79d4489705bea8c142fda1088221629e4b8b3301a9032b6fa7d7",
+    "01-mapped-steady-r2.png": "a24590548f9d79d4489705bea8c142fda1088221629e4b8b3301a9032b6fa7d7",
+    "02-geometry-r2.png": "9f8b9e62d2e54a7d4a4c7580dd5435f7414eef5377811ccbec36c6e9b2c51d79",
+    "03-transfer-r2.png": "7b13f7c997e09de925b221676c441fc0db9f93036018aeeba644b245cfb061dc",
+    "04-mapped-return-r2.png": "5242fbf832e74a6ceb37ad5b644b76dded8fce3e336d9aa371aa1726b50c80a8",
+    "05-off-restored-r2.png": "f026009313d7c2dae4e5dff540ed23c3cc667a37b27a8aa5e2b3d770f7afcd1c",
+    "06-wire-on-r2.png": "ba6644626e10852ac8d131d559b53003a980a2c4feb3f556acb4c2e8170019c0",
+    "07-wire-off-restored-r2.png": "f026009313d7c2dae4e5dff540ed23c3cc667a37b27a8aa5e2b3d770f7afcd1c"
+  },
+  "comparisonsVsOff": {
+    "01-mapped-r2.png": {
+      "changedPixels": 51979,
+      "maxChannelDelta": 185
+    },
+    "01-mapped-steady-r2.png": {
+      "changedPixels": 51979,
+      "maxChannelDelta": 185
+    },
+    "02-geometry-r2.png": {
+      "changedPixels": 51979,
+      "maxChannelDelta": 215
+    },
+    "03-transfer-r2.png": {
+      "changedPixels": 51979,
+      "maxChannelDelta": 199
+    },
+    "04-mapped-return-r2.png": {
+      "changedPixels": 51979,
+      "maxChannelDelta": 185
+    },
+    "05-off-restored-r2.png": {
+      "changedPixels": 0,
+      "maxChannelDelta": 0
+    },
+    "06-wire-on-r2.png": {
+      "changedPixels": 1364,
+      "maxChannelDelta": 110
+    },
+    "07-wire-off-restored-r2.png": {
+      "changedPixels": 0,
+      "maxChannelDelta": 0
+    }
+  },
+  "mappedReturn": {
+    "changedPixels": 0,
+    "maxChannelDelta": 0
+  },
+  "mappedSteady": {
+    "changedPixels": 0,
+    "maxChannelDelta": 0
+  },
+  "samples": {
+    "00-off-r2.png": {
+      "120,320": [
+        129,
+        106,
+        74
+      ],
+      "260,330": [
+        71,
+        57,
+        38
+      ],
+      "140,470": [
+        155,
+        129,
+        93
+      ],
+      "290,475": [
+        166,
+        137,
+        99
+      ]
+    },
+    "01-mapped-r2.png": {
+      "120,320": [
+        176,
+        237,
+        237
+      ],
+      "260,330": [
+        113,
+        127,
+        223
+      ],
+      "140,470": [
+        172,
+        187,
+        253
+      ],
+      "290,475": [
+        229,
+        187,
+        245
+      ]
+    },
+    "01-mapped-steady-r2.png": {
+      "120,320": [
+        176,
+        237,
+        237
+      ],
+      "260,330": [
+        113,
+        127,
+        223
+      ],
+      "140,470": [
+        172,
+        187,
+        253
+      ],
+      "290,475": [
+        229,
+        187,
+        245
+      ]
+    },
+    "02-geometry-r2.png": {
+      "120,320": [
+        172,
+        187,
+        253
+      ],
+      "260,330": [
+        172,
+        187,
+        253
+      ],
+      "140,470": [
+        172,
+        187,
+        253
+      ],
+      "290,475": [
+        172,
+        187,
+        253
+      ]
+    },
+    "03-transfer-r2.png": {
+      "120,320": [
+        100,
+        187,
+        237
+      ],
+      "260,330": [
+        100,
+        187,
+        237
+      ],
+      "140,470": [
+        100,
+        187,
+        237
+      ],
+      "290,475": [
+        100,
+        187,
+        237
+      ]
+    },
+    "04-mapped-return-r2.png": {
+      "120,320": [
+        176,
+        237,
+        237
+      ],
+      "260,330": [
+        113,
+        127,
+        223
+      ],
+      "140,470": [
+        172,
+        187,
+        253
+      ],
+      "290,475": [
+        229,
+        187,
+        245
+      ]
+    },
+    "05-off-restored-r2.png": {
+      "120,320": [
+        129,
+        106,
+        74
+      ],
+      "260,330": [
+        71,
+        57,
+        38
+      ],
+      "140,470": [
+        155,
+        129,
+        93
+      ],
+      "290,475": [
+        166,
+        137,
+        99
+      ]
+    },
+    "06-wire-on-r2.png": {
+      "120,320": [
+        129,
+        106,
+        74
+      ],
+      "260,330": [
+        71,
+        57,
+        38
+      ],
+      "140,470": [
+        155,
+        129,
+        93
+      ],
+      "290,475": [
+        166,
+        137,
+        99
+      ]
+    },
+    "07-wire-off-restored-r2.png": {
+      "120,320": [
+        129,
+        106,
+        74
+      ],
+      "260,330": [
+        71,
+        57,
+        38
+      ],
+      "140,470": [
+        155,
+        129,
+        93
+      ],
+      "290,475": [
+        166,
+        137,
+        99
+      ]
+    }
+  },
+  "interiorRegion11x11": {
+    "01-mapped-r2.png": {
+      "120,320": {
+        "176,237,237": 121
+      },
+      "260,330": {
+        "113,127,223": 121
+      },
+      "140,470": {
+        "172,187,253": 121
+      },
+      "290,475": {
+        "229,187,245": 121
+      }
+    },
+    "02-geometry-r2.png": {
+      "120,320": {
+        "172,187,253": 121
+      },
+      "260,330": {
+        "172,187,253": 121
+      },
+      "140,470": {
+        "172,187,253": 121
+      },
+      "290,475": {
+        "172,187,253": 121
+      }
+    },
+    "03-transfer-r2.png": {
+      "120,320": {
+        "100,187,237": 121
+      },
+      "260,330": {
+        "100,187,237": 121
+      },
+      "140,470": {
+        "100,187,237": 121
+      },
+      "290,475": {
+        "100,187,237": 121
+      }
+    }
+  },
+  "wire": {
+    "changedBoundingBox": [
+      91,
+      269,
+      316,
+      504
+    ],
+    "changedInsideFaceAwayFromPerimeter": 359,
+    "maxInnerDistanceToExpectedTriangleDiagonalPixels": 1.4920308493269094,
+    "filledQuadUnchangedPixels": 50690
+  },
+  "parentNumbersReproduced": true
+}

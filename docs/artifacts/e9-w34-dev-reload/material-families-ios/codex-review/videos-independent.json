@@ -1,0 +1,90 @@
+{
+  "before/channels.mp4": {
+    "sha256": "4af252e4490a2d9c8796e7501e2169846fcff621cb03ff39f84eca850dde70e7",
+    "bytes": 9057640,
+    "decodeCommand": [
+      "ffmpeg",
+      "-v",
+      "warning",
+      "-i",
+      "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/before/channels.mp4",
+      "-map",
+      "0:v:0",
+      "-progress",
+      "pipe:1",
+      "-f",
+      "null",
+      "-"
+    ],
+    "decodeExitCode": 0,
+    "decodedFrames": 1740,
+    "decoderWarnings": true,
+    "independentProbeExitCode": 0
+  },
+  "after/channels.mp4": {
+    "sha256": "ccc7de121ee40d0fa7489dcdb7b0d9c4e3105e42022e42cc1c009e50fdb07b0d",
+    "bytes": 38644371,
+    "decodeCommand": [
+      "ffmpeg",
+      "-v",
+      "warning",
+      "-i",
+      "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/after/channels.mp4",
+      "-map",
+      "0:v:0",
+      "-progress",
+      "pipe:1",
+      "-f",
+      "null",
+      "-"
+    ],
+    "decodeExitCode": 0,
+    "decodedFrames": 7932,
+    "decoderWarnings": true,
+    "independentProbeExitCode": 0
+  },
+  "final/materials.mp4": {
+    "sha256": "22b7707e3fe7b990c8827661363a22c398133c740ee291cd117d94e776842354",
+    "bytes": 18507664,
+    "decodeCommand": [
+      "ffmpeg",
+      "-v",
+      "warning",
+      "-i",
+      "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/materials.mp4",
+      "-map",
+      "0:v:0",
+      "-progress",
+      "pipe:1",
+      "-f",
+      "null",
+      "-"
+    ],
+    "decodeExitCode": 0,
+    "decodedFrames": 3981,
+    "decoderWarnings": true,
+    "independentProbeExitCode": 0
+  },
+  "final/edits.mp4": {
+    "sha256": "3eec24f3b3447ac10622a015ffbedeba5f6723aa8bd945ba8a31422ade9e35a3",
+    "bytes": 12057083,
+    "decodeCommand": [
+      "ffmpeg",
+      "-v",
+      "warning",
+      "-i",
+      "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/edits.mp4",
+      "-map",
+      "0:v:0",
+      "-progress",
+      "pipe:1",
+      "-f",
+      "null",
+      "-"
+    ],
+    "decodeExitCode": 0,
+    "decodedFrames": 2331,
+    "decoderWarnings": true,
+    "independentProbeExitCode": 0
+  }
+}

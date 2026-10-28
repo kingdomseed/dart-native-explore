@@ -1,0 +1,35 @@
+00:00 +0: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_owner_showcase_test.dart
+00:00 +0: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_owner_showcase_test.dart: u4-owners is self-contained with three ordinary single-sided cards
+00:00 +1: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_owner_showcase_test.dart: one typed property-only clip dispatches literal endpoints and payloads
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +2: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_showcase_test.dart: u4 uses the existing route and a self-contained fixed camera
+00:00 +2: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_owner_showcase_test.dart: public owner mutations preserve authored defaults and change only requested owners
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +3: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_owner_showcase_test.dart: public owner mutations preserve authored defaults and change only requested owners
+00:00 +3: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_showcase_test.dart: selected property-only clip carries literal f32 curves and exact kinds
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +4: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_owner_showcase_test.dart: public owner mutations preserve authored defaults and change only requested owners
+00:00 +4: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_showcase_test.dart: public controls emit exact mutations camera=false bare=false
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +5: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_showcase_test.dart: public controls emit exact mutations camera=false bare=false
+00:00 +6: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_showcase_test.dart: public controls emit exact mutations camera=false bare=false
+00:00 +7: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_showcase_test.dart: public controls emit exact mutations camera=false bare=true
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +8: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_showcase_test.dart: public controls emit exact mutations camera=true bare=false
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +9: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_showcase_test.dart: public controls emit exact mutations camera=true bare=true
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +10: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_material_showcase_test.dart: sheen case sends zero-to-one PBR alpha on an angled backed card
+00:00 +11: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_material_showcase_test.dart: sheen case sends zero-to-one PBR alpha on an angled backed card
+00:00 +12: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_material_showcase_test.dart: sheen case sends zero-to-one PBR alpha on an angled backed card
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +13: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_material_showcase_test.dart: u4-materials routes to a self-contained fixed showcase
+00:00 +14: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_material_showcase_test.dart: one opaque literal checker is shared by four independent factors
+00:00 +15: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_material_showcase_test.dart: ordinary double-sided instance references the animated resource
+00:00 +16: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_material_showcase_test.dart: typed property-only clip dispatches exact little-endian curves
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +17: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_material_showcase_test.dart: existing controls request only clock mutations and preserve authored scene
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +18: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u4_material_showcase_test.dart: authored bounds project above the reserved footer at 402x874
+00:00 +19: All tests passed!

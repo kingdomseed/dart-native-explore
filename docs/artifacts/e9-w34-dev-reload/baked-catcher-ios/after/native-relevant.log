@@ -1,0 +1,26 @@
+2026-10-28 00:26:46.754 E  Runner[15785:13214ea] [com.apple.scenekit:SceneKit] Error: Scene <SCNScene: 0x111065a40> is modified within a rendering callback of another scene (<SCNScene: 0x1069de040>). This is not allowed and may lead to crash
+2026-10-28 00:26:46.796 E  Runner[15785:13214ea] [com.apple.scenekit:SceneKit] Error: missing value for attachment "d3CatcherRegion" [vertex: 3 fragment: -1]
+2026-10-28 00:26:46.797 Df Runner[15785:13214ea] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: captured 256x221 RGBA footprint, softness=0.0
+2026-10-28 00:26:53.788 Df Runner[15785:13214ec] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:26:55.822 Df Runner[15785:13214ec] [com.jasonholtdigital.dart3d:scene] debugView channel=depth wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:27:02.572 Df Runner[15785:13214ed] [com.jasonholtdigital.dart3d:scene] debugView channel=baseColor wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:27:04.389 Df Runner[15785:13214e6] [com.jasonholtdigital.dart3d:scene] debugView channel=metallic wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:27:06.222 Df Runner[15785:13214e6] [com.jasonholtdigital.dart3d:scene] debugView channel=roughness wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:27:08.039 Df Runner[15785:13214ed] [com.jasonholtdigital.dart3d:scene] debugView channel=roughness wireframe=true nativeParticlesExcluded=true
+2026-10-28 00:27:09.855 Df Runner[15785:13214e9] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=true nativeParticlesExcluded=false
+2026-10-28 00:27:11.655 Df Runner[15785:13214e4] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false
+2026-10-28 00:27:13.689 Df Runner[15785:13214e6] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:27:17.422 Df Runner[15785:13214ed] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: explicit material upsert queued baked refresh
+2026-10-28 00:27:17.431 Df Runner[15785:13214ed] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: captured 256x221 RGBA footprint, softness=0.0
+2026-10-28 00:27:19.239 Df Runner[15785:13214e0] [com.jasonholtdigital.dart3d:scene] debugView channel=depth wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:27:21.055 Df Runner[15785:1321c70] [com.jasonholtdigital.dart3d:scene] debugView channel=baseColor wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:27:22.922 Df Runner[15785:13214ed] [com.jasonholtdigital.dart3d:scene] debugView channel=metallic wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:27:24.739 Df Runner[15785:13214e0] [com.jasonholtdigital.dart3d:scene] debugView channel=roughness wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:27:26.555 Df Runner[15785:13214e4] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false
+2026-10-28 00:27:31.939 Df Runner[15785:13214e9] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:27:33.912 Df Runner[15785:13214e6] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: captured 256x221 RGBA footprint, softness=0.0
+2026-10-28 00:27:35.655 Df Runner[15785:13214e9] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false
+2026-10-28 00:27:37.439 Df Runner[15785:13214e6] [com.jasonholtdigital.dart3d:scene] debugView channel=depth wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:27:40.939 Df Runner[15785:1321c70] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: explicit material upsert queued baked refresh
+2026-10-28 00:27:40.944 Df Runner[15785:1321c70] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: captured 256x221 RGBA footprint, softness=0.0
+2026-10-28 00:27:42.755 Df Runner[15785:1321c70] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false

@@ -1,0 +1,57 @@
+{
+  "maskIsHistoricalSelectedState": true,
+  "selectedMaskOutsideBasePixels": 0,
+  "baseOutsideSelectedPixels": 12,
+  "baseOnlyLocations": [
+    [
+      39,
+      25
+    ],
+    [
+      40,
+      25
+    ],
+    [
+      41,
+      25
+    ],
+    [
+      42,
+      25
+    ],
+    [
+      39,
+      26
+    ],
+    [
+      40,
+      26
+    ],
+    [
+      41,
+      26
+    ],
+    [
+      42,
+      26
+    ],
+    [
+      39,
+      27
+    ],
+    [
+      40,
+      27
+    ],
+    [
+      41,
+      27
+    ],
+    [
+      42,
+      27
+    ]
+  ],
+  "base": "target target=8445217361178394631 view=0 mode=0 cameraCase=0 aa=1 time=539758.5166666668",
+  "mask": "mask target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=539796.3166666668"
+}

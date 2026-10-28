@@ -1,0 +1,1 @@
+Seconds, left-to-right then top-to-bottom: 0, 5, 12, 30, 60, 75, 82, 88

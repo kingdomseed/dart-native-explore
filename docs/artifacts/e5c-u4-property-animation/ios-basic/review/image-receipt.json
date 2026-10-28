@@ -1,0 +1,143 @@
+{
+  "cameraFaceBounds" : {
+    "camera-t0.png" : [
+      {
+        "height" : 76,
+        "width" : 75,
+        "x" : 63,
+        "y" : 267
+      },
+      {
+        "height" : 76,
+        "width" : 76,
+        "x" : 163,
+        "y" : 267
+      },
+      {
+        "height" : 75,
+        "width" : 75,
+        "x" : 264,
+        "y" : 267
+      }
+    ],
+    "camera-t1.png" : [
+      {
+        "height" : 48,
+        "width" : 47,
+        "x" : 115,
+        "y" : 331
+      },
+      {
+        "height" : 48,
+        "width" : 46,
+        "x" : 178,
+        "y" : 331
+      },
+      {
+        "height" : 47,
+        "width" : 47,
+        "x" : 240,
+        "y" : 331
+      }
+    ],
+    "camera-t2.png" : [
+      {
+        "height" : 32,
+        "width" : 32,
+        "x" : 143,
+        "y" : 366
+      },
+      {
+        "height" : 32,
+        "width" : 32,
+        "x" : 185,
+        "y" : 366
+      },
+      {
+        "height" : 32,
+        "width" : 32,
+        "x" : 227,
+        "y" : 366
+      }
+    ]
+  },
+  "method" : "Independent connected-component bounds, actual AppKit sRGB pixels; offline screenshot measurements only",
+  "rawVsCanonicalCrop" : {
+    "changedPixels" : 0,
+    "height" : 130,
+    "maximumChannelDifference" : 0,
+    "width" : 250,
+    "x" : 80,
+    "y" : 280
+  },
+  "sRgbCenterSamples" : {
+    "color-quarter-t1.png" : [
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        157,
+        157,
+        157
+      ]
+    ],
+    "color-t0.png" : [
+      [
+        255,
+        38,
+        0
+      ],
+      [
+        255,
+        38,
+        0
+      ],
+      [
+        164,
+        164,
+        164
+      ]
+    ],
+    "color-t1.png" : [
+      [
+        202,
+        48,
+        199
+      ],
+      [
+        202,
+        48,
+        199
+      ],
+      [
+        210,
+        210,
+        210
+      ]
+    ],
+    "color-t2.png" : [
+      [
+        4,
+        50,
+        254
+      ],
+      [
+        4,
+        50,
+        254
+      ],
+      [
+        241,
+        241,
+        241
+      ]
+    ]
+  }
+}

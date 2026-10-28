@@ -1,0 +1,413 @@
+{
+  "logs": [
+    {
+      "path": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/package-tests.log",
+      "sha256": "ebdb414800d32963eecece240d3b1dfa66dfdf4e8e0cabcfba390982969853fe",
+      "bytes": 78568,
+      "selectedLines": [
+        "00:04 +393: All tests passed!"
+      ],
+      "tail": [
+        "00:04 +389: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/scene_codec_fixture_test.dart: diff/encode path on the decoded document every id the ops reference lives in the document",
+        "00:04 +390: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/scene_codec_fixture_test.dart: diff/encode path on the decoded document ops JSON-encode cleanly and specs match the manifest",
+        "00:04 +391: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/scene_codec_fixture_test.dart: payload chunks travel the binary channel the with-bytes document emits upsertPayload ops carrying the chunk spec",
+        "00:04 +392: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/scene_codec_fixture_test.dart: payload chunks travel the binary channel loadScene/payload frames are what the wire sends",
+        "00:04 +393: All tests passed!"
+      ]
+    },
+    {
+      "path": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/example-tests.log",
+      "sha256": "958f331faea72c09f389a496addeed916177b880a3e8ca5b58ad08973ffbe42b",
+      "bytes": 68604,
+      "selectedLines": [
+        "00:17 +332: All tests passed!"
+      ],
+      "tail": [
+        "00:15 +328: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dev_reload_test.dart: binary frame rejection recovers on later text; HTTP redirects are not followed",
+        "00:15 +329: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dev_reload_test.dart: fixture CLI changes only the sidecar and reproducibly restores the baseline",
+        "00:17 +330: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dev_reload_test.dart: async controller application errors propagate to caller zone",
+        "00:17 +331: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dev_reload_test.dart: CLI SIGTERM exits cleanly and releases its listener",
+        "00:17 +332: All tests passed!"
+      ]
+    },
+    {
+      "path": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/package-analyze.log",
+      "sha256": "64b39e5fb66d49c2ba6ed5ce37cf82468ff3e73aa9cb71ea7249e2bc9964f787",
+      "bytes": 96,
+      "selectedLines": [
+        "No issues found! (ran in 1.8s)"
+      ],
+      "tail": [
+        "Analyzing dart3d...                                             ",
+        "No issues found! (ran in 1.8s)"
+      ]
+    },
+    {
+      "path": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/example-analyze.log",
+      "sha256": "12ab2bdbbca9b10000ea605c322650809e6d8d8e2e64f8b8b0ffb2ef99bfd1d6",
+      "bytes": 96,
+      "selectedLines": [
+        "No issues found! (ran in 1.9s)"
+      ],
+      "tail": [
+        "Analyzing example...                                            ",
+        "No issues found! (ran in 1.9s)"
+      ]
+    },
+    {
+      "path": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/fixture-tests-before.log",
+      "sha256": "8e8f7fb3cd47bd5867eb15a79e915d46f2430372cb359396124d9e3aa6775c56",
+      "bytes": 919,
+      "selectedLines": [
+        "00:00 +4 -1: Some tests failed."
+      ],
+      "tail": [
+        "00:00 +0 -1: viewport control uses public view replacement and preserves authored target",
+        "00:00 +1 -1: indexed mapped quad carries diagonal, tangent frame and nonwhite color",
+        "00:00 +2 -1: authored target shares screen camera but excludes its sampling monitor",
+        "00:00 +3 -1: factor and coverage controls emit current authored edits and survive reload",
+        "00:00 +4 -1: Some tests failed."
+      ]
+    },
+    {
+      "path": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/fixture-tests-setup.log",
+      "sha256": "fc163a9bd80c4c91c53cdbcf68434513e7484a0320994749e79d977d20a2714b",
+      "bytes": 907,
+      "selectedLines": [
+        "00:00 +4 -1: Some tests failed."
+      ],
+      "tail": [
+        "00:00 +0 -1: viewport control uses public view replacement and preserves authored target",
+        "00:00 +1 -1: indexed mapped quad carries diagonal, tangent frame and nonwhite color",
+        "00:00 +2 -1: authored target shares screen camera but excludes its sampling monitor",
+        "00:00 +3 -1: factor and coverage controls emit current authored edits and survive reload",
+        "00:00 +4 -1: Some tests failed."
+      ]
+    },
+    {
+      "path": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/fixture-tests.log",
+      "sha256": "311343c3ef169bc4a5af1fc0a5070c57d7147295ebe6a214a703dbcf7a330a14",
+      "bytes": 565,
+      "selectedLines": [
+        "00:00 +5: All tests passed!"
+      ],
+      "tail": [
+        "00:00 +1: viewport control uses public view replacement and preserves authored target",
+        "00:00 +2: indexed mapped quad carries diagonal, tangent frame and nonwhite color",
+        "00:00 +3: authored target shares screen camera but excludes its sampling monitor",
+        "00:00 +4: factor and coverage controls emit current authored edits and survive reload",
+        "00:00 +5: All tests passed!"
+      ]
+    },
+    {
+      "path": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/swift-typecheck.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "selectedLines": [],
+      "tail": []
+    },
+    {
+      "path": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/before-viewport/run.log",
+      "sha256": "88c99cc7fb7aa27edab2da1e9ead32f0391153158fee2ff74376a915496dcdc8",
+      "bytes": 1092,
+      "selectedLines": [
+        "Running Xcode build...                                          ",
+        "Xcode build done.                                            6.7s",
+        "dart3d/ScreenDebugPresentation.swift:178: Fatal error: Unexpectedly found nil while unwrapping an Optional value",
+        "Lost connection to device."
+      ],
+      "tail": [
+        "A Dart VM Service on iPhone 17 Pro is available at: http://127.0.0.1:63904/6RXBnO8ijs8=/",
+        "The DartNative DevTools debugger and profiler on iPhone 17 Pro is available at: http://127.0.0.1:63904/6RXBnO8ijs8=/devtools/?uri=ws://127.0.0.1:63904/6RXBnO8ijs8=/ws",
+        "dartnative: [DN] lifecycle \u2192 AppLifecycleState.resumed",
+        "dart3d/ScreenDebugPresentation.swift:178: Fatal error: Unexpectedly found nil while unwrapping an Optional value",
+        "Lost connection to device."
+      ]
+    },
+    {
+      "path": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-skin/probe-run.log",
+      "sha256": "03b8e7f26c54d9fe2525e6a97f1bbf86f6283ff6c8dcde953a07e49886cb6357",
+      "bytes": 656,
+      "selectedLines": [
+        "Running Xcode build...                                          ",
+        "Xcode build done.                                            4.7s",
+        "Failed to build iOS app"
+      ],
+      "tail": [
+        "Swift Compiler Error (Xcode): Unterminated string literal",
+        "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/ios/Classes/RenderTargets.swift:605:57",
+        "",
+        "Could not build the application for the simulator.",
+        "Error launching application on iPhone 17 Pro."
+      ]
+    },
+    {
+      "path": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-skin/probe-run-r2.log",
+      "sha256": "7ecdeac31a479fe070e3f16649b3a854f76d79b06a11cf3ebc67bf2a3d426942",
+      "bytes": 975,
+      "selectedLines": [
+        "Running Xcode build...                                          ",
+        "Xcode build done.                                            7.5s",
+        "Application finished."
+      ],
+      "tail": [
+        "A Dart VM Service on iPhone 17 Pro is available at: http://127.0.0.1:64338/2ysWqcUPwYc=/",
+        "The DartNative DevTools debugger and profiler on iPhone 17 Pro is available at: http://127.0.0.1:64338/2ysWqcUPwYc=/devtools/?uri=ws://127.0.0.1:64338/2ysWqcUPwYc=/ws",
+        "dartnative: [DN] lifecycle \u2192 AppLifecycleState.resumed",
+        "",
+        "Application finished."
+      ]
+    },
+    {
+      "path": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/run.log",
+      "sha256": "571e0abf5579d984bd53c717556afbdd203270e9df3ffaff7253545fea20440c",
+      "bytes": 975,
+      "selectedLines": [
+        "Running Xcode build...                                          ",
+        "Xcode build done.                                           21.9s",
+        "Application finished."
+      ],
+      "tail": [
+        "A Dart VM Service on iPhone 17 Pro is available at: http://127.0.0.1:64805/A449FUPClwQ=/",
+        "The DartNative DevTools debugger and profiler on iPhone 17 Pro is available at: http://127.0.0.1:64805/A449FUPClwQ=/devtools/?uri=ws://127.0.0.1:64805/A449FUPClwQ=/ws",
+        "dartnative: [DN] lifecycle \u2192 AppLifecycleState.resumed",
+        "",
+        "Application finished."
+      ]
+    },
+    {
+      "path": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/package-check.log",
+      "sha256": "6ee53cda8ecf4ab28dff5e313834950c50b5e656b18bd0ab8d48c961c7c5b809",
+      "bytes": 1475,
+      "selectedLines": [],
+      "tail": [
+        "    \"probe/pubspec.lock\": \"1606c33221efeb86ab121be4ef9ef82377f400de9ca7ab838b7822971f285121\"",
+        "  },",
+        "  \"scratchRemoved\": true",
+        "}",
+        ""
+      ]
+    },
+    {
+      "path": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/comment-audit.md",
+      "sha256": "9bd1fc12a9fc9b37c104e15adb53417c6a3c0d17008540272b68b901a1fbe5ba",
+      "bytes": 297,
+      "selectedLines": [
+        "The native Comment Sicko child audited only changed comments and suppressions in",
+        "changed, or deleted comments/suppressions and no actionable findings. It made",
+        "no edits. Baseline comments and lint suppressions were excluded."
+      ],
+      "tail": [
+        "The native Comment Sicko child audited only changed comments and suppressions in",
+        "the six correction source files against reviewed66. It found zero added,",
+        "changed, or deleted comments/suppressions and no actionable findings. It made",
+        "no edits. Baseline comments and lint suppressions were excluded."
+      ]
+    }
+  ],
+  "nativeLogs": {
+    "before-skin": {
+      "sha256": "636425ed73d3593b662d8bff4bd7c3ffee94988e2ba324f05e6b907eb4cf2bd1",
+      "pids": [
+        "40094"
+      ],
+      "lineCount": 14598,
+      "fatalCount": 1,
+      "selectedEvents": [
+        {
+          "line": 4660,
+          "text": "2026-10-27 23:06:08.088 Df Runner[40094:12e1164] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 4920,
+          "text": "2026-10-27 23:06:09.837 Df Runner[40094:12e10a4] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        },
+        {
+          "line": 5524,
+          "text": "2026-10-27 23:07:41.073 Df Runner[40094:12e1626] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 6358,
+          "text": "2026-10-27 23:09:56.872 Df Runner[40094:12e1164] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        },
+        {
+          "line": 14593,
+          "text": "2026-10-27 23:10:15.122 Df Runner[40094:12e2525] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 14598,
+          "text": "2026-10-27 23:10:15.171 Df Runner[40094:12e1076] (libswiftCore.dylib) dart3d/ScreenDebugPresentation.swift:178: Fatal error: Unexpectedly found nil while unwrapping an Optional value"
+        }
+      ]
+    },
+    "before-viewport": {
+      "sha256": "e584f2f5dbd5daf01806085391e99ad707760a0b479ef9fb773ccc9afe716e47",
+      "pids": [
+        "40094",
+        "46292",
+        "50106"
+      ],
+      "lineCount": 82023,
+      "fatalCount": 1,
+      "selectedEvents": [
+        {
+          "line": 9127,
+          "text": "2026-10-27 23:06:08.088 Df Runner[40094:12e1164] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 9588,
+          "text": "2026-10-27 23:06:09.837 Df Runner[40094:12e10a4] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        },
+        {
+          "line": 10594,
+          "text": "2026-10-27 23:07:41.073 Df Runner[40094:12e1626] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 11958,
+          "text": "2026-10-27 23:09:56.872 Df Runner[40094:12e1164] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        },
+        {
+          "line": 29812,
+          "text": "2026-10-27 23:10:15.122 Df Runner[40094:12e2525] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 29817,
+          "text": "2026-10-27 23:10:15.171 Df Runner[40094:12e1076] (libswiftCore.dylib) dart3d/ScreenDebugPresentation.swift:178: Fatal error: Unexpectedly found nil while unwrapping an Optional value"
+        },
+        {
+          "line": 32130,
+          "text": "2026-10-27 23:11:18.172 Df Runner[46292:12e7164] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 32133,
+          "text": "2026-10-27 23:11:18.180 Df Runner[46292:12e70b9] [com.jasonholtdigital.dart3d:scene] w34 fix build gen=3 isolated=true frame=(0.0, 0.0, 402.0, 653.3333333333334) mask=3 source=w34.camera"
+        },
+        {
+          "line": 34514,
+          "text": "2026-10-27 23:11:22.408 Df Runner[46292:12e70b9] [com.jasonholtdigital.dart3d:scene] w34 fix build gen=4 isolated=true frame=(20.0, 333.3333333333333, 362.0, 300.0) mask=3 source=w34.camera"
+        },
+        {
+          "line": 36899,
+          "text": "2026-10-27 23:11:37.205 Df Runner[46292:12e7165] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        },
+        {
+          "line": 36902,
+          "text": "2026-10-27 23:11:37.206 Df Runner[46292:12e70b9] [com.jasonholtdigital.dart3d:scene] w34 fix build gen=5 isolated=false frame=(20.0, 333.3333333333333, 362.0, 300.0) mask=3 source=w34.camera"
+        },
+        {
+          "line": 54583,
+          "text": "2026-10-27 23:11:43.055 Df Runner[46292:12e7167] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 54586,
+          "text": "2026-10-27 23:11:43.065 Df Runner[46292:12e70b9] [com.jasonholtdigital.dart3d:scene] w34 fix build gen=7 isolated=true frame=(0.0, 0.0, 402.0, 653.3333333333334) mask=3 source=w34.camera"
+        },
+        {
+          "line": 55957,
+          "text": "2026-10-27 23:11:48.605 Df Runner[46292:12e7164] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        },
+        {
+          "line": 73530,
+          "text": "2026-10-27 23:12:48.289 Df Runner[50106:12e9d31] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 75066,
+          "text": "2026-10-27 23:12:51.806 Df Runner[50106:12e9d31] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        },
+        {
+          "line": 75837,
+          "text": "2026-10-27 23:12:53.572 Df Runner[50106:12e9faf] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 77377,
+          "text": "2026-10-27 23:12:56.289 Df Runner[50106:12e9faf] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        },
+        {
+          "line": 78915,
+          "text": "2026-10-27 23:12:58.972 Df Runner[50106:12ea408] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 81221,
+          "text": "2026-10-27 23:13:03.489 Df Runner[50106:12ea408] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        }
+      ]
+    },
+    "after-skin": {
+      "sha256": "6ac678b5e83458ab11062abb09b1cb619ed91bbe4bac2b1c21b879d181c92eef",
+      "pids": [
+        "46292"
+      ],
+      "lineCount": 12752,
+      "fatalCount": 0,
+      "selectedEvents": [
+        {
+          "line": 1334,
+          "text": "2026-10-27 23:11:18.172 Df Runner[46292:12e7164] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 1337,
+          "text": "2026-10-27 23:11:18.180 Df Runner[46292:12e70b9] [com.jasonholtdigital.dart3d:scene] w34 fix build gen=3 isolated=true frame=(0.0, 0.0, 402.0, 653.3333333333334) mask=3 source=w34.camera"
+        },
+        {
+          "line": 2523,
+          "text": "2026-10-27 23:11:22.408 Df Runner[46292:12e70b9] [com.jasonholtdigital.dart3d:scene] w34 fix build gen=4 isolated=true frame=(20.0, 333.3333333333333, 362.0, 300.0) mask=3 source=w34.camera"
+        },
+        {
+          "line": 3713,
+          "text": "2026-10-27 23:11:37.205 Df Runner[46292:12e7165] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        },
+        {
+          "line": 3716,
+          "text": "2026-10-27 23:11:37.206 Df Runner[46292:12e70b9] [com.jasonholtdigital.dart3d:scene] w34 fix build gen=5 isolated=false frame=(20.0, 333.3333333333333, 362.0, 300.0) mask=3 source=w34.camera"
+        },
+        {
+          "line": 11957,
+          "text": "2026-10-27 23:11:43.055 Df Runner[46292:12e7167] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 11960,
+          "text": "2026-10-27 23:11:43.065 Df Runner[46292:12e70b9] [com.jasonholtdigital.dart3d:scene] w34 fix build gen=7 isolated=true frame=(0.0, 0.0, 402.0, 653.3333333333334) mask=3 source=w34.camera"
+        },
+        {
+          "line": 12728,
+          "text": "2026-10-27 23:11:48.605 Df Runner[46292:12e7164] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        }
+      ]
+    },
+    "after-viewport": {
+      "sha256": "9762c977a1d08229fd811fcdae82997276276399dd237fefc39a635afb5ae3a4",
+      "pids": [
+        "50106"
+      ],
+      "lineCount": 13061,
+      "fatalCount": 0,
+      "selectedEvents": [
+        {
+          "line": 8188,
+          "text": "2026-10-27 23:12:48.289 Df Runner[50106:12e9d31] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 9066,
+          "text": "2026-10-27 23:12:51.806 Df Runner[50106:12e9d31] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        },
+        {
+          "line": 9508,
+          "text": "2026-10-27 23:12:53.572 Df Runner[50106:12e9faf] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 10390,
+          "text": "2026-10-27 23:12:56.289 Df Runner[50106:12e9faf] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        },
+        {
+          "line": 11270,
+          "text": "2026-10-27 23:12:58.972 Df Runner[50106:12ea408] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 12589,
+          "text": "2026-10-27 23:13:03.489 Df Runner[50106:12ea408] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        }
+      ]
+    }
+  },
+  "execution": "Parent historical execution; reviewer ran no tests, build, or native app."
+}

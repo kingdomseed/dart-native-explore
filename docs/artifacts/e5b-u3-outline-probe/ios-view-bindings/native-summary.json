@@ -1,0 +1,10 @@
+{
+  "pid": "26941",
+  "nativeRows": 30564,
+  "eventRowsExcludingRawRows": 3611,
+  "errorQueryMatches": 0,
+  "dueCount": 7,
+  "setClearCount": 4,
+  "loggerExit": 0,
+  "fullLogRetained": "native-all.log"
+}

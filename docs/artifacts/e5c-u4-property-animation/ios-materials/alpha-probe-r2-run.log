@@ -1,0 +1,12 @@
+Launching lib/main.dart on iPhone 17 Pro in debug mode...
+Running Xcode build...                                          
+Xcode build done.                                           10.9s
+Failed to build iOS app
+Swift Compiler Error (Xcode): The compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/ios/Classes/U4AlphaProbe.swift:207:12
+
+Swift Compiler Error (Xcode): The compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/ios/Classes/U4AlphaProbe.swift:208:12
+
+Could not build the application for the simulator.
+Error launching application on iPhone 17 Pro.

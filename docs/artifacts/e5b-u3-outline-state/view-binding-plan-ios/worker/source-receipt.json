@@ -1,0 +1,205 @@
+{
+  "worktree": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-15abcc3d",
+  "head": "2f38e4e33f0b1cb678bc408a42d069c796cefc12",
+  "archiveSha256": "f5a65f8c778846820e31a4cc6bf9d71134c608ff94eb7151cae4ca4221968fae",
+  "sources": [
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-15abcc3d/dart3d/ios/Classes/SelectionOutline.swift",
+      "sha256": "6df1ba956e86e84455e19e322237d989818a2dbcd8c2feaf8a3a7b4f6faa5220",
+      "lines": 32,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-15abcc3d/dart3d/ios/Classes/SceneViewHost.swift",
+      "sha256": "201c97bc611f7d569e3f8f39f7d40b46115beb83c53f379e83100beac00ddd73",
+      "lines": 6060,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-15abcc3d/dart3d/ios/Classes/RenderTargets.swift",
+      "sha256": "4ae98bf9c638b626630d436644ae8406ae6e8fb7aace58285bd8b0a1ae84a38b",
+      "lines": 771,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-15abcc3d/dart3d/ios/Classes/ToneMapping.swift",
+      "sha256": "45aebc06f6fd24673dbd8d0d092364c86f9b0d20c4710b5bc258084168faaa43",
+      "lines": 575,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-15abcc3d/dart3d/ios/Classes/ScreenDebugPresentation.swift",
+      "sha256": "0b9962c3677b51f8f6fae037137859434706a7c08c6310ef463df968bb4422d7",
+      "lines": 374,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-15abcc3d/dart3d/ios/Classes/FsceneRealizer.swift",
+      "sha256": "2a3c6bd8977c723a0b8df17ae408b56c1d09f5f598d5dcb29c9dd8bc568042d5",
+      "lines": 8540,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-15abcc3d/dart3d/ios/Classes/Dart3dPlugin.swift",
+      "sha256": "d6c0db876999bb6cbd9c5edfc2624da9f2f362b75c08781a454de313c3cdf4b5",
+      "lines": 156,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-15abcc3d/dart3d/lib/src/scene_controller.dart",
+      "sha256": "05302404557ed885385b0488f57d5e1df0b4b07bdfdbdaabd42362e46d9bda1c",
+      "lines": 1195,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-15abcc3d/docs/program-v2.md",
+      "sha256": "92a83fc5b87bd3f76f15152487c407e0d563cdd73cdb90d1e3ad035f58ebc5ca",
+      "lines": 781,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-15abcc3d/.devin/skills/dart-native/SKILL.md",
+      "sha256": "191d83dfd51d896ffae687f5e3c8cc490df9bfcd86f3162dc14c830e7333ef78",
+      "lines": 341,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Users/jasonholt/.pub-cache/hosted/pub.dev/flutter_scene-0.23.0/lib/src/node.dart",
+      "sha256": "e5222a2f93110bbf9f4d109b6a97e321d2d86f5b8054ade3bfe2d4cef9c69f81",
+      "lines": 1524,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Users/jasonholt/.pub-cache/hosted/pub.dev/flutter_scene-0.23.0/lib/src/render/selection_outline_pass.dart",
+      "sha256": "8903eba5f6ea05a5b60c68af9a220775998aa1c141f5e0ecaa5ea1165d33385e",
+      "lines": 196,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Users/jasonholt/.pub-cache/hosted/pub.dev/flutter_scene-0.23.0/lib/src/render/object_filter.dart",
+      "sha256": "42cab45779187d55d50bc5de6d6c596a11947bb3de67b4e1b857edbe53bc03b4",
+      "lines": 261,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Users/jasonholt/.pub-cache/hosted/pub.dev/flutter_scene-0.23.0/lib/src/scene.dart",
+      "sha256": "97d610a8cf48cb706f5306b3a23b778618865894bc142a7fdfdc8f633b8d74ca",
+      "lines": 3055,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Users/jasonholt/.pub-cache/hosted/pub.dev/flutter_scene-0.23.0/shaders/flutter_scene_mask.frag",
+      "sha256": "3ac96bf99f4388466300e7dca57e67d659c21a3804d472e04c3a2420dadcda19",
+      "lines": 18,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Users/jasonholt/.pub-cache/hosted/pub.dev/flutter_scene-0.23.0/shaders/flutter_scene_outline.frag",
+      "sha256": "3900336ff45cd432a40c95e9f149812af297495b47bad5c8e77a9c3fdd129d38",
+      "lines": 60,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNTechnique.h",
+      "sha256": "1f0057a24db957f47bc2fa32fb2ad2d31f7faf91fc4988549da2b2b172d55a74",
+      "lines": 320,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNRenderer.h",
+      "sha256": "94bd9965b7ac3e97f2dd0f2aacaed51ef2da60e91e5c53e81c0581ef0a2dc484",
+      "lines": 102,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNSceneRenderer.h",
+      "sha256": "672f070bd65505d715a4f69bdf4ce187665fd87947d9e3d3edb1b5e22be9affc",
+      "lines": 389,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNSkinner.h",
+      "sha256": "41cbe9a7382cebf4350c68a43b23efe66a0fd081820441c7bab33cbd604fe8b5",
+      "lines": 84,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNMorpher.h",
+      "sha256": "e06c940f58c244302a4d9c08fccd56c097e1c6280400b71863f29a3e60028cfa",
+      "lines": 79,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNNode.h",
+      "sha256": "9cbf3b56efe9d885371b4530e9115946779152691a4ad174d5dcf7a584d4a722",
+      "lines": 695,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNView.h",
+      "sha256": "ecc5bad695c385f1c9ac01e8944fd9ddaf0b051c0d45ef1c310bcc4c6424ea90",
+      "lines": 170,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandQueue.h",
+      "sha256": "6e9da7a33496e30ef20cd415a51dfc72cf1d3f6892b1d8d7e8cfdeab451f5761",
+      "lines": 102,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h",
+      "sha256": "d84dda866f07ffc37ce68e3c635177373cdefa419fc1f64c766442ed81966895",
+      "lines": 458,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-852ea54b/dart3d/ios/Classes/SelectionOutlineProbe.swift",
+      "sha256": "a485affed2957135c90478dd94bf0b583c408d95de6af5fd1107bf49250c14c1",
+      "lines": 202,
+      "basis": "historical source/evidence only"
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-852ea54b/docs/artifacts/e5b-u3-outline-probe/ios/README.md",
+      "sha256": "6c54e74e785de56471a064e96f78253c16ae5cb27eb02c022fba0f83b4182b88",
+      "lines": 33,
+      "basis": "historical source/evidence only"
+    },
+    {
+      "path": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-852ea54b/docs/artifacts/e5b-u3-outline-probe/ios/pixel-analysis.json",
+      "sha256": "2cd9235206f65ee28c084ec4dfb0e4cdf767f21a67daf9a623ff915da94e2b64",
+      "lines": 245,
+      "basis": "historical source/evidence only"
+    },
+    {
+      "path": "/private/tmp/dart3d-u3-outline-view-bindings-20261028/r1/FRAME.md",
+      "sha256": "7fc4b34ef12ad5d06b367f5e6c28bbbc9f4483135a834e64056e5e3b6a3db0db",
+      "lines": 71,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/private/tmp/dart3d-e5b-outline-design-20261027/synthesis.md",
+      "sha256": "623ab56e94c17075ce6b7d02f902c4c9601286ec787f211ae19e9c58867f21e1",
+      "lines": 17,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/private/tmp/dart3d-e5b-outline-design-20261027/grounding.md",
+      "sha256": "ce37cbc2d4968eb01df932bf78b3bff0b3aa7091e95925171db897cb5b024c23",
+      "lines": 31,
+      "basis": "read source/documentation"
+    },
+    {
+      "path": "/private/tmp/dart3d-e5b-outline-design-20261027/candidate-b.md",
+      "sha256": "a6b73d161987cc4fc23483d05025f6bc9270bef177540bae8e6efedd6ecd1280",
+      "lines": 407,
+      "basis": "read source/documentation"
+    }
+  ],
+  "missingDocumentedPaths": [
+    "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-15abcc3d/dartnative/docs/plugin_development.md",
+    "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-15abcc3d/.humanlayer/tasks/e5b-u3/source-map.md"
+  ],
+  "missingPathHandling": "No fetch, install or checkout change; used present native caller code and installed platform/vendor sources.",
+  "historicalEvidence": "Read probe source and its evidence text; did not rerun measurements or claim new visual/runtime proof."
+}

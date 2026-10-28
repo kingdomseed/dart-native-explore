@@ -1,0 +1,25 @@
+{
+  "head": "2f38e4e33f0b1cb678bc408a42d069c796cefc12",
+  "baselineArchiveSha256": "0274d0d85e524406d4962c26712a3a33edbb5f5ca1163712084fed512bf266e0",
+  "sourceArchiveSha256": "35589f6a16f3d54fd3c9194bf2cb5782beb6d6b2fb286e4eac783494fa37e10b",
+  "patchSha256": "6bd1b642c23356e77aa47f2ebfff27addf90d148096fbb517ce189ecf5ba7e26",
+  "changedPaths": [
+    "dart3d/ios/Classes/SceneViewHost.swift"
+  ],
+  "unownedOverlayPreserved": 65,
+  "preexistingOtherFilesPreserved": 3232,
+  "locks": {
+    "dart3d/example/ios/Podfile.lock": "47d5269141917cc2cfad542d6e2c60dc8c3f364e5700ba1354f44208a9e31522",
+    "dart3d/pubspec.lock": "868933c6c9bdd80476a9d1b6d380078eb8ecf45960820d8414beebd55a0b555f",
+    "dart3d/example/pubspec.lock": "4ab8d1150fe7606c532dccb84d07eb0cc4062b5d4b2481c07fd27c135241936c",
+    "dart3d/example/lib/dartnative_plugin_registrant.dart": "c0f873e11de99a1485dd67fd82bc563a61f3c66cc8280b705019ce48cfdbe09f",
+    "dart3d/example/dn_plugins.lock": "73c5209e393e2c670769b2dfe4d09d72b79870c5218ede82e2a6d9c659c0f2a6",
+    "probe/pubspec.lock": "1606c33221efeb86ab121be4ef9ef82377f400de9ca7ab838b7822971f285121"
+  },
+  "cleanRuntimeAll66MatchesProduction": true,
+  "forwardReverseAll66Replay": true,
+  "traceRemoved": true,
+  "scratchRemoved": true,
+  "normalTarget": "DN_TARGET=lib/main.dart",
+  "remainingW34Defines": []
+}

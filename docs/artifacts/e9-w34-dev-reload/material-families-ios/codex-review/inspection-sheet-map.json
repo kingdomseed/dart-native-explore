@@ -1,0 +1,191 @@
+[
+  {
+    "sheet": 1,
+    "row": 1,
+    "column": 1,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/00-off.png",
+    "sha256": "9cc3fd34f4cd5b90546614caf434483f8580c2c39358069c87ee8486530f9256"
+  },
+  {
+    "sheet": 1,
+    "row": 1,
+    "column": 2,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/01-normals.png",
+    "sha256": "a83550454caeeadb355dcaaf0b5859bb895763e9d9fe5f3cc30b231e0d1641a7"
+  },
+  {
+    "sheet": 1,
+    "row": 1,
+    "column": 3,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/01b-normals-settled.png",
+    "sha256": "c2ed6754e8db7fc6ff69beb9eae8d6c934d0af5667fc937253b981755979ccf6"
+  },
+  {
+    "sheet": 1,
+    "row": 2,
+    "column": 1,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/02-metallic.png",
+    "sha256": "276b98867329e314894e5522caced02a4aa6bed64bb78e53963170c2b3637705"
+  },
+  {
+    "sheet": 1,
+    "row": 2,
+    "column": 2,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/03-roughness.png",
+    "sha256": "2214322523e76907de789fd01ab20828b23bb8fb9be77d6ebceda12f5e181937"
+  },
+  {
+    "sheet": 1,
+    "row": 2,
+    "column": 3,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/04-depth.png",
+    "sha256": "a4cecc848074ad77b14124d1e023e5dc7ba8fc085ce54e56cd198dce201ffaa4"
+  },
+  {
+    "sheet": 1,
+    "row": 3,
+    "column": 1,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/05-baseColor.png",
+    "sha256": "34a89a9fae26742e5cb6fef7664f7ad96662668795bfc387a1eb9c7d70ae8ecd"
+  },
+  {
+    "sheet": 1,
+    "row": 3,
+    "column": 2,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/06-baseColor-after-normal-capture.png",
+    "sha256": "34a89a9fae26742e5cb6fef7664f7ad96662668795bfc387a1eb9c7d70ae8ecd"
+  },
+  {
+    "sheet": 1,
+    "row": 3,
+    "column": 3,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/07-baseColor-wire.png",
+    "sha256": "81b6270bcfeefc9d5081bdbfa50dec6384f0d94a006e9598ba85163a3c485b81"
+  },
+  {
+    "sheet": 2,
+    "row": 1,
+    "column": 1,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/08-off-wire.png",
+    "sha256": "9ab6bd4d585db7322acd7044f5152ff87949713430cdc0d14090b12fbbf29d88"
+  },
+  {
+    "sheet": 2,
+    "row": 1,
+    "column": 2,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/09-off-return.png",
+    "sha256": "e2080d5af7813a25ace525f07da6c7c9bcef7edb38f5ae64831aa85b4a1cec7c"
+  },
+  {
+    "sheet": 2,
+    "row": 1,
+    "column": 3,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/10-baseColor-a.png",
+    "sha256": "abfb68a7ebc83b7e2962045c6f69ba2ff5284321ba71ac4018513743c7e2f67a"
+  },
+  {
+    "sheet": 2,
+    "row": 2,
+    "column": 1,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/11-baseColor-factors-b.png",
+    "sha256": "68cc0c6839b91dab591b40f0a1aa8cdb26a50775b54c28e8a9469b34de4266a0"
+  },
+  {
+    "sheet": 2,
+    "row": 2,
+    "column": 2,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/12-baseColor-colors-b.png",
+    "sha256": "d70a4b98fa074ae50a8a54b14c7719754025805de0c4aabf674bb3c53aea4700"
+  },
+  {
+    "sheet": 2,
+    "row": 2,
+    "column": 3,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/13-baseColor-texture-off.png",
+    "sha256": "1e9bee333ee352c64209cf024f6b17017606f1b2d5f945e9ff9457e5d6bb529f"
+  },
+  {
+    "sheet": 2,
+    "row": 3,
+    "column": 1,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/14-baseColor-texture-return.png",
+    "sha256": "d70a4b98fa074ae50a8a54b14c7719754025805de0c4aabf674bb3c53aea4700"
+  },
+  {
+    "sheet": 2,
+    "row": 3,
+    "column": 2,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/15-baseColor-mask.png",
+    "sha256": "8eab6595610b33cd4b80595eb6d2790b5ccae1fc96cce91485a9a03a3265956f"
+  },
+  {
+    "sheet": 2,
+    "row": 3,
+    "column": 3,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/16-baseColor-blend.png",
+    "sha256": "012d535f05264b3bbb200c863ced8af0897c1ce195580ad2fa5769871a0e6fe0"
+  },
+  {
+    "sheet": 3,
+    "row": 1,
+    "column": 1,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/17-off-edited.png",
+    "sha256": "90fefcaff323ec4134f9b630bd3ad57d4a98db5f7a2e94bd638589fb77c680c8"
+  },
+  {
+    "sheet": 3,
+    "row": 1,
+    "column": 2,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/18-off-edited-reload.png",
+    "sha256": "0f0d7f5278ed4b3e37f3e5262781c57412f5bab72c2772d8213590faccfebd1a"
+  },
+  {
+    "sheet": 3,
+    "row": 1,
+    "column": 3,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/19-baseColor-edited-reload.png",
+    "sha256": "ed40e3508a73870f423a7b3ff82b6df7e5bbb49fb5d83054b3a34dcd32a024c3"
+  },
+  {
+    "sheet": 3,
+    "row": 2,
+    "column": 1,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/20-normals-edited.png",
+    "sha256": "ba19447d9b5f84edee46d8af8b4016563026ede4b30cc74c51531383c4144b1b"
+  },
+  {
+    "sheet": 3,
+    "row": 2,
+    "column": 2,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/21-baseColor-texture-off-settled.png",
+    "sha256": "63c96928a58cf64edf6b20185ef66892f34a2814af6e2e651d13ec028aefcfd8"
+  },
+  {
+    "sheet": 3,
+    "row": 2,
+    "column": 3,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/22-off-texture-off.png",
+    "sha256": "17e0e2dd83a4ef8ee5669d0f689056a45c1acb9be3f45f8e7bea4a53fc177e0d"
+  },
+  {
+    "sheet": 3,
+    "row": 3,
+    "column": 1,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/23-baseColor-target-off-capture.png",
+    "sha256": "b2dc2f26dbfe6f898c096e9a10cfad522f95b102a77b9cb202532f180540f094"
+  },
+  {
+    "sheet": 3,
+    "row": 3,
+    "column": 2,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/24-baseColor-target-normal-capture.png",
+    "sha256": "b2dc2f26dbfe6f898c096e9a10cfad522f95b102a77b9cb202532f180540f094"
+  },
+  {
+    "sheet": 3,
+    "row": 3,
+    "column": 3,
+    "source": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/25-off-edited-texture-return.png",
+    "sha256": "ae52c6404f1861e79b91953610805a7369d5201dfa85f0874b505c187fd55f32"
+  }
+]

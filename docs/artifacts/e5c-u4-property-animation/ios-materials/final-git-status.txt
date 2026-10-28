@@ -1,0 +1,47 @@
+ M dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/Dart3dView.kt
+ M dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/FsceneRealizer.kt
+ M dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/MaterialPackages.kt
+ M dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/MeshFactory.kt
+ M dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/RenderTargets.kt
+ M dart3d/android/src/test/kotlin/com/jasonholtdigital/dart3d/MaterialPackagesTest.kt
+ M dart3d/android/src/test/kotlin/com/jasonholtdigital/dart3d/MeshFactoryTest.kt
+ M dart3d/example/lib/showcase_loader.dart
+ M dart3d/example/lib/showcase_scene.dart
+ M dart3d/example/test/w26_geometry_test.dart
+ M dart3d/ios/Classes/FsceneRealizer.swift
+ M dart3d/ios/Classes/GeometryFactory.swift
+ M dart3d/ios/Classes/RenderTargets.swift
+ M dart3d/ios/Classes/SceneViewHost.swift
+ M dart3d/lib/dart3d.dart
+ M dart3d/lib/src/animation.dart
+ M dart3d/lib/src/components.dart
+ M dart3d/lib/src/compose_extensions.dart
+ M dart3d/lib/src/diff_apply.dart
+ M dart3d/lib/src/doc_layer.dart
+ M dart3d/lib/src/fsceneb_reader.dart
+ M dart3d/lib/src/geometry/proc.dart
+ M dart3d/lib/src/protocol.dart
+ M dart3d/lib/src/scene_controller.dart
+ M dart3d/tool/bake_materials.sh
+?? dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/PropertyAnimation.kt
+?? dart3d/android/src/test/kotlin/com/jasonholtdigital/dart3d/U4PropertyAnimationTest.kt
+?? dart3d/example/lib/u3_atlas_probe.dart
+?? dart3d/example/lib/u3_sprite_scene.dart
+?? dart3d/example/lib/u3_tone_scene.dart
+?? dart3d/example/lib/u4_material_scene.dart
+?? dart3d/example/lib/u4_property_scene.dart
+?? dart3d/example/test/u3_atlas_probe_test.dart
+?? dart3d/example/test/u3_sprite_showcase_test.dart
+?? dart3d/example/test/u3_tone_showcase_test.dart
+?? dart3d/example/test/u4_material_showcase_test.dart
+?? dart3d/example/test/u4_showcase_test.dart
+?? dart3d/lib/src/sprite_material.dart
+?? dart3d/lib/src/texture_atlas.dart
+?? dart3d/test/u3_sprite_material_test.dart
+?? dart3d/test/u3_texture_atlas_test.dart
+?? dart3d/test/u4_controller_test.dart
+?? dart3d/test/u4_payload_arrival_test.dart
+?? dart3d/test/u4_property_animation_test.dart
+?? docs/artifacts/e5b-u3-sprite-dart/
+?? docs/artifacts/e5b-u3-sprite/
+?? docs/artifacts/e5c-u4-property-animation/

@@ -1,0 +1,15 @@
+{
+  "runs": [
+    {
+      "reverse": false,
+      "exit": 0,
+      "all66Exact": true
+    },
+    {
+      "reverse": true,
+      "exit": 0,
+      "all66Exact": true
+    }
+  ],
+  "scratchRemoved": true
+}

@@ -1,0 +1,5 @@
+== Devices ==
+-- iOS 26.5 --
+-- iOS 27.0 --
+-- watchOS 26.5 --
+-- watchOS 27.0 --

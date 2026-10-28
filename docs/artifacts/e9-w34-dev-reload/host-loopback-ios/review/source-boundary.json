@@ -1,0 +1,9 @@
+{
+  "initial-to-observed": [
+    "dart3d/example/lib/w34_reload_main.dart"
+  ],
+  "observed-to-candidate": [
+    "dart3d/example/test/w34_reload_transport_test.dart",
+    "dart3d/example/tool/w34_reload_host.dart"
+  ]
+}

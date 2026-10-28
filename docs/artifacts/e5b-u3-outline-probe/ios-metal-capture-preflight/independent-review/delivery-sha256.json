@@ -1,0 +1,13 @@
+{
+  "evidence-verification.json": "e5a496bffef0e8a16c0dac7488462eb860e3660c7da736e1015fb2fa23d543e0",
+  "final-preservation.json": "ba7f089a4cc3e52218af1256502c4534f24fb1df18a4976c124d545baa68d7bd",
+  "independent-log-results.json": "77208d121a5ca08ae6498edd0af551314f1a54f766d33843188a2a047fd08194",
+  "independent-raw-results.json": "612154b50aac87dbd60fb4fdf5b4206cf5c7c74bdf1565ba2e40421e860856ef",
+  "independent-screen-crops.json": "13492f14bf7f92d3ab17c837fd0fbcb4e13e0882c0bf090b55f47604cc8cfcb2",
+  "installed-sdk-verification.json": "9422358316fa07c8ec078771d7f03ec512a55443726013398e42599300be044d",
+  "recompute.py": "7c9df601f08370107d3920efc8f7d44c7590c5c3b72d31f5c0ed825dfad93bc4",
+  "report.md": "9988d687b100340c8887fdf44a049d179e10a0910604c955585e70b9c46edc92",
+  "source-import-preservation.json": "74729e18e86ab3fefe70112bf92b44209eeda9dcf551e778ec99622236078de5",
+  "synthetic-source-identity.json": "f4f46f012a8e43939b3bc9ebaecb4a2b7910a3723371aeb7328c3319dc9d5b85",
+  "video-review.json": "107d498ea36979f0b59ad597aff7325a18697236a9e7009737ce7805e2d9ca42"
+}

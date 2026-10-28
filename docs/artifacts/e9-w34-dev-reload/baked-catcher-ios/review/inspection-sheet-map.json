@@ -1,0 +1,44 @@
+[
+  {
+    "file": "before-inspection.png",
+    "columns": 3,
+    "keysRowMajor": [
+      "before/00-off.png",
+      "before/01-normals.png",
+      "before/02-metallic.png",
+      "before/03-roughness.png",
+      "before/04-basecolor.png",
+      "before/05-depth.png"
+    ]
+  },
+  {
+    "file": "after-inspection.png",
+    "columns": 4,
+    "keysRowMajor": [
+      "after/00-off.png",
+      "after/01-normals.png",
+      "after/02-depth.png",
+      "after/03-basecolor.png",
+      "after/04-metallic.png",
+      "after/05-roughness.png",
+      "after/06-roughness-wire.png",
+      "after/07-off-wire.png",
+      "after/08-off-restored.png",
+      "after/09-normals-A.png",
+      "after/10-normals-B-stale.png",
+      "after/11-normals-B-refresh.png",
+      "after/12-depth-B.png",
+      "after/13-basecolor-B.png",
+      "after/14-metallic-B.png",
+      "after/15-roughness-B.png",
+      "after/16-off-B.png",
+      "after/17-normals-B.png",
+      "after/18-normals-B-reload.png",
+      "after/19-off-B-reload.png",
+      "after/20-depth-B.png",
+      "after/21-depth-A-stale.png",
+      "after/22-depth-A-refresh.png",
+      "after/23-off-A-final.png"
+    ]
+  }
+]

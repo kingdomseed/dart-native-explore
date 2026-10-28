@@ -1,0 +1,2 @@
+6a313b9effba2725aedaf14ebc5be082848b248cdd0b70ea4af04269e323c706  parent-source.tgz
+05353c6b6f383a2dc4264dbcef0fc25d8d2609a20047390d257458f3dea3bbea  parent-correction.patch

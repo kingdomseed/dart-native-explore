@@ -1,0 +1,91 @@
+{
+  "baselinePaths": 66,
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "apply",
+        "--no-index",
+        "--check",
+        "/private/tmp/dart3d-u3-outline-view-probe-20261028/r1/worker/correction.patch"
+      ],
+      "environment": {
+        "GIT_CEILING_DIRECTORIES": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-886b3c86/dart3d/example/build"
+      },
+      "exitCode": 0,
+      "phase": "forward-check",
+      "stderr": "",
+      "stdout": "",
+      "verifiedFiles": 66
+    },
+    {
+      "argv": [
+        "git",
+        "apply",
+        "--no-index",
+        "/private/tmp/dart3d-u3-outline-view-probe-20261028/r1/worker/correction.patch"
+      ],
+      "environment": {
+        "GIT_CEILING_DIRECTORIES": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-886b3c86/dart3d/example/build"
+      },
+      "exitCode": 0,
+      "phase": "forward",
+      "stderr": "",
+      "stdout": "",
+      "verifiedFiles": 70
+    },
+    {
+      "argv": [
+        "git",
+        "apply",
+        "--no-index",
+        "--reverse",
+        "--check",
+        "/private/tmp/dart3d-u3-outline-view-probe-20261028/r1/worker/correction.patch"
+      ],
+      "environment": {
+        "GIT_CEILING_DIRECTORIES": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-886b3c86/dart3d/example/build"
+      },
+      "exitCode": 0,
+      "phase": "reverse-check",
+      "stderr": "",
+      "stdout": "",
+      "verifiedFiles": 70
+    },
+    {
+      "argv": [
+        "git",
+        "apply",
+        "--no-index",
+        "--reverse",
+        "/private/tmp/dart3d-u3-outline-view-probe-20261028/r1/worker/correction.patch"
+      ],
+      "environment": {
+        "GIT_CEILING_DIRECTORIES": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-886b3c86/dart3d/example/build"
+      },
+      "exitCode": 0,
+      "phase": "reverse",
+      "stderr": "",
+      "stdout": "",
+      "verifiedFiles": 66
+    }
+  ],
+  "earlierCorrectedFailure": "Initial git apply from nested directory silently skipped paths due to repository prefix; full-file comparison detected it. Ceiling now prevents repository discovery for plain archive replay.",
+  "forwardAll70Exact": true,
+  "forwardPaths": 70,
+  "patchPaths": [
+    "dart3d/example/lib/u3_outline_views_main.dart",
+    "dart3d/example/lib/u3_outline_views_scene.dart",
+    "dart3d/example/test/u3_outline_views_test.dart",
+    "dart3d/ios/Classes/RenderTargets.swift",
+    "dart3d/ios/Classes/SceneViewHost.swift",
+    "dart3d/ios/Classes/SelectionOutline.swift",
+    "dart3d/ios/Classes/SelectionOutlineViewsProbe.swift",
+    "dart3d/ios/Classes/ToneMapping.swift"
+  ],
+  "plainArchiveReplayNotCheckout": true,
+  "reverseAll66Exact": true,
+  "reversePaths": 66,
+  "scratchRemoved": true,
+  "unownedBaselinePeersPreserved": 62
+}

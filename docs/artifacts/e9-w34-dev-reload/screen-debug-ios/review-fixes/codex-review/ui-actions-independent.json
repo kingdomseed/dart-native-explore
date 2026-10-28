@@ -1,0 +1,98 @@
+[
+  {
+    "args": "click @e14",
+    "snapshotChunk": "ded689",
+    "resolvedRole": "button",
+    "resolvedLabel": "normals",
+    "exitCode": 0,
+    "output": "Tapped @e14 (201, 683)\n"
+  },
+  {
+    "args": "click @e26",
+    "snapshotChunk": "229bab",
+    "resolvedRole": "button",
+    "resolvedLabel": "Viewport full",
+    "exitCode": 0,
+    "output": "Tapped @e26 (330, 809)\n"
+  },
+  {
+    "args": "click @e13",
+    "snapshotChunk": "de7333",
+    "resolvedRole": "button",
+    "resolvedLabel": "Off",
+    "exitCode": 0,
+    "output": "Tapped @e13 (72, 683)\n"
+  },
+  {
+    "args": "click @e24",
+    "snapshotChunk": "063bd2",
+    "resolvedRole": "button",
+    "resolvedLabel": "normals",
+    "exitCode": 0,
+    "output": "Tapped @e24 (201, 683)\n"
+  },
+  {
+    "args": "click @e26",
+    "snapshotChunk": "fc0b5e",
+    "resolvedRole": "button",
+    "resolvedLabel": "Viewport inset",
+    "exitCode": 0,
+    "output": "Tapped @e26 (330, 809)\n"
+  },
+  {
+    "args": "click @e13",
+    "snapshotChunk": "f1d2f1",
+    "resolvedRole": "button",
+    "resolvedLabel": "Off",
+    "exitCode": 0,
+    "output": "Tapped @e13 (72, 683)\n"
+  },
+  {
+    "args": "click @e24",
+    "snapshotChunk": "a4d396",
+    "resolvedRole": "button",
+    "resolvedLabel": "Rig present",
+    "exitCode": 0,
+    "output": "Tapped @e24 (72, 809)\n"
+  },
+  {
+    "args": "click @e12",
+    "snapshotChunk": "ffd2cc",
+    "resolvedRole": "button",
+    "resolvedLabel": "normals",
+    "exitCode": 0,
+    "output": "Tapped @e12 (201, 683)\n"
+  },
+  {
+    "args": "click @e22",
+    "snapshotChunk": "a2727e",
+    "resolvedRole": "button",
+    "resolvedLabel": "Rig removed",
+    "exitCode": 0,
+    "output": "Tapped @e22 (72, 809)\n"
+  },
+  {
+    "args": "click @e25",
+    "snapshotChunk": "43afed",
+    "resolvedRole": "button",
+    "resolvedLabel": "Pose rest",
+    "exitCode": 0,
+    "output": "Tapped @e25 (201, 809)\n"
+  },
+  {
+    "args": "click @e13",
+    "snapshotChunk": "2606cb",
+    "resolvedRole": "button",
+    "resolvedLabel": "Off",
+    "exitCode": 0,
+    "output": "Tapped @e13 (72, 683)\n"
+  },
+  {
+    "args": "click @e25",
+    "snapshotChunk": "3f4e55",
+    "resolvedRole": "button",
+    "resolvedLabel": "Pose raised",
+    "exitCode": 0,
+    "output": "Tapped @e25 (201, 809)\n"
+  }
+]

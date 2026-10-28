@@ -1,0 +1,35 @@
+{
+  "verdict": "PASS",
+  "meaning": "Source plan ready for bounded capability investigation only",
+  "materialFindings": [],
+  "verificationLevel": "Filesystem/hash/source inspection only",
+  "requiredHeadVerified": true,
+  "requestedInputHashesVerified": true,
+  "manifest66Verified": true,
+  "sixLocksVerified": true,
+  "preservationVerified": true,
+  "NOT_RUN": [
+    "builds",
+    "tests",
+    "shader compilation/execution",
+    "GPU ordering",
+    "runtime",
+    "devices",
+    "device discovery",
+    "Android",
+    "performance",
+    "production integration",
+    "whole U3",
+    "T2",
+    "T4"
+  ],
+  "children": 0,
+  "commitsPushesPRsIssuesExternalMutations": "NONE",
+  "outputs": {
+    "import-receipt.json": "1699277e86a4931b399aa066030e8631135e07b954919098626c85b1f7c85b99",
+    "preservation-before.json": "f33ea483fc4bf30b25086517f2e4a0b7121589a248025afad26cd1feec321f88",
+    "preservation-receipt.json": "14c0e3a0d37f18dcbd3e33e5771b95d1c9c2cc50347243e283510ead45f491ea",
+    "review.md": "388d7a3577da8356a1c93c5a7cba9c82edb3a0ca5c7ee2fc1de0708bbd848d9e",
+    "source-receipt.json": "d7fe9243a595bd7dbc9d1f16d28a5d421a67b35f9b95dd7e8d99c03d6c702a07"
+  }
+}

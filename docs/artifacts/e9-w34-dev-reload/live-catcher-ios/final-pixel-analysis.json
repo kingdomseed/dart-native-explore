@@ -1,0 +1,500 @@
+{
+  "comparisons": [
+    {
+      "left": "blend-before/00-off-A.png",
+      "right": "blend-after/00-off-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "blend-before/01-normals-A.png",
+      "right": "blend-after/01-normals-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 20907,
+      "maxRGBDifference": 118
+    },
+    {
+      "left": "blend-before/02-depth-A.png",
+      "right": "blend-after/02-depth-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 17949,
+      "maxRGBDifference": 8
+    },
+    {
+      "left": "blend-before/03-baseColor-A.png",
+      "right": "blend-after/03-baseColor-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 20909,
+      "maxRGBDifference": 150
+    },
+    {
+      "left": "blend-before/04-baseColor-B.png",
+      "right": "blend-after/04-baseColor-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 15586,
+      "maxRGBDifference": 150
+    },
+    {
+      "left": "blend-before/05-off-B.png",
+      "right": "blend-after/05-off-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "blend-after/00-off-A.png",
+      "right": "blend-after/06-off-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "blend-after/00-off-A.png",
+      "right": "blend-after/10-off-wire-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "blend-after/00-off-A.png",
+      "right": "blend-after/14-off-final.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "blend-after/01-normals-A.png",
+      "right": "blend-after/07-normals-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "blend-after/01-normals-A.png",
+      "right": "blend-after/11-normals-reenter.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "blend-after/01-normals-A.png",
+      "right": "blend-after/12-material-replace.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "blend-after/01-normals-A.png",
+      "right": "blend-after/13-reload.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/00-off-A.png",
+      "right": "final-clean/00-off-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/01-normals-A.png",
+      "right": "final-clean/01-normals-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/02-depth-A.png",
+      "right": "final-clean/02-depth-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/03-baseColor-A.png",
+      "right": "final-clean/03-baseColor-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/04-baseColor-B.png",
+      "right": "final-clean/04-baseColor-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/05-normals-B.png",
+      "right": "final-clean/05-normals-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/06-off-B.png",
+      "right": "final-clean/06-off-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/07-off-A-return.png",
+      "right": "final-clean/07-off-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/08-normals-A-return.png",
+      "right": "final-clean/08-normals-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/21-dim.png",
+      "right": "final-clean/09-dim.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/22-bright.png",
+      "right": "final-clean/10-bright.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/25-rest-100.png",
+      "right": "final-clean/11-rest.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/19-low.png",
+      "right": "final-clean/12-low.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/20-high-return.png",
+      "right": "final-clean/13-high.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/26-new-B.png",
+      "right": "final-clean/14-new-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/29-light-absent.png",
+      "right": "final-clean/15-absent.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/30-light-restored.png",
+      "right": "final-clean/16-restored.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/31-material-replace.png",
+      "right": "final-clean/17-replace.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/32-reload-selected.png",
+      "right": "final-clean/18-reload.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/33-off-new-B.png",
+      "right": "final-clean/19-off-new-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "pbr-regression/01-normals.png",
+      "right": "final-pbr/01-normals.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "pbr-regression/05-depth.png",
+      "right": "final-pbr/02-depth.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "pbr-regression/04-baseColor.png",
+      "right": "final-pbr/03-baseColor.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "pbr-regression/02-metallic.png",
+      "right": "final-pbr/04-metallic.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "pbr-regression/03-roughness.png",
+      "right": "final-pbr/05-roughness.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    }
+  ],
+  "stableComparisons": 34,
+  "stableFailures": []
+}

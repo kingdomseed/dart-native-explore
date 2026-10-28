@@ -1,0 +1,116 @@
+[
+  {
+    "path": "/private/tmp/dart3d-u3-outline-publication-control-20261028/r1/parent/baseline/journey.mp4",
+    "sha256": "d5566f2ba6fc8ba0e3466dabad94b37c026fa5c74b955db959ac4bfa760a4f55",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 1206,
+          "height": 2622,
+          "duration": "20.665000",
+          "nb_read_frames": "3831"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "program": "ffprobe",
+        "args": [
+          "-v",
+          "error",
+          "-threads",
+          "2",
+          "-count_frames",
+          "-select_streams",
+          "v:0",
+          "-show_entries",
+          "stream=width,height,duration,nb_read_frames",
+          "-of",
+          "json",
+          "/private/tmp/dart3d-u3-outline-publication-control-20261028/r1/parent/baseline/journey.mp4"
+        ],
+        "exitCode": 0
+      },
+      {
+        "program": "ffmpeg",
+        "args": [
+          "-v",
+          "warning",
+          "-threads",
+          "2",
+          "-i",
+          "/private/tmp/dart3d-u3-outline-publication-control-20261028/r1/parent/baseline/journey.mp4",
+          "-map",
+          "0:v:0",
+          "-an",
+          "-fps_mode",
+          "passthrough",
+          "-f",
+          "null",
+          "-"
+        ],
+        "exitCode": 0
+      }
+    ],
+    "warningLines": 4
+  },
+  {
+    "path": "/private/tmp/dart3d-u3-outline-publication-control-20261028/r1/parent/control/journey.mp4",
+    "sha256": "75f7e8222d48beb3c0437dace158092187475efb3b9b13201abb7f78959397a4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 1206,
+          "height": 2622,
+          "duration": "20.895000",
+          "nb_read_frames": "3882"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "program": "ffprobe",
+        "args": [
+          "-v",
+          "error",
+          "-threads",
+          "2",
+          "-count_frames",
+          "-select_streams",
+          "v:0",
+          "-show_entries",
+          "stream=width,height,duration,nb_read_frames",
+          "-of",
+          "json",
+          "/private/tmp/dart3d-u3-outline-publication-control-20261028/r1/parent/control/journey.mp4"
+        ],
+        "exitCode": 0
+      },
+      {
+        "program": "ffmpeg",
+        "args": [
+          "-v",
+          "warning",
+          "-threads",
+          "2",
+          "-i",
+          "/private/tmp/dart3d-u3-outline-publication-control-20261028/r1/parent/control/journey.mp4",
+          "-map",
+          "0:v:0",
+          "-an",
+          "-fps_mode",
+          "passthrough",
+          "-f",
+          "null",
+          "-"
+        ],
+        "exitCode": 0
+      }
+    ],
+    "warningLines": 2
+  }
+]

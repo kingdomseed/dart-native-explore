@@ -1,0 +1,1224 @@
+{
+  "pngCount": 26,
+  "images": [
+    {
+      "path": "before/00-off-A.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "eee8bea11aff6ae459d0eca25bf72021d096b39a874fc35a2cedb688cda5dac0",
+      "rgbaSha256": "7d014d6fe27324358103492a59e6651384020f5061804f1a57b8f78783daf1bc",
+      "durableCopyExact": true
+    },
+    {
+      "path": "before/01-normals-A.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "c4fb628011989088c6f3c289dcd6285dfff3d4d2cb8791b92c0e80b8267615d6",
+      "rgbaSha256": "2b77b4615d0bf1b1a53465b4a79b861cd680cd1ea33755a5b85be316e0587adf",
+      "durableCopyExact": true
+    },
+    {
+      "path": "before/02-depth-A.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "a8df686bf7effdeb075105785b74d58a8520184fd21132e6aef65c811ee4bb72",
+      "rgbaSha256": "1f8f8f15286a216b04b5811942302e9a26befae97cc2113de771df26cbe82408",
+      "durableCopyExact": true
+    },
+    {
+      "path": "before/03-depth-B.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "b9da32877120a5f2818ea9948794c2c03be4e4b749a7810081cfc930ce58159d",
+      "rgbaSha256": "5d795fc586442a46ac4c10bffc107ea170dae95aadc7c5baec36792ea565090d",
+      "durableCopyExact": true
+    },
+    {
+      "path": "before/04-off-B.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "119a8cac054769029eb7e79eb92ae9172986718f88ecdb646f3a05943e45f28f",
+      "rgbaSha256": "5b0c1d6b38e5b9792a29dd88d064cbbd077008dcff51f00e64c5d1e2caba170e",
+      "durableCopyExact": true
+    },
+    {
+      "path": "before/05-off-A-return.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "119a8cac054769029eb7e79eb92ae9172986718f88ecdb646f3a05943e45f28f",
+      "rgbaSha256": "5b0c1d6b38e5b9792a29dd88d064cbbd077008dcff51f00e64c5d1e2caba170e",
+      "durableCopyExact": true
+    },
+    {
+      "path": "failed-presentation-copy/00-off-A.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "949391389056deb1958e5ddbc91fbcbb1cc4665d18e9e056aa9141a860fbf40c",
+      "rgbaSha256": "b6fa249310aebf0df24e29fd386cd61deaf1e47d48a83e25a7b3630a7d77889f",
+      "durableCopyExact": true
+    },
+    {
+      "path": "model-copy/00-off-A.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "a904ddb8e9a8c9ab5423ca77c4b2b1921e7db181985ea829726e95f7fa3336ee",
+      "rgbaSha256": "61b0a85913b32219d45c01b62c28c6928b7fa6577f315b69d96a3ae12b7ccf69",
+      "durableCopyExact": true
+    },
+    {
+      "path": "model-copy/01-normals-A.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "548f17e81f0eb26d5bc12af63ac789c52e0df6739c58eeb07c360ce8bec28eda",
+      "rgbaSha256": "4bce654b91443cb135e2bee5c0425cb11f6d3baadb89629267a63b1461bcc31a",
+      "durableCopyExact": true
+    },
+    {
+      "path": "model-copy/02-depth-A.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "f6f0634fbc9e8ef6107f8882f23ebeee3a400ca059afaf517877aca2d9cab5b0",
+      "rgbaSha256": "f5b592edaed445c836ae7013d2831b16d5624945a5001b3b99a7179e89f68c65",
+      "durableCopyExact": true
+    },
+    {
+      "path": "model-copy/03-basecolor-A.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "11a9314c828b11b6006a2fd0161f0635df676b72dce429bd5c167ed39e376d80",
+      "rgbaSha256": "8c4163bebb30d5f3d92e93b654562e82864b857be564d85ffed351606235c746",
+      "durableCopyExact": true
+    },
+    {
+      "path": "model-copy/04-metallic-A.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "2a1f97add97f70bd804bac3f0b0b5b2bf7f202eb153d1edd217ef38207644266",
+      "rgbaSha256": "c9222d74a1e14d5c6049480463128d7a07a053e66d19c1436f5ff61eb82b6cb0",
+      "durableCopyExact": true
+    },
+    {
+      "path": "model-copy/05-roughness-A.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "5e247b3cec2897e1c702c1221a9fe9f678cdd280e65f83c83a25e70d3ba25e21",
+      "rgbaSha256": "4c498efc7d66aa091e2d271cedd5669ea7f882653163e05453ff4b6fcf858191",
+      "durableCopyExact": true
+    },
+    {
+      "path": "model-copy/06-normals-A.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "548f17e81f0eb26d5bc12af63ac789c52e0df6739c58eeb07c360ce8bec28eda",
+      "rgbaSha256": "4bce654b91443cb135e2bee5c0425cb11f6d3baadb89629267a63b1461bcc31a",
+      "durableCopyExact": true
+    },
+    {
+      "path": "model-copy/07-normals-B.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "4f35a90b3deafa0b4d90df8f40a862e5f93c3a3eaec30d48c22e325d94db3cbb",
+      "rgbaSha256": "9f4213b93ab11cc34cb38e9db84a80d5115b7b5f3c60f920adf9b6dfad709b90",
+      "durableCopyExact": true
+    },
+    {
+      "path": "model-copy/08-depth-B.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "1ddd5ce1818172c51cab11f94c5275fcff8743c7f30ecf743bcced048654cd77",
+      "rgbaSha256": "554580035cc3ca118a19ac2b3734596f8ad47e96a78c9edcc3022eb1230e8cdf",
+      "durableCopyExact": true
+    },
+    {
+      "path": "model-copy/09-depth-A.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "f6f0634fbc9e8ef6107f8882f23ebeee3a400ca059afaf517877aca2d9cab5b0",
+      "rgbaSha256": "f5b592edaed445c836ae7013d2831b16d5624945a5001b3b99a7179e89f68c65",
+      "durableCopyExact": true
+    },
+    {
+      "path": "model-copy/10-depth-wire.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "a6523c5c4c3ae6f53499d0030298ac77a181564bcc5411e218e57b0cade785e7",
+      "rgbaSha256": "180699664f40917925873f8ce7bf354bb38d4e952792a628270315849dec81e9",
+      "durableCopyExact": true
+    },
+    {
+      "path": "model-copy/11-off-wire-A.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "56bf22d0a39ed5955b9df8eb2ffa0fef844cb4bc7614a5cf86d7f5c54a4ad548",
+      "rgbaSha256": "25d1de4bc2b899543cb2d3087db1d1e48ba9237cb6235ff4fdba309845c66ab0",
+      "durableCopyExact": true
+    },
+    {
+      "path": "model-copy/12-off-restored-A.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "52aa680b1a6e9f8c5a66b259a341788d45a185dae1fa245b023a936fa9a50260",
+      "rgbaSha256": "fd92b7ff384038f598c80868c8ea2dc3e1ec58e44f7835b3be412c2ee8b9eda5",
+      "durableCopyExact": true
+    },
+    {
+      "path": "model-copy/13-normals-A.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "3a417a1cee44ac6174232b637cafc8b53a9714d0b280a78a43ffd9c54676c146",
+      "rgbaSha256": "33b7e5bd3dcef59f9e29d20fa4765dad59ae8dc5ebfe4f90d4229669f2c9f9c7",
+      "durableCopyExact": true
+    },
+    {
+      "path": "model-copy/14-normals-B.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "7098c5ffcd0f6677d1a700dabf00683d3208f0f1dd741dc3cdd7f0e5b62ebbdd",
+      "rgbaSha256": "0356d9c2b06c4833aeacc58255019ddc0d798e561fc51cddf8123c19b755b6c9",
+      "durableCopyExact": true
+    },
+    {
+      "path": "model-copy/15-normals-B-replace.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "7098c5ffcd0f6677d1a700dabf00683d3208f0f1dd741dc3cdd7f0e5b62ebbdd",
+      "rgbaSha256": "0356d9c2b06c4833aeacc58255019ddc0d798e561fc51cddf8123c19b755b6c9",
+      "durableCopyExact": true
+    },
+    {
+      "path": "model-copy/16-normals-B-reload.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "7098c5ffcd0f6677d1a700dabf00683d3208f0f1dd741dc3cdd7f0e5b62ebbdd",
+      "rgbaSha256": "0356d9c2b06c4833aeacc58255019ddc0d798e561fc51cddf8123c19b755b6c9",
+      "durableCopyExact": true
+    },
+    {
+      "path": "model-copy/17-off-B.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "b11306b0637fba6b0b893e53a2080b1cb1a870cd145ea518819b1a5acf0702c7",
+      "rgbaSha256": "1d8826f1a1b3e482c2723b1a133df4d2a1e198107b1b5df50244da456ee9982c",
+      "durableCopyExact": true
+    },
+    {
+      "path": "model-copy/18-off-A-final.png",
+      "size": [
+        402,
+        874
+      ],
+      "sha256": "828db2b85beca645ce3131e3ba6e036abba596e3c700b5f56fffeb87e089a11a",
+      "rgbaSha256": "a0bc628382a5d6f6330f6df3be70e4c1a8b27858fe4495bf085ab5f590c6dffe",
+      "durableCopyExact": true
+    }
+  ],
+  "comparisons": [
+    {
+      "name": "authored-matched-A-final",
+      "a": "before/00-off-A.png",
+      "b": "model-copy/18-off-A-final.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "independentlyMatches": true
+    },
+    {
+      "name": "initial-model-vs-baseline-B-control",
+      "a": "before/04-off-B.png",
+      "b": "model-copy/00-off-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "changedPixels": 44820,
+      "maxChannelDifference": 255,
+      "independentlyMatches": true
+    },
+    {
+      "name": "normals-A-repeat",
+      "a": "model-copy/01-normals-A.png",
+      "b": "model-copy/06-normals-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "independentlyMatches": true
+    },
+    {
+      "name": "authored-before-after",
+      "a": "before/00-off-A.png",
+      "b": "model-copy/00-off-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "changedPixels": 22154,
+      "maxChannelDifference": 62,
+      "independentlyMatches": true
+    },
+    {
+      "name": "authored-after-wire",
+      "a": "model-copy/00-off-A.png",
+      "b": "model-copy/12-off-restored-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "independentlyMatches": true
+    },
+    {
+      "name": "live-normals-motion-without-replace",
+      "a": "model-copy/06-normals-A.png",
+      "b": "model-copy/07-normals-B.png",
+      "crop": [
+        100,
+        405,
+        290,
+        45
+      ],
+      "changedPixels": 4578,
+      "maxChannelDifference": 118,
+      "independentlyMatches": true
+    },
+    {
+      "name": "live-depth-return-without-replace",
+      "a": "model-copy/08-depth-B.png",
+      "b": "model-copy/09-depth-A.png",
+      "crop": [
+        100,
+        405,
+        290,
+        45
+      ],
+      "changedPixels": 4116,
+      "maxChannelDifference": 8,
+      "independentlyMatches": true
+    },
+    {
+      "name": "same-ID-live-replacement",
+      "a": "model-copy/14-normals-B.png",
+      "b": "model-copy/15-normals-B-replace.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "independentlyMatches": true
+    },
+    {
+      "name": "current-B-reload",
+      "a": "model-copy/15-normals-B-replace.png",
+      "b": "model-copy/16-normals-B-reload.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "independentlyMatches": true
+    },
+    {
+      "name": "authored-current-B",
+      "a": "before/04-off-B.png",
+      "b": "model-copy/17-off-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "independentlyMatches": true
+    },
+    {
+      "name": "A-initial-vs-after-replace-reload",
+      "a": "model-copy/00-off-A.png",
+      "b": "model-copy/18-off-A-final.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "changedPixels": 22154,
+      "maxChannelDifference": 62,
+      "independentlyMatches": true
+    }
+  ],
+  "samples": {
+    "before/02-depth-A.png": {
+      "300,425": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "160,425": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "100,425": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "100,360": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "250,425": [
+        253,
+        253,
+        253,
+        255
+      ]
+    },
+    "before/00-off-A.png": {
+      "300,425": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "160,425": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "100,425": [
+        40,
+        39,
+        36,
+        255
+      ],
+      "100,360": [
+        49,
+        48,
+        46,
+        255
+      ],
+      "250,425": [
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    "before/05-off-A-return.png": {
+      "300,425": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "160,425": [
+        40,
+        38,
+        34,
+        255
+      ],
+      "100,425": [
+        40,
+        39,
+        36,
+        255
+      ],
+      "100,360": [
+        49,
+        48,
+        46,
+        255
+      ],
+      "250,425": [
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    "before/01-normals-A.png": {
+      "300,425": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "160,425": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "100,425": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "100,360": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "250,425": [
+        253,
+        253,
+        253,
+        255
+      ]
+    },
+    "before/03-depth-B.png": {
+      "300,425": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "160,425": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "100,425": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "100,360": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "250,425": [
+        253,
+        253,
+        253,
+        255
+      ]
+    },
+    "before/04-off-B.png": {
+      "300,425": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "160,425": [
+        40,
+        38,
+        34,
+        255
+      ],
+      "100,425": [
+        40,
+        39,
+        36,
+        255
+      ],
+      "100,360": [
+        49,
+        48,
+        46,
+        255
+      ],
+      "250,425": [
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    "model-copy/02-depth-A.png": {
+      "300,425": [
+        237,
+        237,
+        237,
+        255
+      ],
+      "160,425": [
+        237,
+        237,
+        237,
+        255
+      ],
+      "100,425": [
+        245,
+        245,
+        245,
+        255
+      ],
+      "100,360": [
+        245,
+        245,
+        245,
+        255
+      ],
+      "250,425": [
+        237,
+        237,
+        237,
+        255
+      ]
+    },
+    "model-copy/18-off-A-final.png": {
+      "300,425": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "160,425": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "100,425": [
+        40,
+        39,
+        36,
+        255
+      ],
+      "100,360": [
+        49,
+        48,
+        46,
+        255
+      ],
+      "250,425": [
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    "model-copy/12-off-restored-A.png": {
+      "300,425": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "160,425": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "100,425": [
+        0,
+        30,
+        49,
+        255
+      ],
+      "100,360": [
+        0,
+        31,
+        51,
+        255
+      ],
+      "250,425": [
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    "model-copy/13-normals-A.png": {
+      "300,425": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "160,425": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "100,425": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "100,360": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "250,425": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "model-copy/00-off-A.png": {
+      "300,425": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "160,425": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "100,425": [
+        0,
+        30,
+        49,
+        255
+      ],
+      "100,360": [
+        0,
+        31,
+        51,
+        255
+      ],
+      "250,425": [
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    "model-copy/07-normals-B.png": {
+      "300,425": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "160,425": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "100,425": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "100,360": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "250,425": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "model-copy/08-depth-B.png": {
+      "300,425": [
+        237,
+        237,
+        237,
+        255
+      ],
+      "160,425": [
+        245,
+        245,
+        245,
+        255
+      ],
+      "100,425": [
+        245,
+        245,
+        245,
+        255
+      ],
+      "100,360": [
+        245,
+        245,
+        245,
+        255
+      ],
+      "250,425": [
+        237,
+        237,
+        237,
+        255
+      ]
+    },
+    "model-copy/14-normals-B.png": {
+      "300,425": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "160,425": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "100,425": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "100,360": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "250,425": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "model-copy/05-roughness-A.png": {
+      "300,425": [
+        253,
+        0,
+        253,
+        255
+      ],
+      "160,425": [
+        253,
+        0,
+        253,
+        255
+      ],
+      "100,425": [
+        216,
+        216,
+        216,
+        255
+      ],
+      "100,360": [
+        216,
+        216,
+        216,
+        255
+      ],
+      "250,425": [
+        253,
+        0,
+        253,
+        255
+      ]
+    },
+    "model-copy/17-off-B.png": {
+      "300,425": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "160,425": [
+        40,
+        38,
+        34,
+        255
+      ],
+      "100,425": [
+        40,
+        39,
+        36,
+        255
+      ],
+      "100,360": [
+        49,
+        48,
+        46,
+        255
+      ],
+      "250,425": [
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    "model-copy/03-basecolor-A.png": {
+      "300,425": [
+        253,
+        0,
+        253,
+        255
+      ],
+      "160,425": [
+        253,
+        0,
+        253,
+        255
+      ],
+      "100,425": [
+        118,
+        150,
+        179,
+        255
+      ],
+      "100,360": [
+        118,
+        150,
+        179,
+        255
+      ],
+      "250,425": [
+        253,
+        0,
+        253,
+        255
+      ]
+    },
+    "model-copy/04-metallic-A.png": {
+      "300,425": [
+        253,
+        0,
+        253,
+        255
+      ],
+      "160,425": [
+        253,
+        0,
+        253,
+        255
+      ],
+      "100,425": [
+        124,
+        124,
+        124,
+        255
+      ],
+      "100,360": [
+        124,
+        124,
+        124,
+        255
+      ],
+      "250,425": [
+        253,
+        0,
+        253,
+        255
+      ]
+    },
+    "model-copy/06-normals-A.png": {
+      "300,425": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "160,425": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "100,425": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "100,360": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "250,425": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "model-copy/15-normals-B-replace.png": {
+      "300,425": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "160,425": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "100,425": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "100,360": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "250,425": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "model-copy/01-normals-A.png": {
+      "300,425": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "160,425": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "100,425": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "100,360": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "250,425": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "model-copy/10-depth-wire.png": {
+      "300,425": [
+        237,
+        237,
+        237,
+        255
+      ],
+      "160,425": [
+        237,
+        237,
+        237,
+        255
+      ],
+      "100,425": [
+        245,
+        245,
+        245,
+        255
+      ],
+      "100,360": [
+        247,
+        247,
+        247,
+        255
+      ],
+      "250,425": [
+        237,
+        237,
+        237,
+        255
+      ]
+    },
+    "model-copy/09-depth-A.png": {
+      "300,425": [
+        237,
+        237,
+        237,
+        255
+      ],
+      "160,425": [
+        237,
+        237,
+        237,
+        255
+      ],
+      "100,425": [
+        245,
+        245,
+        245,
+        255
+      ],
+      "100,360": [
+        245,
+        245,
+        245,
+        255
+      ],
+      "250,425": [
+        237,
+        237,
+        237,
+        255
+      ]
+    },
+    "model-copy/11-off-wire-A.png": {
+      "300,425": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "160,425": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "100,425": [
+        0,
+        30,
+        49,
+        255
+      ],
+      "100,360": [
+        55,
+        76,
+        90,
+        255
+      ],
+      "250,425": [
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    "model-copy/16-normals-B-reload.png": {
+      "300,425": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "160,425": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "100,425": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "100,360": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "250,425": [
+        187,
+        245,
+        229,
+        255
+      ]
+    }
+  },
+  "allParentFieldsMatch": true
+}

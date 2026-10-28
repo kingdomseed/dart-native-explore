@@ -1,0 +1,52 @@
+{
+  "results": {
+    "before": {
+      "centerSheenContributionByAlpha": {
+        "0.0": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "0.5": [
+          0.50634765625,
+          0.50634765625,
+          0.50634765625
+        ],
+        "1.0": [
+          0.50634765625,
+          0.50634765625,
+          0.50634765625
+        ]
+      },
+      "maxHalfAlphaScalingError": 0.259765625,
+      "zeroAlphaContribution": 0.0,
+      "all11GpuCommandsCompleted": true,
+      "outsidePlaneUnchanged": true
+    },
+    "after": {
+      "centerSheenContributionByAlpha": {
+        "0.0": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "0.5": [
+          0.2529296875,
+          0.2529296875,
+          0.2529296875
+        ],
+        "1.0": [
+          0.50634765625,
+          0.50634765625,
+          0.50634765625
+        ]
+      },
+      "maxHalfAlphaScalingError": 0.000244140625,
+      "zeroAlphaContribution": 0.0,
+      "all11GpuCommandsCompleted": true,
+      "outsidePlaneUnchanged": true
+    }
+  },
+  "afterTolerance": 0.001,
+  "boundary": "Raw float16 copied PBR material, synthetic white diffuse/black RGB, rotated plane, no lights. Subtracts same-alpha without-sheen control from each matching pixel. Zero-alpha rim did not reproduce; confirmed defect is full contribution at partial alpha."
+}

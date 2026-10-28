@@ -1,0 +1,68 @@
+{
+  "command": [
+    "ffmpeg",
+    "-nostdin",
+    "-v",
+    "info",
+    "-i",
+    "/private/tmp/dart3d-w34-ios-live-catcher-probe-20261028/r1/parent/model-copy/journey.mp4",
+    "-vf",
+    "crop=1206:1740:0:210,blackdetect=d=0:pix_th=0.01:pic_th=0.99",
+    "-fps_mode",
+    "passthrough",
+    "-f",
+    "null",
+    "-"
+  ],
+  "exitCode": 0,
+  "cropSourcePixels": [
+    0,
+    210,
+    1206,
+    1740
+  ],
+  "threshold": "at least 99 percent pixels below blackdetect 0.01 luma threshold",
+  "intervals": [
+    {
+      "recordingStartSeconds": 1.906667,
+      "recordingEndSeconds": 1.941667,
+      "recordingDurationSeconds": 0.035
+    },
+    {
+      "recordingStartSeconds": 3.53,
+      "recordingEndSeconds": 3.81,
+      "recordingDurationSeconds": 0.28
+    },
+    {
+      "recordingStartSeconds": 26.435,
+      "recordingEndSeconds": 26.691667,
+      "recordingDurationSeconds": 0.256667
+    },
+    {
+      "recordingStartSeconds": 28.231667,
+      "recordingEndSeconds": 28.373333,
+      "recordingDurationSeconds": 0.141667
+    },
+    {
+      "recordingStartSeconds": 29.965,
+      "recordingEndSeconds": 30.093333,
+      "recordingDurationSeconds": 0.128333
+    },
+    {
+      "recordingStartSeconds": 31.681667,
+      "recordingEndSeconds": 31.706667,
+      "recordingDurationSeconds": 0.025
+    },
+    {
+      "recordingStartSeconds": 35.218333,
+      "recordingEndSeconds": 35.235,
+      "recordingDurationSeconds": 0.0166667
+    },
+    {
+      "recordingStartSeconds": 51.215,
+      "recordingEndSeconds": 51.218333,
+      "recordingDurationSeconds": 0.00333333
+    }
+  ],
+  "interpretation": "Short dark scene intervals in original recording around channel transitions. Cause and responsiveness not established; not calibrated application latency."
+}

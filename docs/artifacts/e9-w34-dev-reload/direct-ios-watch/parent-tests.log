@@ -1,0 +1,35 @@
+00:00 +0: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_reload_probe_test.dart
+00:00 +0: actual file events mutate controller incrementally, retain errors and recover
+Shell: w34 host save=initial path=/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene time=2026-10-27T17:48:56.182161Z strategy=in-place
+w34 source=/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene
+w34 watch subscribed source=/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene
+w34 read source=/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene characters=2706
+w34 applied-request time=2026-10-27T17:48:56.221728Z source=/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene ops=[loadScene]
+Shell: w34 host save=material path=/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene time=2026-10-27T17:48:56.249912Z strategy=in-place
+w34 watch type=1 path=/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene event=FileSystemCreateEvent('/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene', isDirectory=false)
+w34 read source=/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene characters=2706
+w34 applied-request time=2026-10-27T17:48:56.328712Z source=/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene ops=[upsertResource, updateNode]
+Shell: w34 host save=environment path=/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene time=2026-10-27T17:48:56.338401Z strategy=in-place
+w34 watch type=2 path=/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene event=FileSystemModifyEvent('/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene', isDirectory=false, contentChanged=true)
+w34 read source=/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene characters=2706
+w34 applied-request time=2026-10-27T17:48:56.342176Z source=/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene ops=[upsertResource, updateStage]
+w34 watch type=2 path=/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene event=FileSystemModifyEvent('/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene', isDirectory=false, contentChanged=false)
+w34 read source=/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene characters=1
+w34 error source=/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene FormatException: Unexpected end of input (at character 2)
+{
+ ^
+
+Shell: w34 host save=baseline path=/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene time=2026-10-27T17:48:56.349235Z strategy=in-place
+w34 watch type=1 path=/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene event=FileSystemCreateEvent('/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene', isDirectory=false)
+w34 read source=/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene characters=2706
+w34 applied-request time=2026-10-27T17:48:56.424771Z source=/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene ops=[upsertResource, upsertResource, updateNode, updateStage]
+Shell: w34 host save=material path=/private/tmp/dart3d-e9-reload-probe-20261027/r1/test-authored.fscene time=2026-10-27T17:48:56.437961Z strategy=in-place
+00:01 +1: explicit source rejects absent, relative and unreadable inputs without loading
+w34 source=
+w34 error source= Invalid argument(s): DART3D_RELOAD_SOURCE must be an absolute .fscene path: 
+w34 source=relative.fscene
+w34 error source=relative.fscene Invalid argument(s): DART3D_RELOAD_SOURCE must be an absolute .fscene path: relative.fscene
+w34 source=/private/tmp/dart3d-e9-reload-probe-20261027/r1/missing/source.fscene
+w34 watch subscribed source=/private/tmp/dart3d-e9-reload-probe-20261027/r1/missing/source.fscene
+w34 error source=/private/tmp/dart3d-e9-reload-probe-20261027/r1/missing/source.fscene PathNotFoundException: Cannot open file, path = '/private/tmp/dart3d-e9-reload-probe-20261027/r1/missing/source.fscene' (OS Error: No such file or directory, errno = 2)
+00:01 +2: All tests passed!

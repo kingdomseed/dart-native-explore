@@ -1,0 +1,290 @@
+{
+  "before/native.log": {
+    "sha256": "b59faef782f1cb9325f5e9bfd696f9f5e6cab78345333b0c31bb243650f3ea54",
+    "lineCount": 10512,
+    "searches": [
+      {
+        "pattern": "debugView:.*unsupported",
+        "matches": [
+          {
+            "line": 8689,
+            "text": "2026-10-27 23:34:44.102 Df Runner[71506:12fc0d9] [com.jasonholtdigital.dart3d:scene] debugView: this implementation unit covers PBR meshes only; material family SCNLightingModelConstant is unsupported"
+          }
+        ]
+      },
+      {
+        "pattern": "Runner\\[71506:",
+        "matches": [
+          {
+            "line": 1,
+            "text": "2026-10-27 23:34:11.151 Df Runner[71506:12fc0ab] (libMobileGestalt.dylib) No persisted cache on this platform."
+          },
+          {
+            "line": 10512,
+            "text": "2026-10-27 23:35:12.211 Df Runner[71506:12fcd8c] [com.jasonholtdigital.dart3d:scene] sim tick 524.474,88 dyn=0 awake=0 []"
+          }
+        ]
+      }
+    ]
+  },
+  "after/native.log": {
+    "sha256": "c8b6fc23ad5ac9fd58c05eb6d390c9ca5865d1ad79691cd530e8097b87534963",
+    "lineCount": 6889,
+    "searches": [
+      {
+        "pattern": "geometryNormal",
+        "matches": []
+      },
+      {
+        "pattern": "(?i)(shader.*(fail|error)|(fail|error).*shader|Fatal error)",
+        "matches": []
+      }
+    ]
+  },
+  "final/native.log": {
+    "sha256": "67e023a3f6e072114e80057882e5acb732a33fdb676e73f818403cf1cf3719bd",
+    "lineCount": 27776,
+    "searches": [
+      {
+        "pattern": "(?i)(uncommitted CATransaction|Fatal error|terminating app|shader.*(compil.*error|failed)|failed.*shader)",
+        "matches": [
+          {
+            "line": 13531,
+            "text": "2026-10-27 23:40:47.266 E  Runner[80574:1303d36] [com.apple.coreanimation:API] warning, deleted thread with uncommitted CATransaction; set CA_DEBUG_TRANSACTIONS=1 in environment to log backtraces, or set CA_ASSERT_MAIN_THREAD_TRANSACTIONS=1 to abort when an implicit transaction isn't created on a main thread."
+          },
+          {
+            "line": 24722,
+            "text": "2026-10-27 23:44:28.846 E  Runner[80574:1303d3b] [com.apple.coreanimation:API] warning, deleted thread with uncommitted CATransaction; set CA_DEBUG_TRANSACTIONS=1 in environment to log backtraces, or set CA_ASSERT_MAIN_THREAD_TRANSACTIONS=1 to abort when an implicit transaction isn't created on a main thread."
+          }
+        ]
+      },
+      {
+        "pattern": "Runner\\[80574:.*debugView",
+        "matches": [
+          {
+            "line": 9184,
+            "text": "2026-10-27 23:40:22.679 Df Runner[80574:1303d40] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+          },
+          {
+            "line": 9618,
+            "text": "2026-10-27 23:40:24.445 Df Runner[80574:1303d36] [com.jasonholtdigital.dart3d:scene] debugView channel=metallic wireframe=false nativeParticlesExcluded=true"
+          },
+          {
+            "line": 10054,
+            "text": "2026-10-27 23:40:26.195 Df Runner[80574:1303d40] [com.jasonholtdigital.dart3d:scene] debugView channel=roughness wireframe=false nativeParticlesExcluded=true"
+          },
+          {
+            "line": 10485,
+            "text": "2026-10-27 23:40:27.844 Df Runner[80574:1303d2f] [com.jasonholtdigital.dart3d:scene] debugView channel=depth wireframe=false nativeParticlesExcluded=true"
+          },
+          {
+            "line": 10920,
+            "text": "2026-10-27 23:40:29.578 Df Runner[80574:1303d40] [com.jasonholtdigital.dart3d:scene] debugView channel=baseColor wireframe=false nativeParticlesExcluded=true"
+          },
+          {
+            "line": 11355,
+            "text": "2026-10-27 23:40:31.345 Df Runner[80574:1303d3b] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+          },
+          {
+            "line": 12213,
+            "text": "2026-10-27 23:40:33.228 Df Runner[80574:1303d3b] [com.jasonholtdigital.dart3d:scene] debugView channel=baseColor wireframe=false nativeParticlesExcluded=true"
+          },
+          {
+            "line": 12646,
+            "text": "2026-10-27 23:40:34.961 Df Runner[80574:1303d2b] [com.jasonholtdigital.dart3d:scene] debugView channel=baseColor wireframe=true nativeParticlesExcluded=true"
+          },
+          {
+            "line": 13079,
+            "text": "2026-10-27 23:40:36.695 Df Runner[80574:1303d3b] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=true nativeParticlesExcluded=false"
+          },
+          {
+            "line": 13512,
+            "text": "2026-10-27 23:40:38.378 Df Runner[80574:1303d3b] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+          },
+          {
+            "line": 13991,
+            "text": "2026-10-27 23:41:26.478 Df Runner[80574:1303d2b] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+          },
+          {
+            "line": 20793,
+            "text": "2026-10-27 23:42:02.828 Df Runner[80574:13045ed] [com.jasonholtdigital.dart3d:scene] debugView channel=baseColor wireframe=false nativeParticlesExcluded=true"
+          },
+          {
+            "line": 22598,
+            "text": "2026-10-27 23:42:14.712 Df Runner[80574:13045ed] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+          },
+          {
+            "line": 23126,
+            "text": "2026-10-27 23:42:18.028 Df Runner[80574:13045ed] [com.jasonholtdigital.dart3d:scene] debugView channel=baseColor wireframe=false nativeParticlesExcluded=true"
+          },
+          {
+            "line": 23384,
+            "text": "2026-10-27 23:42:19.695 Df Runner[80574:1304675] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+          },
+          {
+            "line": 23643,
+            "text": "2026-10-27 23:42:21.378 Df Runner[80574:130593d] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+          },
+          {
+            "line": 23978,
+            "text": "2026-10-27 23:43:41.795 Df Runner[80574:1303d3b] [com.jasonholtdigital.dart3d:scene] debugView channel=baseColor wireframe=false nativeParticlesExcluded=true"
+          },
+          {
+            "line": 24707,
+            "text": "2026-10-27 23:44:23.345 Df Runner[80574:1304675] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+          },
+          {
+            "line": 25607,
+            "text": "2026-10-27 23:45:08.979 Df Runner[80574:1307c37] [com.jasonholtdigital.dart3d:scene] debugView channel=baseColor wireframe=false nativeParticlesExcluded=true"
+          },
+          {
+            "line": 26040,
+            "text": "2026-10-27 23:45:10.879 Df Runner[80574:1305950] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+          },
+          {
+            "line": 26902,
+            "text": "2026-10-27 23:45:12.779 Df Runner[80574:1307cf0] [com.jasonholtdigital.dart3d:scene] debugView channel=baseColor wireframe=false nativeParticlesExcluded=true"
+          },
+          {
+            "line": 27765,
+            "text": "2026-10-27 23:45:15.462 Df Runner[80574:1305950] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+          }
+        ]
+      }
+    ]
+  },
+  "final/run.log": {
+    "sha256": "3c8de588191799d3315e41e30ee0f00c0069ce920de6e5a7944a4b62ff27f4f0",
+    "lineCount": 19,
+    "searches": [
+      {
+        "pattern": "Xcode build done",
+        "matches": [
+          {
+            "line": 3,
+            "text": "Xcode build done.                                           13.3s"
+          }
+        ]
+      },
+      {
+        "pattern": "Application finished",
+        "matches": [
+          {
+            "line": 19,
+            "text": "Application finished."
+          }
+        ]
+      }
+    ]
+  },
+  "package-tests-final.log": {
+    "sha256": "200fc88009b15dc4e94bdee57afbea45f46263fc5eacff58b9ba2af8ddd7757b",
+    "lineCount": 430,
+    "searches": [
+      {
+        "pattern": "\\+393: All tests passed!",
+        "matches": [
+          {
+            "line": 430,
+            "text": "00:03 +393: All tests passed!"
+          }
+        ]
+      }
+    ]
+  },
+  "example-tests-final.log": {
+    "sha256": "da4f21cbd61b64cb92367863858cbfad268e9684aada233a8c47c48894510084",
+    "lineCount": 366,
+    "searches": [
+      {
+        "pattern": "\\+334: All tests passed!",
+        "matches": [
+          {
+            "line": 366,
+            "text": "00:16 +334: All tests passed!"
+          }
+        ]
+      }
+    ]
+  },
+  "package-analyze-final.log": {
+    "sha256": "31d274bc69f05897eeaab4f322f231b6f9f8acb02212b244a8818e4e9bb29f47",
+    "lineCount": 2,
+    "searches": [
+      {
+        "pattern": "No issues found",
+        "matches": [
+          {
+            "line": 2,
+            "text": "No issues found! (ran in 1.2s)"
+          }
+        ]
+      }
+    ]
+  },
+  "example-analyze-final.log": {
+    "sha256": "423210262204dbf637703f2752ba420236f9f2fc686098a50538205499bfa15f",
+    "lineCount": 2,
+    "searches": [
+      {
+        "pattern": "No issues found",
+        "matches": [
+          {
+            "line": 2,
+            "text": "No issues found! (ran in 1.3s)"
+          }
+        ]
+      }
+    ]
+  },
+  "package-tests-final.json": {
+    "command": [
+      "/Users/jasonholt/zero/bin/dn",
+      "test",
+      "--no-pub",
+      "--reporter",
+      "expanded"
+    ],
+    "cwd": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d",
+    "start": "2026-10-27T22:46:54.541829Z",
+    "end": "2026-10-27T22:46:59.013799Z",
+    "exitCode": 0
+  },
+  "package-analyze-final.json": {
+    "command": [
+      "/Users/jasonholt/zero/bin/dn",
+      "analyze",
+      "--no-pub"
+    ],
+    "cwd": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d",
+    "start": "2026-10-27T22:46:59.015243Z",
+    "end": "2026-10-27T22:47:00.394245Z",
+    "exitCode": 0
+  },
+  "swift-typecheck-final.json": {
+    "command": [
+      "xcrun",
+      "swiftc",
+      "-typecheck",
+      "-target",
+      "arm64-apple-ios15.0-simulator",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.1.sdk",
+      "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/ios/Classes/BakedShadowCatchers.swift",
+      "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/ios/Classes/D3Wire.swift",
+      "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/ios/Classes/Dart3dPlugin.swift",
+      "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/ios/Classes/FlutterAssets.swift",
+      "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/ios/Classes/FsceneRealizer.swift",
+      "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/ios/Classes/GeometryFactory.swift",
+      "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/ios/Classes/RenderTargets.swift",
+      "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/ios/Classes/SceneViewHost.swift",
+      "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/ios/Classes/ScreenDebugPresentation.swift",
+      "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/ios/Classes/SelectionOutline.swift",
+      "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/ios/Classes/StageEffects.swift",
+      "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/ios/Classes/StageLut.swift",
+      "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/ios/Classes/ToneMapping.swift"
+    ],
+    "exitCode": 0
+  },
+  "ownership": "All execution evidence is parent-executed; this reviewer reads and verifies offline only."
+}

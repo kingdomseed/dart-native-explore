@@ -1,0 +1,17 @@
+{
+  "FRAME.md": "7fc4b34ef12ad5d06b367f5e6c28bbbc9f4483135a834e64056e5e3b6a3db0db",
+  "review/import-receipt.json": "1699277e86a4931b399aa066030e8631135e07b954919098626c85b1f7c85b99",
+  "review/preservation-before.json": "f33ea483fc4bf30b25086517f2e4a0b7121589a248025afad26cd1feec321f88",
+  "review/preservation-receipt.json": "14c0e3a0d37f18dcbd3e33e5771b95d1c9c2cc50347243e283510ead45f491ea",
+  "review/review.md": "388d7a3577da8356a1c93c5a7cba9c82edb3a0ca5c7ee2fc1de0708bbd848d9e",
+  "review/source-receipt.json": "d7fe9243a595bd7dbc9d1f16d28a5d421a67b35f9b95dd7e8d99c03d6c702a07",
+  "review/verification-receipt.json": "fd4ddae1ee774b837518fea1c3742ff673bc17e20fa2effecf374db7312229b5",
+  "runtime-addendum.md": "ebe9433d3199596ceb2f7bf5dc86f12df63d7c03649faf76c60a39885ba789cf",
+  "worker/delivery-sha256.json": "7c64732a2c2f9ab49709f6701cc6ac185e5c9e83a743910d9797c01a7df15de3",
+  "worker/design.md": "88c100cd456e7025bb0fab725624ea37cfde7d0db149a66970c04fc589100bc1",
+  "worker/import-receipt.json": "b1ab60799b383ca4db0162ffc6507799ea8b71313611babbc2263375aa6b84d3",
+  "worker/preservation-before.json": "fc1d82994a4a82f9077e79386636109f29a2a6fbd08b1d88a5c1414285c03c38",
+  "worker/preservation-receipt.json": "e7d79489341da575286d845ea8cba08367d1161485ebfc1fe0c7be9fec79bcb5",
+  "worker/source-receipt.json": "683a7cc241c3dcc328bfd1abaf422855717ae6f4060a60d23a0f8445e73d51e3",
+  "worker/source-sha256.json": "8a6ab7ae79ef4caa89805803655da2a40eef3347962a692d17aafd0809ddbbf4"
+}

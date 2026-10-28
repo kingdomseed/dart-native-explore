@@ -1,0 +1,20 @@
+--- r0/dart3d/ios/Classes/DebugChannelProbe.swift
++++ r2/dart3d/ios/Classes/DebugChannelProbe.swift
+@@ -59,9 +59,15 @@
+             : mode == "geometry" ? "_surface.geometryNormal/view-space"
+             : mode == "transfer" ? "literal RGB=(0.125,0.5,0.875)"
+             : "ordinary generated material"
+-        let message = "W34 probe mode=\(mode) field=\(field) wireRequested=\(wire) wireActual=\(host.debugOptions.contains(.showWireframe)) debugOptions=\(host.debugOptions.rawValue) cameraHDR=\(String(describing: camera?.wantsHDR)) exposureOffset=\(String(describing: camera?.exposureOffset)) adaptation=\(String(describing: camera?.wantsExposureAdaptation)) whitePoint=\(String(describing: camera?.whitePoint)) averageGray=\(String(describing: camera?.averageGray)) stageExposure=\(host.stageExposure) tone=\(host.stageToneMap) effects=\(String(describing: host.lastEffects)) technique=\(String(describing: host.technique)) packGain=\(ToneMapTechnique.packGain) resolveWhitePoint=\(ToneMapTechnique.whitePoint)"
++        let renderLog = "W34 probe mode=\(mode) field=\(field) wireRequested=\(wire) wireActual=\(host.debugOptions.contains(.showWireframe)) debugOptions=\(host.debugOptions.rawValue) cameraHDR=\(String(describing: camera?.wantsHDR)) exposureOffset=\(String(describing: camera?.exposureOffset)) adaptation=\(String(describing: camera?.wantsExposureAdaptation)) whitePoint=\(String(describing: camera?.whitePoint)) averageGray=\(String(describing: camera?.averageGray))"
++        let displayLog = "W34 display stageExposure=\(host.stageExposure) tone=\(host.stageToneMap) technique=\(String(describing: host.technique)) packGain=\(ToneMapTechnique.packGain) resolveWhitePoint=\(ToneMapTechnique.whitePoint)"
++        let effects = host.lastEffects
++        let effectsLog = "W34 effects grading=\(String(describing: effects?.colorGrading.enabled)) bloom=\(String(describing: effects?.bloom.enabled)) flare=\(String(describing: effects?.lensFlare.enabled)) vignette=\(String(describing: effects?.vignette.enabled)) chromatic=\(String(describing: effects?.chromaticAberration.enabled)) grain=\(String(describing: effects?.filmGrain.enabled)) ao=\(String(describing: effects?.ambientOcclusion.enabled)) ssr=\(String(describing: effects?.screenSpaceReflections.enabled)) gi=\(String(describing: effects?.globalIllumination.enabled)) taa=\(String(describing: effects?.temporalAntiAliasing.enabled)) fog=\(String(describing: effects?.fog.enabled)) rays=\(String(describing: effects?.godRays.enabled)) dof=\(String(describing: effects?.depthOfField.enabled)) autoExposure=\(String(describing: effects?.autoExposure.enabled))"
++        let message = renderLog + displayLog + effectsLog
+         if lastLog != message {
+-            d3Log(message)
++            d3Log(renderLog)
++            d3Log(displayLog)
++            d3Log(effectsLog)
+             lastLog = message
+         }
+     }

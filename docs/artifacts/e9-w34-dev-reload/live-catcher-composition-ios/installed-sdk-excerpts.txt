@@ -1,0 +1,333 @@
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.1.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNMaterial.h
+SHA256 98c11c0e9501bd02f5628f99d47e38d7a0e497d4204fb2d0b9d3c7c5dd48b637
+72:    Produces a constantly shaded surface that is independent of lighting.
+73:    The reflected color is calculated as:
+74:      color = <ambient> * al + <diffuse>
+75:    where
+76:      al — Sum of all ambient lights currently active (visible) in the scene
+77:    and
+78:      <ambient> — The 'ambient' property of the SCNMaterial instance
+79:      <diffuse> — The 'diffuse' property of the SCNMaterial instance
+80: 
+81:  SCNLightingModelShadowOnly:
+82:     Produces a shaded surface that only renders received shadows.
+83:     Use this lighting model in combination with a multiply blend mode to compose shadows over the background.
+84:     The typical use case is to use on a plane that receive shadows in a AR application.
+85:     The shadow intensity can be adjusted using the alpha of the lights's shadow color.
+86:  */
+87: 
+108: 
+109: typedef NS_ENUM(NSInteger, SCNTransparencyMode) {
+110:     SCNTransparencyModeAOne                                                                         = 0, // Takes the transparency information from the alpha channel. The value 1.0 is opaque.
+111:     SCNTransparencyModeRGBZero                                                                      = 1, // Ignores the alpha channel and takes the transparency information from the luminance of the red, green, and blue channels. The value 0.0 is opaque.
+112:     SCNTransparencyModeSingleLayer API_AVAILABLE(macos(10.13), ios(11.0), tvos(11.0), watchos(4.0)) = 2, // Ensures that one layer of transparency is drawn correctly.
+113:     SCNTransparencyModeDualLayer   API_AVAILABLE(macos(10.13), ios(11.0), tvos(11.0), watchos(4.0)) = 3, // Ensures that two layers of transparency are ordered and drawn correctly. This should be used for transparent convex objects like cubes and spheres, when you want to see both front and back faces.
+114:     SCNTransparencyModeDefault     API_AVAILABLE(macos(10.13), ios(11.0), tvos(11.0), watchos(4.0)) = SCNTransparencyModeAOne
+115: };
+116: 
+117: /*! 
+118:  @enum SCNBlendMode
+119:  @abstract  Blend modes that SCNMaterial uses to compose with the framebuffer to produce blended colors.
+120:  */
+121: typedef NS_ENUM(NSInteger, SCNBlendMode) {
+122:     SCNBlendModeAlpha                                                                     = 0, // Blends the source and destination colors by adding the source multiplied by source alpha and the destination multiplied by one minus source alpha.
+123:     SCNBlendModeAdd                                                                       = 1, // Blends the source and destination colors by adding them up.
+124:     SCNBlendModeSubtract                                                                  = 2, // Blends the source and destination colors by subtracting the source from the destination.
+125:     SCNBlendModeMultiply                                                                  = 3, // Blends the source and destination colors by multiplying them.
+126:     SCNBlendModeScreen                                                                    = 4, // Blends the source and destination colors by multiplying one minus the source with the destination and adding the source.
+127:     SCNBlendModeReplace                                                                   = 5, // Replaces the destination with the source (ignores alpha).
+128:     SCNBlendModeMax      API_AVAILABLE(macos(10.13), ios(11.0), tvos(11.0), watchos(4.0)) = 6  // Max the destination with the source (ignores alpha).
+129: } API_AVAILABLE(macos(10.11), ios(9.0));
+130: 
+131: @class SCNMaterialProperty;
+132: @class SCNProgram;
+263:  @property shininess
+264:  @abstract Specifies the receiver's shininess value. Defaults to 1.0. Animatable.
+265:  */
+266: @property(nonatomic) CGFloat shininess;
+267: 
+268: /*! 
+269:  @property transparency
+270:  @abstract Specifies the receiver's transparency value. Defaults to 1.0. Animatable.
+271:  @discussion The color of the transparent property is multiplied by this property. The result is then used to produce the final transparency according to the rule defined by the transparencyMode property.
+272:  */
+273: @property(nonatomic) CGFloat transparency;
+274: 
+275: /*!
+276:  @property lightingModelName
+277:  @abstract Determines the receiver's lighting model. See above for the list of lighting models. Defaults to SCNLightingModelBlinn.
+278:  */
+279: @property(nonatomic, copy) SCNLightingModel lightingModelName;
+280: 
+281: /*! 
+282:  @property litPerPixel
+283:  @abstract Determines whether the receiver is lit per pixel. Defaults to YES. Animatable.
+284:  */
+285: @property(nonatomic, getter=isLitPerPixel) BOOL litPerPixel;
+286: 
+287: /*! 
+288:  @property doubleSided
+289:  @abstract Determines whether the receiver is double sided. Defaults to NO. Animatable.
+290:  */
+291: @property(nonatomic, getter=isDoubleSided) BOOL doubleSided;
+292: 
+293: /*!
+294:  @property fillMode
+295:  @abstract Determines of to how to rasterize the receiver's primitives. Defaults to SCNFillModeFill.
+296:  */
+297: @property(nonatomic) SCNFillMode fillMode API_AVAILABLE(macos(10.13), ios(11.0), tvos(11.0), watchos(4.0));
+298: 
+299: /*! 
+300:  @property cullMode
+301:  @abstract Determines the culling mode of the receiver. Defaults to SCNCullModeBack. Animatable.
+302:  */
+303: @property(nonatomic) SCNCullMode cullMode;
+304: 
+305: /*! 
+306:  @property transparencyMode
+307:  @abstract Determines the transparency mode of the receiver. See above for the transparency modes. Defaults to SCNTransparencyModeDefault.
+308:  */
+309: @property(nonatomic) SCNTransparencyMode transparencyMode;
+310: 
+338:  */
+339: @property(nonatomic) CGFloat fresnelExponent API_AVAILABLE(macos(10.9));
+340: 
+341: /*!
+342:  @property blendMode
+343:  @abstract Specifies the receiver's blend mode. Defaults to SCNBlendModeAlpha.
+344:  */
+345: @property(nonatomic) SCNBlendMode blendMode API_AVAILABLE(macos(10.11), ios(9.0));
+346: 
+347: @end
+
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.1.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNMaterialProperty.h
+SHA256 6c4edb58d28636fb2909094e84289e4d01b7178806a73e115a5dbb284f46ea29
+33: 
+34: /*! @class SCNMaterialProperty
+35:     @abstract The contents of a SCNMaterial slot
+36:     @discussion This can be used to specify the various properties of SCNMaterial slots such as diffuse, ambient, etc.
+37: */
+38: 
+39: SCN_EXPORT
+40: @interface SCNMaterialProperty : NSObject <SCNAnimatable, NSSecureCoding>
+41: 
+42: /*!
+43:  @method materialPropertyWithContents:
+44:  @abstract Creates and initialize a property instance with the specified contents.
+45:  */
+46: + (instancetype)materialPropertyWithContents:(id)contents API_AVAILABLE(macos(10.9));
+47: 
+48: /*! 
+49:  @property contents
+50:  @abstract Specifies the receiver's contents. This can be a color (NSColor, UIColor, CGColorRef), an image (NSImage, UIImage, CGImageRef), a layer (CALayer), a path (NSString or NSURL), a SpriteKit scene (SKScene), a texture (SKTexture, id<MTLTexture> or GLKTextureInfo), or a floating value between 0 and 1 (NSNumber) for metalness and roughness properties. AVCaptureDevice is supported on iOS 11 and AVPlayer is supported on macOS 10.13, iOS 11 and tvOS 11. Animatable when set to a color.
+51:  @discussion Setting the contents to an instance of SKTexture will automatically update the wrapS, wrapT, contentsTransform, minification, magnification and mip filters according to the SKTexture settings.
+52:              When a cube map is expected (e.g. SCNMaterial.reflective, SCNScene.background, SCNScene.lightingEnvironment) you can use
+53:                1. A horizontal strip image                          where `6 * image.height ==     image.width`
+54:                2. A vertical strip image                            where `    image.height == 6 * image.width`
+55:                3. A spherical projection image (latitude/longitude) where `2 * image.height ==     image.width`
+56:                4. A NSArray of 6 images. This array must contain images of the exact same dimensions, in the following order, in a left-handed coordinate system: +X, -X, +Y, -Y, +Z, -Z (or Right, Left, Top, Bottom, Front, Back).
+57:  */
+58: @property(nonatomic, retain, nullable) id contents;
+59: 
+60: /*!
+61:  @property intensity
+62:  @abstract Determines the receiver's intensity. This intensity is used to modulate the properties in several ways.
+63:  It dims the diffuse, specular and emission properties, it varies the bumpiness of the normal property and the
+64:  filter property is blended with white. Default value is 1.0. Animatable.
+65:  */
+66: @property(nonatomic) CGFloat intensity API_AVAILABLE(macos(10.9));
+67: 
+
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.1.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNShadable.h
+SHA256 1e5dd134ac4a1df07243b1a76c26dc4151be4f29c734949a5a34a9b7cde3b13b
+58: 
+59: /*!
+60:  @protocol SCNShadable
+61:  @abstract The SCNShadable protocol defines an object that is rendered with shaders. 
+62:  */
+63: @protocol SCNShadable <NSObject>
+64: @optional
+65: 
+66: /*!
+67:  @property program
+68:  @abstract Specifies a custom program used to render the receiver.
+69:  @discussion When a program is set, it overrides all the rendering parameters such as material settings and shaderModifiers.
+70:  */
+71: @property(nonatomic, retain, nullable) SCNProgram *program API_UNAVAILABLE(watchos);
+72: 
+73: /*!
+74:  @method handleBindingOfSymbol:usingBlock:
+75:  @abstract Sets the block to call at render time to bind the value for the specified symbol of the receiver's SCNProgram. This method has no effect for symbols declared in shader modifiers.
+92:  @property shaderModifiers
+93:  @abstract Dictionary of shader modifiers snippets, targeting entry points. The valid keys are the entry points described in the "Shader Modifier Entry Point" constants. The values are the code snippets formatted as described below.
+94:  @discussion Shader modifiers allow you to inject shader code in the standard shaders of SceneKit. This injection is allowed in few controlled entry points, allowing specific kind of tasks in specific context. Each modifier can operate on specific structures along with access to global uniforms, that could be the standard SceneKit uniforms or its own declared uniforms.
+95:  
+96:  Shader modifiers can be used to tweak SceneKit rendering by adding custom code at the following entry points:
+97:      1. vertex   (SCNShaderModifierEntryPointGeometry)
+98:      2. surface  (SCNShaderModifierEntryPointSurface)
+99:      3. lighting (SCNShaderModifierEntryPointLightingModel)
+100:      4. fragment (SCNShaderModifierEntryPointFragment)
+101:  See below for a detailed explanation of these entry points and the context they provide.
+102:  
+103:  Shader modifiers can be written in either GLSL or the Metal Shading Language. Metal shaders won't run on iOS 8 and macOS 10.10 or earlier.
+104:  
+105:  The structure of a shader modifier is:
+106:  
+107:      GLSL
+108:      | uniform float myGrayAmount = 3.0; // Custom GLSL uniforms declarations are of the form `[uniform type uniformName [= defaultValue]]`
+109:      |
+110:      | // Optional global function definitions (for Metal: references to uniforms in global functions are not supported).
+111:      | float mySin(float t) {
+112:      |    return sin(t);
+113:      | }
+114:      |
+115:      | [#pragma transparent | opaque]
+116:      | [#pragma body]
+117:      |
+118:      | // the shader modifier code snippet itself
+119:      | vec3 myColor = myGrayAmount;
+120:      | _output.color.rgb += myColor;
+121:  
+122:      Metal Shading Language
+123:      | #pragma arguments
+124:      | float myGrayAmount; // Custom Metal uniforms declarations require a #pragma and are of the form `[type name]`
+125:      |
+126:      | #pragma declaration
+127:      | // Optional global function definitions (for Metal: references to uniforms in global functions are not supported).
+128:      | float mySin(float t) {
+129:      |    return sin(t);
+130:      | }
+131:      |
+132:      | [#pragma transparent | opaque]
+133:      | [#pragma body]
+134:      |
+135:      | // the shader modifier code snippet itself
+136:      | float3 myColor = myGrayAmount;
+137:      | _output.color.rgb += myColor;
+138:  
+139:  The `#pragma body` directive
+140:      Is only needed if you declared functions that must not be included in the shader code itself.
+141:  
+142:  The `#pragma transparent` directive
+143:      Forces the rendering to be blended using the following equation:
+144:          _output.color.rgb + (1 - _output.color.a) * dst.rgb;
+145:      where `dst` represents the current fragment color. The rgb components must be premultiplied.
+146:  
+147:  The `#pragma opaque` directive
+148:      Forces the rendering to be opaque. It then ignores the alpha component of the fragment.
+149:  
+150:  When using Metal, you can also transfer varying values from the vertex shader (geometry shader modifier) to the fragment shader (surface and/or fragment shader modifier):
+208:         mat4, mat44 | float4x4               | SCNMatrix4                            |
+209:         sampler2D   | texture2d              | SCNMaterialProperty                   |
+210:         samplerCube | texturecube            | SCNMaterialProperty (with a cube map) |
+211:         -           | device const T*        | MTLBuffer                             | Feature introduced in macOS 10.13, iOS 11.0 and tvOS 11.0
+212:         -           | struct {...}           | NSData                                | The entire struct can be set using NSData but it is also possible to set individual members using the member's name as a key and a value compatible with the member's type
+213:  
+214:      Common scalar types wrapped into a NSValue are also supported.
+215:  
+216:      The following prefixes are reserved by SceneKit and should not be used in custom names:
+217:          1. u_
+218:          2. a_
+219:          3. v_
+220:  
+221:      Custom uniforms can be animated using explicit animations.
+222:  */
+223: @property(nonatomic, copy, nullable) NSDictionary<SCNShaderModifierEntryPoint, NSString *> *shaderModifiers API_AVAILABLE(macos(10.9));
+224: 
+225: /*!
+
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.1.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNLight.h
+SHA256 5326ea5e358ff619a420b1ea4da8b0869e89e6bc0021babcbeaad1f4ac0ab469
+58:  @class SCNLight
+59:  @abstract SCNLight represents a light that can be attached to a SCNNode. 
+60:  */
+61: 
+62: SCN_EXPORT
+63: @interface SCNLight : NSObject <SCNAnimatable, NSCopying, NSSecureCoding>
+64: 
+65: /*! 
+66:  @method light
+67:  @abstract Creates and returns a light instance.
+80:  @abstract Specifies the receiver's color (NSColor or CGColorRef). Animatable. Defaults to white.
+81:  @discussion The initial value is a NSColor. The renderer multiplies the light's color is by the color derived from the light's temperature.
+82:  */
+83: @property(nonatomic, retain) id color;
+84: 
+85: /*!
+86:  @property temperature
+87:  @abstract Specifies the receiver's temperature.
+88:  @discussion This specifies the temperature of the light in Kelvin. The renderer multiplies the light's color by the color derived from the light's temperature. Defaults to 6500 (pure white). Animatable.
+89:  */
+90: @property(nonatomic) CGFloat temperature API_AVAILABLE(macos(10.12), ios(10.0), tvos(10.0));
+91: 
+92: /*!
+93:  @property intensity
+94:  @abstract Specifies the receiver's intensity.
+95:  @discussion This intensity is used to modulate the light color. When used with a physically-based material, this corresponds to the luminous flux of the light, expressed in lumens (lm). Defaults to 1000. Animatable.
+96:  */
+97: @property(nonatomic) CGFloat intensity API_AVAILABLE(macos(10.12), ios(10.0), tvos(10.0));
+98: 
+99: /*!
+100:  @property name
+101:  @abstract Determines the name of the receiver.
+102:  */
+103: @property(nonatomic, copy, nullable) NSString *name;
+104: 
+105: 
+106: #pragma mark - Shadow
+107: 
+108: /*! 
+109:  @property castsShadow
+110:  @abstract Determines whether the receiver casts a shadow. Defaults to NO.
+111:  @discussion Shadows are only supported by spot and directional lights.
+112:  */
+221: @property(nonatomic) CGFloat attenuationStartDistance API_AVAILABLE(macos(10.10));
+222: 
+223: /*!
+224:  @property attenuationEndDistance
+225:  @abstract The distance at which the attenuation ends (Omni or Spot light types only). Animatable. Defaults to 0.
+226:  */
+227: @property(nonatomic) CGFloat attenuationEndDistance API_AVAILABLE(macos(10.10));
+228: 
+229: /*!
+230:  @property attenuationFalloffExponent
+231:  @abstract Specifies the attenuation between the start and end attenuation distances. 0 means a constant attenuation, 1 a linear attenuation and 2 a quadratic attenuation, but any positive value will work (Omni or Spot light types only). Animatable. Defaults to 2.
+232:  */
+233: @property(nonatomic) CGFloat attenuationFalloffExponent API_AVAILABLE(macos(10.10));
+234: 
+235: 
+236: #pragma mark - Spot light parameters
+237: 
+238: /*!
+239:  @property spotInnerAngle
+240:  @abstract The angle in degrees between the spot direction and the lit element below which the lighting is at full strength. Animatable. Defaults to 0.
+241:  */
+242: @property(nonatomic) CGFloat spotInnerAngle API_AVAILABLE(macos(10.10));
+243: 
+244: /*!
+245:  @property spotOuterAngle
+246:  @abstract The angle in degrees between the spot direction and the lit element after which the lighting is at zero strength. Animatable. Defaults to 45 degrees.
+247:  */
+248: @property(nonatomic) CGFloat spotOuterAngle API_AVAILABLE(macos(10.10));
+249: 
+250: 
+251: #pragma mark - IES light parameters
+252: 
+253: /*!
+254:  @property IESProfileURL
+255:  @abstract Specifies the IES file from which the shape, direction, and intensity of illumination is determined. Defaults to nil.
+256:  */
+257: @property(nonatomic, retain, nullable) NSURL *IESProfileURL API_AVAILABLE(macos(10.12), ios(10.0), tvos(10.0));
+258: 
+259: 
+
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.1.sdk/System/Library/Frameworks/CoreGraphics.framework/Headers/CGColor.h
+SHA256 f5c0cf467edcd8e00570f391e3f6619e67f56c92ef7aef485c91c319887a616d
+140:   API_AVAILABLE(macos(10.3), ios(2.0));
+141: 
+142: /* Return the CFTypeID for CGColors. */
+143: 
+144: CG_EXTERN CFTypeID CGColorGetTypeID(void)
+145:   API_AVAILABLE(macos(10.3), ios(2.0));
+146: 
+147: /*** Names of colors for use with `CGColorGetConstantColor'. ***/

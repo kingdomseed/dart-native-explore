@@ -1,0 +1,50 @@
+[
+  {
+    "left": "before/00-off.png",
+    "right": "split/00-off.png",
+    "crop": [
+      0,
+      70,
+      402,
+      600
+    ],
+    "changedPixels": 0,
+    "maxRGBDifference": 0
+  },
+  {
+    "left": "before/01-off-set.png",
+    "right": "before/04-outline-set.png",
+    "crop": [
+      0,
+      70,
+      402,
+      600
+    ],
+    "changedPixels": 0,
+    "maxRGBDifference": 0
+  },
+  {
+    "left": "before/00-off.png",
+    "right": "split/05-clear-rendered.png",
+    "crop": [
+      0,
+      70,
+      402,
+      600
+    ],
+    "changedPixels": 0,
+    "maxRGBDifference": 0
+  },
+  {
+    "left": "split/00-off.png",
+    "right": "split/12-off-return.png",
+    "crop": [
+      0,
+      70,
+      402,
+      600
+    ],
+    "changedPixels": 0,
+    "maxRGBDifference": 0
+  }
+]

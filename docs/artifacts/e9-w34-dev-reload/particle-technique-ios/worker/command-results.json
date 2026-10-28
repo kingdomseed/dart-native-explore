@@ -1,0 +1,57 @@
+[
+  {
+    "cwd": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-7a4f9ea5/dart3d/example",
+    "command": "/Users/jasonholt/zero/bin/dn pub get",
+    "exit": 0,
+    "log": "example-pub-get.log"
+  },
+  {
+    "cwd": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-7a4f9ea5/dart3d/example",
+    "command": "/Users/jasonholt/zero/bin/dart format lib/w34_particle_probe_scene.dart lib/w34_particle_probe_main.dart",
+    "exit": 0,
+    "log": "dart-format.log"
+  },
+  {
+    "cwd": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-7a4f9ea5/dart3d/example",
+    "command": "/Users/jasonholt/zero/bin/dn analyze lib/w34_particle_probe_scene.dart lib/w34_particle_probe_main.dart",
+    "exit": 0,
+    "logs": [
+      "dart-analysis-first.log",
+      "dart-analysis.log"
+    ]
+  },
+  {
+    "cwd": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-7a4f9ea5",
+    "command": "xcrun swiftc -typecheck -target arm64-apple-ios16.0-simulator -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.1.sdk dart3d/ios/Classes/*.swift",
+    "exit": 0,
+    "log": "swift-typecheck-first.log",
+    "logs": [
+      "swift-typecheck-first.log",
+      "swift-typecheck.log"
+    ]
+  },
+  {
+    "cwd": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-7a4f9ea5",
+    "command": "xcrun swiftc -emit-library -emit-module -module-name dart3d -target arm64-apple-ios16.0-simulator -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.1.sdk -emit-module-path /private/tmp/dart3d-e9-particle-technique-probe-20261027/r1/worker/adapter/dart3d.swiftmodule dart3d/ios/Classes/*.swift -o /private/tmp/dart3d-e9-particle-technique-probe-20261027/r1/worker/adapter/libdart3d.dylib",
+    "exit": 0,
+    "log": "swift-adapter-compile-first.log"
+  },
+  {
+    "cwd": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-7a4f9ea5",
+    "command": "SDKROOT=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.1.sdk xcrun --sdk iphonesimulator swiftc -emit-library -emit-module -module-name dart3d -target arm64-apple-ios16.0-simulator -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.1.sdk -emit-module-path /private/tmp/dart3d-e9-particle-technique-probe-20261027/r1/worker/adapter/dart3d.swiftmodule dart3d/ios/Classes/*.swift -o /private/tmp/dart3d-e9-particle-technique-probe-20261027/r1/worker/adapter/libdart3d.dylib",
+    "exit": 0,
+    "log": "swift-adapter-compile.log"
+  },
+  {
+    "cwd": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-7a4f9ea5",
+    "command": "git diff --check",
+    "exit": 0,
+    "log": "diff-check.log"
+  },
+  {
+    "cwd": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-7a4f9ea5",
+    "command": "python3 /private/tmp/dart3d-e9-particle-technique-probe-20261027/r1/worker/package_probe.py",
+    "exit": 0,
+    "log": "replay-proof.txt"
+  }
+]

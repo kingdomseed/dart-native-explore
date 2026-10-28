@@ -1,0 +1,16 @@
+{
+  "head": "2f38e4e33f0b1cb678bc408a42d069c796cefc12",
+  "final66AllMatch": true,
+  "unowned1926AllMatch": true,
+  "locks6AllMatch": true,
+  "initialTrackedFiles": 1902,
+  "trackedOutside66AllMatch": true,
+  "expectedNonignoredInventory": 1939,
+  "actualNonignoredInventory": 1939,
+  "unexpectedFiles": [],
+  "missingFiles": [],
+  "gitDiffCheckExitCode": 0,
+  "replayScratchAbsent": true,
+  "sourceCorrectionsDuringReview": false,
+  "commitPushExternalWrites": false
+}

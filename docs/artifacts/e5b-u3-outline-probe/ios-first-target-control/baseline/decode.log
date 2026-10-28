@@ -1,0 +1,2 @@
+[null @ 0x7805018500] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 1092 >= 1084
+[null @ 0x7805018500] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 1092 >= 1085

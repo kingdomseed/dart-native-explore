@@ -1,0 +1,1106 @@
+diff --git a/dart3d/example/lib/w34_debug_main.dart b/dart3d/example/lib/w34_debug_main.dart
+index 4f106d9..f1f8982 100644
+--- a/dart3d/example/lib/w34_debug_main.dart
++++ b/dart3d/example/lib/w34_debug_main.dart
+@@ -5,11 +5,14 @@ import 'dartnative_plugin_registrant.dart';
+ import 'u2_catcher_scene.dart';
+ import 'w34_debug_scene.dart';
+ 
+-const _bakedCatcherChecks = bool.fromEnvironment('DART3D_W34_BAKED_CATCHER');
++const _liveCatcherChecks = bool.fromEnvironment('DART3D_W34_LIVE_CATCHER');
++const _bakedCatcherChecks =
++    !_liveCatcherChecks && bool.fromEnvironment('DART3D_W34_BAKED_CATCHER');
++const _catcherChecks = _liveCatcherChecks || _bakedCatcherChecks;
+ const _materialChecks =
+-    !_bakedCatcherChecks && bool.fromEnvironment('DART3D_W34_MATERIALS');
++    !_catcherChecks && bool.fromEnvironment('DART3D_W34_MATERIALS');
+ const _consumerChecks =
+-    !_bakedCatcherChecks && bool.fromEnvironment('DART3D_W34_CONSUMERS');
++    !_catcherChecks && bool.fromEnvironment('DART3D_W34_CONSUMERS');
+ 
+ void main() {
+   DartNativePluginRegistrant.registerAll();
+@@ -29,6 +32,8 @@ class _DebugScreenState extends State<_DebugScreen> {
+     skinned: _consumerChecks,
+     materials: _materialChecks,
+     bakedCatcher: _bakedCatcherChecks,
++    liveCatcher: _liveCatcherChecks,
++    blendCaster: const bool.fromEnvironment('DART3D_W34_LIVE_BLEND_CASTER'),
+   );
+   late final _rig = _document.nodes.values.singleWhere(
+     (n) => n.name == 'w34.rig',
+@@ -46,6 +51,8 @@ class _DebugScreenState extends State<_DebugScreen> {
+   bool _textured = true;
+   bool _colored = true;
+   bool _casterMoved = false;
++  bool _lowQuality = false;
++  late final _lightControls = W34LiveLightControls(_controller, _document);
+ 
+   @override
+   void initState() {
+@@ -89,7 +96,7 @@ class _DebugScreenState extends State<_DebugScreen> {
+         Expanded(
+           child: SceneView(
+             controller: _controller,
+-            quality: SceneQuality.high,
++            quality: _lowQuality ? SceneQuality.low : SceneQuality.high,
+             debugView: SceneDebugView(channel: _channel, wireframe: _wireframe),
+           ),
+         ),
+@@ -142,7 +149,7 @@ class _DebugScreenState extends State<_DebugScreen> {
+                       onPressed: () => setState(() => _wireframe = !_wireframe),
+                     ),
+                   ),
+-                  if (_bakedCatcherChecks) ...[
++                  if (_catcherChecks) ...[
+                     Expanded(
+                       child: Button(
+                         title: _casterMoved ? 'Caster B' : 'Caster A',
+@@ -159,7 +166,7 @@ class _DebugScreenState extends State<_DebugScreen> {
+                     ),
+                     Expanded(
+                       child: Button(
+-                        title: 'Refresh',
++                        title: _liveCatcherChecks ? 'Replace' : 'Refresh',
+                         fontSize: 12,
+                         onPressed: () => upsertU2CatcherMaterial(
+                           _controller,
+@@ -210,11 +217,86 @@ class _DebugScreenState extends State<_DebugScreen> {
+                     child: Button(
+                       title: 'Reload',
+                       fontSize: 12,
+-                      onPressed: () => _controller.loadDocument(_document),
++                      onPressed: () {
++                        if (_liveCatcherChecks) {
++                          setState(_lightControls.reload);
++                        } else {
++                          _controller.loadDocument(_document);
++                        }
++                      },
+                     ),
+                   ),
+                 ],
+               ),
++              if (_liveCatcherChecks) ...[
++                Row(
++                  children: [
++                    Expanded(
++                      child: Button(
++                        title: _lightControls.moved ? 'Light B' : 'Light A',
++                        fontSize: 12,
++                        onPressed: () => setState(_lightControls.togglePose),
++                      ),
++                    ),
++                    Expanded(
++                      child: Button(
++                        title: _lowQuality ? 'Low' : 'High',
++                        fontSize: 12,
++                        onPressed: () =>
++                            setState(() => _lowQuality = !_lowQuality),
++                      ),
++                    ),
++                    Expanded(
++                      child: Button(
++                        title: _lightControls.present
++                            ? 'Light on'
++                            : 'Light off',
++                        fontSize: 12,
++                        onPressed: () =>
++                            setState(_lightControls.togglePresence),
++                      ),
++                    ),
++                    Expanded(
++                      child: Button(
++                        title: _lightControls.alternate ? 'New B' : 'New A',
++                        fontSize: 12,
++                        onPressed: () => setState(_lightControls.replace),
++                      ),
++                    ),
++                  ],
++                ),
++                Row(
++                  children: [
++                    for (final (label, time) in [('Dim', 0.0), ('Bright', 2.0)])
++                      Expanded(
++                        child: Button(
++                          title: label,
++                          fontSize: 12,
++                          onPressed: _lightControls.present
++                              ? () => setState(() => _lightControls.seek(time))
++                              : null,
++                        ),
++                      ),
++                    Expanded(
++                      child: Button(
++                        title: _lightControls.playing ? 'Pause' : 'Play',
++                        fontSize: 12,
++                        onPressed: _lightControls.present
++                            ? () => setState(_lightControls.togglePlayback)
++                            : null,
++                      ),
++                    ),
++                    Expanded(
++                      child: Button(
++                        title: 'Rest',
++                        fontSize: 12,
++                        onPressed: () =>
++                            setState(_lightControls.releaseIntensityOverride),
++                      ),
++                    ),
++                  ],
++                ),
++              ],
+               if (_materialChecks)
+                 Row(
+                   children: [
+@@ -289,7 +371,10 @@ class _DebugScreenState extends State<_DebugScreen> {
+                   ],
+                 ),
+               Text(
+-                _bakedCatcherChecks
++                _liveCatcherChecks
++                    ? 'Live footprint. ${_lightControls.cue}. Replace is material only.\n'
++                          'Base color / metallic / roughness absent: magenta.'
++                    : _bakedCatcherChecks
+                     ? 'Baked footprint. Caster moves; cache stays frozen.\n'
+                           'Refresh bakes current caster. Reload keeps its position.\n'
+                           'Base color / metallic / roughness absent: magenta.'
+diff --git a/dart3d/example/lib/w34_debug_scene.dart b/dart3d/example/lib/w34_debug_scene.dart
+index d4f13ae..7621336 100644
+--- a/dart3d/example/lib/w34_debug_scene.dart
++++ b/dart3d/example/lib/w34_debug_scene.dart
+@@ -10,8 +10,10 @@ SceneDocument buildW34DebugDocument({
+   bool skinned = false,
+   bool materials = false,
+   bool bakedCatcher = false,
++  bool liveCatcher = false,
++  bool blendCaster = false,
+ }) {
+-  if (bakedCatcher) {
++  if (bakedCatcher || liveCatcher) {
+     final doc = buildU2CatcherDocument(light: 'spot');
+     final second = doc.nodes.values.singleWhere(
+       (node) => node.name == 'u2.catcher.caster.second',
+@@ -62,6 +64,60 @@ SceneDocument buildW34DebugDocument({
+         ),
+       ],
+     );
++    if (liveCatcher) {
++      if (blendCaster) {
++        final caster = doc.nodes.values.singleWhere(
++          (node) => node.name == 'u2.catcher.caster',
++        );
++        final id =
++            (caster.components.single.properties['material']!
++                    as ResourceRefValue)
++                .id;
++        final material = doc.resources[id]! as MaterialResource;
++        doc.resources[id] = material.copyWith(
++          properties: {
++            ...material.properties,
++            'alphaMode': const StringValue('blend'),
++            'baseColor': const ColorValue(0.82, 0.34, 0.12, 0.55),
++          },
++        );
++      }
++      final catcher = u2CatcherMaterial(doc);
++      doc.resources[catcher.id] = copyU2CatcherMaterial(catcher, mode: 'live');
++      final light = doc.nodes.values.singleWhere(
++        (node) => node.name == 'u2.catcher.light',
++      );
++      final curves = <LocalId>[];
++      for (final values in <List<double>>[
++        [0, 2],
++        [20, 160],
++      ]) {
++        final bytes = ByteData(values.length * 4);
++        for (var i = 0; i < values.length; i++) {
++          bytes.setFloat32(i * 4, values[i], Endian.little);
++        }
++        final payload = doc.addPayload(
++          PayloadSpec(
++            doc.newId(),
++            encoding: PayloadEncoding.floats,
++            bytes: bytes.buffer.asUint8List(),
++          ),
++        );
++        curves.add(payload.id);
++      }
++      final clip = doc.newId();
++      doc.animations[clip] = Dart3dAnimationSpec(
++        clip,
++        name: 'w34.live.intensity',
++        propertyChannels: [
++          D3LightIntensityChannel(
++            node: light.id,
++            timeline: curves[0],
++            keyframes: curves[1],
++          ),
++        ],
++      );
++    }
+     return doc;
+   }
+   final doc = SceneDocument(allocator: IdAllocator(session: 0x7734696f));
+@@ -600,3 +656,109 @@ void editW34MaterialFamilies(
+   }
+   controller.applyCommands(ops);
+ }
++
++class W34LiveLightControls {
++  W34LiveLightControls(this.controller, this.document)
++    : light = document.nodes.values.singleWhere(
++        (node) => node.name == 'u2.catcher.light',
++      ),
++      clip = document.animations.keys.single {
++    component = light.components.single;
++    restPose = light.transform as TrsTransform;
++  }
++
++  final SceneController controller;
++  final SceneDocument document;
++  final NodeSpec light;
++  final LocalId clip;
++  late final ComponentSpec component;
++  late final TrsTransform restPose;
++  bool moved = false;
++  bool present = true;
++  bool alternate = false;
++  bool playing = false;
++  String cue = 'Rest';
++
++  void togglePose() {
++    moved = !moved;
++    final translation = moved ? Vector3(2, 5, 1) : restPose.translation;
++    final rotation = moved ? aimAlong(-translation) : restPose.rotation;
++    light.transform = TrsTransform(
++      translation: translation,
++      rotation: rotation,
++    );
++    controller.setNodeTransforms([
++      NodeTransform(light.id, translation: translation, rotation: rotation),
++    ]);
++  }
++
++  void togglePresence() {
++    releaseIntensityOverride();
++    present = !present;
++    _applyComponent();
++  }
++
++  void replace() {
++    releaseIntensityOverride();
++    alternate = !alternate;
++    present = true;
++    _applyComponent();
++  }
++
++  void _applyComponent() {
++    light.components
++      ..clear()
++      ..addAll([
++        if (present)
++          ComponentSpec(
++            component.type,
++            properties: {
++              ...component.properties,
++              if (alternate) ...{
++                'color': const ColorValue(0.7, 0.85, 1, 1),
++                'intensity': const DoubleValue(80),
++              },
++            },
++          ),
++      ]);
++    controller.applyCommands([
++      {
++        'op': 'updateNode',
++        'node': light.id.toToken(),
++        'flags': ['components'],
++        'spec': encodeNodeCommandSpec(light, document),
++      },
++    ]);
++  }
++
++  void seek(double time) {
++    controller.playAnimation(clip, time: time, weight: 1, loop: true);
++    controller.pauseAnimation(clip);
++    playing = false;
++    cue = time == 0 ? 'Dim' : 'Bright';
++  }
++
++  void togglePlayback() {
++    playing = !playing;
++    if (playing) {
++      controller.playAnimation(clip, weight: 1, loop: true);
++      cue = 'Running';
++    } else {
++      controller.pauseAnimation(clip);
++      cue = 'Paused';
++    }
++  }
++
++  void releaseIntensityOverride() {
++    controller.playAnimation(clip, time: 0, weight: 0);
++    controller.pauseAnimation(clip);
++    playing = false;
++    cue = 'Rest';
++  }
++
++  void reload() {
++    controller.loadDocument(document);
++    playing = false;
++    cue = 'Rest';
++  }
++}
+diff --git a/dart3d/example/test/w34_debug_scene_test.dart b/dart3d/example/test/w34_debug_scene_test.dart
+index 09d8070..a121a85 100644
+--- a/dart3d/example/test/w34_debug_scene_test.dart
++++ b/dart3d/example/test/w34_debug_scene_test.dart
+@@ -12,6 +12,318 @@ import 'package:test/test.dart';
+ import 'package:vector_math/vector_math.dart';
+ 
+ void main() {
++  test('live blend caster survives the public scene load serialization', () {
++    final controller = SceneController()
++      ..loadDocument(
++        buildW34DebugDocument(liveCatcher: true, blendCaster: true),
++      );
++    addTearDown(controller.dispose);
++    final restored = readFsceneWithExtensions(
++      writeFsceneWithExtensions(controller.serializeScene()!),
++    );
++    final caster = restored.nodes.values.singleWhere(
++      (node) => node.name == 'u2.catcher.caster',
++    );
++    final id =
++        (caster.components.single.properties['material']! as ResourceRefValue)
++            .id;
++    final material = restored.resources[id]! as MaterialResource;
++    expect((material.properties['alphaMode']! as StringValue).value, 'blend');
++    final color = material.properties['baseColor']! as ColorValue;
++    expect([color.r, color.g, color.b, color.a], [0.82, 0.34, 0.12, 0.55]);
++    final opaque = buildW34DebugDocument(liveCatcher: true);
++    final opaqueCaster = opaque.nodes.values.singleWhere(
++      (node) => node.name == 'u2.catcher.caster',
++    );
++    final opaqueId =
++        (opaqueCaster.components.single.properties['material']!
++                as ResourceRefValue)
++            .id;
++    expect(
++      (opaque.resources[opaqueId]! as MaterialResource).properties['alphaMode'],
++      isNull,
++    );
++  });
++
++  test('live fixture retains the real receiver and typed U4 float curves', () {
++    final doc = buildW34DebugDocument(liveCatcher: true);
++    final controller = SceneController()..loadDocument(doc);
++    addTearDown(controller.dispose);
++    final sink = _Sink(controller);
++    controller.attachElement(sink);
++    final restored = readFsceneWithExtensions(
++      writeFsceneWithExtensions(controller.serializeScene()!),
++    );
++    expect(
++      (u2CatcherMaterial(restored).properties['mode']! as StringValue).value,
++      'live',
++    );
++    final baked = buildW34DebugDocument(bakedCatcher: true);
++    expect(
++      encodeNodeCommandSpec(
++        restored.nodes[u2CatcherReceiverId(restored)]!,
++        restored,
++      ),
++      encodeNodeCommandSpec(baked.nodes[u2CatcherReceiverId(baked)]!, baked),
++    );
++    expect(
++      encodeResource(
++        restored.resources[u2CatcherGeometryId(restored)]!,
++        (id) => id.toToken(),
++      ),
++      encodeResource(
++        baked.resources[u2CatcherGeometryId(baked)]!,
++        (id) => id.toToken(),
++      ),
++    );
++    expect(
++      restored.nodes.values.where(
++        (n) => n.name.startsWith('u2.catcher.caster'),
++      ),
++      hasLength(1),
++    );
++    final light = restored.nodes.values.singleWhere(
++      (n) => n.name == 'u2.catcher.light',
++    );
++    expect(light.components.single.type, 'spotLight');
++    expect(
++      (light.components.single.properties['intensity']! as DoubleValue).value,
++      100,
++    );
++    final clip = restored.animations.values.single as Dart3dAnimationSpec;
++    final channel = clip.propertyChannels.single as D3LightIntensityChannel;
++    expect(channel.node, light.id);
++    for (final (id, values) in [
++      (channel.timeline, [0.0, 2.0]),
++      (channel.keyframes, [20.0, 160.0]),
++    ]) {
++      final payload = restored.payloads[id]!;
++      expect(payload.encoding, PayloadEncoding.floats);
++      final data = ByteData.sublistView(
++        controller.serializeScene()!.payloads[id]!.bytes!,
++      );
++      expect([
++        data.getFloat32(0, Endian.little),
++        data.getFloat32(4, Endian.little),
++      ], values);
++    }
++    final manifest = jsonDecode(
++      utf8.decode(
++        sink.mutations.firstWhere((m) => m.tag == D3Protocol.loadScene).data,
++      ),
++    );
++    expect(
++      (manifest['animations'] as Map).values.single,
++      encodeAnimationSpec(doc.animations.values.single, doc),
++    );
++    expect(restored.views.single.target, isNull);
++    expect(
++      restored.nodes[restored.views.single.cameraNode]!.name,
++      'w34.camera',
++    );
++    expect(
++      restored.resources.values.whereType<RenderTextureResource>(),
++      isEmpty,
++    );
++    expect(
++      (restored.resources.values
++                  .whereType<MaterialResource>()
++                  .singleWhere((m) => m.name == 'w34.backdrop')
++                  .properties['baseColor']!
++              as ColorValue)
++          .a,
++      1,
++    );
++    expect(writeFsceneWithExtensions(restored), isNot(contains('debugView')));
++    expect(buildW34DebugDocument().animations, isEmpty);
++    expect(baked.animations, isEmpty);
++    expect(buildW34DebugDocument(materials: true).animations, isEmpty);
++    expect(buildW34DebugDocument(skinned: true).animations, isEmpty);
++  });
++
++  test(
++    'live light controls emit public transforms, components and U4 commands',
++    () {
++      final doc = buildW34DebugDocument(liveCatcher: true);
++      final controller = SceneController()..loadDocument(doc);
++      addTearDown(controller.dispose);
++      final controls = W34LiveLightControls(controller, doc);
++      final sink = _Sink(controller);
++      controller.attachElement(sink);
++      sink.mutations.clear();
++      controls.togglePose();
++      final transform = sink.mutations.removeAt(0);
++      expect(transform.tag, D3Protocol.setTransforms);
++      final data = ByteData.sublistView(transform.data);
++      expect(data.getUint32(0, Endian.little), 1);
++      expect(data.getUint8(12), 3);
++      expect(
++        [
++          for (var i = 0; i < 3; i++)
++            data.getFloat32(13 + i * 4, Endian.little),
++        ],
++        [2, 5, 1],
++      );
++      final rotation = (controls.light.transform as TrsTransform).rotation;
++      for (var i = 0; i < 4; i++) {
++        expect(
++          data.getFloat32(25 + i * 4, Endian.little),
++          closeTo(rotation.storage[i], 1e-6),
++        );
++      }
++      expect((controls.light.transform as TrsTransform).translation.storage, [
++        2,
++        5,
++        1,
++      ]);
++      final token = controls.clip.toToken();
++      for (final time in [0.0, 2.0]) {
++        controls.seek(time);
++        final ops = sink.mutations
++            .map((m) => jsonDecode(utf8.decode(m.data)))
++            .toList();
++        expect(ops, [
++          {
++            'op': 'anim',
++            'anim': token,
++            'play': true,
++            'time': time,
++            'weight': 1.0,
++            'loop': true,
++          },
++          {'op': 'anim', 'anim': token, 'pause': true},
++        ]);
++        expect(controls.playing, isFalse);
++        sink.mutations.clear();
++      }
++      controls.togglePlayback();
++      controls.togglePlayback();
++      controls.releaseIntensityOverride();
++      expect(
++        sink.mutations.map((m) => jsonDecode(utf8.decode(m.data))).toList(),
++        [
++          {
++            'op': 'anim',
++            'anim': token,
++            'play': true,
++            'weight': 1.0,
++            'loop': true,
++          },
++          {'op': 'anim', 'anim': token, 'pause': true},
++          {
++            'op': 'anim',
++            'anim': token,
++            'play': true,
++            'time': 0.0,
++            'weight': 0.0,
++          },
++          {'op': 'anim', 'anim': token, 'pause': true},
++        ],
++      );
++      expect(controls.cue, 'Rest');
++      for (final present in [false, true]) {
++        sink.mutations.clear();
++        controls.togglePresence();
++        expect(controls.present, present);
++        final mutation = sink.mutations.last;
++        expect(mutation.tag, D3Protocol.command);
++        final op = jsonDecode(utf8.decode(mutation.data));
++        expect(op['op'], 'updateNode');
++        expect(op['node'], controls.light.id.toToken());
++        expect(op['flags'], ['components']);
++        expect(op['spec']['components'], present ? hasLength(1) : isNull);
++        expect(
++          controller.document!.nodes[controls.light.id]!.components,
++          hasLength(present ? 1 : 0),
++        );
++      }
++      for (final intensity in [80.0, 100.0]) {
++        sink.mutations.clear();
++        controls.replace();
++        final op = jsonDecode(utf8.decode(sink.mutations.last.data));
++        expect(op['op'], 'updateNode');
++        expect(op['spec']['components'].single['type'], 'spotLight');
++        expect(op['spec']['components'].single['properties']['intensity'], {
++          'd': intensity,
++        });
++        expect(op['spec']['components'].single['properties']['range'], {
++          'd': 12.0,
++        });
++      }
++      sink.mutations.clear();
++      moveW34CatcherCaster(controller, doc, moved: true);
++      expect(sink.mutations.removeAt(0).tag, D3Protocol.setTransforms);
++      upsertU2CatcherMaterial(controller, doc, u2CatcherMaterial(doc));
++      final replace = jsonDecode(utf8.decode(sink.mutations.removeAt(0).data));
++      expect(replace['op'], 'upsertResource');
++      expect(replace['id'], u2CatcherMaterial(doc).id.toToken());
++      expect(replace['resource']['properties']['mode'], {'s': 'live'});
++      controls.seek(2);
++      sink.mutations.clear();
++      controls.reload();
++      expect(controls.cue, 'Rest');
++      expect(controls.playing, isFalse);
++      expect(controls.moved, isTrue);
++      expect(sink.mutations.first.tag, D3Protocol.loadScene);
++      final restored = readFsceneWithExtensions(
++        writeFsceneWithExtensions(controller.serializeScene()!),
++      );
++      expect(
++        (restored.nodes[controls.light.id]!.transform as TrsTransform)
++            .translation
++            .storage,
++        [2, 5, 1],
++      );
++      expect(
++        (restored.nodes.values
++                    .singleWhere((n) => n.name == 'u2.catcher.caster')
++                    .transform
++                as TrsTransform)
++            .translation
++            .x,
++        closeTo(0.9, 1e-6),
++      );
++    },
++  );
++
++  test('live geometry fits above its two extra control rows', () {
++    final doc = buildW34DebugDocument(liveCatcher: true);
++    final controller = SceneController()..loadDocument(doc);
++    addTearDown(controller.dispose);
++    final camera = SceneCamera.fromDocument(
++      doc,
++      cameraNode: doc.views.single.cameraNode,
++    )!;
++    for (final moved in [false, true]) {
++      moveW34CatcherCaster(controller, doc, moved: moved);
++      final bounds = meshNodeWorldBounds(doc);
++      for (final node in doc.nodes.values.where(
++        (n) => n.name == 'u2.catcher.receiver' || n.name == 'u2.catcher.caster',
++      )) {
++        final (min, max) = bounds[node.id]!;
++        for (final height in [440.0, 500.0, 600.0]) {
++          for (final x in [min.x, max.x]) {
++            for (final y in [min.y, max.y]) {
++              for (final z in [min.z, max.z]) {
++                final point = camera.worldToScreen(
++                  Vector3(x, y, z),
++                  402,
++                  height,
++                )!;
++                expect(point.$1, inInclusiveRange(12, 390), reason: node.name);
++                expect(
++                  point.$2,
++                  inInclusiveRange(32, height - 32),
++                  reason: node.name,
++                );
++              }
++            }
++          }
++        }
++      }
++    }
++  });
++
+   test(
+     'baked receiver and both caster positions fit the portrait scene area',
+     () {
+diff --git a/dart3d/ios/Classes/FsceneRealizer.swift b/dart3d/ios/Classes/FsceneRealizer.swift
+index e734c34..483d87b 100644
+--- a/dart3d/ios/Classes/FsceneRealizer.swift
++++ b/dart3d/ios/Classes/FsceneRealizer.swift
+@@ -8458,12 +8458,14 @@ extension FsceneRealizer {
+         let sprite = source.name == "d3.sprite"
+         let bakedCatcher = source.lightingModel == .constant
+             && source.name?.hasPrefix("d3.shadowCatcher:") == true
++        let liveCatcher = source.lightingModel == .shadowOnly
++            && source.name?.hasPrefix("d3.shadowCatcher:") == true
+         let unlit = !bakedCatcher && source.lightingModel == .constant
+             && source.value(forKey: "d3BaseColorFactor") != nil
+         let pbr = source.lightingModel == .physicallyBased
+-        guard pbr || unlit || sprite || bakedCatcher else {
++        guard pbr || unlit || sprite || bakedCatcher || liveCatcher else {
+             host.logOnce("debugView.family.\(source.lightingModel.rawValue)",
+-                "debugView: this implementation unit covers PBR, unlit meshes, sprites and baked catchers; "
++                "debugView: this implementation unit covers PBR, unlit meshes, sprites, baked and live catchers; "
+                 + "material family \(source.lightingModel.rawValue) is unsupported")
+             return material
+         }
+@@ -8498,7 +8500,7 @@ extension FsceneRealizer {
+         case .roughness:
+             rgb = pbr ? "float3(saturate(_surface.roughness))" : "float3(1.0, 0.0, 1.0)"
+         case .baseColor:
+-            if bakedCatcher {
++            if bakedCatcher || liveCatcher {
+                 rgb = "float3(1.0, 0.0, 1.0)"
+             } else if sprite {
+                 rgb = """
+@@ -8511,9 +8513,8 @@ extension FsceneRealizer {
+         case .depth:
+             rgb = "float3(max(-_surface.position.z, 0.0) / (1.0 + max(-_surface.position.z, 0.0)))"
+         }
+-        // Existing MASK discard and sheen declarations/body remain before the
+-        // final RGB. Transparent modifiers expect premultiplied RGB once.
+-        let coverage = bakedCatcher || sprite || (source.blendMode == .alpha && !source.writesToDepthBuffer)
++        // Transparent modifiers expect premultiplied RGB once.
++        let coverage = bakedCatcher || liveCatcher || sprite || (source.blendMode == .alpha && !source.writesToDepthBuffer)
+             ? " * _output.color.a" : ""
+         var modifiers = source.shaderModifiers ?? [:]
+         if bakedCatcher {
+diff --git a/dart3d/ios/Classes/ScreenDebugPresentation.swift b/dart3d/ios/Classes/ScreenDebugPresentation.swift
+index 5a6da52..c92537e 100644
+--- a/dart3d/ios/Classes/ScreenDebugPresentation.swift
++++ b/dart3d/ios/Classes/ScreenDebugPresentation.swift
+@@ -23,6 +23,51 @@ struct ScreenDebugOptions: Equatable {
+ }
+ 
+ struct ScreenDebugFrame {
++    struct LightState {
++        let color: Any
++        let intensity: CGFloat
++        let castsShadow: Bool
++        let shadowMapSize: CGSize
++        let shadowBias: CGFloat
++        let shadowRadius: CGFloat
++        let automaticallyAdjustsShadowProjection: Bool
++        let orthographicScale: CGFloat
++        let maximumShadowDistance: CGFloat
++        let forcesBackFaceCasters: Bool
++        let shadowSampleCount: Int
++
++        init(_ source: SCNLight) {
++            color = source.color
++            intensity = source.intensity
++            castsShadow = source.castsShadow
++            shadowMapSize = source.shadowMapSize
++            shadowBias = source.shadowBias
++            shadowRadius = source.shadowRadius
++            automaticallyAdjustsShadowProjection = source.automaticallyAdjustsShadowProjection
++            orthographicScale = source.orthographicScale
++            maximumShadowDistance = source.maximumShadowDistance
++            forcesBackFaceCasters = source.forcesBackFaceCasters
++            shadowSampleCount = source.shadowSampleCount
++        }
++
++        func apply(to displayed: SCNLight) {
++            displayed.color = color
++            displayed.intensity = intensity
++            displayed.castsShadow = castsShadow
++            displayed.shadowMapSize = shadowMapSize
++            displayed.shadowBias = shadowBias
++            displayed.shadowRadius = shadowRadius
++            displayed.automaticallyAdjustsShadowProjection = automaticallyAdjustsShadowProjection
++            displayed.orthographicScale = orthographicScale
++            displayed.maximumShadowDistance = maximumShadowDistance
++            displayed.forcesBackFaceCasters = forcesBackFaceCasters
++            displayed.shadowSampleCount = shadowSampleCount
++        }
++    }
++    struct Light {
++        let template: SCNLight
++        let state: LightState
++    }
+     struct Skin {
+         let identity: ObjectIdentifier
+         let geometry: SCNGeometry
+@@ -49,6 +94,8 @@ struct ScreenDebugFrame {
+         let opacity: CGFloat
+         let category: Int
+         let order: Int
++        let castsShadow: Bool
++        let light: Light?
+         let geometry: SCNGeometry?
+         let skin: Skin?
+         let morph: Morph?
+@@ -68,10 +115,16 @@ final class ScreenDebugAttachments {
+         let materials: [SCNMaterial]
+         let displayed: SCNGeometry
+     }
++    private struct LightTemplate {
++        weak var source: SCNLight?
++        let template: SCNLight
++    }
++    private var lights: [ObjectIdentifier: LightTemplate] = [:]
+     private var materials: [ObjectIdentifier: Material] = [:]
+     private var geometries: [ObjectIdentifier: Geometry] = [:]
+ 
+     func clear() {
++        lights.removeAll()
+         materials.removeAll()
+         geometries.removeAll()
+     }
+@@ -81,10 +134,12 @@ final class ScreenDebugAttachments {
+         var rows: [ScreenDebugFrame.Node] = []
+         var captured = Set<ObjectIdentifier>()
+         var skinNodes: [SCNNode] = []
++        var usedLights = Set<ObjectIdentifier>()
+         var usedMaterials = Set<ObjectIdentifier>()
+         var usedGeometries = Set<ObjectIdentifier>()
+-        let excludedNodes = host.blendCasterProxyIdentities
+-        func geometry(_ source: SCNGeometry) -> SCNGeometry {
++        let shadowProxies = host.blendCasterProxyIdentities
++        func geometry(_ source: SCNGeometry,
++                      materialChannel: ScreenDebugOptions.Channel) -> SCNGeometry {
+             let key = ObjectIdentifier(source)
+             usedGeometries.insert(key)
+             let displayedMaterials = source.materials.map { source -> SCNMaterial in
+@@ -92,13 +147,15 @@ final class ScreenDebugAttachments {
+                 usedMaterials.insert(key)
+                 let signature = FsceneRealizer.screenDebugMaterialSignature(source)
+                 if let cached = materials[key], cached.source === source,
+-                   cached.channel == channel, cached.signature == signature {
++                   cached.channel == materialChannel, cached.signature == signature {
+                     return cached.displayed
+                 }
+-                let displayed = FsceneRealizer.makeScreenDebugMaterial(
+-                    source, channel: channel, host: host)
++                let displayed = materialChannel == .none
++                    ? source.copy() as! SCNMaterial
++                    : FsceneRealizer.makeScreenDebugMaterial(
++                        source, channel: materialChannel, host: host)
+                 materials[key] = Material(source: source, signature: signature,
+-                                          channel: channel, displayed: displayed)
++                                          channel: materialChannel, displayed: displayed)
+                 return displayed
+             }
+             if let cached = geometries[key], cached.source === source,
+@@ -111,16 +168,32 @@ final class ScreenDebugAttachments {
+                                        displayed: displayed)
+             return displayed
+         }
++        func light(_ source: SCNLight) -> ScreenDebugFrame.Light {
++            let key = ObjectIdentifier(source)
++            usedLights.insert(key)
++            let template: SCNLight
++            if let cached = lights[key], cached.source === source {
++                template = cached.template
++            } else {
++                template = source.copy() as! SCNLight
++                template.removeAllAnimations()
++                lights[key] = LightTemplate(source: source, template: template)
++            }
++            return ScreenDebugFrame.Light(template: template,
++                                          state: ScreenDebugFrame.LightState(source))
++        }
+         func visit(_ source: SCNNode, parent: ObjectIdentifier?) {
+             let key = ObjectIdentifier(source)
+-            if excludedNodes.contains(key) { return }
+             captured.insert(key)
++            let materialChannel: ScreenDebugOptions.Channel =
++                shadowProxies.contains(key) ? .none : channel
+             let pose = source.presentation
+             let skin = source.skinner.map {
+                 skinNodes.append(contentsOf: $0.bones)
+                 if let skeleton = $0.skeleton { skinNodes.append(skeleton) }
+                 return ScreenDebugFrame.Skin(
+-                    identity: ObjectIdentifier($0), geometry: geometry($0.baseGeometry!),
++                    identity: ObjectIdentifier($0),
++                    geometry: geometry($0.baseGeometry!, materialChannel: materialChannel),
+                     bones: $0.bones.map(ObjectIdentifier.init),
+                     skeleton: $0.skeleton.map(ObjectIdentifier.init),
+                     inverseBinds: $0.boneInverseBindTransforms,
+@@ -137,7 +210,9 @@ final class ScreenDebugAttachments {
+                 identity: key, parent: parent, transform: pose.transform,
+                 pivot: pose.pivot, hidden: source.isHidden, opacity: pose.opacity,
+                 category: source.categoryBitMask, order: source.renderingOrder,
+-                geometry: source.geometry.map(geometry), skin: skin, morph: morph))
++                castsShadow: source.castsShadow, light: source.light.map(light),
++                geometry: source.geometry.map { geometry($0, materialChannel: materialChannel) },
++                skin: skin, morph: morph))
+             for child in source.childNodes { visit(child, parent: key) }
+         }
+         visit(scene.rootNode, parent: nil)
+@@ -151,9 +226,11 @@ final class ScreenDebugAttachments {
+                 transform: pose.transform, pivot: pose.pivot,
+                 hidden: source.isHidden, opacity: pose.opacity,
+                 category: source.categoryBitMask, order: source.renderingOrder,
++                castsShadow: source.castsShadow, light: nil,
+                 geometry: nil, skin: nil, morph: nil))
+         }
+         for node in skinNodes { captureSkinPose(node) }
++        lights = lights.filter { usedLights.contains($0.key) }
+         materials = materials.filter { usedMaterials.contains($0.key) }
+         geometries = geometries.filter { usedGeometries.contains($0.key) }
+         return ScreenDebugFrame(nodes: rows)
+@@ -163,6 +240,11 @@ final class ScreenDebugAttachments {
+ final class ScreenDebugPresentation {
+     let scene = SCNScene()
+     private var nodes: [ObjectIdentifier: SCNNode] = [:]
++    private struct LightSlot {
++        let template: SCNLight
++        let displayed: SCNLight
++    }
++    private var lights: [ObjectIdentifier: LightSlot] = [:]
+     private var skins: [ObjectIdentifier: ScreenDebugFrame.Skin] = [:]
+     private var morphs: [ObjectIdentifier: ScreenDebugFrame.Morph] = [:]
+ 
+@@ -170,6 +252,7 @@ final class ScreenDebugPresentation {
+         let live = Set(frame.nodes.map { $0.identity })
+         for key in Array(nodes.keys) where !live.contains(key) {
+             nodes.removeValue(forKey: key)?.removeFromParentNode()
++            lights.removeValue(forKey: key)
+             skins.removeValue(forKey: key)
+             morphs.removeValue(forKey: key)
+         }
+@@ -186,6 +269,22 @@ final class ScreenDebugPresentation {
+             node.opacity = row.opacity
+             node.categoryBitMask = row.category
+             node.renderingOrder = row.order
++            node.castsShadow = row.castsShadow
++            if let light = row.light {
++                let slot: LightSlot
++                if let prior = lights[row.identity], prior.template === light.template {
++                    slot = prior
++                } else {
++                    slot = LightSlot(template: light.template,
++                                     displayed: light.template.copy() as! SCNLight)
++                    lights[row.identity] = slot
++                    node.light = slot.displayed
++                }
++                light.state.apply(to: slot.displayed)
++            } else {
++                node.light = nil
++                lights.removeValue(forKey: row.identity)
++            }
+             if let skin = row.skin {
+                 let prior = skins[row.identity]
+                 if prior?.identity != skin.identity || prior?.geometry !== skin.geometry
+diff --git a/docs/debug-views.md b/docs/debug-views.md
+index a695460..c06658a 100644
+--- a/docs/debug-views.md
++++ b/docs/debug-views.md
+@@ -2,7 +2,10 @@
+ 
+ `SceneView.debugView` owns the screen's inspection choice. The controller and
+ serialized document contain no debug state. The iOS presentation covers PBR
+-meshes, ordinary unlit meshes, `d3:sprite` materials, and baked shadow catchers.
++meshes, ordinary unlit meshes, `d3:sprite` materials, and baked and live shadow
++catchers. The [live-catcher simulator replay](artifacts/e9-w34-dev-reload/live-catcher-ios/README.md)
++covers a transformed receiver with one spot light, current light updates,
++component removal, material replacement, reload and Off restoration.
+ The [baked-catcher simulator replay](artifacts/e9-w34-dev-reload/baked-catcher-ios/README.md)
+ covers the five channels, frozen-cache movement, explicit refresh, wire and Off.
+ Android and other material families are outside this unit. The retained PBR simulator evidence covers the five channels, authored-target
+@@ -95,8 +98,20 @@ Only the derived material replaces diagnostic RGB.
+ Channel and wire changes do not dirty or bake the cache. Caster or light edits
+ leave its footprint frozen. An explicit unchanged same-ID material upsert asks
+ the existing cache owner to refresh. Turning Off shows current authored state.
+-Live `shadowOnly` catchers and other families remain unsupported and retain copied
+-authored materials. A shader or required-input failure is a blocker, not an
++Live catchers use the bound `d3.shadowCatcher:<key>` material with the native
++`shadowOnly` lighting model. The diagnostic copy keeps that model, source
++modifiers, sampling, depth, culling, blend, and coverage ownership. Its existing
++transparent/body declaration remains once. The fragment appends selected RGB
++multiplied by native `_output.color.a` once, without writing alpha. Normals use
++the receiver's native normal and the existing solid diagnostic normal property.
++Depth uses the axial formula. Base color, metallic, and roughness are absent
++inputs and use magenta under actual shadow coverage. No mask is inferred from
++shadow RGB, and no opaque receiver or second footprint substitutes for coverage.
++The private scene retains the host's existing depth-only stand-ins for blended
++casters. Their copied materials keep the empty color-write mask and depth
++writes; channel materials apply only to visible surfaces. Moving the caster
++moves the same source-owned stand-in through the existing frame capture.
++Other material families remain unsupported and retain copied authored materials. A shader or required-input failure is a blocker, not an
+ absent-input result. An opaque receiver cannot substitute for coverage proof.
+ 
+ The existing tag-6 view configuration always includes both fields, including
+@@ -114,16 +129,41 @@ accepts only the closed channel names and a JSON boolean. No debug fields enter
+ The iOS host keeps the authored scene as the sole update, animation, physics,
+ and capture owner. Selected-channel screen siblings use detached material and
+ geometry attachments with current native streams. The existing sibling-pose
+-mailbox hands current transforms, camera copies, skinner inputs, and morph
+-weights to a main-thread-owned presentation. Unchanged attachment identities
+-are reused. The projection has no actions, constraints, lights, physics bodies,
+-or particle systems. Captures never borrow its materials or cameras.
++mailbox hands current transforms, camera copies, skinner inputs, morph
++weights, node `castsShadow`, and current native light state to a main-thread-owned presentation. Unchanged attachment identities
++are reused. Capture owns a weak-source identity cache of detached model-light templates.
++It checks the source by reference, clears animations before publishing a template,
++and never mutates a published template. Main owns a separate displayed light per
++private node, copied only when the template reference changes. Current values
++apply each accepted frame under the existing disabled-actions transaction.
++
++The named native light state contains `color`, `intensity`, `castsShadow`,
++`shadowMapSize`, `shadowBias`, `shadowRadius`,
++`automaticallyAdjustsShadowProjection`, `orthographicScale`,
++`maximumShadowDistance`, `forcesBackFaceCasters`, and `shadowSampleCount`.
++`color` retains the native platform value and assigns it directly, including
++immutable platform colors and CGColor. There is no component conversion or
++fallback color. Node `castsShadow` is independent of light `castsShadow`.
++Supplemental skin-only poses carry no light. Source-light removal clears the
++private node's light and display slot; reconciliation prunes removed slots.
++Existing capture clear, pruning, Off, and scene teardown release templates.
++
++U4 intensity and restoration, quality shadow suppression, and the reused stage
++sun's eleven in-place fields travel through this state. Component replacement
++preserves other configuration through a new template identity. Future in-place
++light writers must extend the named state. Arbitrary native light-property Core
++Animation and mutable custom color objects are outside this contract. Capture
++never copies a presentation light or accesses the main-owned displayed light.
++The projection has no actions, constraints, physics bodies, or particle systems. Captures never borrow its materials or cameras.
+ 
+ Full load and native resource replacement discard scene-local derivatives while
+ retaining the view choice. Off reconnects current authored attachments and
+ current display settings. There is no saved-on-entry material restore store.
+ 
+-The retained entry point is `dart3d/example/lib/w34_debug_main.dart`. Its fixture
++The retained entry point is `dart3d/example/lib/w34_debug_main.dart`.
++`DART3D_W34_LIVE_CATCHER=true` selects the live receiver;
++`DART3D_W34_LIVE_BLEND_CASTER=true` additionally makes its caster translucent.
++Its default fixture
+ has a mapped indexed quad, an occluder, nonwhite vertex color, scalar swatches,
+ material-factor and coverage controls, and a shared-camera authored target. The
+ lower monitor samples that target and is excluded from its capture layers. In
+@@ -172,7 +212,7 @@ authored captures and reload. Render-texture sprite coverage and calibrated
+ channel or blend accuracy remain `NOT_RUN`.
+ 
+ The optional `DART3D_W34_BAKED_CATCHER=true` fixture takes precedence over the
+-other fixture flags in the same entry point. It reuses the direct U2 spot-light
++material and consumer fixture flags in the same entry point. It reuses the direct U2 spot-light
+ baked catcher, including its translated, yawed, nonuniformly scaled receiver.
+ It keeps one caster, adds a fixed orthographic camera, and places a real opaque
+ PBR backdrop behind the receiver. The backdrop has a different normal and depth
+@@ -200,8 +240,71 @@ refresh in both directions, current-state Off, and reload with selection retaine
+ The retained scene crops match exactly after Off and reload. Initial capture
+ logs contain the same cross-scene mutation and missing `d3CatcherRegion` warnings
+ in both baseline and corrected runs; neither is resolved by this material slice.
+-Numeric alpha/channel calibration, pending-cache first-frame behavior, live
+-catchers and baked-specific authored-target isolation remain `NOT_RUN`.
++Numeric alpha/channel calibration, pending-cache first-frame behavior, and
++baked-specific authored-target isolation remain `NOT_RUN`.
++
++The retained `DART3D_W34_LIVE_CATCHER=true` mode takes precedence over all other
++W34 fixture flags. It uses the same transformed U2 spot receiver, opaque caster,
++backdrop, and fixed camera as the baked fixture. Only this mode changes that
++receiver to live and adds a typed `Dart3dAnimationSpec` with a
++`D3LightIntensityChannel`. Default, baked, material, and consumer documents keep
++their existing behavior when the live flag is absent.
++
++Use the existing entry point with `--dart-define=DART3D_W34_LIVE_CATCHER=true`.
++The fixture checks are:
++
++1. Retain Off with Wire off. Select normals and depth, move Caster A to B, and
++   verify current coverage follows without Replace. Check baseColor, metallic,
++   and roughness show magenta only under actual coverage. Compare uncovered and
++   partially covered alpha as well as RGB. Toggle Wire, Off, and Wire off.
++2. Toggle Light A/B. The public transform operation moves and re-aims the existing
++   spot node. Toggle High/Low/High through `SceneView.quality`; observe native
++   source and displayed `castsShadow` independently of node `castsShadow`.
++3. Tap Dim and Bright for paused deterministic U4 seeks at 0 and 2 seconds.
++   Their authored spot intensities are 20 and 160. Play loops the two-second
++   linear cue; Pause freezes its current sample. Rest seeks to zero at weight 0
++   and pauses, releasing the intensity owner to the current component's rest
++   value. Stop alone would retain the first key at its previous weight.
++4. Observe source and displayed native intensities and object identities directly
++   during the cue and Rest. The original component rests at 100. New A/B toggles
++   component replacement between original white/100 and blue-white/80 through
++   `updateNode`, returning the cue to Rest first. Template and displayed copies
++   occur for initial or changed source identities, with a distinct displayed
++   light per private node. Continuous U4 samples must keep those identities.
++   Shadow alpha alone cannot prove intensity transport.
++5. Light on/off removes and restores the component on the surviving node through
++   public component updates, returning to Rest. Confirm nil clears its display
++   slot. New A/B also restores a missing light. Replace performs an unchanged
++   same-ID live material upsert only. Reload performs a full document load;
++   it keeps authored caster/light poses and component state, resets playback to
++   Rest, and preserves the view's channel, wire, and quality choices. The footer
++   reports this reset rather than retaining a stale cue label.
++6. Repeat selected channels, Off, reentry, Replace, and Reload with current edits.
++   Inspect copy safety, source isolation, queued-generation rejection, release
++   after frame drain, and allocation/retained-light and frame costs. The reused
++   stage sun's color/shadow settings require separate scene observations.
++   This spot fixture does not exercise that owner.
++
++The recorded simulator sequence shows all five channels, moving live coverage,
++quality shadow suppression, current U4 values, component replacement and removal,
++wire, material Replace, Reload and current-state Off. Traces show stable template
++and displayed identities during changing intensity, matching current native
++values, and empty template/display maps after component removal. This is finite
++map-lifecycle evidence, not a native heap measurement. A separate native adapter
++probe preserves an immutable extended-linear-sRGB CGColor with a component of
++1.6 and verifies the eleven state assignments without changing its frozen
++template. This does not calibrate rendered color, fragment alpha or coverage.
++The clean replay removes all probes and tracing. Numeric alpha/color parity,
++general consumers, actual stage-sun scene updates, shared-light attachments,
++whole-node removal, queued-generation stress, heap retention and performance
++remain `NOT_RUN`. Entry boundary flashes and broader W34 gates remain open.
++Native particles retain their operator-approved unsupported status.
++
++With no attached lights, the current authored live catcher draws its entire
++receiver. The debug channels preserve that native coverage too. The separate
++Off/normals control records the same full receiver before and after material
++Replace and Reload, then restores the footprint when the light returns. This
++existing zero-light material behavior is not corrected by the diagnostic view.
+ 
+ Morph output, additional material families and consumers, Android,
+ performance, and final T2/T4 remain `NOT_RUN` for this unit. It does not establish

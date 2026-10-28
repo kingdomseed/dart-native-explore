@@ -1,0 +1,522 @@
+{
+  "videos": [
+    {
+      "path": "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/before/journey.mp4",
+      "sha256": "826bba084a52de9e58f82a2c49ddba70f362dff3711f4c878bd283752c18a2b9",
+      "commands": [
+        [
+          "ffprobe",
+          "-v",
+          "error",
+          "-select_streams",
+          "v:0",
+          "-show_entries",
+          "stream=width,height,duration",
+          "-of",
+          "json",
+          "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/before/journey.mp4"
+        ],
+        [
+          "ffmpeg",
+          "-v",
+          "warning",
+          "-threads",
+          "2",
+          "-i",
+          "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/before/journey.mp4",
+          "-map",
+          "0:v:0",
+          "-an",
+          "-progress",
+          "pipe:1",
+          "-nostats",
+          "-f",
+          "null",
+          "-"
+        ]
+      ],
+      "startUTC": "2026-10-28T02:06:22.116134+00:00",
+      "endUTC": "2026-10-28T02:06:24.845212+00:00",
+      "probe": {
+        "width": 1206,
+        "height": 2622,
+        "duration": "22.998333"
+      },
+      "decodedFrames": 2092,
+      "probeExit": 0,
+      "decodeExit": 0,
+      "stderr": "video-00-stderr.log"
+    },
+    {
+      "path": "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/traced/journey.mp4",
+      "sha256": "6d4e22b04c62db6604bb22169a3f59e534f9081c4b33eb6953edb35836c86022",
+      "commands": [
+        [
+          "ffprobe",
+          "-v",
+          "error",
+          "-select_streams",
+          "v:0",
+          "-show_entries",
+          "stream=width,height,duration",
+          "-of",
+          "json",
+          "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/traced/journey.mp4"
+        ],
+        [
+          "ffmpeg",
+          "-v",
+          "warning",
+          "-threads",
+          "2",
+          "-i",
+          "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/traced/journey.mp4",
+          "-map",
+          "0:v:0",
+          "-an",
+          "-progress",
+          "pipe:1",
+          "-nostats",
+          "-f",
+          "null",
+          "-"
+        ]
+      ],
+      "startUTC": "2026-10-28T02:06:24.845470+00:00",
+      "endUTC": "2026-10-28T02:06:35.442927+00:00",
+      "probe": {
+        "width": 1206,
+        "height": 2622,
+        "duration": "75.658333"
+      },
+      "decodedFrames": 8931,
+      "probeExit": 0,
+      "decodeExit": 0,
+      "stderr": "video-01-stderr.log"
+    },
+    {
+      "path": "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/traced/light-journey.mp4",
+      "sha256": "8dd5f69917ca8b8d19adb4014f2e35d54ea3ce75d1bf4f10e52370a21d948c50",
+      "commands": [
+        [
+          "ffprobe",
+          "-v",
+          "error",
+          "-select_streams",
+          "v:0",
+          "-show_entries",
+          "stream=width,height,duration",
+          "-of",
+          "json",
+          "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/traced/light-journey.mp4"
+        ],
+        [
+          "ffmpeg",
+          "-v",
+          "warning",
+          "-threads",
+          "2",
+          "-i",
+          "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/traced/light-journey.mp4",
+          "-map",
+          "0:v:0",
+          "-an",
+          "-progress",
+          "pipe:1",
+          "-nostats",
+          "-f",
+          "null",
+          "-"
+        ]
+      ],
+      "startUTC": "2026-10-28T02:06:35.443218+00:00",
+      "endUTC": "2026-10-28T02:06:42.178282+00:00",
+      "probe": {
+        "width": 1206,
+        "height": 2622,
+        "duration": "48.023333"
+      },
+      "decodedFrames": 5682,
+      "probeExit": 0,
+      "decodeExit": 0,
+      "stderr": "video-02-stderr.log"
+    },
+    {
+      "path": "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/traced/lifetime-journey.mp4",
+      "sha256": "9a2d66c8a3e34d8b503f109d5602b7894b0c217c9c24e2145518da9ee14bc48d",
+      "commands": [
+        [
+          "ffprobe",
+          "-v",
+          "error",
+          "-select_streams",
+          "v:0",
+          "-show_entries",
+          "stream=width,height,duration",
+          "-of",
+          "json",
+          "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/traced/lifetime-journey.mp4"
+        ],
+        [
+          "ffmpeg",
+          "-v",
+          "warning",
+          "-threads",
+          "2",
+          "-i",
+          "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/traced/lifetime-journey.mp4",
+          "-map",
+          "0:v:0",
+          "-an",
+          "-progress",
+          "pipe:1",
+          "-nostats",
+          "-f",
+          "null",
+          "-"
+        ]
+      ],
+      "startUTC": "2026-10-28T02:06:42.178525+00:00",
+      "endUTC": "2026-10-28T02:06:44.448131+00:00",
+      "probe": {
+        "width": 1206,
+        "height": 2622,
+        "duration": "15.375000"
+      },
+      "decodedFrames": 1862,
+      "probeExit": 0,
+      "decodeExit": 0,
+      "stderr": "video-03-stderr.log"
+    },
+    {
+      "path": "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/clean/journey.mp4",
+      "sha256": "95eb8d06d7f3f2a166b0ec364383e151f939a4c27620afc245917a79bb9787ee",
+      "commands": [
+        [
+          "ffprobe",
+          "-v",
+          "error",
+          "-select_streams",
+          "v:0",
+          "-show_entries",
+          "stream=width,height,duration",
+          "-of",
+          "json",
+          "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/clean/journey.mp4"
+        ],
+        [
+          "ffmpeg",
+          "-v",
+          "warning",
+          "-threads",
+          "2",
+          "-i",
+          "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/clean/journey.mp4",
+          "-map",
+          "0:v:0",
+          "-an",
+          "-progress",
+          "pipe:1",
+          "-nostats",
+          "-f",
+          "null",
+          "-"
+        ]
+      ],
+      "startUTC": "2026-10-28T02:06:44.448366+00:00",
+      "endUTC": "2026-10-28T02:06:49.459087+00:00",
+      "probe": {
+        "width": 1206,
+        "height": 2622,
+        "duration": "34.695000"
+      },
+      "decodedFrames": 4008,
+      "probeExit": 0,
+      "decodeExit": 0,
+      "stderr": "video-04-stderr.log"
+    },
+    {
+      "path": "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/clean/light-journey.mp4",
+      "sha256": "c68eb2449b621dd70de725ac67ab025c64e0bbeb0c1bf50090efebe375403689",
+      "commands": [
+        [
+          "ffprobe",
+          "-v",
+          "error",
+          "-select_streams",
+          "v:0",
+          "-show_entries",
+          "stream=width,height,duration",
+          "-of",
+          "json",
+          "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/clean/light-journey.mp4"
+        ],
+        [
+          "ffmpeg",
+          "-v",
+          "warning",
+          "-threads",
+          "2",
+          "-i",
+          "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/clean/light-journey.mp4",
+          "-map",
+          "0:v:0",
+          "-an",
+          "-progress",
+          "pipe:1",
+          "-nostats",
+          "-f",
+          "null",
+          "-"
+        ]
+      ],
+      "startUTC": "2026-10-28T02:06:49.459329+00:00",
+      "endUTC": "2026-10-28T02:07:01.006987+00:00",
+      "probe": {
+        "width": 1206,
+        "height": 2622,
+        "duration": "80.526667"
+      },
+      "decodedFrames": 9673,
+      "probeExit": 0,
+      "decodeExit": 0,
+      "stderr": "video-05-stderr.log"
+    },
+    {
+      "path": "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/clean/lifetime-journey.mp4",
+      "sha256": "e47a77203c19bdda6097377ea05f385d4341f8b0f10728cfc2918ffb2d6b52e2",
+      "commands": [
+        [
+          "ffprobe",
+          "-v",
+          "error",
+          "-select_streams",
+          "v:0",
+          "-show_entries",
+          "stream=width,height,duration",
+          "-of",
+          "json",
+          "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/clean/lifetime-journey.mp4"
+        ],
+        [
+          "ffmpeg",
+          "-v",
+          "warning",
+          "-threads",
+          "2",
+          "-i",
+          "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/clean/lifetime-journey.mp4",
+          "-map",
+          "0:v:0",
+          "-an",
+          "-progress",
+          "pipe:1",
+          "-nostats",
+          "-f",
+          "null",
+          "-"
+        ]
+      ],
+      "startUTC": "2026-10-28T02:07:01.007293+00:00",
+      "endUTC": "2026-10-28T02:07:05.292611+00:00",
+      "probe": {
+        "width": 1206,
+        "height": 2622,
+        "duration": "39.038333"
+      },
+      "decodedFrames": 3293,
+      "probeExit": 0,
+      "decodeExit": 0,
+      "stderr": "video-06-stderr.log"
+    },
+    {
+      "path": "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/no-light-control/journey.mp4",
+      "sha256": "22046f7a83b1306c82069b1ea17d551ad94de722839c5a0486cba9f3a7af32f3",
+      "commands": [
+        [
+          "ffprobe",
+          "-v",
+          "error",
+          "-select_streams",
+          "v:0",
+          "-show_entries",
+          "stream=width,height,duration",
+          "-of",
+          "json",
+          "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/no-light-control/journey.mp4"
+        ],
+        [
+          "ffmpeg",
+          "-v",
+          "warning",
+          "-threads",
+          "2",
+          "-i",
+          "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/no-light-control/journey.mp4",
+          "-map",
+          "0:v:0",
+          "-an",
+          "-progress",
+          "pipe:1",
+          "-nostats",
+          "-f",
+          "null",
+          "-"
+        ]
+      ],
+      "startUTC": "2026-10-28T02:07:05.292902+00:00",
+      "endUTC": "2026-10-28T02:07:06.984245+00:00",
+      "probe": {
+        "width": 1206,
+        "height": 2622,
+        "duration": "15.183333"
+      },
+      "decodedFrames": 1283,
+      "probeExit": 0,
+      "decodeExit": 0,
+      "stderr": "video-07-stderr.log"
+    },
+    {
+      "path": "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/blend-before/journey.mp4",
+      "sha256": "b61849324cb8345b12910e61d5eed684b5fd4ce35add98f7bb130f6f21fcbf8c",
+      "commands": [
+        [
+          "ffprobe",
+          "-v",
+          "error",
+          "-select_streams",
+          "v:0",
+          "-show_entries",
+          "stream=width,height,duration",
+          "-of",
+          "json",
+          "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/blend-before/journey.mp4"
+        ],
+        [
+          "ffmpeg",
+          "-v",
+          "warning",
+          "-threads",
+          "2",
+          "-i",
+          "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/blend-before/journey.mp4",
+          "-map",
+          "0:v:0",
+          "-an",
+          "-progress",
+          "pipe:1",
+          "-nostats",
+          "-f",
+          "null",
+          "-"
+        ]
+      ],
+      "startUTC": "2026-10-28T02:07:06.984516+00:00",
+      "endUTC": "2026-10-28T02:07:09.713190+00:00",
+      "probe": {
+        "width": 1206,
+        "height": 2622,
+        "duration": "20.456667"
+      },
+      "decodedFrames": 2232,
+      "probeExit": 0,
+      "decodeExit": 0,
+      "stderr": "video-08-stderr.log"
+    },
+    {
+      "path": "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/blend-after/journey.mp4",
+      "sha256": "3180b31ffb70418e04800f4fcc837203b24dfef43abf1086fa704c45f020692b",
+      "commands": [
+        [
+          "ffprobe",
+          "-v",
+          "error",
+          "-select_streams",
+          "v:0",
+          "-show_entries",
+          "stream=width,height,duration",
+          "-of",
+          "json",
+          "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/blend-after/journey.mp4"
+        ],
+        [
+          "ffmpeg",
+          "-v",
+          "warning",
+          "-threads",
+          "2",
+          "-i",
+          "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/blend-after/journey.mp4",
+          "-map",
+          "0:v:0",
+          "-an",
+          "-progress",
+          "pipe:1",
+          "-nostats",
+          "-f",
+          "null",
+          "-"
+        ]
+      ],
+      "startUTC": "2026-10-28T02:07:09.713431+00:00",
+      "endUTC": "2026-10-28T02:07:14.634083+00:00",
+      "probe": {
+        "width": 1206,
+        "height": 2622,
+        "duration": "35.400000"
+      },
+      "decodedFrames": 3880,
+      "probeExit": 0,
+      "decodeExit": 0,
+      "stderr": "video-09-stderr.log"
+    },
+    {
+      "path": "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/final-clean/journey.mp4",
+      "sha256": "c97661b7095374fe249ee71b680f60537fc43831ebc199eeb731658a5ee83511",
+      "commands": [
+        [
+          "ffprobe",
+          "-v",
+          "error",
+          "-select_streams",
+          "v:0",
+          "-show_entries",
+          "stream=width,height,duration",
+          "-of",
+          "json",
+          "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/final-clean/journey.mp4"
+        ],
+        [
+          "ffmpeg",
+          "-v",
+          "warning",
+          "-threads",
+          "2",
+          "-i",
+          "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/final-clean/journey.mp4",
+          "-map",
+          "0:v:0",
+          "-an",
+          "-progress",
+          "pipe:1",
+          "-nostats",
+          "-f",
+          "null",
+          "-"
+        ]
+      ],
+      "startUTC": "2026-10-28T02:07:14.634427+00:00",
+      "endUTC": "2026-10-28T02:07:20.135620+00:00",
+      "probe": {
+        "width": 1206,
+        "height": 2622,
+        "duration": "37.623333"
+      },
+      "decodedFrames": 4464,
+      "probeExit": 0,
+      "decodeExit": 0,
+      "stderr": "video-10-stderr.log"
+    }
+  ],
+  "totalFrames": 47400
+}

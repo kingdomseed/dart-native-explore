@@ -15,6 +15,8 @@ final class SceneViewHost: SCNView {
     /// Node registry for `setTransforms`, `command` ops, and physics.
     private(set) var nodesById: [UInt64: SCNNode] = [:]
 
+    private let selectionOutline = SelectionOutline()
+
     /// Keys of nodes carrying a `dynamic` rigid body — the set the
     /// settle detector polls after every simulated physics step.
     private(set) var dynamicBodyKeys: Set<UInt64> = []
@@ -49,6 +51,9 @@ final class SceneViewHost: SCNView {
     /// doc, which would respawn physics bodies mid-scene.
     private(set) var geometriesById: [UInt64: SCNGeometry] = [:]
     private(set) var materialsById: [UInt64: SCNMaterial] = [:]
+    private(set) var materialColorOwners: [UInt64: FsceneRealizer.MaterialColorOwner] = [:]
+    private(set) var lightIntensityOwners: [UInt64: FsceneRealizer.LightIntensityOwner] = [:]
+    private(set) var cameraFovOwners: [UInt64: FsceneRealizer.CameraFovOwner] = [:]
     private(set) var texturesById: [UInt64: FsceneRealizer.DecodedTexture] = [:]
     private(set) var shadowCatcherConfigurationsById:
         [UInt64: ShadowCatcherConfiguration] = [:]
@@ -130,7 +135,7 @@ final class SceneViewHost: SCNView {
     private(set) var skinPayloadKeys: [UInt64: UInt64] = [:]
     private(set) var animPayloadKeys: [UInt64: Set<UInt64>] = [:]
     private(set) var skinDefs: [UInt64: [String: Any]] = [:]
-    private(set) var animDefs: [UInt64: [String: Any]] = [:]
+    private(set) var animDefs: [UInt64: FsceneRealizer.AnimationDefinition] = [:]
 
     /// W26: node key → a camera-facing mesh spec (polyline, line
     /// segments, billboard, billboard instances). SceneKit's native
@@ -241,6 +246,14 @@ final class SceneViewHost: SCNView {
     var views: [ViewRec] = []
     var screenViews: [ViewRec] = []
 
+    var screenDebugOptions = ScreenDebugOptions()
+    let screenDebugAttachments = ScreenDebugAttachments()
+    let screenDebugHostWire = ScreenDebugWireframe()
+    var mainScreenDebug: ScreenDebugPresentation?
+    var mainScreenDebugBacking: UIView?
+    var mainScreenDebugOptions = ScreenDebugOptions()
+    var mainScreenWires: [ScreenDebugWireframe] = []
+
     /// W24 split-screen — render-queue state: one rec per screen view
     /// while `multiScreenMode` is on (≥2 screen views or any
     /// `viewport` rect). The sibling `SCNView` objects live in
@@ -268,12 +281,13 @@ final class SceneViewHost: SCNView {
     var mainScreenSubviewGen = 0
 
     /// W24 torn-pose fix: the render queue captures each proxy
-    /// sibling's pose in `willRenderScene` (post-physics) and parks it
+    /// sibling's pose in `didApplyConstraintsAtTime` and parks it
     /// here; the main-thread poke applies it in one `SCNTransaction`
     /// right before `setNeedsDisplay`, so a sibling never draws a
     /// proxy the render queue is halfway through rewriting.
     var siblingPoseSnapshot:
-        (gen: Int, poses: [Int: (SCNMatrix4, SCNCamera)])?
+        (gen: Int, poses: [Int: (SCNMatrix4, SCNCamera)],
+         debug: ScreenDebugFrame?, options: ScreenDebugOptions)?
     let siblingPoseLock = NSLock()
 
     /// UIKit facts the render queue needs, snapshotted on MAIN
@@ -339,6 +353,9 @@ final class SceneViewHost: SCNView {
         let proxy: SCNNode
     }
     private var blendCasters: [BlendCaster] = []
+    var blendCasterProxyIdentities: Set<ObjectIdentifier> {
+        Set(blendCasters.map { ObjectIdentifier($0.proxy) })
+    }
     /// Set by every drained message that can add, remove or re-material
     /// a mesh; cleared by the reconcile at the end of the drain.
     private var blendCastersDirty = false
@@ -453,6 +470,18 @@ final class SceneViewHost: SCNView {
     /// resolve pass of its own with the host's settings, its bloom
     /// chain sized for the sibling's own viewport.
     func applySiblingResolve() {
+        if mainScreenDebugOptions.channel != .none {
+            for sibling in mainScreenSubviews {
+                guard let device = sibling.view.device ?? MTLCreateSystemDefaultDevice(),
+                      let pass = ToneMapTechnique.make(device: device) else {
+                    d3Log("debugView: identity resolve unavailable; numeric output is unverified")
+                    continue
+                }
+                ToneMapTechnique.configure(pass, StageResolve(diagnostic: true))
+                sibling.view.technique = pass
+            }
+            return
+        }
         guard let (look, hostChain) = siblingResolve else { return }
         for sibling in mainScreenSubviews {
             let size = sibling.view.bounds.size
@@ -932,6 +961,10 @@ final class SceneViewHost: SCNView {
         setup()
     }
 
+    deinit {
+        selectionOutline.clearScene()
+    }
+
     private func setup() {
         scene = SCNScene()
         scene?.physicsWorld.contactDelegate = self
@@ -1141,6 +1174,7 @@ final class SceneViewHost: SCNView {
                 // streamed subtrees with the rest of the scene —
                 // rebuild each from its recorded load batch.
                 replayAfterRealize()
+                selectionOutline.retainNodes(Set(nodesById.keys))
                 restoreTransformWrites(written)
                 animLock.lock()
                 for (key, clip) in carriedClips
@@ -1302,6 +1336,26 @@ final class SceneViewHost: SCNView {
     func applyViewConfig(_ data: Data) {
         guard let json = try? JSONSerialization.jsonObject(with: data)
                 as? [String: Any] else { return }
+        let debug: ScreenDebugOptions
+        do { debug = try ScreenDebugOptions.decode(json["debugView"]) }
+        catch {
+            logOnce("viewConfig.debugView.malformed", "viewConfig: \(error.localizedDescription); ignoring malformed configuration")
+            return
+        }
+        if screenDebugOptions != debug {
+            let changesPresentation = (screenDebugOptions.channel == .none)
+                != (debug.channel == .none)
+            screenDebugOptions = debug
+            d3Log("debugView channel=\(debug.channel.rawValue) wireframe=\(debug.wireframe) "
+                + "nativeParticlesExcluded=\(debug.channel != .none)")
+            screenDebugHostWire.apply(debug.wireframe && debug.channel == .none, to: self)
+            if debug.channel == .none { screenDebugAttachments.clear() }
+            if changesPresentation {
+                updateScreenSubviews()
+                applyScreenViewCamera()
+                updateContinuousRendering()
+            }
+        }
         if let v = json["allowsCameraControl"] as? Bool {
             allowsCameraControl = v
             // W24: in split mode the flag lives on sibling 0 (the
@@ -1353,6 +1407,7 @@ final class SceneViewHost: SCNView {
     }
 
     func applyLoadScene(_ data: Data) {
+        selectionOutline.clearScene()
         lastManifest = data
         blendCastersDirty = true
         // Payload ids are document-local — a previous document's bytes
@@ -1377,7 +1432,7 @@ final class SceneViewHost: SCNView {
     }
 
     func applyPayload(_ data: Data) {
-        guard data.count > 8 else { return }
+        guard data.count >= 8 else { return }
         let id = D3Wire.readLocalId(data, data.startIndex)
         let bytes = data.subdata(in: data.startIndex + 8..<data.endIndex)
         payloadStore[id] = bytes
@@ -1550,6 +1605,42 @@ final class SceneViewHost: SCNView {
         }
         defer { if journaled { journalNodeOp(op, json) } }
         switch op {
+        case "setNodeHighlights":
+            guard !replayingOps else { return }
+            guard let updates = json["updates"] as? [Any] else {
+                logOnce("highlights.malformed", "setNodeHighlights: missing updates")
+                return
+            }
+            var changes: [SelectionOutline.Change] = []
+            for raw in updates {
+                guard let update = raw as? [String: Any],
+                      let token = update["node"] as? String,
+                      let key = D3Wire.localIdKey(token),
+                      let rawColor = update["color"] else {
+                    logOnce("highlights.malformed", "setNodeHighlights: invalid update")
+                    continue
+                }
+                let color: SelectionOutline.LinearRGBA?
+                if rawColor is NSNull {
+                    color = nil
+                } else {
+                    guard let rgba = vec(rawColor), rgba.count == 4,
+                          rgba.allSatisfy({ Float($0).isFinite }) else {
+                        logOnce("highlights.malformed", "setNodeHighlights: invalid color")
+                        continue
+                    }
+                    color = SelectionOutline.LinearRGBA(
+                        r: Float(rgba[0]), g: Float(rgba[1]),
+                        b: Float(rgba[2]), a: Float(rgba[3]))
+                }
+                if color != nil && nodesById[key] == nil {
+                    logOnce("highlights.missing.\(key)",
+                        "setNodeHighlights: node \(key) not live; ignoring")
+                    continue
+                }
+                changes.append(SelectionOutline.Change(node: key, color: color))
+            }
+            selectionOutline.apply(changes)
         case "removeNode":
             guard let token = json["node"] as? String,
                   let key = D3Wire.localIdKey(token) else { return }
@@ -1927,6 +2018,7 @@ final class SceneViewHost: SCNView {
         let doomed = nodesById
             .filter { subtree.contains(ObjectIdentifier($0.value)) }
             .map(\.key)
+        if !replayingOps { selectionOutline.removeNodes(doomed) }
         for k in doomed {
             nodesById.removeValue(forKey: k)
             dynamicBodyKeys.remove(k)
@@ -1962,6 +2054,8 @@ final class SceneViewHost: SCNView {
             geometryConsumers.removeValue(forKey: k)
             // W11: the node's skin binding and pending attach die with
             // it; a captured bind pose would be stale for a recycled id.
+            lightIntensityOwners.removeValue(forKey: k)
+            cameraFovOwners.removeValue(forKey: k)
             nodeSkinKeys.removeValue(forKey: k)
             pendingSkinNodes.remove(k)
             pendingColliderShapes.removeValue(forKey: k)
@@ -2240,8 +2334,11 @@ final class SceneViewHost: SCNView {
             ctx.dropMaterialConsumer(geo)
         }
         node.geometry = nil
+        node.castsShadow = true
         node.light = nil
         node.camera = nil
+        ctx.lightIntensityOwners.removeValue(forKey: key)
+        ctx.cameraFovOwners.removeValue(forKey: key)
         node.physicsBody = nil
         // W18: particle systems ride on the node — retire each before
         // detaching so an in-flight pass still holding one renders
@@ -2404,6 +2501,9 @@ final class SceneViewHost: SCNView {
         animDefs = ctx.animDefs
         geometryPayloadKeys = ctx.geometryPayloadKeys
         geometriesById = ctx.geometries
+        materialColorOwners = ctx.materialColorOwners
+        lightIntensityOwners = ctx.lightIntensityOwners
+        cameraFovOwners = ctx.cameraFovOwners
         materialsById = ctx.materials
         texturesById = ctx.textures
         textureConsumers = ctx.textureConsumers
@@ -2638,12 +2738,6 @@ final class SceneViewHost: SCNView {
                     redecodeSkin(skinKey, def)
                 }
             }
-            for (animKey, pids) in animPayloadKeys
-            where pids.contains(key) {
-                if let def = animDefs[animKey] {
-                    redecodeAnimation(animKey, def)
-                }
-            }
         } else {
             // W25 fix-2: every claim map was checked surgically above
             // — reaching here means no installed or deferred resource
@@ -2654,6 +2748,9 @@ final class SceneViewHost: SCNView {
                 "upsertPayload \(key): encoding "
                 + "'\(payloadSpecs[key]?.encoding ?? "?")' backs no "
                 + "known texture or geometry")
+        }
+        for (animKey, pids) in animPayloadKeys where pids.contains(key) {
+            if let def = animDefs[animKey] { redecodeAnimation(animKey, def) }
         }
     }
 
@@ -2671,6 +2768,9 @@ final class SceneViewHost: SCNView {
         ctx.instanceSpecs = instanceSpecs
         ctx.textures = texturesById
         ctx.materials = materialsById
+        ctx.materialColorOwners = materialColorOwners
+        ctx.lightIntensityOwners = lightIntensityOwners
+        ctx.cameraFovOwners = cameraFovOwners
         ctx.geometries = geometriesById
         ctx.textureConsumers = textureConsumers
         ctx.materialConsumers = materialConsumers
@@ -2806,11 +2906,17 @@ final class SceneViewHost: SCNView {
                 ctx.applyVariantComponents()
             }
             ctx.decodeMaterial(key, r)
+            if let owner = ctx.materialColorOwners[key] {
+                applyRetainedMaterialSample(key, owner: owner)
+            }
             materialsById = ctx.materials
             textureConsumers = ctx.textureConsumers
             resourceDefs = ctx.resourceDefs
             if let old, let new = materialsById[key] {
                 let isCatcher = ctx.shadowCatcherConfigurations[key] != nil
+                if old.name == "d3.sprite" || new.name == "d3.sprite" {
+                    ctx.refreshVariantDefaults(key: key, material: new)
+                }
                 if wasCatcher || isCatcher {
                     ctx.refreshVariantDefaults(
                         key: key, material: new)
@@ -2840,6 +2946,9 @@ final class SceneViewHost: SCNView {
             // W16: a material an `lod` level references — re-resolve
             // each consuming spec against the fresh instance.
             rebindLodConsumers(key, ctx)
+            for nodeKey in cameraFacing.keys {
+                applyBillboardMaterialPolicy(nodeKey)
+            }
             bakedShadowCatcherRegistry.materialWasUpserted(
                 key: key,
                 configuration: ctx.shadowCatcherConfigurations[key],
@@ -3060,6 +3169,12 @@ final class SceneViewHost: SCNView {
     /// pick (`restoreDocumentPov`) — the split-mode blank pass must
     /// not outlive the views that justified it.
     func applyScreenViewCamera() {
+        if screenDebugOptions.channel != .none {
+            if let first = screenViews.first, let camera = nodesById[first.cameraKey] {
+                pointOfView = camera
+            } else { restoreDocumentPov() }
+            return
+        }
         guard let v = screenViews.first else {
             restoreDocumentPov()
             return
@@ -4556,7 +4671,11 @@ final class SceneViewHost: SCNView {
                 "upsertAnimation: missing id/animation")
             return
         }
-        redecodeAnimation(key, anim)
+        guard let definition = FsceneRealizer.AnimationDefinition(anim) else {
+            d3Log("animation \(key): malformed metadata; prior definition retained")
+            return
+        }
+        redecodeAnimation(key, definition)
     }
 
     /// `{"op":"removeSkin","id":"<id>"}` — drop the def; every bound
@@ -4651,7 +4770,7 @@ final class SceneViewHost: SCNView {
     /// Re-decodes one animation def — a live clip keeps playback
     /// state, its `time` clamped to the new `endTime` (upstream
     /// `rebind`'s clamp).
-    private func redecodeAnimation(_ key: UInt64, _ def: [String: Any]) {
+    private func redecodeAnimation(_ key: UInt64, _ def: FsceneRealizer.AnimationDefinition) {
         let ctx = surgicalContext()
         ctx.animDefs[key] = def
         ctx.decodeAnimation(key, def)
@@ -4696,7 +4815,11 @@ final class SceneViewHost: SCNView {
         // even with zero clips (upstream's update touches every
         // `_targetTransforms` entry, so a clip removal snaps its nodes
         // back to bind).
-        guard !animClips.isEmpty || !animTargets.isEmpty else { return }
+        guard !animClips.isEmpty || !animTargets.isEmpty
+            || materialColorOwners.values.contains(where: { $0.animationBound })
+            || lightIntensityOwners.values.contains(where: { $0.animationBound })
+            || cameraFovOwners.values.contains(where: { $0.animationBound })
+        else { return }
 
         // Advance + drop clips whose def was removed.
         for key in Array(animClips.keys) {
@@ -4736,6 +4859,9 @@ final class SceneViewHost: SCNView {
             var weights: [Float]?
         }
         var accs: [UInt64: PoseAcc] = [:]
+        var colors: [UInt64: simd_float4] = [:]
+        var intensities: [UInt64: Float] = [:]
+        var fovs: [UInt64: Float] = [:]
 
         // Channels apply in channel order; clips in id order (upstream
         // applies in registration order — key order is the stable
@@ -4748,6 +4874,43 @@ final class SceneViewHost: SCNView {
                   let def = animationsById[animKey] else { continue }
             let w = Float(clip.weight * mult)
             for ch in def.channels {
+                switch ch.kind {
+                case .materialBaseColor:
+                    guard let owner = materialColorOwners[ch.target],
+                          owner.supportsAnimation else {
+                        logOnce("anim.material.\(ch.target)",
+                            "animation baseColor target \(ch.target): missing or ineligible material")
+                        continue
+                    }
+                    let value = sampleProperty(ch, clip.time)
+                    colors[ch.target] = (colors[ch.target] ?? owner.rest)
+                        + (value - owner.rest) * w
+                    continue
+                case .lightIntensity:
+                    guard let owner = lightIntensityOwners[ch.target],
+                          owner.declarationCount == 1 else {
+                        logOnce("anim.light.\(ch.target)",
+                            "animation intensity target \(ch.target): expected exactly one light declaration")
+                        continue
+                    }
+                    let value = sampleProperty(ch, clip.time).x
+                    intensities[ch.target] = (intensities[ch.target] ?? owner.rest)
+                        + (value - owner.rest) * w
+                    continue
+                case .cameraFovRadiansY:
+                    guard let owner = cameraFovOwners[ch.target],
+                          owner.declarationCount == 1,
+                          !owner.camera.usesOrthographicProjection else {
+                        logOnce("anim.camera.\(ch.target)",
+                            "animation FOV target \(ch.target): expected exactly one perspective camera declaration")
+                        continue
+                    }
+                    let value = sampleProperty(ch, clip.time).x
+                    fovs[ch.target] = (fovs[ch.target] ?? owner.rest)
+                        + (value - owner.rest) * w
+                    continue
+                case .translation, .rotation, .scale, .weights: break
+                }
                 guard let (nk, node) = animTarget(ch) else { continue }
                 // Bind-pose capture — once, at first bind, never
                 // re-captured while the entry lives (upstream's
@@ -4770,6 +4933,8 @@ final class SceneViewHost: SCNView {
                     p: st.bindP, r: st.bindR, s: st.bindS,
                     weights: st.bindWeights)
                 switch ch.kind {
+                case .materialBaseColor, .lightIntensity, .cameraFovRadiansY:
+                    preconditionFailure("property channel entered transform binding")
                 case .translation:
                     st.drivesTransform = true
                     if w > 0, let v = sampleVec3(ch, clip.time) {
@@ -4815,6 +4980,34 @@ final class SceneViewHost: SCNView {
             }
         }
 
+        for (key, owner) in materialColorOwners {
+            if let value = colors[key] {
+                owner.animationBound = true
+                owner.apply(value)
+            } else if owner.animationBound {
+                owner.apply(owner.rest)
+                owner.animationBound = false
+            }
+        }
+        for (key, owner) in lightIntensityOwners {
+            if let value = intensities[key] {
+                owner.animationBound = true
+                owner.apply(value)
+            } else if owner.animationBound {
+                owner.apply(owner.rest)
+                owner.animationBound = false
+            }
+        }
+        for (key, owner) in cameraFovOwners {
+            if let value = fovs[key] {
+                owner.animationBound = true
+                owner.apply(value)
+            } else if owner.animationBound {
+                owner.apply(owner.rest)
+                owner.animationBound = false
+            }
+        }
+
         // Write back: bound nodes get their accumulated pose; recorded
         // nodes no channel bound this frame reset to bind — upstream
         // writes every `_targetTransforms` entry each update.
@@ -4841,6 +5034,39 @@ final class SceneViewHost: SCNView {
             }
         }
         for nk in stale { animTargets.removeValue(forKey: nk) }
+    }
+
+    private func sampleProperty(_ ch: FsceneRealizer.DecodedChannel,
+                                _ time: Double) -> simd_float4 {
+        let key = timelineKey(ch.times, time)
+        let value = ch.propertyValues[key.index]
+        if key.lerp < 1, key.index > 0 {
+            let previous = ch.propertyValues[key.index - 1]
+            return previous + (value - previous) * Float(key.lerp)
+        }
+        return value
+    }
+
+    private func applyRetainedMaterialSample(
+        _ key: UInt64, owner: FsceneRealizer.MaterialColorOwner
+    ) {
+        guard owner.supportsAnimation else { return }
+        animLock.lock()
+        defer { animLock.unlock() }
+        let total = animClips.values.reduce(0.0) { $0 + $1.weight }
+        let mult = total > 1 ? 1 / total : 1
+        var value = owner.rest
+        for animKey in animClips.keys.sorted() {
+            guard let clip = animClips[animKey],
+                  let definition = animationsById[animKey] else { continue }
+            for channel in definition.channels
+            where channel.kind == .materialBaseColor && channel.target == key {
+                owner.animationBound = true
+                value += (sampleProperty(channel, clip.time) - owner.rest)
+                    * Float(clip.weight * mult)
+            }
+        }
+        if owner.animationBound { owner.apply(value) }
     }
 
     /// Channel binding — `target` id first, `targetName` fallback
@@ -4929,6 +5155,7 @@ final class SceneViewHost: SCNView {
     /// env leaves both contents slots untouched until its payload
     /// lands, so the replaced document's look must not linger.
     func beginSceneReset() {
+        screenDebugAttachments.clear()
         guard let scene else { return }
         jointLock.lock()
         for (id, rec) in joints where rec.behavior != nil {
@@ -4978,6 +5205,9 @@ final class SceneViewHost: SCNView {
         nodes: [UInt64: SCNNode],
         resources: (geometries: [UInt64: SCNGeometry],
                     materials: [UInt64: SCNMaterial],
+                    materialColorOwners: [UInt64: FsceneRealizer.MaterialColorOwner],
+                    lightIntensityOwners: [UInt64: FsceneRealizer.LightIntensityOwner],
+                    cameraFovOwners: [UInt64: FsceneRealizer.CameraFovOwner],
                     shadowCatcherConfigurations:
                         [UInt64: ShadowCatcherConfiguration],
                     shadowCatcherBindings:
@@ -5006,7 +5236,7 @@ final class SceneViewHost: SCNView {
                     skinPayloadKeys: [UInt64: UInt64],
                     animPayloadKeys: [UInt64: Set<UInt64>],
                     skinDefs: [UInt64: [String: Any]],
-                    animDefs: [UInt64: [String: Any]],
+                    animDefs: [UInt64: FsceneRealizer.AnimationDefinition],
                     variantComponents:
                         [UInt64: FsceneRealizer.VariantComponentSpec],
                     disabledComponents: [UInt64: Set<Int>],
@@ -5047,6 +5277,9 @@ final class SceneViewHost: SCNView {
         colliderIndexByKey = colliderIndices
         geometriesById = resources.geometries
         materialsById = resources.materials
+        materialColorOwners = resources.materialColorOwners
+        lightIntensityOwners = resources.lightIntensityOwners
+        cameraFovOwners = resources.cameraFovOwners
         shadowCatcherConfigurationsById =
             resources.shadowCatcherConfigurations
         shadowCatcherBindingsById = resources.shadowCatcherBindings
@@ -5176,7 +5409,7 @@ extension SceneViewHost: SCNSceneRendererDelegate {
         sampleAnimations(at: time)
         // W16: trails record after the sampler — the head follows
         // this frame's sampled pose. LOD selection runs later, in
-        // `willRenderScene`: a physics-driven node's pose is only
+        // `didApplyConstraintsAtTime`: a physics-driven node's pose is only
         // final after the sim step, and selecting here read the
         // pre-sim pose (a one-frame lag on moving bodies).
         updateTrails(at: time)
@@ -5519,24 +5752,22 @@ extension SceneViewHost: SCNSceneRendererDelegate {
         spec.ownsRenderable = true
     }
 
-    /// W14: post-physics, pre-drawable — the offscreen passes draw the
-    /// same pose the screen frame is about to. Only fires for the
-    /// SCNView; the per-view SCNRenderers have no delegate set. W24:
-    /// sibling proxies sync in the same hook so their poke-drawn
-    /// frames share this pose. W26 also re-expands camera-facing
-    /// meshes here — the last hook before draw sees the final camera
-    /// pose.
+    /// Shared-scene captures must finish encoding before SceneKit
+    /// opens the host render encoder; constraints have finalized the pose.
     func renderer(_ renderer: SCNSceneRenderer,
-                  willRenderScene scene: SCNScene,
-                  atTime time: TimeInterval) {
-        // W16: post-physics, pre-draw — Android's `updateTrailsLods`
-        // slot (post-camera, pre-render) for the lod half.
+                  didApplyConstraintsAtTime time: TimeInterval) {
         updateLods()
         updateCameraFacing()
         syncBlendCasters()
         bakedShadowCatcherRegistry.renderDirty(at: time, host: self)
         renderDueTargets(at: time)
         syncScreenSubviews()
+    }
+
+    func applyBillboardMaterialPolicy(_ key: UInt64) {
+        guard let spec = cameraFacing[key], spec.shape == "billboard",
+              let node = spec.node else { return }
+        node.castsShadow = node.geometry?.firstMaterial?.name != "d3.sprite"
     }
 
     /// W26: rebuilds each `cameraFacing` entry's geometry expanded

@@ -1,0 +1,31 @@
+00:00 +0: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dev_reload_test.dart
+00:00 +0: sidecar-only save loads once, upserts same-ID bytes before consumers, leaves camera and authored text fixed
+00:00 +1: invalid UTF-8 retains the scene and a later file save recovers
+00:01 +2: malformed text retains accepted identity; real atomic scene rename recovers
+00:02 +3: malformed container retains accepted identity and real rename sidecar recovers
+00:03 +4: missing chunk retains accepted identity and real rename sidecar recovers
+00:04 +5: missing payload ID retains accepted identity and real rename sidecar recovers
+00:04 +6: mismatched encoding retains accepted identity and real rename sidecar recovers
+00:05 +7: mismatched layout retains accepted identity and real rename sidecar recovers
+00:06 +8: mismatched format retains accepted identity and real rename sidecar recovers
+00:07 +9: mismatched width retains accepted identity and real rename sidecar recovers
+00:07 +10: mismatched height retains accepted identity and real rename sidecar recovers
+00:08 +11: mismatched length retains accepted identity and real rename sidecar recovers
+00:09 +12: wrong declared byte length retains accepted identity and real rename sidecar recovers
+00:10 +13: matching but invalid raw dimensions and undeclared raw byte length reject before load
+00:10 +14: missing HTTP sidecar retains accepted document and later file creation recovers
+00:10 +15: recursive nested asset events reread unchanged text; surplus chunks and graph are ignored
+00:11 +16: text-only path accepts color/exposure edits without sidecar and keeps camera fixed
+00:11 +17: missing authored file reports error and later save recovers; unrelated saves reread harmlessly
+00:12 +18: HTTP boundary rejects escapes and serves fresh bytes while socket is claimed
+00:12 +19: stop is synchronous, idempotent and prevents saves reaching the same disposed controller
+00:13 +20: host close reports restart; peer disconnect releases listener
+00:13 +21: constructor opens no connection; refused start reports I/O and emits no mutation
+00:13 +22: stop during real pending handshake joins connection before same controller disposal
+00:13 +23: stop drains active real HTTP body read before same disposed controller can receive a late response
+00:13 +24: serial preparation reads the controller document after the last await
+00:13 +25: binary frame rejection recovers on later text; HTTP redirects are not followed
+00:13 +26: fixture CLI changes only the sidecar and reproducibly restores the baseline
+00:15 +27: async controller application errors propagate to caller zone
+00:15 +28: CLI SIGTERM exits cleanly and releases its listener
+00:15 +29: All tests passed!

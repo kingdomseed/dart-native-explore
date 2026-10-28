@@ -1,0 +1,7 @@
+{
+  "pid": "60067",
+  "errorQueryMatches": 0,
+  "runtimeCodeReference": "../clean/packet/source-sha256.json",
+  "referenceRecordedAfterRun": true,
+  "context": "No compiled source changed from clean run; documentation changed. Control uses the same live selector and existing public buttons."
+}

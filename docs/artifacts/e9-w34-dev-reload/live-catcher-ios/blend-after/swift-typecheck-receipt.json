@@ -1,0 +1,30 @@
+{
+  "program": "xcrun",
+  "args": [
+    "swiftc",
+    "-typecheck",
+    "-sdk",
+    "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.1.sdk",
+    "-target",
+    "arm64-apple-ios15.0-simulator",
+    "dart3d/ios/Classes/BakedShadowCatchers.swift",
+    "dart3d/ios/Classes/D3Wire.swift",
+    "dart3d/ios/Classes/Dart3dPlugin.swift",
+    "dart3d/ios/Classes/FlutterAssets.swift",
+    "dart3d/ios/Classes/FsceneRealizer.swift",
+    "dart3d/ios/Classes/GeometryFactory.swift",
+    "dart3d/ios/Classes/RenderTargets.swift",
+    "dart3d/ios/Classes/SceneViewHost.swift",
+    "dart3d/ios/Classes/ScreenDebugPresentation.swift",
+    "dart3d/ios/Classes/SelectionOutline.swift",
+    "dart3d/ios/Classes/StageEffects.swift",
+    "dart3d/ios/Classes/StageLut.swift",
+    "dart3d/ios/Classes/ToneMapping.swift"
+  ],
+  "cwd": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb",
+  "startUTC": "2026-10-28T01:58:16.977802Z",
+  "endUTC": "2026-10-28T01:58:26.864718Z",
+  "exitCode": 0,
+  "runtimeManifest": "blend-after/packet/source-sha256.json",
+  "note": "This latest final-source typecheck replaced the earlier scratch clean checker files; clean runtime packet and run receipts remain unchanged."
+}

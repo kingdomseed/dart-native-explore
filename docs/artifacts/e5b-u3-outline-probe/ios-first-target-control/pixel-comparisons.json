@@ -1,0 +1,123 @@
+[
+  {
+    "pair": "00-off",
+    "crop": [
+      0,
+      70,
+      402,
+      600
+    ],
+    "changedRGBPixels": 0,
+    "maxRGBDifference": 0
+  },
+  {
+    "pair": "01-outline-empty",
+    "crop": [
+      0,
+      70,
+      402,
+      600
+    ],
+    "changedRGBPixels": 0,
+    "maxRGBDifference": 0
+  },
+  {
+    "pair": "02-set-held",
+    "crop": [
+      0,
+      70,
+      402,
+      600
+    ],
+    "changedRGBPixels": 0,
+    "maxRGBDifference": 0
+  },
+  {
+    "pair": "03-set-render",
+    "crop": [
+      0,
+      70,
+      402,
+      600
+    ],
+    "changedRGBPixels": 0,
+    "maxRGBDifference": 0
+  },
+  {
+    "pair": "04-clear-held",
+    "crop": [
+      0,
+      70,
+      402,
+      600
+    ],
+    "changedRGBPixels": 0,
+    "maxRGBDifference": 0
+  },
+  {
+    "pair": "05-clear-render",
+    "crop": [
+      0,
+      70,
+      402,
+      600
+    ],
+    "changedRGBPixels": 0,
+    "maxRGBDifference": 0
+  },
+  {
+    "pair": "06-set-held",
+    "crop": [
+      0,
+      70,
+      402,
+      600
+    ],
+    "changedRGBPixels": 0,
+    "maxRGBDifference": 0
+  },
+  {
+    "pair": "07-set-render",
+    "crop": [
+      0,
+      70,
+      402,
+      600
+    ],
+    "changedRGBPixels": 0,
+    "maxRGBDifference": 0
+  },
+  {
+    "pair": "08-clear-held",
+    "crop": [
+      0,
+      70,
+      402,
+      600
+    ],
+    "changedRGBPixels": 0,
+    "maxRGBDifference": 0
+  },
+  {
+    "pair": "09-clear-render",
+    "crop": [
+      0,
+      70,
+      402,
+      600
+    ],
+    "changedRGBPixels": 0,
+    "maxRGBDifference": 0
+  },
+  {
+    "pair": "10-off-return",
+    "crop": [
+      0,
+      70,
+      402,
+      600
+    ],
+    "changedRGBPixels": 0,
+    "maxRGBDifference": 0
+  }
+]

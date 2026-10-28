@@ -1,0 +1,290 @@
+[
+  {
+    "args": "record start /private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/viewport-and-rig.mp4 --hide-touches",
+    "chunk_id": "ce1846",
+    "wall_time_seconds": 3.109586125,
+    "exit_code": 0,
+    "original_token_count": 50,
+    "output": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/viewport-and-rig.mp4\nSession state: /Users/jasonholt/.t3/userdata/device/agent-device/sessions/t3-250602879bd08be3a220931c\n"
+  },
+  {
+    "args": "screenshot /private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/00-off-full.png",
+    "chunk_id": "7c1660",
+    "wall_time_seconds": 0.631829833,
+    "exit_code": 0,
+    "original_token_count": 26,
+    "output": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/00-off-full.png (402x874 @1x)\n"
+  },
+  {
+    "args": "snapshot -i",
+    "chunk_id": "ded689",
+    "wall_time_seconds": 0.107593625,
+    "exit_code": 0,
+    "original_token_count": 295,
+    "output": "Warning: ios snapshots are slow in this run: p95 1548ms over 22 captures. Possible causes: device load, app or dev server stuck, helper fallback, or stale daemon.\nPage: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 28 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.rig\"\n@e5 [other] \"w34.joint\"\n@e6 [other] \"w34.occluder\"\n@e7 [other] \"w34.literal.0.125\"\n@e8 [other] \"w34.literal.0.5\"\n@e9 [other] \"w34.literal.0.875\"\n@e10 [other] \"w34.camera\"\n@e11 [other] \"w34.light\"\n@e12 [other] \"w34.authoredTarget\"\n@e13 [button] \"Off\"\n@e14 [button] \"normals\"\n@e15 [button] \"metallic\"\n@e16 [button] \"roughness\"\n@e17 [button] \"baseColor\"\n@e18 [button] \"depth\"\n@e19 [button] \"Wire off\"\n@e20 [button] \"Factors A\"\n@e21 [button] \"opaque\"\n@e22 [button] \"Capture\"\n@e23 [button] \"Reload\"\n@e24 [button] \"Rig present\"\n@e25 [button] \"Pose rest\"\n@e26 [button] \"Viewport full\"\n@e27 [text] \"PBR only. Native particles excluded in channel views.\nDepth d/(1+d). Literals 0.125 / 0.5 / 0.875.\nCapture saves authored target. Inspect lower panel in baseColor.\"\n@e28 [toolbar] \"Toolbar\"\n"
+  },
+  {
+    "args": "click @e14",
+    "chunk_id": "7f6a37",
+    "wall_time_seconds": 0.518713833,
+    "exit_code": 0,
+    "original_token_count": 6,
+    "output": "Tapped @e14 (201, 683)\n"
+  },
+  {
+    "args": "screenshot /private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/01-normals-full.png",
+    "chunk_id": "360835",
+    "wall_time_seconds": 0.677457541,
+    "exit_code": 0,
+    "original_token_count": 27,
+    "output": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/01-normals-full.png (402x874 @1x)\n"
+  },
+  {
+    "args": "snapshot -i",
+    "chunk_id": "229bab",
+    "wall_time_seconds": 0.114116416,
+    "exit_code": 0,
+    "original_token_count": 295,
+    "output": "Warning: ios snapshots are slow in this run: p95 1548ms over 23 captures. Possible causes: device load, app or dev server stuck, helper fallback, or stale daemon.\nPage: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 28 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.rig\"\n@e5 [other] \"w34.joint\"\n@e6 [other] \"w34.occluder\"\n@e7 [other] \"w34.literal.0.125\"\n@e8 [other] \"w34.literal.0.5\"\n@e9 [other] \"w34.literal.0.875\"\n@e10 [other] \"w34.camera\"\n@e11 [other] \"w34.light\"\n@e12 [other] \"w34.authoredTarget\"\n@e13 [button] \"Off\"\n@e14 [button] \"normals\"\n@e15 [button] \"metallic\"\n@e16 [button] \"roughness\"\n@e17 [button] \"baseColor\"\n@e18 [button] \"depth\"\n@e19 [button] \"Wire off\"\n@e20 [button] \"Factors A\"\n@e21 [button] \"opaque\"\n@e22 [button] \"Capture\"\n@e23 [button] \"Reload\"\n@e24 [button] \"Rig present\"\n@e25 [button] \"Pose rest\"\n@e26 [button] \"Viewport full\"\n@e27 [text] \"PBR only. Native particles excluded in channel views.\nDepth d/(1+d). Literals 0.125 / 0.5 / 0.875.\nCapture saves authored target. Inspect lower panel in baseColor.\"\n@e28 [toolbar] \"Toolbar\"\n"
+  },
+  {
+    "args": "click @e26",
+    "chunk_id": "85eb63",
+    "wall_time_seconds": 0.481786292,
+    "exit_code": 0,
+    "original_token_count": 6,
+    "output": "Tapped @e26 (330, 809)\n"
+  },
+  {
+    "args": "screenshot /private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/02-normals-inset.png",
+    "chunk_id": "071cdc",
+    "wall_time_seconds": 0.611430917,
+    "exit_code": 0,
+    "original_token_count": 28,
+    "output": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/02-normals-inset.png (402x874 @1x)\n"
+  },
+  {
+    "args": "snapshot -i",
+    "chunk_id": "de7333",
+    "wall_time_seconds": 0.104247875,
+    "exit_code": 0,
+    "original_token_count": 295,
+    "output": "Warning: ios snapshots are slow in this run: p95 1548ms over 24 captures. Possible causes: device load, app or dev server stuck, helper fallback, or stale daemon.\nPage: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 28 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.rig\"\n@e5 [other] \"w34.joint\"\n@e6 [other] \"w34.occluder\"\n@e7 [other] \"w34.literal.0.125\"\n@e8 [other] \"w34.literal.0.5\"\n@e9 [other] \"w34.literal.0.875\"\n@e10 [other] \"w34.camera\"\n@e11 [other] \"w34.light\"\n@e12 [other] \"w34.authoredTarget\"\n@e13 [button] \"Off\"\n@e14 [button] \"normals\"\n@e15 [button] \"metallic\"\n@e16 [button] \"roughness\"\n@e17 [button] \"baseColor\"\n@e18 [button] \"depth\"\n@e19 [button] \"Wire off\"\n@e20 [button] \"Factors A\"\n@e21 [button] \"opaque\"\n@e22 [button] \"Capture\"\n@e23 [button] \"Reload\"\n@e24 [button] \"Rig present\"\n@e25 [button] \"Pose rest\"\n@e26 [button] \"Viewport inset\"\n@e27 [text] \"PBR only. Native particles excluded in channel views.\nDepth d/(1+d). Literals 0.125 / 0.5 / 0.875.\nCapture saves authored target. Inspect lower panel in baseColor.\"\n@e28 [toolbar] \"Toolbar\"\n"
+  },
+  {
+    "args": "click @e13",
+    "chunk_id": "bd3503",
+    "wall_time_seconds": 0.476517833,
+    "exit_code": 0,
+    "original_token_count": 6,
+    "output": "Tapped @e13 (72, 683)\n"
+  },
+  {
+    "args": "screenshot /private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/03-off-inset.png",
+    "chunk_id": "1bd74f",
+    "wall_time_seconds": 0.619258583,
+    "exit_code": 0,
+    "original_token_count": 27,
+    "output": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/03-off-inset.png (402x874 @1x)\n"
+  },
+  {
+    "args": "snapshot -i",
+    "chunk_id": "063bd2",
+    "wall_time_seconds": 0.110498208,
+    "exit_code": 0,
+    "original_token_count": 378,
+    "output": "Warning: ios snapshots are slow in this run: p95 1548ms over 25 captures. Possible causes: device load, app or dev server stuck, helper fallback, or stale daemon.\nPage: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 38 nodes\nWarning: possible repeated nav subtree detected.\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.rig\"\n@e5 [other] \"w34.joint\"\n@e6 [other] \"w34.occluder\"\n@e7 [other] \"w34.literal.0.125\"\n@e8 [other] \"w34.literal.0.5\"\n@e9 [other] \"w34.literal.0.875\"\n@e10 [other] \"w34.camera\"\n@e11 [other] \"w34.light\"\n@e12 [other] \"w34.authoredTarget\"\n@e13 [other] \"w34.quad\"\n@e14 [other] \"w34.rig\"\n@e15 [other] \"w34.joint\"\n@e16 [other] \"w34.occluder\"\n@e17 [other] \"w34.literal.0.125\"\n@e18 [other] \"w34.literal.0.5\"\n@e19 [other] \"w34.literal.0.875\"\n@e20 [other] \"w34.camera\"\n@e21 [other] \"w34.light\"\n@e22 [other] \"w34.authoredTarget\"\n@e23 [button] \"Off\"\n@e24 [button] \"normals\"\n@e25 [button] \"metallic\"\n@e26 [button] \"roughness\"\n@e27 [button] \"baseColor\"\n@e28 [button] \"depth\"\n@e29 [button] \"Wire off\"\n@e30 [button] \"Factors A\"\n@e31 [button] \"opaque\"\n@e32 [button] \"Capture\"\n@e33 [button] \"Reload\"\n@e34 [button] \"Rig present\"\n@e35 [button] \"Pose rest\"\n@e36 [button] \"Viewport inset\"\n@e37 [text] \"PBR only. Native particles excluded in channel views.\nDepth d/(1+d). Literals 0.125 / 0.5 / 0.875.\nCapture saves authored target. Inspect lower panel in baseColor.\"\n@e38 [toolbar] \"Toolbar\"\n"
+  },
+  {
+    "args": "click @e24",
+    "chunk_id": "ca3b87",
+    "wall_time_seconds": 0.461569375,
+    "exit_code": 0,
+    "original_token_count": 6,
+    "output": "Tapped @e24 (201, 683)\n"
+  },
+  {
+    "args": "screenshot /private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/04-normals-inset-from-off.png",
+    "chunk_id": "cb1259",
+    "wall_time_seconds": 0.628364666,
+    "exit_code": 0,
+    "original_token_count": 30,
+    "output": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/04-normals-inset-from-off.png (402x874 @1x)\n"
+  },
+  {
+    "args": "snapshot -i",
+    "chunk_id": "fc0b5e",
+    "wall_time_seconds": 0.088531542,
+    "exit_code": 0,
+    "original_token_count": 295,
+    "output": "Warning: ios snapshots are slow in this run: p95 1548ms over 26 captures. Possible causes: device load, app or dev server stuck, helper fallback, or stale daemon.\nPage: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 28 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.rig\"\n@e5 [other] \"w34.joint\"\n@e6 [other] \"w34.occluder\"\n@e7 [other] \"w34.literal.0.125\"\n@e8 [other] \"w34.literal.0.5\"\n@e9 [other] \"w34.literal.0.875\"\n@e10 [other] \"w34.camera\"\n@e11 [other] \"w34.light\"\n@e12 [other] \"w34.authoredTarget\"\n@e13 [button] \"Off\"\n@e14 [button] \"normals\"\n@e15 [button] \"metallic\"\n@e16 [button] \"roughness\"\n@e17 [button] \"baseColor\"\n@e18 [button] \"depth\"\n@e19 [button] \"Wire off\"\n@e20 [button] \"Factors A\"\n@e21 [button] \"opaque\"\n@e22 [button] \"Capture\"\n@e23 [button] \"Reload\"\n@e24 [button] \"Rig present\"\n@e25 [button] \"Pose rest\"\n@e26 [button] \"Viewport inset\"\n@e27 [text] \"PBR only. Native particles excluded in channel views.\nDepth d/(1+d). Literals 0.125 / 0.5 / 0.875.\nCapture saves authored target. Inspect lower panel in baseColor.\"\n@e28 [toolbar] \"Toolbar\"\n"
+  },
+  {
+    "args": "click @e26",
+    "chunk_id": "37d4d8",
+    "wall_time_seconds": 0.478964958,
+    "exit_code": 0,
+    "original_token_count": 6,
+    "output": "Tapped @e26 (330, 809)\n"
+  },
+  {
+    "args": "snapshot -i",
+    "chunk_id": "f1d2f1",
+    "wall_time_seconds": 0.12175825,
+    "exit_code": 0,
+    "original_token_count": 295,
+    "output": "Warning: ios snapshots are slow in this run: p95 1548ms over 27 captures. Possible causes: device load, app or dev server stuck, helper fallback, or stale daemon.\nPage: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 28 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.rig\"\n@e5 [other] \"w34.joint\"\n@e6 [other] \"w34.occluder\"\n@e7 [other] \"w34.literal.0.125\"\n@e8 [other] \"w34.literal.0.5\"\n@e9 [other] \"w34.literal.0.875\"\n@e10 [other] \"w34.camera\"\n@e11 [other] \"w34.light\"\n@e12 [other] \"w34.authoredTarget\"\n@e13 [button] \"Off\"\n@e14 [button] \"normals\"\n@e15 [button] \"metallic\"\n@e16 [button] \"roughness\"\n@e17 [button] \"baseColor\"\n@e18 [button] \"depth\"\n@e19 [button] \"Wire off\"\n@e20 [button] \"Factors A\"\n@e21 [button] \"opaque\"\n@e22 [button] \"Capture\"\n@e23 [button] \"Reload\"\n@e24 [button] \"Rig present\"\n@e25 [button] \"Pose rest\"\n@e26 [button] \"Viewport full\"\n@e27 [text] \"PBR only. Native particles excluded in channel views.\nDepth d/(1+d). Literals 0.125 / 0.5 / 0.875.\nCapture saves authored target. Inspect lower panel in baseColor.\"\n@e28 [toolbar] \"Toolbar\"\n"
+  },
+  {
+    "args": "click @e13",
+    "chunk_id": "41c725",
+    "wall_time_seconds": 0.474633959,
+    "exit_code": 0,
+    "original_token_count": 6,
+    "output": "Tapped @e13 (72, 683)\n"
+  },
+  {
+    "args": "screenshot /private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/05-off-full-return.png",
+    "chunk_id": "6fac54",
+    "wall_time_seconds": 0.6133965,
+    "exit_code": 0,
+    "original_token_count": 28,
+    "output": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/05-off-full-return.png (402x874 @1x)\n"
+  },
+  {
+    "args": "snapshot -i",
+    "chunk_id": "a4d396",
+    "wall_time_seconds": 0.107851167,
+    "exit_code": 0,
+    "original_token_count": 295,
+    "output": "Warning: ios snapshots are slow in this run: p95 1548ms over 28 captures. Possible causes: device load, app or dev server stuck, helper fallback, or stale daemon.\nPage: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 28 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.rig\"\n@e5 [other] \"w34.joint\"\n@e6 [other] \"w34.occluder\"\n@e7 [other] \"w34.literal.0.125\"\n@e8 [other] \"w34.literal.0.5\"\n@e9 [other] \"w34.literal.0.875\"\n@e10 [other] \"w34.camera\"\n@e11 [other] \"w34.light\"\n@e12 [other] \"w34.authoredTarget\"\n@e13 [button] \"Off\"\n@e14 [button] \"normals\"\n@e15 [button] \"metallic\"\n@e16 [button] \"roughness\"\n@e17 [button] \"baseColor\"\n@e18 [button] \"depth\"\n@e19 [button] \"Wire off\"\n@e20 [button] \"Factors A\"\n@e21 [button] \"opaque\"\n@e22 [button] \"Capture\"\n@e23 [button] \"Reload\"\n@e24 [button] \"Rig present\"\n@e25 [button] \"Pose rest\"\n@e26 [button] \"Viewport full\"\n@e27 [text] \"PBR only. Native particles excluded in channel views.\nDepth d/(1+d). Literals 0.125 / 0.5 / 0.875.\nCapture saves authored target. Inspect lower panel in baseColor.\"\n@e28 [toolbar] \"Toolbar\"\n"
+  },
+  {
+    "args": "click @e24",
+    "chunk_id": "126d92",
+    "wall_time_seconds": 0.467035125,
+    "exit_code": 0,
+    "original_token_count": 6,
+    "output": "Tapped @e24 (72, 809)\n"
+  },
+  {
+    "args": "snapshot -i",
+    "chunk_id": "ffd2cc",
+    "wall_time_seconds": 0.090935,
+    "exit_code": 0,
+    "original_token_count": 283,
+    "output": "Warning: ios snapshots are slow in this run: p95 1548ms over 29 captures. Possible causes: device load, app or dev server stuck, helper fallback, or stale daemon.\nPage: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 26 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.literal.0.125\"\n@e6 [other] \"w34.literal.0.5\"\n@e7 [other] \"w34.literal.0.875\"\n@e8 [other] \"w34.camera\"\n@e9 [other] \"w34.light\"\n@e10 [other] \"w34.authoredTarget\"\n@e11 [button] \"Off\"\n@e12 [button] \"normals\"\n@e13 [button] \"metallic\"\n@e14 [button] \"roughness\"\n@e15 [button] \"baseColor\"\n@e16 [button] \"depth\"\n@e17 [button] \"Wire off\"\n@e18 [button] \"Factors A\"\n@e19 [button] \"opaque\"\n@e20 [button] \"Capture\"\n@e21 [button] \"Reload\"\n@e22 [button] \"Rig removed\"\n@e23 [button] \"Pose rest\"\n@e24 [button] \"Viewport full\"\n@e25 [text] \"PBR only. Native particles excluded in channel views.\nDepth d/(1+d). Literals 0.125 / 0.5 / 0.875.\nCapture saves authored target. Inspect lower panel in baseColor.\"\n@e26 [toolbar] \"Toolbar\"\n"
+  },
+  {
+    "args": "click @e12",
+    "chunk_id": "61e236",
+    "wall_time_seconds": 0.458180583,
+    "exit_code": 0,
+    "original_token_count": 6,
+    "output": "Tapped @e12 (201, 683)\n"
+  },
+  {
+    "args": "screenshot /private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/06-detached-normals.png",
+    "chunk_id": "f8ef1e",
+    "wall_time_seconds": 0.655234708,
+    "exit_code": 0,
+    "original_token_count": 28,
+    "output": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/06-detached-normals.png (402x874 @1x)\n"
+  },
+  {
+    "args": "snapshot -i",
+    "chunk_id": "a2727e",
+    "wall_time_seconds": 0.10640675,
+    "exit_code": 0,
+    "original_token_count": 283,
+    "output": "Warning: ios snapshots are slow in this run: p95 1548ms over 30 captures. Possible causes: device load, app or dev server stuck, helper fallback, or stale daemon.\nPage: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 26 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.literal.0.125\"\n@e6 [other] \"w34.literal.0.5\"\n@e7 [other] \"w34.literal.0.875\"\n@e8 [other] \"w34.camera\"\n@e9 [other] \"w34.light\"\n@e10 [other] \"w34.authoredTarget\"\n@e11 [button] \"Off\"\n@e12 [button] \"normals\"\n@e13 [button] \"metallic\"\n@e14 [button] \"roughness\"\n@e15 [button] \"baseColor\"\n@e16 [button] \"depth\"\n@e17 [button] \"Wire off\"\n@e18 [button] \"Factors A\"\n@e19 [button] \"opaque\"\n@e20 [button] \"Capture\"\n@e21 [button] \"Reload\"\n@e22 [button] \"Rig removed\"\n@e23 [button] \"Pose rest\"\n@e24 [button] \"Viewport full\"\n@e25 [text] \"PBR only. Native particles excluded in channel views.\nDepth d/(1+d). Literals 0.125 / 0.5 / 0.875.\nCapture saves authored target. Inspect lower panel in baseColor.\"\n@e26 [toolbar] \"Toolbar\"\n"
+  },
+  {
+    "args": "click @e22",
+    "chunk_id": "29ffc6",
+    "wall_time_seconds": 0.473715208,
+    "exit_code": 0,
+    "original_token_count": 6,
+    "output": "Tapped @e22 (72, 809)\n"
+  },
+  {
+    "args": "snapshot -i",
+    "chunk_id": "43afed",
+    "wall_time_seconds": 0.109489458,
+    "exit_code": 0,
+    "original_token_count": 295,
+    "output": "Warning: ios snapshots are slow in this run: p95 1548ms over 31 captures. Possible causes: device load, app or dev server stuck, helper fallback, or stale daemon.\nPage: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 28 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.literal.0.125\"\n@e6 [other] \"w34.literal.0.5\"\n@e7 [other] \"w34.literal.0.875\"\n@e8 [other] \"w34.camera\"\n@e9 [other] \"w34.light\"\n@e10 [other] \"w34.authoredTarget\"\n@e11 [other] \"w34.rig\"\n@e12 [other] \"w34.joint\"\n@e13 [button] \"Off\"\n@e14 [button] \"normals\"\n@e15 [button] \"metallic\"\n@e16 [button] \"roughness\"\n@e17 [button] \"baseColor\"\n@e18 [button] \"depth\"\n@e19 [button] \"Wire off\"\n@e20 [button] \"Factors A\"\n@e21 [button] \"opaque\"\n@e22 [button] \"Capture\"\n@e23 [button] \"Reload\"\n@e24 [button] \"Rig present\"\n@e25 [button] \"Pose rest\"\n@e26 [button] \"Viewport full\"\n@e27 [text] \"PBR only. Native particles excluded in channel views.\nDepth d/(1+d). Literals 0.125 / 0.5 / 0.875.\nCapture saves authored target. Inspect lower panel in baseColor.\"\n@e28 [toolbar] \"Toolbar\"\n"
+  },
+  {
+    "args": "click @e25",
+    "chunk_id": "680a7e",
+    "wall_time_seconds": 0.4640405,
+    "exit_code": 0,
+    "original_token_count": 6,
+    "output": "Tapped @e25 (201, 809)\n"
+  },
+  {
+    "args": "screenshot /private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/07-restored-raised.png",
+    "chunk_id": "deecbd",
+    "wall_time_seconds": 0.603339583,
+    "exit_code": 0,
+    "original_token_count": 28,
+    "output": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/07-restored-raised.png (402x874 @1x)\n"
+  },
+  {
+    "args": "snapshot -i",
+    "chunk_id": "2606cb",
+    "wall_time_seconds": 0.105290667,
+    "exit_code": 0,
+    "original_token_count": 295,
+    "output": "Warning: ios snapshots are slow in this run: p95 1548ms over 32 captures. Possible causes: device load, app or dev server stuck, helper fallback, or stale daemon.\nPage: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 28 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.literal.0.125\"\n@e6 [other] \"w34.literal.0.5\"\n@e7 [other] \"w34.literal.0.875\"\n@e8 [other] \"w34.camera\"\n@e9 [other] \"w34.light\"\n@e10 [other] \"w34.authoredTarget\"\n@e11 [other] \"w34.rig\"\n@e12 [other] \"w34.joint\"\n@e13 [button] \"Off\"\n@e14 [button] \"normals\"\n@e15 [button] \"metallic\"\n@e16 [button] \"roughness\"\n@e17 [button] \"baseColor\"\n@e18 [button] \"depth\"\n@e19 [button] \"Wire off\"\n@e20 [button] \"Factors A\"\n@e21 [button] \"opaque\"\n@e22 [button] \"Capture\"\n@e23 [button] \"Reload\"\n@e24 [button] \"Rig present\"\n@e25 [button] \"Pose raised\"\n@e26 [button] \"Viewport full\"\n@e27 [text] \"PBR only. Native particles excluded in channel views.\nDepth d/(1+d). Literals 0.125 / 0.5 / 0.875.\nCapture saves authored target. Inspect lower panel in baseColor.\"\n@e28 [toolbar] \"Toolbar\"\n"
+  },
+  {
+    "args": "click @e13",
+    "chunk_id": "1c565b",
+    "wall_time_seconds": 0.49526875,
+    "exit_code": 0,
+    "original_token_count": 6,
+    "output": "Tapped @e13 (72, 683)\n"
+  },
+  {
+    "args": "screenshot /private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/08-restored-raised-off.png",
+    "chunk_id": "adba56",
+    "wall_time_seconds": 0.620242667,
+    "exit_code": 0,
+    "original_token_count": 29,
+    "output": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/08-restored-raised-off.png (402x874 @1x)\n"
+  },
+  {
+    "args": "snapshot -i",
+    "chunk_id": "3f4e55",
+    "wall_time_seconds": 0.089462083,
+    "exit_code": 0,
+    "original_token_count": 295,
+    "output": "Warning: ios snapshots are slow in this run: p95 1548ms over 33 captures. Possible causes: device load, app or dev server stuck, helper fallback, or stale daemon.\nPage: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 28 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.literal.0.125\"\n@e6 [other] \"w34.literal.0.5\"\n@e7 [other] \"w34.literal.0.875\"\n@e8 [other] \"w34.camera\"\n@e9 [other] \"w34.light\"\n@e10 [other] \"w34.authoredTarget\"\n@e11 [other] \"w34.rig\"\n@e12 [other] \"w34.joint\"\n@e13 [button] \"Off\"\n@e14 [button] \"normals\"\n@e15 [button] \"metallic\"\n@e16 [button] \"roughness\"\n@e17 [button] \"baseColor\"\n@e18 [button] \"depth\"\n@e19 [button] \"Wire off\"\n@e20 [button] \"Factors A\"\n@e21 [button] \"opaque\"\n@e22 [button] \"Capture\"\n@e23 [button] \"Reload\"\n@e24 [button] \"Rig present\"\n@e25 [button] \"Pose raised\"\n@e26 [button] \"Viewport full\"\n@e27 [text] \"PBR only. Native particles excluded in channel views.\nDepth d/(1+d). Literals 0.125 / 0.5 / 0.875.\nCapture saves authored target. Inspect lower panel in baseColor.\"\n@e28 [toolbar] \"Toolbar\"\n"
+  },
+  {
+    "args": "click @e25",
+    "chunk_id": "5af2ef",
+    "wall_time_seconds": 0.456630417,
+    "exit_code": 0,
+    "original_token_count": 6,
+    "output": "Tapped @e25 (201, 809)\n"
+  },
+  {
+    "args": "screenshot /private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/09-off-rest-return.png",
+    "chunk_id": "785d67",
+    "wall_time_seconds": 0.631026708,
+    "exit_code": 0,
+    "original_token_count": 28,
+    "output": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/09-off-rest-return.png (402x874 @1x)\n"
+  },
+  {
+    "args": "record stop",
+    "chunk_id": "27a9dd",
+    "wall_time_seconds": 0.741149583,
+    "exit_code": 0,
+    "original_token_count": 24,
+    "output": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/viewport-and-rig.mp4\n"
+  }
+]

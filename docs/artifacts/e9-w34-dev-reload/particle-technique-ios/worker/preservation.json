@@ -1,0 +1,12 @@
+{
+  "base": "2f38e4e33f0b1cb678bc408a42d069c796cefc12",
+  "acceptedFiles": 58,
+  "probeFiles": 4,
+  "runtimeArchiveFiles": 61,
+  "unownedFilesUnchanged": 1933,
+  "acceptedUnownedFilesUnchanged": 57,
+  "locksUnchanged": 6,
+  "unexpectedSourcePaths": [],
+  "replay": "PASS",
+  "runtime": "NOT_RUN"
+}

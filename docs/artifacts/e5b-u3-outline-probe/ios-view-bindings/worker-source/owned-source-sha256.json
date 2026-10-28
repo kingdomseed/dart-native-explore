@@ -1,0 +1,10 @@
+{
+  "dart3d/example/lib/u3_outline_views_main.dart": "0ebb5143f67bbf5923360dde2bdb862207b9238ba1c061f9a382b3bcd78de741",
+  "dart3d/example/lib/u3_outline_views_scene.dart": "fc4c0e2c88aabaa6e77319c86750c5c71a28c1a94f411ed20a14b273cdd97e94",
+  "dart3d/example/test/u3_outline_views_test.dart": "7420cc5842dba4b41758dbfae27b99b38148a1b1a0f1de9cc3fcfd4e80e7d4bc",
+  "dart3d/ios/Classes/RenderTargets.swift": "47950d3fbe9fa77a939612bd1142efcf1f01304c3b3c86a51332760f5b0cf70c",
+  "dart3d/ios/Classes/SceneViewHost.swift": "3e1c00b2cf0fb09facb4de8619037768c466fbfda49d8dd28cd69378e708ae2e",
+  "dart3d/ios/Classes/SelectionOutline.swift": "d646e6a6bc8de4dbd866cb18a3d45529fad242242693088c1be2c78ad0950f09",
+  "dart3d/ios/Classes/SelectionOutlineViewsProbe.swift": "2c38c1b666495ac02937fddf5a6817b13fecdf4a0411537de15e9920814e5bb0",
+  "dart3d/ios/Classes/ToneMapping.swift": "a0be39a640da5a9da77857eebe0aa59406871f85ec333ed92487e673c3cf65fb"
+}

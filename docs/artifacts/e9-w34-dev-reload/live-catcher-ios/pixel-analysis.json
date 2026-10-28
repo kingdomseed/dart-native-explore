@@ -1,0 +1,3776 @@
+{
+  "comparisons": [
+    {
+      "left": "before/00-off-A.png",
+      "right": "clean/00-off-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "before/01-normals-A.png",
+      "right": "clean/01-normals-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 30425,
+      "maxRGBDifference": 126
+    },
+    {
+      "left": "before/02-depth-A.png",
+      "right": "clean/02-depth-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 30375,
+      "maxRGBDifference": 16
+    },
+    {
+      "left": "before/03-baseColor-A.png",
+      "right": "clean/03-baseColor-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 30425,
+      "maxRGBDifference": 253
+    },
+    {
+      "left": "before/04-baseColor-B.png",
+      "right": "clean/04-baseColor-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 30937,
+      "maxRGBDifference": 253
+    },
+    {
+      "left": "before/05-normals-B.png",
+      "right": "clean/05-normals-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 30937,
+      "maxRGBDifference": 126
+    },
+    {
+      "left": "before/06-off-B.png",
+      "right": "clean/06-off-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "before/07-off-A-return.png",
+      "right": "clean/07-off-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/00-off-A.png",
+      "right": "clean/00-off-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/01-normals-A.png",
+      "right": "clean/01-normals-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/02-depth-A.png",
+      "right": "clean/02-depth-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/03-baseColor-A.png",
+      "right": "clean/03-baseColor-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/04-baseColor-B.png",
+      "right": "clean/04-baseColor-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/05-normals-B.png",
+      "right": "clean/05-normals-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/06-off-B.png",
+      "right": "clean/06-off-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/07-off-A-return.png",
+      "right": "clean/07-off-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/08-normals-A-return.png",
+      "right": "clean/08-normals-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/09-metallic-A.png",
+      "right": "clean/09-metallic-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/10-roughness-A.png",
+      "right": "clean/10-roughness-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/11-baseColor-A-return.png",
+      "right": "clean/11-baseColor-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/12-depth-A-return.png",
+      "right": "clean/12-depth-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/13-depth-wire.png",
+      "right": "clean/13-depth-wire.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/14-off-wire.png",
+      "right": "clean/14-off-wire.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/15-off.png",
+      "right": "clean/15-off.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/16-normals-A.png",
+      "right": "clean/16-normals-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/17-light-B.png",
+      "right": "clean/17-light-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/18-light-A-return.png",
+      "right": "clean/18-light-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/19-low.png",
+      "right": "clean/19-low.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/20-high-return.png",
+      "right": "clean/20-high-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/21-dim.png",
+      "right": "clean/21-dim.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/22-bright.png",
+      "right": "clean/22-bright.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/23-playing.png",
+      "right": "clean/23-playing.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/24-paused.png",
+      "right": "clean/24-paused.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/25-rest-100.png",
+      "right": "clean/25-rest-100.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/26-new-B.png",
+      "right": "clean/26-new-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/27-new-B-dim.png",
+      "right": "clean/27-new-B-dim.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/28-new-B-rest-80.png",
+      "right": "clean/28-new-B-rest-80.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/29-light-absent.png",
+      "right": "clean/29-light-absent.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/30-light-restored.png",
+      "right": "clean/30-light-restored.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/31-material-replace.png",
+      "right": "clean/31-material-replace.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/32-reload-selected.png",
+      "right": "clean/32-reload-selected.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/33-off-new-B.png",
+      "right": "clean/33-off-new-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/34-off-new-A.png",
+      "right": "clean/34-off-new-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/35-off-reload-new-A.png",
+      "right": "clean/35-off-reload-new-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/36-normals-reenter.png",
+      "right": "clean/36-normals-reenter.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/37-absent-1.png",
+      "right": "clean/37-absent-1.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/38-restored-1.png",
+      "right": "clean/38-restored-1.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/39-absent-2.png",
+      "right": "clean/39-absent-2.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/40-restored-2.png",
+      "right": "clean/40-restored-2.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/41-absent-3.png",
+      "right": "clean/41-absent-3.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/42-restored-3.png",
+      "right": "clean/42-restored-3.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/43-off-final.png",
+      "right": "clean/43-off-final.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "no-light-control/01-off-absent.png",
+      "right": "no-light-control/03-off-absent-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "no-light-control/01-off-absent.png",
+      "right": "no-light-control/04-off-absent-replace.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "no-light-control/01-off-absent.png",
+      "right": "no-light-control/05-off-absent-reload.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "no-light-control/00-off-present.png",
+      "right": "no-light-control/06-off-restored.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "no-light-control/00-off-present.png",
+      "right": "no-light-control/08-off-restored-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/29-light-absent.png",
+      "right": "no-light-control/02-normals-absent.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/00-off-A.png",
+      "right": "no-light-control/00-off-present.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/00-off-A.png",
+      "right": "traced/07-off-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/00-off-A.png",
+      "right": "traced/15-off.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/00-off-A.png",
+      "right": "traced/34-off-new-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/00-off-A.png",
+      "right": "traced/35-off-reload-new-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/00-off-A.png",
+      "right": "traced/43-off-final.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "traced/03-baseColor-A.png",
+      "right": "traced/04-baseColor-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 24393,
+      "maxRGBDifference": 157
+    },
+    {
+      "left": "traced/16-normals-A.png",
+      "right": "traced/17-light-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 18267,
+      "maxRGBDifference": 118
+    },
+    {
+      "left": "traced/16-normals-A.png",
+      "right": "traced/18-light-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/00-off-A.png",
+      "right": "clean/07-off-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/00-off-A.png",
+      "right": "clean/15-off.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/00-off-A.png",
+      "right": "clean/34-off-new-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/00-off-A.png",
+      "right": "clean/35-off-reload-new-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/00-off-A.png",
+      "right": "clean/43-off-final.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "clean/03-baseColor-A.png",
+      "right": "clean/04-baseColor-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 24393,
+      "maxRGBDifference": 157
+    },
+    {
+      "left": "clean/16-normals-A.png",
+      "right": "clean/17-light-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 18267,
+      "maxRGBDifference": 118
+    },
+    {
+      "left": "clean/16-normals-A.png",
+      "right": "clean/18-light-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "pbr-regression/old-03-roughness.png",
+      "right": "pbr-regression/03-roughness.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "pbr-regression/old-04-baseColor.png",
+      "right": "pbr-regression/04-baseColor.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "pbr-regression/old-01-normals.png",
+      "right": "pbr-regression/01-normals.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "pbr-regression/old-05-depth.png",
+      "right": "pbr-regression/05-depth.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "left": "pbr-regression/old-02-metallic.png",
+      "right": "pbr-regression/02-metallic.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    }
+  ],
+  "samples": {
+    "before/00-off-A.png": {
+      "100,350": [
+        0,
+        31,
+        50,
+        255
+      ],
+      "300,370": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "335,365": [
+        0,
+        13,
+        28,
+        255
+      ],
+      "200,250": [
+        255,
+        181,
+        114,
+        255
+      ]
+    },
+    "before/01-normals-A.png": {
+      "100,350": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "300,370": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "335,365": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "before/02-depth-A.png": {
+      "100,350": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "300,370": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "335,365": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "200,250": [
+        237,
+        237,
+        237,
+        255
+      ]
+    },
+    "before/03-baseColor-A.png": {
+      "100,350": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "300,370": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "335,365": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "200,250": [
+        237,
+        157,
+        97,
+        255
+      ]
+    },
+    "before/04-baseColor-B.png": {
+      "100,350": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "300,370": [
+        248,
+        221,
+        201,
+        255
+      ],
+      "335,365": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "200,250": [
+        118,
+        150,
+        179,
+        255
+      ]
+    },
+    "before/05-normals-B.png": {
+      "100,350": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "300,370": [
+        231,
+        211,
+        250,
+        255
+      ],
+      "335,365": [
+        253,
+        253,
+        253,
+        255
+      ],
+      "200,250": [
+        187,
+        127,
+        245,
+        255
+      ]
+    },
+    "before/06-off-B.png": {
+      "100,350": [
+        0,
+        31,
+        50,
+        255
+      ],
+      "300,370": [
+        28,
+        15,
+        0,
+        255
+      ],
+      "335,365": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "200,250": [
+        0,
+        36,
+        57,
+        255
+      ]
+    },
+    "before/07-off-A-return.png": {
+      "100,350": [
+        0,
+        31,
+        50,
+        255
+      ],
+      "300,370": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "335,365": [
+        0,
+        13,
+        28,
+        255
+      ],
+      "200,250": [
+        255,
+        181,
+        114,
+        255
+      ]
+    },
+    "traced/00-off-A.png": {
+      "100,350": [
+        0,
+        31,
+        50,
+        255
+      ],
+      "300,370": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "335,365": [
+        0,
+        13,
+        28,
+        255
+      ],
+      "200,250": [
+        255,
+        181,
+        114,
+        255
+      ]
+    },
+    "traced/01-normals-A.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/02-depth-A.png": {
+      "100,350": [
+        245,
+        245,
+        245,
+        255
+      ],
+      "300,370": [
+        237,
+        237,
+        237,
+        255
+      ],
+      "335,365": [
+        245,
+        245,
+        245,
+        255
+      ],
+      "200,250": [
+        237,
+        237,
+        237,
+        255
+      ]
+    },
+    "traced/03-baseColor-A.png": {
+      "100,350": [
+        118,
+        150,
+        179,
+        255
+      ],
+      "300,370": [
+        253,
+        0,
+        253,
+        255
+      ],
+      "335,365": [
+        212,
+        99,
+        228,
+        255
+      ],
+      "200,250": [
+        237,
+        157,
+        97,
+        255
+      ]
+    },
+    "traced/04-baseColor-B.png": {
+      "100,350": [
+        118,
+        150,
+        179,
+        255
+      ],
+      "300,370": [
+        248,
+        52,
+        201,
+        255
+      ],
+      "335,365": [
+        253,
+        0,
+        253,
+        255
+      ],
+      "200,250": [
+        118,
+        150,
+        179,
+        255
+      ]
+    },
+    "traced/05-normals-B.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        206,
+        234,
+        255
+      ],
+      "335,365": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "200,250": [
+        187,
+        127,
+        245,
+        255
+      ]
+    },
+    "traced/06-off-B.png": {
+      "100,350": [
+        0,
+        31,
+        50,
+        255
+      ],
+      "300,370": [
+        28,
+        15,
+        0,
+        255
+      ],
+      "335,365": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "200,250": [
+        0,
+        36,
+        57,
+        255
+      ]
+    },
+    "traced/07-off-A-return.png": {
+      "100,350": [
+        0,
+        31,
+        50,
+        255
+      ],
+      "300,370": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "335,365": [
+        0,
+        13,
+        28,
+        255
+      ],
+      "200,250": [
+        255,
+        181,
+        114,
+        255
+      ]
+    },
+    "traced/08-normals-A-return.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/09-metallic-A.png": {
+      "100,350": [
+        124,
+        124,
+        124,
+        255
+      ],
+      "300,370": [
+        253,
+        0,
+        253,
+        255
+      ],
+      "335,365": [
+        212,
+        81,
+        212,
+        255
+      ],
+      "200,250": [
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    "traced/10-roughness-A.png": {
+      "100,350": [
+        216,
+        216,
+        216,
+        255
+      ],
+      "300,370": [
+        253,
+        0,
+        253,
+        255
+      ],
+      "335,365": [
+        240,
+        146,
+        240,
+        255
+      ],
+      "200,250": [
+        196,
+        196,
+        196,
+        255
+      ]
+    },
+    "traced/11-baseColor-A-return.png": {
+      "100,350": [
+        118,
+        150,
+        179,
+        255
+      ],
+      "300,370": [
+        253,
+        0,
+        253,
+        255
+      ],
+      "335,365": [
+        212,
+        99,
+        228,
+        255
+      ],
+      "200,250": [
+        237,
+        157,
+        97,
+        255
+      ]
+    },
+    "traced/12-depth-A-return.png": {
+      "100,350": [
+        245,
+        245,
+        245,
+        255
+      ],
+      "300,370": [
+        237,
+        237,
+        237,
+        255
+      ],
+      "335,365": [
+        245,
+        245,
+        245,
+        255
+      ],
+      "200,250": [
+        237,
+        237,
+        237,
+        255
+      ]
+    },
+    "traced/13-depth-wire.png": {
+      "100,350": [
+        245,
+        245,
+        245,
+        255
+      ],
+      "300,370": [
+        238,
+        238,
+        238,
+        255
+      ],
+      "335,365": [
+        245,
+        245,
+        245,
+        255
+      ],
+      "200,250": [
+        237,
+        237,
+        237,
+        255
+      ]
+    },
+    "traced/14-off-wire.png": {
+      "100,350": [
+        0,
+        31,
+        50,
+        255
+      ],
+      "300,370": [
+        14,
+        14,
+        14,
+        255
+      ],
+      "335,365": [
+        0,
+        13,
+        28,
+        255
+      ],
+      "200,250": [
+        255,
+        181,
+        114,
+        255
+      ]
+    },
+    "traced/15-off.png": {
+      "100,350": [
+        0,
+        31,
+        50,
+        255
+      ],
+      "300,370": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "335,365": [
+        0,
+        13,
+        28,
+        255
+      ],
+      "200,250": [
+        255,
+        181,
+        114,
+        255
+      ]
+    },
+    "traced/16-normals-A.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/17-light-B.png": {
+      "100,350": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "300,370": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "335,365": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/18-light-A-return.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/19-low.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "335,365": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/20-high-return.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/21-dim.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/22-bright.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/23-playing.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/24-paused.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/25-rest-100.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/26-new-B.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/27-new-B-dim.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/28-new-B-rest-80.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/29-light-absent.png": {
+      "100,350": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/30-light-restored.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/31-material-replace.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/32-reload-selected.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/33-off-new-B.png": {
+      "100,350": [
+        0,
+        30,
+        49,
+        255
+      ],
+      "300,370": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "335,365": [
+        0,
+        13,
+        28,
+        255
+      ],
+      "200,250": [
+        217,
+        158,
+        103,
+        255
+      ]
+    },
+    "traced/34-off-new-A.png": {
+      "100,350": [
+        0,
+        31,
+        50,
+        255
+      ],
+      "300,370": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "335,365": [
+        0,
+        13,
+        28,
+        255
+      ],
+      "200,250": [
+        255,
+        181,
+        114,
+        255
+      ]
+    },
+    "traced/35-off-reload-new-A.png": {
+      "100,350": [
+        0,
+        31,
+        50,
+        255
+      ],
+      "300,370": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "335,365": [
+        0,
+        13,
+        28,
+        255
+      ],
+      "200,250": [
+        255,
+        181,
+        114,
+        255
+      ]
+    },
+    "traced/36-normals-reenter.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/37-absent-1.png": {
+      "100,350": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/38-restored-1.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/39-absent-2.png": {
+      "100,350": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/40-restored-2.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/41-absent-3.png": {
+      "100,350": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/42-restored-3.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "traced/43-off-final.png": {
+      "100,350": [
+        0,
+        31,
+        50,
+        255
+      ],
+      "300,370": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "335,365": [
+        0,
+        13,
+        28,
+        255
+      ],
+      "200,250": [
+        255,
+        181,
+        114,
+        255
+      ]
+    },
+    "clean/00-off-A.png": {
+      "100,350": [
+        0,
+        31,
+        50,
+        255
+      ],
+      "300,370": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "335,365": [
+        0,
+        13,
+        28,
+        255
+      ],
+      "200,250": [
+        255,
+        181,
+        114,
+        255
+      ]
+    },
+    "clean/01-normals-A.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/02-depth-A.png": {
+      "100,350": [
+        245,
+        245,
+        245,
+        255
+      ],
+      "300,370": [
+        237,
+        237,
+        237,
+        255
+      ],
+      "335,365": [
+        245,
+        245,
+        245,
+        255
+      ],
+      "200,250": [
+        237,
+        237,
+        237,
+        255
+      ]
+    },
+    "clean/03-baseColor-A.png": {
+      "100,350": [
+        118,
+        150,
+        179,
+        255
+      ],
+      "300,370": [
+        253,
+        0,
+        253,
+        255
+      ],
+      "335,365": [
+        212,
+        99,
+        228,
+        255
+      ],
+      "200,250": [
+        237,
+        157,
+        97,
+        255
+      ]
+    },
+    "clean/04-baseColor-B.png": {
+      "100,350": [
+        118,
+        150,
+        179,
+        255
+      ],
+      "300,370": [
+        248,
+        52,
+        201,
+        255
+      ],
+      "335,365": [
+        253,
+        0,
+        253,
+        255
+      ],
+      "200,250": [
+        118,
+        150,
+        179,
+        255
+      ]
+    },
+    "clean/05-normals-B.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        206,
+        234,
+        255
+      ],
+      "335,365": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "200,250": [
+        187,
+        127,
+        245,
+        255
+      ]
+    },
+    "clean/06-off-B.png": {
+      "100,350": [
+        0,
+        31,
+        50,
+        255
+      ],
+      "300,370": [
+        28,
+        15,
+        0,
+        255
+      ],
+      "335,365": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "200,250": [
+        0,
+        36,
+        57,
+        255
+      ]
+    },
+    "clean/07-off-A-return.png": {
+      "100,350": [
+        0,
+        31,
+        50,
+        255
+      ],
+      "300,370": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "335,365": [
+        0,
+        13,
+        28,
+        255
+      ],
+      "200,250": [
+        255,
+        181,
+        114,
+        255
+      ]
+    },
+    "clean/08-normals-A-return.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/09-metallic-A.png": {
+      "100,350": [
+        124,
+        124,
+        124,
+        255
+      ],
+      "300,370": [
+        253,
+        0,
+        253,
+        255
+      ],
+      "335,365": [
+        212,
+        81,
+        212,
+        255
+      ],
+      "200,250": [
+        0,
+        0,
+        0,
+        255
+      ]
+    },
+    "clean/10-roughness-A.png": {
+      "100,350": [
+        216,
+        216,
+        216,
+        255
+      ],
+      "300,370": [
+        253,
+        0,
+        253,
+        255
+      ],
+      "335,365": [
+        240,
+        146,
+        240,
+        255
+      ],
+      "200,250": [
+        196,
+        196,
+        196,
+        255
+      ]
+    },
+    "clean/11-baseColor-A-return.png": {
+      "100,350": [
+        118,
+        150,
+        179,
+        255
+      ],
+      "300,370": [
+        253,
+        0,
+        253,
+        255
+      ],
+      "335,365": [
+        212,
+        99,
+        228,
+        255
+      ],
+      "200,250": [
+        237,
+        157,
+        97,
+        255
+      ]
+    },
+    "clean/12-depth-A-return.png": {
+      "100,350": [
+        245,
+        245,
+        245,
+        255
+      ],
+      "300,370": [
+        237,
+        237,
+        237,
+        255
+      ],
+      "335,365": [
+        245,
+        245,
+        245,
+        255
+      ],
+      "200,250": [
+        237,
+        237,
+        237,
+        255
+      ]
+    },
+    "clean/13-depth-wire.png": {
+      "100,350": [
+        245,
+        245,
+        245,
+        255
+      ],
+      "300,370": [
+        238,
+        238,
+        238,
+        255
+      ],
+      "335,365": [
+        245,
+        245,
+        245,
+        255
+      ],
+      "200,250": [
+        237,
+        237,
+        237,
+        255
+      ]
+    },
+    "clean/14-off-wire.png": {
+      "100,350": [
+        0,
+        31,
+        50,
+        255
+      ],
+      "300,370": [
+        14,
+        14,
+        14,
+        255
+      ],
+      "335,365": [
+        0,
+        13,
+        28,
+        255
+      ],
+      "200,250": [
+        255,
+        181,
+        114,
+        255
+      ]
+    },
+    "clean/15-off.png": {
+      "100,350": [
+        0,
+        31,
+        50,
+        255
+      ],
+      "300,370": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "335,365": [
+        0,
+        13,
+        28,
+        255
+      ],
+      "200,250": [
+        255,
+        181,
+        114,
+        255
+      ]
+    },
+    "clean/16-normals-A.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/17-light-B.png": {
+      "100,350": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "300,370": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "335,365": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/18-light-A-return.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/19-low.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "335,365": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/20-high-return.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/21-dim.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/22-bright.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/23-playing.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/24-paused.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/25-rest-100.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/26-new-B.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/27-new-B-dim.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/28-new-B-rest-80.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/29-light-absent.png": {
+      "100,350": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/30-light-restored.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/31-material-replace.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/32-reload-selected.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/33-off-new-B.png": {
+      "100,350": [
+        0,
+        30,
+        49,
+        255
+      ],
+      "300,370": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "335,365": [
+        0,
+        13,
+        28,
+        255
+      ],
+      "200,250": [
+        217,
+        158,
+        103,
+        255
+      ]
+    },
+    "clean/34-off-new-A.png": {
+      "100,350": [
+        0,
+        31,
+        50,
+        255
+      ],
+      "300,370": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "335,365": [
+        0,
+        13,
+        28,
+        255
+      ],
+      "200,250": [
+        255,
+        181,
+        114,
+        255
+      ]
+    },
+    "clean/35-off-reload-new-A.png": {
+      "100,350": [
+        0,
+        31,
+        50,
+        255
+      ],
+      "300,370": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "335,365": [
+        0,
+        13,
+        28,
+        255
+      ],
+      "200,250": [
+        255,
+        181,
+        114,
+        255
+      ]
+    },
+    "clean/36-normals-reenter.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/37-absent-1.png": {
+      "100,350": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/38-restored-1.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/39-absent-2.png": {
+      "100,350": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/40-restored-2.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/41-absent-3.png": {
+      "100,350": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/42-restored-3.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "clean/43-off-final.png": {
+      "100,350": [
+        0,
+        31,
+        50,
+        255
+      ],
+      "300,370": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "335,365": [
+        0,
+        13,
+        28,
+        255
+      ],
+      "200,250": [
+        255,
+        181,
+        114,
+        255
+      ]
+    },
+    "no-light-control/00-off-present.png": {
+      "100,350": [
+        0,
+        31,
+        50,
+        255
+      ],
+      "300,370": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "335,365": [
+        0,
+        13,
+        28,
+        255
+      ],
+      "200,250": [
+        255,
+        181,
+        114,
+        255
+      ]
+    },
+    "no-light-control/01-off-absent.png": {
+      "100,350": [
+        239,
+        239,
+        239,
+        255
+      ],
+      "300,370": [
+        239,
+        239,
+        239,
+        255
+      ],
+      "335,365": [
+        239,
+        239,
+        239,
+        255
+      ],
+      "200,250": [
+        106,
+        59,
+        7,
+        255
+      ]
+    },
+    "no-light-control/02-normals-absent.png": {
+      "100,350": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "no-light-control/03-off-absent-return.png": {
+      "100,350": [
+        239,
+        239,
+        239,
+        255
+      ],
+      "300,370": [
+        239,
+        239,
+        239,
+        255
+      ],
+      "335,365": [
+        239,
+        239,
+        239,
+        255
+      ],
+      "200,250": [
+        106,
+        59,
+        7,
+        255
+      ]
+    },
+    "no-light-control/04-off-absent-replace.png": {
+      "100,350": [
+        239,
+        239,
+        239,
+        255
+      ],
+      "300,370": [
+        239,
+        239,
+        239,
+        255
+      ],
+      "335,365": [
+        239,
+        239,
+        239,
+        255
+      ],
+      "200,250": [
+        106,
+        59,
+        7,
+        255
+      ]
+    },
+    "no-light-control/05-off-absent-reload.png": {
+      "100,350": [
+        239,
+        239,
+        239,
+        255
+      ],
+      "300,370": [
+        239,
+        239,
+        239,
+        255
+      ],
+      "335,365": [
+        239,
+        239,
+        239,
+        255
+      ],
+      "200,250": [
+        106,
+        59,
+        7,
+        255
+      ]
+    },
+    "no-light-control/06-off-restored.png": {
+      "100,350": [
+        0,
+        31,
+        50,
+        255
+      ],
+      "300,370": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "335,365": [
+        0,
+        13,
+        28,
+        255
+      ],
+      "200,250": [
+        255,
+        181,
+        114,
+        255
+      ]
+    },
+    "no-light-control/07-normals-restored.png": {
+      "100,350": [
+        187,
+        127,
+        245,
+        255
+      ],
+      "300,370": [
+        187,
+        245,
+        229,
+        255
+      ],
+      "335,365": [
+        187,
+        206,
+        237,
+        255
+      ],
+      "200,250": [
+        187,
+        245,
+        229,
+        255
+      ]
+    },
+    "no-light-control/08-off-restored-return.png": {
+      "100,350": [
+        0,
+        31,
+        50,
+        255
+      ],
+      "300,370": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "335,365": [
+        0,
+        13,
+        28,
+        255
+      ],
+      "200,250": [
+        255,
+        181,
+        114,
+        255
+      ]
+    }
+  }
+}

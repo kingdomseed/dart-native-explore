@@ -431,7 +431,7 @@ internal object MaterialPackages {
     fun fixedSet(api: MaterialBuilder.TargetApi): List<Spec> =
         baseSet(api) + catcherSpec(api) + bakedCatcherSpec(api) +
             bakedCatcherCaptureSpec(api) + bakedCatcherUtilitySpec(api) +
-            particleSpec(false, api) + particleSpec(true, api)
+            particleSpec(false, api) + particleSpec(true, api) + spriteSpec(api)
 
     private fun startPrewarm(api: MaterialBuilder.TargetApi) {
         if (!prewarmStarted.add(api.name)) return
@@ -740,6 +740,40 @@ internal object MaterialPackages {
                         "    material.baseColor = getColor();\n" +
                         UNLIT_EXPOSURE +
                         "}\n"))
+
+    fun spriteSpec(api: MaterialBuilder.TargetApi): Spec =
+        Spec("sprite|$api", MaterialRecipe()
+            .platform(MaterialBuilder.Platform.MOBILE)
+            .targetApi(api)
+            .name("d3_sprite")
+            .shading(MaterialBuilder.Shading.UNLIT)
+            .vertexDomain(MaterialBuilder.VertexDomain.OBJECT)
+            .doubleSided(true)
+            .culling(MaterialBuilder.CullingMode.NONE)
+            .blending(MaterialBuilder.BlendingMode.TRANSPARENT)
+            .depthWrite(false)
+            .flipUV(false)
+            .require(MaterialBuilder.VertexAttribute.UV0)
+            .require(MaterialBuilder.VertexAttribute.COLOR)
+            .uniformParameter(MaterialBuilder.UniformType.FLOAT4, "tint")
+            .uniformParameter(MaterialBuilder.UniformType.FLOAT4, "spriteRect")
+            .uniformParameter(MaterialBuilder.UniformType.FLOAT, "additive")
+            .samplerParameter(MaterialBuilder.SamplerType.SAMPLER_2D,
+                MaterialBuilder.SamplerFormat.FLOAT,
+                MaterialBuilder.ParameterPrecision.DEFAULT, "spriteMap")
+            .material(
+                "void material(inout MaterialInputs material) {\n" +
+                "    prepareMaterial(material);\n" +
+                "    vec2 uv = materialParams.spriteRect.xy +" +
+                    " getUV0() * materialParams.spriteRect.zw;\n" +
+                "    vec4 c = texture(materialParams_spriteMap, uv) *" +
+                    " materialParams.tint * getColor();\n" +
+                // TRANSPARENT uses premultiplied source-over. Zero coverage
+                // adds weighted RGB without attenuating destination alpha.
+                "    material.baseColor = vec4(c.rgb * c.a," +
+                    " c.a * (1.0 - materialParams.additive));\n" +
+                UNLIT_EXPOSURE +
+                "}\n"))
 
     /** W18 sprite billboard material — see Dart3dView.particleMaterial. */
     fun particleSpec(

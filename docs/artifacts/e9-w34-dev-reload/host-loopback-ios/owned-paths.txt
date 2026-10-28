@@ -1,0 +1,5 @@
+dart3d/example/tool/w34_reload_host.dart
+dart3d/example/tool/fixtures/w34_reload.fscene
+dart3d/example/lib/w34_reload_probe.dart
+dart3d/example/lib/w34_reload_main.dart
+dart3d/example/test/w34_reload_transport_test.dart

@@ -1,0 +1,743 @@
+{
+  "boundary" : "Encoded PNG samples converted to sRGB; not a calibrated linear alpha\/color measurement. Reference\/snapshot comparisons and clean-probe comparisons are exact pixel differences.",
+  "cleanT0Crop" : {
+    "changedPixels" : 0,
+    "maximumChannelDifference" : 0
+  },
+  "cleanT1Crop" : {
+    "changedPixels" : 0,
+    "maximumChannelDifference" : 0
+  },
+  "correctedComparisons" : {
+    "t0CleanVsCandidate" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "t0UnchangedSnapshot" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "t0UnchangedUpperFaces" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "t1CleanVsCandidate" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "t1UnchangedSnapshot" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "t1UnchangedUpperFaces" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "t2CleanVsCandidate" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "t2UnchangedSnapshot" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "t2UnchangedUpperFaces" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    }
+  },
+  "referenceUnchanged" : {
+    "changedPixels" : 0,
+    "maximumChannelDifference" : 0
+  },
+  "snapshotUnchanged" : {
+    "changedPixels" : 0,
+    "maximumChannelDifference" : 0
+  },
+  "sRgbSamples" : {
+    "alpha-candidate-t0.png" : {
+      "alphaBacking" : [
+        199,
+        199,
+        199
+      ],
+      "alphaGray" : [
+        184,
+        181,
+        181
+      ],
+      "alphaWhite" : [
+        215,
+        190,
+        190
+      ],
+      "pbrGray" : [
+        74,
+        40,
+        39
+      ],
+      "pbrWhite" : [
+        173,
+        102,
+        100
+      ],
+      "referenceGray" : [
+        115,
+        115,
+        115
+      ],
+      "referenceWhite" : [
+        253,
+        253,
+        253
+      ],
+      "sharedGray" : [
+        116,
+        63,
+        62
+      ],
+      "sharedPeerWhite" : [
+        255,
+        158,
+        155
+      ],
+      "sharedWhite" : [
+        255,
+        158,
+        155
+      ],
+      "snapshotCenter" : [
+        0,
+        0,
+        0
+      ]
+    },
+    "alpha-candidate-t1.png" : {
+      "alphaBacking" : [
+        199,
+        199,
+        199
+      ],
+      "alphaGray" : [
+        162,
+        159,
+        162
+      ],
+      "alphaWhite" : [
+        207,
+        182,
+        207
+      ],
+      "pbrGray" : [
+        60,
+        40,
+        59
+      ],
+      "pbrWhite" : [
+        144,
+        103,
+        143
+      ],
+      "referenceGray" : [
+        115,
+        115,
+        115
+      ],
+      "referenceWhite" : [
+        253,
+        253,
+        253
+      ],
+      "sharedGray" : [
+        96,
+        64,
+        96
+      ],
+      "sharedPeerWhite" : [
+        216,
+        159,
+        214
+      ],
+      "sharedWhite" : [
+        216,
+        159,
+        214
+      ],
+      "snapshotCenter" : [
+        0,
+        0,
+        0
+      ]
+    },
+    "alpha-candidate-t2.png" : {
+      "alphaBacking" : [
+        199,
+        199,
+        199
+      ],
+      "alphaGray" : [
+        126,
+        127,
+        146
+      ],
+      "alphaWhite" : [
+        169,
+        171,
+        241
+      ],
+      "pbrGray" : [
+        39,
+        40,
+        74
+      ],
+      "pbrWhite" : [
+        100,
+        103,
+        171
+      ],
+      "referenceGray" : [
+        115,
+        115,
+        115
+      ],
+      "referenceWhite" : [
+        253,
+        253,
+        253
+      ],
+      "sharedGray" : [
+        62,
+        64,
+        115
+      ],
+      "sharedPeerWhite" : [
+        155,
+        159,
+        254
+      ],
+      "sharedWhite" : [
+        155,
+        159,
+        254
+      ],
+      "snapshotCenter" : [
+        0,
+        0,
+        0
+      ]
+    },
+    "clean-t0.png" : {
+      "alphaBacking" : [
+        199,
+        199,
+        199
+      ],
+      "alphaGray" : [
+        181,
+        181,
+        181
+      ],
+      "alphaWhite" : [
+        190,
+        184,
+        184
+      ],
+      "pbrGray" : [
+        74,
+        40,
+        39
+      ],
+      "pbrWhite" : [
+        173,
+        102,
+        100
+      ],
+      "referenceGray" : [
+        115,
+        115,
+        115
+      ],
+      "referenceWhite" : [
+        253,
+        253,
+        253
+      ],
+      "sharedGray" : [
+        116,
+        63,
+        62
+      ],
+      "sharedPeerWhite" : [
+        255,
+        158,
+        155
+      ],
+      "sharedWhite" : [
+        255,
+        158,
+        155
+      ],
+      "snapshotCenter" : [
+        0,
+        0,
+        0
+      ]
+    },
+    "clean-t1.png" : {
+      "alphaBacking" : [
+        199,
+        199,
+        199
+      ],
+      "alphaGray" : [
+        159,
+        157,
+        158
+      ],
+      "alphaWhite" : [
+        187,
+        169,
+        186
+      ],
+      "pbrGray" : [
+        60,
+        40,
+        59
+      ],
+      "pbrWhite" : [
+        144,
+        103,
+        143
+      ],
+      "referenceGray" : [
+        115,
+        115,
+        115
+      ],
+      "referenceWhite" : [
+        253,
+        253,
+        253
+      ],
+      "sharedGray" : [
+        96,
+        64,
+        96
+      ],
+      "sharedPeerWhite" : [
+        216,
+        159,
+        214
+      ],
+      "sharedWhite" : [
+        216,
+        159,
+        214
+      ],
+      "snapshotCenter" : [
+        0,
+        0,
+        0
+      ]
+    },
+    "final-t0.png" : {
+      "alphaBacking" : [
+        199,
+        199,
+        199
+      ],
+      "alphaGray" : [
+        184,
+        181,
+        181
+      ],
+      "alphaWhite" : [
+        215,
+        190,
+        190
+      ],
+      "pbrGray" : [
+        74,
+        40,
+        39
+      ],
+      "pbrWhite" : [
+        173,
+        102,
+        100
+      ],
+      "referenceGray" : [
+        115,
+        115,
+        115
+      ],
+      "referenceWhite" : [
+        253,
+        253,
+        253
+      ],
+      "sharedGray" : [
+        116,
+        63,
+        62
+      ],
+      "sharedPeerWhite" : [
+        255,
+        158,
+        155
+      ],
+      "sharedWhite" : [
+        255,
+        158,
+        155
+      ],
+      "snapshotCenter" : [
+        0,
+        0,
+        0
+      ]
+    },
+    "final-t1.png" : {
+      "alphaBacking" : [
+        199,
+        199,
+        199
+      ],
+      "alphaGray" : [
+        162,
+        159,
+        162
+      ],
+      "alphaWhite" : [
+        207,
+        182,
+        207
+      ],
+      "pbrGray" : [
+        60,
+        40,
+        59
+      ],
+      "pbrWhite" : [
+        144,
+        103,
+        143
+      ],
+      "referenceGray" : [
+        115,
+        115,
+        115
+      ],
+      "referenceWhite" : [
+        253,
+        253,
+        253
+      ],
+      "sharedGray" : [
+        96,
+        64,
+        96
+      ],
+      "sharedPeerWhite" : [
+        216,
+        159,
+        214
+      ],
+      "sharedWhite" : [
+        216,
+        159,
+        214
+      ],
+      "snapshotCenter" : [
+        0,
+        0,
+        0
+      ]
+    },
+    "final-t2.png" : {
+      "alphaBacking" : [
+        199,
+        199,
+        199
+      ],
+      "alphaGray" : [
+        126,
+        127,
+        146
+      ],
+      "alphaWhite" : [
+        169,
+        171,
+        241
+      ],
+      "pbrGray" : [
+        39,
+        40,
+        74
+      ],
+      "pbrWhite" : [
+        100,
+        103,
+        171
+      ],
+      "referenceGray" : [
+        115,
+        115,
+        115
+      ],
+      "referenceWhite" : [
+        253,
+        253,
+        253
+      ],
+      "sharedGray" : [
+        62,
+        64,
+        115
+      ],
+      "sharedPeerWhite" : [
+        155,
+        159,
+        254
+      ],
+      "sharedWhite" : [
+        155,
+        159,
+        254
+      ],
+      "snapshotCenter" : [
+        0,
+        0,
+        0
+      ]
+    },
+    "quarter-t1.png" : {
+      "alphaBacking" : [
+        199,
+        199,
+        199
+      ],
+      "alphaGray" : [
+        176,
+        176,
+        176
+      ],
+      "alphaWhite" : [
+        190,
+        179,
+        181
+      ],
+      "pbrGray" : [
+        30,
+        20,
+        30
+      ],
+      "pbrWhite" : [
+        83,
+        57,
+        83
+      ],
+      "referenceGray" : [
+        115,
+        115,
+        115
+      ],
+      "referenceWhite" : [
+        253,
+        253,
+        253
+      ],
+      "sharedGray" : [
+        50,
+        28,
+        49
+      ],
+      "sharedPeerWhite" : [
+        131,
+        92,
+        130
+      ],
+      "sharedWhite" : [
+        131,
+        92,
+        130
+      ],
+      "snapshotCenter" : [
+        0,
+        0,
+        0
+      ]
+    },
+    "t0.png" : {
+      "alphaBacking" : [
+        199,
+        199,
+        199
+      ],
+      "alphaGray" : [
+        181,
+        181,
+        181
+      ],
+      "alphaWhite" : [
+        190,
+        184,
+        184
+      ],
+      "pbrGray" : [
+        74,
+        40,
+        39
+      ],
+      "pbrWhite" : [
+        173,
+        102,
+        100
+      ],
+      "referenceGray" : [
+        115,
+        115,
+        115
+      ],
+      "referenceWhite" : [
+        253,
+        253,
+        253
+      ],
+      "sharedGray" : [
+        116,
+        63,
+        62
+      ],
+      "sharedPeerWhite" : [
+        255,
+        158,
+        155
+      ],
+      "sharedWhite" : [
+        255,
+        158,
+        155
+      ],
+      "snapshotCenter" : [
+        0,
+        0,
+        0
+      ]
+    },
+    "t1.png" : {
+      "alphaBacking" : [
+        199,
+        199,
+        199
+      ],
+      "alphaGray" : [
+        159,
+        157,
+        158
+      ],
+      "alphaWhite" : [
+        187,
+        169,
+        186
+      ],
+      "pbrGray" : [
+        60,
+        40,
+        59
+      ],
+      "pbrWhite" : [
+        144,
+        103,
+        143
+      ],
+      "referenceGray" : [
+        115,
+        115,
+        115
+      ],
+      "referenceWhite" : [
+        253,
+        253,
+        253
+      ],
+      "sharedGray" : [
+        96,
+        64,
+        96
+      ],
+      "sharedPeerWhite" : [
+        216,
+        159,
+        214
+      ],
+      "sharedWhite" : [
+        216,
+        159,
+        214
+      ],
+      "snapshotCenter" : [
+        0,
+        0,
+        0
+      ]
+    },
+    "t2.png" : {
+      "alphaBacking" : [
+        199,
+        199,
+        199
+      ],
+      "alphaGray" : [
+        125,
+        126,
+        140
+      ],
+      "alphaWhite" : [
+        159,
+        161,
+        224
+      ],
+      "pbrGray" : [
+        39,
+        40,
+        74
+      ],
+      "pbrWhite" : [
+        100,
+        103,
+        171
+      ],
+      "referenceGray" : [
+        115,
+        115,
+        115
+      ],
+      "referenceWhite" : [
+        253,
+        253,
+        253
+      ],
+      "sharedGray" : [
+        62,
+        64,
+        115
+      ],
+      "sharedPeerWhite" : [
+        155,
+        159,
+        254
+      ],
+      "sharedWhite" : [
+        155,
+        159,
+        254
+      ],
+      "snapshotCenter" : [
+        0,
+        0,
+        0
+      ]
+    }
+  }
+}

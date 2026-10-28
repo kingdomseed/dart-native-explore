@@ -1,0 +1,14 @@
+diff --git a/dart3d/ios/Classes/SceneViewHost.swift b/dart3d/ios/Classes/SceneViewHost.swift
+index 340aebf..07ecd2f 100644
+--- a/dart3d/ios/Classes/SceneViewHost.swift
++++ b/dart3d/ios/Classes/SceneViewHost.swift
+@@ -1343,7 +1343,8 @@ final class SceneViewHost: SCNView {
+             return
+         }
+         if screenDebugOptions != debug {
+-            let changesPresentation = screenDebugOptions.channel != debug.channel
++            let changesPresentation = (screenDebugOptions.channel == .none)
++                != (debug.channel == .none)
+             screenDebugOptions = debug
+             d3Log("debugView channel=\(debug.channel.rawValue) wireframe=\(debug.wireframe) "
+                 + "nativeParticlesExcluded=\(debug.channel != .none)")

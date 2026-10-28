@@ -1,0 +1,33 @@
+00:00 +0: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart
+00:00 +0: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart: live probe changes only the real catcher mode in the baked fixture
+00:00 +1: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u2_catcher_showcase_test.dart: U2 baked shadow-catcher showcase catalogue route builds the baked catcher fixture
+00:00 +2: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart: live caster transport and material replacement retain current reload
+00:00 +3: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart: live caster transport and material replacement retain current reload
+00:00 +4: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart: live caster transport and material replacement retain current reload
+00:00 +5: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart: live caster transport and material replacement retain current reload
+00:00 +6: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart: live caster transport and material replacement retain current reload
+00:00 +7: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u2_catcher_showcase_test.dart: U2 baked shadow-catcher showcase public resource command accepts edits and identical refreshes
+00:00 +8: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u2_catcher_showcase_test.dart: U2 baked shadow-catcher showcase public resource command accepts edits and identical refreshes
+00:00 +9: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart: baked fixture loads the real transformed U2 receiver and one caster
+00:00 +10: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u2_catcher_showcase_test.dart: U2 baked shadow-catcher showcase ordinary receiver resource can become a baked catcher by upsert
+00:00 +11: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u2_catcher_showcase_test.dart: U2 baked shadow-catcher showcase ordinary receiver resource can become a baked catcher by upsert
+00:00 +12: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart: material fixture records unlit and both native-colored sprite draws
+00:01 +13: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart: material fixture records unlit and both native-colored sprite draws
+00:01 +14: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart: material fixture records unlit and both native-colored sprite draws
+00:01 +15: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart: material fixture records unlit and both native-colored sprite draws
+00:01 +16: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart: material fixture records unlit and both native-colored sprite draws
+00:01 +17: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart: material controls emit current textures, tint, native color and coverage
+00:01 +18: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart: consumer fixture retains bone slots across rig removal and re-add
+00:01 +19: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart: viewport control uses public view replacement and preserves authored target
+00:01 +20: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart: indexed mapped quad carries diagonal, tangent frame and nonwhite color
+00:01 +21: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart: authored target shares screen camera but excludes its sampling monitor
+00:01 +22: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart: factor and coverage controls emit current authored edits and survive reload
+00:01 +23: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: public route keeps the ordinary probe separate and shares one image
+00:01 +24: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: marked alpha texels include colored zero coverage and half coverage with padded edges
+00:01 +25: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: NextFrame emits real upserts, wraps, preserves the fixed reference and reloads
+00:01 +26: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: actual tint component, source removal, blend and same-ID type replacements survive transport
+00:01 +27: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: explicit depth control crosses the translucent pair without changing frames or camera
+00:01 +28: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: one-second caller timer uses the same upsert and stops on pause and disposal
+00:05 +29: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: render-texture variant uses an isolated ordinary source and existing view codecs
+00:05 +30: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/u3_sprite_showcase_test.dart: visible fixture geometry fits above controls at 402 by 874
+00:05 +31: All tests passed!

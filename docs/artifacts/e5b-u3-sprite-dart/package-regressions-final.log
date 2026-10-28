@@ -1,0 +1,44 @@
+00:00 +0: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_sprite_material_test.dart
+00:00 +0: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_texture_atlas_test.dart: public atlas API maps padded tiles from the top left in row order
+00:00 +1: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u2_geometry_raycast_test.dart: procMesh ring raycast misses the hole and hits the annulus
+00:00 +2: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u2_geometry_raycast_test.dart: procMesh ring raycast misses the hole and hits the annulus
+00:00 +3: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u2_geometry_raycast_test.dart: procMesh ring raycast misses the hole and hits the annulus
+00:00 +4: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u2_geometry_raycast_test.dart: procMesh ring raycast misses the hole and hits the annulus
+00:00 +5: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u2_geometry_raycast_test.dart: procMesh ring raycast misses the hole and hits the annulus
+00:00 +6: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_texture_atlas_test.dart: material maps serialize as existing scene texture references
+00:00 +7: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere subdivisions clamp to kD3MaxIcosphereSubdivisions
+00:00 +8: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere subdivisions clamp to kD3MaxIcosphereSubdivisions
+00:00 +9: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere subdivisions clamp to kD3MaxIcosphereSubdivisions
+00:00 +10: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere subdivisions clamp to kD3MaxIcosphereSubdivisions
+00:00 +11: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere subdivisions clamp to kD3MaxIcosphereSubdivisions
+00:00 +12: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere subdivisions clamp to kD3MaxIcosphereSubdivisions
+00:00 +13: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere subdivisions clamp to kD3MaxIcosphereSubdivisions
+00:00 +14: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere subdivisions clamp to kD3MaxIcosphereSubdivisions
+00:00 +15: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere subdivisions clamp to kD3MaxIcosphereSubdivisions
+00:00 +16: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere subdivisions clamp to kD3MaxIcosphereSubdivisions
+00:00 +17: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere subdivisions clamp to kD3MaxIcosphereSubdivisions
+00:00 +18: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere subdivisions clamp to kD3MaxIcosphereSubdivisions
+00:00 +19: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere edge cache stays injective at the cap (Euler V)
+00:00 +20: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) segment counts clamp to kD3MaxProcSegments; indices are 32-bit
+00:00 +21: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) zero plane/sphere/torus segments clamp instead of NaN
+00:00 +22: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) d3BakedInstanceCount honors both the count and vertex budget
+00:00 +23: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: polyline / line-segment attributes closed polyline wraps colors/widths at the seam
+00:00 +24: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: polyline / line-segment attributes closed dashed polyline wraps attributes too
+00:00 +25: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: polyline / line-segment attributes rgb colors pad to rgba (solid and dashed)
+00:00 +26: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: polyline / line-segment attributes line-segment colors apply one per segment to both endpoints
+00:00 +27: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: polyline / line-segment attributes a short attribute list falls back instead of throwing
+00:00 +28: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: mesh builder transform leaves normals alone under pure translation
+00:00 +29: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: mesh builder transform uses the inverse transpose under non-uniform scale
+00:00 +30: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: mesh builder a reflecting transform rewinds triangles
+00:00 +31: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: mesh builder addMesh backfills white for uncolored meshes
+00:00 +32: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference mirrored instances keep outward winding and normals
+00:00 +33: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference translation never tilts baked normals; colors stamp
+00:00 +34: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +35: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: sweeps and billboards closed tubes get no end caps
+00:01 +36: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: sweeps and billboards ribbon normals are perpendicular to a climbing path
+00:01 +37: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: sweeps and billboards billboards scale before rotating
+00:01 +38: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: sweeps and billboards billboard bounds cover any rotation (half-diagonal)
+00:01 +39: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: sweeps and billboards tube/ribbon bounds include Catmull-Rom overshoot
+00:01 +40: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: sweeps and billboards path point getters return defensive copies
+00:01 +41: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: icosphere UV seam no triangle interpolates across the u seam
+00:01 +42: All tests passed!

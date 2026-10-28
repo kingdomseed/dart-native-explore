@@ -1,0 +1,9 @@
+{
+  "preservation-before.json": "fc1d82994a4a82f9077e79386636109f29a2a6fbd08b1d88a5c1414285c03c38",
+  "source-sha256.json": "8a6ab7ae79ef4caa89805803655da2a40eef3347962a692d17aafd0809ddbbf4",
+  "worktree-status.txt": "486c06bf3121980a050903860caa95973603b2be643590732f42e216e9088a02",
+  "preservation-receipt.json": "e7d79489341da575286d845ea8cba08367d1161485ebfc1fe0c7be9fec79bcb5",
+  "source-receipt.json": "683a7cc241c3dcc328bfd1abaf422855717ae6f4060a60d23a0f8445e73d51e3",
+  "design.md": "88c100cd456e7025bb0fab725624ea37cfde7d0db149a66970c04fc589100bc1",
+  "import-receipt.json": "b1ab60799b383ca4db0162ffc6507799ea8b71313611babbc2263375aa6b84d3"
+}

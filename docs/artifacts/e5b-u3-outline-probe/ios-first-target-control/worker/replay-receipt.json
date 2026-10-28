@@ -1,0 +1,55 @@
+{
+  "before70_verified": true,
+  "forward70_verified": true,
+  "reverse70_verified": true,
+  "commands": [
+    {
+      "command": [
+        "git",
+        "apply",
+        "--check",
+        "/private/tmp/dart3d-u3-outline-first-target-diagnosis-20261028/r1/worker/control-only.patch"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "apply",
+        "/private/tmp/dart3d-u3-outline-first-target-diagnosis-20261028/r1/worker/control-only.patch"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "apply",
+        "--reverse",
+        "--check",
+        "/private/tmp/dart3d-u3-outline-first-target-diagnosis-20261028/r1/worker/control-only.patch"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "apply",
+        "--reverse",
+        "/private/tmp/dart3d-u3-outline-first-target-diagnosis-20261028/r1/worker/control-only.patch"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "scratch_removed": true,
+  "final_archive70_verified": true,
+  "patch_sha256": "cb7aa7e908d6a34560bcef20e7bf55a00fb8e531e1c54f14cd0025e62afa224d",
+  "final_archive_sha256": "433daa2a14f574564bc1f91af3a3cdc23fe215e843a1b2e1ee3bcb33d2b7c5e2"
+}

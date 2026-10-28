@@ -1,0 +1,72 @@
+{
+  "bytesPerPixel" : 4,
+  "commandError" : "",
+  "commandStatus" : 4,
+  "format" : 81,
+  "height" : 256,
+  "rowBytes" : 1024,
+  "rowOrigin" : "not assumed; sampled both halves",
+  "samples" : [
+    {
+      "rawPixelBytes" : [
+        0,
+        0,
+        0,
+        0
+      ],
+      "x" : 64,
+      "y" : 25
+    },
+    {
+      "rawPixelBytes" : [
+        0,
+        0,
+        188,
+        128
+      ],
+      "x" : 64,
+      "y" : 57
+    },
+    {
+      "rawPixelBytes" : [
+        0,
+        0,
+        255,
+        255
+      ],
+      "x" : 64,
+      "y" : 89
+    },
+    {
+      "rawPixelBytes" : [
+        0,
+        0,
+        0,
+        0
+      ],
+      "x" : 64,
+      "y" : 166
+    },
+    {
+      "rawPixelBytes" : [
+        188,
+        0,
+        0,
+        128
+      ],
+      "x" : 64,
+      "y" : 198
+    },
+    {
+      "rawPixelBytes" : [
+        255,
+        0,
+        0,
+        255
+      ],
+      "x" : 64,
+      "y" : 230
+    }
+  ],
+  "width" : 256
+}

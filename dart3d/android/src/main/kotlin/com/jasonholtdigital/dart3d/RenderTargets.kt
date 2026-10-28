@@ -105,12 +105,15 @@ object RenderTargets {
      * orthoScale 1.0 = SCNCamera's orthographicScale default).
      */
     class CameraSpec(
-        val fovDeg: Double = 60.0,
+        fovDeg: Double = 60.0,
         val near: Double = 0.05,
         val far: Double = 1000.0,
         val ortho: Boolean = false,
         val orthoScale: Double = 1.0,
     ) {
+        val fov = AnimatedProperty(floatArrayOf(Math.toRadians(fovDeg).toFloat()))
+        val fovDeg: Double get() = Math.toDegrees(fov.effective[0].toDouble())
+
         /** Projects [cam] for [aspect] (target or viewport w/h). */
         fun applyTo(cam: Camera, aspect: Double) {
             if (ortho) {

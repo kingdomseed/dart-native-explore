@@ -1,0 +1,20 @@
+{
+  "head_unchanged": true,
+  "accepted58_all_unchanged": true,
+  "other_tracked_files_unchanged": true,
+  "six_locks_unchanged": true,
+  "candidate_artifacts_unchanged": true,
+  "candidate_design_receipt_hashes_match": true,
+  "candidate_design_sha256": {
+    "a": "c27b074db770b117776fd3635ad842ec221346f8478e5cf75317ce815eef3e6c",
+    "b": "65760c207d8e01db1a8a2883fb6244e325acb04c5efcc0b881643415880ed656",
+    "c": "0e8baeae2452b4a8574bff4e656d61dac749bf4f65b79dac1a95423f0f31d3e0"
+  },
+  "all_git_deltas_within_import": true,
+  "status_lines": 57,
+  "runtime": "NOT_RUN",
+  "builds": "NOT_RUN",
+  "tests": "NOT_RUN",
+  "devices": "NOT_RUN",
+  "performance": "NOT_RUN"
+}

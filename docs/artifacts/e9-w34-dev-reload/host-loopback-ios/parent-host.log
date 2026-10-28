@@ -1,0 +1,8 @@
+listening ws://127.0.0.1:49334 source=/private/tmp/dart3d-e9-host-reload-probe-20261027/r1/parent-authored.fscene
+connected 2026-10-27T19:18:50.425033
+send 2026-10-27T19:18:50.430428 chars=2706
+send 2026-10-27T19:19:40.062051 chars=3353
+send 2026-10-27T19:19:50.075186 chars=3353
+send 2026-10-27T19:19:58.442378 chars=1
+send 2026-10-27T19:20:07.370768 chars=2706
+error peer closed; restart required

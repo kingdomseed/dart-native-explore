@@ -1,0 +1,155 @@
+{
+  "final": {
+    "path": "/private/tmp/dart3d-w34-ios-live-catcher-probe-20261028/r1/parent/model-copy/journey.mp4",
+    "sha256": "f614ba1a3342f1d63b6b50c74181050054abad5f61548475cd9dd801339501b8",
+    "probeCommand": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-select_streams",
+      "v:0",
+      "-show_entries",
+      "stream=width,height,nb_frames,nb_read_frames:format=duration",
+      "-of",
+      "json",
+      "/private/tmp/dart3d-w34-ios-live-catcher-probe-20261028/r1/parent/model-copy/journey.mp4"
+    ],
+    "probeExit": 0,
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 1206,
+          "height": 2622,
+          "nb_frames": "8047",
+          "nb_read_frames": "8047"
+        }
+      ],
+      "format": {
+        "duration": "76.636667"
+      }
+    },
+    "samplesCommand": [
+      "ffmpeg",
+      "-nostdin",
+      "-v",
+      "error",
+      "-i",
+      "/private/tmp/dart3d-w34-ios-live-catcher-probe-20261028/r1/parent/model-copy/journey.mp4",
+      "-vf",
+      "fps=1/2.5,scale=402:874",
+      "-fps_mode",
+      "passthrough",
+      "/private/tmp/dart3d-w34-ios-live-catcher-review-20261028/r1/final-video-samples/%03d.png"
+    ],
+    "samplesExit": 0,
+    "sampleCount": 31,
+    "samplePolicy": "fps filter at 2.5 second intervals; samples are not source frame-count or latency measurements",
+    "decodeCommand": [
+      "ffmpeg",
+      "-nostdin",
+      "-v",
+      "error",
+      "-i",
+      "/private/tmp/dart3d-w34-ios-live-catcher-probe-20261028/r1/parent/model-copy/journey.mp4",
+      "-fps_mode",
+      "passthrough",
+      "-progress",
+      "/private/tmp/dart3d-w34-ios-live-catcher-review-20261028/r1/video-decode-progress.txt",
+      "-f",
+      "null",
+      "-"
+    ],
+    "decodeExit": 0,
+    "decodeExitOrigin": "Reviewer direct tool execution returned decode_exit=0; not inferred from empty log",
+    "decodeLog": {
+      "file": "video-decode.log",
+      "sha256": "720bcfb6bc4f3b517b14c4898af65e7bb8f285aa768e65d9393064833e7af9ca",
+      "lines": 3475
+    },
+    "decodeProgress": {
+      "file": "video-decode-progress.txt",
+      "sha256": "5c7b52215954bd08512d569b887ae479b75b1427542b913124bb43314c86ac73",
+      "lines": 108
+    },
+    "progressFinal": "frame=8047\nfps=1934.93\nstream_0_0_q=-0.0\nbitrate=N/A\ntotal_size=N/A\nout_time_us=76643233\nout_time_ms=76643233\nout_time=00:01:16.643233\ndup_frames=0\ndrop_frames=0\nspeed=18.4x\nprogress=end"
+  },
+  "failed": {
+    "path": "/private/tmp/dart3d-w34-ios-live-catcher-probe-20261028/r1/parent/after/journey.mp4",
+    "sha256": "d55123c1856cbb027508f162c57ffcf05a990c1c05dfcee68f41c3eaaf794fb3",
+    "probeCommand": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-select_streams",
+      "v:0",
+      "-show_entries",
+      "stream=width,height,nb_frames,nb_read_frames:format=duration",
+      "-of",
+      "json",
+      "/private/tmp/dart3d-w34-ios-live-catcher-probe-20261028/r1/parent/after/journey.mp4"
+    ],
+    "probeExit": 0,
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 1206,
+          "height": 2622,
+          "nb_frames": "74",
+          "nb_read_frames": "74"
+        }
+      ],
+      "format": {
+        "duration": "1.186667"
+      }
+    },
+    "samplesCommand": [
+      "ffmpeg",
+      "-nostdin",
+      "-v",
+      "error",
+      "-i",
+      "/private/tmp/dart3d-w34-ios-live-catcher-probe-20261028/r1/parent/after/journey.mp4",
+      "-vf",
+      "select='eq(n,0)+eq(n,36)+eq(n,73)',scale=402:874",
+      "-fps_mode",
+      "passthrough",
+      "/private/tmp/dart3d-w34-ios-live-catcher-review-20261028/r1/failed-video-samples/%03d.png"
+    ],
+    "samplesExit": 0,
+    "sampleCount": 3,
+    "samplePolicy": "Source frames 0, 36, 73; 2.5-second periodic filter produces zero frames for this 1.186667-second clip",
+    "decodeCommand": [
+      "ffmpeg",
+      "-nostdin",
+      "-v",
+      "error",
+      "-i",
+      "/private/tmp/dart3d-w34-ios-live-catcher-probe-20261028/r1/parent/after/journey.mp4",
+      "-fps_mode",
+      "passthrough",
+      "-progress",
+      "/private/tmp/dart3d-w34-ios-live-catcher-review-20261028/r1/failed-video-decode-progress.txt",
+      "-f",
+      "null",
+      "-"
+    ],
+    "decodeExit": 0,
+    "decodeLog": {
+      "file": "failed-video-decode.log",
+      "sha256": "558b771f9dbf02a0b0a7e39ca60147c66e6ac4c27bf6406ec2f044d6fc6660cb",
+      "lines": 10
+    },
+    "decodeProgress": {
+      "file": "failed-video-decode-progress.txt",
+      "sha256": "274ebf51b3550e07bce06042ab513c831cdbc8082275860c7cade9b8de376b0b",
+      "lines": 12
+    },
+    "progressFinal": "frame=74\nfps=0.00\nstream_0_0_q=-0.0\nbitrate=N/A\ntotal_size=N/A\nout_time_us=1183333\nout_time_ms=1183333\nout_time=00:00:01.183333\ndup_frames=0\ndrop_frames=0\nspeed=17.5x\nprogress=end"
+  }
+}

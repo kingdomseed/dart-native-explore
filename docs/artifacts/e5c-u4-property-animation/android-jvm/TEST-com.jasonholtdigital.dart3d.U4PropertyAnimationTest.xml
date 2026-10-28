@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.jasonholtdigital.dart3d.U4PropertyAnimationTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-10-27T21:10:02.172Z" hostname="Jasons-Mac-mini" time="0.024">
+  <properties/>
+  <testcase name="metadata rejects unknown ordinary and property kinds and duplicate endpoints" classname="com.jasonholtdigital.dart3d.U4PropertyAnimationTest" time="0.017"/>
+  <testcase name="both claims exist before payloads and corrected peers recover without new IDs" classname="com.jasonholtdigital.dart3d.U4PropertyAnimationTest" time="0.0"/>
+  <testcase name="joined curves reject nonfinite unordered malformed and out of domain values" classname="com.jasonholtdigital.dart3d.U4PropertyAnimationTest" time="0.001"/>
+  <testcase name="owner blending uses authored rest global weights zero binding and one restoration" classname="com.jasonholtdigital.dart3d.U4PropertyAnimationTest" time="0.001"/>
+  <testcase name="ordinary metadata retains all four kinds retarget name and payload claims" classname="com.jasonholtdigital.dart3d.U4PropertyAnimationTest" time="0.001"/>
+  <testcase name="camera retained projection reads effective vertical field of view" classname="com.jasonholtdigital.dart3d.U4PropertyAnimationTest" time="0.0"/>
+  <testcase name="literal wire kinds decode and sample their midpoint" classname="com.jasonholtdigital.dart3d.U4PropertyAnimationTest" time="0.001"/>
+  <testcase name="light owner conversion retains actual area dimensions" classname="com.jasonholtdigital.dart3d.U4PropertyAnimationTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

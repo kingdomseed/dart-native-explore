@@ -1,0 +1,46 @@
+{
+  "parent_evidence_manifest_files": 65,
+  "all_hashes_match": true,
+  "video_sha256": "0bece5e937b718a05d9473ab95e4d00e26dea7a7680e8989311efe792c3fda7a",
+  "strict_decoded_frames": 2109,
+  "duration_seconds": 33.795,
+  "source_time_base": "1/600",
+  "image_comparison_matches_parent_json": true,
+  "image_sizes": [
+    [
+      402,
+      874
+    ],
+    [
+      402,
+      874
+    ],
+    [
+      402,
+      874
+    ],
+    [
+      402,
+      874
+    ],
+    [
+      402,
+      874
+    ]
+  ],
+  "authored_snapshots": {
+    "material_only_baseColor": true,
+    "environment_only_exposure": true,
+    "malformed_literal_open_brace": true,
+    "baseline_exact_initial": true,
+    "fixture_exact_initial": true
+  },
+  "scope": "Independent offline recomputation only. No app/test/build/device execution.",
+  "independently_extracted_last_frame": {
+    "file": "independent-video-final.png",
+    "source_decoded_frame_index": 2108,
+    "sha256": "9b459124c6eb8223ce7d86f884453b4ed4dbd045e3de1f1d26fc09fc0c707de4",
+    "visual_result": "recovered red cube and restore diff footer",
+    "encoded_png_byte_identical_to_parent_supplied": false
+  }
+}

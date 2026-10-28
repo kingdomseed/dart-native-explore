@@ -1,0 +1,55 @@
+{
+  "worktree": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-b38c6b48",
+  "head": "2f38e4e33f0b1cb678bc408a42d069c796cefc12",
+  "beforeFileAndSymlinkEntries": 1902,
+  "runtime70Verified": 70,
+  "control70Verified": 70,
+  "unownedPreexistingEntriesPreserved": 1873,
+  "unownedImportedPeerEntriesPreserved": 66,
+  "onlyChangedFromRuntime70": [
+    "dart3d/example/lib/u3_outline_views_main.dart",
+    "dart3d/example/lib/u3_outline_views_scene.dart",
+    "dart3d/example/test/u3_outline_views_test.dart",
+    "dart3d/ios/Classes/SelectionOutlineViewsProbe.swift"
+  ],
+  "sixLocksUnchanged": {
+    "dart3d/example/ios/Podfile.lock": {
+      "sha256": "47d5269141917cc2cfad542d6e2c60dc8c3f364e5700ba1354f44208a9e31522",
+      "bytes": 838,
+      "mode": 420
+    },
+    "dart3d/pubspec.lock": {
+      "sha256": "868933c6c9bdd80476a9d1b6d380078eb8ecf45960820d8414beebd55a0b555f",
+      "bytes": 12805,
+      "mode": 420
+    },
+    "dart3d/example/pubspec.lock": {
+      "sha256": "4ab8d1150fe7606c532dccb84d07eb0cc4062b5d4b2481c07fd27c135241936c",
+      "bytes": 13347,
+      "mode": 420
+    },
+    "dart3d/example/lib/dartnative_plugin_registrant.dart": {
+      "sha256": "c0f873e11de99a1485dd67fd82bc563a61f3c66cc8280b705019ce48cfdbe09f",
+      "bytes": 2326,
+      "mode": 420
+    },
+    "dart3d/example/dn_plugins.lock": {
+      "sha256": "73c5209e393e2c670769b2dfe4d09d72b79870c5218ede82e2a6d9c659c0f2a6",
+      "bytes": 204,
+      "mode": 420
+    },
+    "probe/pubspec.lock": {
+      "sha256": "1606c33221efeb86ab121be4ef9ef82377f400de9ca7ab838b7822971f285121",
+      "bytes": 1665,
+      "mode": 420
+    }
+  },
+  "removedOwnGeneratedEntries": 4812,
+  "keptGeneratedNormalMainConfig": [
+    "dart3d/example/ios/DartNative/Generated.xcconfig",
+    "dart3d/example/ios/DartNative/dn_export_environment.sh"
+  ],
+  "unexpectedAddedRemovedChangedUnowned": [],
+  "parentWrites": "NONE",
+  "runtimeDevicesDiscoveryAndroidExternalMutations": "NONE"
+}

@@ -1,0 +1,18 @@
+{
+  "candidate-a/preservation.txt": "2dcc4decad1f5f592cf34f05a763afe70067015de73b19b6e512d9b5eb53abd3",
+  "candidate-a/import-sha256.txt": "206fad2de1f69905ad37033021e0566a63c7f5494b72c67d70fef541214a6ade",
+  "candidate-a/design.md": "c27b074db770b117776fd3635ad842ec221346f8478e5cf75317ce815eef3e6c",
+  "candidate-a/locks-sha256.txt": "d3d5683f5ed171e240fe57e129277aa789dd9d35ec6201fdf46391f62c435d50",
+  "candidate-a/design-sha256.txt": "9678441de887b7e1f4218a3151d035e57718268484213ec8051e2498945f131e",
+  "candidate-b/accepted58-sha256.txt": "206fad2de1f69905ad37033021e0566a63c7f5494b72c67d70fef541214a6ade",
+  "candidate-b/preservation-receipt.json": "187f2165ed5ce4dd7d222c127fb0f8cfeac99d1f99a4ad55802792b0bbfac3d3",
+  "candidate-b/final-git-status.txt": "3d1ffacbaf38cdbbb7be3f32f72ee767c8735ea6e85101adcd9cd8f4357d9cc6",
+  "candidate-b/preserved-locks.json": "d16675d83f9835e296a8d9ed09ab5554c2118ed2f16c01384d1bef5b8e5c66a1",
+  "candidate-b/design.md": "65760c207d8e01db1a8a2883fb6244e325acb04c5efcc0b881643415880ed656",
+  "candidate-b/import-receipt.json": "e4cbe2f1d565cd649f3d10acedc1b5a1abceb975f9b5b3ac8445674aefa9a302",
+  "candidate-c/accepted58-sha256.txt": "206fad2de1f69905ad37033021e0566a63c7f5494b72c67d70fef541214a6ade",
+  "candidate-c/preservation-receipt.json": "d1a214b0b06db7c1989624adb20cd4753e8e17a75bf29e9e6f9fa71006b1cfeb",
+  "candidate-c/final-git-status.txt": "3d1ffacbaf38cdbbb7be3f32f72ee767c8735ea6e85101adcd9cd8f4357d9cc6",
+  "candidate-c/design.md": "0e8baeae2452b4a8574bff4e656d61dac749bf4f65b79dac1a95423f0f31d3e0",
+  "candidate-c/import-receipt.json": "e1b8898b5efd7051f780c28930dda29dccf98c89411e8867321bd5629976a3c7"
+}

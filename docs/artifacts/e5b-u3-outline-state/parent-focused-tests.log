@@ -1,0 +1,70 @@
+00:00 +0: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_node_highlights_test.dart
+00:00 +0: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/subtree_stream_test.dart: placeholder spec carries the instance member on the wire
+00:00 +1: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/subtree_stream_test.dart: placeholder spec carries the instance member on the wire
+00:00 +2: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/subtree_stream_test.dart: placeholder spec carries the instance member on the wire
+00:00 +3: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/subtree_stream_test.dart: placeholder spec carries the instance member on the wire
+00:00 +3: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: binary curve replacement accepts timeline first
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +4: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: binary curve replacement accepts timeline first
+00:00 +5: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: binary curve replacement accepts timeline first
+00:00 +6: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: binary curve replacement accepts timeline first
+00:00 +7: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: canonical op order removeNode → upsertPayload → upsertResource → addNode → updateNode, contiguous and in batch order
+00:00 +8: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: canonical op order removeNode → upsertPayload → upsertResource → addNode → updateNode, contiguous and in batch order
+00:00 +9: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: canonical op order removeNode → upsertPayload → upsertResource → addNode → updateNode, contiguous and in batch order
+00:00 +9: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: binary curve replacement accepts values first
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +10: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/subtree_stream_test.dart: loadSubtree emits the canonical batch
+00:00 +11: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/subtree_stream_test.dart: loadSubtree emits the canonical batch
+00:00 +12: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/subtree_stream_test.dart: loadSubtree emits the canonical batch
+00:00 +12: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: runtime invalid curve cannot leave an earlier removal unsent
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +13: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_node_highlights_test.dart: command-built scenes flush highlights before the implicit load
+00:00 +14: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_node_highlights_test.dart: command-built scenes flush highlights before the implicit load
+00:00 +15: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: node ops removeNode carries the removed node token
+00:00 +15: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: corrective diff can encode an intermediate curve and retain its clip
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +16: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/subtree_stream_test.dart: priorRoots not re-produced get a removeNode first
+00:00 +17: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: corrective diff can encode an intermediate curve and retain its clip
+00:00 +18: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: corrective diff can encode an intermediate curve and retain its clip
+00:00 +19: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: corrective diff can encode an intermediate curve and retain its clip
+00:00 +20: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: corrective diff can encode an intermediate curve and retain its clip
+00:00 +21: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: corrective diff can encode an intermediate curve and retain its clip
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +22: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_node_highlights_test.dart: highlight set and clear leave authored serialization unchanged
+00:00 +23: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_node_highlights_test.dart: highlight set and clear leave authored serialization unchanged
+00:00 +24: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/subtree_stream_test.dart: diffCommands carries the instance member on a placeholder add
+00:00 +24: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: full document load still rejects an invalid completed curve before dispatch
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +25: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/subtree_stream_test.dart: diffCommands carries the instance member on a placeholder add
+00:00 +26: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/subtree_stream_test.dart: diffCommands carries the instance member on a placeholder add
+00:00 +27: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/subtree_stream_test.dart: diffCommands carries the instance member on a placeholder add
+00:00 +28: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: resource and payload re-diff a geometry spec change produces upsertResource
+00:00 +29: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: resource and payload re-diff a geometry spec change produces upsertResource
+00:00 +29: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: runtime floats payload metadata survives serialization and correction
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +30: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: runtime floats payload metadata survives serialization and correction
+00:00 +31: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: runtime floats payload metadata survives serialization and correction
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +32: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: resource and payload re-diff a payload byte change produces upsertPayload with base64
+00:00 +32: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: runtime bytes payload metadata survives serialization and correction
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +33: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: resource and payload re-diff a payload byte change produces upsertPayload with base64
+00:00 +34: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: runtime bytes payload metadata survives serialization and correction
+00:00 +35: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/subtree_stream_test.dart: loadSubtree throws when removedNodes deletes the merged root
+00:00 +36: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: resource and payload re-diff upsertPayload carries the chunk spec for runtime-minted payloads
+00:00 +36: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: corrective diff sends changed {encoding: bytes} with identical payload bytes
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +37: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: corrective diff sends changed {encoding: bytes} with identical payload bytes
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +38: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/subtree_stream_test.dart: unloadSubtree retracts the skins and animations it added
+00:00 +39: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/subtree_stream_test.dart: unloadSubtree retracts the skins and animations it added
+00:00 +39: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: corrective diff sends changed {length: 7} with identical payload bytes
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +40: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: corrective diff sends changed {length: 7} with identical payload bytes
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +41: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: spec fidelity encodeNodeCommandSpec output equals the manifest node entry
+00:00 +42: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: spec fidelity encodeNodeCommandSpec output equals the manifest node entry
+00:00 +43: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: edge cases an empty diff emits an empty batch
+00:00 +44: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: edge cases every op survives the commandBytes JSON round-trip
+00:00 +45: All tests passed!

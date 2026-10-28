@@ -1,0 +1,36 @@
+Temporary integration only; parent owns native build and runtime.
+
+1. Copy U4AlphaProbe.swift into dart3d/ios/Classes using the existing pod wildcard.
+2. Add to SceneViewHost stored state:
+       private let u4AlphaProbe = U4AlphaProbe()
+3. In renderer(_:didApplyConstraintsAtTime:), after updateCameraFacing() and
+   before syncBlendCasters()/other captures, add:
+       if let scene { u4AlphaProbe.runOnce(scene: scene, device: device) }
+   Verify SceneViewHost inherits the scene/device SCNView properties. The normal
+   updateAtTime property sampler has already run. Do not modify its clock.
+4. Run the real u4-materials fixture at t0 on the approved simulator. Do not seek
+   before the one-shot probe. It asserts actual KVC factor [1,.25,.25,.25].
+5. Log category U4AlphaProbe reports six case summaries and the exact Caches JSON
+   path. Copy that JSON with approved simulator tooling. Raw center/outer 3x3
+   patches, copied modifiers, native factor/flags and GPU status are retained.
+6. Remove class and both host hooks together before the clean verification run.
+
+Cases: explicit clear, empty SCNRenderer load, actual current fragment, original
+late multiply (normalizes exactly one occurrence), no late multiply, explicit
+premultiplied reference. All candidate scenes/materials/cameras are private and
+separate. The original live material/geometry/texture/scene is never mutated.
+
+Synthetic isolation inputs: the copied material's diffuse image is replaced by
+white; geometry is SCNPlane2x2; camera is orthographic at native Z3; no lights,
+HDR, exposure adaptation or image effects. Constant ordinary source shading,
+surface factor modifier, actual KVC factor and BLEND flags remain. This is a
+shader/compositing diagnostic, not proof of image UVs, PBR, camera rendering,
+animation interpolation, performance or complete U4.
+
+The probe deliberately waits synchronously for its private command buffers and
+retains every scene/renderer/texture/buffer. It is never production rendering.
+Each output is compared against the measured empty-scene baseline, not merely
+the requested clear. Parent must interpret expectedStraightAlphaRGBA versus
+expectedDoublePremultipliedRGBA and inspect outer patches/GPU status. No PASS
+is encoded. Exact alpha readback includes destination alpha 1; this does not
+test partial destination coverage (already separate sprite evidence).

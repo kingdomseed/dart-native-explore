@@ -1,0 +1,13 @@
+{
+  "host_connections": 1,
+  "host_sends": 5,
+  "receiver_connections": 1,
+  "loads": 1,
+  "diffs": 3,
+  "decode_errors": 1,
+  "native_protocol_hellos": 1,
+  "native_runner_pids": [
+    "41344"
+  ],
+  "run_ends_application_finished": true
+}

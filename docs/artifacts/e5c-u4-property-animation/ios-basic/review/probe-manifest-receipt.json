@@ -1,0 +1,25 @@
+{
+  "verifiedManifests": {
+    "baseline-native-sha256.txt": [
+      {
+        "path": "dart3d/ios/Classes/FsceneRealizer.swift",
+        "sha256": "7a923b0f72a8a01e5b5f43cc86572213eabe73d3c140bbcc25437fc4555be391"
+      },
+      {
+        "path": "dart3d/ios/Classes/SceneViewHost.swift",
+        "sha256": "8887e13b946bb3ba8d4073992fef2e2d432fbbf91bc7ef001c71c404e191da73"
+      }
+    ],
+    "observation-native-sha256.txt": [
+      {
+        "path": "dart3d/ios/Classes/FsceneRealizer.swift",
+        "sha256": "7a923b0f72a8a01e5b5f43cc86572213eabe73d3c140bbcc25437fc4555be391"
+      },
+      {
+        "path": "dart3d/ios/Classes/SceneViewHost.swift",
+        "sha256": "ff6d795aab40c2884d5a3be154972d0b42d0258f8ef9cf4ee9a6beea24164957"
+      }
+    ]
+  },
+  "replayProofListsAll43ExactPaths": true
+}

@@ -1,0 +1,52 @@
+{
+  "color-controls": {
+    "sha256": "83dd1a264237766b04739cb0adc8ab7cc9071b5dd71f549eb5a726066f9a549e",
+    "metadata": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 1206,
+          "height": 2622,
+          "avg_frame_rate": "30/1",
+          "duration": "94.966667",
+          "nb_read_frames": "2849"
+        }
+      ],
+      "format": {
+        "duration": "94.966667"
+      }
+    },
+    "allFramesDecoded": 2849,
+    "sceneChangedFrameCount": 728,
+    "firstSceneChangeSeconds": 0.03333333333333333,
+    "lastSceneChangeSeconds": 94.73333333333333,
+    "boundary": "Recorded image changes only; capture FPS and timestamps do not measure app FPS or driver latency"
+  },
+  "camera-controls": {
+    "sha256": "4ca019c9bd4601f5887e199a4fb1a99485f3262301dfd948b11748ce427d360a",
+    "metadata": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 1206,
+          "height": 2622,
+          "avg_frame_rate": "30/1",
+          "duration": "69.566667",
+          "nb_read_frames": "2087"
+        }
+      ],
+      "format": {
+        "duration": "69.566667"
+      }
+    },
+    "allFramesDecoded": 2087,
+    "sceneChangedFrameCount": 1209,
+    "firstSceneChangeSeconds": 0.03333333333333333,
+    "lastSceneChangeSeconds": 68.86666666666666,
+    "boundary": "Recorded image changes only; capture FPS and timestamps do not measure app FPS or driver latency"
+  }
+}

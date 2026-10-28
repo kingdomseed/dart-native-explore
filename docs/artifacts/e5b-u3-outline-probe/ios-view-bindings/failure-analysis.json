@@ -1,0 +1,112 @@
+{
+  "targetClearFromCode": [
+    0,
+    0,
+    0,
+    1
+  ],
+  "actualOffTargetZeroAlphaPixels": 6695,
+  "maskPasses": [
+    {
+      "time": 539791.4000000001,
+      "nativeMaskEvent": "2026-10-28 03:50:28.785 Df Runner[26941:13c4243] [com.jasonholtdigital.dart3d:scene] U3OV mask-encoded binding=target=8445217361178394631 view=0 mode=2 cameraCase=0 time=539791.4000000001 camera=-3.0,1.2,5.0 maskLayers=3 raster=96x72 output=96x72 poses=[\"-0.85,0.2,0.0\", \"-0.85,0.2,0.0\", \"0.9,-0.4,-0.3\"]",
+      "cpuHasSelectedDraws": true,
+      "maskNonzeroPixels": 0,
+      "observedContourPixels": 0,
+      "targetOutsideContourChangedPixels": 0,
+      "targetContourColorOrAlphaMismatches": 0,
+      "privateAlphaOutsideContourChangedPixels": 6912,
+      "privateAlphaContourColorOrAlphaMismatches": 0,
+      "maskFile": "/private/tmp/dart3d-u3-outline-view-probe-20261028/r1/parent/raw/u3-outline-mask-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-539791.4000000001.rgba",
+      "targetFile": "/private/tmp/dart3d-u3-outline-view-probe-20261028/r1/parent/raw/u3-outline-target-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-539791.4000000001.rgba"
+    },
+    {
+      "time": 539796.3166666668,
+      "nativeMaskEvent": "2026-10-28 03:50:33.702 Df Runner[26941:13c4243] [com.jasonholtdigital.dart3d:scene] U3OV mask-encoded binding=target=8445217361178394631 view=0 mode=2 cameraCase=0 time=539796.3166666668 camera=-3.0,1.2,5.0 maskLayers=3 raster=96x72 output=96x72 poses=[]",
+      "cpuHasSelectedDraws": false,
+      "maskNonzeroPixels": 205,
+      "observedContourPixels": 267,
+      "targetOutsideContourChangedPixels": 0,
+      "targetContourColorOrAlphaMismatches": 0,
+      "privateAlphaOutsideContourChangedPixels": 0,
+      "privateAlphaContourColorOrAlphaMismatches": 0,
+      "maskFile": "/private/tmp/dart3d-u3-outline-view-probe-20261028/r1/parent/raw/u3-outline-mask-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-539796.3166666668.rgba",
+      "targetFile": "/private/tmp/dart3d-u3-outline-view-probe-20261028/r1/parent/raw/u3-outline-target-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-539796.3166666668.rgba"
+    },
+    {
+      "time": 539887.0000000001,
+      "nativeMaskEvent": "2026-10-28 03:52:04.384 Df Runner[26941:13c4247] [com.jasonholtdigital.dart3d:scene] U3OV mask-encoded binding=target=8445217361178394631 view=0 mode=2 cameraCase=0 time=539887.0000000001 camera=-3.0,1.2,5.0 maskLayers=3 raster=96x72 output=96x72 poses=[]",
+      "cpuHasSelectedDraws": false,
+      "maskNonzeroPixels": 0,
+      "observedContourPixels": 0,
+      "targetOutsideContourChangedPixels": 0,
+      "targetContourColorOrAlphaMismatches": 0,
+      "privateAlphaOutsideContourChangedPixels": 0,
+      "privateAlphaContourColorOrAlphaMismatches": 0,
+      "maskFile": "/private/tmp/dart3d-u3-outline-view-probe-20261028/r1/parent/raw/u3-outline-mask-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-539887.0000000001.rgba",
+      "targetFile": "/private/tmp/dart3d-u3-outline-view-probe-20261028/r1/parent/raw/u3-outline-target-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-539887.0000000001.rgba"
+    },
+    {
+      "time": 539891.2000000001,
+      "nativeMaskEvent": "2026-10-28 03:52:08.585 Df Runner[26941:13c4248] [com.jasonholtdigital.dart3d:scene] U3OV mask-encoded binding=target=8445217361178394631 view=0 mode=2 cameraCase=0 time=539891.2000000001 camera=-3.0,1.2,5.0 maskLayers=3 raster=96x72 output=96x72 poses=[\"-0.85,0.2,0.0\", \"-0.85,0.2,0.0\", \"0.9,-0.4,-0.3\"]",
+      "cpuHasSelectedDraws": true,
+      "maskNonzeroPixels": 0,
+      "observedContourPixels": 0,
+      "targetOutsideContourChangedPixels": 0,
+      "targetContourColorOrAlphaMismatches": 0,
+      "privateAlphaOutsideContourChangedPixels": 0,
+      "privateAlphaContourColorOrAlphaMismatches": 0,
+      "maskFile": "/private/tmp/dart3d-u3-outline-view-probe-20261028/r1/parent/raw/u3-outline-mask-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-539891.2000000001.rgba",
+      "targetFile": "/private/tmp/dart3d-u3-outline-view-probe-20261028/r1/parent/raw/u3-outline-target-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-539891.2000000001.rgba"
+    },
+    {
+      "time": 539893.1000000001,
+      "nativeMaskEvent": "2026-10-28 03:52:10.485 Df Runner[26941:13c4243] [com.jasonholtdigital.dart3d:scene] U3OV mask-encoded binding=target=8445217361178394631 view=0 mode=2 cameraCase=0 time=539893.1000000001 camera=-3.0,1.2,5.0 maskLayers=3 raster=96x72 output=96x72 poses=[\"-0.85,0.2,0.0\", \"-0.85,0.2,0.0\", \"0.9,-0.4,-0.3\"]",
+      "cpuHasSelectedDraws": true,
+      "maskNonzeroPixels": 205,
+      "observedContourPixels": 267,
+      "targetOutsideContourChangedPixels": 0,
+      "targetContourColorOrAlphaMismatches": 0,
+      "privateAlphaOutsideContourChangedPixels": 0,
+      "privateAlphaContourColorOrAlphaMismatches": 0,
+      "maskFile": "/private/tmp/dart3d-u3-outline-view-probe-20261028/r1/parent/raw/u3-outline-mask-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-539893.1000000001.rgba",
+      "targetFile": "/private/tmp/dart3d-u3-outline-view-probe-20261028/r1/parent/raw/u3-outline-target-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-539893.1000000001.rgba"
+    },
+    {
+      "time": 539897.0000000001,
+      "nativeMaskEvent": "2026-10-28 03:52:14.385 Df Runner[26941:13c4248] [com.jasonholtdigital.dart3d:scene] U3OV mask-encoded binding=target=8445217361178394631 view=0 mode=2 cameraCase=0 time=539897.0000000001 camera=-3.0,1.2,5.0 maskLayers=3 raster=96x72 output=96x72 poses=[]",
+      "cpuHasSelectedDraws": false,
+      "maskNonzeroPixels": 205,
+      "observedContourPixels": 267,
+      "targetOutsideContourChangedPixels": 0,
+      "targetContourColorOrAlphaMismatches": 0,
+      "privateAlphaOutsideContourChangedPixels": 0,
+      "privateAlphaContourColorOrAlphaMismatches": 0,
+      "maskFile": "/private/tmp/dart3d-u3-outline-view-probe-20261028/r1/parent/raw/u3-outline-mask-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-539897.0000000001.rgba",
+      "targetFile": "/private/tmp/dart3d-u3-outline-view-probe-20261028/r1/parent/raw/u3-outline-target-target-8445217361178394631-view-0-mode-2-cameraCase-0-aa-1-time-539897.0000000001.rgba"
+    }
+  ],
+  "storedReads": [
+    {
+      "label": "stored-8445216278846636033:set,8445216278846636034:set target=8445217361178394631 dirty=false time=539779.4166666667",
+      "previousTarget": "target target=8445217361178394631 view=0 mode=0 cameraCase=0 aa=1 time=539758.5166666668",
+      "byteDifferences": 0
+    },
+    {
+      "label": "stored-8445216278846636033:clear,8445216278846636034:clear target=8445217361178394631 dirty=false time=539794.3500000001",
+      "previousTarget": "target target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=539791.4000000001",
+      "byteDifferences": 0
+    },
+    {
+      "label": "stored-8445216278846636033:set,8445216278846636034:set target=8445217361178394631 dirty=false time=539889.2333333334",
+      "previousTarget": "target target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=539887.0000000001",
+      "byteDifferences": 0
+    },
+    {
+      "label": "stored-8445216278846636033:clear,8445216278846636034:clear target=8445217361178394631 dirty=false time=539895.0500000002",
+      "previousTarget": "target target=8445217361178394631 view=0 mode=2 cameraCase=0 aa=1 time=539893.1000000001",
+      "byteDifferences": 0
+    }
+  ],
+  "oracle": "Pinned radius3 circular kernel, strict-greater coverage, current mask centers and nearest texel-center samples; BGRA8_sRGB expected transfer. This checks actual raw outputs, not source selection correctness."
+}

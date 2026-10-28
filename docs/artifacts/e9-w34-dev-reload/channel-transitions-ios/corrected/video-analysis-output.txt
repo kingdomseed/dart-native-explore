@@ -1,0 +1,2 @@
+{"crop":[180,360,42,35],"scaledVideo":[402,874],"threshold":"maximum RGB byte < 20","frames":2806,"darkFrames":6,"intervals":[{"firstFrame":358,"lastFrame":362,"start":5.733333,"lastTimestamp":5.765,"frames":5},{"firstFrame":2614,"lastFrame":2614,"start":24.59,"lastTimestamp":24.59,"frames":1}]}
+

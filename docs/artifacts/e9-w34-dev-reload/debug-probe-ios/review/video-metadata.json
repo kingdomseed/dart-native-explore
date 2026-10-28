@@ -1,0 +1,22 @@
+{
+    "programs": [
+
+    ],
+    "stream_groups": [
+
+    ],
+    "streams": [
+        {
+            "codec_name": "hevc",
+            "width": 1206,
+            "height": 2622,
+            "r_frame_rate": "59/1",
+            "avg_frame_rate": "2597800/42743",
+            "duration": "213.713333",
+            "nb_frames": "12989"
+        }
+    ],
+    "format": {
+        "duration": "213.713333"
+    }
+}

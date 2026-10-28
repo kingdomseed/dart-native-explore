@@ -1,0 +1,32 @@
+Launching lib/main.dart on iPhone 17 Pro in debug mode...
+Running Xcode build...                                          
+Xcode build done.                                           16.8s
+dartnative: [DN] Licence valid (community), expires 2027-09-14
+dartnative: [DN] lifecycle → AppLifecycleState.inactive
+dartnative: dart3d: u4 requested light=area rest=1
+dartnative: dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+dartnative: dart3d: u4 requested mode=u4.color-light clip=0007AD000000T time=0 weight=1 rawIds=false
+Syncing files to device iPhone 17 Pro...                            46ms
+
+DartNative run key commands.
+r Hot reload. 🔥🔥🔥
+R Hot restart.
+h List all available interactive commands.
+d Detach (terminate "dn run" but leave application running).
+c Clear the screen
+q Quit (terminate the application on the device).
+
+A Dart VM Service on iPhone 17 Pro is available at: http://127.0.0.1:49488/LvPRQZhbkA4=/
+The DartNative DevTools debugger and profiler on iPhone 17 Pro is available at: http://127.0.0.1:49488/LvPRQZhbkA4=/devtools/?uri=ws://127.0.0.1:49488/LvPRQZhbkA4=/ws
+dartnative: [DN] lifecycle → AppLifecycleState.resumed
+dartnative: dart3d: u4 requested clip=0007AD000000T pause time=1.0
+dartnative: dart3d: u4 requested clip=0007AD000000T pause time=2.0
+dartnative: dart3d: u4 requested clip=0007AD000000T weight=0.25 playing=false
+dartnative: dart3d: u4 requested clip=0007AD000000T pause time=1.0
+dartnative: dart3d: u4 requested light=area Replace light rest=3
+dartnative: dart3d: u4 requested clip=0007AD000000T pause time=2.0
+dartnative: dart3d: u4 requested light=area Remove light
+dartnative: dart3d: u4 requested light=area Re-add light rest=1
+dartnative: dart3d: u4 requested clip=0007AD000000T pause time=1.0
+
+Application finished.

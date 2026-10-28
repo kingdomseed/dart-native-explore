@@ -1,0 +1,142 @@
+{
+  "crop": [
+    0,
+    70,
+    402,
+    580
+  ],
+  "comparisons": [
+    {
+      "baseline": "01-normals.png",
+      "compared": "corrected/01-normals.png",
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "baseline": "02-metallic.png",
+      "compared": "corrected/02-metallic.png",
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "baseline": "03-roughness.png",
+      "compared": "corrected/03-roughness.png",
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "baseline": "04-baseColor.png",
+      "compared": "corrected/04-baseColor.png",
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "baseline": "05-depth.png",
+      "compared": "corrected/05-depth.png",
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "baseline": "06-normals-return.png",
+      "compared": "corrected/06-normals-return.png",
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "baseline": "07-wire-on.png",
+      "compared": "corrected/07-wire-on.png",
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "baseline": "08-depth-wire.png",
+      "compared": "corrected/08-depth-wire.png",
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "baseline": "09-off-wire.png",
+      "compared": "corrected/09-off-wire.png",
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "baseline": "10-off.png",
+      "compared": "corrected/10-off.png",
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "baseline": "11-baseColor-reenter.png",
+      "compared": "corrected/11-baseColor-reenter.png",
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "baseline": "01-normals.png",
+      "compared": "clean/01-normals.png",
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "baseline": "02-metallic.png",
+      "compared": "clean/02-metallic.png",
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "baseline": "03-roughness.png",
+      "compared": "clean/03-roughness.png",
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "baseline": "04-baseColor.png",
+      "compared": "clean/04-baseColor.png",
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "baseline": "05-depth.png",
+      "compared": "clean/05-depth.png",
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "baseline": "06-normals-return.png",
+      "compared": "clean/06-normals-return.png",
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "baseline": "07-wire-on.png",
+      "compared": "clean/07-wire-on.png",
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "baseline": "08-depth-wire.png",
+      "compared": "clean/08-depth-wire.png",
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "baseline": "09-off-wire.png",
+      "compared": "clean/09-off-wire.png",
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "baseline": "10-off.png",
+      "compared": "clean/10-off.png",
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    },
+    {
+      "baseline": "11-baseColor-reenter.png",
+      "compared": "clean/11-baseColor-reenter.png",
+      "changedPixels": 0,
+      "maxRGBDifference": 0
+    }
+  ]
+}

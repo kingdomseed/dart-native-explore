@@ -1,0 +1,15 @@
+00:00 +0: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-886b3c86/dart3d/test/u3_node_highlights_test.dart
+00:00 +0: one mutation atomically clears one node and sets another
+00:00 +1: two independent colors and alpha values travel in one patch
+00:00 +2: a later null clears only the named node on the wire
+00:00 +3: empty attached and queued batches emit nothing
+00:00 +4: queued colors copy mutable vectors and map entries before attach
+00:00 +5: initial explicit load then highlight flush in order without reload
+00:00 +6: a later explicit load remains after the queued highlight
+00:00 +7: command-built scenes flush highlights before the implicit load
+00:00 +8: recreated views receive authored content without highlight replay
+00:00 +9: detached highlights precede the implicit reconstruction load
+00:00 +10: highlight set and clear leave authored serialization unchanged
+00:00 +11: the existing JSON encoder rejects non-finite components before send
+00:00 +12: dispose sends no clear to an attached view
+00:00 +13: All tests passed!

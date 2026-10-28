@@ -1,0 +1,38 @@
+{
+  "Renderer.cpp": {
+    "url": "https://raw.githubusercontent.com/google/filament/v1.77.3/filament/src/details/Renderer.cpp",
+    "sha256": "1a17ebb5922fc5ea4ad253b6104b4be146cc89ab07210cb2694216a8c948ae90"
+  },
+  "Engine.cpp": {
+    "url": "https://raw.githubusercontent.com/google/filament/v1.77.3/filament/src/details/Engine.cpp",
+    "sha256": "66061a8270b49f348b603a091d8219a16c5714cbae3d66b8a4b953d509ee4b93"
+  },
+  "MaterialInstance.cpp": {
+    "url": "https://raw.githubusercontent.com/google/filament/v1.77.3/filament/src/details/MaterialInstance.cpp",
+    "sha256": "29333e7c4a63da49ddb57aeb26d27d2edda5a50b0a21cfe7a25a4f57ca45b7fe"
+  },
+  "RenderableManager.cpp": {
+    "url": "https://raw.githubusercontent.com/google/filament/v1.77.3/filament/src/components/RenderableManager.cpp",
+    "sha256": "9811828b2a283ed7c55a7241e9b0f7538a83fc0361347c2a8f527acf1304ad98"
+  },
+  "RenderPass.cpp": {
+    "url": "https://raw.githubusercontent.com/google/filament/v1.77.3/filament/src/RenderPass.cpp",
+    "sha256": "ef3ba75a13ba61a7eeccd1f53bfb0530424a3435e0e9113a617537c9aa96ff36"
+  },
+  "Renderer.java": {
+    "url": "https://raw.githubusercontent.com/google/filament/v1.77.3/android/filament-android/src/main/java/com/google/android/filament/Renderer.java",
+    "sha256": "021bb87f806477eab00983880423703c9ca449914f3cf1216a4d238a91feb3e6"
+  },
+  "RenderableManager.java": {
+    "url": "https://raw.githubusercontent.com/google/filament/v1.77.3/android/filament-android/src/main/java/com/google/android/filament/RenderableManager.java",
+    "sha256": "41e6636dd1634c2b3765223a154573349e8756aeb78bb42970339a6a444aa3e6"
+  },
+  "surface_main.fs": {
+    "url": "https://raw.githubusercontent.com/google/filament/v1.77.3/shaders/src/surface_main.fs",
+    "sha256": "44d5e8081c2f7054a0015072c98264d4c70e40b7f96d6b1277c6c504a7e0d337"
+  },
+  "RenderPrimitive.cpp": {
+    "url": "https://raw.githubusercontent.com/google/filament/v1.77.3/filament/src/RenderPrimitive.cpp",
+    "sha256": "fb0d89366279182e391682147bed54b7779f836fde109142756668ac592108de"
+  }
+}

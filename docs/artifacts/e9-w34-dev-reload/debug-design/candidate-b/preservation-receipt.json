@@ -1,0 +1,17 @@
+{
+  "imported_files_rechecked": 58,
+  "imported_files_unchanged": true,
+  "locks_and_registrants_rechecked": 6,
+  "locks_and_registrants_unchanged": true,
+  "all_checkout_deltas_within_accepted58": true,
+  "implementation_edits_after_import": false,
+  "head_unchanged": true,
+  "tracked_modified_count": 25,
+  "untracked_import_count": 32,
+  "runtime": "NOT_RUN",
+  "builds": "NOT_RUN",
+  "tests": "NOT_RUN",
+  "performance": "NOT_RUN",
+  "devices": "NOT_RUN",
+  "design_sha256": "65760c207d8e01db1a8a2883fb6244e325acb04c5efcc0b881643415880ed656"
+}

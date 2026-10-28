@@ -1,0 +1,250 @@
+{
+  "boundary" : "Decoded PNG RGB in sRGB. Exact clean\/observed crop equality and retained-card equality; no calibrated linear color or performance claim.",
+  "comparisons" : {
+    "00-initial" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "01-shared-quarter-seek1" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "02-other-seek2" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "03-default-current-A" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "04-hidden-old-A" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "05-replace-A-while-hidden" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "06-old-default-restored" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "07-foreign-rebind" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "08-current-owner-only" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "09-foreign-overridden" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    },
+    "10-foreign-restored" : {
+      "changedPixels" : 0,
+      "maximumChannelDifference" : 0
+    }
+  },
+  "crop" : [
+    65,
+    275,
+    270,
+    95
+  ],
+  "samplesSRGB8" : {
+    "00-initial" : [
+      [
+        255,
+        38,
+        0
+      ],
+      [
+        255,
+        38,
+        0
+      ],
+      [
+        255,
+        38,
+        0
+      ]
+    ],
+    "01-shared-quarter-seek1" : [
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        241,
+        230,
+        241
+      ]
+    ],
+    "02-other-seek2" : [
+      [
+        229,
+        230,
+        253
+      ],
+      [
+        0,
+        248,
+        0
+      ],
+      [
+        0,
+        248,
+        0
+      ]
+    ],
+    "03-default-current-A" : [
+      [
+        229,
+        230,
+        253
+      ],
+      [
+        229,
+        230,
+        253
+      ],
+      [
+        229,
+        230,
+        253
+      ]
+    ],
+    "04-hidden-old-A" : [
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        0,
+        248,
+        0
+      ],
+      [
+        0,
+        248,
+        0
+      ]
+    ],
+    "05-replace-A-while-hidden" : [
+      [
+        160,
+        168,
+        210
+      ],
+      [
+        0,
+        248,
+        0
+      ],
+      [
+        0,
+        248,
+        0
+      ]
+    ],
+    "06-old-default-restored" : [
+      [
+        126,
+        168,
+        224
+      ],
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        241,
+        230,
+        241
+      ]
+    ],
+    "07-foreign-rebind" : [
+      [
+        126,
+        168,
+        224
+      ],
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        255,
+        198,
+        0
+      ]
+    ],
+    "08-current-owner-only" : [
+      [
+        202,
+        48,
+        199
+      ],
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        255,
+        198,
+        0
+      ]
+    ],
+    "09-foreign-overridden" : [
+      [
+        202,
+        48,
+        199
+      ],
+      [
+        0,
+        248,
+        0
+      ],
+      [
+        0,
+        248,
+        0
+      ]
+    ],
+    "10-foreign-restored" : [
+      [
+        202,
+        48,
+        199
+      ],
+      [
+        241,
+        230,
+        241
+      ],
+      [
+        255,
+        198,
+        0
+      ]
+    ]
+  },
+  "sampleX" : [
+    110,
+    200,
+    290
+  ],
+  "sampleY" : 320
+}

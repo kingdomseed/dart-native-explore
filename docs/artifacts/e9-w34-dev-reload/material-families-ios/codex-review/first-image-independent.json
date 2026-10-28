@@ -1,0 +1,42 @@
+{
+  "sourceSha256": "a83550454caeeadb355dcaaf0b5859bb895763e9d9fe5f3cc30b231e0d1641a7",
+  "settledSha256": "c2ed6754e8db7fc6ff69beb9eae8d6c934d0af5667fc937253b981755979ccf6",
+  "sipsOutputSha256": "3aaf5cab5d9eb1889db7d9305910865898391e359d5110524cf5e1ce9a5b0268",
+  "sipsCommand": [
+    "sips",
+    "-s",
+    "format",
+    "png",
+    "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/final/01-normals.png",
+    "--out",
+    "/private/tmp/dart3d-w34-ios-material-families-review-20261027/r1/first-normals-sips.png"
+  ],
+  "sipsExitCode": 0,
+  "rectangle": [
+    0,
+    70,
+    402,
+    580
+  ],
+  "sourceNonblackScenePixels": 34950,
+  "sourceAlphaHistogram": {
+    "255": 351348
+  },
+  "sourceSample_130_170": [
+    172,
+    187,
+    253,
+    255
+  ],
+  "comparisons": {
+    "settled": {
+      "changedPixels": 0,
+      "maxChannelDifference": 0
+    },
+    "sipsConverted": {
+      "changedPixels": 0,
+      "maxChannelDifference": 0
+    }
+  },
+  "observation": "Original tool preview appeared black. The encoded PNG decodes as visible normals with ffmpeg and sips. Preserve original and settled files; no native transient, timing or cause conclusion follows."
+}

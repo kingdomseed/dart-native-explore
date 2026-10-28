@@ -1,0 +1,728 @@
+Filtering the log data using "process == "Runner" AND (subsystem == "com.jasonholtdigital.dart3d" OR composedMessage CONTAINS[c] "error" OR composedMessage CONTAINS[c] "shader")"
+Timestamp               Ty Process[PID:TID]
+2026-10-27 12:01:41.966 Db Runner[7699:109f6ef] [com.apple.BaseBoard:Common] [rdar://100354962] Fixing incorrect property returned by protocol_copyPropertyList2() for "error": required --> optional
+2026-10-27 12:01:41.966 Db Runner[7699:109f6ef] [com.apple.FrontBoard:SceneExtension] registering method "error" from extension FBSSceneTransitionContextCore on class "FBSSceneTransitionContext"
+2026-10-27 12:01:41.966 Db Runner[7699:109f6ef] [com.apple.FrontBoard:SceneExtension] registering method "setError:" from extension FBSSceneTransitionContextCore on class "FBSSceneTransitionContext"
+2026-10-27 12:01:43.246 Db Runner[7699:109f649] [com.apple.defaults:User Defaults] found no value for key ReportValidationErrors in CFPrefsSearchListSource<0x1048e2120> (Domain: com.apple.Accessibility, Container: (null) Non-launch persona: 0)
+2026-10-27 12:01:43.246 Db Runner[7699:109f649] [com.apple.Accessibility:AXSupportCommon] CF Read: domain = com.apple.Accessibility, preference = ReportValidationErrors, appID = (null) result = (null) (-1 - empty, 0 - false, 1 - true)
+2026-10-27 12:01:43.246 Db Runner[7699:109f649] [com.apple.defaults:User Defaults] found no value for key ReportValidationErrors in CFPrefsPlistSource<0x1048e23a0> (Domain: com.apple.Accessibility, User: kCFPreferencesCurrentUser, ByHost: No, Container: /Users/jasonholt/Library/Developer/CoreSimulator/Devices/C24F3C6D-A3A9-4FB7-978E-36E67EF55354/data, Contents Need Refresh: No (Cached: 84, Newest: 84, Index: 220)
+2026-10-27 12:01:43.638 I  Runner[7699:109f649] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1000) error:0 data:<private>
+2026-10-27 12:01:43.702 I  Runner[7699:109f649] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>
+2026-10-27 12:01:43.775 I  Runner[7699:109f649] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1001) error:0 data:<private>
+2026-10-27 12:01:43.812 I  Runner[7699:109f649] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>
+2026-10-27 12:01:43.812 I  Runner[7699:109f649] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>
+2026-10-27 12:01:44.184 Db Runner[7699:109f6f2] [com.apple.defaults:User Defaults] found no value for key MetalPerformanceShaderCompilerStatsSignposts in CFPrefsSearchListSource<0x1048e0780> (Domain: com.jasonholtdigital.dart3dExample, Container: (null) Non-launch persona: 0)
+2026-10-27 12:01:44.186 Db Runner[7699:109f649] [com.apple.defaults:User Defaults] setting new value 6 for key METAL_ERROR_MODE in CFPrefsSource<0x103e442e0> (Domain: Volatile, User: , ByHost: No, Container: , Contents Need Refresh: No (Sentinel)
+2026-10-27 12:01:44.189 Db Runner[7699:109f649] [com.apple.defaults:User Defaults] looked up value 6 for key METAL_ERROR_MODE in CFPrefsSource<0x103e442e0> (Domain: Volatile, User: , ByHost: No, Container: , Contents Need Refresh: No (Sentinel) via CFPrefsSearchListSource<0x1048e0780> (Domain: com.jasonholtdigital.dart3dExample, Container: (null) Non-launch persona: 0)
+2026-10-27 12:01:44.191 Db Runner[7699:109f649] [com.apple.defaults:User Defaults] setting new value 4 for key METAL_DEBUG_ERROR_MODE in CFPrefsSource<0x103e442e0> (Domain: Volatile, User: , ByHost: No, Container: , Contents Need Refresh: No (Sentinel)
+2026-10-27 12:01:44.191 Db Runner[7699:109f649] [com.apple.defaults:User Defaults] looked up value 4 for key METAL_DEBUG_ERROR_MODE in CFPrefsSource<0x103e442e0> (Domain: Volatile, User: , ByHost: No, Container: , Contents Need Refresh: No (Sentinel) via CFPrefsSearchListSource<0x1048e0780> (Domain: com.jasonholtdigital.dart3dExample, Container: (null) Non-launch persona: 0)
+2026-10-27 12:01:44.191 Db Runner[7699:109f649] [com.apple.defaults:User Defaults] setting new value 4 for key METAL_ERROR_CHECK_EXTENDED_MODE in CFPrefsSource<0x103e442e0> (Domain: Volatile, User: , ByHost: No, Container: , Contents Need Refresh: No (Sentinel)
+2026-10-27 12:01:44.191 Db Runner[7699:109f649] [com.apple.defaults:User Defaults] looked up value 4 for key METAL_ERROR_CHECK_EXTENDED_MODE in CFPrefsSource<0x103e442e0> (Domain: Volatile, User: , ByHost: No, Container: , Contents Need Refresh: No (Sentinel) via CFPrefsSearchListSource<0x1048e0780> (Domain: com.jasonholtdigital.dart3dExample, Container: (null) Non-launch persona: 0)
+2026-10-27 12:01:44.747 I  Runner[7699:109f649] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (3031) error:0 data:<private>
+2026-10-27 12:01:44.766 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] protocol hello: Dart v1.0
+2026-10-27 12:01:44.770 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] texture 8445200877093912577: awaiting payload
+2026-10-27 12:01:44.771 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] renderTexture 8445200877093912584: 256x256 update=everyFrame
+2026-10-27 12:01:44.795 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912588: body=nil shape=false pos=2.4 cat=- mask=-
+2026-10-27 12:01:44.795 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912597: body=nil shape=false pos=1.85 cat=- mask=-
+2026-10-27 12:01:44.795 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912592: body=nil shape=false pos=1.15 cat=- mask=-
+2026-10-27 12:01:44.795 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912579: body=nil shape=false pos=2.4 cat=- mask=-
+2026-10-27 12:01:44.795 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912586: body=nil shape=false pos=0.0 cat=- mask=-
+2026-10-27 12:01:44.795 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912601: body=nil shape=false pos=0.0 cat=- mask=-
+2026-10-27 12:01:44.795 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912598: body=nil shape=false pos=0.0 cat=- mask=-
+2026-10-27 12:01:44.795 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912594: body=nil shape=false pos=1.15 cat=- mask=-
+2026-10-27 12:01:44.795 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912599: body=nil shape=false pos=0.0 cat=- mask=-
+2026-10-27 12:01:44.795 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912600: body=nil shape=false pos=2.4 cat=- mask=-
+2026-10-27 12:01:44.795 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912582: body=nil shape=false pos=0.0 cat=- mask=-
+2026-10-27 12:01:44.795 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912585: body=nil shape=false pos=0.0 cat=- mask=-
+2026-10-27 12:01:44.795 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912581: body=nil shape=false pos=2.4 cat=- mask=-
+2026-10-27 12:01:44.795 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912590: body=nil shape=false pos=1.15 cat=- mask=-
+2026-10-27 12:01:44.795 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912602: body=nil shape=false pos=4.0 cat=- mask=-
+2026-10-27 12:01:44.800 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] renderTexture 8445200877093912584: 256x256 update=everyFrame
+2026-10-27 12:01:44.813 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] texture 8445200877093912577: 40x40 rgba8 (6400 B in 12.71 ms)
+2026-10-27 12:01:44.815 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912592: body=nil shape=false pos=1.15 cat=- mask=-
+2026-10-27 12:01:44.815 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912590: body=nil shape=false pos=1.15 cat=- mask=-
+2026-10-27 12:01:44.815 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912597: body=nil shape=false pos=1.85 cat=- mask=-
+2026-10-27 12:01:44.815 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912586: body=nil shape=false pos=0.0 cat=- mask=-
+2026-10-27 12:01:44.815 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912585: body=nil shape=false pos=0.0 cat=- mask=-
+2026-10-27 12:01:44.815 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912579: body=nil shape=false pos=2.4 cat=- mask=-
+2026-10-27 12:01:44.815 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912581: body=nil shape=false pos=2.4 cat=- mask=-
+2026-10-27 12:01:44.815 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912600: body=nil shape=false pos=2.4 cat=- mask=-
+2026-10-27 12:01:44.815 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912594: body=nil shape=false pos=1.15 cat=- mask=-
+2026-10-27 12:01:44.815 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912598: body=nil shape=false pos=0.0 cat=- mask=-
+2026-10-27 12:01:44.815 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912599: body=nil shape=false pos=0.0 cat=- mask=-
+2026-10-27 12:01:44.815 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912588: body=nil shape=false pos=2.4 cat=- mask=-
+2026-10-27 12:01:44.815 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912601: body=nil shape=false pos=0.0 cat=- mask=-
+2026-10-27 12:01:44.815 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912602: body=nil shape=false pos=4.0 cat=- mask=-
+2026-10-27 12:01:44.815 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] node 8445200877093912582: body=nil shape=false pos=0.0 cat=- mask=-
+2026-10-27 12:01:44.838 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] u3 RT control: encoding omitted; cameraMask=2 presentationMask=2 samples=4
+2026-10-27 12:01:45.840 Df Runner[7699:109f6ee] [com.jasonholtdigital.dart3d:scene] sim tick 482.868,63 dyn=0 awake=0 []
+2026-10-27 12:01:46.833 Df Runner[7699:109f6f0] [com.jasonholtdigital.dart3d:scene] sim tick 482.869,63 dyn=0 awake=0 []
+2026-10-27 12:01:47.833 Df Runner[7699:109f6f2] [com.jasonholtdigital.dart3d:scene] sim tick 482.870,63 dyn=0 awake=0 []
+2026-10-27 12:01:48.049 Df Runner[7699:109f6f2] [com.apple.dt.xctest:Default] Query  found matching snapshots: {(
+    Application, pid: 7699
+)} (error: (null))
+2026-10-27 12:01:48.049 Df Runner[7699:109f6f2] [com.apple.dt.xctest:Default] Replying to query  with results: <XCTElementQueryResults: 0x117a7f0f0> (error: (null))
+2026-10-27 12:01:48.082 Df Runner[7699:109f6f0] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 12:01:48.082 Df Runner[7699:109f6f0] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window with results: <XCTElementQueryResults: 0x117a0a5b0> (error: (null))
+2026-10-27 12:01:48.089 Df Runner[7699:109f6f0] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 12:01:48.089 Df Runner[7699:109f6f0] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x117a3f5d0> (error: (null))
+2026-10-27 12:01:48.097 Df Runner[7699:109f6f2] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 12:01:48.097 Df Runner[7699:109f6f2] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x117a0aa90> (error: (null))
+2026-10-27 12:01:48.113 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] App element pid: 7699 (App element pid: 7699) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4372299776.4"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.113 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4372299776.4 (AX element pid: 7699, elementOrHash.elementID: 4372299776.4) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 2;
+    "XC_kAXXCAttributeElementBaseType" = UIWindow;
+    "XC_kAXXCAttributeElementType" = UIWindow;
+    "XC_kAXXCAttributeTraits" = 0;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.114 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Window (AX element pid: 7699, elementOrHash.elementID: 4372299776.4) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4450953216.5"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.114 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4450953216.5 (AX element pid: 7699, elementOrHash.elementID: 4450953216.5) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UITransitionView;
+    "XC_kAXXCAttributeElementType" = UITransitionView;
+    "XC_kAXXCAttributeTraits" = 0;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.114 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4450953216.5) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4452047104.6"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.114 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4452047104.6 (AX element pid: 7699, elementOrHash.elementID: 4452047104.6) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIDropShadowView;
+    "XC_kAXXCAttributeElementType" = UIDropShadowView;
+    "XC_kAXXCAttributeTraits" = 0;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.114 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4452047104.6) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4450950144.7"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.114 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4450950144.7 (AX element pid: 7699, elementOrHash.elementID: 4450950144.7) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UILayoutContainerView;
+    "XC_kAXXCAttributeElementType" = UILayoutContainerView;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.115 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4450950144.7) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4360323440.8",
+        "AX element pid: 7699, elementOrHash.elementID: 4374354944.9",
+        "AX element pid: 7699, elementOrHash.elementID: 4450950656.10"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.115 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4360323440.8 (AX element pid: 7699, elementOrHash.elementID: 4360323440.8) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 21;
+    "XC_kAXXCAttributeElementBaseType" = UINavigationBar;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNResidentNavigationBar";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.115 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4374354944.9 (AX element pid: 7699, elementOrHash.elementID: 4374354944.9) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UINavigationTransitionView;
+    "XC_kAXXCAttributeElementType" = UINavigationTransitionView;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.115 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4450950656.10 (AX element pid: 7699, elementOrHash.elementID: 4450950656.10) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 24;
+    "XC_kAXXCAttributeElementBaseType" = "_UIFloatingBarContainerView";
+    "XC_kAXXCAttributeElementType" = "_UIFloatingBarContainerView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.116 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] NavigationBar (AX element pid: 7699, elementOrHash.elementID: 4360323440.8) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.116 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4374354944.9) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4373513536.11"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.116 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4373513536.11 (AX element pid: 7699, elementOrHash.elementID: 4373513536.11) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIViewControllerWrapperView;
+    "XC_kAXXCAttributeElementType" = UIViewControllerWrapperView;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.116 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Toolbar (AX element pid: 7699, elementOrHash.elementID: 4450950656.10) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4450951168.12"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.116 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4450951168.12 (AX element pid: 7699, elementOrHash.elementID: 4450951168.12) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = "_TtGC5UIKitP10$18563c79c22FloatingBarHostingViewVS_20FloatingBarContainer_";
+    "XC_kAXXCAttributeElementType" = "_TtGC5UIKitP10$18563c79c22FloatingBarHostingViewVS_20FloatingBarContainer_";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.116 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4373513536.11) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4373513088.13"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.116 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4373513088.13 (AX element pid: 7699, elementOrHash.elementID: 4373513088.13) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = UIView;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.116 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4450951168.12) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.116 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4373513088.13) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4460432384.14"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.116 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4460432384.14 (AX element pid: 7699, elementOrHash.elementID: 4460432384.14) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNAutoRoundView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.117 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4460432384.14) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4460436480.15"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.117 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4460436480.15 (AX element pid: 7699, elementOrHash.elementID: 4460436480.15) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNAutoRoundView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.117 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4460436480.15) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4372807680.16",
+        "AX element pid: 7699, elementOrHash.elementID: 4462330624.17",
+        "AX element pid: 7699, elementOrHash.elementID: 4460442112.18"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.117 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4372807680.16 (AX element pid: 7699, elementOrHash.elementID: 4372807680.16) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dart3d.SceneViewHost";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.117 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4462330624.17 (AX element pid: 7699, elementOrHash.elementID: 4462330624.17) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 9;
+    "XC_kAXXCAttributeElementBaseType" = UIButton;
+    "XC_kAXXCAttributeElementType" = UIButton;
+    "XC_kAXXCAttributeTraits" = 8589934593;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.117 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4460442112.18 (AX element pid: 7699, elementOrHash.elementID: 4460442112.18) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNAutoRoundView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.118 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4372807680.16) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4462494464.19"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.118 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4462494464.19 (AX element pid: 7699, elementOrHash.elementID: 4462494464.19) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNScene;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.118 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Button (AX element pid: 7699, elementOrHash.elementID: 4462330624.17) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4374282240.20"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.118 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4374282240.20 (AX element pid: 7699, elementOrHash.elementID: 4374282240.20) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 48;
+    "XC_kAXXCAttributeElementBaseType" = UILabel;
+    "XC_kAXXCAttributeElementType" = UILabel;
+    "XC_kAXXCAttributeTraits" = 8589934656;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.118 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4460442112.18) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4460444672.21",
+        "AX element pid: 7699, elementOrHash.elementID: 4462331392.22",
+        "AX element pid: 7699, elementOrHash.elementID: 4462337536.23"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.118 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4460444672.21 (AX element pid: 7699, elementOrHash.elementID: 4460444672.21) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNAutoRoundView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.118 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4462331392.22 (AX element pid: 7699, elementOrHash.elementID: 4462331392.22) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 9;
+    "XC_kAXXCAttributeElementBaseType" = UIButton;
+    "XC_kAXXCAttributeElementType" = UIButton;
+    "XC_kAXXCAttributeTraits" = 8589934593;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.118 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4462337536.23 (AX element pid: 7699, elementOrHash.elementID: 4462337536.23) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 9;
+    "XC_kAXXCAttributeElementBaseType" = UIButton;
+    "XC_kAXXCAttributeElementType" = UIButton;
+    "XC_kAXXCAttributeTraits" = 8589934593;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.118 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4462494464.19) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4452962368.24"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.118 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4452962368.24 (AX element pid: 7699, elementOrHash.elementID: 4452962368.24) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.119 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] StaticText (AX element pid: 7699, elementOrHash.elementID: 4374282240.20) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.119 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4460444672.21) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4460445184.27"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.119 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4460445184.27 (AX element pid: 7699, elementOrHash.elementID: 4460445184.27) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNAutoRoundView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.119 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Button (AX element pid: 7699, elementOrHash.elementID: 4462331392.22) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.119 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Button (AX element pid: 7699, elementOrHash.elementID: 4462337536.23) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.119 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4452378624.28 (AX element pid: 7699, elementOrHash.elementID: 4452378624.28) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.120 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4452971648.29 (AX element pid: 7699, elementOrHash.elementID: 4452971648.29) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.120 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4452383424.30 (AX element pid: 7699, elementOrHash.elementID: 4452383424.30) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.120 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4452384064.31 (AX element pid: 7699, elementOrHash.elementID: 4452384064.31) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.120 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4452377664.32 (AX element pid: 7699, elementOrHash.elementID: 4452377664.32) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.120 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4452974208.33 (AX element pid: 7699, elementOrHash.elementID: 4452974208.33) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.120 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4452384384.34 (AX element pid: 7699, elementOrHash.elementID: 4452384384.34) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.120 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4452965888.35 (AX element pid: 7699, elementOrHash.elementID: 4452965888.35) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.121 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4452376384.36 (AX element pid: 7699, elementOrHash.elementID: 4452376384.36) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.121 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4452971328.37 (AX element pid: 7699, elementOrHash.elementID: 4452971328.37) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.121 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4452973888.38 (AX element pid: 7699, elementOrHash.elementID: 4452973888.38) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.121 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4452377984.39 (AX element pid: 7699, elementOrHash.elementID: 4452377984.39) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.121 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4452377024.40 (AX element pid: 7699, elementOrHash.elementID: 4452377024.40) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.122 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4452370624.41 (AX element pid: 7699, elementOrHash.elementID: 4452370624.41) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.122 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4452972608.42 (AX element pid: 7699, elementOrHash.elementID: 4452972608.42) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.122 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4452379264.43 (AX element pid: 7699, elementOrHash.elementID: 4452379264.43) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.122 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4460445184.27) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4450948608.44",
+        "AX element pid: 7699, elementOrHash.elementID: 4450958848.45",
+        "AX element pid: 7699, elementOrHash.elementID: 4450677760.46",
+        "AX element pid: 7699, elementOrHash.elementID: 4450678272.47",
+        "AX element pid: 7699, elementOrHash.elementID: 4689592832.48",
+        "AX element pid: 7699, elementOrHash.elementID: 4689594368.49"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.123 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4450948608.44 (AX element pid: 7699, elementOrHash.elementID: 4450948608.44) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 48;
+    "XC_kAXXCAttributeElementBaseType" = UILabel;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNLabel";
+    "XC_kAXXCAttributeTraits" = 8589934656;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.123 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4450958848.45 (AX element pid: 7699, elementOrHash.elementID: 4450958848.45) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 48;
+    "XC_kAXXCAttributeElementBaseType" = UILabel;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNLabel";
+    "XC_kAXXCAttributeTraits" = 8589934656;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.123 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4450677760.46 (AX element pid: 7699, elementOrHash.elementID: 4450677760.46) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 48;
+    "XC_kAXXCAttributeElementBaseType" = UILabel;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNLabel";
+    "XC_kAXXCAttributeTraits" = 8589934656;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.123 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4450678272.47 (AX element pid: 7699, elementOrHash.elementID: 4450678272.47) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNAutoRoundView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.123 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4689592832.48 (AX element pid: 7699, elementOrHash.elementID: 4689592832.48) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNAutoRoundView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.123 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4689594368.49 (AX element pid: 7699, elementOrHash.elementID: 4689594368.49) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNAutoRoundView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.123 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4452378624.28) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.123 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4452971648.29) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.124 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4452383424.30) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.124 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4452384064.31) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.124 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4452377664.32) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.124 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4452974208.33) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.124 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4452384384.34) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.124 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4452965888.35) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.124 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4452376384.36) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.124 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4452971328.37) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.124 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4452973888.38) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.125 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4452377984.39) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.125 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4452377024.40) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.125 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4452370624.41) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.125 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4452972608.42) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.125 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4452379264.43) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.125 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] StaticText (AX element pid: 7699, elementOrHash.elementID: 4450948608.44) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.125 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] StaticText (AX element pid: 7699, elementOrHash.elementID: 4450958848.45) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.125 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] StaticText (AX element pid: 7699, elementOrHash.elementID: 4450677760.46) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.125 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4450678272.47) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4462332160.50",
+        "AX element pid: 7699, elementOrHash.elementID: 4462332928.51"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.126 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4462332160.50 (AX element pid: 7699, elementOrHash.elementID: 4462332160.50) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 9;
+    "XC_kAXXCAttributeElementBaseType" = UIButton;
+    "XC_kAXXCAttributeElementType" = UIButton;
+    "XC_kAXXCAttributeTraits" = 8589934593;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.126 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4462332928.51 (AX element pid: 7699, elementOrHash.elementID: 4462332928.51) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 9;
+    "XC_kAXXCAttributeElementBaseType" = UIButton;
+    "XC_kAXXCAttributeElementType" = UIButton;
+    "XC_kAXXCAttributeTraits" = 8589934593;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.126 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4689592832.48) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4462333696.52",
+        "AX element pid: 7699, elementOrHash.elementID: 4462334464.53"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.126 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4462333696.52 (AX element pid: 7699, elementOrHash.elementID: 4462333696.52) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 9;
+    "XC_kAXXCAttributeElementBaseType" = UIButton;
+    "XC_kAXXCAttributeElementType" = UIButton;
+    "XC_kAXXCAttributeTraits" = 8589934593;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.126 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4462334464.53 (AX element pid: 7699, elementOrHash.elementID: 4462334464.53) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 9;
+    "XC_kAXXCAttributeElementBaseType" = UIButton;
+    "XC_kAXXCAttributeElementType" = UIButton;
+    "XC_kAXXCAttributeTraits" = 8589934593;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.126 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Other (AX element pid: 7699, elementOrHash.elementID: 4689594368.49) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4462335232.54",
+        "AX element pid: 7699, elementOrHash.elementID: 4462336000.55",
+        "AX element pid: 7699, elementOrHash.elementID: 4462336768.56"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.126 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4462335232.54 (AX element pid: 7699, elementOrHash.elementID: 4462335232.54) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 9;
+    "XC_kAXXCAttributeElementBaseType" = UIButton;
+    "XC_kAXXCAttributeElementType" = UIButton;
+    "XC_kAXXCAttributeTraits" = 8589934593;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.127 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4462336000.55 (AX element pid: 7699, elementOrHash.elementID: 4462336000.55) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 9;
+    "XC_kAXXCAttributeElementBaseType" = UIButton;
+    "XC_kAXXCAttributeElementType" = UIButton;
+    "XC_kAXXCAttributeTraits" = 8589934593;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.127 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4462336768.56 (AX element pid: 7699, elementOrHash.elementID: 4462336768.56) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 9;
+    "XC_kAXXCAttributeElementBaseType" = UIButton;
+    "XC_kAXXCAttributeElementType" = UIButton;
+    "XC_kAXXCAttributeTraits" = 8589934593;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.127 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Button (AX element pid: 7699, elementOrHash.elementID: 4462332160.50) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4450391744.57"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.127 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4450391744.57 (AX element pid: 7699, elementOrHash.elementID: 4450391744.57) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 48;
+    "XC_kAXXCAttributeElementBaseType" = UILabel;
+    "XC_kAXXCAttributeElementType" = UILabel;
+    "XC_kAXXCAttributeTraits" = 8589934656;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.127 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Button (AX element pid: 7699, elementOrHash.elementID: 4462332928.51) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4450393088.58"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.127 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4450393088.58 (AX element pid: 7699, elementOrHash.elementID: 4450393088.58) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 48;
+    "XC_kAXXCAttributeElementBaseType" = UILabel;
+    "XC_kAXXCAttributeElementType" = UILabel;
+    "XC_kAXXCAttributeTraits" = 8589934656;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.127 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Button (AX element pid: 7699, elementOrHash.elementID: 4462333696.52) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4450394432.59"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.127 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4450394432.59 (AX element pid: 7699, elementOrHash.elementID: 4450394432.59) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 48;
+    "XC_kAXXCAttributeElementBaseType" = UILabel;
+    "XC_kAXXCAttributeElementType" = UILabel;
+    "XC_kAXXCAttributeTraits" = 8589934656;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.128 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Button (AX element pid: 7699, elementOrHash.elementID: 4462334464.53) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4450395776.60"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.128 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4450395776.60 (AX element pid: 7699, elementOrHash.elementID: 4450395776.60) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 48;
+    "XC_kAXXCAttributeElementBaseType" = UILabel;
+    "XC_kAXXCAttributeElementType" = UILabel;
+    "XC_kAXXCAttributeTraits" = 8589934656;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.128 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Button (AX element pid: 7699, elementOrHash.elementID: 4462335232.54) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4450397120.61"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.128 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4450397120.61 (AX element pid: 7699, elementOrHash.elementID: 4450397120.61) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 48;
+    "XC_kAXXCAttributeElementBaseType" = UILabel;
+    "XC_kAXXCAttributeElementType" = UILabel;
+    "XC_kAXXCAttributeTraits" = 8589934656;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.128 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Button (AX element pid: 7699, elementOrHash.elementID: 4462336000.55) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4450398464.62"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.128 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4450398464.62 (AX element pid: 7699, elementOrHash.elementID: 4450398464.62) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 48;
+    "XC_kAXXCAttributeElementBaseType" = UILabel;
+    "XC_kAXXCAttributeElementType" = UILabel;
+    "XC_kAXXCAttributeTraits" = 8589934656;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.128 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] Button (AX element pid: 7699, elementOrHash.elementID: 4462336768.56) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 7699, elementOrHash.elementID: 4450399808.63"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.128 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] AX element pid: 7699, elementOrHash.elementID: 4450399808.63 (AX element pid: 7699, elementOrHash.elementID: 4450399808.63) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 48;
+    "XC_kAXXCAttributeElementBaseType" = UILabel;
+    "XC_kAXXCAttributeElementType" = UILabel;
+    "XC_kAXXCAttributeTraits" = 8589934656;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 12:01:48.128 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] StaticText (AX element pid: 7699, elementOrHash.elementID: 4450391744.57) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.128 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] StaticText (AX element pid: 7699, elementOrHash.elementID: 4450393088.58) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.129 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] StaticText (AX element pid: 7699, elementOrHash.elementID: 4450394432.59) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.129 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] StaticText (AX element pid: 7699, elementOrHash.elementID: 4450395776.60) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.129 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] StaticText (AX element pid: 7699, elementOrHash.elementID: 4450397120.61) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.129 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] StaticText (AX element pid: 7699, elementOrHash.elementID: 4450398464.62) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.129 Df Runner[7699:109f649] [com.apple.dt.xctest:Default] StaticText (AX element pid: 7699, elementOrHash.elementID: 4450399808.63) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 12:01:48.130 Df Runner[7699:109f6ee] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Keyboard (First Match) found matching snapshots: {(
+)} (error: (null))
+2026-10-27 12:01:48.130 Df Runner[7699:109f6ee] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Keyboard (First Match) with results: <XCTElementQueryResults: 0x117817d20> (error: (null))
+2026-10-27 12:01:48.832 Df Runner[7699:109f6f0] [com.jasonholtdigital.dart3d:scene] sim tick 482.871,63 dyn=0 awake=0 []
+2026-10-27 12:01:49.834 Df Runner[7699:109f855] [com.jasonholtdigital.dart3d:scene] sim tick 482.872,63 dyn=0 awake=0 []
+2026-10-27 12:01:50.833 Df Runner[7699:109f6ec] [com.jasonholtdigital.dart3d:scene] sim tick 482.873,63 dyn=0 awake=0 []
+2026-10-27 12:01:51.833 Df Runner[7699:109f6eb] [com.jasonholtdigital.dart3d:scene] sim tick 482.874,63 dyn=0 awake=0 []
+2026-10-27 12:01:52.833 Df Runner[7699:109f6eb] [com.jasonholtdigital.dart3d:scene] sim tick 482.875,63 dyn=0 awake=0 []
+2026-10-27 12:01:53.833 Df Runner[7699:109f6eb] [com.jasonholtdigital.dart3d:scene] sim tick 482.876,63 dyn=0 awake=0 []
+2026-10-27 12:01:54.833 Df Runner[7699:109f855] [com.jasonholtdigital.dart3d:scene] sim tick 482.877,63 dyn=0 awake=0 []
+2026-10-27 12:01:55.832 Df Runner[7699:109f855] [com.jasonholtdigital.dart3d:scene] sim tick 482.878,63 dyn=0 awake=0 []
+2026-10-27 12:01:56.832 Df Runner[7699:109f6ec] [com.jasonholtdigital.dart3d:scene] sim tick 482.879,63 dyn=0 awake=0 []
+2026-10-27 12:01:57.833 Df Runner[7699:109f855] [com.jasonholtdigital.dart3d:scene] sim tick 482.880,63 dyn=0 awake=0 []
+2026-10-27 12:01:58.832 Df Runner[7699:109f6ec] [com.jasonholtdigital.dart3d:scene] sim tick 482.881,63 dyn=0 awake=0 []
+2026-10-27 12:01:59.833 Df Runner[7699:109f6ee] [com.jasonholtdigital.dart3d:scene] sim tick 482.882,63 dyn=0 awake=0 []
+2026-10-27 12:02:00.832 Df Runner[7699:109f6ee] [com.jasonholtdigital.dart3d:scene] sim tick 482.883,63 dyn=0 awake=0 []
+2026-10-27 12:02:01.831 Df Runner[7699:109f6ec] [com.jasonholtdigital.dart3d:scene] sim tick 482.884,63 dyn=0 awake=0 []
+2026-10-27 12:02:02.833 Df Runner[7699:109f6eb] [com.jasonholtdigital.dart3d:scene] sim tick 482.885,63 dyn=0 awake=0 []
+2026-10-27 12:02:03.832 Df Runner[7699:109f6ec] [com.jasonholtdigital.dart3d:scene] sim tick 482.886,63 dyn=0 awake=0 []
+2026-10-27 12:02:04.832 Df Runner[7699:109f6eb] [com.jasonholtdigital.dart3d:scene] sim tick 482.887,63 dyn=0 awake=0 []
+2026-10-27 12:02:05.833 Df Runner[7699:109f855] [com.jasonholtdigital.dart3d:scene] sim tick 482.888,63 dyn=0 awake=0 []
+2026-10-27 12:02:06.832 Df Runner[7699:109f6ec] [com.jasonholtdigital.dart3d:scene] sim tick 482.889,63 dyn=0 awake=0 []
+2026-10-27 12:02:07.833 Df Runner[7699:109f6ec] [com.jasonholtdigital.dart3d:scene] sim tick 482.890,63 dyn=0 awake=0 []
+2026-10-27 12:02:08.833 Df Runner[7699:109f855] [com.jasonholtdigital.dart3d:scene] sim tick 482.891,63 dyn=0 awake=0 []
+2026-10-27 12:02:09.833 Df Runner[7699:109f6ec] [com.jasonholtdigital.dart3d:scene] sim tick 482.892,63 dyn=0 awake=0 []
+

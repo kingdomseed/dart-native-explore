@@ -1,0 +1,572 @@
+{
+  "literalStateChecks": [
+    {
+      "time": 0.0,
+      "weight": 1.0,
+      "opaqueExpected": [
+        1.0,
+        0.25,
+        0.25,
+        1.0
+      ],
+      "alphaExpected": [
+        1.0,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "observed": {
+        "pid": 24188,
+        "time": 0.0,
+        "weight": 1.0,
+        "trsTargets": 0,
+        "draws": {
+          "u4.materials.shared.canonical": {
+            "object": "0x000000010dff48c0",
+            "factor": [
+              1.0,
+              0.25,
+              0.25,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.shared.live": {
+            "object": "0x000000010dff48c0",
+            "factor": [
+              1.0,
+              0.25,
+              0.25,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.pbr": {
+            "object": "0x000000010dff43c0",
+            "factor": [
+              1.0,
+              0.25,
+              0.25,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.reference": {
+            "object": "0x000000010dff4780",
+            "factor": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.alpha": {
+            "object": "0x000000010dff4640",
+            "factor": [
+              1.0,
+              0.25,
+              0.25,
+              0.25
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.alpha.backing": {
+            "object": "0x000000010dff4500",
+            "factor": [
+              0.5,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "texture": "none",
+            "transparency": 1.0
+          },
+          "u4.materials.snapshot": {
+            "object": "0x000000010dff5400",
+            "factor": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.snapshot.backing": {
+            "object": "0x000000010dff4500",
+            "factor": [
+              0.5,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "texture": "none",
+            "transparency": 1.0
+          }
+        }
+      }
+    },
+    {
+      "time": 1.0,
+      "weight": 1.0,
+      "opaqueExpected": [
+        0.625,
+        0.25,
+        0.625,
+        1.0
+      ],
+      "alphaExpected": [
+        0.625,
+        0.25,
+        0.625,
+        0.5
+      ],
+      "observed": {
+        "pid": 24188,
+        "time": 1.0,
+        "weight": 1.0,
+        "trsTargets": 0,
+        "draws": {
+          "u4.materials.shared.canonical": {
+            "object": "0x000000010dff48c0",
+            "factor": [
+              0.625,
+              0.25,
+              0.625,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.shared.live": {
+            "object": "0x000000010dff48c0",
+            "factor": [
+              0.625,
+              0.25,
+              0.625,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.pbr": {
+            "object": "0x000000010dff43c0",
+            "factor": [
+              0.625,
+              0.25,
+              0.625,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.reference": {
+            "object": "0x000000010dff4780",
+            "factor": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.alpha": {
+            "object": "0x000000010dff4640",
+            "factor": [
+              0.625,
+              0.25,
+              0.625,
+              0.5
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.alpha.backing": {
+            "object": "0x000000010dff4500",
+            "factor": [
+              0.5,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "texture": "none",
+            "transparency": 1.0
+          },
+          "u4.materials.snapshot": {
+            "object": "0x000000010dff5400",
+            "factor": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.snapshot.backing": {
+            "object": "0x000000010dff4500",
+            "factor": [
+              0.5,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "texture": "none",
+            "transparency": 1.0
+          }
+        }
+      }
+    },
+    {
+      "time": 2.0,
+      "weight": 1.0,
+      "opaqueExpected": [
+        0.25,
+        0.25,
+        1.0,
+        1.0
+      ],
+      "alphaExpected": [
+        0.25,
+        0.25,
+        1.0,
+        0.75
+      ],
+      "observed": {
+        "pid": 24188,
+        "time": 2.0,
+        "weight": 1.0,
+        "trsTargets": 0,
+        "draws": {
+          "u4.materials.shared.canonical": {
+            "object": "0x000000010dff48c0",
+            "factor": [
+              0.25,
+              0.25,
+              1.0,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.shared.live": {
+            "object": "0x000000010dff48c0",
+            "factor": [
+              0.25,
+              0.25,
+              1.0,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.pbr": {
+            "object": "0x000000010dff43c0",
+            "factor": [
+              0.25,
+              0.25,
+              1.0,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.reference": {
+            "object": "0x000000010dff4780",
+            "factor": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.alpha": {
+            "object": "0x000000010dff4640",
+            "factor": [
+              0.25,
+              0.25,
+              1.0,
+              0.75
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.alpha.backing": {
+            "object": "0x000000010dff4500",
+            "factor": [
+              0.5,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "texture": "none",
+            "transparency": 1.0
+          },
+          "u4.materials.snapshot": {
+            "object": "0x000000010dff5400",
+            "factor": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.snapshot.backing": {
+            "object": "0x000000010dff4500",
+            "factor": [
+              0.5,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "texture": "none",
+            "transparency": 1.0
+          }
+        }
+      }
+    },
+    {
+      "time": 1.0,
+      "weight": 0.25,
+      "opaqueExpected": [
+        0.15625,
+        0.0625,
+        0.15625,
+        1.0
+      ],
+      "alphaExpected": [
+        0.90625,
+        0.25,
+        0.34375,
+        0.3125
+      ],
+      "observed": {
+        "pid": 24188,
+        "time": 1.0,
+        "weight": 0.25,
+        "trsTargets": 0,
+        "draws": {
+          "u4.materials.shared.canonical": {
+            "object": "0x000000010dff48c0",
+            "factor": [
+              0.15625,
+              0.0625,
+              0.15625,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.shared.live": {
+            "object": "0x000000010dff48c0",
+            "factor": [
+              0.15625,
+              0.0625,
+              0.15625,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.pbr": {
+            "object": "0x000000010dff43c0",
+            "factor": [
+              0.15625,
+              0.0625,
+              0.15625,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.reference": {
+            "object": "0x000000010dff4780",
+            "factor": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.alpha": {
+            "object": "0x000000010dff4640",
+            "factor": [
+              0.90625,
+              0.25,
+              0.34375,
+              0.3125
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.alpha.backing": {
+            "object": "0x000000010dff4500",
+            "factor": [
+              0.5,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "texture": "none",
+            "transparency": 1.0
+          },
+          "u4.materials.snapshot": {
+            "object": "0x000000010dff5400",
+            "factor": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.snapshot.backing": {
+            "object": "0x000000010dff4500",
+            "factor": [
+              0.5,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "texture": "none",
+            "transparency": 1.0
+          }
+        }
+      }
+    },
+    {
+      "time": 0.0,
+      "weight": 0.25,
+      "opaqueExpected": [
+        0.25,
+        0.0625,
+        0.0625,
+        1.0
+      ],
+      "alphaExpected": [
+        1.0,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "observed": {
+        "pid": 24188,
+        "time": 0.0,
+        "weight": 0.25,
+        "trsTargets": 0,
+        "draws": {
+          "u4.materials.shared.canonical": {
+            "object": "0x000000010dff48c0",
+            "factor": [
+              0.25,
+              0.0625,
+              0.0625,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.shared.live": {
+            "object": "0x000000010dff48c0",
+            "factor": [
+              0.25,
+              0.0625,
+              0.0625,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.pbr": {
+            "object": "0x000000010dff43c0",
+            "factor": [
+              0.25,
+              0.0625,
+              0.0625,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.reference": {
+            "object": "0x000000010dff4780",
+            "factor": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.alpha": {
+            "object": "0x000000010dff4640",
+            "factor": [
+              1.0,
+              0.25,
+              0.25,
+              0.25
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.alpha.backing": {
+            "object": "0x000000010dff4500",
+            "factor": [
+              0.5,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "texture": "none",
+            "transparency": 1.0
+          },
+          "u4.materials.snapshot": {
+            "object": "0x000000010dff5400",
+            "factor": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "texture": "metal2x2:ObjectIdentifier(0x0000000106365380)",
+            "transparency": 1.0
+          },
+          "u4.materials.snapshot.backing": {
+            "object": "0x000000010dff4500",
+            "factor": [
+              0.5,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "texture": "none",
+            "transparency": 1.0
+          }
+        }
+      }
+    }
+  ],
+  "completeObservations": 826,
+  "allSnapshotFactorsBlack": true,
+  "allReferenceFactorsWhite": true,
+  "sharedMaterialIdentity": true,
+  "independentSnapshotIdentity": true,
+  "sameMetalTextureAcrossSixFaces": true,
+  "allTrsTargetsZero": true,
+  "boundary": "Reads actual native material uniforms/objects after sampling; does not calibrate GPU alpha or color. Initial R1 diagnostic truncated and excluded."
+}

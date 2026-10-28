@@ -1,0 +1,19 @@
+{
+  "sourceSha256": "a83550454caeeadb355dcaaf0b5859bb895763e9d9fe5f3cc30b231e0d1641a7",
+  "settledSha256": "c2ed6754e8db7fc6ff69beb9eae8d6c934d0af5667fc937253b981755979ccf6",
+  "rectangle": [
+    0,
+    70,
+    402,
+    580
+  ],
+  "sourceNonblackPixels": 34950,
+  "settledChangedPixels": 0,
+  "reencodedChangedPixels": 0,
+  "sample_130_170": [
+    172,
+    187,
+    253,
+    255
+  ]
+}

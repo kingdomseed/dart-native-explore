@@ -1,0 +1,28 @@
+Page: com.jasonholtdigital.dart3dExample
+App: com.jasonholtdigital.dart3dExample
+Snapshot: 23 nodes
+@e1 [application] "Dart3d Example"
+@e2 [navigation-bar] "dartnative_ios.DartNativeView"
+@e3 [other] "w34.quad"
+@e4 [other] "w34.occluder"
+@e5 [other] "w34.literal.0.125"
+@e6 [other] "w34.literal.0.5"
+@e7 [other] "w34.literal.0.875"
+@e8 [other] "w34.camera"
+@e9 [other] "w34.light"
+@e10 [other] "w34.authoredTarget"
+@e11 [button] "Off"
+@e12 [button] "normals"
+@e13 [button] "metallic"
+@e14 [button] "roughness"
+@e15 [button] "baseColor"
+@e16 [button] "depth"
+@e17 [button] "Wire off"
+@e18 [button] "Factors A"
+@e19 [button] "opaque"
+@e20 [button] "Capture"
+@e21 [button] "Reload"
+@e22 [text] "PBR only. Native particles excluded in channel views.
+Depth d/(1+d). Literals 0.125 / 0.5 / 0.875.
+Capture saves authored target. Inspect lower panel in baseColor."
+@e23 [toolbar] "Toolbar"

@@ -1,0 +1,2 @@
+2c70e6f6dd5c19f42bda18f6fe69a1835ace47a7a7d33807486bf8b175abcfb9  parent-r2-source.tgz
+520fe187e53ec2f21059be9e3029860b2f15fa1dccad2d9ff3baef262ed8e3db  parent-r2-probe.patch

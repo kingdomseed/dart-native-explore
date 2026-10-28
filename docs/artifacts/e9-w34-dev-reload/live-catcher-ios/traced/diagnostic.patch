@@ -1,0 +1,114 @@
+diff --git a/dart3d/ios/Classes/ScreenDebugPresentation.swift b/dart3d/ios/Classes/ScreenDebugPresentation.swift
+index 7b7e8e2..eb9a5a9 100644
+--- a/dart3d/ios/Classes/ScreenDebugPresentation.swift
++++ b/dart3d/ios/Classes/ScreenDebugPresentation.swift
+@@ -122,8 +122,10 @@ final class ScreenDebugAttachments {
+     private var lights: [ObjectIdentifier: LightTemplate] = [:]
+     private var materials: [ObjectIdentifier: Material] = [:]
+     private var geometries: [ObjectIdentifier: Geometry] = [:]
++    private var traceLightCount = -1
+ 
+     func clear() {
++        d3Log("liveDebugTrace captureClear templates=\(lights.count)")
+         lights.removeAll()
+         materials.removeAll()
+         geometries.removeAll()
+@@ -175,6 +177,7 @@ final class ScreenDebugAttachments {
+                 template = source.copy() as! SCNLight
+                 template.removeAllAnimations()
+                 lights[key] = LightTemplate(source: source, template: template)
++                d3Log("liveDebugTrace templateCreate source=\(ObjectIdentifier(source)) template=\(ObjectIdentifier(template)) intensity=\(source.intensity)")
+             }
+             return ScreenDebugFrame.Light(template: template,
+                                           state: ScreenDebugFrame.LightState(source))
+@@ -225,6 +228,10 @@ final class ScreenDebugAttachments {
+         }
+         for node in skinNodes { captureSkinPose(node) }
+         lights = lights.filter { usedLights.contains($0.key) }
++        if traceLightCount != lights.count {
++            d3Log("liveDebugTrace captureCount templates=\(lights.count)")
++            traceLightCount = lights.count
++        }
+         materials = materials.filter { usedMaterials.contains($0.key) }
+         geometries = geometries.filter { usedGeometries.contains($0.key) }
+         return ScreenDebugFrame(nodes: rows)
+@@ -241,8 +248,60 @@ final class ScreenDebugPresentation {
+     private var lights: [ObjectIdentifier: LightSlot] = [:]
+     private var skins: [ObjectIdentifier: ScreenDebugFrame.Skin] = [:]
+     private var morphs: [ObjectIdentifier: ScreenDebugFrame.Morph] = [:]
++    private var traceFrame = 0
++    private var traceSlotCount = -1
++    private static var traceValidated = false
++
++    deinit {
++        d3Log("liveDebugTrace presentationDeinit slots=\(lights.count)")
++    }
++
++    private static func traceMatches(_ state: ScreenDebugFrame.LightState, _ light: SCNLight) -> Bool {
++        CFEqual(state.color as AnyObject, light.color as AnyObject)
++            && state.intensity == light.intensity
++            && state.castsShadow == light.castsShadow
++            && state.shadowMapSize == light.shadowMapSize
++            && state.shadowBias == light.shadowBias
++            && state.shadowRadius == light.shadowRadius
++            && state.automaticallyAdjustsShadowProjection == light.automaticallyAdjustsShadowProjection
++            && state.orthographicScale == light.orthographicScale
++            && state.maximumShadowDistance == light.maximumShadowDistance
++            && state.forcesBackFaceCasters == light.forcesBackFaceCasters
++            && state.shadowSampleCount == light.shadowSampleCount
++    }
++
++    private static func traceValidateNativeState() {
++        guard !traceValidated else { return }
++        traceValidated = true
++        let source = SCNLight()
++        let template = source.copy() as! SCNLight
++        let originalIntensity = template.intensity
++        let space = CGColorSpace(name: CGColorSpace.extendedLinearSRGB)!
++        let color = CGColor(colorSpace: space, components: [1.6, 0.125, 0.5, 0.75])!
++        source.color = color
++        source.intensity = 53.5
++        source.castsShadow = true
++        source.shadowMapSize = CGSize(width: 128, height: 256)
++        source.shadowBias = 0.03125
++        source.shadowRadius = 1.25
++        source.automaticallyAdjustsShadowProjection = false
++        source.orthographicScale = 2.5
++        source.maximumShadowDistance = 77
++        source.forcesBackFaceCasters = true
++        source.shadowSampleCount = 7
++        let state = ScreenDebugFrame.LightState(source)
++        let displayed = template.copy() as! SCNLight
++        state.apply(to: displayed)
++        let matches = traceMatches(state, displayed)
++        let colorExact = CFEqual(color, displayed.color as AnyObject)
++        let templateUnchanged = template.intensity == originalIntensity
++        d3Log("liveDebugTrace adapterProbe fieldsMatch=\(matches) cgColorExact=\(colorExact) templateUnchanged=\(templateUnchanged) inputSpace=\(space.name! as String) inputComponents=\(color.components!) sourceType=\(type(of: source.color)) displayedType=\(type(of: displayed.color))")
++        precondition(matches && colorExact && templateUnchanged)
++    }
+ 
+     func apply(_ frame: ScreenDebugFrame) {
++        traceFrame += 1
++        Self.traceValidateNativeState()
+         let live = Set(frame.nodes.map { $0.identity })
+         for key in Array(nodes.keys) where !live.contains(key) {
+             nodes.removeValue(forKey: key)?.removeFromParentNode()
+@@ -273,11 +332,17 @@ final class ScreenDebugPresentation {
+                                      displayed: light.template.copy() as! SCNLight)
+                     lights[row.identity] = slot
+                     node.light = slot.displayed
++                    d3Log("liveDebugTrace displayCreate node=\(row.identity) template=\(ObjectIdentifier(light.template)) displayed=\(ObjectIdentifier(slot.displayed))")
+                 }
+                 light.state.apply(to: slot.displayed)
++                if traceFrame % 60 == 0 {
++                    d3Log("liveDebugTrace sample frame=\(traceFrame) node=\(row.identity) template=\(ObjectIdentifier(light.template)) displayed=\(ObjectIdentifier(slot.displayed)) inputI=\(light.state.intensity) actualI=\(slot.displayed.intensity) inputShadow=\(light.state.castsShadow) actualShadow=\(slot.displayed.castsShadow) fieldsMatch=\(Self.traceMatches(light.state, slot.displayed)) attached=\(node.light === slot.displayed) colorInput=\(light.state.color) colorActual=\(slot.displayed.color)")
++                }
+             } else {
+                 node.light = nil
+-                lights.removeValue(forKey: row.identity)
++                if lights.removeValue(forKey: row.identity) != nil {
++                    d3Log("liveDebugTrace displayRemove node=\(row.identity) remaining=\(lights.count)")
++                }
+             }
+             if let skin = row.skin {
+                 let prior = skins[row.identity]

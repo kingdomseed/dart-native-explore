@@ -1,0 +1,16 @@
+{
+  "base_count": 52,
+  "candidate_count": 57,
+  "exact_additions": [
+    "dart3d/example/lib/w34_reload_main.dart",
+    "dart3d/example/lib/w34_reload_probe.dart",
+    "dart3d/example/test/w34_reload_transport_test.dart",
+    "dart3d/example/tool/fixtures/w34_reload.fscene",
+    "dart3d/example/tool/w34_reload_host.dart"
+  ],
+  "unowned_tracked_preserved": 1876,
+  "locks_preserved": 6,
+  "parent_read_only_source52_matches": true,
+  "parent_five_additions_absent": true,
+  "parent_locks_match": true
+}

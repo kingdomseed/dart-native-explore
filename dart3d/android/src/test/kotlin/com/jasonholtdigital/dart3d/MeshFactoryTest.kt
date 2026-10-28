@@ -22,6 +22,32 @@ import org.junit.Test
  */
 class MeshFactoryTest {
 
+    @Test
+    fun `billboard UVs use top left origin for direct and instanced quads`() {
+        val right = MeshFactory.V3(1f, 0f, 0f)
+        val up = MeshFactory.V3(0f, 1f, 0f)
+        val meshes = listOf(
+            MeshFactory.billboardQuad(2f, 2f, 0f,
+                floatArrayOf(1f, 1f, 1f, 1f), right, up),
+            MeshFactory.bakeBillboardInstances(
+                listOf(MeshFactory.V3(0f, 0f, 0f)),
+                2f, 2f, 0f, null, right, up),
+        )
+        val expected = arrayOf(
+            floatArrayOf(-1f, -1f, 0f, 0f, 1f),
+            floatArrayOf(1f, -1f, 0f, 1f, 1f),
+            floatArrayOf(-1f, 1f, 0f, 0f, 0f),
+            floatArrayOf(1f, 1f, 0f, 1f, 0f),
+        )
+        for (mesh in meshes) {
+            for (vertex in 0 until 4) {
+                val actual = record(mesh, vertex)
+                assertArrayEquals(expected[vertex], floatArrayOf(
+                    actual[0], actual[1], actual[2], actual[7], actual[8]), 0f)
+            }
+        }
+    }
+
     private val asymmetricExtrudeProfile = listOf(
         MeshFactory.V2(0f, 0f),
         MeshFactory.V2(2f, 0f),

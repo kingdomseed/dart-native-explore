@@ -35,7 +35,7 @@ class MaterialPackagesTest {
     }
 
     @Test
-    fun `the fixed set adds both catcher paths and their bake passes`() {
+    fun `the fixed set adds catcher, particle and standalone sprite packages`() {
         for (api in apis) {
             val fixed = MaterialPackages.fixedSet(api).map { it.key }
             val base = MaterialPackages.baseSet(api).map { it.key }
@@ -43,7 +43,7 @@ class MaterialPackagesTest {
             assertEquals(
                 listOf("catcher|$api", "catcher|baked|$api",
                     "catcher|capture|$api", "catcher|utility|$api",
-                    "particle|false|$api", "particle|true|$api"),
+                    "particle|false|$api", "particle|true|$api", "sprite|$api"),
                 fixed.drop(base.size))
         }
     }
@@ -51,9 +51,9 @@ class MaterialPackagesTest {
     @Test
     fun `every fixed package has its own key and fingerprint`() {
         val specs = apis.flatMap { MaterialPackages.fixedSet(it) }
-        assertEquals(26, specs.size)
-        assertEquals(26, specs.map { it.key }.toSet().size)
-        assertEquals(26, specs.map { it.fingerprint }.toSet().size)
+        assertEquals(28, specs.size)
+        assertEquals(28, specs.map { it.key }.toSet().size)
+        assertEquals(28, specs.map { it.fingerprint }.toSet().size)
     }
 
     @Test

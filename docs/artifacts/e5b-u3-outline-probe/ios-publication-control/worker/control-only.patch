@@ -1,0 +1,322 @@
+diff --git a/dart3d/ios/Classes/SelectionOutlineViewsProbe.swift b/dart3d/ios/Classes/SelectionOutlineViewsProbe.swift
+--- a/dart3d/ios/Classes/SelectionOutlineViewsProbe.swift
++++ b/dart3d/ios/Classes/SelectionOutlineViewsProbe.swift
+@@ -15,6 +15,7 @@
+     let time: TimeInterval
+     let mode: Int
+     let cameraCase: Int
++    let publishInUpdate: Bool
+     let draws: [Draw]
+ }
+ 
+@@ -78,6 +79,8 @@
+         }
+         let mode = Int(control.position.x.rounded())
+         let cameraCase = Int(control.position.y.rounded())
++        // Authored marker z=1 is reflected to SceneKit z=-1 at both native ingresses.
++        let publishInUpdate = control.position.z == -1
+         if tailEnabled != (mode != 0) {
+             tailEnabled = mode != 0
+             host.invalidateOutlineViewsResolve()
+@@ -134,8 +137,9 @@
+             }
+         }
+         templates = templates.filter { used.contains($0.key) }
+-        frame = OutlineViewsFrame(time: time, mode: mode, cameraCase: cameraCase, draws: draws)
+-        let label = "mode=\(mode) cameraCase=\(cameraCase) draws=\(draws.count)"
++        frame = OutlineViewsFrame(time: time, mode: mode, cameraCase: cameraCase,
++            publishInUpdate: publishInUpdate, draws: draws)
++        let label = "mode=\(mode) cameraCase=\(cameraCase) draws=\(draws.count) publishInUpdate=\(publishInUpdate)"
+         if label != lastControl { d3Log("U3OV control \(label) time=\(time)"); lastControl = label }
+         guard !host.multiScreenMode, mode != 0, let pov = host.pointOfView,
+               let camera = pov.camera, let queue = host.commandQueue,
+@@ -231,6 +235,7 @@
+     private var observation = ""
+     private var lastDrawLogTime = -Double.infinity
+     private var syntheticRenderer: SCNRenderer?
++    private var publication: (() -> Void)?
+ 
+     init(device: MTLDevice, label: String) {
+         renderer = SCNRenderer(device: device)
+@@ -264,36 +269,45 @@
+             d3Log("U3OV rebind binding=\(label) raster=\(width)x\(height) output=\(outputWidth)x\(outputHeight) mask=rgba16Float")
+         }
+         guard let mask, let depth else { d3Log("U3OV BLOCKED mask allocation \(label)"); return }
+-        SCNTransaction.begin(); SCNTransaction.disableActions = true
+-        camera.camera = source.copy() as? SCNCamera
+-        camera.camera?.categoryBitMask = layerMask
+-        camera.camera?.wantsHDR = false
+-        camera.camera?.wantsExposureAdaptation = false
+-        camera.camera?.exposureOffset = 0
+-        camera.camera?.whitePoint = 1
+-        camera.camera?.bloomIntensity = 0
+-        camera.camera?.vignettingIntensity = 0
+-        camera.transform = transform
+-        let live = Set(frame.draws.map { $0.identity })
+-        for key in Array(nodes.keys) where !live.contains(key) {
+-            if let old = nodes.removeValue(forKey: key) { old.0.removeFromParentNode(); host.retireOutlineProbe(old.0) }
+-        }
+-        for draw in frame.draws {
+-            let node: SCNNode
+-            if let old = nodes[draw.identity], old.1 === draw.template { node = old.0 }
+-            else {
+-                if let old = nodes[draw.identity] { old.0.removeFromParentNode(); host.retireOutlineProbe(old.0) }
+-                let geometry = draw.template.copy() as! SCNGeometry
+-                geometry.materials = draw.template.materials.map { $0.copy() as! SCNMaterial }
+-                node = SCNNode(geometry: geometry)
+-                scene.rootNode.addChildNode(node)
+-                nodes[draw.identity] = (node, draw.template)
+-            }
+-            node.transform = draw.transform; node.pivot = draw.pivot
+-            node.isHidden = draw.hidden; node.opacity = draw.opacity
+-            node.categoryBitMask = draw.category; node.renderingOrder = draw.order
+-        }
+-        SCNTransaction.commit()
++        let publish = { [self] in
++            camera.camera = source.copy() as? SCNCamera
++            camera.camera?.categoryBitMask = layerMask
++            camera.camera?.wantsHDR = false
++            camera.camera?.wantsExposureAdaptation = false
++            camera.camera?.exposureOffset = 0
++            camera.camera?.whitePoint = 1
++            camera.camera?.bloomIntensity = 0
++            camera.camera?.vignettingIntensity = 0
++            camera.transform = transform
++            let live = Set(frame.draws.map { $0.identity })
++            for key in Array(nodes.keys) where !live.contains(key) {
++                if let old = nodes.removeValue(forKey: key) { old.0.removeFromParentNode(); host.retireOutlineProbe(old.0) }
++            }
++            for draw in frame.draws {
++                let node: SCNNode
++                if let old = nodes[draw.identity], old.1 === draw.template { node = old.0 }
++                else {
++                    if let old = nodes[draw.identity] { old.0.removeFromParentNode(); host.retireOutlineProbe(old.0) }
++                    let geometry = draw.template.copy() as! SCNGeometry
++                    geometry.materials = draw.template.materials.map { $0.copy() as! SCNMaterial }
++                    node = SCNNode(geometry: geometry)
++                    scene.rootNode.addChildNode(node)
++                    nodes[draw.identity] = (node, draw.template)
++                }
++                node.transform = draw.transform; node.pivot = draw.pivot
++                node.isHidden = draw.hidden; node.opacity = draw.opacity
++                node.categoryBitMask = draw.category; node.renderingOrder = draw.order
++            }
++        }
++        let controlled = frame.publishInUpdate && label.hasPrefix("target=")
++        if controlled {
++            publication = publish
++            renderer.delegate = self
++        } else {
++            SCNTransaction.begin(); SCNTransaction.disableActions = true
++            publish()
++            SCNTransaction.commit()
++        }
+         let pass = MTLRenderPassDescriptor()
+         pass.colorAttachments[0].texture = mask
+         pass.colorAttachments[0].loadAction = .clear
+@@ -304,11 +318,25 @@
+         pass.depthAttachment.clearDepth = 1
+         renderer.render(atTime: frame.time, viewport: CGRect(x: 0, y: 0, width: width, height: height),
+             commandBuffer: commandBuffer, passDescriptor: pass)
++        if controlled {
++            if publication != nil {
++                d3Log("U3OV BLOCKED private-update callback absent binding=\(label) time=\(frame.time)")
++                publication = nil
++            }
++            renderer.delegate = nil
++        }
+         observation = "binding=\(label) mode=\(frame.mode) cameraCase=\(frame.cameraCase) time=\(frame.time) camera=\(transform.m41),\(transform.m42),\(transform.m43) maskLayers=\(layerMask) raster=\(width)x\(height) output=\(outputWidth)x\(outputHeight) poses=\(frame.draws.map { "\($0.transform.m41),\($0.transform.m42),\($0.transform.m43)" })"
+         if frame.time - lastLogTime >= 0.25 {
+             d3Log("U3OV mask-encoded \(observation)")
+             lastLogTime = frame.time
+         }
++    }
++
++    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
++        // Publish only the detached mask scene in its own documented update callback.
++        publication?()
++        publication = nil
++        d3Log("U3OV private-update-publication binding=\(label) time=\(time) draws=\(nodes.count)")
+     }
+ 
+     func bind(_ technique: SCNTechnique?, frame: OutlineViewsFrame?) {
+@@ -330,6 +358,7 @@
+     }
+ 
+     func renderer(_ renderer: SCNSceneRenderer, didRenderScene scene: SCNScene, atTime time: TimeInterval) {
++        if renderer === self.renderer { return }
+         // CPU submission observation only; this is not GPU completion.
+         if time - lastDrawLogTime >= 0.25 {
+             let actualCamera = renderer.pointOfView?.presentation.worldTransform
+diff --git a/dart3d/example/lib/u3_outline_views_main.dart b/dart3d/example/lib/u3_outline_views_main.dart
+--- a/dart3d/example/lib/u3_outline_views_main.dart
++++ b/dart3d/example/lib/u3_outline_views_main.dart
+@@ -6,6 +6,9 @@
+ 
+ const _single = bool.fromEnvironment('DART3D_U3_OUTLINE_SINGLE');
+ const _msaa = bool.fromEnvironment('DART3D_U3_OUTLINE_TARGET_MSAA');
++const _publishInUpdate = bool.fromEnvironment(
++  'DART3D_U3_OUTLINE_PUBLISH_IN_UPDATE',
++);
+ const _modeName = String.fromEnvironment(
+   'DART3D_U3_OUTLINE_MODE',
+   defaultValue: 'off',
+@@ -32,6 +35,7 @@
+   final _document = buildU3OutlineViewsDocument(
+     single: _single,
+     targetMsaa: _msaa,
++    publishInUpdate: _publishInUpdate,
+     mode: _bootMode,
+   );
+   U3OutlineMode _mode = _bootMode;
+@@ -81,6 +85,7 @@
+                               _controller,
+                               mode,
+                               cameraB: _cameraB,
++                              publishInUpdate: _publishInUpdate,
+                             );
+                           },
+                         ),
+@@ -131,6 +136,7 @@
+                             _controller,
+                             _mode,
+                             cameraB: _cameraB,
++                            publishInUpdate: _publishInUpdate,
+                           );
+                           setU3OutlineCameraPose(
+                             _controller,
+diff --git a/dart3d/example/lib/u3_outline_views_scene.dart b/dart3d/example/lib/u3_outline_views_scene.dart
+--- a/dart3d/example/lib/u3_outline_views_scene.dart
++++ b/dart3d/example/lib/u3_outline_views_scene.dart
+@@ -19,6 +19,7 @@
+ SceneDocument buildU3OutlineViewsDocument({
+   bool single = false,
+   bool targetMsaa = false,
++  bool publishInUpdate = false,
+   U3OutlineMode mode = U3OutlineMode.off,
+ }) {
+   final doc = SceneDocument(allocator: IdAllocator(session: 0x75337072));
+@@ -132,7 +133,7 @@
+       id: u3OutlineControl,
+       name: u3OutlineMarker,
+       transform: TrsTransform(
+-        translation: Vector3(mode.index.toDouble(), 0, 0),
++        translation: Vector3(mode.index.toDouble(), 0, publishInUpdate ? 1 : 0),
+       ),
+     ),
+   );
+@@ -250,10 +251,15 @@
+   SceneController controller,
+   U3OutlineMode mode, {
+   required bool cameraB,
++  bool publishInUpdate = false,
+ }) => controller.setNodeTransforms([
+   NodeTransform(
+     u3OutlineControl,
+-    translation: Vector3(mode.index.toDouble(), cameraB ? 1 : 0, 0),
++    translation: Vector3(
++      mode.index.toDouble(),
++      cameraB ? 1 : 0,
++      publishInUpdate ? 1 : 0,
++    ),
+   ),
+ ]);
+ 
+diff --git a/dart3d/example/test/u3_outline_views_test.dart b/dart3d/example/test/u3_outline_views_test.dart
+--- a/dart3d/example/test/u3_outline_views_test.dart
++++ b/dart3d/example/test/u3_outline_views_test.dart
+@@ -142,6 +142,94 @@
+       );
+     },
+   );
++
++  for (final publishInUpdate in [false, true]) {
++    test(
++      'publication selector=$publishInUpdate survives public mode/camera writes without requesting a draw',
++      () {
++        final doc = buildU3OutlineViewsDocument(
++          publishInUpdate: publishInUpdate,
++        );
++        final controller = SceneController()..loadDocument(doc);
++        addTearDown(controller.dispose);
++        final sink = _Sink(controller);
++        controller.attachElement(sink);
++        final loaded =
++            jsonDecode(
++                  utf8.decode(
++                    sink.mutations
++                        .firstWhere((m) => m.tag == D3Protocol.loadScene)
++                        .data,
++                  ),
++                )
++                as Map;
++        final baseline = SceneController()
++          ..loadDocument(buildU3OutlineViewsDocument());
++        addTearDown(baseline.dispose);
++        final baselineSink = _Sink(baseline);
++        baseline.attachElement(baselineSink);
++        final original =
++            jsonDecode(
++                  utf8.decode(
++                    baselineSink.mutations
++                        .firstWhere((m) => m.tag == D3Protocol.loadScene)
++                        .data,
++                  ),
++                )
++                as Map;
++        final marker = (loaded['nodes'] as Map).values.cast<Map>().singleWhere(
++          (n) => n['name'] == u3OutlineMarker,
++        );
++        final originalMarker = (original['nodes'] as Map).values
++            .cast<Map>()
++            .singleWhere((n) => n['name'] == u3OutlineMarker);
++        expect(((marker['transform'] as Map)['trs'] as Map)['t'], [
++          0,
++          0,
++          publishInUpdate ? 1 : 0,
++        ]);
++        marker['transform'] = originalMarker['transform'];
++        loaded['documentId'] = original['documentId'];
++        expect(loaded, original);
++        sink.mutations.clear();
++        for (final mode in U3OutlineMode.values) {
++          setU3OutlineMode(
++            controller,
++            mode,
++            cameraB: true,
++            publishInUpdate: publishInUpdate,
++          );
++        }
++        expect(sink.mutations, hasLength(3));
++        for (var i = 0; i < sink.mutations.length; i++) {
++          final mutation = sink.mutations[i];
++          expect(mutation.tag, D3Protocol.setTransforms);
++          final data = ByteData.sublistView(mutation.data);
++          expect(
++            [
++              for (var c = 0; c < 3; c++)
++                data.getFloat32(13 + c * 4, Endian.little),
++            ],
++            [i.toDouble(), 1, publishInUpdate ? 1 : 0],
++          );
++        }
++        expect(sink.commands, isEmpty);
++        setU3OutlineColors(controller);
++        final target = doc.resources.values
++            .whereType<RenderTextureResource>()
++            .single;
++        controller.renderTexture(target.id);
++        clearU3OutlineColors(controller);
++        controller.renderTexture(target.id);
++        expect(sink.commands.map((c) => c['op']), [
++          'setNodeHighlights',
++          'render',
++          'setNodeHighlights',
++          'render',
++        ]);
++      },
++    );
++  }
+ 
+   for (final single in [false, true]) {
+     for (final msaa in [false, true]) {

@@ -1,0 +1,168 @@
+{
+  "image": "/private/tmp/dart3d-e5b-sprite-rt-current-20261027/r1/04-alpha-tinted-untextured.png",
+  "width": 1206,
+  "height": 2622,
+  "interpretation": "Encoded PNG channels; no GPU readback or calibration.",
+  "regions": {
+    "backdrop": {
+      "box": [
+        450,
+        680,
+        9,
+        9
+      ],
+      "meanRgba": [
+        80.0,
+        97.0,
+        111.0,
+        255.0
+      ],
+      "standardDeviation": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "selectedZeroAlpha": {
+      "box": [
+        559,
+        630,
+        9,
+        9
+      ],
+      "meanRgba": [
+        104.0,
+        122.0,
+        126.0,
+        255.0
+      ],
+      "standardDeviation": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "selectedHalfAlpha": {
+      "box": [
+        559,
+        690,
+        9,
+        9
+      ],
+      "meanRgba": [
+        104.0,
+        122.0,
+        126.0,
+        255.0
+      ],
+      "standardDeviation": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "selectedOpaque": {
+      "box": [
+        559,
+        765,
+        9,
+        9
+      ],
+      "meanRgba": [
+        104.0,
+        122.0,
+        126.0,
+        255.0
+      ],
+      "standardDeviation": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "untexturedHalfAlpha": {
+      "box": [
+        288,
+        1008,
+        9,
+        9
+      ],
+      "meanRgba": [
+        104.0,
+        163.0,
+        191.0,
+        255.0
+      ],
+      "standardDeviation": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "overlapBackOnly": {
+      "box": [
+        625,
+        1008,
+        9,
+        9
+      ],
+      "meanRgba": [
+        157.0,
+        93.0,
+        118.0,
+        255.0
+      ],
+      "standardDeviation": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "overlapFrontOnly": {
+      "box": [
+        865,
+        1008,
+        9,
+        9
+      ],
+      "meanRgba": [
+        84.0,
+        152.0,
+        131.0,
+        255.0
+      ],
+      "standardDeviation": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "overlapBoth": {
+      "box": [
+        735,
+        1008,
+        9,
+        9
+      ],
+      "meanRgba": [
+        129.0,
+        150.0,
+        135.0,
+        255.0
+      ],
+      "standardDeviation": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  }
+}

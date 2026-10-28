@@ -117,7 +117,11 @@ SceneDocument readFsceneLogged(
 /// on both natives, so nothing applies, not even the reparent edge —
 /// `spec`'s `children` is inert (a node's children are whoever named
 /// it as `parent`), and node ops on missing ids no-op.
-void foldCommandIntoDocument(SceneDocument doc, Map<String, Object?> op) {
+void foldCommandIntoDocument(
+  SceneDocument doc,
+  Map<String, Object?> op, {
+  AnimationSpec? decodedAnimation,
+}) {
   switch (op['op']) {
     case 'addNode':
       final id = _opId(op, 'node');
@@ -187,12 +191,14 @@ void foldCommandIntoDocument(SceneDocument doc, Map<String, Object?> op) {
     case 'removeSkin':
       doc.skins.remove(_opId(op, 'id'));
     case 'upsertAnimation':
-      doc.animations[_opId(op, 'id')] = _decodeEntry<AnimationSpec>(
-        doc,
-        'animations',
-        op['id'],
-        op['animation'],
-      );
+      final id = _opId(op, 'id');
+      final animation =
+          decodedAnimation ??
+          decodeAnimationSpec(
+            id,
+            Map<String, Object?>.from(op['animation'] as Map),
+          );
+      doc.animations[id] = animation;
     case 'removeAnimation':
       doc.animations.remove(_opId(op, 'id'));
     case 'updateViews':
@@ -338,7 +344,7 @@ void _upsertPayload(SceneDocument doc, Map<String, Object?> op) {
     return;
   }
   final encodingName = op['encoding'] as String;
-  doc.payloads[id] = PayloadSpec(
+  final candidate = PayloadSpec(
     id,
     // A name outside `PayloadEncoding.values` can't be represented —
     // upstream `_decodePayload` throws on it too — so it degrades to
@@ -356,6 +362,7 @@ void _upsertPayload(SceneDocument doc, Map<String, Object?> op) {
     length: (op['length'] as num?)?.toInt() ?? bytes.lengthInBytes,
     bytes: bytes,
   );
+  foldPayloadIntoDocument(doc, candidate);
 }
 
 // Both `bytes` forms decode to the chunk, or null when the wire value

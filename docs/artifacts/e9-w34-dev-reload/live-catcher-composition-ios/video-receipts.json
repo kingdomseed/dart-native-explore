@@ -1,0 +1,138 @@
+{
+  "baseline": {
+    "path": "/private/tmp/dart3d-w34-ios-live-catcher-composition-20261028/r1/parent/baseline/journey.mp4",
+    "sha256": "1d92f657bcfa5748b9649cef2eff6e9b57c73003a5b2b6d70d04e16117e9106a",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 1206,
+          "height": 2622,
+          "nb_frames": "2514",
+          "nb_read_frames": "2514"
+        }
+      ],
+      "format": {
+        "duration": "39.658333"
+      }
+    },
+    "decodeCommand": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "/private/tmp/dart3d-w34-ios-live-catcher-composition-20261028/r1/parent/baseline/journey.mp4",
+      "-fps_mode",
+      "passthrough",
+      "-f",
+      "null",
+      "-"
+    ],
+    "decodeExitCode": 0,
+    "warningLines": 179,
+    "note": "Retained muxer warnings do not establish application fps/latency. Read log; no warning-free claim."
+  },
+  "multiply": {
+    "path": "/private/tmp/dart3d-w34-ios-live-catcher-composition-20261028/r1/parent/multiply/journey.mp4",
+    "sha256": "d0c85a15cf7f0fb0be5fc8c8fa02f228b80c781dc07e938008a30d8e1aa641c9",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 1206,
+          "height": 2622,
+          "nb_frames": "682",
+          "nb_read_frames": "682"
+        }
+      ],
+      "format": {
+        "duration": "9.460000"
+      }
+    },
+    "decodeCommand": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "/private/tmp/dart3d-w34-ios-live-catcher-composition-20261028/r1/parent/multiply/journey.mp4",
+      "-fps_mode",
+      "passthrough",
+      "-f",
+      "null",
+      "-"
+    ],
+    "decodeExitCode": 0,
+    "warningLines": 130,
+    "note": "Retained muxer warnings do not establish application fps/latency. Read log; no warning-free claim."
+  },
+  "transparent": {
+    "path": "/private/tmp/dart3d-w34-ios-live-catcher-composition-20261028/r1/parent/transparent/journey.mp4",
+    "sha256": "ce5e6a4107c991016217b345dd382873f8d613201bc25a54f0efdc9980027994",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 1206,
+          "height": 2622,
+          "nb_frames": "686",
+          "nb_read_frames": "686"
+        }
+      ],
+      "format": {
+        "duration": "9.616667"
+      }
+    },
+    "decodeCommand": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "/private/tmp/dart3d-w34-ios-live-catcher-composition-20261028/r1/parent/transparent/journey.mp4",
+      "-fps_mode",
+      "passthrough",
+      "-f",
+      "null",
+      "-"
+    ],
+    "decodeExitCode": 0,
+    "warningLines": 114,
+    "note": "Retained muxer warnings do not establish application fps/latency. Read log; no warning-free claim."
+  },
+  "clean": {
+    "path": "/private/tmp/dart3d-w34-ios-live-catcher-composition-20261028/r1/parent/clean/journey.mp4",
+    "sha256": "0306895e2b0a213fb2b1c019842223f569da5564b1cddbcbcb793fbb80c92f2d",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 1206,
+          "height": 2622,
+          "nb_frames": "686",
+          "nb_read_frames": "686"
+        }
+      ],
+      "format": {
+        "duration": "9.570000"
+      }
+    },
+    "decodeCommand": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "/private/tmp/dart3d-w34-ios-live-catcher-composition-20261028/r1/parent/clean/journey.mp4",
+      "-fps_mode",
+      "passthrough",
+      "-f",
+      "null",
+      "-"
+    ],
+    "decodeExitCode": 0,
+    "warningLines": 164,
+    "note": "Retained muxer warnings do not establish application fps/latency. Read log; no warning-free claim."
+  }
+}
