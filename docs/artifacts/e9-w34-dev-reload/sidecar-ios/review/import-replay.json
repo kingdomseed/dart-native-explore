@@ -1,0 +1,99 @@
+{
+  "base": "2f38e4e33f0b1cb678bc408a42d069c796cefc12",
+  "archive_sha256": [
+    "646f5d269a78020fb588ea420fb2783ea9d5a998e6b8019fd8885ad365726f2d",
+    "6a313b9effba2725aedaf14ebc5be082848b248cdd0b70ea4af04269e323c706"
+  ],
+  "accepted52_unchanged": true,
+  "observed58_verified": true,
+  "exact_six_additions": [
+    "dart3d/example/lib/dev_reload_main.dart",
+    "dart3d/example/test/dev_reload_test.dart",
+    "dart3d/example/tool/w34_asset_fixture.dart",
+    "dart3d/lib/dev_reload.dart",
+    "dart3d/tool/reload_host.dart",
+    "docs/dev-reload.md"
+  ],
+  "initial_files": 1902,
+  "unowned_initial_files_preserved": 1876,
+  "locks": {
+    "dart3d/example/dn_plugins.lock": "73c5209e393e2c670769b2dfe4d09d72b79870c5218ede82e2a6d9c659c0f2a6",
+    "dart3d/example/ios/Podfile.lock": "47d5269141917cc2cfad542d6e2c60dc8c3f364e5700ba1354f44208a9e31522",
+    "dart3d/example/lib/dartnative_plugin_registrant.dart": "c0f873e11de99a1485dd67fd82bc563a61f3c66cc8280b705019ce48cfdbe09f",
+    "dart3d/example/pubspec.lock": "4ab8d1150fe7606c532dccb84d07eb0cc4062b5d4b2481c07fd27c135241936c",
+    "dart3d/pubspec.lock": "868933c6c9bdd80476a9d1b6d380078eb8ecf45960820d8414beebd55a0b555f",
+    "probe/pubspec.lock": "1606c33221efeb86ab121be4ef9ef82377f400de9ca7ab838b7822971f285121"
+  },
+  "patch_sha256": "05353c6b6f383a2dc4264dbcef0fc25d8d2609a20047390d257458f3dea3bbea",
+  "replay": [
+    {
+      "args": [
+        "git",
+        "apply",
+        "--check",
+        "/private/tmp/dart3d-e9-reload-library-implementation-20261027/r1/parent-correction.patch"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "apply",
+        "/private/tmp/dart3d-e9-reload-library-implementation-20261027/r1/parent-correction.patch"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "apply",
+        "--reverse",
+        "--check",
+        "/private/tmp/dart3d-e9-reload-library-implementation-20261027/r1/parent-correction.patch"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "apply",
+        "--reverse",
+        "/private/tmp/dart3d-e9-reload-library-implementation-20261027/r1/parent-correction.patch"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "apply",
+        "--check",
+        "/private/tmp/dart3d-e9-reload-library-implementation-20261027/r1/parent-correction.patch"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "apply",
+        "/private/tmp/dart3d-e9-reload-library-implementation-20261027/r1/parent-correction.patch"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "replay_scratch_removed": true,
+  "owned_manifest_six_hashes_match_source58": true,
+  "baseline_paths_manifest_verified": true,
+  "baseline_sha256_manifest_adjacent_hash_verified": true
+}

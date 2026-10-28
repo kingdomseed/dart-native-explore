@@ -1,0 +1,280 @@
+{
+  "baseline": {
+    "pid": "85554",
+    "options": 11,
+    "selectedChannelChanges": 6,
+    "instrumented": true,
+    "selectedChangesWithRebuild": 6,
+    "allRebuilds": 11,
+    "installedViews": 8,
+    "errorQueryMatches": 0,
+    "events": [
+      {
+        "channel": "normals",
+        "wire": "false",
+        "rebuilds": [
+          "2026-10-28 01:42:10.689 Df Runner[85554:135b017] [com.jasonholtdigital.dart3d:scene] screenTransition rebuild gen=3 channel=normals"
+        ],
+        "installed": [
+          "2026-10-28 01:42:10.700 Df Runner[85554:135b00f] [com.jasonholtdigital.dart3d:scene] screenTransition installed gen=3 channel=normals views=ObjectIdentifier(0x000000010b5b3c00)"
+        ]
+      },
+      {
+        "channel": "metallic",
+        "wire": "false",
+        "rebuilds": [
+          "2026-10-28 01:42:16.305 Df Runner[85554:135bc70] [com.jasonholtdigital.dart3d:scene] screenTransition rebuild gen=4 channel=metallic"
+        ],
+        "installed": [
+          "2026-10-28 01:42:16.307 Df Runner[85554:135b00f] [com.jasonholtdigital.dart3d:scene] screenTransition installed gen=4 channel=metallic views=ObjectIdentifier(0x000000010b5b3480)"
+        ]
+      },
+      {
+        "channel": "roughness",
+        "wire": "false",
+        "rebuilds": [
+          "2026-10-28 01:42:23.538 Df Runner[85554:135b01a] [com.jasonholtdigital.dart3d:scene] screenTransition rebuild gen=5 channel=roughness"
+        ],
+        "installed": [
+          "2026-10-28 01:42:23.540 Df Runner[85554:135b00f] [com.jasonholtdigital.dart3d:scene] screenTransition installed gen=5 channel=roughness views=ObjectIdentifier(0x000000010b5b3c00)"
+        ]
+      },
+      {
+        "channel": "baseColor",
+        "wire": "false",
+        "rebuilds": [
+          "2026-10-28 01:42:25.372 Df Runner[85554:135bc70] [com.jasonholtdigital.dart3d:scene] screenTransition rebuild gen=6 channel=baseColor"
+        ],
+        "installed": [
+          "2026-10-28 01:42:25.374 Df Runner[85554:135b00f] [com.jasonholtdigital.dart3d:scene] screenTransition installed gen=6 channel=baseColor views=ObjectIdentifier(0x000000010b5b3480)"
+        ]
+      },
+      {
+        "channel": "depth",
+        "wire": "false",
+        "rebuilds": [
+          "2026-10-28 01:42:27.239 Df Runner[85554:135b01a] [com.jasonholtdigital.dart3d:scene] screenTransition rebuild gen=7 channel=depth"
+        ],
+        "installed": [
+          "2026-10-28 01:42:27.240 Df Runner[85554:135b00f] [com.jasonholtdigital.dart3d:scene] screenTransition installed gen=7 channel=depth views=ObjectIdentifier(0x000000010b5b3c00)"
+        ]
+      },
+      {
+        "channel": "normals",
+        "wire": "false",
+        "rebuilds": [
+          "2026-10-28 01:42:29.055 Df Runner[85554:135b01b] [com.jasonholtdigital.dart3d:scene] screenTransition rebuild gen=8 channel=normals"
+        ],
+        "installed": [
+          "2026-10-28 01:42:29.057 Df Runner[85554:135b00f] [com.jasonholtdigital.dart3d:scene] screenTransition installed gen=8 channel=normals views=ObjectIdentifier(0x000000010b5b3480)"
+        ]
+      },
+      {
+        "channel": "normals",
+        "wire": "true",
+        "rebuilds": [],
+        "installed": []
+      },
+      {
+        "channel": "depth",
+        "wire": "true",
+        "rebuilds": [
+          "2026-10-28 01:42:32.722 Df Runner[85554:135b01d] [com.jasonholtdigital.dart3d:scene] screenTransition rebuild gen=9 channel=depth"
+        ],
+        "installed": [
+          "2026-10-28 01:42:32.723 Df Runner[85554:135b00f] [com.jasonholtdigital.dart3d:scene] screenTransition installed gen=9 channel=depth views=ObjectIdentifier(0x000000010b5b3c00)"
+        ]
+      },
+      {
+        "channel": "none",
+        "wire": "true",
+        "rebuilds": [
+          "2026-10-28 01:42:34.572 Df Runner[85554:135b017] [com.jasonholtdigital.dart3d:scene] screenTransition rebuild gen=10 channel=none"
+        ],
+        "installed": []
+      },
+      {
+        "channel": "none",
+        "wire": "false",
+        "rebuilds": [],
+        "installed": []
+      },
+      {
+        "channel": "baseColor",
+        "wire": "false",
+        "rebuilds": [
+          "2026-10-28 01:42:38.172 Df Runner[85554:135b017] [com.jasonholtdigital.dart3d:scene] screenTransition rebuild gen=11 channel=baseColor"
+        ],
+        "installed": [
+          "2026-10-28 01:42:38.173 Df Runner[85554:135b00f] [com.jasonholtdigital.dart3d:scene] screenTransition installed gen=11 channel=baseColor views=ObjectIdentifier(0x000000010b5b2d00)"
+        ]
+      }
+    ]
+  },
+  "corrected": {
+    "pid": "91403",
+    "options": 11,
+    "selectedChannelChanges": 6,
+    "instrumented": true,
+    "selectedChangesWithRebuild": 0,
+    "allRebuilds": 5,
+    "installedViews": 2,
+    "errorQueryMatches": 0,
+    "events": [
+      {
+        "channel": "normals",
+        "wire": "false",
+        "rebuilds": [
+          "2026-10-28 01:44:15.356 Df Runner[91403:135f116] [com.jasonholtdigital.dart3d:scene] screenTransition rebuild gen=3 channel=normals"
+        ],
+        "installed": [
+          "2026-10-28 01:44:15.364 Df Runner[91403:135f0ea] [com.jasonholtdigital.dart3d:scene] screenTransition installed gen=3 channel=normals views=ObjectIdentifier(0x000000010719fc00)"
+        ]
+      },
+      {
+        "channel": "metallic",
+        "wire": "false",
+        "rebuilds": [],
+        "installed": []
+      },
+      {
+        "channel": "roughness",
+        "wire": "false",
+        "rebuilds": [],
+        "installed": []
+      },
+      {
+        "channel": "baseColor",
+        "wire": "false",
+        "rebuilds": [],
+        "installed": []
+      },
+      {
+        "channel": "depth",
+        "wire": "false",
+        "rebuilds": [],
+        "installed": []
+      },
+      {
+        "channel": "normals",
+        "wire": "false",
+        "rebuilds": [],
+        "installed": []
+      },
+      {
+        "channel": "normals",
+        "wire": "true",
+        "rebuilds": [],
+        "installed": []
+      },
+      {
+        "channel": "depth",
+        "wire": "true",
+        "rebuilds": [],
+        "installed": []
+      },
+      {
+        "channel": "none",
+        "wire": "true",
+        "rebuilds": [
+          "2026-10-28 01:44:30.589 Df Runner[91403:135f110] [com.jasonholtdigital.dart3d:scene] screenTransition rebuild gen=4 channel=none"
+        ],
+        "installed": []
+      },
+      {
+        "channel": "none",
+        "wire": "false",
+        "rebuilds": [],
+        "installed": []
+      },
+      {
+        "channel": "baseColor",
+        "wire": "false",
+        "rebuilds": [
+          "2026-10-28 01:44:34.206 Df Runner[91403:135f5cc] [com.jasonholtdigital.dart3d:scene] screenTransition rebuild gen=5 channel=baseColor"
+        ],
+        "installed": [
+          "2026-10-28 01:44:34.207 Df Runner[91403:135f0ea] [com.jasonholtdigital.dart3d:scene] screenTransition installed gen=5 channel=baseColor views=ObjectIdentifier(0x000000010719f480)"
+        ]
+      }
+    ]
+  },
+  "clean": {
+    "pid": "95227",
+    "options": 11,
+    "selectedChannelChanges": 6,
+    "instrumented": false,
+    "selectedChangesWithRebuild": null,
+    "allRebuilds": null,
+    "installedViews": null,
+    "errorQueryMatches": 0,
+    "events": [
+      {
+        "channel": "normals",
+        "wire": "false",
+        "rebuilds": [],
+        "installed": []
+      },
+      {
+        "channel": "metallic",
+        "wire": "false",
+        "rebuilds": [],
+        "installed": []
+      },
+      {
+        "channel": "roughness",
+        "wire": "false",
+        "rebuilds": [],
+        "installed": []
+      },
+      {
+        "channel": "baseColor",
+        "wire": "false",
+        "rebuilds": [],
+        "installed": []
+      },
+      {
+        "channel": "depth",
+        "wire": "false",
+        "rebuilds": [],
+        "installed": []
+      },
+      {
+        "channel": "normals",
+        "wire": "false",
+        "rebuilds": [],
+        "installed": []
+      },
+      {
+        "channel": "normals",
+        "wire": "true",
+        "rebuilds": [],
+        "installed": []
+      },
+      {
+        "channel": "depth",
+        "wire": "true",
+        "rebuilds": [],
+        "installed": []
+      },
+      {
+        "channel": "none",
+        "wire": "true",
+        "rebuilds": [],
+        "installed": []
+      },
+      {
+        "channel": "none",
+        "wire": "false",
+        "rebuilds": [],
+        "installed": []
+      },
+      {
+        "channel": "baseColor",
+        "wire": "false",
+        "rebuilds": [],
+        "installed": []
+      }
+    ]
+  }
+}

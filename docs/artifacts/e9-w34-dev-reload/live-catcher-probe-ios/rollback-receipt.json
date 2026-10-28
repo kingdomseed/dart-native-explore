@@ -1,0 +1,11 @@
+{
+  "recordedAt": "2026-10-27T23:56:49.326339Z",
+  "all66AcceptedHashesRestored": true,
+  "allPreexistingFilesRestored": 3122,
+  "sixLocksPreserved": true,
+  "normalTarget": "DN_TARGET=lib/main.dart",
+  "remainingW34Defines": [],
+  "probeRemoved": true,
+  "failedPacketSha256": "e3dc268ecfb32bfba561ee0ef82e42c57642c2330c091f302a3623106934ea25",
+  "candidatePacketSha256": "4e6bf1bcb5fe15dccbebdd5f5cdbd50588866fb63d3424b910a9bc51293cde9a"
+}

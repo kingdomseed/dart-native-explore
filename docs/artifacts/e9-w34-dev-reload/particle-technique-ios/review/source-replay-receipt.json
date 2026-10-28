@@ -1,0 +1,148 @@
+{
+  "base_head": "2f38e4e33f0b1cb678bc408a42d069c796cefc12",
+  "private_packet": {
+    "count": 118,
+    "manifest_sha256": "fc0223859236a74f8d01823b5843ba717c7ec5180d67ef2d9d626e0240ea58b5"
+  },
+  "durable_packet": {
+    "count": 52,
+    "manifest_sha256": "d918655badc7d391d486917ed7c9ca8ebcc791dd153acfae9a92bc655a145629"
+  },
+  "durable_correspondence": "all 52 files byte-identical to frozen private packet",
+  "video_hashes": {
+    "count": 2,
+    "manifest_sha256": "77ea4cf6b3a72a96bd0b896012b9ece1e4674ff95a1a675fe331baa84525e87c"
+  },
+  "accepted58": {
+    "paths": 58,
+    "all_manifest_entries_match": true
+  },
+  "r1": {
+    "paths": 61,
+    "all_manifest_entries_match": true,
+    "unchanged_accepted_sources": 57
+  },
+  "r2": {
+    "paths": 61,
+    "all_manifest_entries_match": true,
+    "unchanged_accepted_sources": 57
+  },
+  "r1_to_r2_changed_paths": [
+    "dart3d/ios/Classes/ParticleDebugProbe.swift"
+  ],
+  "baseline_regular_paths": 1934,
+  "replays": {
+    "r1": {
+      "commands": [
+        {
+          "argv": [
+            "git",
+            "apply",
+            "--check",
+            "/private/tmp/dart3d-e9-particle-technique-probe-20261027/r1/parent-probe.patch"
+          ],
+          "exit": 0,
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "apply",
+            "/private/tmp/dart3d-e9-particle-technique-probe-20261027/r1/parent-probe.patch"
+          ],
+          "exit": 0,
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "apply",
+            "--reverse",
+            "--check",
+            "/private/tmp/dart3d-e9-particle-technique-probe-20261027/r1/parent-probe.patch"
+          ],
+          "exit": 0,
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "apply",
+            "--reverse",
+            "/private/tmp/dart3d-e9-particle-technique-probe-20261027/r1/parent-probe.patch"
+          ],
+          "exit": 0,
+          "stderr": ""
+        }
+      ],
+      "source61_exact": true,
+      "unowned_preserved": 1933,
+      "reverse_exact_baseline": true,
+      "archive_sha256": "560cbe5d93d83b8bd96c659002e6d71d98ab1a304468dd0f7b5a811c79af9294",
+      "patch_sha256": "4b67a86525f3bcb961bb9307d51f541e4b9e6b72b54653776fe996d35ce22620"
+    },
+    "r2": {
+      "commands": [
+        {
+          "argv": [
+            "git",
+            "apply",
+            "--check",
+            "/private/tmp/dart3d-e9-particle-technique-probe-20261027/r1/parent-r2-probe.patch"
+          ],
+          "exit": 0,
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "apply",
+            "/private/tmp/dart3d-e9-particle-technique-probe-20261027/r1/parent-r2-probe.patch"
+          ],
+          "exit": 0,
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "apply",
+            "--reverse",
+            "--check",
+            "/private/tmp/dart3d-e9-particle-technique-probe-20261027/r1/parent-r2-probe.patch"
+          ],
+          "exit": 0,
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "git",
+            "apply",
+            "--reverse",
+            "/private/tmp/dart3d-e9-particle-technique-probe-20261027/r1/parent-r2-probe.patch"
+          ],
+          "exit": 0,
+          "stderr": ""
+        }
+      ],
+      "source61_exact": true,
+      "unowned_preserved": 1933,
+      "reverse_exact_baseline": true,
+      "archive_sha256": "ad36f3cb97f394bc56324e9bd0f211d3ea6e7225132c594436f54049764d6ecb",
+      "patch_sha256": "2709b22236ef3f9867e554105b81deb78c147ffe0f088e84269dae58564e1d46"
+    }
+  },
+  "replay_scratch_removed": true,
+  "import": {
+    "source61_exact": true,
+    "unowned_paths_preserved": 1876,
+    "before_count": 1902,
+    "after_count": 1937,
+    "locks_registrants_preserved": {
+      "dart3d/example/ios/Podfile.lock": "47d5269141917cc2cfad542d6e2c60dc8c3f364e5700ba1354f44208a9e31522",
+      "dart3d/example/lib/dartnative_plugin_registrant.dart": "c0f873e11de99a1485dd67fd82bc563a61f3c66cc8280b705019ce48cfdbe09f",
+      "dart3d/example/pubspec.lock": "4ab8d1150fe7606c532dccb84d07eb0cc4062b5d4b2481c07fd27c135241936c",
+      "dart3d/pubspec.lock": "868933c6c9bdd80476a9d1b6d380078eb8ecf45960820d8414beebd55a0b555f",
+      "probe/pubspec.lock": "1606c33221efeb86ab121be4ef9ef82377f400de9ca7ab838b7822971f285121"
+    }
+  }
+}

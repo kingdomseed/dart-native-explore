@@ -1,0 +1,12 @@
+diff --git a/dart3d/ios/Classes/FsceneRealizer.swift b/dart3d/ios/Classes/FsceneRealizer.swift
+index d4f2423..e734c34 100644
+--- a/dart3d/ios/Classes/FsceneRealizer.swift
++++ b/dart3d/ios/Classes/FsceneRealizer.swift
+@@ -2433,6 +2433,7 @@ enum FsceneRealizer {
+                 } else {
+                     mode = .live
+                     m.lightingModel = .shadowOnly
++                    m.shaderModifiers = [.fragment: "#pragma transparent\n#pragma body\n"]
+                     if authoredMode != "live" {
+                         host.logOnce("w24.catcher.mode.\(authoredMode)",
+                             "shadowCatcher mode '\(authoredMode)' unknown; "

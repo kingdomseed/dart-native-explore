@@ -1,0 +1,173 @@
+{
+  "pid": 40349,
+  "exception": {
+    "codes": "0x0000000000000001, 0x42d2d93542d2d935",
+    "rawCodes": [
+      1,
+      4815149774390090037
+    ],
+    "type": "EXC_BAD_ACCESS",
+    "signal": "SIGSEGV",
+    "subtype": "KERN_INVALID_ADDRESS at 0x42d2d93542d2d935"
+  },
+  "termination": {
+    "flags": 0,
+    "code": 11,
+    "namespace": "SIGNAL",
+    "indicator": "Segmentation fault: 11",
+    "byProc": "exc handler",
+    "byPid": 40349
+  },
+  "faultingThread": 2,
+  "threadName": null,
+  "queue": "com.apple.scenekit.renderingQueue.dart3d.SceneViewHost0x105fb4000",
+  "frames": [
+    {
+      "imageOffset": 2056,
+      "symbol": "objc_msgSend",
+      "symbolLocation": 8,
+      "imageIndex": 78
+    },
+    {
+      "imageOffset": 1308532,
+      "symbol": "-[SCNLight setIESProfileURL:]",
+      "symbolLocation": 36,
+      "imageIndex": 72
+    },
+    {
+      "imageOffset": 1291432,
+      "symbol": "-[SCNLight copyWithZone:]",
+      "symbolLocation": 476,
+      "imageIndex": 72
+    },
+    {
+      "imageOffset": 2027696,
+      "sourceLine": 138,
+      "sourceFile": "ScreenDebugPresentation.swift",
+      "symbol": "visit #1 (_:parent:) in ScreenDebugAttachments.capture(_:channel:host:)",
+      "imageIndex": 4,
+      "symbolLocation": 1264
+    },
+    {
+      "imageOffset": 2029020,
+      "sourceLine": 146,
+      "sourceFile": "ScreenDebugPresentation.swift",
+      "symbol": "visit #1 (_:parent:) in ScreenDebugAttachments.capture(_:channel:host:)",
+      "imageIndex": 4,
+      "symbolLocation": 2588
+    },
+    {
+      "imageOffset": 2022764,
+      "sourceLine": 148,
+      "sourceFile": "ScreenDebugPresentation.swift",
+      "symbol": "ScreenDebugAttachments.capture(_:channel:host:)",
+      "imageIndex": 4,
+      "symbolLocation": 584
+    },
+    {
+      "imageOffset": 1311840,
+      "sourceLine": 613,
+      "sourceFile": "RenderTargets.swift",
+      "symbol": "closure #1 in SceneViewHost.syncScreenSubviews()",
+      "imageIndex": 4,
+      "symbolLocation": 128
+    },
+    {
+      "imageOffset": 1319816,
+      "sourceFile": "/<compiler-generated>",
+      "symbol": "partial apply for closure #1 in SceneViewHost.syncScreenSubviews()",
+      "symbolLocation": 52,
+      "imageIndex": 4
+    },
+    {
+      "imageOffset": 197076,
+      "sourceFile": "/<compiler-generated>",
+      "symbol": "Optional.map<A, B>(_:)",
+      "symbolLocation": 212,
+      "imageIndex": 4
+    },
+    {
+      "imageOffset": 1308120,
+      "sourceLine": 612,
+      "sourceFile": "RenderTargets.swift",
+      "symbol": "SceneViewHost.syncScreenSubviews()",
+      "imageIndex": 4,
+      "symbolLocation": 464
+    },
+    {
+      "imageOffset": 1920836,
+      "sourceLine": 5763,
+      "sourceFile": "SceneViewHost.swift",
+      "symbol": "SceneViewHost.renderer(_:didApplyConstraintsAtTime:)",
+      "imageIndex": 4,
+      "symbolLocation": 140
+    },
+    {
+      "imageOffset": 1930852,
+      "sourceFile": "/<compiler-generated>",
+      "symbol": "@objc SceneViewHost.renderer(_:didApplyConstraintsAtTime:)",
+      "symbolLocation": 68,
+      "imageIndex": 4
+    },
+    {
+      "imageOffset": 1524088,
+      "symbol": "-[SCNRenderer _update:]",
+      "symbolLocation": 1452,
+      "imageIndex": 72
+    },
+    {
+      "imageOffset": 1531232,
+      "symbol": "-[SCNRenderer _drawSceneWithNewRenderer:]",
+      "symbolLocation": 152,
+      "imageIndex": 72
+    },
+    {
+      "imageOffset": 1532504,
+      "symbol": "-[SCNRenderer _drawScene:]",
+      "symbolLocation": 40,
+      "imageIndex": 72
+    },
+    {
+      "imageOffset": 1533272,
+      "symbol": "-[SCNRenderer _drawAtTime:]",
+      "symbolLocation": 524,
+      "imageIndex": 72
+    },
+    {
+      "imageOffset": 2169196,
+      "symbol": "-[SCNView _drawAtTime:]",
+      "symbolLocation": 408,
+      "imageIndex": 72
+    },
+    {
+      "imageOffset": 845344,
+      "symbol": "__83-[NSObject(SCN_DisplayLinkExtensions) SCN_setupDisplayLinkWithQueue:screen:policy:]_block_invoke",
+      "symbolLocation": 44,
+      "imageIndex": 72
+    },
+    {
+      "imageOffset": 3341720,
+      "symbol": "-[SCNDisplayLink _displayLinkCallbackReturningImmediately]",
+      "symbolLocation": 132,
+      "imageIndex": 72
+    },
+    {
+      "imageOffset": 114924,
+      "symbol": "_dispatch_client_callout",
+      "symbolLocation": 12,
+      "imageIndex": 73
+    },
+    {
+      "imageOffset": 24696,
+      "symbol": "_dispatch_continuation_pop",
+      "symbolLocation": 776,
+      "imageIndex": 73
+    },
+    {
+      "imageOffset": 102804,
+      "symbol": "_dispatch_source_invoke",
+      "symbolLocation": 1804,
+      "imageIndex": 73
+    }
+  ]
+}

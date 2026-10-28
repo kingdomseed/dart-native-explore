@@ -1,0 +1,464 @@
+diff --git a/dart3d/example/lib/w34_debug_main.dart b/dart3d/example/lib/w34_debug_main.dart
+index 1f0dcc2..d97d7d4 100644
+--- a/dart3d/example/lib/w34_debug_main.dart
++++ b/dart3d/example/lib/w34_debug_main.dart
+@@ -4,6 +4,8 @@ import 'package:dartnative/dartnative.dart';
+ import 'dartnative_plugin_registrant.dart';
+ import 'w34_debug_scene.dart';
+ 
++const _consumerChecks = bool.fromEnvironment('DART3D_W34_CONSUMERS');
++
+ void main() {
+   DartNativePluginRegistrant.registerAll();
+   runApp(const _DebugScreen());
+@@ -18,11 +20,20 @@ class _DebugScreen extends StatefulWidget {
+ 
+ class _DebugScreenState extends State<_DebugScreen> {
+   final _controller = SceneController();
+-  final _document = buildW34DebugDocument();
++  final _document = buildW34DebugDocument(skinned: _consumerChecks);
++  late final _rig = _document.nodes.values.singleWhere(
++    (n) => n.name == 'w34.rig',
++  );
++  late final _joint = _document.nodes.values.singleWhere(
++    (n) => n.name == 'w34.joint',
++  );
+   SceneDebugChannel _channel = SceneDebugChannel.none;
+   bool _wireframe = false;
+   bool _edited = false;
+   String _coverage = 'opaque';
++  bool _rigPresent = true;
++  bool _posed = false;
++  bool _inset = false;
+ 
+   @override
+   void initState() {
+@@ -151,6 +162,54 @@ class _DebugScreenState extends State<_DebugScreen> {
+                   ),
+                 ],
+               ),
++              if (_consumerChecks)
++                Row(
++                  children: [
++                    Expanded(
++                      child: Button(
++                        title: _rigPresent ? 'Rig present' : 'Rig removed',
++                        fontSize: 12,
++                        onPressed: () {
++                          final rig = _rig, joint = _joint;
++                          setState(() => _rigPresent = !_rigPresent);
++                          setW34RigPresent(
++                            _controller,
++                            _document,
++                            rig,
++                            joint,
++                            present: _rigPresent,
++                          );
++                        },
++                      ),
++                    ),
++                    Expanded(
++                      child: Button(
++                        title: _posed ? 'Pose raised' : 'Pose rest',
++                        fontSize: 12,
++                        onPressed: _rigPresent
++                            ? () {
++                                setState(() => _posed = !_posed);
++                                poseW34Joint(
++                                  _controller,
++                                  _joint,
++                                  posed: _posed,
++                                );
++                              }
++                            : null,
++                      ),
++                    ),
++                    Expanded(
++                      child: Button(
++                        title: _inset ? 'Viewport inset' : 'Viewport full',
++                        fontSize: 12,
++                        onPressed: () {
++                          setState(() => _inset = !_inset);
++                          setW34Viewport(_controller, _document, inset: _inset);
++                        },
++                      ),
++                    ),
++                  ],
++                ),
+               Text(
+                 'PBR only. Native particles excluded in channel views.\n'
+                 'Depth d/(1+d). Literals 0.125 / 0.5 / 0.875.\n'
+diff --git a/dart3d/example/lib/w34_debug_scene.dart b/dart3d/example/lib/w34_debug_scene.dart
+index 08a2016..6617a06 100644
+--- a/dart3d/example/lib/w34_debug_scene.dart
++++ b/dart3d/example/lib/w34_debug_scene.dart
+@@ -3,25 +3,40 @@ import 'dart:typed_data';
+ import 'package:dart3d/dart3d.dart';
+ import 'package:vector_math/vector_math.dart';
+ 
+-SceneDocument buildW34DebugDocument() {
++SceneDocument buildW34DebugDocument({bool skinned = false}) {
+   final doc = SceneDocument(allocator: IdAllocator(session: 0x7734696f));
++  final positions = [
++    Vector3(-1, -1, 0),
++    Vector3(1, -1, 0),
++    Vector3(1, 1, 0),
++    Vector3(-1, 1, 0),
++  ];
++  final normals = List.generate(4, (_) => Vector3(0, 0, -1));
++  final uvs = [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(0, 1)];
++  final colors = List.generate(4, (_) => Vector4(0.8, 1, 0.6, 1));
++  final tangents = List.generate(4, (_) => Vector4(1, 0, 0, -1));
+   final vertices = doc.addPayload(
+     PayloadSpec(
+       doc.newId(),
+       encoding: PayloadEncoding.vertexBuffer,
+-      layout: 'unskinned_uv1_tangent',
+-      bytes: VertexPack.unskinned(
+-        positions: [
+-          Vector3(-1, -1, 0),
+-          Vector3(1, -1, 0),
+-          Vector3(1, 1, 0),
+-          Vector3(-1, 1, 0),
+-        ],
+-        normals: List.generate(4, (_) => Vector3(0, 0, -1)),
+-        uvs: [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(0, 1)],
+-        colors: List.generate(4, (_) => Vector4(0.8, 1, 0.6, 1)),
+-        tangents: List.generate(4, (_) => Vector4(1, 0, 0, -1)),
+-      ),
++      layout: skinned ? 'skinned_uv1_tangent' : 'unskinned_uv1_tangent',
++      bytes: skinned
++          ? VertexPack.skinned(
++              positions: positions,
++              normals: normals,
++              uvs: uvs,
++              colors: colors,
++              tangents: tangents,
++              joints: List.generate(4, (_) => Vector4(1, 0, 0, 0)),
++              weights: List.generate(4, (_) => Vector4(1, 0, 0, 0)),
++            )
++          : VertexPack.unskinned(
++              positions: positions,
++              normals: normals,
++              uvs: uvs,
++              colors: colors,
++              tangents: tangents,
++            ),
+     ),
+   );
+   final indexBytes = ByteData(12);
+@@ -138,7 +153,7 @@ SceneDocument buildW34DebugDocument() {
+       },
+     ),
+   );
+-  doc.createNode(
++  final quadNode = doc.createNode(
+     name: 'w34.quad',
+     root: true,
+     transform: TrsTransform(
+@@ -156,6 +171,37 @@ SceneDocument buildW34DebugDocument() {
+       ),
+     ],
+   );
++  if (skinned) {
++    final rig = doc.createNode(
++      name: 'w34.rig',
++      root: true,
++      transform: quadNode.transform,
++    );
++    final joint = doc.createNode(name: 'w34.joint');
++    rig.children.add(joint.id);
++    final matrices = Float32List.fromList([
++      ...Matrix4.identity().storage,
++      ...Matrix4.identity().storage,
++    ]);
++    final ibm = doc.addPayload(
++      PayloadSpec(
++        doc.newId(),
++        encoding: PayloadEncoding.matrices,
++        length: matrices.lengthInBytes,
++        bytes: matrices.buffer.asUint8List(),
++      ),
++    );
++    final skin = doc.addSkin(
++      SkinSpec(
++        doc.newId(),
++        joints: [rig.id, joint.id],
++        skeleton: rig.id,
++        inverseBindMatrices: ibm.id,
++      ),
++    );
++    quadNode.skin = skin.id;
++    quadNode.transform = TrsTransform();
++  }
+   final occluderMaterial = doc.addResource(
+     MaterialResource(
+       doc.newId(),
+@@ -317,3 +363,57 @@ void editW34DebugMaterial(
+     },
+   ]);
+ }
++
++void setW34RigPresent(
++  SceneController controller,
++  SceneDocument document,
++  NodeSpec rig,
++  NodeSpec joint, {
++  required bool present,
++}) {
++  if (!present) {
++    controller.removeNode(rig.id);
++    return;
++  }
++  controller.applyCommands([
++    {
++      'op': 'addNode',
++      'node': rig.id.toToken(),
++      'parent': null,
++      'spec': encodeNodeCommandSpec(rig, document),
++    },
++    {
++      'op': 'addNode',
++      'node': joint.id.toToken(),
++      'parent': rig.id.toToken(),
++      'spec': encodeNodeCommandSpec(joint, document),
++    },
++  ]);
++}
++
++void poseW34Joint(
++  SceneController controller,
++  NodeSpec joint, {
++  required bool posed,
++}) {
++  controller.setNodeTransforms([
++    NodeTransform(joint.id, translation: Vector3(0, posed ? 0.35 : 0, 0)),
++  ]);
++}
++
++void setW34Viewport(
++  SceneController controller,
++  SceneDocument document, {
++  required bool inset,
++}) {
++  final target = document.views.singleWhere((view) => view.target != null);
++  final screen = document.views.singleWhere((view) => view.target == null);
++  controller.updateViews([
++    target,
++    Dart3dRenderViewSpec(
++      cameraNode: screen.cameraNode,
++      layerMask: screen.layerMask,
++      viewport: inset ? [60, 60, 1086, 900] : null,
++    ),
++  ]);
++}
+diff --git a/dart3d/example/test/w34_debug_scene_test.dart b/dart3d/example/test/w34_debug_scene_test.dart
+index e97d760..bd4c70d 100644
+--- a/dart3d/example/test/w34_debug_scene_test.dart
++++ b/dart3d/example/test/w34_debug_scene_test.dart
+@@ -8,8 +8,89 @@ import 'package:dart3d/src/protocol.dart';
+ import 'package:dart3d/src/scene_view.dart';
+ import 'package:dart3d_example/w34_debug_scene.dart';
+ import 'package:test/test.dart';
++import 'package:vector_math/vector_math.dart';
+ 
+ void main() {
++  test('consumer fixture retains bone slots across rig removal and re-add', () {
++    final doc = buildW34DebugDocument(skinned: true);
++    final rig = doc.nodes.values.singleWhere((n) => n.name == 'w34.rig');
++    final joint = doc.nodes.values.singleWhere((n) => n.name == 'w34.joint');
++    final mesh = doc.nodes.values.singleWhere((n) => n.name == 'w34.quad');
++    final skin = doc.skins[mesh.skin]!;
++    expect(skin.joints, [rig.id, joint.id]);
++    expect(skin.skeleton, rig.id);
++    expect(rig.children, [joint.id]);
++    expect(mesh.children, isNot(contains(rig.id)));
++    final geometryId =
++        (mesh.components.single.properties['geometry']! as ResourceRefValue).id;
++    final geometry = doc.resources[geometryId]! as GeometryResource;
++    final vertices = ByteData.sublistView(
++      doc.payloads[geometry.vertices]!.bytes!,
++    );
++    expect(vertices.lengthInBytes, 4 * VertexPack.skinnedUv1TangentStride);
++    expect(vertices.getFloat32(72, Endian.little), 1);
++    expect(vertices.getFloat32(88, Endian.little), 1);
++    final controller = SceneController()..loadDocument(doc);
++    addTearDown(controller.dispose);
++    final sink = _Sink(controller);
++    controller.attachElement(sink);
++    sink.mutations.clear();
++    poseW34Joint(controller, joint, posed: true);
++    expect(sink.mutations.single.tag, D3Protocol.setTransforms);
++    expect(
++      (controller.document!.nodes[joint.id]!.transform as TrsTransform)
++          .translation,
++      Vector3(0, 0.35, 0),
++    );
++    sink.mutations.clear();
++    setW34RigPresent(controller, doc, rig, joint, present: false);
++    expect(controller.document!.nodes.containsKey(rig.id), isFalse);
++    expect(controller.document!.nodes.containsKey(joint.id), isFalse);
++    expect(controller.document!.nodes[mesh.id]!.skin, skin.id);
++    expect(controller.document!.skins[skin.id]!.joints, [rig.id, joint.id]);
++    expect(jsonDecode(utf8.decode(sink.mutations.single.data)), {
++      'op': 'removeNode',
++      'node': rig.id.toToken(),
++    });
++    sink.mutations.clear();
++    setW34RigPresent(controller, doc, rig, joint, present: true);
++    expect(controller.document!.nodes[rig.id]!.children, [joint.id]);
++    expect(controller.document!.nodes.containsKey(joint.id), isTrue);
++    final batch = jsonDecode(utf8.decode(sink.mutations.single.data));
++    expect(batch['op'], 'batch');
++    final adds = batch['ops'] as List;
++    expect(adds.map((op) => op['op']), ['addNode', 'addNode']);
++    expect(adds[0]['parent'], isNull);
++    expect(adds[1]['parent'], rig.id.toToken());
++    final translation = adds[1]['spec']['transform']['trs']['t'];
++    expect(translation[0], 0);
++    expect(translation[1], closeTo(0.35, 1e-6));
++    expect(translation[2], 0);
++  });
++
++  test(
++    'viewport control uses public view replacement and preserves authored target',
++    () {
++      final doc = buildW34DebugDocument();
++      final controller = SceneController()..loadDocument(doc);
++      addTearDown(controller.dispose);
++      final sink = _Sink(controller);
++      controller.attachElement(sink);
++      sink.mutations.clear();
++      final target = doc.views.singleWhere((v) => v.target != null);
++      setW34Viewport(controller, doc, inset: true);
++      final inset = jsonDecode(utf8.decode(sink.mutations.removeAt(0).data));
++      expect(inset['op'], 'updateViews');
++      expect(inset['views'][0]['target'], 'rt:${target.target!.toToken()}');
++      expect(inset['views'][1]['viewport'], [60.0, 60.0, 1086.0, 900.0]);
++      expect(inset['views'][1]['camera'], inset['views'][0]['camera']);
++      setW34Viewport(controller, doc, inset: false);
++      final full = jsonDecode(utf8.decode(sink.mutations.removeAt(0).data));
++      expect(full['views'][1].containsKey('viewport'), isFalse);
++      expect(full['views'][0], inset['views'][0]);
++    },
++  );
++
+   test(
+     'indexed mapped quad carries diagonal, tangent frame and nonwhite color',
+     () {
+diff --git a/dart3d/ios/Classes/RenderTargets.swift b/dart3d/ios/Classes/RenderTargets.swift
+index e0c1797..1142c62 100644
+--- a/dart3d/ios/Classes/RenderTargets.swift
++++ b/dart3d/ios/Classes/RenderTargets.swift
+@@ -530,7 +530,15 @@ extension SceneViewHost {
+                   self.screenSubviewBuild == gen,
+                   self.multiScreenMode else { return }
+             self.mainScreenDebugOptions = debugOptions
+-            if isolated { self.mainScreenDebug = ScreenDebugPresentation() }
++            if isolated {
++                self.mainScreenDebug = ScreenDebugPresentation()
++                let backing = UIView(frame: self.bounds)
++                backing.backgroundColor = .black
++                backing.isOpaque = true
++                backing.isUserInteractionEnabled = false
++                self.addSubview(backing)
++                self.mainScreenDebugBacking = backing
++            }
+             for (i, rec) in recs.enumerated() {
+                 let sub = SCNView(frame: self.screenSubviewFrame(rec.viewport))
+                 sub.scene = isolated ? self.mainScreenDebug?.scene : snapScene
+@@ -573,6 +581,8 @@ extension SceneViewHost {
+             for wire in self.mainScreenWires { wire.release() }
+             self.mainScreenWires = []
+             self.mainScreenDebug = nil
++            self.mainScreenDebugBacking?.removeFromSuperview()
++            self.mainScreenDebugBacking = nil
+             for s in self.mainScreenSubviews {
+                 s.view.removeFromSuperview()
+             }
+@@ -669,6 +679,7 @@ extension SceneViewHost {
+     /// Re-lays the sibling frames after a bounds change — called from
+     /// `layoutSubviews` (main thread) and at build time.
+     func layoutScreenSubviews() {
++        mainScreenDebugBacking?.frame = bounds
+         for s in mainScreenSubviews {
+             s.view.frame = screenSubviewFrame(s.rec.viewport)
+         }
+diff --git a/dart3d/ios/Classes/SceneViewHost.swift b/dart3d/ios/Classes/SceneViewHost.swift
+index 07fb960..340aebf 100644
+--- a/dart3d/ios/Classes/SceneViewHost.swift
++++ b/dart3d/ios/Classes/SceneViewHost.swift
+@@ -250,6 +250,7 @@ final class SceneViewHost: SCNView {
+     let screenDebugAttachments = ScreenDebugAttachments()
+     let screenDebugHostWire = ScreenDebugWireframe()
+     var mainScreenDebug: ScreenDebugPresentation?
++    var mainScreenDebugBacking: UIView?
+     var mainScreenDebugOptions = ScreenDebugOptions()
+     var mainScreenWires: [ScreenDebugWireframe] = []
+ 
+diff --git a/dart3d/ios/Classes/ScreenDebugPresentation.swift b/dart3d/ios/Classes/ScreenDebugPresentation.swift
+index 0cfb000..5a6da52 100644
+--- a/dart3d/ios/Classes/ScreenDebugPresentation.swift
++++ b/dart3d/ios/Classes/ScreenDebugPresentation.swift
+@@ -79,6 +79,8 @@ final class ScreenDebugAttachments {
+     func capture(_ scene: SCNScene, channel: ScreenDebugOptions.Channel,
+                  host: SceneViewHost) -> ScreenDebugFrame {
+         var rows: [ScreenDebugFrame.Node] = []
++        var captured = Set<ObjectIdentifier>()
++        var skinNodes: [SCNNode] = []
+         var usedMaterials = Set<ObjectIdentifier>()
+         var usedGeometries = Set<ObjectIdentifier>()
+         let excludedNodes = host.blendCasterProxyIdentities
+@@ -112,9 +114,12 @@ final class ScreenDebugAttachments {
+         func visit(_ source: SCNNode, parent: ObjectIdentifier?) {
+             let key = ObjectIdentifier(source)
+             if excludedNodes.contains(key) { return }
++            captured.insert(key)
+             let pose = source.presentation
+             let skin = source.skinner.map {
+-                ScreenDebugFrame.Skin(
++                skinNodes.append(contentsOf: $0.bones)
++                if let skeleton = $0.skeleton { skinNodes.append(skeleton) }
++                return ScreenDebugFrame.Skin(
+                     identity: ObjectIdentifier($0), geometry: geometry($0.baseGeometry!),
+                     bones: $0.bones.map(ObjectIdentifier.init),
+                     skeleton: $0.skeleton.map(ObjectIdentifier.init),
+@@ -136,6 +141,19 @@ final class ScreenDebugAttachments {
+             for child in source.childNodes { visit(child, parent: key) }
+         }
+         visit(scene.rootNode, parent: nil)
++        func captureSkinPose(_ source: SCNNode) {
++            let key = ObjectIdentifier(source)
++            guard captured.insert(key).inserted else { return }
++            if let parent = source.parent { captureSkinPose(parent) }
++            let pose = source.presentation
++            rows.append(ScreenDebugFrame.Node(
++                identity: key, parent: source.parent.map(ObjectIdentifier.init),
++                transform: pose.transform, pivot: pose.pivot,
++                hidden: source.isHidden, opacity: pose.opacity,
++                category: source.categoryBitMask, order: source.renderingOrder,
++                geometry: nil, skin: nil, morph: nil))
++        }
++        for node in skinNodes { captureSkinPose(node) }
+         materials = materials.filter { usedMaterials.contains($0.key) }
+         geometries = geometries.filter { usedGeometries.contains($0.key) }
+         return ScreenDebugFrame(nodes: rows)
+diff --git a/docs/debug-views.md b/docs/debug-views.md
+index 6e6e34e..de00a9c 100644
+--- a/docs/debug-views.md
++++ b/docs/debug-views.md
+@@ -107,6 +107,13 @@ with ideal rounded sRGB values 99, 188, and 240. This is approximate screenshot
+ output after SceneKit packing, not calibrated raw channel readback. Transparency
+ captures do not establish numeric alpha or premultiplication accuracy.
+ 
+-Native skin/morph output, additional material families and consumers, Android,
++The optional `DART3D_W34_CONSUMERS=true` fixture uses a two-bone skin and public
++rig removal, restoration, pose and viewport controls. Focused simulator replay
++covers channel selection with retained detached bones, restored deformation,
++and inset viewport isolation in both selection orders. It does not establish
++arbitrary skinning or morph output. Diagnostic siblings cover the host with a
++black backing outside their viewport rectangles; turning channels off removes it.
++
++Morph output, additional material families and consumers, Android,
+ performance, and final T2/T4 remain `NOT_RUN` for this unit. It does not establish
+ whole W34 or Track E readiness.

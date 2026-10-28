@@ -1,0 +1,17 @@
+{
+  "path": "/private/tmp/dart3d-w34-ios-baked-catcher-20261028/r1/worker/logs/swift-typecheck.json",
+  "sha256": "0a4cfc2f92017fcbaef0fd6b9b2f390ca903edda1cb35da1ad9e057312a2d897",
+  "receipt": {
+    "command": [
+      "zsh",
+      "-c",
+      "xcrun swiftc -typecheck -sdk \"$(xcrun --sdk iphonesimulator --show-sdk-path)\" -target arm64-apple-ios15.0-simulator dart3d/ios/Classes/*.swift"
+    ],
+    "cwd": ".",
+    "exitCode": 0,
+    "start": "2026-10-27T23:15:08.494554+00:00",
+    "end": "2026-10-27T23:15:15.428799+00:00"
+  },
+  "parentDurableTypecheckLogBytes": 0,
+  "independentReviewerTypecheck": "NOT_RUN"
+}

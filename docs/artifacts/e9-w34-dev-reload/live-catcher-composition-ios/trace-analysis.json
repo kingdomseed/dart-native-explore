@@ -1,0 +1,272 @@
+[
+  {
+    "pid": 62005,
+    "phase": "view-config-after",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "none",
+    "compositionState": "none",
+    "materialId": "none",
+    "raw": "2026-10-28 01:16:59.838 Df Runner[62005:1346b3b] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=view-config-after channel=none wireframe=false materialKey=none consumer=none"
+  },
+  {
+    "pid": 62005,
+    "phase": "install-after",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "current",
+    "compositionState": "lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]",
+    "materialId": "0x00000001097d9e00",
+    "raw": "2026-10-28 01:16:59.917 Df Runner[62005:1346b3b] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=install-after channel=none wireframe=false materialKey=8444939141786894336 nodeKey=8444939141786894337 nodeId=ObjectIdentifier(0x00000001097d9f40) geometryId=ObjectIdentifier(0x0000000109794fc0) slot=0 snapshotClone=true materialId=ObjectIdentifier(0x00000001097d9e00) lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]"
+  },
+  {
+    "pid": 62005,
+    "phase": "material-upsert-before",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "current",
+    "compositionState": "lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]",
+    "materialId": "0x00000001097d9e00",
+    "raw": "2026-10-28 01:18:10.073 Df Runner[62005:1346b3a] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=material-upsert-before channel=none wireframe=false materialKey=8444939141786894336 nodeKey=8444939141786894337 nodeId=ObjectIdentifier(0x00000001097d9f40) geometryId=ObjectIdentifier(0x0000000109794fc0) slot=0 snapshotClone=true materialId=ObjectIdentifier(0x00000001097d9e00) lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]"
+  },
+  {
+    "pid": 62005,
+    "phase": "material-rebind-after",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "current",
+    "compositionState": "lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]",
+    "materialId": "0x0000000108e0e440",
+    "raw": "2026-10-28 01:18:10.077 Df Runner[62005:1346b3a] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=material-rebind-after channel=none wireframe=false materialKey=8444939141786894336 nodeKey=8444939141786894337 nodeId=ObjectIdentifier(0x00000001097d9f40) geometryId=ObjectIdentifier(0x0000000109794fc0) slot=0 snapshotClone=true materialId=ObjectIdentifier(0x0000000108e0e440) lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]"
+  },
+  {
+    "pid": 62005,
+    "phase": "install-after",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "current",
+    "compositionState": "lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]",
+    "materialId": "0x0000000108f89040",
+    "raw": "2026-10-28 01:18:12.137 Df Runner[62005:1346b41] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=install-after channel=none wireframe=false materialKey=8444939141786894336 nodeKey=8444939141786894337 nodeId=ObjectIdentifier(0x0000000108f8a300) geometryId=ObjectIdentifier(0x000000010f3f9ec0) slot=0 snapshotClone=true materialId=ObjectIdentifier(0x0000000108f89040) lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]"
+  },
+  {
+    "pid": 62005,
+    "phase": "material-upsert-before",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "current",
+    "compositionState": "lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]",
+    "materialId": "0x0000000108f89040",
+    "raw": "2026-10-28 01:18:31.067 Df Runner[62005:1346b40] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=material-upsert-before channel=none wireframe=false materialKey=8444939141786894336 nodeKey=8444939141786894337 nodeId=ObjectIdentifier(0x0000000108f8a300) geometryId=ObjectIdentifier(0x000000010f3f9ec0) slot=0 snapshotClone=true materialId=ObjectIdentifier(0x0000000108f89040) lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]"
+  },
+  {
+    "pid": 62005,
+    "phase": "material-rebind-after",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "current",
+    "compositionState": "lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]",
+    "materialId": "0x0000000108e0f200",
+    "raw": "2026-10-28 01:18:31.067 Df Runner[62005:1346b40] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=material-rebind-after channel=none wireframe=false materialKey=8444939141786894336 nodeKey=8444939141786894337 nodeId=ObjectIdentifier(0x0000000108f8a300) geometryId=ObjectIdentifier(0x000000010f3f9ec0) slot=0 snapshotClone=true materialId=ObjectIdentifier(0x0000000108e0f200) lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]"
+  },
+  {
+    "pid": 62005,
+    "phase": "install-after",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "current",
+    "compositionState": "lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]",
+    "materialId": "0x00000001097d9400",
+    "raw": "2026-10-28 01:18:32.895 Df Runner[62005:1346b40] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=install-after channel=none wireframe=false materialKey=8444939141786894336 nodeKey=8444939141786894337 nodeId=ObjectIdentifier(0x00000001097d8640) geometryId=ObjectIdentifier(0x000000010f3f9200) slot=0 snapshotClone=true materialId=ObjectIdentifier(0x00000001097d9400) lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]"
+  },
+  {
+    "pid": 65876,
+    "phase": "view-config-after",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "none",
+    "compositionState": "none",
+    "materialId": "none",
+    "raw": "2026-10-28 01:19:08.153 Df Runner[65876:1349c39] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=view-config-after channel=none wireframe=false materialKey=none consumer=none"
+  },
+  {
+    "pid": 65876,
+    "phase": "install-after",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "current",
+    "compositionState": "lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]",
+    "materialId": "0x000000010aea0780",
+    "raw": "2026-10-28 01:19:08.204 Df Runner[65876:1349c39] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=install-after channel=none wireframe=false materialKey=8444939141786894336 nodeKey=8444939141786894337 nodeId=ObjectIdentifier(0x000000010aea1f40) geometryId=ObjectIdentifier(0x000000010d7e9b00) slot=0 snapshotClone=true materialId=ObjectIdentifier(0x000000010aea0780) lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]"
+  },
+  {
+    "pid": 65876,
+    "phase": "install-after",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "current",
+    "compositionState": "lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]",
+    "materialId": "0x000000011907c280",
+    "raw": "2026-10-28 01:19:24.533 Df Runner[65876:1349c39] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=install-after channel=none wireframe=false materialKey=8444939141786894336 nodeKey=8444939141786894337 nodeId=ObjectIdentifier(0x000000011907c640) geometryId=ObjectIdentifier(0x00000001193e3600) slot=0 snapshotClone=true materialId=ObjectIdentifier(0x000000011907c280) lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]"
+  },
+  {
+    "pid": 67157,
+    "phase": "view-config-after",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "none",
+    "compositionState": "none",
+    "materialId": "none",
+    "raw": "2026-10-28 01:20:04.468 Df Runner[67157:134b14c] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=view-config-after channel=none wireframe=false materialKey=none consumer=none"
+  },
+  {
+    "pid": 67157,
+    "phase": "install-after",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "current",
+    "compositionState": "lightingModel=SCNLightingModelShadowOnly blendMode=3 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]",
+    "materialId": "0x0000000106e94280",
+    "raw": "2026-10-28 01:20:04.517 Df Runner[67157:134b14c] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=install-after channel=none wireframe=false materialKey=8444939141786894336 nodeKey=8444939141786894337 nodeId=ObjectIdentifier(0x0000000106e952c0) geometryId=ObjectIdentifier(0x0000000109ba9c80) slot=0 snapshotClone=true materialId=ObjectIdentifier(0x0000000106e94280) lightingModel=SCNLightingModelShadowOnly blendMode=3 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]"
+  },
+  {
+    "pid": 67157,
+    "phase": "material-upsert-before",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "current",
+    "compositionState": "lightingModel=SCNLightingModelShadowOnly blendMode=3 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]",
+    "materialId": "0x0000000106e94280",
+    "raw": "2026-10-28 01:21:01.412 Df Runner[67157:134b144] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=material-upsert-before channel=none wireframe=false materialKey=8444939141786894336 nodeKey=8444939141786894337 nodeId=ObjectIdentifier(0x0000000106e952c0) geometryId=ObjectIdentifier(0x0000000109ba9c80) slot=0 snapshotClone=true materialId=ObjectIdentifier(0x0000000106e94280) lightingModel=SCNLightingModelShadowOnly blendMode=3 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]"
+  },
+  {
+    "pid": 67157,
+    "phase": "material-rebind-after",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "current",
+    "compositionState": "lightingModel=SCNLightingModelShadowOnly blendMode=3 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]",
+    "materialId": "0x000000010d461180",
+    "raw": "2026-10-28 01:21:01.412 Df Runner[67157:134b144] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=material-rebind-after channel=none wireframe=false materialKey=8444939141786894336 nodeKey=8444939141786894337 nodeId=ObjectIdentifier(0x0000000106e952c0) geometryId=ObjectIdentifier(0x0000000109ba9c80) slot=0 snapshotClone=true materialId=ObjectIdentifier(0x000000010d461180) lightingModel=SCNLightingModelShadowOnly blendMode=3 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]"
+  },
+  {
+    "pid": 67157,
+    "phase": "install-after",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "current",
+    "compositionState": "lightingModel=SCNLightingModelShadowOnly blendMode=3 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]",
+    "materialId": "0x000000010d462e40",
+    "raw": "2026-10-28 01:21:03.210 Df Runner[67157:134b141] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=install-after channel=none wireframe=false materialKey=8444939141786894336 nodeKey=8444939141786894337 nodeId=ObjectIdentifier(0x0000000106e95040) geometryId=ObjectIdentifier(0x000000011905d740) slot=0 snapshotClone=true materialId=ObjectIdentifier(0x000000010d462e40) lightingModel=SCNLightingModelShadowOnly blendMode=3 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]"
+  },
+  {
+    "pid": 67157,
+    "phase": "material-upsert-before",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "current",
+    "compositionState": "lightingModel=SCNLightingModelShadowOnly blendMode=3 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]",
+    "materialId": "0x000000010d462e40",
+    "raw": "2026-10-28 01:21:06.801 Df Runner[67157:134b149] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=material-upsert-before channel=none wireframe=false materialKey=8444939141786894336 nodeKey=8444939141786894337 nodeId=ObjectIdentifier(0x0000000106e95040) geometryId=ObjectIdentifier(0x000000011905d740) slot=0 snapshotClone=true materialId=ObjectIdentifier(0x000000010d462e40) lightingModel=SCNLightingModelShadowOnly blendMode=3 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]"
+  },
+  {
+    "pid": 67157,
+    "phase": "material-rebind-after",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "current",
+    "compositionState": "lightingModel=SCNLightingModelShadowOnly blendMode=3 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]",
+    "materialId": "0x000000010d460780",
+    "raw": "2026-10-28 01:21:06.801 Df Runner[67157:134b149] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=material-rebind-after channel=none wireframe=false materialKey=8444939141786894336 nodeKey=8444939141786894337 nodeId=ObjectIdentifier(0x0000000106e95040) geometryId=ObjectIdentifier(0x000000011905d740) slot=0 snapshotClone=true materialId=ObjectIdentifier(0x000000010d460780) lightingModel=SCNLightingModelShadowOnly blendMode=3 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]"
+  },
+  {
+    "pid": 67157,
+    "phase": "install-after",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "current",
+    "compositionState": "lightingModel=SCNLightingModelShadowOnly blendMode=3 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]",
+    "materialId": "0x000000010d422940",
+    "raw": "2026-10-28 01:21:08.643 Df Runner[67157:134b13c] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=install-after channel=none wireframe=false materialKey=8444939141786894336 nodeKey=8444939141786894337 nodeId=ObjectIdentifier(0x000000010d423340) geometryId=ObjectIdentifier(0x000000010d7ead00) slot=0 snapshotClone=true materialId=ObjectIdentifier(0x000000010d422940) lightingModel=SCNLightingModelShadowOnly blendMode=3 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]"
+  },
+  {
+    "pid": 70854,
+    "phase": "view-config-after",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "none",
+    "compositionState": "none",
+    "materialId": "none",
+    "raw": "2026-10-28 01:22:58.620 Df Runner[70854:134e1cc] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=view-config-after channel=none wireframe=false materialKey=none consumer=none"
+  },
+  {
+    "pid": 70854,
+    "phase": "install-after",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "current",
+    "compositionState": "lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[\"SCNShaderModifierEntryPointFragment\"]",
+    "materialId": "0x0000000119499f40",
+    "raw": "2026-10-28 01:22:58.683 Df Runner[70854:134e1cc] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=install-after channel=none wireframe=false materialKey=8444939141786894336 nodeKey=8444939141786894337 nodeId=ObjectIdentifier(0x000000011949a080) geometryId=ObjectIdentifier(0x000000010d671c80) slot=0 snapshotClone=true materialId=ObjectIdentifier(0x0000000119499f40) lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[\"SCNShaderModifierEntryPointFragment\"]"
+  },
+  {
+    "pid": 70854,
+    "phase": "material-upsert-before",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "current",
+    "compositionState": "lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[\"SCNShaderModifierEntryPointFragment\"]",
+    "materialId": "0x0000000119499f40",
+    "raw": "2026-10-28 01:23:18.264 Df Runner[70854:134e20e] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=material-upsert-before channel=none wireframe=false materialKey=8444939141786894336 nodeKey=8444939141786894337 nodeId=ObjectIdentifier(0x000000011949a080) geometryId=ObjectIdentifier(0x000000010d671c80) slot=0 snapshotClone=true materialId=ObjectIdentifier(0x0000000119499f40) lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[\"SCNShaderModifierEntryPointFragment\"]"
+  },
+  {
+    "pid": 70854,
+    "phase": "material-rebind-after",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "current",
+    "compositionState": "lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[\"SCNShaderModifierEntryPointFragment\"]",
+    "materialId": "0x000000010aeb0c80",
+    "raw": "2026-10-28 01:23:18.264 Df Runner[70854:134e20e] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=material-rebind-after channel=none wireframe=false materialKey=8444939141786894336 nodeKey=8444939141786894337 nodeId=ObjectIdentifier(0x000000011949a080) geometryId=ObjectIdentifier(0x000000010d671c80) slot=0 snapshotClone=true materialId=ObjectIdentifier(0x000000010aeb0c80) lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[\"SCNShaderModifierEntryPointFragment\"]"
+  },
+  {
+    "pid": 70854,
+    "phase": "install-after",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "current",
+    "compositionState": "lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[\"SCNShaderModifierEntryPointFragment\"]",
+    "materialId": "0x0000000119499540",
+    "raw": "2026-10-28 01:23:20.094 Df Runner[70854:134e1cf] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=install-after channel=none wireframe=false materialKey=8444939141786894336 nodeKey=8444939141786894337 nodeId=ObjectIdentifier(0x000000011949b5c0) geometryId=ObjectIdentifier(0x000000011c02c6c0) slot=0 snapshotClone=true materialId=ObjectIdentifier(0x0000000119499540) lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[\"SCNShaderModifierEntryPointFragment\"]"
+  },
+  {
+    "pid": 70854,
+    "phase": "material-upsert-before",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "current",
+    "compositionState": "lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[\"SCNShaderModifierEntryPointFragment\"]",
+    "materialId": "0x0000000119499540",
+    "raw": "2026-10-28 01:23:23.751 Df Runner[70854:134e1cd] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=material-upsert-before channel=none wireframe=false materialKey=8444939141786894336 nodeKey=8444939141786894337 nodeId=ObjectIdentifier(0x000000011949b5c0) geometryId=ObjectIdentifier(0x000000011c02c6c0) slot=0 snapshotClone=true materialId=ObjectIdentifier(0x0000000119499540) lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[\"SCNShaderModifierEntryPointFragment\"]"
+  },
+  {
+    "pid": 70854,
+    "phase": "material-rebind-after",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "current",
+    "compositionState": "lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[\"SCNShaderModifierEntryPointFragment\"]",
+    "materialId": "0x00000001194997c0",
+    "raw": "2026-10-28 01:23:23.751 Df Runner[70854:134e1cd] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=material-rebind-after channel=none wireframe=false materialKey=8444939141786894336 nodeKey=8444939141786894337 nodeId=ObjectIdentifier(0x000000011949b5c0) geometryId=ObjectIdentifier(0x000000011c02c6c0) slot=0 snapshotClone=true materialId=ObjectIdentifier(0x00000001194997c0) lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[\"SCNShaderModifierEntryPointFragment\"]"
+  },
+  {
+    "pid": 70854,
+    "phase": "install-after",
+    "channel": "none",
+    "wireframe": "false",
+    "consumer": "current",
+    "compositionState": "lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[\"SCNShaderModifierEntryPointFragment\"]",
+    "materialId": "0x000000011949ae40",
+    "raw": "2026-10-28 01:23:25.574 Df Runner[70854:134e20e] [com.jasonholtdigital.dart3d:scene] liveCatcherTrace phase=install-after channel=none wireframe=false materialKey=8444939141786894336 nodeKey=8444939141786894337 nodeId=ObjectIdentifier(0x000000010617ed00) geometryId=ObjectIdentifier(0x00000001197a6d00) slot=0 snapshotClone=true materialId=ObjectIdentifier(0x000000011949ae40) lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[\"SCNShaderModifierEntryPointFragment\"]"
+  }
+]

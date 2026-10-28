@@ -1,0 +1,196 @@
+{
+  "before": {
+    "pid": "22977",
+    "sampleCount": 0,
+    "matchingLoggedSampleValues": null,
+    "errorMatches": 0,
+    "creationRemovalCallSites": null,
+    "captureCounts": null,
+    "epochs": [],
+    "adapterProbe": []
+  },
+  "traced": {
+    "pid": "26712",
+    "sampleCount": 162,
+    "matchingLoggedSampleValues": true,
+    "errorMatches": 0,
+    "creationRemovalCallSites": {
+      "templateCreates": 10,
+      "displayCreates": 10,
+      "displayRemovals": 4
+    },
+    "captureCounts": [
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1
+    ],
+    "epochs": [
+      {
+        "epoch": 1,
+        "node": "ObjectIdentifier(0x000000011201a440)",
+        "template": "ObjectIdentifier(0x000000011224b600)",
+        "displayed": "ObjectIdentifier(0x000000011224ab80)",
+        "sampleCount": 50,
+        "intensities": [
+          100.0
+        ],
+        "shadowValues": [
+          "true"
+        ]
+      },
+      {
+        "epoch": 2,
+        "node": "ObjectIdentifier(0x000000011201a440)",
+        "template": "ObjectIdentifier(0x0000000112249c80)",
+        "displayed": "ObjectIdentifier(0x0000000112249f80)",
+        "sampleCount": 11,
+        "intensities": [
+          100.0
+        ],
+        "shadowValues": [
+          "true"
+        ]
+      },
+      {
+        "epoch": 3,
+        "node": "ObjectIdentifier(0x000000011201a440)",
+        "template": "ObjectIdentifier(0x000000011224ad00)",
+        "displayed": "ObjectIdentifier(0x0000000112249f80)",
+        "sampleCount": 85,
+        "intensities": [
+          20.0,
+          70.16666412353516,
+          100.0,
+          102.83332824707031,
+          140.1666717529297,
+          160.0
+        ],
+        "shadowValues": [
+          "false",
+          "true"
+        ]
+      },
+      {
+        "epoch": 4,
+        "node": "ObjectIdentifier(0x000000011201a440)",
+        "template": "ObjectIdentifier(0x0000000112249680)",
+        "displayed": "ObjectIdentifier(0x0000000112249b00)",
+        "sampleCount": 5,
+        "intensities": [
+          20.0,
+          80.0
+        ],
+        "shadowValues": [
+          "true"
+        ]
+      },
+      {
+        "epoch": 5,
+        "node": "ObjectIdentifier(0x000000011201a440)",
+        "template": "ObjectIdentifier(0x000000011224aa00)",
+        "displayed": "ObjectIdentifier(0x000000011224ad00)",
+        "sampleCount": 4,
+        "intensities": [
+          80.0
+        ],
+        "shadowValues": [
+          "true"
+        ]
+      },
+      {
+        "epoch": 6,
+        "node": "ObjectIdentifier(0x00000001083f7e80)",
+        "template": "ObjectIdentifier(0x000000011224aa00)",
+        "displayed": "ObjectIdentifier(0x0000000112230c00)",
+        "sampleCount": 1,
+        "intensities": [
+          80.0
+        ],
+        "shadowValues": [
+          "true"
+        ]
+      },
+      {
+        "epoch": 7,
+        "node": "ObjectIdentifier(0x00000001083f48c0)",
+        "template": "ObjectIdentifier(0x0000000112247780)",
+        "displayed": "ObjectIdentifier(0x0000000112247900)",
+        "sampleCount": 1,
+        "intensities": [
+          100.0
+        ],
+        "shadowValues": [
+          "true"
+        ]
+      },
+      {
+        "epoch": 8,
+        "node": "ObjectIdentifier(0x00000001083f48c0)",
+        "template": "ObjectIdentifier(0x0000000112247600)",
+        "displayed": "ObjectIdentifier(0x0000000112246580)",
+        "sampleCount": 2,
+        "intensities": [
+          100.0
+        ],
+        "shadowValues": [
+          "true"
+        ]
+      },
+      {
+        "epoch": 9,
+        "node": "ObjectIdentifier(0x00000001083f48c0)",
+        "template": "ObjectIdentifier(0x0000000112246280)",
+        "displayed": "ObjectIdentifier(0x0000000112246580)",
+        "sampleCount": 2,
+        "intensities": [
+          100.0
+        ],
+        "shadowValues": [
+          "true"
+        ]
+      },
+      {
+        "epoch": 10,
+        "node": "ObjectIdentifier(0x00000001083f48c0)",
+        "template": "ObjectIdentifier(0x0000000112247780)",
+        "displayed": "ObjectIdentifier(0x0000000112246580)",
+        "sampleCount": 1,
+        "intensities": [
+          100.0
+        ],
+        "shadowValues": [
+          "true"
+        ]
+      }
+    ],
+    "adapterProbe": [
+      "2026-10-28 02:17:56.960 Df Runner[26712:1379bad] [com.jasonholtdigital.dart3d:scene] liveDebugTrace adapterProbe fieldsMatch=true cgColorExact=true templateUnchanged=true inputSpace=kCGColorSpaceExtendedLinearSRGB inputComponents=[1.6, 0.125, 0.5, 0.75] sourceType=__NSCFType displayedType=__NSCFType"
+    ]
+  },
+  "clean": {
+    "pid": "41515",
+    "sampleCount": 0,
+    "matchingLoggedSampleValues": null,
+    "errorMatches": 0,
+    "creationRemovalCallSites": null,
+    "captureCounts": null,
+    "epochs": [],
+    "adapterProbe": []
+  },
+  "pbr-regression": {
+    "pid": "54806",
+    "sampleCount": 0,
+    "matchingLoggedSampleValues": null,
+    "errorMatches": 0,
+    "creationRemovalCallSites": null,
+    "captureCounts": null,
+    "epochs": [],
+    "adapterProbe": []
+  }
+}

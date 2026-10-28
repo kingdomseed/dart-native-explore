@@ -1,0 +1,18 @@
+{
+  "beforeOnlyChangedFromAccepted66": [
+    "dart3d/example/lib/w34_debug_main.dart",
+    "dart3d/example/lib/w34_debug_scene.dart",
+    "dart3d/example/test/w34_debug_scene_test.dart"
+  ],
+  "beforeFixturesMatchWorker": true,
+  "beforeNativeMatchesAccepted66": true,
+  "beforeAndFinalFixtureDifferences": [
+    "dart3d/example/lib/w34_debug_scene.dart"
+  ],
+  "writerAndImported66MatchFinalPacket": true,
+  "unchangedPresentationHostTargets": true,
+  "finalPacketSha256": "6f41a1c0ebe3e09bc92fa327a55b48bfaaa5914ca2700322739e225f536432f4",
+  "beforeSourceManifestSha256": "c6d113bb1b5c468ef9d0922baa354d28bbd9cbaff62699e8900becd90640191a",
+  "finalNativeHash": "b198c1794024f21b389a438fc05ca79f9bab8e2b6755621e97ce8a2385fa0060",
+  "executedBinaryIdentity": "parent run/source provenance, not an independent runtime or executable measurement"
+}

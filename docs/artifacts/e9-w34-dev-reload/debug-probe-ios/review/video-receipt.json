@@ -1,0 +1,83 @@
+{
+  "decodeExit": 0,
+  "decodedFrames": 12989,
+  "independentNonmonotonicDTSWarningLines": 693,
+  "parentNonmonotonicDTSWarningLines": 693,
+  "sampleTimesSeconds": [
+    0,
+    30,
+    90,
+    160,
+    165,
+    175,
+    185,
+    190,
+    195,
+    200,
+    205,
+    211
+  ],
+  "representativeFrames": [
+    {
+      "file": "video-frames/frame00.png",
+      "seconds": 0,
+      "sha256": "0995ab3712cf01a1cb77fba6408e2d1b8769e533e0db44781c7448b41878c78e"
+    },
+    {
+      "file": "video-frames/frame01.png",
+      "seconds": 30,
+      "sha256": "e8a493c0b436e786ce7ea946e1a3ea2fc153d3ae8ca07ee6a31782cd9fa082e2"
+    },
+    {
+      "file": "video-frames/frame02.png",
+      "seconds": 90,
+      "sha256": "7b7f4b0a17ee5214e9b6a38aef7a78c2927779483ce6d615ba3c4df9634f5e25"
+    },
+    {
+      "file": "video-frames/frame03.png",
+      "seconds": 160,
+      "sha256": "09a63d177c6e00a1a810c4c5d1ae03a471c31f34a04d6c5ed105278950e46deb"
+    },
+    {
+      "file": "video-frames/frame04.png",
+      "seconds": 165,
+      "sha256": "2e02af8ffb787505dc280c35ac3fa90dff075ed346c015be774c321f2c253195"
+    },
+    {
+      "file": "video-frames/frame05.png",
+      "seconds": 175,
+      "sha256": "74f33020af34367f96aa346e7e62ccfa84c6e5ab683e2a1a301715c4b63f5723"
+    },
+    {
+      "file": "video-frames/frame06.png",
+      "seconds": 185,
+      "sha256": "c0013ada2fd0ff59fbebd3be81b15941cec186cae65e2f2a2a70950923a3505c"
+    },
+    {
+      "file": "video-frames/frame07.png",
+      "seconds": 190,
+      "sha256": "1896326bb888018077ff32e82e766ace85689a3cee84bc188fad094ce682da50"
+    },
+    {
+      "file": "video-frames/frame08.png",
+      "seconds": 195,
+      "sha256": "c6d5b424559aaaf336f875e42db16d5144e5dd25b73d721f41bbd69b249ed798"
+    },
+    {
+      "file": "video-frames/frame09.png",
+      "seconds": 200,
+      "sha256": "bdb2abfa09054c43d1d5339a52a3deb8030684b94c707a5aae0260e0bbcee698"
+    },
+    {
+      "file": "video-frames/frame10.png",
+      "seconds": 205,
+      "sha256": "25afe0094f1c56b2bc5ab73db2542bf9c486f381d1d77bd77e42b30bb2c71b58"
+    },
+    {
+      "file": "video-frames/frame11.png",
+      "seconds": 211,
+      "sha256": "1b42afd562b678fce4d29b717e1266f2d92af8f3b70fd006e0976fb1dd1eed48"
+    }
+  ],
+  "timingLatencyClaim": false
+}

@@ -1,0 +1,42 @@
+{
+  "stages": {
+    "blend-before": {
+      "pid": "73004",
+      "nativeRowCount": 18268,
+      "eventRows": 42,
+      "errorMatches": 0,
+      "sampledCopyCount": null,
+      "templateCreateCount": null,
+      "displayCreateCount": null
+    },
+    "blend-after": {
+      "pid": "75946",
+      "nativeRowCount": 29899,
+      "eventRows": 85,
+      "errorMatches": 0,
+      "sampledCopyCount": null,
+      "templateCreateCount": null,
+      "displayCreateCount": null
+    },
+    "final-clean": {
+      "pid": "81679",
+      "nativeRowCount": 36553,
+      "eventRows": 80,
+      "errorMatches": 0,
+      "sampledCopyCount": null,
+      "templateCreateCount": null,
+      "displayCreateCount": null
+    },
+    "final-pbr": {
+      "pid": "87809",
+      "nativeRowCount": 6287,
+      "eventRows": 53,
+      "errorMatches": 0,
+      "sampledCopyCount": null,
+      "templateCreateCount": null,
+      "displayCreateCount": null
+    }
+  },
+  "loggerExit": 137,
+  "loggerEnd": "Simulator shutdown ended the logger; earlier app runs quit normally."
+}

@@ -1,0 +1,101 @@
+--- worker/dart3d/lib/dev_reload.dart
++++ parent/dart3d/lib/dev_reload.dart
+@@ -37,7 +37,7 @@
+   WebSocket? _socket;
+   StreamSubscription<void>? _messages;
+   Future<void>? _connecting;
+-  Future<SceneDocument>? _preparing;
++  Future<SceneDocument?>? _preparing;
+   Future<void>? _stopping;
+   bool _stopped = false;
+ 
+@@ -100,21 +100,25 @@
+       _status('input error expected WebSocket text');
+       return;
+     }
+-    late final SceneDocument next;
++    late final SceneDocument? next;
++    final preparation = () async {
++      try {
++        return await _prepare(message);
++      } on IOException catch (error) {
++        _status('input error $error');
++        return null;
++      } on FormatException catch (error) {
++        _status('input error $error');
++        return null;
++      }
++    }();
++    _preparing = preparation;
+     try {
+-      final preparation = _prepare(message);
+-      _preparing = preparation;
+       next = await preparation;
+-    } on IOException catch (error) {
+-      _status('input error $error');
+-      return;
+-    } on FormatException catch (error) {
+-      _status('input error $error');
+-      return;
+     } finally {
+       _preparing = null;
+     }
+-    if (_stopped) return;
++    if (_stopped || next == null) return;
+     final current = _controller.document;
+     if (current == null) {
+       _controller.loadDocument(next);
+@@ -240,7 +244,5 @@
+     await work;
+   } on IOException {
+     // Closing the owned client interrupts handshake and response reads.
+-  } on FormatException {
+-    // A detached preparation may already have rejected input when stop begins.
+   }
+ }
+--- worker/dart3d/example/test/dev_reload_test.dart
++++ parent/dart3d/example/test/dev_reload_test.dart
+@@ -220,6 +220,25 @@
+         hostLog.values.where((v) => v.startsWith('payload ')).length,
+         greaterThanOrEqualTo(3),
+       );
++    },
++  );
++
++  test(
++    'invalid UTF-8 retains the scene and a later file save recovers',
++    () async {
++      await start();
++      final accepted = controller.document;
++      element.sent.clear();
++      final rejected = hostLog.next('file error');
++      source.writeAsBytesSync([0xff], flush: true);
++      expect(await rejected, contains('Failed to decode'));
++      expect(controller.document, same(accepted));
++      expect(element.sent, isEmpty);
++      final applied = status.next('applyDiff');
++      source.writeAsStringSync(initial, flush: true);
++      await applied;
++      expect(controller.document!.payload(w34ImageId)!.bytes, w34Pixels());
++      expect(element.sent, isEmpty);
+     },
+   );
+ 
+@@ -662,7 +681,6 @@
+           peerMessages = peer!.listen((_) {});
+           peer!.add(initial);
+         } else {
+-          // Chunked response deliberately remains open until the client stops.
+           request.response.add([70, 83, 67, 66]);
+           await request.response.flush();
+           reading.complete(request);
+--- worker/docs/dev-reload.md
++++ parent/docs/dev-reload.md
+@@ -78,7 +78,6 @@
+   onStatus: reportStatus,
+ );
+ await reload.start();
+-// Later, before disposing the controller:
+ await reload.stop();
+ controller.dispose();
+ ```

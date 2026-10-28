@@ -1,0 +1,56 @@
+{
+  "before": {
+    "pid": "22977",
+    "instrumented": false,
+    "errorQueryMatches": 0,
+    "sampleCount": 0,
+    "allSampleFieldsMatch": null,
+    "templateCreates": null,
+    "displayCreates": null,
+    "displayRemovals": null,
+    "captureTemplateCounts": null
+  },
+  "traced": {
+    "pid": "26712",
+    "instrumented": true,
+    "errorQueryMatches": 0,
+    "sampleCount": 162,
+    "allSampleFieldsMatch": true,
+    "templateCreates": 10,
+    "displayCreates": 10,
+    "displayRemovals": 4,
+    "captureTemplateCounts": [
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1
+    ]
+  },
+  "clean": {
+    "pid": "41515",
+    "instrumented": false,
+    "errorQueryMatches": 0,
+    "sampleCount": 0,
+    "allSampleFieldsMatch": null,
+    "templateCreates": null,
+    "displayCreates": null,
+    "displayRemovals": null,
+    "captureTemplateCounts": null
+  },
+  "pbr-regression": {
+    "pid": "54806",
+    "instrumented": false,
+    "errorQueryMatches": 0,
+    "sampleCount": 0,
+    "allSampleFieldsMatch": null,
+    "templateCreates": null,
+    "displayCreates": null,
+    "displayRemovals": null,
+    "captureTemplateCounts": null
+  }
+}

@@ -1,0 +1,1146 @@
+{
+  "fullNativeLogSha256": "2772ce02db7856fdb96c32272443a80a81d562de982884ed79d0a12ef5ff7af8",
+  "fullNativeLineCount": 52751,
+  "processes": {
+    "36427": {
+      "lineCount": 2003,
+      "first": [
+        4,
+        "2026-10-28 00:46:52.076 Df Runner[36427:1331721] [com.apple.xpc:connection] [0x103797ff0] activating connection: mach=true listener=false peer=false name=com.apple.cfprefsd.daemon"
+      ],
+      "last": [
+        3331,
+        "2026-10-28 00:47:33.248 I  Runner[36427:1331703] [com.apple.Accessibility:AXSupportCommon] Update on AX Enabled Notification, App Notification: 0, AX Enabled: 1, AX App Enabled: 1"
+      ],
+      "scene": [
+        {
+          "line": 292,
+          "text": "2026-10-28 00:46:54.495 Df Runner[36427:13317e7] [com.jasonholtdigital.dart3d:scene] protocol hello: Dart v1.0"
+        },
+        {
+          "line": 301,
+          "text": "2026-10-28 00:46:54.522 Df Runner[36427:13317e7] [com.jasonholtdigital.dart3d:scene] shadowCatcher live softness unsupported on SceneKit's shadowOnly material"
+        },
+        {
+          "line": 302,
+          "text": "2026-10-28 00:46:54.540 Df Runner[36427:13317e7] [com.jasonholtdigital.dart3d:scene] node 8444939141786894340: body=nil shape=false pos=5.0 cat=- mask=-"
+        },
+        {
+          "line": 303,
+          "text": "2026-10-28 00:46:54.540 Df Runner[36427:13317e7] [com.jasonholtdigital.dart3d:scene] node 8444939141786894339: body=nil shape=false pos=0.7 cat=- mask=-"
+        },
+        {
+          "line": 304,
+          "text": "2026-10-28 00:46:54.540 Df Runner[36427:13317e7] [com.jasonholtdigital.dart3d:scene] node 8444939141786894337: body=nil shape=false pos=0.025 cat=- mask=-"
+        },
+        {
+          "line": 305,
+          "text": "2026-10-28 00:46:54.540 Df Runner[36427:13317e7] [com.jasonholtdigital.dart3d:scene] node 8444939141786894344: body=nil shape=false pos=4.5 cat=- mask=-"
+        },
+        {
+          "line": 306,
+          "text": "2026-10-28 00:46:54.540 Df Runner[36427:13317e7] [com.jasonholtdigital.dart3d:scene] node 8444939141786894346: body=nil shape=false pos=-1.0 cat=- mask=-"
+        },
+        {
+          "line": 308,
+          "text": "2026-10-28 00:46:55.667 Df Runner[36427:13317e7] [com.jasonholtdigital.dart3d:scene] sim tick 528.778,32 dyn=0 awake=0 []"
+        },
+        {
+          "line": 310,
+          "text": "2026-10-28 00:46:56.661 Df Runner[36427:1331721] [com.jasonholtdigital.dart3d:scene] sim tick 528.779,32 dyn=0 awake=0 []"
+        },
+        {
+          "line": 311,
+          "text": "2026-10-28 00:46:57.662 Df Runner[36427:1331722] [com.jasonholtdigital.dart3d:scene] sim tick 528.780,32 dyn=0 awake=0 []"
+        },
+        {
+          "line": 312,
+          "text": "2026-10-28 00:46:58.662 Df Runner[36427:1331721] [com.jasonholtdigital.dart3d:scene] sim tick 528.781,32 dyn=0 awake=0 []"
+        },
+        {
+          "line": 313,
+          "text": "2026-10-28 00:46:59.661 Df Runner[36427:1331721] [com.jasonholtdigital.dart3d:scene] sim tick 528.782,32 dyn=0 awake=0 []"
+        },
+        {
+          "line": 314,
+          "text": "2026-10-28 00:47:00.661 Df Runner[36427:1331723] [com.jasonholtdigital.dart3d:scene] sim tick 528.783,32 dyn=0 awake=0 []"
+        },
+        {
+          "line": 315,
+          "text": "2026-10-28 00:47:01.659 Df Runner[36427:1331724] [com.jasonholtdigital.dart3d:scene] sim tick 528.784,32 dyn=0 awake=0 []"
+        },
+        {
+          "line": 316,
+          "text": "2026-10-28 00:47:02.659 Df Runner[36427:13317e7] [com.jasonholtdigital.dart3d:scene] sim tick 528.785,32 dyn=0 awake=0 []"
+        },
+        {
+          "line": 318,
+          "text": "2026-10-28 00:47:03.660 Df Runner[36427:1331724] [com.jasonholtdigital.dart3d:scene] sim tick 528.786,32 dyn=0 awake=0 []"
+        },
+        {
+          "line": 326,
+          "text": "2026-10-28 00:47:04.660 Df Runner[36427:13317e7] [com.jasonholtdigital.dart3d:scene] sim tick 528.787,32 dyn=0 awake=0 []"
+        },
+        {
+          "line": 327,
+          "text": "2026-10-28 00:47:05.661 Df Runner[36427:1331723] [com.jasonholtdigital.dart3d:scene] sim tick 528.788,32 dyn=0 awake=0 []"
+        },
+        {
+          "line": 331,
+          "text": "2026-10-28 00:47:06.660 Df Runner[36427:1331721] [com.jasonholtdigital.dart3d:scene] sim tick 528.789,32 dyn=0 awake=0 []"
+        },
+        {
+          "line": 332,
+          "text": "2026-10-28 00:47:07.661 Df Runner[36427:1331721] [com.jasonholtdigital.dart3d:scene] sim tick 528.790,32 dyn=0 awake=0 []"
+        },
+        {
+          "line": 1078,
+          "text": "2026-10-28 00:47:08.576 Df Runner[36427:13317e7] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 1080,
+          "text": "2026-10-28 00:47:08.577 Df Runner[36427:13317e7] [com.jasonholtdigital.dart3d:scene] debugView: this implementation unit covers PBR, unlit meshes, sprites and baked catchers; material family SCNLightingModelShadowOnly is unsupported"
+        },
+        {
+          "line": 1085,
+          "text": "2026-10-28 00:47:08.660 Df Runner[36427:1331724] [com.jasonholtdigital.dart3d:scene] sim tick 528.791,32 dyn=0 awake=0 []"
+        },
+        {
+          "line": 1092,
+          "text": "2026-10-28 00:47:09.661 Df Runner[36427:1331723] [com.jasonholtdigital.dart3d:scene] sim tick 528.792,32 dyn=0 awake=0 []"
+        },
+        {
+          "line": 1093,
+          "text": "2026-10-28 00:47:10.661 Df Runner[36427:1331727] [com.jasonholtdigital.dart3d:scene] sim tick 528.793,32 dyn=0 awake=0 []"
+        },
+        {
+          "line": 1094,
+          "text": "2026-10-28 00:47:11.661 Df Runner[36427:1331727] [com.jasonholtdigital.dart3d:scene] sim tick 528.794,32 dyn=0 awake=0 []"
+        },
+        {
+          "line": 1096,
+          "text": "2026-10-28 00:47:12.660 Df Runner[36427:1331723] [com.jasonholtdigital.dart3d:scene] sim tick 528.795,32 dyn=0 awake=0 []"
+        },
+        {
+          "line": 1097,
+          "text": "2026-10-28 00:47:13.676 Df Runner[36427:1332094] [com.jasonholtdigital.dart3d:scene] sim tick 528.796,33 dyn=0 awake=0 []"
+        },
+        {
+          "line": 1101,
+          "text": "2026-10-28 00:47:14.676 Df Runner[36427:13317e7] [com.jasonholtdigital.dart3d:scene] sim tick 528.797,33 dyn=0 awake=0 []"
+        },
+        {
+          "line": 1587,
+          "text": "2026-10-28 00:47:15.676 Df Runner[36427:1331723] [com.jasonholtdigital.dart3d:scene] sim tick 528.798,33 dyn=0 awake=0 []"
+        },
+        {
+          "line": 1824,
+          "text": "2026-10-28 00:47:16.043 Df Runner[36427:13317e7] [com.jasonholtdigital.dart3d:scene] debugView channel=depth wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 1835,
+          "text": "2026-10-28 00:47:16.677 Df Runner[36427:1331721] [com.jasonholtdigital.dart3d:scene] sim tick 528.799,33 dyn=0 awake=0 []"
+        },
+        {
+          "line": 1839,
+          "text": "2026-10-28 00:47:17.678 Df Runner[36427:1332167] [com.jasonholtdigital.dart3d:scene] sim tick 528.800,33 dyn=0 awake=0 []"
+        },
+        {
+          "line": 1840,
+          "text": "2026-10-28 00:47:18.678 Df Runner[36427:1331727] [com.jasonholtdigital.dart3d:scene] sim tick 528.801,33 dyn=0 awake=0 []"
+        },
+        {
+          "line": 1841,
+          "text": "2026-10-28 00:47:19.676 Df Runner[36427:1331721] [com.jasonholtdigital.dart3d:scene] sim tick 528.802,33 dyn=0 awake=0 []"
+        },
+        {
+          "line": 1842,
+          "text": "2026-10-28 00:47:20.676 Df Runner[36427:1331721] [com.jasonholtdigital.dart3d:scene] sim tick 528.803,33 dyn=0 awake=0 []"
+        },
+        {
+          "line": 1843,
+          "text": "2026-10-28 00:47:21.676 Df Runner[36427:13317e7] [com.jasonholtdigital.dart3d:scene] sim tick 528.804,33 dyn=0 awake=0 []"
+        },
+        {
+          "line": 1847,
+          "text": "2026-10-28 00:47:22.676 Df Runner[36427:1332094] [com.jasonholtdigital.dart3d:scene] sim tick 528.805,33 dyn=0 awake=0 []"
+        },
+        {
+          "line": 1848,
+          "text": "2026-10-28 00:47:23.677 Df Runner[36427:1331724] [com.jasonholtdigital.dart3d:scene] sim tick 528.806,33 dyn=0 awake=0 []"
+        },
+        {
+          "line": 2561,
+          "text": "2026-10-28 00:47:24.676 Df Runner[36427:13317e8] [com.jasonholtdigital.dart3d:scene] sim tick 528.807,33 dyn=0 awake=0 []"
+        },
+        {
+          "line": 2580,
+          "text": "2026-10-28 00:47:25.676 Df Runner[36427:13317e7] [com.jasonholtdigital.dart3d:scene] sim tick 528.808,33 dyn=0 awake=0 []"
+        },
+        {
+          "line": 2584,
+          "text": "2026-10-28 00:47:26.676 Df Runner[36427:13317e7] [com.jasonholtdigital.dart3d:scene] sim tick 528.809,33 dyn=0 awake=0 []"
+        },
+        {
+          "line": 2585,
+          "text": "2026-10-28 00:47:27.676 Df Runner[36427:1332094] [com.jasonholtdigital.dart3d:scene] sim tick 528.810,33 dyn=0 awake=0 []"
+        },
+        {
+          "line": 2586,
+          "text": "2026-10-28 00:47:28.676 Df Runner[36427:1331721] [com.jasonholtdigital.dart3d:scene] sim tick 528.811,33 dyn=0 awake=0 []"
+        },
+        {
+          "line": 2590,
+          "text": "2026-10-28 00:47:29.676 Df Runner[36427:1331721] [com.jasonholtdigital.dart3d:scene] sim tick 528.812,33 dyn=0 awake=0 []"
+        },
+        {
+          "line": 3315,
+          "text": "2026-10-28 00:47:30.493 Df Runner[36427:1332094] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        },
+        {
+          "line": 3318,
+          "text": "2026-10-28 00:47:30.677 Df Runner[36427:1332167] [com.jasonholtdigital.dart3d:scene] sim tick 528.813,33 dyn=0 awake=0 []"
+        },
+        {
+          "line": 3327,
+          "text": "2026-10-28 00:47:31.676 Df Runner[36427:1331721] [com.jasonholtdigital.dart3d:scene] sim tick 528.814,33 dyn=0 awake=0 []"
+        },
+        {
+          "line": 3328,
+          "text": "2026-10-28 00:47:32.678 Df Runner[36427:1331721] [com.jasonholtdigital.dart3d:scene] sim tick 528.815,33 dyn=0 awake=0 []"
+        }
+      ],
+      "bakedCaptureOrRefresh": [],
+      "shaderOrTransaction": [],
+      "fatal": []
+    },
+    "40349": {
+      "lineCount": 8279,
+      "first": [
+        4428,
+        "2026-10-28 00:48:10.208 Df Runner[40349:1334951] [com.apple.xpc:connection] [0x1056a5e30] activating connection: mach=true listener=false peer=false name=com.apple.cfprefsd.daemon"
+      ],
+      "last": [
+        22262,
+        "2026-10-28 00:48:36.917 F  Runner[40349:1334951] [com.apple.scenekit:SceneKit] Assertion 'light->_type == kC3DLightTypeIES' failed. Light should be a IES"
+      ],
+      "scene": [
+        {
+          "line": 4715,
+          "text": "2026-10-28 00:48:13.428 Df Runner[40349:1334954] [com.jasonholtdigital.dart3d:scene] protocol hello: Dart v1.0"
+        },
+        {
+          "line": 4716,
+          "text": "2026-10-28 00:48:13.432 Df Runner[40349:1334954] [com.jasonholtdigital.dart3d:scene] shadowCatcher live softness unsupported on SceneKit's shadowOnly material"
+        },
+        {
+          "line": 4717,
+          "text": "2026-10-28 00:48:13.451 Df Runner[40349:1334954] [com.jasonholtdigital.dart3d:scene] node 8444939141786894339: body=nil shape=false pos=0.7 cat=- mask=-"
+        },
+        {
+          "line": 4718,
+          "text": "2026-10-28 00:48:13.451 Df Runner[40349:1334954] [com.jasonholtdigital.dart3d:scene] node 8444939141786894340: body=nil shape=false pos=5.0 cat=- mask=-"
+        },
+        {
+          "line": 4719,
+          "text": "2026-10-28 00:48:13.451 Df Runner[40349:1334954] [com.jasonholtdigital.dart3d:scene] node 8444939141786894337: body=nil shape=false pos=0.025 cat=- mask=-"
+        },
+        {
+          "line": 4720,
+          "text": "2026-10-28 00:48:13.451 Df Runner[40349:1334954] [com.jasonholtdigital.dart3d:scene] node 8444939141786894344: body=nil shape=false pos=4.5 cat=- mask=-"
+        },
+        {
+          "line": 4721,
+          "text": "2026-10-28 00:48:13.451 Df Runner[40349:1334954] [com.jasonholtdigital.dart3d:scene] node 8444939141786894346: body=nil shape=false pos=-1.0 cat=- mask=-"
+        },
+        {
+          "line": 4730,
+          "text": "2026-10-28 00:48:14.541 Df Runner[40349:1334954] [com.jasonholtdigital.dart3d:scene] sim tick 528.857,18 dyn=0 awake=0 []"
+        },
+        {
+          "line": 4732,
+          "text": "2026-10-28 00:48:15.526 Df Runner[40349:1334981] [com.jasonholtdigital.dart3d:scene] sim tick 528.858,18 dyn=0 awake=0 []"
+        },
+        {
+          "line": 4733,
+          "text": "2026-10-28 00:48:16.527 Df Runner[40349:1334954] [com.jasonholtdigital.dart3d:scene] sim tick 528.859,18 dyn=0 awake=0 []"
+        },
+        {
+          "line": 4734,
+          "text": "2026-10-28 00:48:17.526 Df Runner[40349:1334952] [com.jasonholtdigital.dart3d:scene] sim tick 528.860,18 dyn=0 awake=0 []"
+        },
+        {
+          "line": 4735,
+          "text": "2026-10-28 00:48:18.528 Df Runner[40349:133494f] [com.jasonholtdigital.dart3d:scene] sim tick 528.861,18 dyn=0 awake=0 []"
+        },
+        {
+          "line": 4736,
+          "text": "2026-10-28 00:48:19.528 Df Runner[40349:133494f] [com.jasonholtdigital.dart3d:scene] sim tick 528.862,18 dyn=0 awake=0 []"
+        },
+        {
+          "line": 4737,
+          "text": "2026-10-28 00:48:20.527 Df Runner[40349:1334954] [com.jasonholtdigital.dart3d:scene] sim tick 528.863,18 dyn=0 awake=0 []"
+        },
+        {
+          "line": 4738,
+          "text": "2026-10-28 00:48:21.528 Df Runner[40349:1334954] [com.jasonholtdigital.dart3d:scene] sim tick 528.864,18 dyn=0 awake=0 []"
+        },
+        {
+          "line": 4739,
+          "text": "2026-10-28 00:48:22.528 Df Runner[40349:1334953] [com.jasonholtdigital.dart3d:scene] sim tick 528.865,18 dyn=0 awake=0 []"
+        },
+        {
+          "line": 4740,
+          "text": "2026-10-28 00:48:23.528 Df Runner[40349:1334951] [com.jasonholtdigital.dart3d:scene] sim tick 528.866,18 dyn=0 awake=0 []"
+        },
+        {
+          "line": 4741,
+          "text": "2026-10-28 00:48:24.528 Df Runner[40349:1334953] [com.jasonholtdigital.dart3d:scene] sim tick 528.867,18 dyn=0 awake=0 []"
+        },
+        {
+          "line": 4742,
+          "text": "2026-10-28 00:48:25.528 Df Runner[40349:1334953] [com.jasonholtdigital.dart3d:scene] sim tick 528.868,18 dyn=0 awake=0 []"
+        },
+        {
+          "line": 4743,
+          "text": "2026-10-28 00:48:26.528 Df Runner[40349:133494f] [com.jasonholtdigital.dart3d:scene] sim tick 528.869,18 dyn=0 awake=0 []"
+        },
+        {
+          "line": 4744,
+          "text": "2026-10-28 00:48:27.527 Df Runner[40349:1334951] [com.jasonholtdigital.dart3d:scene] sim tick 528.870,18 dyn=0 awake=0 []"
+        },
+        {
+          "line": 4745,
+          "text": "2026-10-28 00:48:28.528 Df Runner[40349:1334953] [com.jasonholtdigital.dart3d:scene] sim tick 528.871,18 dyn=0 awake=0 []"
+        },
+        {
+          "line": 4746,
+          "text": "2026-10-28 00:48:29.528 Df Runner[40349:133494f] [com.jasonholtdigital.dart3d:scene] sim tick 528.872,18 dyn=0 awake=0 []"
+        },
+        {
+          "line": 4747,
+          "text": "2026-10-28 00:48:30.528 Df Runner[40349:1334954] [com.jasonholtdigital.dart3d:scene] sim tick 528.873,18 dyn=0 awake=0 []"
+        },
+        {
+          "line": 4748,
+          "text": "2026-10-28 00:48:31.528 Df Runner[40349:1334954] [com.jasonholtdigital.dart3d:scene] sim tick 528.874,18 dyn=0 awake=0 []"
+        },
+        {
+          "line": 4749,
+          "text": "2026-10-28 00:48:32.528 Df Runner[40349:133494f] [com.jasonholtdigital.dart3d:scene] sim tick 528.875,18 dyn=0 awake=0 []"
+        },
+        {
+          "line": 4754,
+          "text": "2026-10-28 00:48:33.527 Df Runner[40349:1334951] [com.jasonholtdigital.dart3d:scene] sim tick 528.876,18 dyn=0 awake=0 []"
+        },
+        {
+          "line": 6513,
+          "text": "2026-10-28 00:48:34.527 Df Runner[40349:1334954] [com.jasonholtdigital.dart3d:scene] sim tick 528.877,18 dyn=0 awake=0 []"
+        },
+        {
+          "line": 21261,
+          "text": "2026-10-28 00:48:35.528 Df Runner[40349:1334954] [com.jasonholtdigital.dart3d:scene] sim tick 528.878,18 dyn=0 awake=0 []"
+        },
+        {
+          "line": 21534,
+          "text": "2026-10-28 00:48:36.528 Df Runner[40349:1334954] [com.jasonholtdigital.dart3d:scene] sim tick 528.879,18 dyn=0 awake=0 []"
+        },
+        {
+          "line": 22258,
+          "text": "2026-10-28 00:48:36.910 Df Runner[40349:1334951] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        }
+      ],
+      "bakedCaptureOrRefresh": [],
+      "shaderOrTransaction": [],
+      "fatal": []
+    },
+    "41819": {
+      "lineCount": 15339,
+      "first": [
+        22263,
+        "2026-10-28 00:49:53.302 Df Runner[41819:13365da] [com.apple.xpc:connection] [0x101c2e160] activating connection: mach=true listener=false peer=false name=com.apple.cfprefsd.daemon"
+      ],
+      "last": [
+        52750,
+        "2026-10-28 00:51:39.895 Df Runner[41819:1336cc8] [com.jasonholtdigital.dart3d:scene] sim tick 529.062,55 dyn=0 awake=0 []"
+      ],
+      "scene": [
+        {
+          "line": 22549,
+          "text": "2026-10-28 00:49:55.262 Df Runner[41819:13365e4] [com.jasonholtdigital.dart3d:scene] protocol hello: Dart v1.0"
+        },
+        {
+          "line": 22550,
+          "text": "2026-10-28 00:49:55.265 Df Runner[41819:13365e4] [com.jasonholtdigital.dart3d:scene] shadowCatcher live softness unsupported on SceneKit's shadowOnly material"
+        },
+        {
+          "line": 22551,
+          "text": "2026-10-28 00:49:55.282 Df Runner[41819:13365e4] [com.jasonholtdigital.dart3d:scene] node 8444939141786894339: body=nil shape=false pos=0.7 cat=- mask=-"
+        },
+        {
+          "line": 22552,
+          "text": "2026-10-28 00:49:55.282 Df Runner[41819:13365e4] [com.jasonholtdigital.dart3d:scene] node 8444939141786894337: body=nil shape=false pos=0.025 cat=- mask=-"
+        },
+        {
+          "line": 22553,
+          "text": "2026-10-28 00:49:55.282 Df Runner[41819:13365e4] [com.jasonholtdigital.dart3d:scene] node 8444939141786894344: body=nil shape=false pos=4.5 cat=- mask=-"
+        },
+        {
+          "line": 22554,
+          "text": "2026-10-28 00:49:55.282 Df Runner[41819:13365e4] [com.jasonholtdigital.dart3d:scene] node 8444939141786894340: body=nil shape=false pos=5.0 cat=- mask=-"
+        },
+        {
+          "line": 22555,
+          "text": "2026-10-28 00:49:55.282 Df Runner[41819:13365e4] [com.jasonholtdigital.dart3d:scene] node 8444939141786894346: body=nil shape=false pos=-1.0 cat=- mask=-"
+        },
+        {
+          "line": 22564,
+          "text": "2026-10-28 00:49:56.361 Df Runner[41819:13365f1] [com.jasonholtdigital.dart3d:scene] sim tick 528.959,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 22566,
+          "text": "2026-10-28 00:49:57.362 Df Runner[41819:13365ea] [com.jasonholtdigital.dart3d:scene] sim tick 528.960,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 22567,
+          "text": "2026-10-28 00:49:58.361 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] sim tick 528.961,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 22568,
+          "text": "2026-10-28 00:49:59.362 Df Runner[41819:13365ef] [com.jasonholtdigital.dart3d:scene] sim tick 528.962,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 22569,
+          "text": "2026-10-28 00:50:00.361 Df Runner[41819:13365df] [com.jasonholtdigital.dart3d:scene] sim tick 528.963,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 22570,
+          "text": "2026-10-28 00:50:01.360 Df Runner[41819:13365df] [com.jasonholtdigital.dart3d:scene] sim tick 528.964,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 22571,
+          "text": "2026-10-28 00:50:02.362 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] sim tick 528.965,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 22572,
+          "text": "2026-10-28 00:50:03.362 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] sim tick 528.966,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 22573,
+          "text": "2026-10-28 00:50:04.362 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] sim tick 528.967,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 22574,
+          "text": "2026-10-28 00:50:05.362 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] sim tick 528.968,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 22575,
+          "text": "2026-10-28 00:50:06.362 Df Runner[41819:13365df] [com.jasonholtdigital.dart3d:scene] sim tick 528.969,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 22576,
+          "text": "2026-10-28 00:50:07.360 Df Runner[41819:13365df] [com.jasonholtdigital.dart3d:scene] sim tick 528.970,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 22577,
+          "text": "2026-10-28 00:50:08.362 Df Runner[41819:13365df] [com.jasonholtdigital.dart3d:scene] sim tick 528.971,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 22578,
+          "text": "2026-10-28 00:50:09.361 Df Runner[41819:13365da] [com.jasonholtdigital.dart3d:scene] sim tick 528.972,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 22579,
+          "text": "2026-10-28 00:50:10.362 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] sim tick 528.973,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 22580,
+          "text": "2026-10-28 00:50:11.362 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] sim tick 528.974,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 22581,
+          "text": "2026-10-28 00:50:12.360 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] sim tick 528.975,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 22582,
+          "text": "2026-10-28 00:50:13.362 Df Runner[41819:13365df] [com.jasonholtdigital.dart3d:scene] sim tick 528.976,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 22583,
+          "text": "2026-10-28 00:50:14.362 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] sim tick 528.977,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 22584,
+          "text": "2026-10-28 00:50:15.362 Df Runner[41819:13365df] [com.jasonholtdigital.dart3d:scene] sim tick 528.978,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 22585,
+          "text": "2026-10-28 00:50:16.361 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] sim tick 528.979,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 22590,
+          "text": "2026-10-28 00:50:17.360 Df Runner[41819:13365da] [com.jasonholtdigital.dart3d:scene] sim tick 528.980,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 32231,
+          "text": "2026-10-28 00:50:18.363 Df Runner[41819:13365e6] [com.jasonholtdigital.dart3d:scene] sim tick 528.981,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 39366,
+          "text": "2026-10-28 00:50:19.362 Df Runner[41819:13365da] [com.jasonholtdigital.dart3d:scene] sim tick 528.982,02 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40092,
+          "text": "2026-10-28 00:50:20.278 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 40109,
+          "text": "2026-10-28 00:50:21.255 Df Runner[41819:13365df] [com.jasonholtdigital.dart3d:scene] sim tick 528.983,90 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40116,
+          "text": "2026-10-28 00:50:22.243 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] sim tick 528.984,90 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40842,
+          "text": "2026-10-28 00:50:22.860 Df Runner[41819:13365df] [com.jasonholtdigital.dart3d:scene] debugView channel=depth wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 40862,
+          "text": "2026-10-28 00:50:23.460 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] sim tick 528.986,12 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40863,
+          "text": "2026-10-28 00:50:24.461 Df Runner[41819:13365e6] [com.jasonholtdigital.dart3d:scene] sim tick 528.987,12 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40864,
+          "text": "2026-10-28 00:50:25.461 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] sim tick 528.988,12 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40865,
+          "text": "2026-10-28 00:50:26.460 Df Runner[41819:1336a77] [com.jasonholtdigital.dart3d:scene] sim tick 528.989,12 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40866,
+          "text": "2026-10-28 00:50:27.460 Df Runner[41819:13365e6] [com.jasonholtdigital.dart3d:scene] sim tick 528.990,12 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40867,
+          "text": "2026-10-28 00:50:28.460 Df Runner[41819:1336cc8] [com.jasonholtdigital.dart3d:scene] sim tick 528.991,12 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40868,
+          "text": "2026-10-28 00:50:29.460 Df Runner[41819:13365da] [com.jasonholtdigital.dart3d:scene] sim tick 528.992,12 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40869,
+          "text": "2026-10-28 00:50:30.460 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] sim tick 528.993,12 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40870,
+          "text": "2026-10-28 00:50:31.461 Df Runner[41819:1336cc8] [com.jasonholtdigital.dart3d:scene] sim tick 528.994,12 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40871,
+          "text": "2026-10-28 00:50:32.460 Df Runner[41819:13365df] [com.jasonholtdigital.dart3d:scene] sim tick 528.995,12 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40872,
+          "text": "2026-10-28 00:50:33.461 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] sim tick 528.996,12 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40873,
+          "text": "2026-10-28 00:50:34.461 Df Runner[41819:13365da] [com.jasonholtdigital.dart3d:scene] sim tick 528.997,12 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40874,
+          "text": "2026-10-28 00:50:35.460 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] sim tick 528.998,12 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40875,
+          "text": "2026-10-28 00:50:36.461 Df Runner[41819:1336cc8] [com.jasonholtdigital.dart3d:scene] sim tick 528.999,12 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40876,
+          "text": "2026-10-28 00:50:37.461 Df Runner[41819:13365df] [com.jasonholtdigital.dart3d:scene] sim tick 529.000,12 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40877,
+          "text": "2026-10-28 00:50:38.461 Df Runner[41819:1336a77] [com.jasonholtdigital.dart3d:scene] sim tick 529.001,12 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40878,
+          "text": "2026-10-28 00:50:39.460 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] sim tick 529.002,12 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40879,
+          "text": "2026-10-28 00:50:40.460 Df Runner[41819:1336a77] [com.jasonholtdigital.dart3d:scene] sim tick 529.003,12 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40880,
+          "text": "2026-10-28 00:50:41.461 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] sim tick 529.004,12 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40881,
+          "text": "2026-10-28 00:50:42.461 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] sim tick 529.005,12 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40882,
+          "text": "2026-10-28 00:50:43.461 Df Runner[41819:13365da] [com.jasonholtdigital.dart3d:scene] sim tick 529.006,12 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40883,
+          "text": "2026-10-28 00:50:44.461 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] sim tick 529.007,12 dyn=0 awake=0 []"
+        },
+        {
+          "line": 40884,
+          "text": "2026-10-28 00:50:45.460 Df Runner[41819:1336a77] [com.jasonholtdigital.dart3d:scene] sim tick 529.008,12 dyn=0 awake=0 []"
+        },
+        {
+          "line": 41610,
+          "text": "2026-10-28 00:50:46.010 Df Runner[41819:13365e6] [com.jasonholtdigital.dart3d:scene] debugView channel=baseColor wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 41630,
+          "text": "2026-10-28 00:50:46.677 Df Runner[41819:1336a77] [com.jasonholtdigital.dart3d:scene] sim tick 529.009,33 dyn=0 awake=0 []"
+        },
+        {
+          "line": 42033,
+          "text": "2026-10-28 00:50:47.677 Df Runner[41819:1336a77] [com.jasonholtdigital.dart3d:scene] sim tick 529.010,33 dyn=0 awake=0 []"
+        },
+        {
+          "line": 42357,
+          "text": "2026-10-28 00:50:47.810 Df Runner[41819:13365da] [com.jasonholtdigital.dart3d:scene] debugView channel=metallic wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 42373,
+          "text": "2026-10-28 00:50:48.744 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] sim tick 529.011,40 dyn=0 awake=0 []"
+        },
+        {
+          "line": 43099,
+          "text": "2026-10-28 00:50:49.544 Df Runner[41819:13365e6] [com.jasonholtdigital.dart3d:scene] debugView channel=roughness wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 43112,
+          "text": "2026-10-28 00:50:49.812 Df Runner[41819:1336cc8] [com.jasonholtdigital.dart3d:scene] sim tick 529.012,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 43116,
+          "text": "2026-10-28 00:50:50.810 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] sim tick 529.013,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 43842,
+          "text": "2026-10-28 00:50:51.260 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 43856,
+          "text": "2026-10-28 00:50:51.810 Df Runner[41819:1336cc8] [com.jasonholtdigital.dart3d:scene] sim tick 529.014,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 43860,
+          "text": "2026-10-28 00:50:52.810 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] sim tick 529.015,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 44594,
+          "text": "2026-10-28 00:50:53.812 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] sim tick 529.016,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 45319,
+          "text": "2026-10-28 00:50:54.794 Df Runner[41819:13365da] [com.jasonholtdigital.dart3d:scene] debugView channel=depth wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 45325,
+          "text": "2026-10-28 00:50:54.812 Df Runner[41819:1336cc8] [com.jasonholtdigital.dart3d:scene] sim tick 529.017,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 45334,
+          "text": "2026-10-28 00:50:55.810 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] sim tick 529.018,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 46064,
+          "text": "2026-10-28 00:50:56.810 Df Runner[41819:13365da] [com.jasonholtdigital.dart3d:scene] sim tick 529.019,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 46072,
+          "text": "2026-10-28 00:50:57.810 Df Runner[41819:13365df] [com.jasonholtdigital.dart3d:scene] sim tick 529.020,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 46798,
+          "text": "2026-10-28 00:50:58.360 Df Runner[41819:13365e6] [com.jasonholtdigital.dart3d:scene] debugView channel=depth wireframe=true nativeParticlesExcluded=true"
+        },
+        {
+          "line": 46811,
+          "text": "2026-10-28 00:50:58.810 Df Runner[41819:13365e6] [com.jasonholtdigital.dart3d:scene] sim tick 529.021,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 46812,
+          "text": "2026-10-28 00:50:59.810 Df Runner[41819:13365da] [com.jasonholtdigital.dart3d:scene] sim tick 529.022,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 46813,
+          "text": "2026-10-28 00:51:00.811 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] sim tick 529.023,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 46814,
+          "text": "2026-10-28 00:51:01.811 Df Runner[41819:1336cc8] [com.jasonholtdigital.dart3d:scene] sim tick 529.024,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 46815,
+          "text": "2026-10-28 00:51:02.811 Df Runner[41819:13365df] [com.jasonholtdigital.dart3d:scene] sim tick 529.025,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 46816,
+          "text": "2026-10-28 00:51:03.811 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] sim tick 529.026,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 46817,
+          "text": "2026-10-28 00:51:04.811 Df Runner[41819:1336cc8] [com.jasonholtdigital.dart3d:scene] sim tick 529.027,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 46818,
+          "text": "2026-10-28 00:51:05.811 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] sim tick 529.028,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 46822,
+          "text": "2026-10-28 00:51:06.810 Df Runner[41819:1336a77] [com.jasonholtdigital.dart3d:scene] sim tick 529.029,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 47544,
+          "text": "2026-10-28 00:51:07.194 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=true nativeParticlesExcluded=false"
+        },
+        {
+          "line": 47557,
+          "text": "2026-10-28 00:51:07.812 Df Runner[41819:1336a77] [com.jasonholtdigital.dart3d:scene] sim tick 529.030,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 47561,
+          "text": "2026-10-28 00:51:08.811 Df Runner[41819:13365df] [com.jasonholtdigital.dart3d:scene] sim tick 529.031,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 48285,
+          "text": "2026-10-28 00:51:09.027 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        },
+        {
+          "line": 48297,
+          "text": "2026-10-28 00:51:09.811 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] sim tick 529.032,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 49023,
+          "text": "2026-10-28 00:51:10.777 Df Runner[41819:13365e6] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 49029,
+          "text": "2026-10-28 00:51:10.810 Df Runner[41819:1336a77] [com.jasonholtdigital.dart3d:scene] sim tick 529.033,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 49038,
+          "text": "2026-10-28 00:51:11.811 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] sim tick 529.034,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 49768,
+          "text": "2026-10-28 00:51:12.810 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] sim tick 529.035,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 49776,
+          "text": "2026-10-28 00:51:13.811 Df Runner[41819:13365e6] [com.jasonholtdigital.dart3d:scene] sim tick 529.036,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 50506,
+          "text": "2026-10-28 00:51:14.810 Df Runner[41819:13365da] [com.jasonholtdigital.dart3d:scene] sim tick 529.037,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 50513,
+          "text": "2026-10-28 00:51:15.812 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] sim tick 529.038,47 dyn=0 awake=0 []"
+        },
+        {
+          "line": 51236,
+          "text": "2026-10-28 00:51:16.195 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] node 8444939141786894344: body=nil shape=false pos=4.5 cat=- mask=-"
+        },
+        {
+          "line": 51237,
+          "text": "2026-10-28 00:51:16.195 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] node 8444939141786894337: body=nil shape=false pos=0.025 cat=- mask=-"
+        },
+        {
+          "line": 51238,
+          "text": "2026-10-28 00:51:16.195 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] node 8444939141786894339: body=nil shape=false pos=0.7 cat=- mask=-"
+        },
+        {
+          "line": 51239,
+          "text": "2026-10-28 00:51:16.195 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] node 8444939141786894340: body=nil shape=false pos=5.0 cat=- mask=-"
+        },
+        {
+          "line": 51240,
+          "text": "2026-10-28 00:51:16.195 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] node 8444939141786894346: body=nil shape=false pos=-1.0 cat=- mask=-"
+        },
+        {
+          "line": 51249,
+          "text": "2026-10-28 00:51:16.894 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] sim tick 529.039,55 dyn=0 awake=0 []"
+        },
+        {
+          "line": 51963,
+          "text": "2026-10-28 00:51:17.894 Df Runner[41819:1336cc8] [com.jasonholtdigital.dart3d:scene] sim tick 529.040,55 dyn=0 awake=0 []"
+        },
+        {
+          "line": 51975,
+          "text": "2026-10-28 00:51:17.977 Df Runner[41819:1336cc8] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        },
+        {
+          "line": 51988,
+          "text": "2026-10-28 00:51:18.896 Df Runner[41819:13365e6] [com.jasonholtdigital.dart3d:scene] sim tick 529.041,55 dyn=0 awake=0 []"
+        },
+        {
+          "line": 51989,
+          "text": "2026-10-28 00:51:19.895 Df Runner[41819:13365e6] [com.jasonholtdigital.dart3d:scene] sim tick 529.042,55 dyn=0 awake=0 []"
+        },
+        {
+          "line": 51990,
+          "text": "2026-10-28 00:51:20.895 Df Runner[41819:13365e6] [com.jasonholtdigital.dart3d:scene] sim tick 529.043,55 dyn=0 awake=0 []"
+        },
+        {
+          "line": 51991,
+          "text": "2026-10-28 00:51:21.894 Df Runner[41819:13365e6] [com.jasonholtdigital.dart3d:scene] sim tick 529.044,55 dyn=0 awake=0 []"
+        },
+        {
+          "line": 51992,
+          "text": "2026-10-28 00:51:22.894 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] sim tick 529.045,55 dyn=0 awake=0 []"
+        },
+        {
+          "line": 51993,
+          "text": "2026-10-28 00:51:23.896 Df Runner[41819:13365e6] [com.jasonholtdigital.dart3d:scene] sim tick 529.046,55 dyn=0 awake=0 []"
+        },
+        {
+          "line": 51994,
+          "text": "2026-10-28 00:51:24.896 Df Runner[41819:1336cc8] [com.jasonholtdigital.dart3d:scene] sim tick 529.047,55 dyn=0 awake=0 []"
+        },
+        {
+          "line": 51995,
+          "text": "2026-10-28 00:51:25.896 Df Runner[41819:1336cc8] [com.jasonholtdigital.dart3d:scene] sim tick 529.048,55 dyn=0 awake=0 []"
+        },
+        {
+          "line": 51996,
+          "text": "2026-10-28 00:51:26.895 Df Runner[41819:1336cc8] [com.jasonholtdigital.dart3d:scene] sim tick 529.049,55 dyn=0 awake=0 []"
+        },
+        {
+          "line": 51997,
+          "text": "2026-10-28 00:51:27.894 Df Runner[41819:13365df] [com.jasonholtdigital.dart3d:scene] sim tick 529.050,55 dyn=0 awake=0 []"
+        },
+        {
+          "line": 51998,
+          "text": "2026-10-28 00:51:28.896 Df Runner[41819:13365df] [com.jasonholtdigital.dart3d:scene] sim tick 529.051,55 dyn=0 awake=0 []"
+        },
+        {
+          "line": 51999,
+          "text": "2026-10-28 00:51:29.895 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] sim tick 529.052,55 dyn=0 awake=0 []"
+        },
+        {
+          "line": 52000,
+          "text": "2026-10-28 00:51:30.895 Df Runner[41819:13365df] [com.jasonholtdigital.dart3d:scene] sim tick 529.053,55 dyn=0 awake=0 []"
+        },
+        {
+          "line": 52001,
+          "text": "2026-10-28 00:51:31.895 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] sim tick 529.054,55 dyn=0 awake=0 []"
+        },
+        {
+          "line": 52002,
+          "text": "2026-10-28 00:51:32.896 Df Runner[41819:1336cc8] [com.jasonholtdigital.dart3d:scene] sim tick 529.055,55 dyn=0 awake=0 []"
+        },
+        {
+          "line": 52003,
+          "text": "2026-10-28 00:51:33.894 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] sim tick 529.056,55 dyn=0 awake=0 []"
+        },
+        {
+          "line": 52742,
+          "text": "2026-10-28 00:51:34.894 Df Runner[41819:13365da] [com.jasonholtdigital.dart3d:scene] sim tick 529.057,55 dyn=0 awake=0 []"
+        },
+        {
+          "line": 52746,
+          "text": "2026-10-28 00:51:35.895 Df Runner[41819:1336cc8] [com.jasonholtdigital.dart3d:scene] sim tick 529.058,55 dyn=0 awake=0 []"
+        },
+        {
+          "line": 52747,
+          "text": "2026-10-28 00:51:36.895 Df Runner[41819:13365da] [com.jasonholtdigital.dart3d:scene] sim tick 529.059,55 dyn=0 awake=0 []"
+        },
+        {
+          "line": 52748,
+          "text": "2026-10-28 00:51:37.896 Df Runner[41819:13365df] [com.jasonholtdigital.dart3d:scene] sim tick 529.060,55 dyn=0 awake=0 []"
+        },
+        {
+          "line": 52749,
+          "text": "2026-10-28 00:51:38.895 Df Runner[41819:13365df] [com.jasonholtdigital.dart3d:scene] sim tick 529.061,55 dyn=0 awake=0 []"
+        },
+        {
+          "line": 52750,
+          "text": "2026-10-28 00:51:39.895 Df Runner[41819:1336cc8] [com.jasonholtdigital.dart3d:scene] sim tick 529.062,55 dyn=0 awake=0 []"
+        }
+      ],
+      "bakedCaptureOrRefresh": [],
+      "shaderOrTransaction": [],
+      "fatal": []
+    }
+  },
+  "crash": {
+    "header": {
+      "app_name": "Runner",
+      "timestamp": "2026-10-28 00:48:39.00 +0100",
+      "app_version": "0.1.0",
+      "slice_uuid": "767ebac2-e9c1-32db-9d03-87b5f225dc95",
+      "build_version": "1",
+      "platform": 7,
+      "bundleID": "com.jasonholtdigital.dart3dExample",
+      "share_with_app_devs": 1,
+      "is_first_party": 0,
+      "bug_type": "309",
+      "os_version": "macOS 27.0.1 (26A434)",
+      "roots_installed": 0,
+      "name": "Runner",
+      "incident_id": "BF3D54B4-CFEA-4082-BB93-22B41A93218A"
+    },
+    "pid": 40349,
+    "exception": {
+      "codes": "0x0000000000000001, 0x42d2d93542d2d935",
+      "rawCodes": [
+        1,
+        4815149774390090037
+      ],
+      "type": "EXC_BAD_ACCESS",
+      "signal": "SIGSEGV",
+      "subtype": "KERN_INVALID_ADDRESS at 0x42d2d93542d2d935"
+    },
+    "termination": {
+      "flags": 0,
+      "code": 11,
+      "namespace": "SIGNAL",
+      "indicator": "Segmentation fault: 11",
+      "byProc": "exc handler",
+      "byPid": 40349
+    },
+    "faultingThread": 2,
+    "faultQueue": "com.apple.scenekit.renderingQueue.dart3d.SceneViewHost0x105fb4000",
+    "frames": [
+      {
+        "imageOffset": 2056,
+        "symbol": "objc_msgSend",
+        "symbolLocation": 8,
+        "imageIndex": 78
+      },
+      {
+        "imageOffset": 1308532,
+        "symbol": "-[SCNLight setIESProfileURL:]",
+        "symbolLocation": 36,
+        "imageIndex": 72
+      },
+      {
+        "imageOffset": 1291432,
+        "symbol": "-[SCNLight copyWithZone:]",
+        "symbolLocation": 476,
+        "imageIndex": 72
+      },
+      {
+        "imageOffset": 2027696,
+        "sourceLine": 138,
+        "sourceFile": "ScreenDebugPresentation.swift",
+        "symbol": "visit #1 (_:parent:) in ScreenDebugAttachments.capture(_:channel:host:)",
+        "imageIndex": 4,
+        "symbolLocation": 1264
+      },
+      {
+        "imageOffset": 2029020,
+        "sourceLine": 146,
+        "sourceFile": "ScreenDebugPresentation.swift",
+        "symbol": "visit #1 (_:parent:) in ScreenDebugAttachments.capture(_:channel:host:)",
+        "imageIndex": 4,
+        "symbolLocation": 2588
+      },
+      {
+        "imageOffset": 2022764,
+        "sourceLine": 148,
+        "sourceFile": "ScreenDebugPresentation.swift",
+        "symbol": "ScreenDebugAttachments.capture(_:channel:host:)",
+        "imageIndex": 4,
+        "symbolLocation": 584
+      },
+      {
+        "imageOffset": 1311840,
+        "sourceLine": 613,
+        "sourceFile": "RenderTargets.swift",
+        "symbol": "closure #1 in SceneViewHost.syncScreenSubviews()",
+        "imageIndex": 4,
+        "symbolLocation": 128
+      },
+      {
+        "imageOffset": 1319816,
+        "sourceFile": "/<compiler-generated>",
+        "symbol": "partial apply for closure #1 in SceneViewHost.syncScreenSubviews()",
+        "symbolLocation": 52,
+        "imageIndex": 4
+      },
+      {
+        "imageOffset": 197076,
+        "sourceFile": "/<compiler-generated>",
+        "symbol": "Optional.map<A, B>(_:)",
+        "symbolLocation": 212,
+        "imageIndex": 4
+      },
+      {
+        "imageOffset": 1308120,
+        "sourceLine": 612,
+        "sourceFile": "RenderTargets.swift",
+        "symbol": "SceneViewHost.syncScreenSubviews()",
+        "imageIndex": 4,
+        "symbolLocation": 464
+      },
+      {
+        "imageOffset": 1920836,
+        "sourceLine": 5763,
+        "sourceFile": "SceneViewHost.swift",
+        "symbol": "SceneViewHost.renderer(_:didApplyConstraintsAtTime:)",
+        "imageIndex": 4,
+        "symbolLocation": 140
+      },
+      {
+        "imageOffset": 1930852,
+        "sourceFile": "/<compiler-generated>",
+        "symbol": "@objc SceneViewHost.renderer(_:didApplyConstraintsAtTime:)",
+        "symbolLocation": 68,
+        "imageIndex": 4
+      },
+      {
+        "imageOffset": 1524088,
+        "symbol": "-[SCNRenderer _update:]",
+        "symbolLocation": 1452,
+        "imageIndex": 72
+      },
+      {
+        "imageOffset": 1531232,
+        "symbol": "-[SCNRenderer _drawSceneWithNewRenderer:]",
+        "symbolLocation": 152,
+        "imageIndex": 72
+      },
+      {
+        "imageOffset": 1532504,
+        "symbol": "-[SCNRenderer _drawScene:]",
+        "symbolLocation": 40,
+        "imageIndex": 72
+      },
+      {
+        "imageOffset": 1533272,
+        "symbol": "-[SCNRenderer _drawAtTime:]",
+        "symbolLocation": 524,
+        "imageIndex": 72
+      },
+      {
+        "imageOffset": 2169196,
+        "symbol": "-[SCNView _drawAtTime:]",
+        "symbolLocation": 408,
+        "imageIndex": 72
+      },
+      {
+        "imageOffset": 845344,
+        "symbol": "__83-[NSObject(SCN_DisplayLinkExtensions) SCN_setupDisplayLinkWithQueue:screen:policy:]_block_invoke",
+        "symbolLocation": 44,
+        "imageIndex": 72
+      },
+      {
+        "imageOffset": 3341720,
+        "symbol": "-[SCNDisplayLink _displayLinkCallbackReturningImmediately]",
+        "symbolLocation": 132,
+        "imageIndex": 72
+      },
+      {
+        "imageOffset": 114924,
+        "symbol": "_dispatch_client_callout",
+        "symbolLocation": 12,
+        "imageIndex": 73
+      },
+      {
+        "imageOffset": 24696,
+        "symbol": "_dispatch_continuation_pop",
+        "symbolLocation": 776,
+        "imageIndex": 73
+      },
+      {
+        "imageOffset": 102804,
+        "symbol": "_dispatch_source_invoke",
+        "symbolLocation": 1804,
+        "imageIndex": 73
+      },
+      {
+        "imageOffset": 42124,
+        "symbol": "_dispatch_lane_serial_drain",
+        "symbolLocation": 304,
+        "imageIndex": 73
+      },
+      {
+        "imageOffset": 45564,
+        "symbol": "_dispatch_lane_invoke",
+        "symbolLocation": 396,
+        "imageIndex": 73
+      },
+      {
+        "imageOffset": 90376,
+        "symbol": "_dispatch_root_queue_drain_deferred_wlh",
+        "symbolLocation": 288,
+        "imageIndex": 73
+      },
+      {
+        "imageOffset": 88144,
+        "symbol": "_dispatch_workloop_worker_thread",
+        "symbolLocation": 692,
+        "imageIndex": 73
+      },
+      {
+        "imageOffset": 11388,
+        "symbol": "_pthread_wqthread",
+        "symbolLocation": 288,
+        "imageIndex": 9
+      },
+      {
+        "imageOffset": 6780,
+        "symbol": "start_wqthread",
+        "symbolLocation": 8,
+        "imageIndex": 9
+      }
+    ],
+    "summaryMatchesFullIPS": true,
+    "imageCount": 84
+  },
+  "parentExecutionReceipt": {
+    "origin": "Parent transcript of tool exit results; empty typecheck logs alone are not receipts",
+    "focusedTests": {
+      "command": "/Users/jasonholt/zero/bin/dn test --no-pub test/w34_debug_scene_test.dart test/u2_catcher_showcase_test.dart test/u3_sprite_showcase_test.dart",
+      "cwd": "dart3d/example",
+      "exitCode": 0,
+      "passed": 31
+    },
+    "exampleAnalyze": {
+      "command": "/Users/jasonholt/zero/bin/dn analyze --no-pub",
+      "cwd": "dart3d/example",
+      "exitCode": 0
+    },
+    "modelCopyTypecheck": {
+      "command": "xcrun swiftc -typecheck -sdk \"$(xcrun --sdk iphonesimulator --show-sdk-path)\" -target arm64-apple-ios15.0-simulator dart3d/ios/Classes/*.swift",
+      "cwd": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb",
+      "exitCode": 0,
+      "sourceManifest": "model-copy/source-sha256.json"
+    },
+    "firstPresentationCopyNative": "FAIL EXC_BAD_ACCESS PID40349 at SCNLight.copyWithZone/setIESProfileURL; DN wrapper exit0 is not a native pass",
+    "modelCopyNative": "PID41819 recorded selections and completed DN run; no independent runtime",
+    "fullSuites": "NOT_RUN for throwaway candidate",
+    "sourceLightMutation": "NOT_RUN",
+    "animatedLightParity": "NOT_RUN",
+    "offOpacityDiscrepancy": "OPEN"
+  },
+  "beforeRunMarkers": [
+    "Xcode build done.                                            6.3s",
+    "Application finished."
+  ],
+  "afterRunMarkers": [
+    "Xcode build done.                                           26.5s",
+    "Lost connection to device."
+  ],
+  "model-copyRunMarkers": [
+    "Xcode build done.                                            7.8s",
+    "Application finished."
+  ]
+}

@@ -1,0 +1,29 @@
+Launching lib/w34_reload_main.dart on iPhone 17 Pro in debug mode...
+Running Xcode build...                                          
+Xcode build done.                                            7.6s
+dartnative: [DN] Licence valid (community), expires 2027-09-14
+dartnative: [DN] lifecycle → AppLifecycleState.inactive
+dartnative: w34 connecting ws://127.0.0.1:49334
+Syncing files to device iPhone 17 Pro...                            31ms
+
+DartNative run key commands.
+r Hot reload. 🔥🔥🔥
+R Hot restart.
+h List all available interactive commands.
+d Detach (terminate "dn run" but leave application running).
+c Clear the screen
+q Quit (terminate the application on the device).
+
+A Dart VM Service on iPhone 17 Pro is available at: http://127.0.0.1:58411/vFTtIiWYTFc=/
+The DartNative DevTools debugger and profiler on iPhone 17 Pro is available at: http://127.0.0.1:58411/vFTtIiWYTFc=/devtools/?uri=ws://127.0.0.1:58411/vFTtIiWYTFc=/ws
+dartnative: [DN] lifecycle → AppLifecycleState.resumed
+dartnative: w34 connected ws://127.0.0.1:49334
+dartnative: w34 loadDocument request=2026-10-27T19:18:50.447009
+dartnative: w34 applyDiff request=2026-10-27T19:19:40.070837 ops=[upsertResource, updateNode]
+dartnative: w34 applyDiff request=2026-10-27T19:19:50.089704 ops=[upsertResource, updateStage]
+dartnative: w34 decode error FormatException: Unexpected end of input (at character 2)
+{
+ ^
+dartnative: w34 applyDiff request=2026-10-27T19:20:07.380587 ops=[upsertResource, upsertResource, updateNode, updateStage]
+
+Application finished.

@@ -1,0 +1,296 @@
+{
+  "uiSha256": "3514e5e0924ec575c3d4cc50e32deb9de81f260570e713a517992e30eeb56e79",
+  "actions": [
+    {
+      "index": 3,
+      "snapshotIndex": 2,
+      "reference": "@e19",
+      "title": "Capture",
+      "exitCode": 0
+    },
+    {
+      "index": 5,
+      "snapshotIndex": 4,
+      "reference": "@e11",
+      "title": "normals",
+      "exitCode": 0
+    },
+    {
+      "index": 8,
+      "snapshotIndex": 7,
+      "reference": "@e12",
+      "title": "metallic",
+      "exitCode": 0
+    },
+    {
+      "index": 11,
+      "snapshotIndex": 10,
+      "reference": "@e13",
+      "title": "roughness",
+      "exitCode": 0
+    },
+    {
+      "index": 14,
+      "snapshotIndex": 13,
+      "reference": "@e15",
+      "title": "depth",
+      "exitCode": 0
+    },
+    {
+      "index": 17,
+      "snapshotIndex": 16,
+      "reference": "@e14",
+      "title": "baseColor",
+      "exitCode": 0
+    },
+    {
+      "index": 20,
+      "snapshotIndex": 19,
+      "reference": "@e11",
+      "title": "normals",
+      "exitCode": 0
+    },
+    {
+      "index": 22,
+      "snapshotIndex": 21,
+      "reference": "@e19",
+      "title": "Capture",
+      "exitCode": 0
+    },
+    {
+      "index": 24,
+      "snapshotIndex": 23,
+      "reference": "@e14",
+      "title": "baseColor",
+      "exitCode": 0
+    },
+    {
+      "index": 27,
+      "snapshotIndex": 26,
+      "reference": "@e16",
+      "title": "Wire off",
+      "exitCode": 0
+    },
+    {
+      "index": 30,
+      "snapshotIndex": 29,
+      "reference": "@e10",
+      "title": "Off",
+      "exitCode": 0
+    },
+    {
+      "index": 33,
+      "snapshotIndex": 32,
+      "reference": "@e16",
+      "title": "Wire on",
+      "exitCode": 0
+    },
+    {
+      "index": 37,
+      "snapshotIndex": 36,
+      "reference": "@e14",
+      "title": "baseColor",
+      "exitCode": 0
+    },
+    {
+      "index": 40,
+      "snapshotIndex": 39,
+      "reference": "@e17",
+      "title": "Factors A",
+      "exitCode": 0
+    },
+    {
+      "index": 43,
+      "snapshotIndex": 42,
+      "reference": "@e22",
+      "title": "Colors A",
+      "exitCode": 0
+    },
+    {
+      "index": 46,
+      "snapshotIndex": 45,
+      "reference": "@e21",
+      "title": "Texture on",
+      "exitCode": 0
+    },
+    {
+      "index": 49,
+      "snapshotIndex": 48,
+      "reference": "@e21",
+      "title": "Texture off",
+      "exitCode": 0
+    },
+    {
+      "index": 52,
+      "snapshotIndex": 51,
+      "reference": "@e18",
+      "title": "opaque",
+      "exitCode": 0
+    },
+    {
+      "index": 55,
+      "snapshotIndex": 54,
+      "reference": "@e18",
+      "title": "mask",
+      "exitCode": 0
+    },
+    {
+      "index": 58,
+      "snapshotIndex": 57,
+      "reference": "@e11",
+      "title": "Off",
+      "exitCode": 0
+    },
+    {
+      "index": 61,
+      "snapshotIndex": 60,
+      "reference": "@e21",
+      "title": "Reload",
+      "exitCode": 0
+    },
+    {
+      "index": 64,
+      "snapshotIndex": 63,
+      "reference": "@e15",
+      "title": "baseColor",
+      "exitCode": 0
+    },
+    {
+      "index": 67,
+      "snapshotIndex": 66,
+      "reference": "@e12",
+      "title": "normals",
+      "exitCode": 0
+    },
+    {
+      "index": 70,
+      "snapshotIndex": 69,
+      "reference": "@e11",
+      "title": "Off",
+      "exitCode": 0
+    },
+    {
+      "index": 73,
+      "snapshotIndex": 72,
+      "reference": "@e15",
+      "title": "baseColor",
+      "exitCode": 0
+    },
+    {
+      "index": 75,
+      "snapshotIndex": 74,
+      "reference": "@e22",
+      "title": "Texture on",
+      "exitCode": 0
+    },
+    {
+      "index": 77,
+      "snapshotIndex": 76,
+      "reference": "@e20",
+      "title": "Capture",
+      "exitCode": 0
+    },
+    {
+      "index": 79,
+      "snapshotIndex": 78,
+      "reference": "@e15",
+      "title": "baseColor",
+      "exitCode": 0
+    },
+    {
+      "index": 82,
+      "snapshotIndex": 81,
+      "reference": "@e12",
+      "title": "normals",
+      "exitCode": 0
+    },
+    {
+      "index": 84,
+      "snapshotIndex": 83,
+      "reference": "@e20",
+      "title": "Capture",
+      "exitCode": 0
+    },
+    {
+      "index": 86,
+      "snapshotIndex": 85,
+      "reference": "@e15",
+      "title": "baseColor",
+      "exitCode": 0
+    },
+    {
+      "index": 89,
+      "snapshotIndex": 88,
+      "reference": "@e22",
+      "title": "Texture off",
+      "exitCode": 0
+    },
+    {
+      "index": 91,
+      "snapshotIndex": 90,
+      "reference": "@e11",
+      "title": "Off",
+      "exitCode": 0
+    }
+  ],
+  "recordedScreenshots": [
+    "00-off.png",
+    "01-normals.png",
+    "02-metallic.png",
+    "03-roughness.png",
+    "04-depth.png",
+    "05-baseColor.png",
+    "06-baseColor-after-normal-capture.png",
+    "07-baseColor-wire.png",
+    "08-off-wire.png",
+    "09-off-return.png",
+    "10-baseColor-a.png",
+    "11-baseColor-factors-b.png",
+    "12-baseColor-colors-b.png",
+    "13-baseColor-texture-off.png",
+    "14-baseColor-texture-return.png",
+    "15-baseColor-mask.png",
+    "16-baseColor-blend.png",
+    "17-off-edited.png",
+    "18-off-edited-reload.png",
+    "19-baseColor-edited-reload.png",
+    "20-normals-edited.png",
+    "23-baseColor-target-off-capture.png",
+    "24-baseColor-target-normal-capture.png",
+    "25-off-edited-texture-return.png"
+  ],
+  "allNumberedPngs": [
+    "00-off.png",
+    "01-normals.png",
+    "01b-normals-settled.png",
+    "02-metallic.png",
+    "03-roughness.png",
+    "04-depth.png",
+    "05-baseColor.png",
+    "06-baseColor-after-normal-capture.png",
+    "07-baseColor-wire.png",
+    "08-off-wire.png",
+    "09-off-return.png",
+    "10-baseColor-a.png",
+    "11-baseColor-factors-b.png",
+    "12-baseColor-colors-b.png",
+    "13-baseColor-texture-off.png",
+    "14-baseColor-texture-return.png",
+    "15-baseColor-mask.png",
+    "16-baseColor-blend.png",
+    "17-off-edited.png",
+    "18-off-edited-reload.png",
+    "19-baseColor-edited-reload.png",
+    "20-normals-edited.png",
+    "21-baseColor-texture-off-settled.png",
+    "22-off-texture-off.png",
+    "23-baseColor-target-off-capture.png",
+    "24-baseColor-target-normal-capture.png",
+    "25-off-edited-texture-return.png"
+  ],
+  "notInThisUiReceipt": [
+    "01b-normals-settled.png",
+    "21-baseColor-texture-off-settled.png",
+    "22-off-texture-off.png"
+  ]
+}

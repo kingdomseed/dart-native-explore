@@ -1,0 +1,226 @@
+[
+  {
+    "args": "record start /private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/before/channels.mp4 --hide-touches",
+    "chunk_id": "db4398",
+    "wall_time_seconds": 2.500677041,
+    "exit_code": 0,
+    "original_token_count": 47,
+    "output": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/before/channels.mp4\nSession state: /Users/jasonholt/.t3/userdata/device/agent-device/sessions/t3-250602879bd08be3a220931c\n"
+  },
+  {
+    "args": "screenshot /private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/before/00-off.png",
+    "chunk_id": "720e80",
+    "wall_time_seconds": 0.62190325,
+    "exit_code": 0,
+    "original_token_count": 25,
+    "output": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/before/00-off.png (402x874 @1x)\n"
+  },
+  {
+    "args": "snapshot -i",
+    "chunk_id": "0c3c9a",
+    "wall_time_seconds": 0.090913666,
+    "exit_code": 0,
+    "original_token_count": 223,
+    "output": "Page: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 24 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.sprite.alpha\"\n@e6 [other] \"w34.sprite.additive\"\n@e7 [other] \"w34.camera\"\n@e8 [other] \"w34.light\"\n@e9 [other] \"w34.authoredTarget\"\n@e10 [button] \"Off\"\n@e11 [button] \"normals\"\n@e12 [button] \"metallic\"\n@e13 [button] \"roughness\"\n@e14 [button] \"baseColor\"\n@e15 [button] \"depth\"\n@e16 [button] \"Wire off\"\n@e17 [button] \"Factors A\"\n@e18 [button] \"opaque\"\n@e19 [button] \"Capture\"\n@e20 [button] \"Reload\"\n@e21 [button] \"Texture on\"\n@e22 [button] \"Colors A\"\n@e23 [text] \"Unlit left; sprite alpha / additive right.\nMetallic / roughness absent inputs are magenta.\nCapture is authored. Image textures only; RT alpha unproven.\"\n@e24 [toolbar] \"Toolbar\"\n"
+  },
+  {
+    "args": "click @e19",
+    "chunk_id": "9d3f5c",
+    "wall_time_seconds": 0.547318625,
+    "exit_code": 0,
+    "original_token_count": 6,
+    "output": "Tapped @e19 (278, 771)\n"
+  },
+  {
+    "args": "snapshot -i",
+    "chunk_id": "e36e0b",
+    "wall_time_seconds": 0.077195125,
+    "exit_code": 0,
+    "original_token_count": 223,
+    "output": "Page: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 24 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.sprite.alpha\"\n@e6 [other] \"w34.sprite.additive\"\n@e7 [other] \"w34.camera\"\n@e8 [other] \"w34.light\"\n@e9 [other] \"w34.authoredTarget\"\n@e10 [button] \"Off\"\n@e11 [button] \"normals\"\n@e12 [button] \"metallic\"\n@e13 [button] \"roughness\"\n@e14 [button] \"baseColor\"\n@e15 [button] \"depth\"\n@e16 [button] \"Wire off\"\n@e17 [button] \"Factors A\"\n@e18 [button] \"opaque\"\n@e19 [button] \"Capture\"\n@e20 [button] \"Reload\"\n@e21 [button] \"Texture on\"\n@e22 [button] \"Colors A\"\n@e23 [text] \"Unlit left; sprite alpha / additive right.\nMetallic / roughness absent inputs are magenta.\nCapture is authored. Image textures only; RT alpha unproven.\"\n@e24 [toolbar] \"Toolbar\"\n"
+  },
+  {
+    "args": "click @e11",
+    "chunk_id": "745233",
+    "wall_time_seconds": 0.436173,
+    "exit_code": 0,
+    "original_token_count": 6,
+    "output": "Tapped @e11 (201, 683)\n"
+  },
+  {
+    "args": "screenshot /private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/before/01-normals.png",
+    "chunk_id": "9af7fc",
+    "wall_time_seconds": 0.623646375,
+    "exit_code": 0,
+    "original_token_count": 26,
+    "output": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/before/01-normals.png (402x874 @1x)\n"
+  },
+  {
+    "args": "snapshot -i",
+    "chunk_id": "cf3ee4",
+    "wall_time_seconds": 0.113185708,
+    "exit_code": 0,
+    "original_token_count": 223,
+    "output": "Page: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 24 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.sprite.alpha\"\n@e6 [other] \"w34.sprite.additive\"\n@e7 [other] \"w34.camera\"\n@e8 [other] \"w34.light\"\n@e9 [other] \"w34.authoredTarget\"\n@e10 [button] \"Off\"\n@e11 [button] \"normals\"\n@e12 [button] \"metallic\"\n@e13 [button] \"roughness\"\n@e14 [button] \"baseColor\"\n@e15 [button] \"depth\"\n@e16 [button] \"Wire off\"\n@e17 [button] \"Factors A\"\n@e18 [button] \"opaque\"\n@e19 [button] \"Capture\"\n@e20 [button] \"Reload\"\n@e21 [button] \"Texture on\"\n@e22 [button] \"Colors A\"\n@e23 [text] \"Unlit left; sprite alpha / additive right.\nMetallic / roughness absent inputs are magenta.\nCapture is authored. Image textures only; RT alpha unproven.\"\n@e24 [toolbar] \"Toolbar\"\n"
+  },
+  {
+    "args": "click @e12",
+    "chunk_id": "6d6d04",
+    "wall_time_seconds": 0.435934583,
+    "exit_code": 0,
+    "original_token_count": 6,
+    "output": "Tapped @e12 (330, 683)\n"
+  },
+  {
+    "args": "screenshot /private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/before/02-metallic.png",
+    "chunk_id": "b18d9c",
+    "wall_time_seconds": 0.626231917,
+    "exit_code": 0,
+    "original_token_count": 26,
+    "output": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/before/02-metallic.png (402x874 @1x)\n"
+  },
+  {
+    "args": "snapshot -i",
+    "chunk_id": "0d54fa",
+    "wall_time_seconds": 0.103291458,
+    "exit_code": 0,
+    "original_token_count": 223,
+    "output": "Page: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 24 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.sprite.alpha\"\n@e6 [other] \"w34.sprite.additive\"\n@e7 [other] \"w34.camera\"\n@e8 [other] \"w34.light\"\n@e9 [other] \"w34.authoredTarget\"\n@e10 [button] \"Off\"\n@e11 [button] \"normals\"\n@e12 [button] \"metallic\"\n@e13 [button] \"roughness\"\n@e14 [button] \"baseColor\"\n@e15 [button] \"depth\"\n@e16 [button] \"Wire off\"\n@e17 [button] \"Factors A\"\n@e18 [button] \"opaque\"\n@e19 [button] \"Capture\"\n@e20 [button] \"Reload\"\n@e21 [button] \"Texture on\"\n@e22 [button] \"Colors A\"\n@e23 [text] \"Unlit left; sprite alpha / additive right.\nMetallic / roughness absent inputs are magenta.\nCapture is authored. Image textures only; RT alpha unproven.\"\n@e24 [toolbar] \"Toolbar\"\n"
+  },
+  {
+    "args": "click @e13",
+    "chunk_id": "9aaf2a",
+    "wall_time_seconds": 0.4348375,
+    "exit_code": 0,
+    "original_token_count": 6,
+    "output": "Tapped @e13 (72, 727)\n"
+  },
+  {
+    "args": "screenshot /private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/before/03-roughness.png",
+    "chunk_id": "601198",
+    "wall_time_seconds": 0.617500167,
+    "exit_code": 0,
+    "original_token_count": 26,
+    "output": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/before/03-roughness.png (402x874 @1x)\n"
+  },
+  {
+    "args": "snapshot -i",
+    "chunk_id": "e64787",
+    "wall_time_seconds": 0.102312667,
+    "exit_code": 0,
+    "original_token_count": 223,
+    "output": "Page: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 24 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.sprite.alpha\"\n@e6 [other] \"w34.sprite.additive\"\n@e7 [other] \"w34.camera\"\n@e8 [other] \"w34.light\"\n@e9 [other] \"w34.authoredTarget\"\n@e10 [button] \"Off\"\n@e11 [button] \"normals\"\n@e12 [button] \"metallic\"\n@e13 [button] \"roughness\"\n@e14 [button] \"baseColor\"\n@e15 [button] \"depth\"\n@e16 [button] \"Wire off\"\n@e17 [button] \"Factors A\"\n@e18 [button] \"opaque\"\n@e19 [button] \"Capture\"\n@e20 [button] \"Reload\"\n@e21 [button] \"Texture on\"\n@e22 [button] \"Colors A\"\n@e23 [text] \"Unlit left; sprite alpha / additive right.\nMetallic / roughness absent inputs are magenta.\nCapture is authored. Image textures only; RT alpha unproven.\"\n@e24 [toolbar] \"Toolbar\"\n"
+  },
+  {
+    "args": "click @e15",
+    "chunk_id": "641eba",
+    "wall_time_seconds": 0.428159583,
+    "exit_code": 0,
+    "original_token_count": 6,
+    "output": "Tapped @e15 (330, 727)\n"
+  },
+  {
+    "args": "screenshot /private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/before/04-depth.png",
+    "chunk_id": "5885e0",
+    "wall_time_seconds": 0.625747334,
+    "exit_code": 0,
+    "original_token_count": 25,
+    "output": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/before/04-depth.png (402x874 @1x)\n"
+  },
+  {
+    "args": "snapshot -i",
+    "chunk_id": "212f99",
+    "wall_time_seconds": 0.097316959,
+    "exit_code": 0,
+    "original_token_count": 223,
+    "output": "Page: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 24 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.sprite.alpha\"\n@e6 [other] \"w34.sprite.additive\"\n@e7 [other] \"w34.camera\"\n@e8 [other] \"w34.light\"\n@e9 [other] \"w34.authoredTarget\"\n@e10 [button] \"Off\"\n@e11 [button] \"normals\"\n@e12 [button] \"metallic\"\n@e13 [button] \"roughness\"\n@e14 [button] \"baseColor\"\n@e15 [button] \"depth\"\n@e16 [button] \"Wire off\"\n@e17 [button] \"Factors A\"\n@e18 [button] \"opaque\"\n@e19 [button] \"Capture\"\n@e20 [button] \"Reload\"\n@e21 [button] \"Texture on\"\n@e22 [button] \"Colors A\"\n@e23 [text] \"Unlit left; sprite alpha / additive right.\nMetallic / roughness absent inputs are magenta.\nCapture is authored. Image textures only; RT alpha unproven.\"\n@e24 [toolbar] \"Toolbar\"\n"
+  },
+  {
+    "args": "click @e14",
+    "chunk_id": "77b01f",
+    "wall_time_seconds": 0.462458041,
+    "exit_code": 0,
+    "original_token_count": 6,
+    "output": "Tapped @e14 (201, 727)\n"
+  },
+  {
+    "args": "screenshot /private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/before/05-baseColor.png",
+    "chunk_id": "c6cb90",
+    "wall_time_seconds": 0.604219417,
+    "exit_code": 0,
+    "original_token_count": 26,
+    "output": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/before/05-baseColor.png (402x874 @1x)\n"
+  },
+  {
+    "args": "snapshot -i",
+    "chunk_id": "9452b9",
+    "wall_time_seconds": 0.112186333,
+    "exit_code": 0,
+    "original_token_count": 223,
+    "output": "Page: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 24 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.sprite.alpha\"\n@e6 [other] \"w34.sprite.additive\"\n@e7 [other] \"w34.camera\"\n@e8 [other] \"w34.light\"\n@e9 [other] \"w34.authoredTarget\"\n@e10 [button] \"Off\"\n@e11 [button] \"normals\"\n@e12 [button] \"metallic\"\n@e13 [button] \"roughness\"\n@e14 [button] \"baseColor\"\n@e15 [button] \"depth\"\n@e16 [button] \"Wire off\"\n@e17 [button] \"Factors A\"\n@e18 [button] \"opaque\"\n@e19 [button] \"Capture\"\n@e20 [button] \"Reload\"\n@e21 [button] \"Texture on\"\n@e22 [button] \"Colors A\"\n@e23 [text] \"Unlit left; sprite alpha / additive right.\nMetallic / roughness absent inputs are magenta.\nCapture is authored. Image textures only; RT alpha unproven.\"\n@e24 [toolbar] \"Toolbar\"\n"
+  },
+  {
+    "args": "click @e17",
+    "chunk_id": "70dec7",
+    "wall_time_seconds": 0.410490834,
+    "exit_code": 0,
+    "original_token_count": 6,
+    "output": "Tapped @e17 (124, 771)\n"
+  },
+  {
+    "args": "screenshot /private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/before/06-baseColor-factors-b.png",
+    "chunk_id": "f2416e",
+    "wall_time_seconds": 0.624403459,
+    "exit_code": 0,
+    "original_token_count": 29,
+    "output": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/before/06-baseColor-factors-b.png (402x874 @1x)\n"
+  },
+  {
+    "args": "snapshot -i",
+    "chunk_id": "314ca1",
+    "wall_time_seconds": 0.092580792,
+    "exit_code": 0,
+    "original_token_count": 223,
+    "output": "Page: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 24 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.sprite.alpha\"\n@e6 [other] \"w34.sprite.additive\"\n@e7 [other] \"w34.camera\"\n@e8 [other] \"w34.light\"\n@e9 [other] \"w34.authoredTarget\"\n@e10 [button] \"Off\"\n@e11 [button] \"normals\"\n@e12 [button] \"metallic\"\n@e13 [button] \"roughness\"\n@e14 [button] \"baseColor\"\n@e15 [button] \"depth\"\n@e16 [button] \"Wire off\"\n@e17 [button] \"Factors B\"\n@e18 [button] \"opaque\"\n@e19 [button] \"Capture\"\n@e20 [button] \"Reload\"\n@e21 [button] \"Texture on\"\n@e22 [button] \"Colors A\"\n@e23 [text] \"Unlit left; sprite alpha / additive right.\nMetallic / roughness absent inputs are magenta.\nCapture is authored. Image textures only; RT alpha unproven.\"\n@e24 [toolbar] \"Toolbar\"\n"
+  },
+  {
+    "args": "click @e17",
+    "chunk_id": "8fde4b",
+    "wall_time_seconds": 0.432770833,
+    "exit_code": 0,
+    "original_token_count": 6,
+    "output": "Tapped @e17 (124, 771)\n"
+  },
+  {
+    "args": "snapshot -i",
+    "chunk_id": "9c1cf0",
+    "wall_time_seconds": 0.106699875,
+    "exit_code": 0,
+    "original_token_count": 223,
+    "output": "Page: com.jasonholtdigital.dart3dExample\nApp: com.jasonholtdigital.dart3dExample\nSnapshot: 24 nodes\n@e1 [application] \"Dart3d Example\"\n@e2 [navigation-bar] \"dartnative_ios.DartNativeView\"\n@e3 [other] \"w34.quad\"\n@e4 [other] \"w34.occluder\"\n@e5 [other] \"w34.sprite.alpha\"\n@e6 [other] \"w34.sprite.additive\"\n@e7 [other] \"w34.camera\"\n@e8 [other] \"w34.light\"\n@e9 [other] \"w34.authoredTarget\"\n@e10 [button] \"Off\"\n@e11 [button] \"normals\"\n@e12 [button] \"metallic\"\n@e13 [button] \"roughness\"\n@e14 [button] \"baseColor\"\n@e15 [button] \"depth\"\n@e16 [button] \"Wire off\"\n@e17 [button] \"Factors A\"\n@e18 [button] \"opaque\"\n@e19 [button] \"Capture\"\n@e20 [button] \"Reload\"\n@e21 [button] \"Texture on\"\n@e22 [button] \"Colors A\"\n@e23 [text] \"Unlit left; sprite alpha / additive right.\nMetallic / roughness absent inputs are magenta.\nCapture is authored. Image textures only; RT alpha unproven.\"\n@e24 [toolbar] \"Toolbar\"\n"
+  },
+  {
+    "args": "click @e10",
+    "chunk_id": "2e2ff5",
+    "wall_time_seconds": 0.430544542,
+    "exit_code": 0,
+    "original_token_count": 6,
+    "output": "Tapped @e10 (72, 683)\n"
+  },
+  {
+    "args": "screenshot /private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/before/07-off-return.png",
+    "chunk_id": "610a65",
+    "wall_time_seconds": 0.599551333,
+    "exit_code": 0,
+    "original_token_count": 26,
+    "output": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/before/07-off-return.png (402x874 @1x)\n"
+  },
+  {
+    "args": "record stop",
+    "chunk_id": "25ccc1",
+    "wall_time_seconds": 0.640126667,
+    "exit_code": 0,
+    "original_token_count": 22,
+    "output": "/private/tmp/dart3d-w34-ios-material-families-20261027/r1/parent/before/channels.mp4\n"
+  }
+]

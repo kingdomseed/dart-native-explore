@@ -1,0 +1,88 @@
+{
+  "forward_source58": true,
+  "reverse_source52": true,
+  "six_additions_removed": true,
+  "commands": [
+    {
+      "command": "shasum",
+      "args": [
+        "-a",
+        "256",
+        "-c",
+        "/private/tmp/dart3d-e5b-outline-state-current-20261027/r1/parent-source-sha256.txt"
+      ],
+      "exit": 0,
+      "stdout": "dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/AnimClips.kt: OK\ndart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/Dart3dView.kt: OK\ndart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/FsceneRealizer.kt: OK\ndart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/MaterialPackages.kt: OK\ndart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/MeshFactory.kt: OK\ndart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/PropertyAnimation.kt: OK\ndart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/RenderTargets.kt: OK\ndart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/SelectionOutline.kt: OK\ndart3d/android/src/test/kotlin/com/jasonholtdigital/dart3d/MaterialPackagesTest.kt: OK\ndart3d/android/src/test/kotlin/com/jasonholtdigital/dart3d/MeshFactoryTest.kt: OK\ndart3d/android/src/test/kotlin/com/jasonholtdigital/dart3d/U4PropertyAnimationTest.kt: OK\ndart3d/example/lib/showcase_loader.dart: OK\ndart3d/example/lib/showcase_scene.dart: OK\ndart3d/example/lib/u3_atlas_probe.dart: OK\ndart3d/example/lib/u3_sprite_scene.dart: OK\ndart3d/example/lib/u3_tone_scene.dart: OK\ndart3d/example/lib/u4_material_scene.dart: OK\ndart3d/example/lib/u4_owner_scene.dart: OK\ndart3d/example/lib/u4_property_scene.dart: OK\ndart3d/example/lib/u4_snapshot_scene.dart: OK\ndart3d/example/test/u3_atlas_probe_test.dart: OK\ndart3d/example/test/u3_sprite_showcase_test.dart: OK\ndart3d/example/test/u3_tone_showcase_test.dart: OK\ndart3d/example/test/u4_material_showcase_test.dart: OK\ndart3d/example/test/u4_owner_showcase_test.dart: OK\ndart3d/example/test/u4_showcase_test.dart: OK\ndart3d/example/test/u4_snapshot_showcase_test.dart: OK\ndart3d/example/test/w26_geometry_test.dart: OK\ndart3d/ios/Classes/FsceneRealizer.swift: OK\ndart3d/ios/Classes/GeometryFactory.swift: OK\ndart3d/ios/Classes/RenderTargets.swift: OK\ndart3d/ios/Classes/SceneViewHost.swift: OK\ndart3d/ios/Classes/SelectionOutline.swift: OK\ndart3d/lib/dart3d.dart: OK\ndart3d/lib/src/animation.dart: OK\ndart3d/lib/src/components.dart: OK\ndart3d/lib/src/compose_extensions.dart: OK\ndart3d/lib/src/diff_apply.dart: OK\ndart3d/lib/src/doc_layer.dart: OK\ndart3d/lib/src/fsceneb_reader.dart: OK\ndart3d/lib/src/geometry/proc.dart: OK\ndart3d/lib/src/protocol.dart: OK\ndart3d/lib/src/scene_controller.dart: OK\ndart3d/lib/src/sprite_material.dart: OK\ndart3d/lib/src/texture_atlas.dart: OK\ndart3d/test/u3_node_highlights_test.dart: OK\ndart3d/test/u3_sprite_material_test.dart: OK\ndart3d/test/u3_texture_atlas_test.dart: OK\ndart3d/test/u4_controller_test.dart: OK\ndart3d/test/u4_payload_arrival_test.dart: OK\ndart3d/test/u4_property_animation_test.dart: OK\ndart3d/tool/bake_materials.sh: OK\n",
+      "stderr": ""
+    },
+    {
+      "command": "git",
+      "args": [
+        "apply",
+        "--check",
+        "/private/tmp/dart3d-e9-reload-library-implementation-20261027/r1/parent-correction.patch"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "git",
+      "args": [
+        "apply",
+        "/private/tmp/dart3d-e9-reload-library-implementation-20261027/r1/parent-correction.patch"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "shasum",
+      "args": [
+        "-a",
+        "256",
+        "-c",
+        "/private/tmp/dart3d-e9-reload-library-implementation-20261027/r1/parent-source-sha256.txt"
+      ],
+      "exit": 0,
+      "stdout": "dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/AnimClips.kt: OK\ndart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/Dart3dView.kt: OK\ndart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/FsceneRealizer.kt: OK\ndart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/MaterialPackages.kt: OK\ndart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/MeshFactory.kt: OK\ndart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/PropertyAnimation.kt: OK\ndart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/RenderTargets.kt: OK\ndart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/SelectionOutline.kt: OK\ndart3d/android/src/test/kotlin/com/jasonholtdigital/dart3d/MaterialPackagesTest.kt: OK\ndart3d/android/src/test/kotlin/com/jasonholtdigital/dart3d/MeshFactoryTest.kt: OK\ndart3d/android/src/test/kotlin/com/jasonholtdigital/dart3d/U4PropertyAnimationTest.kt: OK\ndart3d/example/lib/dev_reload_main.dart: OK\ndart3d/example/lib/showcase_loader.dart: OK\ndart3d/example/lib/showcase_scene.dart: OK\ndart3d/example/lib/u3_atlas_probe.dart: OK\ndart3d/example/lib/u3_sprite_scene.dart: OK\ndart3d/example/lib/u3_tone_scene.dart: OK\ndart3d/example/lib/u4_material_scene.dart: OK\ndart3d/example/lib/u4_owner_scene.dart: OK\ndart3d/example/lib/u4_property_scene.dart: OK\ndart3d/example/lib/u4_snapshot_scene.dart: OK\ndart3d/example/test/dev_reload_test.dart: OK\ndart3d/example/test/u3_atlas_probe_test.dart: OK\ndart3d/example/test/u3_sprite_showcase_test.dart: OK\ndart3d/example/test/u3_tone_showcase_test.dart: OK\ndart3d/example/test/u4_material_showcase_test.dart: OK\ndart3d/example/test/u4_owner_showcase_test.dart: OK\ndart3d/example/test/u4_showcase_test.dart: OK\ndart3d/example/test/u4_snapshot_showcase_test.dart: OK\ndart3d/example/test/w26_geometry_test.dart: OK\ndart3d/example/tool/w34_asset_fixture.dart: OK\ndart3d/ios/Classes/FsceneRealizer.swift: OK\ndart3d/ios/Classes/GeometryFactory.swift: OK\ndart3d/ios/Classes/RenderTargets.swift: OK\ndart3d/ios/Classes/SceneViewHost.swift: OK\ndart3d/ios/Classes/SelectionOutline.swift: OK\ndart3d/lib/dart3d.dart: OK\ndart3d/lib/dev_reload.dart: OK\ndart3d/lib/src/animation.dart: OK\ndart3d/lib/src/components.dart: OK\ndart3d/lib/src/compose_extensions.dart: OK\ndart3d/lib/src/diff_apply.dart: OK\ndart3d/lib/src/doc_layer.dart: OK\ndart3d/lib/src/fsceneb_reader.dart: OK\ndart3d/lib/src/geometry/proc.dart: OK\ndart3d/lib/src/protocol.dart: OK\ndart3d/lib/src/scene_controller.dart: OK\ndart3d/lib/src/sprite_material.dart: OK\ndart3d/lib/src/texture_atlas.dart: OK\ndart3d/test/u3_node_highlights_test.dart: OK\ndart3d/test/u3_sprite_material_test.dart: OK\ndart3d/test/u3_texture_atlas_test.dart: OK\ndart3d/test/u4_controller_test.dart: OK\ndart3d/test/u4_payload_arrival_test.dart: OK\ndart3d/test/u4_property_animation_test.dart: OK\ndart3d/tool/bake_materials.sh: OK\ndart3d/tool/reload_host.dart: OK\ndocs/dev-reload.md: OK\n",
+      "stderr": ""
+    },
+    {
+      "command": "git",
+      "args": [
+        "apply",
+        "--reverse",
+        "--check",
+        "/private/tmp/dart3d-e9-reload-library-implementation-20261027/r1/parent-correction.patch"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "git",
+      "args": [
+        "apply",
+        "--reverse",
+        "/private/tmp/dart3d-e9-reload-library-implementation-20261027/r1/parent-correction.patch"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "shasum",
+      "args": [
+        "-a",
+        "256",
+        "-c",
+        "/private/tmp/dart3d-e5b-outline-state-current-20261027/r1/parent-source-sha256.txt"
+      ],
+      "exit": 0,
+      "stdout": "dart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/AnimClips.kt: OK\ndart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/Dart3dView.kt: OK\ndart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/FsceneRealizer.kt: OK\ndart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/MaterialPackages.kt: OK\ndart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/MeshFactory.kt: OK\ndart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/PropertyAnimation.kt: OK\ndart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/RenderTargets.kt: OK\ndart3d/android/src/main/kotlin/com/jasonholtdigital/dart3d/SelectionOutline.kt: OK\ndart3d/android/src/test/kotlin/com/jasonholtdigital/dart3d/MaterialPackagesTest.kt: OK\ndart3d/android/src/test/kotlin/com/jasonholtdigital/dart3d/MeshFactoryTest.kt: OK\ndart3d/android/src/test/kotlin/com/jasonholtdigital/dart3d/U4PropertyAnimationTest.kt: OK\ndart3d/example/lib/showcase_loader.dart: OK\ndart3d/example/lib/showcase_scene.dart: OK\ndart3d/example/lib/u3_atlas_probe.dart: OK\ndart3d/example/lib/u3_sprite_scene.dart: OK\ndart3d/example/lib/u3_tone_scene.dart: OK\ndart3d/example/lib/u4_material_scene.dart: OK\ndart3d/example/lib/u4_owner_scene.dart: OK\ndart3d/example/lib/u4_property_scene.dart: OK\ndart3d/example/lib/u4_snapshot_scene.dart: OK\ndart3d/example/test/u3_atlas_probe_test.dart: OK\ndart3d/example/test/u3_sprite_showcase_test.dart: OK\ndart3d/example/test/u3_tone_showcase_test.dart: OK\ndart3d/example/test/u4_material_showcase_test.dart: OK\ndart3d/example/test/u4_owner_showcase_test.dart: OK\ndart3d/example/test/u4_showcase_test.dart: OK\ndart3d/example/test/u4_snapshot_showcase_test.dart: OK\ndart3d/example/test/w26_geometry_test.dart: OK\ndart3d/ios/Classes/FsceneRealizer.swift: OK\ndart3d/ios/Classes/GeometryFactory.swift: OK\ndart3d/ios/Classes/RenderTargets.swift: OK\ndart3d/ios/Classes/SceneViewHost.swift: OK\ndart3d/ios/Classes/SelectionOutline.swift: OK\ndart3d/lib/dart3d.dart: OK\ndart3d/lib/src/animation.dart: OK\ndart3d/lib/src/components.dart: OK\ndart3d/lib/src/compose_extensions.dart: OK\ndart3d/lib/src/diff_apply.dart: OK\ndart3d/lib/src/doc_layer.dart: OK\ndart3d/lib/src/fsceneb_reader.dart: OK\ndart3d/lib/src/geometry/proc.dart: OK\ndart3d/lib/src/protocol.dart: OK\ndart3d/lib/src/scene_controller.dart: OK\ndart3d/lib/src/sprite_material.dart: OK\ndart3d/lib/src/texture_atlas.dart: OK\ndart3d/test/u3_node_highlights_test.dart: OK\ndart3d/test/u3_sprite_material_test.dart: OK\ndart3d/test/u3_texture_atlas_test.dart: OK\ndart3d/test/u4_controller_test.dart: OK\ndart3d/test/u4_payload_arrival_test.dart: OK\ndart3d/test/u4_property_animation_test.dart: OK\ndart3d/tool/bake_materials.sh: OK\n",
+      "stderr": ""
+    }
+  ],
+  "scratch_removed": true
+}

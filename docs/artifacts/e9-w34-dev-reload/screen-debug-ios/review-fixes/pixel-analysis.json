@@ -1,0 +1,83 @@
+{
+  "beforeGap": {
+    "path": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/before-viewport/06-diagnostic-inset.png",
+    "sha256": "768eddc4754f31a70af06aed91d8d8ead111e6de124049901bd3f2154775f239",
+    "rectangle": [
+      140,
+      75,
+      175,
+      230
+    ],
+    "nonblackPixels": 36630
+  },
+  "afterGap": {
+    "path": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/02-normals-inset.png",
+    "sha256": "070f324ee96e7a5c241807bfecff42510354b09f78d128f7fc7548e96efab13d",
+    "rectangle": [
+      140,
+      75,
+      175,
+      230
+    ],
+    "nonblackPixels": 0
+  },
+  "afterOtherOrderGap": {
+    "path": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/04-normals-inset-from-off.png",
+    "sha256": "070f324ee96e7a5c241807bfecff42510354b09f78d128f7fc7548e96efab13d",
+    "rectangle": [
+      140,
+      75,
+      175,
+      230
+    ],
+    "nonblackPixels": 0
+  },
+  "orders": {
+    "left": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/02-normals-inset.png",
+    "right": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/04-normals-inset-from-off.png",
+    "rectangle": [
+      0,
+      70,
+      402,
+      580
+    ],
+    "changedPixels": 0,
+    "maxChannelDifference": 0
+  },
+  "offViewportReturn": {
+    "left": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/00-off-full.png",
+    "right": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/05-off-full-return.png",
+    "rectangle": [
+      0,
+      70,
+      402,
+      580
+    ],
+    "changedPixels": 0,
+    "maxChannelDifference": 0
+  },
+  "offRigReturn": {
+    "left": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/00-off-full.png",
+    "right": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/09-off-rest-return.png",
+    "rectangle": [
+      0,
+      70,
+      402,
+      580
+    ],
+    "changedPixels": 0,
+    "maxChannelDifference": 0
+  },
+  "posedOff": {
+    "left": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/08-restored-raised-off.png",
+    "right": "/private/tmp/dart3d-w34-screen-debug-ios-fixes-20261027/r2/after-viewport/09-off-rest-return.png",
+    "rectangle": [
+      0,
+      70,
+      402,
+      580
+    ],
+    "changedPixels": 26179,
+    "maxChannelDifference": 155
+  }
+}

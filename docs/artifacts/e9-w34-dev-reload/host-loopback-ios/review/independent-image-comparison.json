@@ -1,0 +1,64 @@
+{
+  "crop": [
+    0,
+    100,
+    402,
+    700
+  ],
+  "sample": [
+    180,
+    340,
+    9,
+    9
+  ],
+  "samples": [
+    {
+      "file": "parent-00-red.png",
+      "meanRgb9x9": [
+        172.0,
+        68.0,
+        47.0
+      ],
+      "changedScenePixelsAgainstInitial": 0
+    },
+    {
+      "file": "parent-01-blue.png",
+      "meanRgb9x9": [
+        47.0,
+        68.0,
+        172.0
+      ],
+      "changedScenePixelsAgainstInitial": 82467
+    },
+    {
+      "file": "parent-02-dark-blue.png",
+      "meanRgb9x9": [
+        17.0,
+        28.0,
+        82.0
+      ],
+      "changedScenePixelsAgainstInitial": 82467
+    },
+    {
+      "file": "parent-03-malformed-retained.png",
+      "meanRgb9x9": [
+        17.0,
+        28.0,
+        82.0
+      ],
+      "changedScenePixelsAgainstInitial": 82467
+    },
+    {
+      "file": "parent-04-recovered-red.png",
+      "meanRgb9x9": [
+        172.0,
+        68.0,
+        47.0
+      ],
+      "changedScenePixelsAgainstInitial": 0
+    }
+  ],
+  "malformedAgainstLastValidChangedPixels": 0,
+  "recoveryAgainstInitialChangedPixels": 0,
+  "scope": "Encoded screenshot observations only, not photometry, alpha or latency."
+}

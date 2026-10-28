@@ -1,0 +1,36 @@
+{
+  "parent_source_read_only_hash_check": {
+    "accepted58_match": true,
+    "three_probe_additions_absent": true,
+    "device_or_process_state_queried": false
+  },
+  "review_checkout_all_postimport_bytes_preserved": true,
+  "six_locks_registrants_unchanged": {
+    "dart3d/example/dn_plugins.lock": "73c5209e393e2c670769b2dfe4d09d72b79870c5218ede82e2a6d9c659c0f2a6",
+    "dart3d/example/ios/Podfile.lock": "47d5269141917cc2cfad542d6e2c60dc8c3f364e5700ba1354f44208a9e31522",
+    "dart3d/example/lib/dartnative_plugin_registrant.dart": "c0f873e11de99a1485dd67fd82bc563a61f3c66cc8280b705019ce48cfdbe09f",
+    "dart3d/example/pubspec.lock": "4ab8d1150fe7606c532dccb84d07eb0cc4062b5d4b2481c07fd27c135241936c",
+    "dart3d/pubspec.lock": "868933c6c9bdd80476a9d1b6d380078eb8ecf45960820d8414beebd55a0b555f",
+    "probe/pubspec.lock": "1606c33221efeb86ab121be4ef9ef82377f400de9ca7ab838b7822971f285121"
+  },
+  "installed_headers": {
+    "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNTechnique.h": "1f0057a24db957f47bc2fa32fb2ad2d31f7faf91fc4988549da2b2b172d55a74",
+    "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/SceneKit.framework/Headers/scn_metal": "c0b1464c182e3ebb9442b369885ee751a9d1d078cd5eb6e7330848be37e8b027",
+    "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNParticleSystem.h": "8158e460b1a63bb18aba030134a4e2f95fa35b155a03cce23d8da2786971e0db",
+    "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNSceneRenderer.h": "672f070bd65505d715a4f69bdf4ce187665fd87947d9e3d3edb1b5e22be9affc"
+  },
+  "logs": {
+    "parent-runtime/native.log": {
+      "reviewed_lines": 2031,
+      "matching_probe_or_pipeline_error_lines": []
+    },
+    "parent-runtime-r2/native.log": {
+      "reviewed_lines": 1469,
+      "matching_probe_or_pipeline_error_lines": []
+    }
+  },
+  "post_run_source_check_counts": {
+    "parent-runtime": 61,
+    "parent-runtime-r2": 61
+  }
+}

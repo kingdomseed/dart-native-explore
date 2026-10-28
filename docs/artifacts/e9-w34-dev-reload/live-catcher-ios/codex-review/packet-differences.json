@@ -1,0 +1,34 @@
+{
+  "before": [
+    "dart3d/example/lib/w34_debug_main.dart",
+    "dart3d/example/lib/w34_debug_scene.dart",
+    "dart3d/example/test/w34_debug_scene_test.dart",
+    "dart3d/ios/Classes/FsceneRealizer.swift",
+    "dart3d/ios/Classes/ScreenDebugPresentation.swift",
+    "docs/debug-views.md"
+  ],
+  "traced": [
+    "dart3d/example/lib/w34_debug_main.dart",
+    "dart3d/example/lib/w34_debug_scene.dart",
+    "dart3d/example/test/w34_debug_scene_test.dart",
+    "dart3d/ios/Classes/ScreenDebugPresentation.swift",
+    "docs/debug-views.md"
+  ],
+  "clean": [
+    "dart3d/example/lib/w34_debug_main.dart",
+    "dart3d/example/lib/w34_debug_scene.dart",
+    "dart3d/example/test/w34_debug_scene_test.dart",
+    "dart3d/ios/Classes/ScreenDebugPresentation.swift",
+    "docs/debug-views.md"
+  ],
+  "blend-before": [
+    "dart3d/ios/Classes/ScreenDebugPresentation.swift",
+    "docs/debug-views.md"
+  ],
+  "blend-after": [
+    "docs/debug-views.md"
+  ],
+  "final-clean": [
+    "docs/debug-views.md"
+  ]
+}

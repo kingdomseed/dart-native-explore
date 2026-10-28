@@ -37,7 +37,8 @@ export 'src/scene_controller.dart'
     show NodeTransform, SceneController, SceneTickListener;
 export 'src/scene_pointer.dart';
 export 'src/sky_generator.dart';
-export 'src/scene_view.dart' show SceneQuality, SceneView;
+export 'src/scene_view.dart'
+    show SceneDebugChannel, SceneDebugView, SceneQuality, SceneView;
 export 'src/subtree_stream.dart';
 export 'src/ffi_bindings.dart' show Dart3dFFIBindings;
 export 'src/physics.dart';

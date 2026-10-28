@@ -1,0 +1,50 @@
+{
+  "before-viewport/inset.mp4": {
+    "sha256": "0ff91887c32e0d79cf09940bba6c16c78ac0ba1ac100e52b43a323a936ffc11f",
+    "bytes": 6495208,
+    "parentHashMatches": true,
+    "parentSizeMatches": true,
+    "probeExitCode": 0,
+    "decodeExitCode": 0,
+    "nonmonotonicWarnings": true,
+    "progressFile": "before-viewport--inset.mp4.progress.txt",
+    "decodeLog": "before-viewport--inset.mp4.decode.log",
+    "timingClaim": false
+  },
+  "before-skin/crash.mp4": {
+    "sha256": "f2d95ebe9498793e09dd978210167528b644a26f10cc1f67decc4b0f8d5fa6ca",
+    "bytes": 2289361,
+    "parentHashMatches": true,
+    "parentSizeMatches": true,
+    "probeExitCode": 0,
+    "decodeExitCode": 0,
+    "nonmonotonicWarnings": true,
+    "progressFile": "before-skin--crash.mp4.progress.txt",
+    "decodeLog": "before-skin--crash.mp4.decode.log",
+    "timingClaim": false
+  },
+  "after-skin/detached-restored.mp4": {
+    "sha256": "a31cbe47e1e81cbc94f6a8100f86dd9a830c1466cbd8fa2748e6aa23a497a0ea",
+    "bytes": 5062595,
+    "parentHashMatches": true,
+    "parentSizeMatches": true,
+    "probeExitCode": 0,
+    "decodeExitCode": 0,
+    "nonmonotonicWarnings": true,
+    "progressFile": "after-skin--detached-restored.mp4.progress.txt",
+    "decodeLog": "after-skin--detached-restored.mp4.decode.log",
+    "timingClaim": false
+  },
+  "after-viewport/viewport-and-rig.mp4": {
+    "sha256": "05d11738cb35e773a2bea91e707dad22db6c8301ddbe2e1e772c3f3df2706fce",
+    "bytes": 11325644,
+    "parentHashMatches": true,
+    "parentSizeMatches": true,
+    "probeExitCode": 0,
+    "decodeExitCode": 0,
+    "nonmonotonicWarnings": true,
+    "progressFile": "after-viewport--viewport-and-rig.mp4.progress.txt",
+    "decodeLog": "after-viewport--viewport-and-rig.mp4.decode.log",
+    "timingClaim": false
+  }
+}

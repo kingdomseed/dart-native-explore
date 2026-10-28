@@ -1,0 +1,25 @@
+{
+  "verdict": "PASS",
+  "scope": "Bounded iOS W34 live-catcher diagnostic material, native-light-state transport, and existing blend-caster proxy retention",
+  "baseHead": "2f38e4e33f0b1cb678bc408a42d069c796cefc12",
+  "findings": [],
+  "minimumCorrection": null,
+  "correctionOwner": null,
+  "proofLanes": {
+    "independentSourceReview": "PASS",
+    "independentOfflineArchiveAndPreservationChecks": "PASS",
+    "independentPixelComparisons": {"comparisons": 118, "expectedStableExact": 103},
+    "independentVideoDecode": {"originals": 11, "frames": 47400, "allExitZero": true, "dtsWarningsRetained": true},
+    "independentRawLogParsing": "PASS; historical trace assertions only",
+    "parentTestsAndAnalyses": "Inspected parent logs: 393 + 341 passed; both analyses clear",
+    "parentSwiftTypecheck": "Inspected parent receipt: 13 files, exit 0",
+    "parentNativeRuns": "Inspected logs, stills, and original recordings",
+    "independentTestsBuildsOrDeviceRuns": "NOT_RUN"
+  },
+  "wholeW34E9TrackEAcceptance": false,
+  "providerDiversityClaim": false,
+  "parentReadOnly": true,
+  "final66OverlayRetained": true,
+  "replayScratchRemoved": true,
+  "report": "review.md"
+}

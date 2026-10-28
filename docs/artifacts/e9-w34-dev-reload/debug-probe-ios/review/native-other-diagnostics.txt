@@ -1,0 +1,67 @@
+34: 2026-10-27 20:55:11.541 Db Runner[60742:1254946] [com.apple.defaults:User Defaults] setting new value 4 for key METAL_ERROR_CHECK_EXTENDED_MODE in CFPrefsSource<0x10546aa30> (Domain: Volatile, User: , ByHost: No, Container: , Contents Need Refresh: No (Sentinel)
+35: 2026-10-27 20:55:11.541 Db Runner[60742:1254946] [com.apple.defaults:User Defaults] looked up value 4 for key METAL_ERROR_CHECK_EXTENDED_MODE in CFPrefsSource<0x10546aa30> (Domain: Volatile, User: , ByHost: No, Container: , Contents Need Refresh: No (Sentinel) via CFPrefsSearchListSource<0x105cc4780> (Domain: com.jasonholtdigital.dart3dExample, Container: (null) Non-launch persona: 0)
+138: }: (no error) for children using XC_kAXXCAttributeChildren
+144: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+149: }: (no error) for children using XC_kAXXCAttributeChildren
+155: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+160: }: (no error) for children using XC_kAXXCAttributeChildren
+166: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+171: }: (no error) for children using XC_kAXXCAttributeChildren
+177: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+184: }: (no error) for children using XC_kAXXCAttributeChildren
+190: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+196: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+202: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+206: }: (no error) for children using XC_kAXXCAttributeChildren
+211: }: (no error) for children using XC_kAXXCAttributeChildren
+217: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+222: }: (no error) for children using XC_kAXXCAttributeChildren
+228: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+233: }: (no error) for children using XC_kAXXCAttributeChildren
+239: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+243: }: (no error) for children using XC_kAXXCAttributeChildren
+248: }: (no error) for children using XC_kAXXCAttributeChildren
+254: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+259: }: (no error) for children using XC_kAXXCAttributeChildren
+265: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+271: }: (no error) for children using XC_kAXXCAttributeChildren
+277: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+283: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+288: }: (no error) for children using XC_kAXXCAttributeChildren
+294: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+299: }: (no error) for children using XC_kAXXCAttributeChildren
+305: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+310: }: (no error) for children using XC_kAXXCAttributeChildren
+316: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+323: }: (no error) for children using XC_kAXXCAttributeChildren
+329: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+335: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+341: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+348: }: (no error) for children using XC_kAXXCAttributeChildren
+354: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+360: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+366: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+370: }: (no error) for children using XC_kAXXCAttributeChildren
+378: }: (no error) for children using XC_kAXXCAttributeChildren
+384: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+390: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+396: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+402: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+407: }: (no error) for children using XC_kAXXCAttributeChildren
+413: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+417: }: (no error) for children using XC_kAXXCAttributeChildren
+421: }: (no error) for children using XC_kAXXCAttributeChildren
+425: }: (no error) for children using XC_kAXXCAttributeChildren
+430: }: (no error) for children using XC_kAXXCAttributeChildren
+436: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+441: }: (no error) for children using XC_kAXXCAttributeChildren
+447: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+452: }: (no error) for children using XC_kAXXCAttributeChildren
+458: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+463: }: (no error) for children using XC_kAXXCAttributeChildren
+469: }: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+473: }: (no error) for children using XC_kAXXCAttributeChildren
+477: }: (no error) for children using XC_kAXXCAttributeChildren
+481: }: (no error) for children using XC_kAXXCAttributeChildren
+485: }: (no error) for children using XC_kAXXCAttributeChildren
+489: }: (no error) for children using XC_kAXXCAttributeChildren

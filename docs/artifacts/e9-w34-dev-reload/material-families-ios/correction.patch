@@ -1,0 +1,647 @@
+diff --git a/dart3d/example/lib/w34_debug_main.dart b/dart3d/example/lib/w34_debug_main.dart
+index d97d7d4..a5477bc 100644
+--- a/dart3d/example/lib/w34_debug_main.dart
++++ b/dart3d/example/lib/w34_debug_main.dart
+@@ -4,6 +4,7 @@ import 'package:dartnative/dartnative.dart';
+ import 'dartnative_plugin_registrant.dart';
+ import 'w34_debug_scene.dart';
+ 
++const _materialChecks = bool.fromEnvironment('DART3D_W34_MATERIALS');
+ const _consumerChecks = bool.fromEnvironment('DART3D_W34_CONSUMERS');
+ 
+ void main() {
+@@ -20,7 +21,10 @@ class _DebugScreen extends StatefulWidget {
+ 
+ class _DebugScreenState extends State<_DebugScreen> {
+   final _controller = SceneController();
+-  final _document = buildW34DebugDocument(skinned: _consumerChecks);
++  final _document = buildW34DebugDocument(
++    skinned: _consumerChecks,
++    materials: _materialChecks,
++  );
+   late final _rig = _document.nodes.values.singleWhere(
+     (n) => n.name == 'w34.rig',
+   );
+@@ -34,6 +38,8 @@ class _DebugScreenState extends State<_DebugScreen> {
+   bool _rigPresent = true;
+   bool _posed = false;
+   bool _inset = false;
++  bool _textured = true;
++  bool _colored = true;
+ 
+   @override
+   void initState() {
+@@ -47,12 +53,25 @@ class _DebugScreenState extends State<_DebugScreen> {
+     super.dispose();
+   }
+ 
+-  void _edit() => editW34DebugMaterial(
+-    _controller,
+-    _document,
+-    edited: _edited,
+-    coverage: _coverage,
+-  );
++  void _edit() {
++    if (_materialChecks) {
++      editW34MaterialFamilies(
++        _controller,
++        _document,
++        edited: _edited,
++        textured: _textured,
++        colored: _colored,
++        coverage: _coverage,
++      );
++      return;
++    }
++    editW34DebugMaterial(
++      _controller,
++      _document,
++      edited: _edited,
++      coverage: _coverage,
++    );
++  }
+ 
+   @override
+   Widget build(BuildContext context) => Scaffold(
+@@ -162,6 +181,31 @@ class _DebugScreenState extends State<_DebugScreen> {
+                   ),
+                 ],
+               ),
++              if (_materialChecks)
++                Row(
++                  children: [
++                    Expanded(
++                      child: Button(
++                        title: _textured ? 'Texture on' : 'Texture off',
++                        fontSize: 12,
++                        onPressed: () {
++                          setState(() => _textured = !_textured);
++                          _edit();
++                        },
++                      ),
++                    ),
++                    Expanded(
++                      child: Button(
++                        title: _colored ? 'Colors A' : 'Colors B',
++                        fontSize: 12,
++                        onPressed: () {
++                          setState(() => _colored = !_colored);
++                          _edit();
++                        },
++                      ),
++                    ),
++                  ],
++                ),
+               if (_consumerChecks)
+                 Row(
+                   children: [
+@@ -211,9 +255,13 @@ class _DebugScreenState extends State<_DebugScreen> {
+                   ],
+                 ),
+               Text(
+-                'PBR only. Native particles excluded in channel views.\n'
+-                'Depth d/(1+d). Literals 0.125 / 0.5 / 0.875.\n'
+-                'Capture saves authored target. Inspect lower panel in baseColor.',
++                _materialChecks
++                    ? 'Unlit left; sprite alpha / additive right.\n'
++                          'Metallic / roughness absent inputs are magenta.\n'
++                          'Capture is authored. Image textures only; RT alpha unproven.'
++                    : 'PBR only. Native particles excluded in channel views.\n'
++                          'Depth d/(1+d). Literals 0.125 / 0.5 / 0.875.\n'
++                          'Capture saves authored target. Inspect lower panel in baseColor.',
+                 style: const TextStyle(color: Color(0xFFCCCCCC), fontSize: 11),
+               ),
+             ],
+diff --git a/dart3d/example/lib/w34_debug_scene.dart b/dart3d/example/lib/w34_debug_scene.dart
+index 6617a06..e60fdb7 100644
+--- a/dart3d/example/lib/w34_debug_scene.dart
++++ b/dart3d/example/lib/w34_debug_scene.dart
+@@ -3,7 +3,10 @@ import 'dart:typed_data';
+ import 'package:dart3d/dart3d.dart';
+ import 'package:vector_math/vector_math.dart';
+ 
+-SceneDocument buildW34DebugDocument({bool skinned = false}) {
++SceneDocument buildW34DebugDocument({
++  bool skinned = false,
++  bool materials = false,
++}) {
+   final doc = SceneDocument(allocator: IdAllocator(session: 0x7734696f));
+   final positions = [
+     Vector3(-1, -1, 0),
+@@ -133,21 +136,30 @@ SceneDocument buildW34DebugDocument({bool skinned = false}) {
+     MaterialResource(
+       doc.newId(),
+       name: 'w34.mapped',
+-      type: 'physicallyBased',
++      type: materials ? 'unlit' : 'physicallyBased',
+       properties: {
+         'baseColor': const ColorValue(0.65, 0.42, 0.2, 1),
+         'baseColorTexture': ResourceRefValue(base.id),
+-        'metallic': const DoubleValue(0.7),
+-        'roughness': const DoubleValue(0.6),
+-        'metallicRoughnessTexture': ResourceRefValue(mr.id),
+-        'normalTexture': ResourceRefValue(normal.id),
+-        'normalScale': const DoubleValue(1),
+-        'normalTextureTransform': MapValue({
+-          'offset': Vec2Value(Vector2(0.1, 0.08)),
+-          'scale': Vec2Value(Vector2(0.8, 0.84)),
+-          'rotation': const DoubleValue(0.13),
+-          'texCoord': const IntValue(0),
+-        }),
++        if (materials) 'normalTexture': ResourceRefValue(normal.id),
++        if (materials)
++          'baseColorTextureTransform': MapValue({
++            'offset': Vec2Value(Vector2(0.04, 0.08)),
++            'scale': Vec2Value(Vector2(0.88, 0.84)),
++            'rotation': const DoubleValue(0.13),
++          }),
++        if (!materials) ...{
++          'metallic': const DoubleValue(0.7),
++          'roughness': const DoubleValue(0.6),
++          'metallicRoughnessTexture': ResourceRefValue(mr.id),
++          'normalTexture': ResourceRefValue(normal.id),
++          'normalScale': const DoubleValue(1),
++          'normalTextureTransform': MapValue({
++            'offset': Vec2Value(Vector2(0.1, 0.08)),
++            'scale': Vec2Value(Vector2(0.8, 0.84)),
++            'rotation': const DoubleValue(0.13),
++            'texCoord': const IntValue(0),
++          }),
++        },
+         'alphaMode': const StringValue('opaque'),
+         'alphaCutoff': const DoubleValue(0.5),
+       },
+@@ -157,9 +169,9 @@ SceneDocument buildW34DebugDocument({bool skinned = false}) {
+     name: 'w34.quad',
+     root: true,
+     transform: TrsTransform(
+-      translation: Vector3(0, 1.1, 0),
++      translation: materials ? Vector3(-0.65, 1.1, 0) : Vector3(0, 1.1, 0),
+       rotation: Quaternion.axisAngle(Vector3(0, 1, 0), 0.18),
+-      scale: Vector3.all(0.88),
++      scale: Vector3.all(materials ? 0.48 : 0.88),
+     ),
+     components: [
+       ComponentSpec(
+@@ -225,7 +237,8 @@ SceneDocument buildW34DebugDocument({bool skinned = false}) {
+       ),
+     ],
+   );
+-  for (final (index, value) in [0.125, 0.5, 0.875].indexed) {
++  for (final (index, value)
++      in (materials ? <double>[] : [0.125, 0.5, 0.875]).indexed) {
+     final literal = doc.addResource(
+       MaterialResource(
+         doc.newId(),
+@@ -252,6 +265,36 @@ SceneDocument buildW34DebugDocument({bool skinned = false}) {
+       ],
+     );
+   }
++  if (materials) {
++    for (final (index, blend) in D3SpriteBlendMode.values.indexed) {
++      final sprite = doc.addResource(
++        D3SpriteMaterial(
++          colorTexture: base.id,
++          tint: Vector4(0.65, 0.42, 0.2, 0.7),
++          blendMode: blend,
++          textureRect: Vector4(0.04, 0.08, 0.92, 0.92),
++        ).toResource(doc.newId()).copyWith(name: 'w34.sprite.${blend.name}'),
++      );
++      doc.createNode(
++        name: 'w34.sprite.${blend.name}',
++        root: true,
++        transform: TrsTransform(
++          translation: Vector3(0.65, 1.15 - index * 1.1, -0.1),
++        ),
++        components: [
++          d3ProcMeshComponent(
++            D3BillboardProc(
++              size: Vector2.all(0.9),
++              facing: 'screen',
++              rotation: 0.13,
++              color: const [0.8, 0.6, 0.4, 0.5],
++            ),
++            material: sprite.id,
++          ),
++        ],
++      );
++    }
++  }
+   final camera = doc.createNode(
+     name: 'w34.camera',
+     root: true,
+@@ -309,10 +352,16 @@ SceneDocument buildW34DebugDocument({bool skinned = false}) {
+   final monitor = doc.createNode(
+     name: 'w34.authoredTarget',
+     root: true,
+-    transform: TrsTransform(translation: Vector3(0, -1.5, 0)),
++    transform: TrsTransform(
++      translation: Vector3(0, materials ? -1.4 : -1.5, 0),
++    ),
+     components: [
+       d3ProcMeshComponent(
+-        D3CuboidProc(extents: Vector3(1.7, 1.7, 0.04)),
++        D3CuboidProc(
++          extents: materials
++              ? Vector3(1.5, 1.3, 0.04)
++              : Vector3(1.7, 1.7, 0.04),
++        ),
+         material: monitorMaterial.id,
+       ),
+     ],
+@@ -417,3 +466,65 @@ void setW34Viewport(
+     ),
+   ]);
+ }
++
++void editW34MaterialFamilies(
++  SceneController controller,
++  SceneDocument document, {
++  required bool edited,
++  required bool textured,
++  required bool colored,
++  required String coverage,
++}) {
++  final unlit = document.resources.values
++      .whereType<MaterialResource>()
++      .singleWhere((material) => material.name == 'w34.mapped');
++  final texture = document.resources.values
++      .whereType<TextureResource>()
++      .singleWhere((texture) => texture.content == 'color');
++  final ops = <Map<String, dynamic>>[];
++  for (final material in [
++    unlit,
++    ...document.resources.values.whereType<MaterialResource>().where(
++      (material) => material.type == 'd3:sprite',
++    ),
++  ]) {
++    final sprite = material.type == 'd3:sprite';
++    material.properties['baseColor'] = edited
++        ? ColorValue(0.18, 0.7, 0.4, sprite ? 0.4 : 0.65)
++        : ColorValue(0.65, 0.42, 0.2, sprite ? 0.7 : 1);
++    if (textured) {
++      material.properties['baseColorTexture'] = ResourceRefValue(texture.id);
++    } else {
++      material.properties.remove('baseColorTexture');
++    }
++    if (!sprite) material.properties['alphaMode'] = StringValue(coverage);
++    ops.add({
++      'op': 'upsertResource',
++      'id': material.id.toToken(),
++      'resource': encodeResource(material, (id) => id.toToken()),
++    });
++    if (sprite) {
++      final node = document.nodes.values.singleWhere(
++        (node) => node.name == material.name,
++      );
++      node.components[0] = d3ProcMeshComponent(
++        D3BillboardProc(
++          size: Vector2.all(0.9),
++          facing: 'screen',
++          rotation: 0.13,
++          color: colored
++              ? const [0.8, 0.6, 0.4, 0.5]
++              : const [0.35, 0.9, 0.7, 0.8],
++        ),
++        material: material.id,
++      );
++      ops.add({
++        'op': 'updateNode',
++        'node': node.id.toToken(),
++        'flags': ['components'],
++        'spec': encodeNodeCommandSpec(node, document),
++      });
++    }
++  }
++  controller.applyCommands(ops);
++}
+diff --git a/dart3d/example/test/w34_debug_scene_test.dart b/dart3d/example/test/w34_debug_scene_test.dart
+index bd4c70d..667d826 100644
+--- a/dart3d/example/test/w34_debug_scene_test.dart
++++ b/dart3d/example/test/w34_debug_scene_test.dart
+@@ -11,6 +11,137 @@ import 'package:test/test.dart';
+ import 'package:vector_math/vector_math.dart';
+ 
+ void main() {
++  test(
++    'material fixture records unlit and both native-colored sprite draws',
++    () {
++      final doc = buildW34DebugDocument(materials: true);
++      final controller = SceneController()..loadDocument(doc);
++      addTearDown(controller.dispose);
++      final sink = _Sink(controller);
++      controller.attachElement(sink);
++      expect(sink.mutations.any((m) => m.tag == D3Protocol.loadScene), isTrue);
++      final restored = readFsceneWithExtensions(
++        writeFsceneWithExtensions(controller.serializeScene()!),
++      );
++      final unlit = restored.resources.values
++          .whereType<MaterialResource>()
++          .singleWhere((m) => m.name == 'w34.mapped');
++      expect(unlit.type, 'unlit');
++      expect(
++        (unlit.properties['baseColorTextureTransform']! as MapValue)
++            .values
++            .keys,
++        containsAll(['offset', 'scale', 'rotation']),
++      );
++      for (final blend in ['alpha', 'additive']) {
++        final sprite = restored.resources.values
++            .whereType<MaterialResource>()
++            .singleWhere((m) => m.name == 'w34.sprite.$blend');
++        expect(sprite.type, 'd3:sprite');
++        expect((sprite.properties['blendMode']! as StringValue).value, blend);
++        expect(
++          (sprite.properties['baseColor']! as ColorValue).a,
++          closeTo(0.7, 1e-6),
++        );
++        final node = restored.nodes.values.singleWhere(
++          (n) => n.name == sprite.name,
++        );
++        final color = node.components.single.properties['color']! as ColorValue;
++        expect([color.r, color.g, color.b, color.a], [0.8, 0.6, 0.4, 0.5]);
++      }
++      final geometry = restored.resources.values
++          .whereType<GeometryResource>()
++          .single;
++      final vertices = ByteData.sublistView(
++        doc.payloads[geometry.vertices]!.bytes!,
++      );
++      expect(vertices.getFloat32(40, Endian.little), closeTo(0.8, 1e-6));
++      final target = restored.views.singleWhere((v) => v.target != null);
++      final monitor = restored.nodes.values.singleWhere(
++        (n) => n.name == 'w34.authoredTarget',
++      );
++      expect(monitor.layers & target.layerMask, 0);
++    },
++  );
++
++  test(
++    'material controls emit current textures, tint, native color and coverage',
++    () {
++      final doc = buildW34DebugDocument(materials: true);
++      final controller = SceneController()..loadDocument(doc);
++      addTearDown(controller.dispose);
++      final sink = _Sink(controller);
++      controller.attachElement(sink);
++      sink.mutations.clear();
++      for (final coverage in ['opaque', 'mask', 'blend']) {
++        editW34MaterialFamilies(
++          controller,
++          doc,
++          edited: true,
++          textured: false,
++          colored: false,
++          coverage: coverage,
++        );
++        final batch = jsonDecode(utf8.decode(sink.mutations.removeAt(0).data));
++        expect(batch['op'], 'batch');
++        final ops = batch['ops'] as List;
++        final materials = ops
++            .where((op) => op['op'] == 'upsertResource')
++            .toList();
++        expect(materials.length, 3);
++        expect(materials[0]['resource']['type'], 'unlit');
++        expect(materials[0]['resource']['properties']['alphaMode'], {
++          's': coverage,
++        });
++        expect(materials[0]['resource']['properties']['baseColor'], {
++          'c': [0.18, 0.7, 0.4, 0.65],
++        });
++        for (final op in materials) {
++          expect(
++            op['resource']['properties'].containsKey('baseColorTexture'),
++            isFalse,
++          );
++        }
++        for (final op in materials.skip(1)) {
++          expect(op['resource']['properties']['baseColor'], {
++            'c': [0.18, 0.7, 0.4, 0.4],
++          });
++        }
++        final nodes = ops.where((op) => op['op'] == 'updateNode').toList();
++        expect(nodes.length, 2);
++        for (final op in nodes) {
++          expect(op['flags'], ['components']);
++          expect(op['spec']['components'][0]['properties']['color'], {
++            'c': [0.35, 0.9, 0.7, 0.8],
++          });
++        }
++      }
++      editW34MaterialFamilies(
++        controller,
++        doc,
++        edited: false,
++        textured: true,
++        colored: true,
++        coverage: 'opaque',
++      );
++      final current = readFsceneWithExtensions(
++        writeFsceneWithExtensions(controller.serializeScene()!),
++      );
++      final sprites = current.resources.values
++          .whereType<MaterialResource>()
++          .where((m) => m.type == 'd3:sprite')
++          .toList();
++      expect(sprites.length, 2);
++      for (final sprite in sprites) {
++        expect(sprite.properties['baseColorTexture'], isA<ResourceRefValue>());
++        expect((sprite.properties['baseColor']! as ColorValue).a, 0.7);
++      }
++      expect(writeFsceneWithExtensions(current), isNot(contains('debugView')));
++      controller.loadDocument(current);
++      expect(sink.mutations.last.tag, D3Protocol.loadScene);
++    },
++  );
++
+   test('consumer fixture retains bone slots across rig removal and re-add', () {
+     final doc = buildW34DebugDocument(skinned: true);
+     final rig = doc.nodes.values.singleWhere((n) => n.name == 'w34.rig');
+diff --git a/dart3d/ios/Classes/FsceneRealizer.swift b/dart3d/ios/Classes/FsceneRealizer.swift
+index cffabe4..0709722 100644
+--- a/dart3d/ios/Classes/FsceneRealizer.swift
++++ b/dart3d/ios/Classes/FsceneRealizer.swift
+@@ -2496,11 +2496,11 @@ enum FsceneRealizer {
+                     float d3SpriteSourcePremultiplied;
+                     #pragma transparent
+                     #pragma body
+-                    float4 c = _surface.diffuse * d3SpriteTint
++                    float4 d3SampledSpriteColor = _surface.diffuse * d3SpriteTint
+                         * in.d3SpriteColor;
+                     float weight = d3SpriteSourcePremultiplied > 0.5
+-                        ? d3SpriteTint.a * in.d3SpriteColor.a : c.a;
+-                    _output.color = float4(c.rgb * weight, c.a);
++                        ? d3SpriteTint.a * in.d3SpriteColor.a : d3SampledSpriteColor.a;
++                    _output.color = float4(d3SampledSpriteColor.rgb * weight, d3SampledSpriteColor.a);
+                     """]
+                 if props["baseColorTexture"] != nil {
+                     applyTextureSlot(m, materialKey: key,
+@@ -8423,7 +8423,7 @@ enum FsceneRealizer {
+ 
+ extension FsceneRealizer {
+     static func screenDebugMaterialSignature(_ material: SCNMaterial) -> NSArray {
+-        var values: [Any] = [material.lightingModel.rawValue,
++        var values: [Any] = [material.lightingModel.rawValue, material.name ?? "",
+             material.shaderModifiers ?? [:], material.blendMode.rawValue,
+             material.transparencyMode.rawValue, material.transparency,
+             material.isDoubleSided, material.cullMode.rawValue,
+@@ -8434,7 +8434,8 @@ extension FsceneRealizer {
+                          material.ambientOcclusion, material.clearCoat,
+                          material.clearCoatRoughness, material.clearCoatNormal,
+                          material.multiply, material.reflective, material.specular]
+-        for key in ["d3BaseColorFactor", "d3SheenColorTex", "d3SheenRoughTex"] {
++        for key in ["d3BaseColorFactor", "d3SheenColorTex", "d3SheenRoughTex",
++                    "d3SpriteTint", "d3SpriteSourcePremultiplied"] {
+             let value = material.value(forKey: key)
+             if let property = value as? SCNMaterialProperty { properties.append(property) }
+             else { values.append(value ?? NSNull()) }
+@@ -8453,13 +8454,18 @@ extension FsceneRealizer {
+     static func makeScreenDebugMaterial(_ source: SCNMaterial,
+         channel: ScreenDebugOptions.Channel, host: SceneViewHost) -> SCNMaterial {
+         let material = source.copy() as! SCNMaterial
+-        guard source.lightingModel == .physicallyBased else {
++        let sprite = source.name == "d3.sprite"
++        let unlit = source.lightingModel == .constant
++            && source.value(forKey: "d3BaseColorFactor") != nil
++        let pbr = source.lightingModel == .physicallyBased
++        guard pbr || unlit || sprite else {
+             host.logOnce("debugView.family.\(source.lightingModel.rawValue)",
+-                "debugView: this implementation unit covers PBR meshes only; "
++                "debugView: this implementation unit covers PBR, unlit meshes and sprites; "
+                 + "material family \(source.lightingModel.rawValue) is unsupported")
+             return material
+         }
+-        for key in ["d3BaseColorFactor", "d3SheenColorTex", "d3SheenRoughTex"] {
++        for key in ["d3BaseColorFactor", "d3SheenColorTex", "d3SheenRoughTex",
++                    "d3SpriteTint", "d3SpriteSourcePremultiplied"] {
+             if let value = source.value(forKey: key) {
+                 if let current = value as? SCNMaterialProperty {
+                     let property = SCNMaterialProperty()
+@@ -8481,18 +8487,41 @@ extension FsceneRealizer {
+         let rgb: String
+         switch channel {
+         case .none: return material
+-        case .normals: rgb = "0.5 * normalize(_surface.normal) + 0.5"
+-        case .metallic: rgb = "float3(saturate(_surface.metalness))"
+-        case .roughness: rgb = "float3(saturate(_surface.roughness))"
+-        case .baseColor: rgb = "saturate(_surface.diffuse.rgb)"
++        case .normals:
++            if !pbr { material.normal.contents = UIColor.white }
++            rgb = "0.5 * normalize(_surface.normal) + 0.5"
++        case .metallic:
++            rgb = pbr ? "float3(saturate(_surface.metalness))" : "float3(1.0, 0.0, 1.0)"
++        case .roughness:
++            rgb = pbr ? "float3(saturate(_surface.roughness))" : "float3(1.0, 0.0, 1.0)"
++        case .baseColor:
++            if sprite {
++                rgb = """
++                    saturate(d3SpriteSourcePremultiplied > 0.5
++                        ? (_surface.diffuse.a > 0.0
++                            ? d3SampledSpriteColor.rgb / _surface.diffuse.a : float3(0.0))
++                        : d3SampledSpriteColor.rgb)
++                    """
++            } else { rgb = "saturate(_surface.diffuse.rgb)" }
+         case .depth:
+             rgb = "float3(max(-_surface.position.z, 0.0) / (1.0 + max(-_surface.position.z, 0.0)))"
+         }
+         // Existing MASK discard and sheen declarations/body remain before the
+         // final RGB. Transparent modifiers expect premultiplied RGB once.
+-        let coverage = source.blendMode == .alpha && !source.writesToDepthBuffer
++        let coverage = sprite || (source.blendMode == .alpha && !source.writesToDepthBuffer)
+             ? " * _output.color.a" : ""
+         var modifiers = source.shaderModifiers ?? [:]
++        if unlit {
++            modifiers[.geometry] = """
++                #pragma varyings
++                float4 d3DebugUnlitColor;
++                #pragma body
++                out.d3DebugUnlitColor = _geometry.color;
++                _geometry.color = float4(1.0);
++                """
++            modifiers[.surface] = (modifiers[.surface] ?? "")
++                + "\n_surface.diffuse *= in.d3DebugUnlitColor;\n"
++        }
+         modifiers[.fragment] = (modifiers[.fragment] ?? "")
+             + "\n_output.color.rgb = (\(rgb))\(coverage);\n"
+         material.shaderModifiers = modifiers
+diff --git a/docs/debug-views.md b/docs/debug-views.md
+index de00a9c..18ff8c8 100644
+--- a/docs/debug-views.md
++++ b/docs/debug-views.md
+@@ -1,8 +1,9 @@
+ # Screen debug views
+ 
+ `SceneView.debugView` owns the screen's inspection choice. The controller and
+-serialized document contain no debug state. This first implementation unit adds
+-iOS PBR mesh presentation. Android and other material families are outside this
++serialized document contain no debug state. The iOS presentation covers PBR
++meshes, ordinary unlit meshes, and `d3:sprite` materials. Android and other
++material families are outside this
+ unit. The retained PBR simulator evidence covers the five channels, authored-target
+ isolation, filled wireframe, and restoration to current authored state.
+ 
+@@ -54,12 +55,33 @@ The authored scene remains their sole simulation owner. There is no particle
+ recreation, second simulation, or substitute renderer. Wireframe makes no
+ particle-topology promise.
+ 
+-Other material families are not established by this PBR unit. Encountered
+-non-PBR families log that they are unsupported and retain copied authored
+-materials; that output is not a defined diagnostic. Later catcher work uses
+-opaque receiver inspection for normals, depth, and topology, with absent PBR
+-inputs marked magenta. This unit does not implement or promise shadowOnly
+-footprint-alpha diagnostics, sprite parity, or general material-family parity.
++Ordinary unlit meshes use sampled diffuse RGB after the current factor and
++native vertex or instance color. Sprites use sampled texture RGB times the
++current tint and native `d3SpriteColor`, before RGB premultiplication. The
++existing texture owner identifies premultiplied render textures. Only source
++texture alpha is divided out, never tint alpha or vertex alpha. Zero source
++coverage stays zero. Alpha sprites keep source-over blending; additive sprites
++keep their RGB-only write mask and destination coverage. Both retain native
++depth behavior. Sprite diagnostics multiply their RGB by source coverage once.
++
++Unlit and sprite normals use SceneKit's view-space `normal` with normal mapping
++disabled on the diagnostic copy by a solid normal property. The authored normal
++texture remains unchanged. The simulator's constant-material path did not yield
++usable values from `geometryNormal`. Depth uses the same axial formula as PBR.
++Metallic and roughness have no input in these families and display linear
++magenta `(1,0,1)`.
++Magenta does not stand for an inaccessible input or a shader compiler failure.
++The [material-family simulator sequence](artifacts/e9-w34-dev-reload/material-families-ios/README.md)
++exercises straight image textures, current edits, coverage modes and authored
++captures. Premultiplied render-texture sprites and calibrated coverage accuracy
++remain unverified. Host tests and builds alone establish neither.
++
++Other families log unsupported and retain copied authored materials. Catchers
++remain excluded, including baked catchers whose lighting model is constant.
++Future catcher diagnostics must prove preservation of the native receiver
++footprint and coverage, including `shadowOnly` coverage access. An opaque
++receiver plane cannot substitute for that proof. No catcher coverage exception
++is granted by this mesh and sprite slice.
+ 
+ The existing tag-6 view configuration always includes both fields, including
+ complete explicit off:
+@@ -114,6 +136,24 @@ and inset viewport isolation in both selection orders. It does not establish
+ arbitrary skinning or morph output. Diagnostic siblings cover the host with a
+ black backing outside their viewport rectangles; turning channels off removes it.
+ 
++The optional `DART3D_W34_MATERIALS=true` fixture uses the same entry point and
++fixed camera. It places a tilted unlit indexed quad on the left, alpha and
++additive billboards on the right, and the authored-target monitor below them.
++The image has asymmetric RGB marks and zero, half, and full alpha bands. The
++quad has nonwhite native vertex color. Both sprites have nonwhite native RGBA
++color, a transformed texture rectangle, and a nonwhite tint with fractional
++alpha. **Factors A/B** edits current unlit factors and sprite tint. **Colors A/B**
++rebuilds current billboard components through `updateNode`. **Texture on/off**
++rebinds the existing image through material upserts. **opaque/mask/blend** changes
++only the unlit coverage policy. **Capture**, **Reload**, channel, wire, and **Off**
++use their existing operations. The default PBR and consumer fixtures retain
++their previous controls and document semantics.
++
++The material fixture samples straight image textures. Its authored target is an
++isolation monitor, not a premultiplied sprite source. Render-texture sprite
++coverage, exact channel values, and all new native visual behavior remain
++`NOT_RUN` until a native replay supplies evidence.
++
+ Morph output, additional material families and consumers, Android,
+ performance, and final T2/T4 remain `NOT_RUN` for this unit. It does not establish
+ whole W34 or Track E readiness.

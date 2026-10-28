@@ -1,0 +1,134 @@
+{
+  "accepted": {
+    "archiveSha256": "562c40177e9661a3deebe56828ac9dcf9dec8c6c58301924d552dbcc5370b4f0",
+    "safeUniqueRegularMembers": 66,
+    "adjacentHashes": {
+      "source-sha256.txt": "e9756a5ce110b463f8d68c6409376e14e8cb6a608df7eb1be5880edf906b0f6e",
+      "owned-source.tgz": "7335a57d4cec610887c7be137cfb1101f1b0af271f970d3864c99203309e7f0f",
+      "owned-paths.txt": "6ec55c00f46cc80a02fe875219ce00e20d0f2f8f6b9c732705804d97f4114b33",
+      "source-sha256.json": "ee7c387521f33cea62e6e8b4ef3cda1b6deaa4238661a2af7a6a6984833ad5c4",
+      "source-paths.txt": "073cdb377beee141d96234efcae7ad7f17582ddeade0b70ef93def1f6acf6dba",
+      "correction.patch": "0745a0d4543ae96c8152f9ece2d6df95ae64472379fdf1087169ff4761510b58",
+      "source.tgz": "562c40177e9661a3deebe56828ac9dcf9dec8c6c58301924d552dbcc5370b4f0",
+      "receipt.json": "ed27d238285e4a04589aa1ef15d32b7ece25fcd52700d1778d23b4df73fd566d"
+    },
+    "ownedArchiveExactFive": [
+      "dart3d/ios/Classes/FsceneRealizer.swift",
+      "dart3d/example/lib/w34_debug_main.dart",
+      "dart3d/example/lib/w34_debug_scene.dart",
+      "dart3d/example/test/w34_debug_scene_test.dart",
+      "docs/debug-views.md"
+    ]
+  },
+  "final": {
+    "archiveSha256": "4e6bf1bcb5fe15dccbebdd5f5cdbd50588866fb63d3424b910a9bc51293cde9a",
+    "safeUniqueRegularMembers": 66,
+    "adjacentHashes": {
+      "source-sha256.txt": "60349870c601e200332358b87c8378b054bd1cbabdd45771bd7b131586ae955c",
+      "owned-source.tgz": "ba4618c3b693606d3e0d6b67a541192c661969719eed21da97593c6bdbcb8b49",
+      "owned-paths.txt": "01fd3fc0dc7f0bcc4f855b8af379453d4a77c91c2a5be3b4322bdd4ca6d71cf5",
+      "source-sha256.json": "ce2547f793bdbe03c50c575472ccf2fba726ae59f5455ca0f1451ca781882d47",
+      "source-paths.txt": "073cdb377beee141d96234efcae7ad7f17582ddeade0b70ef93def1f6acf6dba",
+      "correction.patch": "58915961046cb824b98287c5ec98ca8af92ef9ae0d73dc2f5c169c78a5071249",
+      "source.tgz": "4e6bf1bcb5fe15dccbebdd5f5cdbd50588866fb63d3424b910a9bc51293cde9a",
+      "receipt.json": "08cd1f3304dadd2a3b0f49c47e1ef422a65a6a35ff0789f08365230b569a016d"
+    },
+    "ownedArchiveExactFive": [
+      "dart3d/example/lib/w34_debug_main.dart",
+      "dart3d/example/lib/w34_debug_scene.dart",
+      "dart3d/example/test/w34_debug_scene_test.dart",
+      "dart3d/ios/Classes/FsceneRealizer.swift",
+      "dart3d/ios/Classes/ScreenDebugPresentation.swift"
+    ]
+  },
+  "failed": {
+    "archiveSha256": "e3dc268ecfb32bfba561ee0ef82e42c57642c2330c091f302a3623106934ea25",
+    "safeUniqueRegularMembers": 66,
+    "adjacentHashes": {
+      "source-sha256.json": "d01ed9372dfbc9c7519b6b331838545c52914bac0b1234661e420f481b5a5b95",
+      "source.tgz": "e3dc268ecfb32bfba561ee0ef82e42c57642c2330c091f302a3623106934ea25"
+    }
+  },
+  "deltaPaths": [
+    "dart3d/example/lib/w34_debug_main.dart",
+    "dart3d/example/lib/w34_debug_scene.dart",
+    "dart3d/example/test/w34_debug_scene_test.dart",
+    "dart3d/ios/Classes/FsceneRealizer.swift",
+    "dart3d/ios/Classes/ScreenDebugPresentation.swift"
+  ],
+  "unownedPreserved": 61,
+  "failedToFinalPaths": [
+    "dart3d/ios/Classes/ScreenDebugPresentation.swift"
+  ],
+  "importMatchesAll66": true,
+  "initialOutsideOverlayPreserved": 1873,
+  "locks": {
+    "dart3d/example/ios/Podfile.lock": "47d5269141917cc2cfad542d6e2c60dc8c3f364e5700ba1354f44208a9e31522",
+    "dart3d/pubspec.lock": "868933c6c9bdd80476a9d1b6d380078eb8ecf45960820d8414beebd55a0b555f",
+    "dart3d/example/pubspec.lock": "4ab8d1150fe7606c532dccb84d07eb0cc4062b5d4b2481c07fd27c135241936c",
+    "dart3d/example/lib/dartnative_plugin_registrant.dart": "c0f873e11de99a1485dd67fd82bc563a61f3c66cc8280b705019ce48cfdbe09f",
+    "dart3d/example/dn_plugins.lock": "73c5209e393e2c670769b2dfe4d09d72b79870c5218ede82e2a6d9c659c0f2a6",
+    "probe/pubspec.lock": "1606c33221efeb86ab121be4ef9ef82377f400de9ca7ab838b7822971f285121"
+  },
+  "forward": {
+    "commands": [
+      {
+        "command": [
+          "git",
+          "apply",
+          "--check",
+          "/private/tmp/dart3d-w34-ios-live-catcher-probe-20261028/r1/parent/packet/correction.patch"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "git",
+          "apply",
+          "/private/tmp/dart3d-w34-ios-live-catcher-probe-20261028/r1/parent/packet/correction.patch"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    ],
+    "all66Exact": true
+  },
+  "reverse": {
+    "commands": [
+      {
+        "command": [
+          "git",
+          "apply",
+          "--reverse",
+          "--check",
+          "/private/tmp/dart3d-w34-ios-live-catcher-probe-20261028/r1/parent/packet/correction.patch"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "git",
+          "apply",
+          "--reverse",
+          "/private/tmp/dart3d-w34-ios-live-catcher-probe-20261028/r1/parent/packet/correction.patch"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    ],
+    "all66Exact": true
+  },
+  "baselineOnlyThreeDartDelta": [
+    "dart3d/example/lib/w34_debug_main.dart",
+    "dart3d/example/lib/w34_debug_scene.dart",
+    "dart3d/example/test/w34_debug_scene_test.dart"
+  ],
+  "parentAllInitialFilesRestored": 3122,
+  "parentOutsideOverlayInitialRestored": 3056
+}

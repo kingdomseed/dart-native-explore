@@ -1,0 +1,15 @@
+00:00 +0: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_reload_transport_test.dart
+00:00 +0: real watch and socket load once, diff color/exposure, restore fixed camera
+00:00 +1: authored decode errors retain the same document and later saves recover
+00:00 +2: actual rename save reloads; unrelated sibling save emits no mutation
+00:01 +3: missing source during rename surfaces error then recovers on real event
+00:01 +4: stop before controller disposal prevents later file-save callbacks
+00:02 +5: peer disconnect terminates host and releases listening port
+00:02 +6: host close surfaces receiver disconnect and releases resources
+00:02 +7: occupied port and missing source surface actual startup failures
+00:02 +8: one consumer only; refused second peer does not disrupt first
+00:02 +9: CLI SIGTERM closes its watcher/server and exits
+00:03 +10: one refused connection surfaces error with no controller mutation
+00:03 +11: stop during real pending handshake cannot reach disposed controller
+00:03 +12: receiver rejects binary messages and accepts subsequent text
+00:03 +13: All tests passed!

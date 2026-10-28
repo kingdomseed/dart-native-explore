@@ -1,0 +1,264 @@
+{
+  "beforeFinalOff": {
+    "left": "before/00-off.png",
+    "right": "final/00-off.png",
+    "rectangle": [
+      0,
+      70,
+      402,
+      580
+    ],
+    "changedPixels": 0,
+    "maxChannelDifference": 0,
+    "nonblackMaskDifferences": 0
+  },
+  "offReturn": {
+    "left": "final/00-off.png",
+    "right": "final/09-off-return.png",
+    "rectangle": [
+      0,
+      70,
+      402,
+      580
+    ],
+    "changedPixels": 0,
+    "maxChannelDifference": 0,
+    "nonblackMaskDifferences": 0
+  },
+  "normalInputControl": {
+    "left": "normal-input-r2/01-normals.png",
+    "right": "final/01b-normals-settled.png",
+    "rectangle": [
+      0,
+      70,
+      402,
+      580
+    ],
+    "changedPixels": 0,
+    "maxChannelDifference": 0,
+    "nonblackMaskDifferences": 0
+  },
+  "normalFailureCorrection": {
+    "left": "after/01b-normals-settled.png",
+    "right": "final/01b-normals-settled.png",
+    "rectangle": [
+      50,
+      105,
+      310,
+      290
+    ],
+    "changedPixels": 28992,
+    "maxChannelDifference": 177,
+    "nonblackMaskDifferences": 18747
+  },
+  "targetCaptureA": {
+    "left": "final/05-baseColor.png",
+    "right": "final/06-baseColor-after-normal-capture.png",
+    "rectangle": [
+      160,
+      440,
+      90,
+      55
+    ],
+    "changedPixels": 0,
+    "maxChannelDifference": 0,
+    "nonblackMaskDifferences": 0
+  },
+  "targetCaptureB": {
+    "left": "final/23-baseColor-target-off-capture.png",
+    "right": "final/24-baseColor-target-normal-capture.png",
+    "rectangle": [
+      160,
+      440,
+      90,
+      55
+    ],
+    "changedPixels": 0,
+    "maxChannelDifference": 0,
+    "nonblackMaskDifferences": 0
+  },
+  "wire": {
+    "left": "final/05-baseColor.png",
+    "right": "final/07-baseColor-wire.png",
+    "rectangle": [
+      50,
+      105,
+      310,
+      290
+    ],
+    "changedPixels": 1789,
+    "maxChannelDifference": 92,
+    "nonblackMaskDifferences": 193
+  },
+  "wireOccluder": {
+    "left": "final/05-baseColor.png",
+    "right": "final/07-baseColor-wire.png",
+    "rectangle": [
+      230,
+      160,
+      28,
+      60
+    ],
+    "changedPixels": 0,
+    "maxChannelDifference": 0,
+    "nonblackMaskDifferences": 0
+  },
+  "factorEdit": {
+    "left": "final/10-baseColor-a.png",
+    "right": "final/11-baseColor-factors-b.png",
+    "rectangle": [
+      50,
+      105,
+      310,
+      290
+    ],
+    "changedPixels": 28989,
+    "maxChannelDifference": 85,
+    "nonblackMaskDifferences": 3
+  },
+  "nativeColorEdit": {
+    "left": "final/11-baseColor-factors-b.png",
+    "right": "final/12-baseColor-colors-b.png",
+    "rectangle": [
+      50,
+      105,
+      310,
+      290
+    ],
+    "changedPixels": 18765,
+    "maxChannelDifference": 42,
+    "nonblackMaskDifferences": 3
+  },
+  "coverageModes": {
+    "left": "final/15-baseColor-mask.png",
+    "right": "final/16-baseColor-blend.png",
+    "rectangle": [
+      60,
+      120,
+      125,
+      140
+    ],
+    "changedPixels": 10220,
+    "maxChannelDifference": 151,
+    "nonblackMaskDifferences": 4251
+  },
+  "reloadMain": {
+    "left": "final/17-off-edited.png",
+    "right": "final/18-off-edited-reload.png",
+    "rectangle": [
+      50,
+      105,
+      310,
+      290
+    ],
+    "changedPixels": 0,
+    "maxChannelDifference": 0,
+    "nonblackMaskDifferences": 0
+  },
+  "reloadTarget": {
+    "left": "final/17-off-edited.png",
+    "right": "final/18-off-edited-reload.png",
+    "rectangle": [
+      160,
+      440,
+      90,
+      55
+    ],
+    "changedPixels": 1484,
+    "maxChannelDifference": 58,
+    "nonblackMaskDifferences": 0
+  },
+  "untexturedOffDiagnostic": {
+    "left": "final/21-baseColor-texture-off-settled.png",
+    "right": "final/22-off-texture-off.png",
+    "rectangle": [
+      50,
+      105,
+      310,
+      290
+    ],
+    "changedPixels": 18579,
+    "maxChannelDifference": 40,
+    "nonblackMaskDifferences": 0
+  },
+  "absentInputUnlit": {
+    "left": "final/02-metallic.png",
+    "right": "final/03-roughness.png",
+    "rectangle": [
+      110,
+      145,
+      60,
+      75
+    ],
+    "changedPixels": 0,
+    "maxChannelDifference": 0,
+    "nonblackMaskDifferences": 0
+  },
+  "samples": [
+    {
+      "path": "final/02-metallic.png",
+      "point": [
+        130,
+        170
+      ],
+      "rgba": [
+        253,
+        0,
+        253,
+        255
+      ]
+    },
+    {
+      "path": "final/03-roughness.png",
+      "point": [
+        130,
+        170
+      ],
+      "rgba": [
+        253,
+        0,
+        253,
+        255
+      ]
+    },
+    {
+      "path": "final/01b-normals-settled.png",
+      "point": [
+        130,
+        170
+      ],
+      "rgba": [
+        172,
+        187,
+        253,
+        255
+      ]
+    },
+    {
+      "path": "final/21-baseColor-texture-off-settled.png",
+      "point": [
+        130,
+        170
+      ],
+      "rgba": [
+        86,
+        179,
+        111,
+        255
+      ]
+    },
+    {
+      "path": "final/22-off-texture-off.png",
+      "point": [
+        130,
+        170
+      ],
+      "rgba": [
+        106,
+        216,
+        135,
+        255
+      ]
+    }
+  ]
+}

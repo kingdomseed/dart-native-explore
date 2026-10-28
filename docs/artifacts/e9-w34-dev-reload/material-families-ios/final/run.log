@@ -1,0 +1,19 @@
+Launching lib/w34_debug_main.dart on iPhone 17 Pro in debug mode...
+Running Xcode build...                                          
+Xcode build done.                                           13.3s
+dartnative: [DN] Licence valid (community), expires 2027-09-14
+dartnative: [DN] lifecycle → AppLifecycleState.resumed
+Syncing files to device iPhone 17 Pro...                            12ms
+
+DartNative run key commands.
+r Hot reload. 🔥🔥🔥
+R Hot restart.
+h List all available interactive commands.
+d Detach (terminate "dn run" but leave application running).
+c Clear the screen
+q Quit (terminate the application on the device).
+
+A Dart VM Service on iPhone 17 Pro is available at: http://127.0.0.1:50436/xmPbJJR_qhA=/
+The DartNative DevTools debugger and profiler on iPhone 17 Pro is available at: http://127.0.0.1:50436/xmPbJJR_qhA=/devtools/?uri=ws://127.0.0.1:50436/xmPbJJR_qhA=/ws
+
+Application finished.

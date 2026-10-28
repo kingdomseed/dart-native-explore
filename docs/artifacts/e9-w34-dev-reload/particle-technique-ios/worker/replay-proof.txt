@@ -1,0 +1,10 @@
+Exported base plus accepted58 matches every baseline path/hash. No git checkout or index was created.
+git apply ['--check'] exit 0. 
+git apply [] exit 0. 
+Forward replay reproduces all four owned files. All 1933 unowned paths and six locks match.
+git apply ['--reverse', '--check'] exit 0. 
+git apply ['--reverse'] exit 0. 
+Reverse replay restores all 1934 baseline files, accepted58 and six locks. Three new files absent.
+Complete owned-source archive reproduces identical full source tree over baseline.
+Full accepted58+probe archive reproduces identical full source tree and preserves six locks.
+Removed only this script-owned replay scratch.

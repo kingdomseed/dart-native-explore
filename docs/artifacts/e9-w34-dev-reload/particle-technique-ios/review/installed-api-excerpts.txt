@@ -1,0 +1,309 @@
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNTechnique.h SHA256 1f0057a24db957f47bc2fa32fb2ad2d31f7faf91fc4988549da2b2b172d55a74
+14:  @class SCNTechnique
+15:  @abstract SCNTechnique represents a rendering process that may require multiple passes.
+16:  @discussion A technique is generally initialized from a Property List file. It can be set to any object that conforms to the SCNTechniqueSupport protocol.
+17:  */
+18: SCN_EXPORT API_AVAILABLE(macos(10.10))
+19: @interface SCNTechnique : NSObject <SCNAnimatable, NSCopying, NSSecureCoding>
+20: 
+21: /*!
+22:  @method techniqueWithDictionary:
+23:  @abstract Creates and returns a technique instance initialized with the specified dictionary.
+24:  @param dictionary The dictionary representation of the technique.
+25:  @discussion The format of the dictionary is described below. Quoted strings can be any name of your choice. Tags are defined below.
+26:  The passes are executed sequentially as specified in the "sequence" section. The definition of each pass is within the "passes" section. A pass may have inputs/outputs that reference targets or symbols defined in the "targets" and "symbols" section. The entries of the "symbols" section can be set/get and animated with SCNTechnique's APIs below.
+27:  
+28:  {
+29:    sequence: ["Pass1", "Pass2", ...],
+30:    passes: {
+31:      "Pass1": {
+32:         outputs: <outputs>
+33:         inputs: <inputs>
+34:         draw: <draw command>
+35:         program: <program name>
+36:         metalVertexShader: <METAL vertex shader function name>
+37:         metalFragmentShader: <METAL fragment shader function name>
+38:         colorStates: <color states>               //optional
+39:         depthStates: <depth states>               //optional
+40:         stencilStates: <stencil states>           //optional
+41:         cullMode: <cull mode>                     //optional
+42:         blendStates: <blend states>               //optional
+43:         viewport: <custom viewport>               //optional
+44:         pointOfView: <node name>                  //optional
+45:         samples: <sample count>                   //optional
+46:         excludeCategoryMask: <category bitMask>   //optional
+47:         includeCategoryMask: <category bitMask>   //optional
+48:      },
+96:  
+97: <render target reference>
+98:  A string referencing a target (i.e an entry in the top level "targets" dictionary) or one of the special strings below:
+99:  COLOR  The render target that represents that main color fragments that will be displayed on the screen ultimately.
+100:  DEPTH  The render target that represents that main depth fragments.
+101:  
+102: <draw command>
+103:  can be one of the following strings:
+104:  DRAW_SCENE:    render the entire scene
+105:  DRAW_QUAD:     render a fullscreen quad
+106:  DRAW_NODE:     render a node and its sub-tree. The node is specified by setting its name as the value for the key "node".
+107:  
+108: <program name>
+109:  Name of a program (a vertex shader + a fragment shader) located in the application bundle.
+110:  The vertex shader must have the extension "vsh" and the fragment shader "fsh".
+111:  
+112: <METAL vertex shader function name>
+113:  Name of a METAL function to use as the vertex shader.
+114: 
+115: <METAL fragment shader function name>
+116:  Name of a METAL function to use as the fragment shader.
+117:  
+118: <color states>
+119:  A dictionary with the following optional keys:
+120:  "clear" a boolean specifying whether the color target should be cleared or not
+121:  "clearColor" a string specifying the clear color as 4 float ("red green blue alpha"), or the string "sceneBackground" to clear with the scene background color.
+122:  
+123: <depth states>
+124:  A dictionary with the following optional keys:
+125:  "clear" a boolean specifying whether the depth target should be cleared or not
+126:  "enableWrite" a boolean specifying whether writing to depth should be enabled or not.
+127:  "enableRead" a boolean specifying whether reading from depth should be enabled or not.
+128:  "func" a string specifying depth function to use. See <comparison function> for the possible values.
+176: <category bitMask>
+177:  A integer value representing a node category mask (see SCNNode's categoryBitMask).
+178:  if the key "excludeCategoryMask" is not specified then it defaults to 0.
+179:  if the key "includeCategoryMask" is not specified then it defaults to all bits set.
+180:  The DRAW_SCENE command will then render nodes that validate the following test (node.categoryBitMask & includeCategoryMask) && !(excludeCategoryMask & node.categoryBitMask).
+181: 
+182: <node name>
+183:  The name of a node, or "self" to reference the owner of the technique if any.
+184: 
+185: <sample count>
+186:  The number of samples (multisampling) used to render the pass.
+187:  
+188: <symbol description>
+189:  A dictionary with the following optional keys and their possible associated values:
+190:  
+191:  semantic: vertex, normal, color, texcoord, tangent, time, modelViewProjectionTransform, modelViewTransform, modelTransform, viewTransform, projectionTransform, normalTransform, modelViewProjectionInverseTransform, modelViewInverseTransform, modelInverseTransform, viewInverseTransform, projectionInverseTransform, normalInverseTransform
+192:  
+193:  type: float, vec2, vec3, vec4, mat4, int, ivec2, ivec3, ivec4, mat3, sampler2D, none. Every types can also be an array of the given type by adding [N] where N is the number of elements in the array.
+194:  
+195:  image: name of an image located in the application bundle. (only valid when type is sampler2D)
+196:  
+197:  if a semantic is set, no type is required.
+198:  Note that with Metal shaders you should not provide any semantic. Instead simply declare a struct in you shader and add the members you need named as specified in SceneKit/scn_metal.
+199:  
+200:  For example for a per-node semantic:
+201:  
+202:  struct MyStruct
+203:  {
+204:  float4x4 modelTransform;
+205:  float4x4 modelViewProjectionTransform;
+206:  };
+207:  then in your function add an argument that must be named “scn_node” to get the members automatically filed with node semantics (see the documentation in scn_metal).
+296:  @property library
+297:  @abstract The Metal library to use to load the Metal programs specified in the technique description. Defaults to nil which corresponds to the default Metal library.
+298:  */
+299: @property(nonatomic, strong, nullable) id <MTLLibrary> library API_AVAILABLE(macos(10.14), ios(12.0), tvos(12.0)) API_UNAVAILABLE(watchos);
+300: #endif
+301: 
+302: @end
+303: 
+304: 
+305: 
+306: /*!
+307:  @protocol SCNTechniqueSupport
+308:  @abstract The SCNTechniqueSupport protocol describes an object that supports single or multi-pass techniques
+309:  */
+310: @protocol SCNTechniqueSupport <NSObject>
+311: 
+312: /*!
+313:  @property technique
+314:  @abstract Specifies the technique of the receiver. Defaults to nil.
+315:  */
+316: @property(nonatomic, copy, nullable) SCNTechnique *technique API_AVAILABLE(macos(10.10));
+317: 
+318: @end
+319: 
+320: NS_ASSUME_NONNULL_END
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/SceneKit.framework/Headers/scn_metal SHA256 c0b1464c182e3ebb9442b369885ee751a9d1d078cd5eb6e7330848be37e8b027
+8: enum {
+9:     SCNVertexSemanticPosition,
+10:     SCNVertexSemanticNormal,
+11:     SCNVertexSemanticTangent,
+12:     SCNVertexSemanticColor,
+13:     SCNVertexSemanticBoneIndices,
+14:     SCNVertexSemanticBoneWeights,
+15:     SCNVertexSemanticTexcoord0,
+16:     SCNVertexSemanticTexcoord1,
+17:     SCNVertexSemanticTexcoord2,
+18:     SCNVertexSemanticTexcoord3,
+19:     SCNVertexSemanticTexcoord4,
+20:     SCNVertexSemanticTexcoord5,
+21:     SCNVertexSemanticTexcoord6,
+22:     SCNVertexSemanticTexcoord7
+23: };
+59: // In custom shaders or in shader modifiers, you also have access to node relative information.
+60: // This is done using an argument named "scn_node", which must be a struct with only the necessary fields
+61: // among the following list:
+62: //
+63: // float4x4 modelTransform;
+64: // float4x4 inverseModelTransform;
+65: // float4x4 modelViewTransform;
+66: // float4x4 inverseModelViewTransform;
+67: // float4x4 normalTransform; // This is the inverseTransposeModelViewTransform, need for normal transformation
+68: // float4x4 modelViewProjectionTransform;
+69: // float4x4 inverseModelViewProjectionTransform;
+70: // float2x3 boundingBox;
+71: // float2x3 worldBoundingBox;
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNParticleSystem.h SHA256 8158e460b1a63bb18aba030134a4e2f95fa35b155a03cce23d8da2786971e0db
+190: SCN_EXPORT API_AVAILABLE(macos(10.10))
+191: @interface SCNParticleSystem : NSObject <NSCopying, NSSecureCoding, SCNAnimatable>
+192: 
+193: // Create an instance of a particle system
+194: + (instancetype)particleSystem;
+195: + (nullable instancetype)particleSystemNamed:(NSString *)name inDirectory:(nullable NSString *)directory;
+196: 
+197: #pragma mark Emitter properties
+198: 
+199: // Specifies the duration of the emission. Defaults to 1. Animatable.
+200: @property(nonatomic) CGFloat emissionDuration;
+201: 
+202: // Specifies the variation of the emission duration. Defaults to 0. Animatable.
+203: @property(nonatomic) CGFloat emissionDurationVariation;
+215: // An emissionDuration of 0 without looping means that the particles are emitted instantaneously
+216: // 0 means that the emitter emits nothing, unless it has variation. Defaults to 1. Animatable.
+217: @property(nonatomic) CGFloat birthRate;
+218: 
+219: // Specifies the variation of the rate flow. Defaults to 0. Animatable.
+220: @property(nonatomic) CGFloat birthRateVariation;
+221: 
+222: // Specifies the time length during which particles are emit before the first rendering of the system.
+223: // For example this allows to start a scene with snow that already has fallen. Defaults to 0. Animatable.
+224: @property(nonatomic) CGFloat warmupDuration;
+225: 
+275: @property(nonatomic) CGFloat particleLifeSpan;
+276: 
+277: // Specifies the life span variation of particles. Animatable.
+278: @property(nonatomic) CGFloat particleLifeSpanVariation;
+279: 
+280: // Specifies an optional system to spawn new particles when a particle dies
+281: @property(nonatomic, retain, nullable) SCNParticleSystem *systemSpawnedOnDying;
+282: 
+283: // Specifies an optional system to spawn new particles when a particle dies
+284: @property(nonatomic, retain, nullable) SCNParticleSystem *systemSpawnedOnCollision;
+285: 
+286: // Specifies an optional system to spawn new particles when a particle is alive
+287: @property(nonatomic, retain, nullable) SCNParticleSystem *systemSpawnedOnLiving;
+288: 
+289: #pragma mark Particle Rendering
+290: 
+291: // Specifies the image of the particle.
+292: // Can be set to an NSImage/UIImage, a path or a URL.
+310: // Specifies the texture animation frame rate variation, in frames per second. Defaults to 0. Animatable.
+311: @property(nonatomic) CGFloat imageSequenceFrameRateVariation;
+312: 
+313: // Specifies the texture animation mode. Defaults to SCNTextureAnimationModeRepeat.
+314: @property(nonatomic) SCNParticleImageSequenceAnimationMode imageSequenceAnimationMode;
+315: 
+316: // Specifies the initial color of the particle. Animatable. Defaults to opaque white.
+317: @property(nonatomic, retain) UIColor *particleColor;
+318: 
+319: // Specifies the normalized variation of the color.
+320: // With x : hue variation, y : saturation variation, z : brightness variation, w : alpha variation. Animatable.
+321: @property(nonatomic) SCNVector4 particleColorVariation;
+322: 
+323: // Specifies the initial size of the particle. Animatable.
+324: @property(nonatomic) CGFloat particleSize;
+325: 
+326: // Specifies the initial size variation of the particle. Animatable.
+327: @property(nonatomic) CGFloat particleSizeVariation;
+328: 
+329: // Specifies the initial intensity of the particle. Animatable.
+330: @property(nonatomic) CGFloat particleIntensity API_AVAILABLE(macos(10.13), ios(11.0), tvos(11.0), watchos(4.0));
+331: 
+332: // Specifies the initial intensity variation of the particle. Animatable.
+333: @property(nonatomic) CGFloat particleIntensityVariation API_AVAILABLE(macos(10.13), ios(11.0), tvos(11.0), watchos(4.0));
+334: 
+335: // Specifies the blend mode to use to render the particle system. Defaults to SCNParticleBlendModeAdditive.
+336: @property(nonatomic) SCNParticleBlendMode blendMode;
+337: 
+338: // Specifies whether a black pass is required or not when rendering the particle system.
+339: // This reinforces the contrast of additive/light systems. Defaults to NO.
+340: @property(nonatomic, getter=isBlackPassEnabled) BOOL blackPassEnabled;
+341: 
+342: // Specifies the orientation mode of the particles. Defaults to SCNParticleOrientationModeBillboardScreenAligned.
+343: @property(nonatomic) SCNParticleOrientationMode orientationMode;
+344: 
+345: // Specifies the sorting mode of the particles. Defaults to SCNParticleSortingModeNone.
+346: @property(nonatomic) SCNParticleSortingMode sortingMode;
+347: 
+348: // Enables the lighting of particle systems
+349: @property(nonatomic, getter=isLightingEnabled) BOOL lightingEnabled;
+350: 
+351: #pragma mark Particle Simulation
+352: 
+353: // Enables the use of the gravity defined in SCNPhysicsWorld
+354: @property(nonatomic) BOOL affectedByGravity;
+355: 
+356: // Enables the effect of the physics fields added to the SCNPhysicsWorld
+357: @property(nonatomic) BOOL affectedByPhysicsFields;
+358: 
+359: // Specifies whether particles die on collision
+360: @property(nonatomic) BOOL particleDiesOnCollision;
+374: // Specifies the particle bounce variation. Animatable.
+375: @property(nonatomic) CGFloat particleBounceVariation;
+376: 
+377: // Specifies the particle friction. Animatable.
+378: @property(nonatomic) CGFloat particleFriction;
+379: 
+380: // Specifies the particle friction variation. Animatable.
+381: @property(nonatomic) CGFloat particleFrictionVariation;
+382: 
+383: // Specifies the charge on the particle. Charge determines the degree to which a particle is affected by
+384: // electric and magnetic fields. Note that this is a unitless quantity, it is up to the developer to
+385: // set charge and field strength appropriately. Defaults to 0.0. Animatable.
+386: @property(nonatomic) CGFloat particleCharge;
+387: 
+388: // Specifies the particle charge variation. Animatable.
+389: @property(nonatomic) CGFloat particleChargeVariation;
+390: 
+391: // Specifies the particle air resistance. Defaults to 0. Animatable.
+392: @property(nonatomic) CGFloat dampingFactor;
+393: 
+394: // Specifies the simulation speed multiplier. Defaults to 1. Animatable.
+395: @property(nonatomic) CGFloat speedFactor;
+396: 
+397: // Specifies whether particles stretch along their direction. Defaults to 0. Animatable.
+398: @property(nonatomic) CGFloat stretchFactor;
+399: 
+400: // Specifies the receiver's fresnel exponent value. Defaults to 3. Animatable.
+401: // Only used if the particleImage is a cube map. The bigger the amount, the more concentrated the reflection is around the edges
+402: @property(nonatomic) CGFloat fresnelExponent;
+403: 
+404: /*!
+405:  @property writeToDepthBuffer
+406:  @abstract Determines whether the receiver writes to the depth buffer when rendered. Defaults to NO.
+407:  */
+408: @property(nonatomic) BOOL writesToDepthBuffer API_AVAILABLE(macos(12.0), ios(15.0), tvos(15.0), watchos(8.0));
+409: 
+410: // Property controllers.
+411: @property(nonatomic, copy, nullable) NSDictionary<SCNParticleProperty, SCNParticlePropertyController *> *propertyControllers;
+412: 
+413: // Remove all the already-emitted particles and restart the simulation.
+414: - (void)reset;
+415: 
+416: // Events handling
+417: // "block" will be invoked for particles that trigger the specified event, with the data and dataStride that corresponds to "properties". The block should only update the particle properties reference by the "indices" passed as argument in the block.
+418: - (void)handleEvent:(SCNParticleEvent)event forProperties:(NSArray<SCNParticleProperty> *)properties withBlock:(SCNParticleEventBlock)block;
+419: 
+420: // Modifications handling
+421: // "block" will be invoked at every simulation step at the specified stage. The data and dataStride passed to the block will corresponds to the specified "properties".
+422: - (void)addModifierForProperties:(NSArray<SCNParticleProperty> *)properties atStage:(SCNParticleModifierStage)stage withBlock:(SCNParticleModifierBlock)block;
+423: - (void)removeModifiersOfStage:(SCNParticleModifierStage)stage;
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNSceneRenderer.h SHA256 672f070bd65505d715a4f69bdf4ce187665fd87947d9e3d3edb1b5e22be9affc
+314: 
+315: /*!
+316:  @property usesReverseZ
+317:  @abstract Specifies if the renderer should use the reverse Z technique. Defaults to YES.
+318:  @discussion This property is only valid on a renderer created with a Metal device.
+319:  */
+320: @property (nonatomic) BOOL usesReverseZ API_AVAILABLE(macos(10.15), ios(13.0), tvos(13.0), watchos(6.0));

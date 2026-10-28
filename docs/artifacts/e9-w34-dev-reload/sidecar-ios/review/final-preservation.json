@@ -1,0 +1,16 @@
+{
+  "source_after_import_unchanged": true,
+  "source_file_count": 1934,
+  "no_added_checkout_files_after_import": true,
+  "six_locks_preserved": true,
+  "replay_scratch_remaining": [],
+  "decoded_inspection_pngs_removed": {
+    "video-first.png": "f1855f5132c78f08c5975484afc72520826e196bec4a6f8d5752d4767accb47c",
+    "video-final.png": "bf047a1d1854ed6ceb40c4c714d8d7630c8c0a57f80824e084a849fb64d29dd7",
+    "video-contact.png": "dec6e2d77bf46fc1d275bb93ac4ed95de81b00d0a1e73477277bc49aec81b915"
+  },
+  "raw_pixel_buffers_were_memory_only": true,
+  "parent_writes": false,
+  "imported_source_retained": true,
+  "independent_tests_builds_devices": "NOT_RUN"
+}

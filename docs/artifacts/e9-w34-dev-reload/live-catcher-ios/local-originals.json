@@ -1,0 +1,54 @@
+{
+  "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/native-all.log": {
+    "sha256": "8e4d29b016fa4d349785ee4dd8a036561cec512ac3ae2ac79add2f2aa81a440a",
+    "bytes": 15993314
+  },
+  "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/blend-before/native-all.log": {
+    "sha256": "9d311cd803e7cf8d078de3050efa415291934eb49170477980256753c5a82e61",
+    "bytes": 20793671
+  },
+  "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/before/journey.mp4": {
+    "sha256": "826bba084a52de9e58f82a2c49ddba70f362dff3711f4c878bd283752c18a2b9",
+    "bytes": 12353452
+  },
+  "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/traced/light-journey.mp4": {
+    "sha256": "8dd5f69917ca8b8d19adb4014f2e35d54ea3ce75d1bf4f10e52370a21d948c50",
+    "bytes": 28846487
+  },
+  "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/traced/lifetime-journey.mp4": {
+    "sha256": "9a2d66c8a3e34d8b503f109d5602b7894b0c217c9c24e2145518da9ee14bc48d",
+    "bytes": 9803535
+  },
+  "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/traced/journey.mp4": {
+    "sha256": "6d4e22b04c62db6604bb22169a3f59e534f9081c4b33eb6953edb35836c86022",
+    "bytes": 46112206
+  },
+  "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/clean/light-journey.mp4": {
+    "sha256": "c68eb2449b621dd70de725ac67ab025c64e0bbeb0c1bf50090efebe375403689",
+    "bytes": 48656914
+  },
+  "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/clean/lifetime-journey.mp4": {
+    "sha256": "e47a77203c19bdda6097377ea05f385d4341f8b0f10728cfc2918ffb2d6b52e2",
+    "bytes": 19253080
+  },
+  "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/clean/journey.mp4": {
+    "sha256": "95eb8d06d7f3f2a166b0ec364383e151f939a4c27620afc245917a79bb9787ee",
+    "bytes": 22004097
+  },
+  "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/no-light-control/journey.mp4": {
+    "sha256": "22046f7a83b1306c82069b1ea17d551ad94de722839c5a0486cba9f3a7af32f3",
+    "bytes": 7012744
+  },
+  "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/blend-before/journey.mp4": {
+    "sha256": "b61849324cb8345b12910e61d5eed684b5fd4ce35add98f7bb130f6f21fcbf8c",
+    "bytes": 10997048
+  },
+  "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/blend-after/journey.mp4": {
+    "sha256": "3180b31ffb70418e04800f4fcc837203b24dfef43abf1086fa704c45f020692b",
+    "bytes": 21817247
+  },
+  "/private/tmp/dart3d-w34-ios-live-production-20261028/r1/parent/final-clean/journey.mp4": {
+    "sha256": "c97661b7095374fe249ee71b680f60537fc43831ebc199eeb731658a5ee83511",
+    "bytes": 23606540
+  }
+}

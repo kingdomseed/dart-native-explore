@@ -1,0 +1,2 @@
+Normal lib/main.dart target restored; no probe/reload selector. Other defines undisclosed.
+All three probe additions absent. Accepted reload library remains integrated.
