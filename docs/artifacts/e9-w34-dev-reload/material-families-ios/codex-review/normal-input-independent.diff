@@ -1,0 +1,11 @@
+--- after/FsceneRealizer-failed-normals.swift
++++ normal-input-r2/FsceneRealizer.swift
+@@ -8489,7 +8489,7 @@
+         case .none: return material
+         case .normals:
+             rgb = pbr ? "0.5 * normalize(_surface.normal) + 0.5"
+-                : "0.5 * normalize(_surface.geometryNormal) + 0.5"
++                : "0.5 * normalize(_surface.normal) + 0.5"
+         case .metallic:
+             rgb = pbr ? "float3(saturate(_surface.metalness))" : "float3(1.0, 0.0, 1.0)"
+         case .roughness:

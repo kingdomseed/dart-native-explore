@@ -1,0 +1,26 @@
+--- r1
++++ r2
+@@ -142,7 +142,7 @@
+                     "outputs": ["color": "COLOR", "depth": "DEPTH"],
+                     "colorStates": ["clear": true,
+                                     "clearColor": "0.015 0.015 0.015 1"],
+-                    "depthStates": ["clear": true, "enableRead": true,
++                    "depthStates": ["clear": true, "enableRead": false,
+                                     "enableWrite": true,
+                                     "func": host.usesReverseZ ? "greaterEqual" : "lessEqual"],
+                 ]],
+@@ -167,11 +167,14 @@
+     private func logState(host: SceneViewHost, event: String) {
+         guard let system else { return }
+         let actual = host.technique
++        let passes = actual?.dictionaryRepresentation["passes"] as? [String: Any]
++        let scenePass = passes?["w34_particle_scene"] as? [String: Any]
+         d3Log("W34ParticleProbe \(event) requested=\(mode.rawValue)"
+             + " technique=\(String(describing: actual.map(ObjectIdentifier.init)))"
+             + " passes=\(String(describing: actual?.dictionaryRepresentation["sequence"]))"
+             + " reverseZ=\(host.usesReverseZ)"
+             + " depthFunc=\(host.usesReverseZ ? "greaterEqual" : "lessEqual")")
++        d3Log("W34ParticleProbe \(event) depthStates=\(String(describing: scenePass?["depthStates"]))")
+         d3Log("W34ParticleProbe \(event) shader"
+             + " library=\(String(describing: actual?.library.map(ObjectIdentifier.init)))"
+             + " functions=\(actual?.library?.functionNames ?? [])")

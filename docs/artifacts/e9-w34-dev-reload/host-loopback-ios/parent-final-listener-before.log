@@ -1,0 +1,4 @@
+COMMAND   PID      USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+dartvm  40646 jasonholt    9u  IPv4 0xd70562a8c6ff7c64      0t0  TCP 127.0.0.1:49334 (LISTEN)
+dartvm  40646 jasonholt   14u  IPv4 0x95f9f1f863629615      0t0  TCP 127.0.0.1:49334->127.0.0.1:58417 (ESTABLISHED)
+Runner  41344 jasonholt   15u  IPv4 0xc1acb1022a9d260c      0t0  TCP 127.0.0.1:58417->127.0.0.1:49334 (ESTABLISHED)

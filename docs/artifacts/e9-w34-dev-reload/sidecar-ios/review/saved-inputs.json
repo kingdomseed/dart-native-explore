@@ -1,0 +1,1147 @@
+{
+  "init": {
+    "scene_sha256": "5261ff0059f72616c8dc0e69bc97d965a2e004ff7e3fda5f45325ed32b5ca611",
+    "scene_characters": 2397,
+    "sidecar_sha256": "82facd2365dffe257b04452231a4c6fbea3605182d9511f8df6ed43dfb4c8f81",
+    "sidecar_length": 2472,
+    "scene": {
+      "fscene": 5,
+      "documentId": "48HJ89964WM2JAHB5GPJWBSG64",
+      "payloadSource": "pixels.fsceneb",
+      "stage": {
+        "environmentRef": "env:0007ED000000C"
+      },
+      "resources": {
+        "tex:0007ED0000002": {
+          "kind": "texture",
+          "payload": "chunk:0007ED0000000"
+        },
+        "mat:0007ED0000004": {
+          "kind": "material",
+          "type": "unlit",
+          "properties": {
+            "baseColor": {
+              "c": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            },
+            "baseColorTexture": {
+              "rref": "tex:0007ED0000002"
+            },
+            "doubleSided": {
+              "b": true
+            }
+          }
+        },
+        "geo:0007ED0000006": {
+          "kind": "geometry",
+          "procedural": {
+            "shape": "plane",
+            "width": 3.0,
+            "depth": 3.0,
+            "segmentsX": 1,
+            "segmentsZ": 1
+          }
+        },
+        "env:0007ED000000C": {
+          "kind": "environment",
+          "environment": {
+            "type": "empty"
+          },
+          "environmentIntensity": 0.0,
+          "exposure": 1.0,
+          "toneMapping": "linear",
+          "effects": {}
+        }
+      },
+      "nodes": {
+        "n:0007ED0000008": {
+          "name": "w34.quad",
+          "transform": {
+            "trs": {
+              "t": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "r": [
+                -0.7071067690849304,
+                0.0,
+                0.0,
+                0.7071067690849304
+              ],
+              "s": [
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "components": [
+            {
+              "type": "mesh",
+              "properties": {
+                "geometry": {
+                  "rref": "geo:0007ED0000006"
+                },
+                "material": {
+                  "rref": "mat:0007ED0000004"
+                }
+              }
+            }
+          ]
+        },
+        "n:0007ED000000A": {
+          "name": "w34.camera",
+          "transform": {
+            "trs": {
+              "t": [
+                0.0,
+                0.0,
+                -6.0
+              ],
+              "r": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "s": [
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "components": [
+            {
+              "type": "camera",
+              "properties": {
+                "projection": {
+                  "s": "perspective"
+                },
+                "fovRadiansY": {
+                  "d": 0.8
+                },
+                "near": {
+                  "d": 0.1
+                },
+                "far": {
+                  "d": 30.0
+                }
+              }
+            }
+          ]
+        }
+      },
+      "roots": [
+        "n:0007ED0000008",
+        "n:0007ED000000A"
+      ],
+      "payloads": {
+        "chunk:0007ED0000000": {
+          "encoding": "image",
+          "format": "rgba8",
+          "width": 2,
+          "height": 2,
+          "length": 16
+        }
+      }
+    },
+    "sidecar_manifest": {
+      "fscene": 5,
+      "documentId": "48HJ89964WM2JAHB5GPJWBSG64",
+      "payloadSource": "pixels.fsceneb",
+      "stage": {
+        "environmentRef": "env:0007ED000000C"
+      },
+      "resources": {
+        "tex:0007ED0000002": {
+          "kind": "texture",
+          "payload": "chunk:0007ED0000000"
+        },
+        "mat:0007ED0000004": {
+          "kind": "material",
+          "type": "unlit",
+          "properties": {
+            "baseColor": {
+              "c": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            },
+            "baseColorTexture": {
+              "rref": "tex:0007ED0000002"
+            },
+            "doubleSided": {
+              "b": true
+            }
+          }
+        },
+        "geo:0007ED0000006": {
+          "kind": "geometry",
+          "procedural": {
+            "shape": "plane",
+            "width": 3.0,
+            "depth": 3.0,
+            "segmentsX": 1,
+            "segmentsZ": 1
+          }
+        },
+        "env:0007ED000000C": {
+          "kind": "environment",
+          "environment": {
+            "type": "empty"
+          },
+          "environmentIntensity": 0.0,
+          "exposure": 1.0,
+          "toneMapping": "linear",
+          "effects": {}
+        }
+      },
+      "nodes": {
+        "n:0007ED0000008": {
+          "name": "w34.quad",
+          "transform": {
+            "trs": {
+              "t": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "r": [
+                -0.7071067690849304,
+                0.0,
+                0.0,
+                0.7071067690849304
+              ],
+              "s": [
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "components": [
+            {
+              "type": "mesh",
+              "properties": {
+                "geometry": {
+                  "rref": "geo:0007ED0000006"
+                },
+                "material": {
+                  "rref": "mat:0007ED0000004"
+                }
+              }
+            }
+          ]
+        },
+        "n:0007ED000000A": {
+          "name": "w34.camera",
+          "transform": {
+            "trs": {
+              "t": [
+                0.0,
+                0.0,
+                -6.0
+              ],
+              "r": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "s": [
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "components": [
+            {
+              "type": "camera",
+              "properties": {
+                "projection": {
+                  "s": "perspective"
+                },
+                "fovRadiansY": {
+                  "d": 0.8
+                },
+                "near": {
+                  "d": 0.1
+                },
+                "far": {
+                  "d": 30.0
+                }
+              }
+            }
+          ]
+        }
+      },
+      "roots": [
+        "n:0007ED0000008",
+        "n:0007ED000000A"
+      ],
+      "payloads": {
+        "chunk:0007ED0000000": {
+          "encoding": "image",
+          "format": "rgba8",
+          "width": 2,
+          "height": 2,
+          "length": 16
+        }
+      }
+    },
+    "payload_token": "0007ED0000000",
+    "payload_bytes": [
+      255,
+      30,
+      20,
+      255,
+      20,
+      240,
+      70,
+      255,
+      20,
+      240,
+      70,
+      255,
+      255,
+      30,
+      20,
+      255
+    ],
+    "chunks": [
+      {
+        "type": "JSON",
+        "length": 2397
+      },
+      {
+        "type": "BLOB",
+        "length": 33
+      }
+    ]
+  },
+  "b": {
+    "scene_sha256": "5261ff0059f72616c8dc0e69bc97d965a2e004ff7e3fda5f45325ed32b5ca611",
+    "scene_characters": 2397,
+    "sidecar_sha256": "c7bbe700d89ba4fac131fb0031460bed953b2be4a918b7ca093af1ea83f498a4",
+    "sidecar_length": 2472,
+    "scene": {
+      "fscene": 5,
+      "documentId": "48HJ89964WM2JAHB5GPJWBSG64",
+      "payloadSource": "pixels.fsceneb",
+      "stage": {
+        "environmentRef": "env:0007ED000000C"
+      },
+      "resources": {
+        "tex:0007ED0000002": {
+          "kind": "texture",
+          "payload": "chunk:0007ED0000000"
+        },
+        "mat:0007ED0000004": {
+          "kind": "material",
+          "type": "unlit",
+          "properties": {
+            "baseColor": {
+              "c": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            },
+            "baseColorTexture": {
+              "rref": "tex:0007ED0000002"
+            },
+            "doubleSided": {
+              "b": true
+            }
+          }
+        },
+        "geo:0007ED0000006": {
+          "kind": "geometry",
+          "procedural": {
+            "shape": "plane",
+            "width": 3.0,
+            "depth": 3.0,
+            "segmentsX": 1,
+            "segmentsZ": 1
+          }
+        },
+        "env:0007ED000000C": {
+          "kind": "environment",
+          "environment": {
+            "type": "empty"
+          },
+          "environmentIntensity": 0.0,
+          "exposure": 1.0,
+          "toneMapping": "linear",
+          "effects": {}
+        }
+      },
+      "nodes": {
+        "n:0007ED0000008": {
+          "name": "w34.quad",
+          "transform": {
+            "trs": {
+              "t": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "r": [
+                -0.7071067690849304,
+                0.0,
+                0.0,
+                0.7071067690849304
+              ],
+              "s": [
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "components": [
+            {
+              "type": "mesh",
+              "properties": {
+                "geometry": {
+                  "rref": "geo:0007ED0000006"
+                },
+                "material": {
+                  "rref": "mat:0007ED0000004"
+                }
+              }
+            }
+          ]
+        },
+        "n:0007ED000000A": {
+          "name": "w34.camera",
+          "transform": {
+            "trs": {
+              "t": [
+                0.0,
+                0.0,
+                -6.0
+              ],
+              "r": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "s": [
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "components": [
+            {
+              "type": "camera",
+              "properties": {
+                "projection": {
+                  "s": "perspective"
+                },
+                "fovRadiansY": {
+                  "d": 0.8
+                },
+                "near": {
+                  "d": 0.1
+                },
+                "far": {
+                  "d": 30.0
+                }
+              }
+            }
+          ]
+        }
+      },
+      "roots": [
+        "n:0007ED0000008",
+        "n:0007ED000000A"
+      ],
+      "payloads": {
+        "chunk:0007ED0000000": {
+          "encoding": "image",
+          "format": "rgba8",
+          "width": 2,
+          "height": 2,
+          "length": 16
+        }
+      }
+    },
+    "sidecar_manifest": {
+      "fscene": 5,
+      "documentId": "48HJ89964WM2JAHB5GPJWBSG64",
+      "payloadSource": "pixels.fsceneb",
+      "stage": {
+        "environmentRef": "env:0007ED000000C"
+      },
+      "resources": {
+        "tex:0007ED0000002": {
+          "kind": "texture",
+          "payload": "chunk:0007ED0000000"
+        },
+        "mat:0007ED0000004": {
+          "kind": "material",
+          "type": "unlit",
+          "properties": {
+            "baseColor": {
+              "c": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            },
+            "baseColorTexture": {
+              "rref": "tex:0007ED0000002"
+            },
+            "doubleSided": {
+              "b": true
+            }
+          }
+        },
+        "geo:0007ED0000006": {
+          "kind": "geometry",
+          "procedural": {
+            "shape": "plane",
+            "width": 3.0,
+            "depth": 3.0,
+            "segmentsX": 1,
+            "segmentsZ": 1
+          }
+        },
+        "env:0007ED000000C": {
+          "kind": "environment",
+          "environment": {
+            "type": "empty"
+          },
+          "environmentIntensity": 0.0,
+          "exposure": 1.0,
+          "toneMapping": "linear",
+          "effects": {}
+        }
+      },
+      "nodes": {
+        "n:0007ED0000008": {
+          "name": "w34.quad",
+          "transform": {
+            "trs": {
+              "t": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "r": [
+                -0.7071067690849304,
+                0.0,
+                0.0,
+                0.7071067690849304
+              ],
+              "s": [
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "components": [
+            {
+              "type": "mesh",
+              "properties": {
+                "geometry": {
+                  "rref": "geo:0007ED0000006"
+                },
+                "material": {
+                  "rref": "mat:0007ED0000004"
+                }
+              }
+            }
+          ]
+        },
+        "n:0007ED000000A": {
+          "name": "w34.camera",
+          "transform": {
+            "trs": {
+              "t": [
+                0.0,
+                0.0,
+                -6.0
+              ],
+              "r": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "s": [
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "components": [
+            {
+              "type": "camera",
+              "properties": {
+                "projection": {
+                  "s": "perspective"
+                },
+                "fovRadiansY": {
+                  "d": 0.8
+                },
+                "near": {
+                  "d": 0.1
+                },
+                "far": {
+                  "d": 30.0
+                }
+              }
+            }
+          ]
+        }
+      },
+      "roots": [
+        "n:0007ED0000008",
+        "n:0007ED000000A"
+      ],
+      "payloads": {
+        "chunk:0007ED0000000": {
+          "encoding": "image",
+          "format": "rgba8",
+          "width": 2,
+          "height": 2,
+          "length": 16
+        }
+      }
+    },
+    "payload_token": "0007ED0000000",
+    "payload_bytes": [
+      20,
+      80,
+      255,
+      255,
+      255,
+      220,
+      20,
+      255,
+      255,
+      220,
+      20,
+      255,
+      20,
+      80,
+      255,
+      255
+    ],
+    "chunks": [
+      {
+        "type": "JSON",
+        "length": 2397
+      },
+      {
+        "type": "BLOB",
+        "length": 33
+      }
+    ]
+  },
+  "malformed": {
+    "scene_sha256": "5261ff0059f72616c8dc0e69bc97d965a2e004ff7e3fda5f45325ed32b5ca611",
+    "scene_characters": 2397,
+    "sidecar_sha256": "ae4b3280e56e2faf83f414a6e3dabe9d5fbe18976544c05fed121accb85b53fc",
+    "sidecar_length": 3,
+    "scene": {
+      "fscene": 5,
+      "documentId": "48HJ89964WM2JAHB5GPJWBSG64",
+      "payloadSource": "pixels.fsceneb",
+      "stage": {
+        "environmentRef": "env:0007ED000000C"
+      },
+      "resources": {
+        "tex:0007ED0000002": {
+          "kind": "texture",
+          "payload": "chunk:0007ED0000000"
+        },
+        "mat:0007ED0000004": {
+          "kind": "material",
+          "type": "unlit",
+          "properties": {
+            "baseColor": {
+              "c": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            },
+            "baseColorTexture": {
+              "rref": "tex:0007ED0000002"
+            },
+            "doubleSided": {
+              "b": true
+            }
+          }
+        },
+        "geo:0007ED0000006": {
+          "kind": "geometry",
+          "procedural": {
+            "shape": "plane",
+            "width": 3.0,
+            "depth": 3.0,
+            "segmentsX": 1,
+            "segmentsZ": 1
+          }
+        },
+        "env:0007ED000000C": {
+          "kind": "environment",
+          "environment": {
+            "type": "empty"
+          },
+          "environmentIntensity": 0.0,
+          "exposure": 1.0,
+          "toneMapping": "linear",
+          "effects": {}
+        }
+      },
+      "nodes": {
+        "n:0007ED0000008": {
+          "name": "w34.quad",
+          "transform": {
+            "trs": {
+              "t": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "r": [
+                -0.7071067690849304,
+                0.0,
+                0.0,
+                0.7071067690849304
+              ],
+              "s": [
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "components": [
+            {
+              "type": "mesh",
+              "properties": {
+                "geometry": {
+                  "rref": "geo:0007ED0000006"
+                },
+                "material": {
+                  "rref": "mat:0007ED0000004"
+                }
+              }
+            }
+          ]
+        },
+        "n:0007ED000000A": {
+          "name": "w34.camera",
+          "transform": {
+            "trs": {
+              "t": [
+                0.0,
+                0.0,
+                -6.0
+              ],
+              "r": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "s": [
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "components": [
+            {
+              "type": "camera",
+              "properties": {
+                "projection": {
+                  "s": "perspective"
+                },
+                "fovRadiansY": {
+                  "d": 0.8
+                },
+                "near": {
+                  "d": 0.1
+                },
+                "far": {
+                  "d": 30.0
+                }
+              }
+            }
+          ]
+        }
+      },
+      "roots": [
+        "n:0007ED0000008",
+        "n:0007ED000000A"
+      ],
+      "payloads": {
+        "chunk:0007ED0000000": {
+          "encoding": "image",
+          "format": "rgba8",
+          "width": 2,
+          "height": 2,
+          "length": 16
+        }
+      }
+    },
+    "literal_bytes": [
+      0,
+      1,
+      2
+    ]
+  },
+  "a": {
+    "scene_sha256": "5261ff0059f72616c8dc0e69bc97d965a2e004ff7e3fda5f45325ed32b5ca611",
+    "scene_characters": 2397,
+    "sidecar_sha256": "82facd2365dffe257b04452231a4c6fbea3605182d9511f8df6ed43dfb4c8f81",
+    "sidecar_length": 2472,
+    "scene": {
+      "fscene": 5,
+      "documentId": "48HJ89964WM2JAHB5GPJWBSG64",
+      "payloadSource": "pixels.fsceneb",
+      "stage": {
+        "environmentRef": "env:0007ED000000C"
+      },
+      "resources": {
+        "tex:0007ED0000002": {
+          "kind": "texture",
+          "payload": "chunk:0007ED0000000"
+        },
+        "mat:0007ED0000004": {
+          "kind": "material",
+          "type": "unlit",
+          "properties": {
+            "baseColor": {
+              "c": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            },
+            "baseColorTexture": {
+              "rref": "tex:0007ED0000002"
+            },
+            "doubleSided": {
+              "b": true
+            }
+          }
+        },
+        "geo:0007ED0000006": {
+          "kind": "geometry",
+          "procedural": {
+            "shape": "plane",
+            "width": 3.0,
+            "depth": 3.0,
+            "segmentsX": 1,
+            "segmentsZ": 1
+          }
+        },
+        "env:0007ED000000C": {
+          "kind": "environment",
+          "environment": {
+            "type": "empty"
+          },
+          "environmentIntensity": 0.0,
+          "exposure": 1.0,
+          "toneMapping": "linear",
+          "effects": {}
+        }
+      },
+      "nodes": {
+        "n:0007ED0000008": {
+          "name": "w34.quad",
+          "transform": {
+            "trs": {
+              "t": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "r": [
+                -0.7071067690849304,
+                0.0,
+                0.0,
+                0.7071067690849304
+              ],
+              "s": [
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "components": [
+            {
+              "type": "mesh",
+              "properties": {
+                "geometry": {
+                  "rref": "geo:0007ED0000006"
+                },
+                "material": {
+                  "rref": "mat:0007ED0000004"
+                }
+              }
+            }
+          ]
+        },
+        "n:0007ED000000A": {
+          "name": "w34.camera",
+          "transform": {
+            "trs": {
+              "t": [
+                0.0,
+                0.0,
+                -6.0
+              ],
+              "r": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "s": [
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "components": [
+            {
+              "type": "camera",
+              "properties": {
+                "projection": {
+                  "s": "perspective"
+                },
+                "fovRadiansY": {
+                  "d": 0.8
+                },
+                "near": {
+                  "d": 0.1
+                },
+                "far": {
+                  "d": 30.0
+                }
+              }
+            }
+          ]
+        }
+      },
+      "roots": [
+        "n:0007ED0000008",
+        "n:0007ED000000A"
+      ],
+      "payloads": {
+        "chunk:0007ED0000000": {
+          "encoding": "image",
+          "format": "rgba8",
+          "width": 2,
+          "height": 2,
+          "length": 16
+        }
+      }
+    },
+    "sidecar_manifest": {
+      "fscene": 5,
+      "documentId": "48HJ89964WM2JAHB5GPJWBSG64",
+      "payloadSource": "pixels.fsceneb",
+      "stage": {
+        "environmentRef": "env:0007ED000000C"
+      },
+      "resources": {
+        "tex:0007ED0000002": {
+          "kind": "texture",
+          "payload": "chunk:0007ED0000000"
+        },
+        "mat:0007ED0000004": {
+          "kind": "material",
+          "type": "unlit",
+          "properties": {
+            "baseColor": {
+              "c": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            },
+            "baseColorTexture": {
+              "rref": "tex:0007ED0000002"
+            },
+            "doubleSided": {
+              "b": true
+            }
+          }
+        },
+        "geo:0007ED0000006": {
+          "kind": "geometry",
+          "procedural": {
+            "shape": "plane",
+            "width": 3.0,
+            "depth": 3.0,
+            "segmentsX": 1,
+            "segmentsZ": 1
+          }
+        },
+        "env:0007ED000000C": {
+          "kind": "environment",
+          "environment": {
+            "type": "empty"
+          },
+          "environmentIntensity": 0.0,
+          "exposure": 1.0,
+          "toneMapping": "linear",
+          "effects": {}
+        }
+      },
+      "nodes": {
+        "n:0007ED0000008": {
+          "name": "w34.quad",
+          "transform": {
+            "trs": {
+              "t": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "r": [
+                -0.7071067690849304,
+                0.0,
+                0.0,
+                0.7071067690849304
+              ],
+              "s": [
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "components": [
+            {
+              "type": "mesh",
+              "properties": {
+                "geometry": {
+                  "rref": "geo:0007ED0000006"
+                },
+                "material": {
+                  "rref": "mat:0007ED0000004"
+                }
+              }
+            }
+          ]
+        },
+        "n:0007ED000000A": {
+          "name": "w34.camera",
+          "transform": {
+            "trs": {
+              "t": [
+                0.0,
+                0.0,
+                -6.0
+              ],
+              "r": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "s": [
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          },
+          "components": [
+            {
+              "type": "camera",
+              "properties": {
+                "projection": {
+                  "s": "perspective"
+                },
+                "fovRadiansY": {
+                  "d": 0.8
+                },
+                "near": {
+                  "d": 0.1
+                },
+                "far": {
+                  "d": 30.0
+                }
+              }
+            }
+          ]
+        }
+      },
+      "roots": [
+        "n:0007ED0000008",
+        "n:0007ED000000A"
+      ],
+      "payloads": {
+        "chunk:0007ED0000000": {
+          "encoding": "image",
+          "format": "rgba8",
+          "width": 2,
+          "height": 2,
+          "length": 16
+        }
+      }
+    },
+    "payload_token": "0007ED0000000",
+    "payload_bytes": [
+      255,
+      30,
+      20,
+      255,
+      20,
+      240,
+      70,
+      255,
+      20,
+      240,
+      70,
+      255,
+      255,
+      30,
+      20,
+      255
+    ],
+    "chunks": [
+      {
+        "type": "JSON",
+        "length": 2397
+      },
+      {
+        "type": "BLOB",
+        "length": 33
+      }
+    ]
+  }
+}

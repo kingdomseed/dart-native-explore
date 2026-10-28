@@ -1,0 +1,26 @@
+{
+  "origin": "Parent transcript of tool exit results; empty typecheck logs alone are not receipts",
+  "focusedTests": {
+    "command": "/Users/jasonholt/zero/bin/dn test --no-pub test/w34_debug_scene_test.dart test/u2_catcher_showcase_test.dart test/u3_sprite_showcase_test.dart",
+    "cwd": "dart3d/example",
+    "exitCode": 0,
+    "passed": 31
+  },
+  "exampleAnalyze": {
+    "command": "/Users/jasonholt/zero/bin/dn analyze --no-pub",
+    "cwd": "dart3d/example",
+    "exitCode": 0
+  },
+  "modelCopyTypecheck": {
+    "command": "xcrun swiftc -typecheck -sdk \"$(xcrun --sdk iphonesimulator --show-sdk-path)\" -target arm64-apple-ios15.0-simulator dart3d/ios/Classes/*.swift",
+    "cwd": "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb",
+    "exitCode": 0,
+    "sourceManifest": "model-copy/source-sha256.json"
+  },
+  "firstPresentationCopyNative": "FAIL EXC_BAD_ACCESS PID40349 at SCNLight.copyWithZone/setIESProfileURL; DN wrapper exit0 is not a native pass",
+  "modelCopyNative": "PID41819 recorded selections and completed DN run; no independent runtime",
+  "fullSuites": "NOT_RUN for throwaway candidate",
+  "sourceLightMutation": "NOT_RUN",
+  "animatedLightParity": "NOT_RUN",
+  "offOpacityDiscrepancy": "OPEN"
+}

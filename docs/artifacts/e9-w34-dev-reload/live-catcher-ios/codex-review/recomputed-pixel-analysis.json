@@ -1,0 +1,1126 @@
+{
+  "comparisons": [
+    {
+      "left": "before/00-off-A.png",
+      "right": "clean/00-off-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "before/01-normals-A.png",
+      "right": "clean/01-normals-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 30425,
+      "maxRGBDifference": 126,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "before/02-depth-A.png",
+      "right": "clean/02-depth-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 30375,
+      "maxRGBDifference": 16,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "before/03-baseColor-A.png",
+      "right": "clean/03-baseColor-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 30425,
+      "maxRGBDifference": 253,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "before/04-baseColor-B.png",
+      "right": "clean/04-baseColor-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 30937,
+      "maxRGBDifference": 253,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "before/05-normals-B.png",
+      "right": "clean/05-normals-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 30937,
+      "maxRGBDifference": 126,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "before/06-off-B.png",
+      "right": "clean/06-off-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "before/07-off-A-return.png",
+      "right": "clean/07-off-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/00-off-A.png",
+      "right": "clean/00-off-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/01-normals-A.png",
+      "right": "clean/01-normals-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/02-depth-A.png",
+      "right": "clean/02-depth-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/03-baseColor-A.png",
+      "right": "clean/03-baseColor-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/04-baseColor-B.png",
+      "right": "clean/04-baseColor-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/05-normals-B.png",
+      "right": "clean/05-normals-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/06-off-B.png",
+      "right": "clean/06-off-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/07-off-A-return.png",
+      "right": "clean/07-off-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/08-normals-A-return.png",
+      "right": "clean/08-normals-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/09-metallic-A.png",
+      "right": "clean/09-metallic-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/10-roughness-A.png",
+      "right": "clean/10-roughness-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/11-baseColor-A-return.png",
+      "right": "clean/11-baseColor-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/12-depth-A-return.png",
+      "right": "clean/12-depth-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/13-depth-wire.png",
+      "right": "clean/13-depth-wire.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/14-off-wire.png",
+      "right": "clean/14-off-wire.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/15-off.png",
+      "right": "clean/15-off.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/16-normals-A.png",
+      "right": "clean/16-normals-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/17-light-B.png",
+      "right": "clean/17-light-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/18-light-A-return.png",
+      "right": "clean/18-light-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/19-low.png",
+      "right": "clean/19-low.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/20-high-return.png",
+      "right": "clean/20-high-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/21-dim.png",
+      "right": "clean/21-dim.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/22-bright.png",
+      "right": "clean/22-bright.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/23-playing.png",
+      "right": "clean/23-playing.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/24-paused.png",
+      "right": "clean/24-paused.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/25-rest-100.png",
+      "right": "clean/25-rest-100.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/26-new-B.png",
+      "right": "clean/26-new-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/27-new-B-dim.png",
+      "right": "clean/27-new-B-dim.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/28-new-B-rest-80.png",
+      "right": "clean/28-new-B-rest-80.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/29-light-absent.png",
+      "right": "clean/29-light-absent.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/30-light-restored.png",
+      "right": "clean/30-light-restored.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/31-material-replace.png",
+      "right": "clean/31-material-replace.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/32-reload-selected.png",
+      "right": "clean/32-reload-selected.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/33-off-new-B.png",
+      "right": "clean/33-off-new-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/34-off-new-A.png",
+      "right": "clean/34-off-new-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/35-off-reload-new-A.png",
+      "right": "clean/35-off-reload-new-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/36-normals-reenter.png",
+      "right": "clean/36-normals-reenter.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/37-absent-1.png",
+      "right": "clean/37-absent-1.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/38-restored-1.png",
+      "right": "clean/38-restored-1.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/39-absent-2.png",
+      "right": "clean/39-absent-2.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/40-restored-2.png",
+      "right": "clean/40-restored-2.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/41-absent-3.png",
+      "right": "clean/41-absent-3.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/42-restored-3.png",
+      "right": "clean/42-restored-3.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/43-off-final.png",
+      "right": "clean/43-off-final.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "no-light-control/01-off-absent.png",
+      "right": "no-light-control/03-off-absent-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "no-light-control/01-off-absent.png",
+      "right": "no-light-control/04-off-absent-replace.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "no-light-control/01-off-absent.png",
+      "right": "no-light-control/05-off-absent-reload.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "no-light-control/00-off-present.png",
+      "right": "no-light-control/06-off-restored.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "no-light-control/00-off-present.png",
+      "right": "no-light-control/08-off-restored-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "clean/29-light-absent.png",
+      "right": "no-light-control/02-normals-absent.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "clean/00-off-A.png",
+      "right": "no-light-control/00-off-present.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/00-off-A.png",
+      "right": "traced/07-off-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/00-off-A.png",
+      "right": "traced/15-off.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/00-off-A.png",
+      "right": "traced/34-off-new-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/00-off-A.png",
+      "right": "traced/35-off-reload-new-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/00-off-A.png",
+      "right": "traced/43-off-final.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/03-baseColor-A.png",
+      "right": "traced/04-baseColor-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 24393,
+      "maxRGBDifference": 157,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/16-normals-A.png",
+      "right": "traced/17-light-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 18267,
+      "maxRGBDifference": 118,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "traced/16-normals-A.png",
+      "right": "traced/18-light-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "clean/00-off-A.png",
+      "right": "clean/07-off-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "clean/00-off-A.png",
+      "right": "clean/15-off.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "clean/00-off-A.png",
+      "right": "clean/34-off-new-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "clean/00-off-A.png",
+      "right": "clean/35-off-reload-new-A.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "clean/00-off-A.png",
+      "right": "clean/43-off-final.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "clean/03-baseColor-A.png",
+      "right": "clean/04-baseColor-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 24393,
+      "maxRGBDifference": 157,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "clean/16-normals-A.png",
+      "right": "clean/17-light-B.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": false,
+      "changedPixels": 18267,
+      "maxRGBDifference": 118,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "clean/16-normals-A.png",
+      "right": "clean/18-light-A-return.png",
+      "crop": [
+        0,
+        70,
+        402,
+        570
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "pbr-regression/old-03-roughness.png",
+      "right": "pbr-regression/03-roughness.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "pbr-regression/old-04-baseColor.png",
+      "right": "pbr-regression/04-baseColor.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "pbr-regression/old-01-normals.png",
+      "right": "pbr-regression/01-normals.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "pbr-regression/old-05-depth.png",
+      "right": "pbr-regression/05-depth.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    },
+    {
+      "left": "pbr-regression/old-02-metallic.png",
+      "right": "pbr-regression/02-metallic.png",
+      "crop": [
+        0,
+        70,
+        402,
+        580
+      ],
+      "expectedStable": true,
+      "changedPixels": 0,
+      "maxRGBDifference": 0,
+      "independentlyRecomputed": true
+    }
+  ],
+  "stableCount": 69,
+  "stableFailures": []
+}

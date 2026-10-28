@@ -1,0 +1,13 @@
+PASS git apply --check /private/tmp/dart3d-e9-host-reload-probe-20261027/r1/candidate-probe.patch
+PASS git apply /private/tmp/dart3d-e9-host-reload-probe-20261027/r1/candidate-probe.patch
+PASS exact candidate57 after forward replay
+PASS git apply --reverse --check /private/tmp/dart3d-e9-host-reload-probe-20261027/r1/candidate-probe.patch
+PASS git apply --reverse /private/tmp/dart3d-e9-host-reload-probe-20261027/r1/candidate-probe.patch
+PASS exact baseline52 and five additions absent after reverse replay
+PASS git apply --check /private/tmp/dart3d-e9-host-reload-probe-20261027/r1/post-run-cleanup.patch
+PASS git apply /private/tmp/dart3d-e9-host-reload-probe-20261027/r1/post-run-cleanup.patch
+PASS observed57 plus cleanup equals exact candidate57
+PASS git apply --reverse --check /private/tmp/dart3d-e9-host-reload-probe-20261027/r1/post-run-cleanup.patch
+PASS git apply --reverse /private/tmp/dart3d-e9-host-reload-probe-20261027/r1/post-run-cleanup.patch
+PASS cleanup reverse equals exact observed57
+REMOVED own replay scratch /private/tmp/e9-review-replay-3zr0cqdt

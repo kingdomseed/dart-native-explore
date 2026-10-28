@@ -1,0 +1,963 @@
+Read-only source evidence. No GPU/runtime inference.
+Apple URL fetch https://developer.apple.com/documentation/scenekit/scntechnique?changes=_2_1_8 returned JavaScript-required page. Installed headers provide inspected API details.
+Repo-local .devin/skills/dart-native/SKILL.md read fully. dartnative/docs/plugin_development.md and referenced widgets.md absent in this prepared checkout. Installed Button source used. README verification-status prose is historical and is not evidence for this probe.
+
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNTechnique.h
+SHA256 1f0057a24db957f47bc2fa32fb2ad2d31f7faf91fc4988549da2b2b172d55a74
+1: //
+2: //  SCNTechnique.h
+3: //  SceneKit
+4: //
+5: //  Copyright © 2014-2021 Apple Inc. All rights reserved.
+6: //
+7: 
+8: #import <SceneKit/SCNShadable.h>
+9: #import <SceneKit/SCNAnimation.h>
+10: 
+11: NS_ASSUME_NONNULL_BEGIN
+12: 
+13: /*!
+14:  @class SCNTechnique
+15:  @abstract SCNTechnique represents a rendering process that may require multiple passes.
+16:  @discussion A technique is generally initialized from a Property List file. It can be set to any object that conforms to the SCNTechniqueSupport protocol.
+17:  */
+18: SCN_EXPORT API_AVAILABLE(macos(10.10))
+19: @interface SCNTechnique : NSObject <SCNAnimatable, NSCopying, NSSecureCoding>
+20: 
+21: /*!
+22:  @method techniqueWithDictionary:
+23:  @abstract Creates and returns a technique instance initialized with the specified dictionary.
+24:  @param dictionary The dictionary representation of the technique.
+25:  @discussion The format of the dictionary is described below. Quoted strings can be any name of your choice. Tags are defined below.
+26:  The passes are executed sequentially as specified in the "sequence" section. The definition of each pass is within the "passes" section. A pass may have inputs/outputs that reference targets or symbols defined in the "targets" and "symbols" section. The entries of the "symbols" section can be set/get and animated with SCNTechnique's APIs below.
+27:  
+28:  {
+29:    sequence: ["Pass1", "Pass2", ...],
+30:    passes: {
+31:      "Pass1": {
+32:         outputs: <outputs>
+33:         inputs: <inputs>
+34:         draw: <draw command>
+35:         program: <program name>
+36:         metalVertexShader: <METAL vertex shader function name>
+37:         metalFragmentShader: <METAL fragment shader function name>
+38:         colorStates: <color states>               //optional
+39:         depthStates: <depth states>               //optional
+40:         stencilStates: <stencil states>           //optional
+41:         cullMode: <cull mode>                     //optional
+42:         blendStates: <blend states>               //optional
+43:         viewport: <custom viewport>               //optional
+44:         pointOfView: <node name>                  //optional
+45:         samples: <sample count>                   //optional
+46:         excludeCategoryMask: <category bitMask>   //optional
+47:         includeCategoryMask: <category bitMask>   //optional
+48:      },
+49:      "Pass2" : { 
+50:          [...]
+51:      }
+52:    }
+53:    symbols: {
+54:      "symbol A": {
+55:         <symbol description>
+56:      }
+57:      [...]
+58:    }
+59:    targets: {
+60:       "target A": {
+61:          <target description>
+62:      }
+63:      [...]
+64:    },
+65: 
+66:    //optional
+67: 
+68:    bundle: <bundleIdentifier>,
+69:    metalLibraryName: <metalLibraryName>,
+70: }
+71: 
+72: <outputs>:
+73:  The possible (and optional) keys with their possible associated values are:
+74:  color: a string referencing a color render target. See <render target reference>.
+75:  depth: a string referencing a depth render target. See <render target reference>.
+76:  stencil: a string referencing a stencil render target. See <render target reference>.
+77:  
+78: <inputs>:
+79: The inputs are listed in a dictionary. The keys are the uniform name as specified in the program of this pass.
+80: The values can be a single string referencing a symbol or a semantic or a target OR a dictionary with the following structure:
+81:  
+82:  {
+83:    target: <render target reference>,
+84:  
+85:    //optional:
+86:    minificationFilter: linear, nearest
+87:    magnificationFilter: linear, nearest
+88:    mipFilter: linear, nearest, none
+89:    wrapS: clamp, repeat, clampToBorder, mirror
+90:    wrapT: clamp, repeat, clampToBorder, mirror
+91:    wrapP: clamp, repeat, clampToBorder, mirror
+92:    maxAnisotropy: a number
+93:  }
+94:  
+95:  (See SCNMaterialProperty for more documentation and default values of these optional parameters.)
+96:  
+97: <render target reference>
+98:  A string referencing a target (i.e an entry in the top level "targets" dictionary) or one of the special strings below:
+99:  COLOR  The render target that represents that main color fragments that will be displayed on the screen ultimately.
+100:  DEPTH  The render target that represents that main depth fragments.
+101:  
+102: <draw command>
+103:  can be one of the following strings:
+104:  DRAW_SCENE:    render the entire scene
+105:  DRAW_QUAD:     render a fullscreen quad
+106:  DRAW_NODE:     render a node and its sub-tree. The node is specified by setting its name as the value for the key "node".
+107:  
+108: <program name>
+109:  Name of a program (a vertex shader + a fragment shader) located in the application bundle.
+110:  The vertex shader must have the extension "vsh" and the fragment shader "fsh".
+111:  
+112: <METAL vertex shader function name>
+113:  Name of a METAL function to use as the vertex shader.
+114: 
+115: <METAL fragment shader function name>
+116:  Name of a METAL function to use as the fragment shader.
+117:  
+118: <color states>
+119:  A dictionary with the following optional keys:
+120:  "clear" a boolean specifying whether the color target should be cleared or not
+121:  "clearColor" a string specifying the clear color as 4 float ("red green blue alpha"), or the string "sceneBackground" to clear with the scene background color.
+122:  
+123: <depth states>
+124:  A dictionary with the following optional keys:
+125:  "clear" a boolean specifying whether the depth target should be cleared or not
+126:  "enableWrite" a boolean specifying whether writing to depth should be enabled or not.
+127:  "enableRead" a boolean specifying whether reading from depth should be enabled or not.
+128:  "func" a string specifying depth function to use. See <comparison function> for the possible values.
+129: 
+130: <stencil states>
+131:  A dictionary with the following optional keys:
+132:  "clear" a boolean specifying whether the stencil target should be cleared or not
+133:  "enable" a boolean specifying whether writing to stencil should be enabled or not.
+134:  "behavior" a dictionary describing the stencil behavior of the front face, or of both faces if no backFaceBehavior is specified. See <stencil behavior> for the format of this dictionary.
+135:  "backFaceBehavior" a dictionary describing the behavior of the back face. See <stencil behavior> for the format of this dictionary.
+136:  
+137: <stencil behavior>
+138:  A dictionary with the following optional keys:
+139:  "depthFail" a string specifying the operation to do if the depth test fails. See <stencil operation> for the possible values.
+140:  "fail" a string specifying the operation to do if the stencil test fails. See <Stencil operation> for the possible values.
+141:  "pass" a string specifying the operation to do if the stencil test passes. See <stencil operation> for the possible values.
+142:  "function" a string specifying the stencil test. See <comparison function> for the possible values.
+143:  "readMask" a uint8_t number specifying a mask that is ANDed with both the reference value and the stored stencil value when the test is done
+144:  "writeMask" a uint8_t number specifies a bit mask to enable and disable writing of individual bits in the stencil planes
+145:  "referenceValue" a uint8_t number specifies the reference value for the stencil test. The initial value is 0. 
+146:  
+147: <stencil operation>
+148:  A string specifying a stencil operation. It can be one of the following: keep, zero, replace, increment, decrement, invert, incrementWrap, decrementWrap
+149:  
+150: <comparison function>
+151:  A string specifying a comparison function. It can be one of the following: never, always, equal, notEqual, less, lessEqual, greater, greaterEqual
+152:  
+153: <blend states>
+154:  A dictionary with the following optional keys:
+155:  "enable" a boolean number specifying if the blending should be enabled or not. defaults to true.
+156:  "colorSrc" a string specifying a blend mode. See <blend mode>
+157:  "colorDst" a string specifying a blend mode. See <blend mode>
+158:  "alphaSrc" a string specifying a blend mode. See <blend mode>
+159:  "alphaDst" a string specifying a blend mode. See <blend mode>
+160:  "colorOp" a string specifying a blend operation. See <blend operation>
+161:  "alphaOp" a string specifying a blend operation. See <blend operation>
+162:  In no Blend states are specified, then the blending is turned off.
+163:  
+164: <blend mode>
+165:  A string specifying a blend mode. It can be one of the following: zero, one, srcColor, oneMinusSrcColor, srcAlpha, oneMinusSrcAlpha, dstColor, oneMinusDstColor, dstAlpha, oneMinusDstAlpha, constantColor, oneMinusConstantColor, constantAlpha, oneMinusConstantAlpha, alphaSaturate.
+166:  
+167: <blend operation>
+168:  A string specifying a blend operation. It can be one of the following: add, substract, reverseSubstract, min, max.
+169: 
+170: <cull mode>
+171:  A string specifying a cull mode. It can be one of the following: front, none, back.
+172:  
+173: <custom viewport>
+174:  A string specifying the viewport as 4 float.
+175: 
+176: <category bitMask>
+177:  A integer value representing a node category mask (see SCNNode's categoryBitMask).
+178:  if the key "excludeCategoryMask" is not specified then it defaults to 0.
+179:  if the key "includeCategoryMask" is not specified then it defaults to all bits set.
+180:  The DRAW_SCENE command will then render nodes that validate the following test (node.categoryBitMask & includeCategoryMask) && !(excludeCategoryMask & node.categoryBitMask).
+181: 
+182: <node name>
+183:  The name of a node, or "self" to reference the owner of the technique if any.
+184: 
+185: <sample count>
+186:  The number of samples (multisampling) used to render the pass.
+187:  
+188: <symbol description>
+189:  A dictionary with the following optional keys and their possible associated values:
+190:  
+191:  semantic: vertex, normal, color, texcoord, tangent, time, modelViewProjectionTransform, modelViewTransform, modelTransform, viewTransform, projectionTransform, normalTransform, modelViewProjectionInverseTransform, modelViewInverseTransform, modelInverseTransform, viewInverseTransform, projectionInverseTransform, normalInverseTransform
+192:  
+193:  type: float, vec2, vec3, vec4, mat4, int, ivec2, ivec3, ivec4, mat3, sampler2D, none. Every types can also be an array of the given type by adding [N] where N is the number of elements in the array.
+194:  
+195:  image: name of an image located in the application bundle. (only valid when type is sampler2D)
+196:  
+197:  if a semantic is set, no type is required.
+198:  Note that with Metal shaders you should not provide any semantic. Instead simply declare a struct in you shader and add the members you need named as specified in SceneKit/scn_metal.
+199:  
+200:  For example for a per-node semantic:
+201:  
+202:  struct MyStruct
+203:  {
+204:  float4x4 modelTransform;
+205:  float4x4 modelViewProjectionTransform;
+206:  };
+207:  then in your function add an argument that must be named “scn_node” to get the members automatically filed with node semantics (see the documentation in scn_metal).
+208:  
+209: <target description>
+210:  A dictionary with the following optional keys and their possible associated values:
+211:  
+212:  type: a string specifying the type of the render target. It can be one of the following: color, depth, stencil
+213:  format: a string specifying the format of the render target. It can be:
+214:  - for color targets (if not specified defaults to the framebuffer's pixel format)
+215:    - r8
+216:    - r16                   // Available since macOS 13, iOS 16, tvOS 16 and watchOS 9
+217:    - r16f
+218:    - r32f                  // Available since macOS 13, iOS 16, tvOS 16 and watchOS 9
+219:    - rg8                   // Available since macOS 13, iOS 16, tvOS 16 and watchOS 9
+220:    - rg16
+221:    - rg16f                 // Available since macOS 13, iOS 16, tvOS 16 and watchOS 9
+222:    - rg32f                 // Available since macOS 13, iOS 16, tvOS 16 and watchOS 9
+223:    - rgba8                 // Available since macOS 13, iOS 16, tvOS 16 and watchOS 9
+224:    - rgba16                // Available since macOS 13, iOS 16, tvOS 16 and watchOS 9
+225:    - rgba16f               // Available since macOS 13, iOS 16, tvOS 16 and watchOS 9
+226:    - rgba32f
+227:    - rgba (deprecated)
+228:  - for depth targets
+229:    - depth16               // Available since macOS 13, iOS 16, tvOS 16 and watchOS 9
+230:    - depth24
+231:    - depth32f              // Available since macOS 13, iOS 16, tvOS 16 and watchOS 9
+232:  - for combined depth and stencil targets:
+233:    - depth24Unorm_stencil8 // Available since macOS 13, iOS 16, tvOS 16 and watchOS 9
+234:    - depth32Float_stencil8 // Available since macOS 13, iOS 16, tvOS 16 and watchOS 9
+235:  scaleFactor: a float value (encapsulated in a NSNumber) that controls the size of the render target. Defaults to 1, which means 1x the size of the main viewport.
+236:  size: a string with the format %dx%d that controls the size of the render target.
+237:  persistent: a boolean that tells if this target should persist from one frame to the next. It permits to create temporal effects suchs as motion blur. Defaults to NO.
+238: 
+239:  <bundleIdentifier>
+240:  An optional bundle identifier to load metal programs from
+241: 
+242:  <metalLibraryName>
+243:  An optional metal library name to load metal programs from. The metallib file is located from the default or specified bundle using NSBundle pathForResource:ofType:.
+244:  */
+245: + (nullable SCNTechnique *)techniqueWithDictionary:(NSDictionary<NSString *, id> *)dictionary;
+246: 
+247: /*!
+248:  @method techniqueBySequencingTechniques:
+249:  @abstract Creates and returns a technique by sequencing the passes from the specified techniques.
+250:  @param techniques The techniques to sequence.
+
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/SceneKit.framework/Headers/scn_metal
+SHA256 c0b1464c182e3ebb9442b369885ee751a9d1d078cd5eb6e7330848be37e8b027
+1: #ifndef __SCNMetalDefines__
+2: #define __SCNMetalDefines__
+3: #if defined(__METAL_VERSION__)
+4: #define SCN_METAL_HAS_SIMD_TYPES 1
+5: #else
+6: #define SCN_METAL_HAS_SIMD_TYPES 0
+7: #endif
+8: enum {
+9:     SCNVertexSemanticPosition,
+10:     SCNVertexSemanticNormal,
+11:     SCNVertexSemanticTangent,
+12:     SCNVertexSemanticColor,
+13:     SCNVertexSemanticBoneIndices,
+14:     SCNVertexSemanticBoneWeights,
+15:     SCNVertexSemanticTexcoord0,
+16:     SCNVertexSemanticTexcoord1,
+17:     SCNVertexSemanticTexcoord2,
+18:     SCNVertexSemanticTexcoord3,
+19:     SCNVertexSemanticTexcoord4,
+20:     SCNVertexSemanticTexcoord5,
+21:     SCNVertexSemanticTexcoord6,
+22:     SCNVertexSemanticTexcoord7
+23: };
+24: 
+25: #if SCN_METAL_HAS_SIMD_TYPES
+26: 
+27: // This structure hold all the informations that are constant through a render pass
+28: // In a shader modifier, it is given both in vertex and fragment stage through an argument named "scn_frame".
+29: struct SCNSceneBuffer {
+30:     float4x4    viewTransform;
+31:     float4x4    inverseViewTransform; // transform from view space to world space
+32:     float4x4    projectionTransform;
+33:     float4x4    viewProjectionTransform;
+34:     float4x4    viewToCubeTransform; // transform from view space to cube texture space (canonical Y Up space)
+35:     float4x4    lastFrameViewProjectionTransform;
+36:     float4      ambientLightingColor;
+37:     float4		fogColor;
+38:     float3		fogParameters; // x:-1/(end-start) y:1-start*x z:exp
+39:     float2      inverseResolution;
+40:     float       time;
+41:     float       sinTime;
+42:     float       cosTime;
+43:     float       random01;
+44:     float       motionBlurIntensity;
+45:     // new in macOS 10.12 and iOS 10
+46:     float       environmentIntensity;
+47:     float4x4    inverseProjectionTransform;
+48:     float4x4    inverseViewProjectionTransform;
+49:     // new in macOS 10.13 and iOS 11
+50:     float2      nearFar; // x: near, y: far
+51:     float4      viewportSize; // xy:size, zw:origin
+52:     // new in macOS 10.14 and iOS 12
+53:     float4x4    inverseTransposeViewTransform;
+54: 
+55:     // internal, DO NOT USE
+56:     float4      clusterScale; // w contains z bias
+57: };
+58: 
+59: // In custom shaders or in shader modifiers, you also have access to node relative information.
+60: // This is done using an argument named "scn_node", which must be a struct with only the necessary fields
+61: // among the following list:
+62: //
+63: // float4x4 modelTransform;
+64: // float4x4 inverseModelTransform;
+65: // float4x4 modelViewTransform;
+66: // float4x4 inverseModelViewTransform;
+67: // float4x4 normalTransform; // This is the inverseTransposeModelViewTransform, need for normal transformation
+68: // float4x4 modelViewProjectionTransform;
+69: // float4x4 inverseModelViewProjectionTransform;
+70: // float2x3 boundingBox;
+71: // float2x3 worldBoundingBox;
+72: 
+73: #endif
+74: 
+75: #endif /* defined(__SCNMetalDefines__) */
+
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNParticleSystem.h
+SHA256 8158e460b1a63bb18aba030134a4e2f95fa35b155a03cce23d8da2786971e0db
+190: SCN_EXPORT API_AVAILABLE(macos(10.10))
+191: @interface SCNParticleSystem : NSObject <NSCopying, NSSecureCoding, SCNAnimatable>
+192: 
+193: // Create an instance of a particle system
+194: + (instancetype)particleSystem;
+195: + (nullable instancetype)particleSystemNamed:(NSString *)name inDirectory:(nullable NSString *)directory;
+196: 
+197: #pragma mark Emitter properties
+198: 
+199: // Specifies the duration of the emission. Defaults to 1. Animatable.
+200: @property(nonatomic) CGFloat emissionDuration;
+201: 
+202: // Specifies the variation of the emission duration. Defaults to 0. Animatable.
+203: @property(nonatomic) CGFloat emissionDurationVariation;
+204: 
+205: // Specifies the idle duration between two emissions. Defaults to 0. Animatable.
+206: @property(nonatomic) CGFloat idleDuration;
+207: 
+208: // Specifies the variation of the idle duration. Defaults to 0. Animatable.
+209: @property(nonatomic) CGFloat idleDurationVariation;
+210: 
+211: // Specifies the looping behavior of the emission. Defaults to YES.
+212: @property(nonatomic) BOOL loops;
+213: 
+214: // Specifies the particle rate flow, in particles per emissionDuration.
+215: // An emissionDuration of 0 without looping means that the particles are emitted instantaneously
+216: // 0 means that the emitter emits nothing, unless it has variation. Defaults to 1. Animatable.
+217: @property(nonatomic) CGFloat birthRate;
+218: 
+219: // Specifies the variation of the rate flow. Defaults to 0. Animatable.
+220: @property(nonatomic) CGFloat birthRateVariation;
+221: 
+222: // Specifies the time length during which particles are emit before the first rendering of the system.
+223: // For example this allows to start a scene with snow that already has fallen. Defaults to 0. Animatable.
+224: @property(nonatomic) CGFloat warmupDuration;
+225: 
+226: // Specifies the shape of the emitter. nil means a punctual emitter. Defaults to nil.
+227: @property(nonatomic, retain, nullable) SCNGeometry *emitterShape;
+228: 
+229: // Specifies the location of newly created particles. Defaults to SCNParticleBirthLocationSurface.
+230: @property(nonatomic) SCNParticleBirthLocation birthLocation;
+231: 
+232: // Specifies the direction of newly created particles. Defaults to SCNParticleBirthDirectionConstant.
+233: @property(nonatomic) SCNParticleBirthDirection birthDirection;
+234: 
+235: // Specifies the spreading direction of newly created particles, in degrees. Not used in SCNParticleBirthDirectionRandom. Defaults to 0. Animatable.
+
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNParticleSystem.h
+SHA256 8158e460b1a63bb18aba030134a4e2f95fa35b155a03cce23d8da2786971e0db
+380: // Specifies the particle friction variation. Animatable.
+381: @property(nonatomic) CGFloat particleFrictionVariation;
+382: 
+383: // Specifies the charge on the particle. Charge determines the degree to which a particle is affected by
+384: // electric and magnetic fields. Note that this is a unitless quantity, it is up to the developer to
+385: // set charge and field strength appropriately. Defaults to 0.0. Animatable.
+386: @property(nonatomic) CGFloat particleCharge;
+387: 
+388: // Specifies the particle charge variation. Animatable.
+389: @property(nonatomic) CGFloat particleChargeVariation;
+390: 
+391: // Specifies the particle air resistance. Defaults to 0. Animatable.
+392: @property(nonatomic) CGFloat dampingFactor;
+393: 
+394: // Specifies the simulation speed multiplier. Defaults to 1. Animatable.
+395: @property(nonatomic) CGFloat speedFactor;
+396: 
+397: // Specifies whether particles stretch along their direction. Defaults to 0. Animatable.
+398: @property(nonatomic) CGFloat stretchFactor;
+399: 
+400: // Specifies the receiver's fresnel exponent value. Defaults to 3. Animatable.
+401: // Only used if the particleImage is a cube map. The bigger the amount, the more concentrated the reflection is around the edges
+402: @property(nonatomic) CGFloat fresnelExponent;
+403: 
+404: /*!
+405:  @property writeToDepthBuffer
+406:  @abstract Determines whether the receiver writes to the depth buffer when rendered. Defaults to NO.
+407:  */
+408: @property(nonatomic) BOOL writesToDepthBuffer API_AVAILABLE(macos(12.0), ios(15.0), tvos(15.0), watchos(8.0));
+409: 
+410: // Property controllers.
+411: @property(nonatomic, copy, nullable) NSDictionary<SCNParticleProperty, SCNParticlePropertyController *> *propertyControllers;
+412: 
+413: // Remove all the already-emitted particles and restart the simulation.
+414: - (void)reset;
+415: 
+416: // Events handling
+417: // "block" will be invoked for particles that trigger the specified event, with the data and dataStride that corresponds to "properties". The block should only update the particle properties reference by the "indices" passed as argument in the block.
+418: - (void)handleEvent:(SCNParticleEvent)event forProperties:(NSArray<SCNParticleProperty> *)properties withBlock:(SCNParticleEventBlock)block;
+419: 
+420: // Modifications handling
+421: // "block" will be invoked at every simulation step at the specified stage. The data and dataStride passed to the block will corresponds to the specified "properties".
+422: - (void)addModifierForProperties:(NSArray<SCNParticleProperty> *)properties atStage:(SCNParticleModifierStage)stage withBlock:(SCNParticleModifierBlock)block;
+423: - (void)removeModifiersOfStage:(SCNParticleModifierStage)stage;
+424: - (void)removeAllModifiers;
+425: 
+426: @end
+427: 
+428: 
+429: @interface SCNNode (SCNParticleSystemSupport)
+430: 
+431: // Add a particle system to the receiver.
+432: - (void)addParticleSystem:(SCNParticleSystem *)system API_AVAILABLE(macos(10.10));
+433: 
+434: // Remove all particle systems of the receiver.
+435: - (void)removeAllParticleSystems API_AVAILABLE(macos(10.10));
+436: 
+437: // Remove the specified particle system from the receiver.
+438: - (void)removeParticleSystem:(SCNParticleSystem *)system API_AVAILABLE(macos(10.10));
+439: 
+440: // The particle systems attached to the node.
+441: @property(readonly, nullable) NSArray<SCNParticleSystem *> *particleSystems API_AVAILABLE(macos(10.10));
+442: 
+443: @end
+444: 
+445: 
+
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNSceneRenderer.h
+SHA256 672f070bd65505d715a4f69bdf4ce187665fd87947d9e3d3edb1b5e22be9affc
+30:     SCNAntialiasingModeMultisampling2X,
+31:     SCNAntialiasingModeMultisampling4X
+32: } API_AVAILABLE(macos(10.10));
+33: 
+34: /*!
+35:  @enum SCNRenderingAPI
+36:  @abstract rendering API used by SCNView and SCNRenderer.
+37:  @discussion Default preferred API is SCNRenderingAPIMetal on iOS and it depends on the configuration on macOS.
+38:  If Metal is requested but not available then it fallbacks to SCNRenderingAPIOpenGLES2 on iOS and to SCNRenderingAPIOpenGLLegacy on macOS.
+39:  */
+40: typedef NS_ENUM(NSUInteger, SCNRenderingAPI) {
+41:     SCNRenderingAPIMetal,
+42:     SCNRenderingAPIOpenGLES2 API_UNAVAILABLE(macCatalyst)
+43: } API_AVAILABLE(macos(10.11), ios(9.0));
+44: 
+45: /*!
+46:  @enum SCNDebugOptions
+47:  @abstract Debug options.
+48:  */
+49: typedef NS_OPTIONS(NSUInteger, SCNDebugOptions) {
+50:     SCNDebugOptionNone                                                                               = 0,
+51:     SCNDebugOptionShowPhysicsShapes                                                                  = 1 << 0, //show physics shape
+52:     SCNDebugOptionShowBoundingBoxes                                                                  = 1 << 1, //show object bounding boxes
+53:     SCNDebugOptionShowLightInfluences                                                                = 1 << 2, //show objects's light influences
+54:     SCNDebugOptionShowLightExtents                                                                   = 1 << 3, //show light extents
+55:     SCNDebugOptionShowPhysicsFields                                                                  = 1 << 4, //show SCNPhysicsFields forces and extents
+56:     SCNDebugOptionShowWireframe                                                                      = 1 << 5, //show wireframe on top of objects
+57:     SCNDebugOptionRenderAsWireframe API_AVAILABLE(macos(10.13), ios(11.0), tvos(11.0), watchos(4.0)) = 1 << 6, //render objects as wireframe
+58:     SCNDebugOptionShowSkeletons     API_AVAILABLE(macos(10.13), ios(11.0), tvos(11.0), watchos(4.0)) = 1 << 7, //show skinning bones
+59:     SCNDebugOptionShowCreases       API_AVAILABLE(macos(10.13), ios(11.0), tvos(11.0), watchos(4.0)) = 1 << 8, //show subdivision creases
+60:     SCNDebugOptionShowConstraints   API_AVAILABLE(macos(10.13), ios(11.0), tvos(11.0), watchos(4.0)) = 1 << 9, //show slider constraint
+61:     SCNDebugOptionShowCameras       API_AVAILABLE(macos(10.13), ios(11.0), tvos(11.0), watchos(4.0)) = 1 << 10, //show cameras
+62: } API_AVAILABLE(macos(10.11), ios(9.0));
+63: 
+64: /*! @protocol SCNSceneRenderer
+65:     @abstract Protocol adopted by the various renderers (SCNView, SCNLayer, SCNRenderer)
+66:  */
+67: @protocol SCNSceneRenderer <NSObject>
+68: @required
+69: 
+70: /*!
+71:  @property scene
+72:  @abstract Specifies the scene of the receiver.
+73:  */
+74: @property(nonatomic, retain, nullable) SCNScene *scene;
+75: 
+76: /*!
+77:  @method presentScene:withTransition:incomingPointOfView:
+78:  @abstract Present a SCNScene in the receiver, replacing the current scene.
+79:  @param scene The new scene to present.
+80:  @param transition the transition to use when presenting the scene.
+81:  @param pointOfView the point of view to use to render the new scene.
+82:  @param completionHandler the block invoked on completion.
+83:  */
+84: - (void)presentScene:(SCNScene *)scene withTransition:(SKTransition *)transition incomingPointOfView:(nullable SCNNode *)pointOfView completionHandler:(nullable void (^)(void))completionHandler API_AVAILABLE(macos(10.11), ios(9.0));
+85: 
+86: /*!
+87:  @property sceneTime
+88:  @abstract Specifies the current "scene time" to display the scene.
+89:  @discussion The scene time only affect scene time based animations (see SCNAnimation.h "usesSceneTimeBase" and SCNSceneSource.h "SCNSceneSourceAnimationImportPolicyKey" for how to create scene time based animations). Scene time based animations and this property are typically used by tools and viewer to ease seeking in time while previewing a scene.
+90:  */
+
+dart3d/ios/Classes/ToneMapping.swift
+SHA256 669d2dc6e7d502d9f88daa3ebe45ee99bf392d5a662b35dcef70be5cfe67e8f2
+440:         -> SCNTechnique?
+441:     {
+442:         guard let lib = library(for: device) else { return nil }
+443:         var symbols: [String: Any] = ["d3LutSymbol": ["type": "sampler2D"]]
+444:         for name in vectorSymbols {
+445:             symbols[name + "Symbol"] = ["type": "vec4"]
+446:         }
+447:         func quad(_ fragment: String, inputs: [String: Any],
+448:                   output: String) -> [String: Any] {
+449:             [
+450:                 "draw": "DRAW_QUAD",
+451:                 "metalVertexShader": "d3_resolve_vertex",
+452:                 "metalFragmentShader": fragment,
+453:                 "inputs": inputs,
+454:                 "outputs": ["color": output],
+455:             ]
+456:         }
+457:         var passes: [String: Any] = [:]
+458:         var sequence: [String] = []
+459:         var targets: [String: Any] = [:]
+460:         var resolveInputs: [String: Any] = [
+461:             "colorSampler": "COLOR",
+462:             "d3Lut": "d3LutSymbol",
+463:             // Unread without bloom; the slot still needs a texture.
+464:             "d3BloomSum": "d3LutSymbol",
+465:         ]
+466:         for name in vectorSymbols {
+467:             resolveInputs[name] = name + "Symbol"
+468:         }
+469:         if let bloom {
+470:             func target(_ name: String, level: Int) {
+471:                 targets[name] = [
+472:                     "type": "color",
+473:                     "format": "rgba16f",
+474:                     "size": "\(max(1, bloom.width >> level))x"
+475:                         + "\(max(1, bloom.height >> level))",
+476:                 ]
+477:             }
+478:             for level in 0..<bloom.levels {
+479:                 target("d3BloomDown\(level)", level: level)
+480:             }
+481:             passes["d3_bloom_bright"] = quad(
+482:                 "d3_bloom_bright_fragment",
+483:                 inputs: ["colorSampler": "COLOR",
+484:                          "d3Mode": "d3ModeSymbol",
+485:                          "d3Bloom": "d3BloomSymbol"],
+486:                 output: "d3BloomDown0")
+487:             sequence.append("d3_bloom_bright")
+488:             for level in 1..<bloom.levels {
+489:                 passes["d3_bloom_down\(level)"] = quad(
+490:                     "d3_bloom_down_fragment",
+491:                     inputs: ["d3Source": "d3BloomDown\(level - 1)"],
+492:                     output: "d3BloomDown\(level)")
+493:                 sequence.append("d3_bloom_down\(level)")
+494:             }
+495:             var sum = "d3BloomDown\(bloom.levels - 1)"
+496:             for level in stride(from: bloom.levels - 2, through: 0, by: -1) {
+497:                 target("d3BloomUp\(level)", level: level)
+498:                 passes["d3_bloom_up\(level)"] = quad(
+499:                     "d3_bloom_up_fragment",
+500:                     inputs: ["d3Low": sum,
+501:                              "d3High": "d3BloomDown\(level)"],
+502:                     output: "d3BloomUp\(level)")
+503:                 sequence.append("d3_bloom_up\(level)")
+504:                 sum = "d3BloomUp\(level)"
+505:             }
+506:             resolveInputs["d3BloomSum"] = sum
+507:         }
+508:         passes["d3_resolve"] = quad(
+509:             "d3_resolve_fragment", inputs: resolveInputs, output: "COLOR")
+510:         sequence.append("d3_resolve")
+511:         var definition: [String: Any] = [
+512:             "passes": passes,
+513:             "sequence": sequence,
+514:             "symbols": symbols,
+515:         ]
+516:         if !targets.isEmpty { definition["targets"] = targets }
+517:         guard let technique = SCNTechnique(dictionary: definition)
+518:         else { return nil }
+519:         technique.library = lib
+520:         return technique
+521:     }
+522: 
+523:     /// Writes [resolve] into [technique], which was made for [bloom]
+524:     /// (nil: without a bloom chain, and then no bloom is added).
+525:     static func configure(_ technique: SCNTechnique, _ resolve: StageResolve,
+
+dart3d/ios/Classes/FsceneRealizer.swift
+SHA256 08b1f5011e2dd13848dcad3833fba486e593f2f46711ba8632f3b4be1527ab22
+6094:         /// `particleEmitter`/`meshParticleEmitter` component — or not:
+6095:         /// `enabled:false` attaches nothing (W18 makes `enabled` the
+6096:         /// first component flag with a live tick to gate).
+6097:         func decodeParticleEmitter(key: UInt64, node: SCNNode,
+6098:                                    index: Int, props: [String: Any],
+6099:                                    mesh: Bool) {
+6100:             let logKey = "particles.\(key).\(index)"
+6101:             if d3Bool(props["enabled"]) == false {
+6102:                 let kind = mesh ? "meshParticleEmitter" : "particleEmitter"
+6103:                 host.logOnce("\(logKey).enabled",
+6104:                     "component '\(kind)' on node \(key): enabled:false "
+6105:                     + "— emitter not attached (the first component with "
+6106:                     + "a real tick gate)")
+6107:                 return
+6108:             }
+6109:             // The component contract skips an incomplete mesh
+6110:             // emitter — the sprite degrade would otherwise draw
+6111:             // white/default sprites for it.
+6112:             if mesh, (d3List(props["geometries"])?.isEmpty ?? true)
+6113:                 || d3Ref(props["material"]) == nil {
+6114:                 host.logOnce("\(logKey).meshIncomplete",
+6115:                     "meshParticleEmitter on node \(key): missing "
+6116:                     + "geometries or material — skipped")
+6117:                 return
+6118:             }
+6119:             let sys = SCNParticleSystem()
+6120:             sys.isLocal = true  // upstream simulates in node space
+6121:             sys.birthRate =
+6122:                 CGFloat(max(d3Double(props["emitRate"]) ?? 32, 0))
+6123:             // looping → emit forever: loops repeats the emit/idle
+6124:             // cycle and idleDuration defaults to 0, so emission is
+6125:             // gapless. emissionDuration must be a SMALL finite value
+6126:             // on iOS 26.5 — 0, .infinity, and 1e6 all emit NOTHING
+6127:             // (device-proven; likely a birthRate×duration budget).
+6128:             // A nonpositive duration normalizes to the 5 s format
+6129:             // default first (Dart/Android do the same) — 0 is exactly
+6130:             // the emit-nothing value.
+6131:             let looping = d3Bool(props["looping"]) ?? true
+6132:             sys.loops = looping
+6133:             let rawDuration = d3Double(props["duration"]) ?? 5
+6134:             let duration = rawDuration > 0 && rawDuration.isFinite
+6135:                 ? rawDuration : 5
+6136:             sys.emissionDuration = CGFloat(duration)
+6137:             sys.warmupDuration =
+6138:                 CGFloat(d3Double(props["prewarm"]) ?? 0)
+6139: 
+6140:             let (life, lifeVar) =
+6141:                 d3DistMeanVar(props["lifetime"], 1.5)
+6142:             sys.particleLifeSpan = life
+6143:             sys.particleLifeSpanVariation = lifeVar
+6144:             let (speed, speedVar) =
+6145:                 d3DistMeanVar(props["startSpeed"], 1.5)
+6146:             sys.particleVelocity = speed
+6147:             sys.particleVelocityVariation = speedVar
+6148:             let (size, sizeVar) =
+6149:                 d3DistMeanVar(props["startSize"], 0.3)
+6150:             sys.particleSize = size
+6151:             sys.particleSizeVariation = sizeVar
+6152:             // SceneKit's particleAngle/particleAngularVelocity are
+6153:             // DEGREES (and degrees/s) per SCNParticleSystem.h — the
+6154:             // wire's radians convert here, like spreadingAngle.
+6155:             let deg = 180.0 / Double.pi
+6156:             let (rot, rotVar) =
+6157:                 d3DistMeanVar(props["startRotation"], 0)
+6158:             sys.particleAngle = CGFloat(rot * deg)
+6159:             sys.particleAngleVariation = CGFloat(rotVar * deg)
+6160:             let (avel, avelVar) =
+6161:                 d3DistMeanVar(props["startAngularVelocity"], 0)
+6162:             sys.particleAngularVelocity = CGFloat(avel * deg)
+6163:             sys.particleAngularVelocityVariation = CGFloat(avelVar * deg)
+6164: 
+6165:             // Emitter shape → emitterShape + direction knobs. All
+6166:             // fscene vectors mirror z entering SceneKit space. An
+6167:             // absent `shape` is the format's default cone (radius
+6168:             // 0.25, angle 0.3) — or the legacy flat `shapeType`/
+6169:             // `shapeRadius`/`shapeAngle` members when present, as the
+6170:             // Dart/Android decoders synthesize.
+6171:             var emitDir = SIMD3<Double>(0, 1, 0)
+6172:             let shape: [String: Any] = d3Map(props["shape"]) ?? {
+6173:                 let r = max(d3Double(props["shapeRadius"]) ?? 0.25, 0)
+6174:                 let a = max(d3Double(props["shapeAngle"]) ?? 0.3, 0)
+6175:                 switch d3String(props["shapeType"]) ?? "cone" {
+6176:                 case "point": return ["kind": "point"]
+6177:                 case "sphere": return ["kind": "sphere", "radius": r]
+6178:                 case "box":
+6179:                     return ["kind": "box", "halfExtents": [r, r, r]]
+6180:                 default:
+6181:                     return ["kind": "cone", "radius": r, "angle": a]
+6182:                 }
+6183:             }()
+6184:             switch d3String(shape["kind"]) ?? "cone" {
+6185:             case "point":
+6186:                 if let d = d3Vec3(shape["direction"]),
+6187:                    d.count == 3 {
+6188:                     emitDir = SIMD3(d[0], d[1], d[2])
+6189:                 }
+6190:             case "sphere":
+6191:                 let r = d3Double(shape["radius"]) ?? 1
+6192:                 sys.emitterShape =
+6193:                     SCNSphere(radius: CGFloat(r))
+6194:                 sys.birthLocation =
+6195:                     d3Bool(shape["surfaceOnly"]) == true
+6196:                     ? .surface : .volume
+6197:                 sys.birthDirection = .surfaceNormal
+6198:                 if d3Bool(shape["hemisphere"]) == true {
+6199:                     host.logOnce("\(logKey).hemisphere",
+6200:                         "particleEmitter: sphere 'hemisphere' has "
+6201:                         + "no SceneKit counterpart — full sphere")
+6202:                 }
+6203:             case "box":
+6204:                 if let he = d3Vec3(shape["halfExtents"]),
+6205:                    he.count == 3 {
+6206:                     sys.emitterShape = SCNBox(
+6207:                         width: CGFloat(he[0] * 2),
+6208:                         height: CGFloat(he[1] * 2),
+6209:                         length: CGFloat(he[2] * 2),
+6210:                         chamferRadius: 0)
+6211:                     sys.birthLocation = .volume
+6212:                 }
+6213:                 if let d = d3Vec3(shape["direction"]),
+6214:                    d.count == 3 {
+6215:                     emitDir = SIMD3(d[0], d[1], d[2])
+6216:                 }
+6217:             default:  // cone — the format default
+6218:                 let r = d3Double(shape["radius"]) ?? 0
+6219:                 if r > 0 {
+6220:                     // A zero-height cylinder's volume is the disc
+6221:                     // the cone emits from.
+6222:                     sys.emitterShape = SCNCylinder(
+6223:                         radius: CGFloat(r), height: 0.001)
+6224:                     sys.birthLocation = .volume
+6225:                 }
+6226:                 sys.spreadingAngle = CGFloat(
+6227:                     (d3Double(shape["angle"]) ?? 0.5) * deg)
+6228:             }
+6229:             sys.emittingDirection = SCNVector3(
+6230:                 Float(emitDir.x), Float(emitDir.y), Float(-emitDir.z))
+6231: 
+6232:             // Constant acceleration: `gravity` plus every
+6233:             // acceleration module folds into sys.acceleration.
+6234:             if let g = d3Vec3(props["gravity"]), g.count == 3 {
+6235:                 sys.acceleration = SCNVector3(
+6236:                     Float(g[0]), Float(g[1]), Float(-g[2]))
+6237:             }
+6238: 
+6239:             // Sprite render knobs.
+6240:             switch d3String(props["blendMode"]) ?? "alpha" {
+6241:             case "additive":
+6242:                 sys.blendMode = .additive
+6243:             default:
+6244:                 sys.blendMode = .alpha
+6245:                 sys.sortingMode = .projectedDepth
+6246:             }
+6247:             switch d3String(props["facing"]) ?? "spherical" {
+6248:             case "axisLocked":
+6249:                 sys.orientationMode = .billboardYAligned
+6250:             case "velocityStretched":
+6251:                 sys.orientationMode = .billboardViewAligned
+6252:                 sys.stretchFactor =
+6253:                     CGFloat(d3Double(props["velocityStretch"]) ?? 0)
+6254:             default:
+6255:                 sys.orientationMode = .billboardViewAligned
+6256:             }
+6257:             if d3Bool(props["randomFlipX"]) == true {
+6258:                 host.logOnce("\(logKey).randomFlipX",
+6259:                     "particleEmitter: 'randomFlipX' has no SceneKit "
+6260:                     + "counterpart — skipped")
+6261:             }
+6262:             if let ar = d3Double(props["aspectRatio"]), ar != 1.0 {
+6263:                 host.logOnce("\(logKey).aspectRatio",
+6264:                     "particleEmitter: 'aspectRatio' has no SceneKit "
+6265:                     + "counterpart — square sprites")
+6266:             }
+6267:             if let texKey = d3Ref(props["texture"]),
+6268:                let tex = textures[texKey]?.contents {
+6269:                 sys.particleImage = tex
+6270:             }
+6271:             // Clamped before any product: two huge-but-valid Int dims
+6272:             // overflow `cols * rows` and trap. 4096 per axis is far past
+6273:             // any usable atlas (a cell must still be ≥ 1 texel).
+6274:             let flipCols = min(max(d3Int(props["flipbookColumns"]) ?? 1, 1),
+6275:                                Self.maxFlipbookAxis)
+6276:             let flipRows = min(max(d3Int(props["flipbookRows"]) ?? 1, 1),
+6277:                                Self.maxFlipbookAxis)
+6278:             if flipCols > 1 || flipRows > 1 {
+6279:                 sys.imageSequenceColumnCount = flipCols
+6280:                 sys.imageSequenceRowCount = flipRows
+6281:             }
+6282: 
+6283:             // Mesh emitters degrade to an untextured sprite pass on
+6284:             // iOS (SCNParticleSystem is sprite-only) tinted by the
+6285:             // material's AUTHORED baseColor factor — read from the
+6286:             // material def, since `diffuse.contents` holds the image
+6287:             // once a base-color texture binds. Per-particle color is
+6288:             // inert on mesh emitters (upstream parity): startColor
+6289:             // and colorOverLife don't apply.
+6290:             if mesh {
+6291:                 if let matKey = d3Ref(props["material"]) {
+6292:                     let mp = resourceDefs[matKey]?["properties"]
+6293:                         as? [String: Any]
+6294:                     if let c = d3Color(mp?["baseColor"]) {
+6295:                         sys.particleColor = c
+6296:                     } else if let c = materials[matKey]?.diffuse.contents
+6297:                                 as? UIColor {
+6298:                         sys.particleColor = c
+6299:                     }
+6300:                 }
+6301:                 host.logOnce("\(logKey).meshDegrade",
+6302:                     "meshParticleEmitter on node \(key): realized as a "
+6303:                     + "sprite pass (SCNParticleSystem is sprite-only)")
+6304:             } else {
+6305:                 // startColor samples ONCE at spawn — a gradient
+6306:                 // contributes its age-0 color (the reference samples
+6307:                 // `startColor` at normalized age 0); only a
+6308:                 // colorOverLife module animates over life.
+6309:                 switch d3ParticleColor(props["startColor"]) {
+6310:                 case .fixed(let c, let v):
+6311:                     sys.particleColor = c
+6312:                     sys.particleColorVariation = v
+6313:                 case .gradient(let stops):
+6314:                     sys.particleColor = stops[0].c
+6315:                 }
+6316:             }
+6317: 
+6318:             // Modules, in list order. A component without `modules`
+6319:             // gets the legacy flat stack.
+6320:             var drag = 0.0
+6321:             var colorOverLife: CAKeyframeAnimation?
+6322:             let modules = d3List(props["modules"])
+6323:                 ?? legacyParticleModules(props)
+6324:             for e in modules {
+6325:                 guard let m = d3Map(e) else { continue }
+6326:                 if d3String(m["kind"]) == "linearDrag" {
+6327:                     drag += d3Double(m["coefficient"]) ?? 0
+6328:                     continue
+6329:                 }
+6330:                 if d3String(m["kind"]) == "colorOverLife" {
+6331:                     // Inert on mesh emitters; otherwise it OVERWRITES
+6332:                     // the color each tick (reference semantics): a
+6333:                     // gradient animates, constant/uniform replace the
+6334:                     // spawn color outright.
+6335:                     guard !mesh, let dist = d3Map(m["color"]) else {
+6336:                         continue
+6337:                     }
+6338:                     switch d3ParticleColor(dist) {
+6339:                     case .gradient(let stops):
+6340:                         colorOverLife = gradientAnimation(stops)
+6341:                     case .fixed(let c, let v):
+6342:                         colorOverLife = nil
+6343:                         sys.particleColor = c
+6344:                         sys.particleColorVariation = v
+6345:                     }
+6346:                     continue
+6347:                 }
+6348:                 applyParticleModule(
+6349:                     sys, m, sizeMean: sys.particleSize,
+6350:                     lifeSpan: sys.particleLifeSpan,
+6351:                     flipbookCols: flipCols, flipbookRows: flipRows,
+6352:                     logKey: logKey)
+6353:             }
+6354:             if drag > 0 { sys.dampingFactor = CGFloat(drag) }
+6355:             if let anim = colorOverLife {
+6356:                 let ctl = SCNParticlePropertyController(animation: anim)
+6357:                 ctl.inputMode = .overLife
+6358:                 var pcs = sys.propertyControllers ?? [:]
+6359:                 pcs[.color] = ctl
+6360:                 sys.propertyControllers = pcs
+6361:             }
+6362: 
+6363:             if d3Bool(props["paused"]) == true {
+6364:                 sys.speedFactor = 0   // frozen sim, particles still draw
+6365:             }
+6366:             if props["seed"] != nil || props["fixedStep"] != nil
+6367:                 || props["maxFrameTime"] != nil
+6368:                 || props["maxParticles"] != nil {
+6369:                 host.logOnce("\(logKey).simKnobs",
+6370:                     "particleEmitter on node \(key): seed/fixedStep/"
+6371:                     + "maxFrameTime/maxParticles have no SceneKit "
+6372:                     + "counterpart — the render clock drives the sim")
+6373:             }
+6374: 
+6375:             node.addParticleSystem(sys)
+6376:             scheduleParticleBursts(sys, node: node, props: props,
+6377:                                    looping: looping, duration: duration,
+6378:                                    prewarm: Double(sys.warmupDuration),
+
+dart3d/lib/src/scene_controller.dart
+SHA256 05302404557ed885385b0488f57d5e1df0b4b07bdfdbdaabd42362e46d9bda1c
+572:     );
+573:   }
+574: 
+575:   /// Sends a view configuration mutation immediately (used by the element
+576:   /// to push widget props; apps normally just set them on [SceneView]).
+577:   void sendViewConfig(Map<String, Object?> config) {
+578:     _sendOrQueue(D3Protocol.viewConfig, D3Protocol.viewConfigBytes(config));
+579:   }
+580: 
+
+/Users/jasonholt/zero/bin/cache/pkg/dartnative/lib/src/widgets/button.dart
+SHA256 0969e7b6b9cc687b60827eb3a1a634c915b3341ec428a731d4beba6baa64b340
+305:   /// [ButtonVariant.prominentGlass]. The CLEAR variants
+306:   /// ([ButtonVariant.clearGlass] / [ButtonVariant.prominentClearGlass]) already
+307:   /// respect [foregroundColor], and non-glass variants are unaffected.
+308:   final bool automaticTint;
+309: 
+310:   const Button({
+311:     super.key,
+312:     this.title,
+313:     this.child,
+314:     this.onPressed,
+315:     this.variant,
+316:     this.color,
+317:     this.foregroundColor,
+318:     this.padding,
+319:     this.shape,
+320:     this.elevation,
+321:     this.imageAsset,
+322:     this.width,
+323:     this.height,
+324:     this.fontSize,
+325:     this.fontWeight,
+326:     this.imageSize,
+327:     this.automaticTint = false,
+328:   });
+329: }
+
+dart3d/ios/dart3d.podspec
+SHA256 9fe55a4bf14d988f3c3b1809dda6af9392fdc0e7854f96eb53b67f583da6a853
+1: Pod::Spec.new do |s|
+2:   s.name             = 'dart3d'
+3:   s.version          = '0.1.0'
+4:   s.summary          = 'General-purpose 3D scene plugin for DartNative (SceneKit on iOS).'
+5:   s.description      = <<-DESC
+6:     dart3d renders .fscene scene documents on the platform's native 3D
+7:     stack — SceneKit on iOS, Filament + Jolt on Android. Scene updates
+8:     arrive as PluginMutation bytes; no method channels.
+9:   DESC
+10:   s.homepage         = 'https://dartpub.dev/packages/dart3d'
+11:   s.license          = { :type => 'MIT' }
+12:   s.author           = { 'Jason Holt Digital' => 'hello@jasonholtdigital.com' }
+13:   s.platform         = :ios, '13.0'
+14: 
+15:   s.source           = { :path => '.' }
+16: 
+17:   s.source_files     = 'Classes/**/*.swift'
+18:   s.frameworks       = 'UIKit', 'SceneKit', 'Foundation', 'Metal',
+19:                        'MetalKit', 'CoreImage', 'ModelIO'
+20: 
+21:   s.swift_version    = '5.9'
+22: 
+23:   s.pod_target_xcconfig = {
+24:     'DEFINES_MODULE' => 'YES',
+25:   }
+26: end
+

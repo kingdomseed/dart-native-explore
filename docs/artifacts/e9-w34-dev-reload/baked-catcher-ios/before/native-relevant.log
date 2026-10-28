@@ -1,0 +1,9 @@
+2026-10-28 00:25:13.459 E  Runner[12785:131e37b] [com.apple.scenekit:SceneKit] Error: Scene <SCNScene: 0x10f439a40> is modified within a rendering callback of another scene (<SCNScene: 0x103dd6040>). This is not allowed and may lead to crash
+2026-10-28 00:25:14.019 E  Runner[12785:131e37b] [com.apple.scenekit:SceneKit] Error: missing value for attachment "d3CatcherRegion" [vertex: 3 fragment: -1]
+2026-10-28 00:25:14.020 Df Runner[12785:131e37b] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: captured 256x221 RGBA footprint, softness=0.0
+2026-10-28 00:25:49.640 Df Runner[12785:131e378] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:25:49.661 Df Runner[12785:131e378] [com.jasonholtdigital.dart3d:scene] debugView: this implementation unit covers PBR, unlit meshes and sprites; material family SCNLightingModelConstant is unsupported
+2026-10-28 00:25:54.338 Df Runner[12785:131e378] [com.jasonholtdigital.dart3d:scene] debugView channel=metallic wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:26:11.622 Df Runner[12785:131e37a] [com.jasonholtdigital.dart3d:scene] debugView channel=roughness wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:26:13.538 Df Runner[12785:131e37b] [com.jasonholtdigital.dart3d:scene] debugView channel=baseColor wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:26:15.355 Df Runner[12785:131f2ac] [com.jasonholtdigital.dart3d:scene] debugView channel=depth wireframe=false nativeParticlesExcluded=true

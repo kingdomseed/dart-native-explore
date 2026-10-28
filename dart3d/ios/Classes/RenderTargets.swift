@@ -494,6 +494,7 @@ extension SceneViewHost {
             for v in rec.views { retireViewRuntime(v) }
         }
         renderTargets = [:]
+        screenDebugAttachments.clear()
         outlineViewsProbe.clear(host: self)
         views = []
         screenViews = []
@@ -509,7 +510,8 @@ extension SceneViewHost {
     /// Whether the current screen-view set needs sibling mode: more
     /// than one screen view, or any view carrying a `viewport` rect.
     private var wantsScreenSubviews: Bool {
-        screenViews.count > 1
+        screenDebugOptions.channel != .none
+            || screenViews.count > 1
             || screenViews.contains { $0.viewport != nil }
     }
 
@@ -534,14 +536,19 @@ extension SceneViewHost {
         screenSubviews = []
         teardownScreenSubviews()
         guard multiScreenMode else { return }
-        let recs = screenViews
+        let debugOptions = screenDebugOptions
+        let isolated = debugOptions.channel != .none
+        let recs = screenViews.isEmpty && isolated ? [ViewRec(
+            cameraKey: 0, targetKey: nil, layerMask: UInt32.max, order: 0,
+            aaMode: nil, renderScale: nil, filterQuality: nil, viewport: nil)] : screenViews
         // Index 0's point-of-view is the real camera node when
         // resolvable — the lowest-order view keeps the single-view
         // semantics (allowsCameraControl mutates the real node,
         // authored motion reads it directly). Later views draw
         // through detached proxies posed per frame.
         screenSubviews = recs.enumerated().map { i, rec in
-            let real = i == 0 ? nodesById[rec.cameraKey] : nil
+            let real = i == 0 ? (isolated && screenViews.isEmpty
+                ? docPov ?? pointOfView : nodesById[rec.cameraKey]) : nil
             let pov = real ?? SCNNode()
             if real == nil, let camNode = nodesById[rec.cameraKey],
                let cam = camNode.camera?.copy() as? SCNCamera {
@@ -556,7 +563,14 @@ extension SceneViewHost {
             return ScreenSubview(
                 rec: rec, pov: pov, drivesRealNode: real != nil)
         }
-        let povs = screenSubviews.map { $0.pov }
+        let controls = screenSubviews.map { $0.pov }
+        let povs = screenSubviews.map { source -> SCNNode in
+            guard isolated else { return source.pov }
+            let pov = SCNNode()
+            pov.transform = source.pov.presentation.worldTransform
+            if let camera = source.pov.camera { pov.camera = ScreenDebugPresentation.camera(camera) }
+            return pov
+        }
         let snapScene = scene
         let snapControl = allowsCameraControl
         let quality = currentSubviewQuality()
@@ -564,9 +578,19 @@ extension SceneViewHost {
             guard let self,
                   self.screenSubviewBuild == gen,
                   self.multiScreenMode else { return }
+            self.mainScreenDebugOptions = debugOptions
+            if isolated {
+                self.mainScreenDebug = ScreenDebugPresentation()
+                let backing = UIView(frame: self.bounds)
+                backing.backgroundColor = .black
+                backing.isOpaque = true
+                backing.isUserInteractionEnabled = false
+                self.addSubview(backing)
+                self.mainScreenDebugBacking = backing
+            }
             for (i, rec) in recs.enumerated() {
                 let sub = SCNView(frame: self.screenSubviewFrame(rec.viewport))
-                sub.scene = snapScene
+                sub.scene = isolated ? self.mainScreenDebug?.scene : snapScene
                 // Paused + on-demand: the sibling shares the scene but
                 // owns no clock — no second update/sim step. The host
                 // pokes setNeedsDisplay once per host frame.
@@ -575,7 +599,14 @@ extension SceneViewHost {
                 sub.autoenablesDefaultLighting = false
                 sub.isUserInteractionEnabled = i == 0
                 sub.allowsCameraControl = i == 0 && snapControl
+                if isolated { self.mainScreenDebug?.scene.rootNode.addChildNode(povs[i]) }
                 sub.pointOfView = povs[i]
+                if isolated && i == 0 {
+                    sub.defaultCameraController.pointOfView = controls[i]
+                }
+                let wire = ScreenDebugWireframe()
+                wire.apply(debugOptions.wireframe, to: sub)
+                self.mainScreenWires.append(wire)
                 self.addSubview(sub)
                 self.mainScreenSubviews.append((view: sub, rec: rec))
             }
@@ -596,6 +627,11 @@ extension SceneViewHost {
         siblingPoseLock.unlock()
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
+            for wire in self.mainScreenWires { wire.release() }
+            self.mainScreenWires = []
+            self.mainScreenDebug = nil
+            self.mainScreenDebugBacking?.removeFromSuperview()
+            self.mainScreenDebugBacking = nil
             let bindings = Array(self.mainOutlineBindings.values)
             self.mainOutlineBindings = [:]
             self.enqueueSceneWork { [weak self] in
@@ -626,9 +662,15 @@ extension SceneViewHost {
     /// under the same id (a remove + re-add left the sibling on the
     /// detached old node) or first becomes resolvable.
     func syncScreenSubviews() {
+        let options = screenDebugOptions
+        let isolated = options.channel != .none
+        let debugFrame = isolated ? scene.map {
+            screenDebugAttachments.capture($0, channel: options.channel, host: self)
+        } : nil
         var poses: [Int: (SCNMatrix4, SCNCamera)] = [:]
         for (i, s) in screenSubviews.enumerated() {
-            guard let camNode = nodesById[s.rec.cameraKey],
+            guard let camNode = (isolated && screenViews.isEmpty
+                ? docPov ?? pointOfView : nodesById[s.rec.cameraKey]),
                   let cam = camNode.camera else { continue }
             let mask = s.rec.layerMask == UInt32.max
                 ? Int(bitPattern: UInt.max) : Int(s.rec.layerMask)
@@ -639,18 +681,18 @@ extension SceneViewHost {
                 updateScreenSubviews()
                 return
             }
-            if s.drivesRealNode {
+            if s.drivesRealNode && !isolated {
                 cam.categoryBitMask = mask
                 if outlineViewsProbe.frame == nil { continue }
             }
-            if let copy = cam.copy() as? SCNCamera {
+            if let copy = isolated ? ScreenDebugPresentation.camera(cam) : cam.copy() as? SCNCamera {
                 copy.categoryBitMask = mask
                 poses[i] = (camNode.presentation.worldTransform, copy)
             }
         }
         siblingPoseLock.lock()
-        siblingPoseSnapshot = poses.isEmpty && outlineViewsProbe.frame == nil
-            ? nil : (gen: screenSubviewBuild, poses: poses, outline: outlineViewsProbe.frame)
+        siblingPoseSnapshot = (gen: screenSubviewBuild, poses: poses,
+                               debug: debugFrame, options: options, outline: outlineViewsProbe.frame)
         siblingPoseLock.unlock()
     }
 
@@ -670,6 +712,8 @@ extension SceneViewHost {
             if let snap, snap.gen == self.mainScreenSubviewGen {
                 SCNTransaction.begin()
                 SCNTransaction.disableActions = true
+                if let frame = snap.debug { self.mainScreenDebug?.apply(frame) }
+                self.mainScreenDebugOptions = snap.options
                 if snap.outline == nil, !self.mainOutlineBindings.isEmpty {
                     for binding in self.mainOutlineBindings.values { self.retireOutlineProbe(binding) }
                     self.mainOutlineBindings = [:]
@@ -680,10 +724,13 @@ extension SceneViewHost {
                     self.mainOutlineViewsEnabled = enabled
                     self.applySiblingResolve()
                 }
+                for (i, sibling) in self.mainScreenSubviews.enumerated() {
+                    self.mainScreenWires[i].apply(snap.options.wireframe, to: sibling.view)
+                }
                 for (i, pose) in snap.poses
                 where i < self.mainScreenSubviewPovs.count {
                     let pov = self.mainScreenSubviewPovs[i]
-                    if i != 0 {
+                    if i != 0 || snap.debug != nil {
                         pov.transform = pose.0
                         pov.camera = pose.1
                     }
@@ -727,6 +774,7 @@ extension SceneViewHost {
     /// Re-lays the sibling frames after a bounds change — called from
     /// `layoutSubviews` (main thread) and at build time.
     func layoutScreenSubviews() {
+        mainScreenDebugBacking?.frame = bounds
         for s in mainScreenSubviews {
             s.view.frame = screenSubviewFrame(s.rec.viewport)
         }
@@ -808,9 +856,9 @@ extension SceneViewHost {
     /// whenever viewConfig/stage effects change one of them.
     func applySiblingHostState() {
         for (i, s) in mainScreenSubviews.enumerated() {
-            s.view.backgroundColor = backgroundColor
-            s.view.isTemporalAntialiasingEnabled =
-                isTemporalAntialiasingEnabled
+            let isolated = mainScreenDebugOptions.channel != .none
+            s.view.backgroundColor = isolated ? .black : backgroundColor
+            s.view.isTemporalAntialiasingEnabled = isolated ? false : isTemporalAntialiasingEnabled
             s.view.showsStatistics = i == 0 && showsStatistics
         }
         applySiblingResolve()

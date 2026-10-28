@@ -1,0 +1,3589 @@
+{
+  "pidSummary": {
+    "12785": {
+      "totalLines": 2437,
+      "captures": [
+        {
+          "line": 314,
+          "text": "2026-10-28 00:25:14.020 Df Runner[12785:131e37b] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: captured 256x221 RGBA footprint, softness=0.0"
+        }
+      ],
+      "warnings": [
+        {
+          "line": 33,
+          "text": "2026-10-28 00:25:10.455 Df Runner[12785:131e35b] [com.apple.runningboard:general] Added observer for process assertions expiration warning: <_RBSExpirationWarningClient: 0x103d25360>"
+        },
+        {
+          "line": 307,
+          "text": "2026-10-28 00:25:13.459 E  Runner[12785:131e37b] [com.apple.scenekit:SceneKit] Error: Scene <SCNScene: 0x10f439a40> is modified within a rendering callback of another scene (<SCNScene: 0x103dd6040>). This is not allowed and may lead to crash"
+        },
+        {
+          "line": 313,
+          "text": "2026-10-28 00:25:14.019 E  Runner[12785:131e37b] [com.apple.scenekit:SceneKit] Error: missing value for attachment \"d3CatcherRegion\" [vertex: 3 fragment: -1]"
+        }
+      ]
+    },
+    "15785": {
+      "totalLines": 17357,
+      "captures": [
+        {
+          "line": 4400,
+          "text": "2026-10-28 00:26:46.797 Df Runner[15785:13214ea] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: captured 256x221 RGBA footprint, softness=0.0"
+        },
+        {
+          "line": 29332,
+          "text": "2026-10-28 00:27:17.431 Df Runner[15785:13214ed] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: captured 256x221 RGBA footprint, softness=0.0"
+        },
+        {
+          "line": 34521,
+          "text": "2026-10-28 00:27:33.912 Df Runner[15785:13214e6] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: captured 256x221 RGBA footprint, softness=0.0"
+        },
+        {
+          "line": 37476,
+          "text": "2026-10-28 00:27:40.944 Df Runner[15785:1321c70] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: captured 256x221 RGBA footprint, softness=0.0"
+        }
+      ],
+      "warnings": [
+        {
+          "line": 4143,
+          "text": "2026-10-28 00:26:42.948 Df Runner[15785:13214cf] [com.apple.runningboard:general] Added observer for process assertions expiration warning: <_RBSExpirationWarningClient: 0x10690a020>"
+        },
+        {
+          "line": 4398,
+          "text": "2026-10-28 00:26:46.754 E  Runner[15785:13214ea] [com.apple.scenekit:SceneKit] Error: Scene <SCNScene: 0x111065a40> is modified within a rendering callback of another scene (<SCNScene: 0x1069de040>). This is not allowed and may lead to crash"
+        },
+        {
+          "line": 4399,
+          "text": "2026-10-28 00:26:46.796 E  Runner[15785:13214ea] [com.apple.scenekit:SceneKit] Error: missing value for attachment \"d3CatcherRegion\" [vertex: 3 fragment: -1]"
+        }
+      ]
+    }
+  },
+  "logs": {
+    "/private/tmp/dart3d-w34-ios-baked-catcher-20261028/r1/parent/native-all.log": {
+      "sha256": "797666edb6d80310c9f6197ddc156dee6cf7c919149be39eaed560ce069c5cae",
+      "lineCount": 38246,
+      "matches": [
+        {
+          "line": 203,
+          "text": "2026-10-28 00:25:12.337 I  Runner[12785:131e35b] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1000) error:0 data:<private>"
+        },
+        {
+          "line": 205,
+          "text": "2026-10-28 00:25:12.393 I  Runner[12785:131e35b] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 239,
+          "text": "2026-10-28 00:25:12.986 I  Runner[12785:131e35b] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1001) error:0 data:<private>"
+        },
+        {
+          "line": 240,
+          "text": "2026-10-28 00:25:13.001 I  Runner[12785:131e35b] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 241,
+          "text": "2026-10-28 00:25:13.001 I  Runner[12785:131e35b] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 283,
+          "text": "2026-10-28 00:25:13.368 I  Runner[12785:131e35b] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (3031) error:0 data:<private>"
+        },
+        {
+          "line": 307,
+          "text": "2026-10-28 00:25:13.459 E  Runner[12785:131e37b] [com.apple.scenekit:SceneKit] Error: Scene <SCNScene: 0x10f439a40> is modified within a rendering callback of another scene (<SCNScene: 0x103dd6040>). This is not allowed and may lead to crash"
+        },
+        {
+          "line": 313,
+          "text": "2026-10-28 00:25:14.019 E  Runner[12785:131e37b] [com.apple.scenekit:SceneKit] Error: missing value for attachment \"d3CatcherRegion\" [vertex: 3 fragment: -1]"
+        },
+        {
+          "line": 314,
+          "text": "2026-10-28 00:25:14.020 Df Runner[12785:131e37b] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: captured 256x221 RGBA footprint, softness=0.0"
+        },
+        {
+          "line": 452,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 453,
+          "text": "2026-10-28 00:25:49.325 Df Runner[12785:131e379] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x10f5e59b0> (error: (null))"
+        },
+        {
+          "line": 525,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 526,
+          "text": "2026-10-28 00:25:49.334 Df Runner[12785:131f2ac] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x10f5e4cf0> (error: (null))"
+        },
+        {
+          "line": 598,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 599,
+          "text": "2026-10-28 00:25:49.341 Df Runner[12785:131e379] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x10f5e5530> (error: (null))"
+        },
+        {
+          "line": 671,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 672,
+          "text": "2026-10-28 00:25:49.349 Df Runner[12785:131e37b] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x10f5e64f0> (error: (null))"
+        },
+        {
+          "line": 746,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 747,
+          "text": "2026-10-28 00:25:49.356 Df Runner[12785:131e378] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x10f5e58c0> (error: (null))"
+        },
+        {
+          "line": 831,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 833,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x10f5e5c80> (error: (null))"
+        },
+        {
+          "line": 917,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 919,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x10f5e64f0> (error: (null))"
+        },
+        {
+          "line": 1061,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 1063,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x10f5e6ac0> (error: (null))"
+        },
+        {
+          "line": 1102,
+          "text": "2026-10-28 00:25:49.618 I  Runner[12785:131e35b] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 1103,
+          "text": "2026-10-28 00:25:49.640 Df Runner[12785:131e378] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 1105,
+          "text": "2026-10-28 00:25:49.661 Df Runner[12785:131e378] [com.jasonholtdigital.dart3d:scene] debugView: this implementation unit covers PBR, unlit meshes and sprites; material family SCNLightingModelConstant is unsupported"
+        },
+        {
+          "line": 1109,
+          "text": "2026-10-28 00:25:49.673 I  Runner[12785:131e35b] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 1115,
+          "text": "2026-10-28 00:25:49.905 I  Runner[12785:131e35b] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 1194,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 1195,
+          "text": "2026-10-28 00:25:54.182 Df Runner[12785:131e378] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x10f5e6100> (error: (null))"
+        },
+        {
+          "line": 1267,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 1268,
+          "text": "2026-10-28 00:25:54.191 Df Runner[12785:131e37b] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x10f6b3510> (error: (null))"
+        },
+        {
+          "line": 1340,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 1341,
+          "text": "2026-10-28 00:25:54.200 Df Runner[12785:131e539] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x10f5e7330> (error: (null))"
+        },
+        {
+          "line": 1413,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 1414,
+          "text": "2026-10-28 00:25:54.208 Df Runner[12785:131e539] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x109779ef0> (error: (null))"
+        },
+        {
+          "line": 1488,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 1489,
+          "text": "2026-10-28 00:25:54.217 Df Runner[12785:131f2ac] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x10f5e55c0> (error: (null))"
+        },
+        {
+          "line": 1573,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 1575,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x109779410> (error: (null))"
+        },
+        {
+          "line": 1659,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 1661,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x10f5e5770> (error: (null))"
+        },
+        {
+          "line": 1803,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 1805,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x10f6b2160> (error: (null))"
+        },
+        {
+          "line": 1842,
+          "text": "2026-10-28 00:25:54.322 I  Runner[12785:131e35b] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 1844,
+          "text": "2026-10-28 00:25:54.338 Df Runner[12785:131e378] [com.jasonholtdigital.dart3d:scene] debugView channel=metallic wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 1848,
+          "text": "2026-10-28 00:25:54.340 I  Runner[12785:131e35b] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 1855,
+          "text": "2026-10-28 00:25:54.590 I  Runner[12785:131e35b] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 1946,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 1947,
+          "text": "2026-10-28 00:26:11.458 Df Runner[12785:131f2ac] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x10f560b10> (error: (null))"
+        },
+        {
+          "line": 2019,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 2020,
+          "text": "2026-10-28 00:26:11.467 Df Runner[12785:131e37a] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x10f5e6880> (error: (null))"
+        },
+        {
+          "line": 2092,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 2093,
+          "text": "2026-10-28 00:26:11.477 Df Runner[12785:131e37a] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x10f5e6370> (error: (null))"
+        },
+        {
+          "line": 2165,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 2166,
+          "text": "2026-10-28 00:26:11.485 Df Runner[12785:131e378] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x10f5e4570> (error: (null))"
+        },
+        {
+          "line": 2240,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 2241,
+          "text": "2026-10-28 00:26:11.493 Df Runner[12785:131e378] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x10f5e5a70> (error: (null))"
+        },
+        {
+          "line": 2325,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 2327,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x10f5e50b0> (error: (null))"
+        },
+        {
+          "line": 2411,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 2413,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x10f5601e0> (error: (null))"
+        },
+        {
+          "line": 2555,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 2557,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x10f5e7480> (error: (null))"
+        },
+        {
+          "line": 2596,
+          "text": "2026-10-28 00:26:11.606 I  Runner[12785:131e35b] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 2598,
+          "text": "2026-10-28 00:26:11.622 Df Runner[12785:131e37a] [com.jasonholtdigital.dart3d:scene] debugView channel=roughness wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 2602,
+          "text": "2026-10-28 00:26:11.623 I  Runner[12785:131e35b] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 2608,
+          "text": "2026-10-28 00:26:11.873 I  Runner[12785:131e35b] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 2687,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 2688,
+          "text": "2026-10-28 00:26:13.371 Df Runner[12785:131e37a] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x10f6b24f0> (error: (null))"
+        },
+        {
+          "line": 2760,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 2761,
+          "text": "2026-10-28 00:26:13.381 Df Runner[12785:131e378] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x10f6b2400> (error: (null))"
+        },
+        {
+          "line": 2833,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 2834,
+          "text": "2026-10-28 00:26:13.390 Df Runner[12785:131e37a] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x10f5e4db0> (error: (null))"
+        },
+        {
+          "line": 2906,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 2907,
+          "text": "2026-10-28 00:26:13.399 Df Runner[12785:131e37a] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x109779e00> (error: (null))"
+        },
+        {
+          "line": 2981,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 2982,
+          "text": "2026-10-28 00:26:13.407 Df Runner[12785:131e37a] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x10f5e7360> (error: (null))"
+        },
+        {
+          "line": 3066,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 3068,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x10f6b3510> (error: (null))"
+        },
+        {
+          "line": 3152,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 3154,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x10f5e7330> (error: (null))"
+        },
+        {
+          "line": 3296,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 3298,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x109779e30> (error: (null))"
+        },
+        {
+          "line": 3336,
+          "text": "2026-10-28 00:26:13.523 I  Runner[12785:131e35b] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 3338,
+          "text": "2026-10-28 00:26:13.538 Df Runner[12785:131e37b] [com.jasonholtdigital.dart3d:scene] debugView channel=baseColor wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 3343,
+          "text": "2026-10-28 00:26:13.540 I  Runner[12785:131e35b] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 3349,
+          "text": "2026-10-28 00:26:13.790 I  Runner[12785:131e35b] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 3428,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 3429,
+          "text": "2026-10-28 00:26:15.190 Df Runner[12785:131e378] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x10f5e7060> (error: (null))"
+        },
+        {
+          "line": 3501,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 3502,
+          "text": "2026-10-28 00:26:15.199 Df Runner[12785:131e539] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x10f5e7900> (error: (null))"
+        },
+        {
+          "line": 3574,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 3575,
+          "text": "2026-10-28 00:26:15.208 Df Runner[12785:131e378] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x10f5e6670> (error: (null))"
+        },
+        {
+          "line": 3647,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 3648,
+          "text": "2026-10-28 00:26:15.216 Df Runner[12785:131e539] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x10f5e7b70> (error: (null))"
+        },
+        {
+          "line": 3722,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 3723,
+          "text": "2026-10-28 00:26:15.224 Df Runner[12785:131e378] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x10f5e6160> (error: (null))"
+        },
+        {
+          "line": 3807,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 3809,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x10f5e5aa0> (error: (null))"
+        },
+        {
+          "line": 3893,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 3895,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x10f5e7330> (error: (null))"
+        },
+        {
+          "line": 4037,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 4039,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x10f5e7420> (error: (null))"
+        },
+        {
+          "line": 4077,
+          "text": "2026-10-28 00:26:15.339 I  Runner[12785:131e35b] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 4079,
+          "text": "2026-10-28 00:26:15.355 Df Runner[12785:131f2ac] [com.jasonholtdigital.dart3d:scene] debugView channel=depth wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 4083,
+          "text": "2026-10-28 00:26:15.356 I  Runner[12785:131e35b] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 4090,
+          "text": "2026-10-28 00:26:15.606 I  Runner[12785:131e35b] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 4295,
+          "text": "2026-10-28 00:26:45.412 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1000) error:0 data:<private>"
+        },
+        {
+          "line": 4296,
+          "text": "2026-10-28 00:26:45.464 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 4330,
+          "text": "2026-10-28 00:26:46.242 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1001) error:0 data:<private>"
+        },
+        {
+          "line": 4331,
+          "text": "2026-10-28 00:26:46.254 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 4332,
+          "text": "2026-10-28 00:26:46.254 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 4374,
+          "text": "2026-10-28 00:26:46.667 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (3031) error:0 data:<private>"
+        },
+        {
+          "line": 4398,
+          "text": "2026-10-28 00:26:46.754 E  Runner[15785:13214ea] [com.apple.scenekit:SceneKit] Error: Scene <SCNScene: 0x111065a40> is modified within a rendering callback of another scene (<SCNScene: 0x1069de040>). This is not allowed and may lead to crash"
+        },
+        {
+          "line": 4399,
+          "text": "2026-10-28 00:26:46.796 E  Runner[15785:13214ea] [com.apple.scenekit:SceneKit] Error: missing value for attachment \"d3CatcherRegion\" [vertex: 3 fragment: -1]"
+        },
+        {
+          "line": 4400,
+          "text": "2026-10-28 00:26:46.797 Df Runner[15785:13214ea] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: captured 256x221 RGBA footprint, softness=0.0"
+        },
+        {
+          "line": 4477,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 4478,
+          "text": "2026-10-28 00:26:50.874 Df Runner[15785:13214ed] [com.apple.dt.xctest:Default] Replying to query  with results: <XCTElementQueryResults: 0x1111a5620> (error: (null))"
+        },
+        {
+          "line": 4552,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 4553,
+          "text": "2026-10-28 00:26:50.916 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1111a4d80> (error: (null))"
+        },
+        {
+          "line": 4637,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 4639,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a63a0> (error: (null))"
+        },
+        {
+          "line": 4723,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 4725,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a4150> (error: (null))"
+        },
+        {
+          "line": 5560,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 5561,
+          "text": "2026-10-28 00:26:50.944 Df Runner[15785:13214e0] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Keyboard (First Match) with results: <XCTElementQueryResults: 0x1111a5680> (error: (null))"
+        },
+        {
+          "line": 5635,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 5636,
+          "text": "2026-10-28 00:26:50.969 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1111a5290> (error: (null))"
+        },
+        {
+          "line": 5720,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 5722,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a66a0> (error: (null))"
+        },
+        {
+          "line": 5806,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 5808,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a6d90> (error: (null))"
+        },
+        {
+          "line": 5922,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 5923,
+          "text": "2026-10-28 00:26:50.992 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Button with results: <XCTElementQueryResults: 0x1111a66a0> (error: (null))"
+        },
+        {
+          "line": 5995,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 5996,
+          "text": "2026-10-28 00:26:51.001 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Link with results: <XCTElementQueryResults: 0x1111a5920> (error: (null))"
+        },
+        {
+          "line": 6068,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 6069,
+          "text": "2026-10-28 00:26:51.008 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x1111a5920> (error: (null))"
+        },
+        {
+          "line": 6141,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 6142,
+          "text": "2026-10-28 00:26:51.015 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x1111a6100> (error: (null))"
+        },
+        {
+          "line": 6214,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 6215,
+          "text": "2026-10-28 00:26:51.023 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x1111a4ea0> (error: (null))"
+        },
+        {
+          "line": 6287,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 6288,
+          "text": "2026-10-28 00:26:51.031 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x1111a4ea0> (error: (null))"
+        },
+        {
+          "line": 6360,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 6361,
+          "text": "2026-10-28 00:26:51.038 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Switch with results: <XCTElementQueryResults: 0x1111a6190> (error: (null))"
+        },
+        {
+          "line": 6433,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 6434,
+          "text": "2026-10-28 00:26:51.046 Df Runner[15785:13214ed] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Slider with results: <XCTElementQueryResults: 0x1111a6190> (error: (null))"
+        },
+        {
+          "line": 6506,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 6507,
+          "text": "2026-10-28 00:26:51.053 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SegmentedControl with results: <XCTElementQueryResults: 0x1111a5620> (error: (null))"
+        },
+        {
+          "line": 6579,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 6580,
+          "text": "2026-10-28 00:26:51.060 Df Runner[15785:13214ed] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Cell with results: <XCTElementQueryResults: 0x1111a5620> (error: (null))"
+        },
+        {
+          "line": 6652,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 6653,
+          "text": "2026-10-28 00:26:51.067 Df Runner[15785:13214ed] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type CollectionView with results: <XCTElementQueryResults: 0x1111a5a40> (error: (null))"
+        },
+        {
+          "line": 6725,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 6726,
+          "text": "2026-10-28 00:26:51.074 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Table with results: <XCTElementQueryResults: 0x1111a6400> (error: (null))"
+        },
+        {
+          "line": 6798,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 6799,
+          "text": "2026-10-28 00:26:51.082 Df Runner[15785:13214ed] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type ScrollView with results: <XCTElementQueryResults: 0x1111a60a0> (error: (null))"
+        },
+        {
+          "line": 6871,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 6872,
+          "text": "2026-10-28 00:26:51.089 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Picker with results: <XCTElementQueryResults: 0x1111a5680> (error: (null))"
+        },
+        {
+          "line": 6944,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 6945,
+          "text": "2026-10-28 00:26:51.097 Df Runner[15785:13214e0] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Stepper with results: <XCTElementQueryResults: 0x1111a6f70> (error: (null))"
+        },
+        {
+          "line": 7017,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 7018,
+          "text": "2026-10-28 00:26:51.105 Df Runner[15785:13214ed] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TabBar with results: <XCTElementQueryResults: 0x1111a6c40> (error: (null))"
+        },
+        {
+          "line": 7090,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 7091,
+          "text": "2026-10-28 00:26:51.113 Df Runner[15785:13214ed] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type MenuItem with results: <XCTElementQueryResults: 0x1111a7cf0> (error: (null))"
+        },
+        {
+          "line": 7185,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 7186,
+          "text": "2026-10-28 00:26:51.120 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type StaticText with results: <XCTElementQueryResults: 0x1111a7510> (error: (null))"
+        },
+        {
+          "line": 7258,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 7259,
+          "text": "2026-10-28 00:26:51.129 Df Runner[15785:13214e0] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Image with results: <XCTElementQueryResults: 0x1111a7cf0> (error: (null))"
+        },
+        {
+          "line": 7361,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 7363,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a6100> (error: (null))"
+        },
+        {
+          "line": 7465,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 7467,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a54d0> (error: (null))"
+        },
+        {
+          "line": 7628,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 7630,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a5b90> (error: (null))"
+        },
+        {
+          "line": 7769,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 7771,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a7180> (error: (null))"
+        },
+        {
+          "line": 7910,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 7912,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a6a90> (error: (null))"
+        },
+        {
+          "line": 8051,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 8053,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a7390> (error: (null))"
+        },
+        {
+          "line": 8192,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 8194,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a5800> (error: (null))"
+        },
+        {
+          "line": 8333,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 8335,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a4ff0> (error: (null))"
+        },
+        {
+          "line": 8474,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 8476,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a5770> (error: (null))"
+        },
+        {
+          "line": 8628,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 8630,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a5b30> (error: (null))"
+        },
+        {
+          "line": 8738,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 8740,
+          "text": "    \u21aa\ufe0e Element at index 1 with results: <XCTElementQueryResults: 0x1111a4ff0> (error: (null))"
+        },
+        {
+          "line": 8848,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 8850,
+          "text": "    \u21aa\ufe0e Element at index 1 with results: <XCTElementQueryResults: 0x1111a6280> (error: (null))"
+        },
+        {
+          "line": 9017,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 9019,
+          "text": "    \u21aa\ufe0e Element at index 1 with results: <XCTElementQueryResults: 0x1111a7cc0> (error: (null))"
+        },
+        {
+          "line": 9164,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 9166,
+          "text": "    \u21aa\ufe0e Element at index 1 with results: <XCTElementQueryResults: 0x1111a5c50> (error: (null))"
+        },
+        {
+          "line": 9311,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 9313,
+          "text": "    \u21aa\ufe0e Element at index 1 with results: <XCTElementQueryResults: 0x1111a4690> (error: (null))"
+        },
+        {
+          "line": 9458,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 9460,
+          "text": "    \u21aa\ufe0e Element at index 1 with results: <XCTElementQueryResults: 0x1111a7e70> (error: (null))"
+        },
+        {
+          "line": 9605,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 9607,
+          "text": "    \u21aa\ufe0e Element at index 1 with results: <XCTElementQueryResults: 0x1111a7cc0> (error: (null))"
+        },
+        {
+          "line": 9752,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 9754,
+          "text": "    \u21aa\ufe0e Element at index 1 with results: <XCTElementQueryResults: 0x1111a5c50> (error: (null))"
+        },
+        {
+          "line": 9899,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 9901,
+          "text": "    \u21aa\ufe0e Element at index 1 with results: <XCTElementQueryResults: 0x1111a5500> (error: (null))"
+        },
+        {
+          "line": 10059,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 10061,
+          "text": "    \u21aa\ufe0e Element at index 1 with results: <XCTElementQueryResults: 0x1111a5770> (error: (null))"
+        },
+        {
+          "line": 10172,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 10174,
+          "text": "    \u21aa\ufe0e Element at index 2 with results: <XCTElementQueryResults: 0x1111a4ff0> (error: (null))"
+        },
+        {
+          "line": 10285,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 10287,
+          "text": "    \u21aa\ufe0e Element at index 2 with results: <XCTElementQueryResults: 0x1111a5c50> (error: (null))"
+        },
+        {
+          "line": 10457,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 10459,
+          "text": "    \u21aa\ufe0e Element at index 2 with results: <XCTElementQueryResults: 0x1111a6280> (error: (null))"
+        },
+        {
+          "line": 10607,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 10609,
+          "text": "    \u21aa\ufe0e Element at index 2 with results: <XCTElementQueryResults: 0x1111a43f0> (error: (null))"
+        },
+        {
+          "line": 10757,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 10759,
+          "text": "    \u21aa\ufe0e Element at index 2 with results: <XCTElementQueryResults: 0x1111a4cf0> (error: (null))"
+        },
+        {
+          "line": 10907,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 10909,
+          "text": "    \u21aa\ufe0e Element at index 2 with results: <XCTElementQueryResults: 0x1111a6e80> (error: (null))"
+        },
+        {
+          "line": 11057,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 11059,
+          "text": "    \u21aa\ufe0e Element at index 2 with results: <XCTElementQueryResults: 0x1111a6eb0> (error: (null))"
+        },
+        {
+          "line": 11207,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 11209,
+          "text": "    \u21aa\ufe0e Element at index 2 with results: <XCTElementQueryResults: 0x1111a5770> (error: (null))"
+        },
+        {
+          "line": 11357,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 11359,
+          "text": "    \u21aa\ufe0e Element at index 2 with results: <XCTElementQueryResults: 0x1111a5bf0> (error: (null))"
+        },
+        {
+          "line": 11520,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 11522,
+          "text": "    \u21aa\ufe0e Element at index 2 with results: <XCTElementQueryResults: 0x1111a7cc0> (error: (null))"
+        },
+        {
+          "line": 11636,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 11638,
+          "text": "    \u21aa\ufe0e Element at index 3 with results: <XCTElementQueryResults: 0x1111a6730> (error: (null))"
+        },
+        {
+          "line": 11752,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 11754,
+          "text": "    \u21aa\ufe0e Element at index 3 with results: <XCTElementQueryResults: 0x1111a4ff0> (error: (null))"
+        },
+        {
+          "line": 11927,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 11929,
+          "text": "    \u21aa\ufe0e Element at index 3 with results: <XCTElementQueryResults: 0x1111a5170> (error: (null))"
+        },
+        {
+          "line": 12080,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 12082,
+          "text": "    \u21aa\ufe0e Element at index 3 with results: <XCTElementQueryResults: 0x1111a6e80> (error: (null))"
+        },
+        {
+          "line": 12233,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 12235,
+          "text": "    \u21aa\ufe0e Element at index 3 with results: <XCTElementQueryResults: 0x1111a7e70> (error: (null))"
+        },
+        {
+          "line": 12386,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 12388,
+          "text": "    \u21aa\ufe0e Element at index 3 with results: <XCTElementQueryResults: 0x1111a4ff0> (error: (null))"
+        },
+        {
+          "line": 12539,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 12541,
+          "text": "    \u21aa\ufe0e Element at index 3 with results: <XCTElementQueryResults: 0x1111a5230> (error: (null))"
+        },
+        {
+          "line": 12692,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 12694,
+          "text": "    \u21aa\ufe0e Element at index 3 with results: <XCTElementQueryResults: 0x1111a5170> (error: (null))"
+        },
+        {
+          "line": 12845,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 12847,
+          "text": "    \u21aa\ufe0e Element at index 3 with results: <XCTElementQueryResults: 0x1111a6eb0> (error: (null))"
+        },
+        {
+          "line": 13011,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 13013,
+          "text": "    \u21aa\ufe0e Element at index 3 with results: <XCTElementQueryResults: 0x1111a7e70> (error: (null))"
+        },
+        {
+          "line": 13130,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 13132,
+          "text": "    \u21aa\ufe0e Element at index 4 with results: <XCTElementQueryResults: 0x1111a54d0> (error: (null))"
+        },
+        {
+          "line": 13249,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 13251,
+          "text": "    \u21aa\ufe0e Element at index 4 with results: <XCTElementQueryResults: 0x1111a6e80> (error: (null))"
+        },
+        {
+          "line": 13427,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 13429,
+          "text": "    \u21aa\ufe0e Element at index 4 with results: <XCTElementQueryResults: 0x1111a43f0> (error: (null))"
+        },
+        {
+          "line": 13583,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 13585,
+          "text": "    \u21aa\ufe0e Element at index 4 with results: <XCTElementQueryResults: 0x1111a5b30> (error: (null))"
+        },
+        {
+          "line": 13739,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 13741,
+          "text": "    \u21aa\ufe0e Element at index 4 with results: <XCTElementQueryResults: 0x1111a5140> (error: (null))"
+        },
+        {
+          "line": 13895,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 13897,
+          "text": "    \u21aa\ufe0e Element at index 4 with results: <XCTElementQueryResults: 0x1111a5bf0> (error: (null))"
+        },
+        {
+          "line": 14051,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 14053,
+          "text": "    \u21aa\ufe0e Element at index 4 with results: <XCTElementQueryResults: 0x1111a5c50> (error: (null))"
+        },
+        {
+          "line": 14207,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 14209,
+          "text": "    \u21aa\ufe0e Element at index 4 with results: <XCTElementQueryResults: 0x1111a5800> (error: (null))"
+        },
+        {
+          "line": 14363,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 14365,
+          "text": "    \u21aa\ufe0e Element at index 4 with results: <XCTElementQueryResults: 0x1111a4690> (error: (null))"
+        },
+        {
+          "line": 14532,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 14534,
+          "text": "    \u21aa\ufe0e Element at index 4 with results: <XCTElementQueryResults: 0x1111a6280> (error: (null))"
+        },
+        {
+          "line": 14654,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 14656,
+          "text": "    \u21aa\ufe0e Element at index 5 with results: <XCTElementQueryResults: 0x1111a6eb0> (error: (null))"
+        },
+        {
+          "line": 14776,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 14778,
+          "text": "    \u21aa\ufe0e Element at index 5 with results: <XCTElementQueryResults: 0x1111a5830> (error: (null))"
+        },
+        {
+          "line": 14957,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 14959,
+          "text": "    \u21aa\ufe0e Element at index 5 with results: <XCTElementQueryResults: 0x1111a4000> (error: (null))"
+        },
+        {
+          "line": 15116,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 15118,
+          "text": "    \u21aa\ufe0e Element at index 5 with results: <XCTElementQueryResults: 0x1111a54d0> (error: (null))"
+        },
+        {
+          "line": 15275,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 15277,
+          "text": "    \u21aa\ufe0e Element at index 5 with results: <XCTElementQueryResults: 0x1111a5230> (error: (null))"
+        },
+        {
+          "line": 15434,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 15436,
+          "text": "    \u21aa\ufe0e Element at index 5 with results: <XCTElementQueryResults: 0x1111a5800> (error: (null))"
+        },
+        {
+          "line": 15593,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 15595,
+          "text": "    \u21aa\ufe0e Element at index 5 with results: <XCTElementQueryResults: 0x1111a6e80> (error: (null))"
+        },
+        {
+          "line": 15752,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 15754,
+          "text": "    \u21aa\ufe0e Element at index 5 with results: <XCTElementQueryResults: 0x1111a5800> (error: (null))"
+        },
+        {
+          "line": 15911,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 15913,
+          "text": "    \u21aa\ufe0e Element at index 5 with results: <XCTElementQueryResults: 0x1111a5b30> (error: (null))"
+        },
+        {
+          "line": 16083,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 16085,
+          "text": "    \u21aa\ufe0e Element at index 5 with results: <XCTElementQueryResults: 0x1111a5c50> (error: (null))"
+        },
+        {
+          "line": 16208,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 16210,
+          "text": "    \u21aa\ufe0e Element at index 6 with results: <XCTElementQueryResults: 0x1111a5830> (error: (null))"
+        },
+        {
+          "line": 16333,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 16335,
+          "text": "    \u21aa\ufe0e Element at index 6 with results: <XCTElementQueryResults: 0x1111a5230> (error: (null))"
+        },
+        {
+          "line": 16517,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 16519,
+          "text": "    \u21aa\ufe0e Element at index 6 with results: <XCTElementQueryResults: 0x1111a5800> (error: (null))"
+        },
+        {
+          "line": 16679,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 16681,
+          "text": "    \u21aa\ufe0e Element at index 6 with results: <XCTElementQueryResults: 0x1111a7cc0> (error: (null))"
+        },
+        {
+          "line": 16841,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 16843,
+          "text": "    \u21aa\ufe0e Element at index 6 with results: <XCTElementQueryResults: 0x1111a5170> (error: (null))"
+        },
+        {
+          "line": 17003,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 17005,
+          "text": "    \u21aa\ufe0e Element at index 6 with results: <XCTElementQueryResults: 0x1111a5c50> (error: (null))"
+        },
+        {
+          "line": 17165,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 17167,
+          "text": "    \u21aa\ufe0e Element at index 6 with results: <XCTElementQueryResults: 0x1111a6e80> (error: (null))"
+        },
+        {
+          "line": 17327,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 17329,
+          "text": "    \u21aa\ufe0e Element at index 6 with results: <XCTElementQueryResults: 0x1111a6eb0> (error: (null))"
+        },
+        {
+          "line": 17489,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 17491,
+          "text": "    \u21aa\ufe0e Element at index 6 with results: <XCTElementQueryResults: 0x1111a64c0> (error: (null))"
+        },
+        {
+          "line": 17664,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 17666,
+          "text": "    \u21aa\ufe0e Element at index 6 with results: <XCTElementQueryResults: 0x1111a4690> (error: (null))"
+        },
+        {
+          "line": 17792,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 17794,
+          "text": "    \u21aa\ufe0e Element at index 7 with results: <XCTElementQueryResults: 0x1111a6e80> (error: (null))"
+        },
+        {
+          "line": 17920,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 17922,
+          "text": "    \u21aa\ufe0e Element at index 7 with results: <XCTElementQueryResults: 0x1111a43f0> (error: (null))"
+        },
+        {
+          "line": 18107,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 18109,
+          "text": "    \u21aa\ufe0e Element at index 7 with results: <XCTElementQueryResults: 0x1111a5b30> (error: (null))"
+        },
+        {
+          "line": 18272,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 18274,
+          "text": "    \u21aa\ufe0e Element at index 7 with results: <XCTElementQueryResults: 0x1111a6700> (error: (null))"
+        },
+        {
+          "line": 18437,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 18439,
+          "text": "    \u21aa\ufe0e Element at index 7 with results: <XCTElementQueryResults: 0x1111a5140> (error: (null))"
+        },
+        {
+          "line": 18602,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 18604,
+          "text": "    \u21aa\ufe0e Element at index 7 with results: <XCTElementQueryResults: 0x1111a4ff0> (error: (null))"
+        },
+        {
+          "line": 18767,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 18769,
+          "text": "    \u21aa\ufe0e Element at index 7 with results: <XCTElementQueryResults: 0x1111a4690> (error: (null))"
+        },
+        {
+          "line": 18932,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 18934,
+          "text": "    \u21aa\ufe0e Element at index 7 with results: <XCTElementQueryResults: 0x1111a43f0> (error: (null))"
+        },
+        {
+          "line": 19097,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 19099,
+          "text": "    \u21aa\ufe0e Element at index 7 with results: <XCTElementQueryResults: 0x1111a6700> (error: (null))"
+        },
+        {
+          "line": 19275,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 19277,
+          "text": "    \u21aa\ufe0e Element at index 7 with results: <XCTElementQueryResults: 0x1111a6eb0> (error: (null))"
+        },
+        {
+          "line": 19406,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 19408,
+          "text": "    \u21aa\ufe0e Element at index 8 with results: <XCTElementQueryResults: 0x1111a4690> (error: (null))"
+        },
+        {
+          "line": 19537,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 19539,
+          "text": "    \u21aa\ufe0e Element at index 8 with results: <XCTElementQueryResults: 0x1111a54d0> (error: (null))"
+        },
+        {
+          "line": 19727,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 19729,
+          "text": "    \u21aa\ufe0e Element at index 8 with results: <XCTElementQueryResults: 0x1111a43f0> (error: (null))"
+        },
+        {
+          "line": 19896,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 19898,
+          "text": "    \u21aa\ufe0e Element at index 8 with results: <XCTElementQueryResults: 0x1111a5bf0> (error: (null))"
+        },
+        {
+          "line": 20064,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 20066,
+          "text": "    \u21aa\ufe0e Element at index 8 with results: <XCTElementQueryResults: 0x1111a4690> (error: (null))"
+        },
+        {
+          "line": 20232,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 20234,
+          "text": "    \u21aa\ufe0e Element at index 8 with results: <XCTElementQueryResults: 0x1111a6670> (error: (null))"
+        },
+        {
+          "line": 20400,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 20402,
+          "text": "    \u21aa\ufe0e Element at index 8 with results: <XCTElementQueryResults: 0x1111a54d0> (error: (null))"
+        },
+        {
+          "line": 20568,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 20570,
+          "text": "    \u21aa\ufe0e Element at index 8 with results: <XCTElementQueryResults: 0x1111a5c50> (error: (null))"
+        },
+        {
+          "line": 20736,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 20738,
+          "text": "    \u21aa\ufe0e Element at index 8 with results: <XCTElementQueryResults: 0x1111a5f50> (error: (null))"
+        },
+        {
+          "line": 20917,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 20919,
+          "text": "    \u21aa\ufe0e Element at index 8 with results: <XCTElementQueryResults: 0x1111a5170> (error: (null))"
+        },
+        {
+          "line": 20993,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 20994,
+          "text": "2026-10-28 00:26:52.263 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1111a4ff0> (error: (null))"
+        },
+        {
+          "line": 21078,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 21080,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a5230> (error: (null))"
+        },
+        {
+          "line": 21164,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 21166,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a7cc0> (error: (null))"
+        },
+        {
+          "line": 21264,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 21265,
+          "text": "2026-10-28 00:26:53.611 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x1111a43f0> (error: (null))"
+        },
+        {
+          "line": 21337,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 21338,
+          "text": "2026-10-28 00:26:53.619 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x1111a6280> (error: (null))"
+        },
+        {
+          "line": 21410,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 21411,
+          "text": "2026-10-28 00:26:53.626 Df Runner[15785:13214e0] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x1111a5b30> (error: (null))"
+        },
+        {
+          "line": 21483,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 21484,
+          "text": "2026-10-28 00:26:53.634 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x1111a5bf0> (error: (null))"
+        },
+        {
+          "line": 21558,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 21559,
+          "text": "2026-10-28 00:26:53.641 Df Runner[15785:13214e0] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1111a5830> (error: (null))"
+        },
+        {
+          "line": 21643,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 21645,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a4cf0> (error: (null))"
+        },
+        {
+          "line": 21729,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 21731,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a43f0> (error: (null))"
+        },
+        {
+          "line": 21873,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 21875,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a5140> (error: (null))"
+        },
+        {
+          "line": 21914,
+          "text": "2026-10-28 00:26:53.775 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 21917,
+          "text": "2026-10-28 00:26:53.786 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 21919,
+          "text": "2026-10-28 00:26:53.788 Df Runner[15785:13214ec] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 21933,
+          "text": "2026-10-28 00:26:54.390 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 22010,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 22011,
+          "text": "2026-10-28 00:26:55.663 Df Runner[15785:13214ed] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x1111a7330> (error: (null))"
+        },
+        {
+          "line": 22083,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 22084,
+          "text": "2026-10-28 00:26:55.672 Df Runner[15785:13214ed] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x1111a79c0> (error: (null))"
+        },
+        {
+          "line": 22156,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 22157,
+          "text": "2026-10-28 00:26:55.681 Df Runner[15785:13214ed] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x1111a7f00> (error: (null))"
+        },
+        {
+          "line": 22229,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 22230,
+          "text": "2026-10-28 00:26:55.689 Df Runner[15785:13214e4] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x1111a7f00> (error: (null))"
+        },
+        {
+          "line": 22304,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 22305,
+          "text": "2026-10-28 00:26:55.697 Df Runner[15785:13214e4] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1111a6910> (error: (null))"
+        },
+        {
+          "line": 22389,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 22391,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a6430> (error: (null))"
+        },
+        {
+          "line": 22475,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 22477,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a7150> (error: (null))"
+        },
+        {
+          "line": 22619,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 22621,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a7540> (error: (null))"
+        },
+        {
+          "line": 22659,
+          "text": "2026-10-28 00:26:55.806 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 22661,
+          "text": "2026-10-28 00:26:55.822 Df Runner[15785:13214ec] [com.jasonholtdigital.dart3d:scene] debugView channel=depth wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 22665,
+          "text": "2026-10-28 00:26:55.823 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 22674,
+          "text": "2026-10-28 00:26:56.072 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 22758,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 22759,
+          "text": "2026-10-28 00:27:02.408 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x1111a6670> (error: (null))"
+        },
+        {
+          "line": 22831,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 22832,
+          "text": "2026-10-28 00:27:02.418 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x1111a4cf0> (error: (null))"
+        },
+        {
+          "line": 22904,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 22905,
+          "text": "2026-10-28 00:27:02.426 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x1111a43f0> (error: (null))"
+        },
+        {
+          "line": 22977,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 22978,
+          "text": "2026-10-28 00:27:02.434 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x1111a58f0> (error: (null))"
+        },
+        {
+          "line": 23052,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 23053,
+          "text": "2026-10-28 00:27:02.443 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1111a50b0> (error: (null))"
+        },
+        {
+          "line": 23137,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 23139,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a54d0> (error: (null))"
+        },
+        {
+          "line": 23224,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 23226,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a5b30> (error: (null))"
+        },
+        {
+          "line": 23368,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 23370,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a5c50> (error: (null))"
+        },
+        {
+          "line": 23408,
+          "text": "2026-10-28 00:27:02.556 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 23410,
+          "text": "2026-10-28 00:27:02.572 Df Runner[15785:13214ed] [com.jasonholtdigital.dart3d:scene] debugView channel=baseColor wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 23414,
+          "text": "2026-10-28 00:27:02.574 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 23422,
+          "text": "2026-10-28 00:27:02.823 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 23501,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 23502,
+          "text": "2026-10-28 00:27:04.230 Df Runner[15785:13214e0] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x1111a48d0> (error: (null))"
+        },
+        {
+          "line": 23574,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 23575,
+          "text": "2026-10-28 00:27:04.239 Df Runner[15785:13214ed] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x1111a7540> (error: (null))"
+        },
+        {
+          "line": 23647,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 23648,
+          "text": "2026-10-28 00:27:04.247 Df Runner[15785:13214ed] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x1111a4150> (error: (null))"
+        },
+        {
+          "line": 23720,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 23721,
+          "text": "2026-10-28 00:27:04.256 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x1111a7540> (error: (null))"
+        },
+        {
+          "line": 23795,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 23796,
+          "text": "2026-10-28 00:27:04.264 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1111a6160> (error: (null))"
+        },
+        {
+          "line": 23880,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 23882,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a4de0> (error: (null))"
+        },
+        {
+          "line": 23966,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 23968,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a7720> (error: (null))"
+        },
+        {
+          "line": 24110,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 24112,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a79c0> (error: (null))"
+        },
+        {
+          "line": 24150,
+          "text": "2026-10-28 00:27:04.373 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 24152,
+          "text": "2026-10-28 00:27:04.389 Df Runner[15785:13214e6] [com.jasonholtdigital.dart3d:scene] debugView channel=metallic wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 24156,
+          "text": "2026-10-28 00:27:04.390 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 24163,
+          "text": "2026-10-28 00:27:04.639 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 24242,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 24243,
+          "text": "2026-10-28 00:27:06.067 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x1111a5f50> (error: (null))"
+        },
+        {
+          "line": 24315,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 24316,
+          "text": "2026-10-28 00:27:06.076 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x1111a6310> (error: (null))"
+        },
+        {
+          "line": 24388,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 24389,
+          "text": "2026-10-28 00:27:06.084 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x1111a6eb0> (error: (null))"
+        },
+        {
+          "line": 24461,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 24462,
+          "text": "2026-10-28 00:27:06.092 Df Runner[15785:13214e0] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x1111a5f50> (error: (null))"
+        },
+        {
+          "line": 24536,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 24537,
+          "text": "2026-10-28 00:27:06.101 Df Runner[15785:13214e0] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1111a7e70> (error: (null))"
+        },
+        {
+          "line": 24621,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 24623,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a43f0> (error: (null))"
+        },
+        {
+          "line": 24707,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 24709,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a4690> (error: (null))"
+        },
+        {
+          "line": 24851,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 24853,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a7990> (error: (null))"
+        },
+        {
+          "line": 24889,
+          "text": "2026-10-28 00:27:06.206 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 24891,
+          "text": "2026-10-28 00:27:06.222 Df Runner[15785:13214e6] [com.jasonholtdigital.dart3d:scene] debugView channel=roughness wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 24895,
+          "text": "2026-10-28 00:27:06.223 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 24901,
+          "text": "2026-10-28 00:27:06.475 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 24981,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 24982,
+          "text": "2026-10-28 00:27:07.877 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x1111a6580> (error: (null))"
+        },
+        {
+          "line": 25054,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 25055,
+          "text": "2026-10-28 00:27:07.886 Df Runner[15785:13214ed] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x1111a78d0> (error: (null))"
+        },
+        {
+          "line": 25127,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 25128,
+          "text": "2026-10-28 00:27:07.894 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x1111a7720> (error: (null))"
+        },
+        {
+          "line": 25200,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 25201,
+          "text": "2026-10-28 00:27:07.902 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x1111a6160> (error: (null))"
+        },
+        {
+          "line": 25275,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 25276,
+          "text": "2026-10-28 00:27:07.910 Df Runner[15785:13214e0] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1111a53e0> (error: (null))"
+        },
+        {
+          "line": 25360,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 25362,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a5650> (error: (null))"
+        },
+        {
+          "line": 25446,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 25448,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a5c20> (error: (null))"
+        },
+        {
+          "line": 25590,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 25592,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a7150> (error: (null))"
+        },
+        {
+          "line": 25630,
+          "text": "2026-10-28 00:27:08.023 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 25632,
+          "text": "2026-10-28 00:27:08.039 Df Runner[15785:13214ed] [com.jasonholtdigital.dart3d:scene] debugView channel=roughness wireframe=true nativeParticlesExcluded=true"
+        },
+        {
+          "line": 25636,
+          "text": "2026-10-28 00:27:08.043 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 25639,
+          "text": "2026-10-28 00:27:08.273 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 25641,
+          "text": "2026-10-28 00:27:08.289 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 25721,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 25722,
+          "text": "2026-10-28 00:27:09.700 Df Runner[15785:13214ed] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x1111a7960> (error: (null))"
+        },
+        {
+          "line": 25794,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 25795,
+          "text": "2026-10-28 00:27:09.709 Df Runner[15785:13214ed] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x1111a65b0> (error: (null))"
+        },
+        {
+          "line": 25867,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 25868,
+          "text": "2026-10-28 00:27:09.717 Df Runner[15785:13214ed] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x1111a5a70> (error: (null))"
+        },
+        {
+          "line": 25940,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 25941,
+          "text": "2026-10-28 00:27:09.726 Df Runner[15785:13214e0] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x1111a6070> (error: (null))"
+        },
+        {
+          "line": 26015,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 26016,
+          "text": "2026-10-28 00:27:09.734 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1111a5350> (error: (null))"
+        },
+        {
+          "line": 26100,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 26102,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a7de0> (error: (null))"
+        },
+        {
+          "line": 26186,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 26188,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a6d00> (error: (null))"
+        },
+        {
+          "line": 26330,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 26332,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a4150> (error: (null))"
+        },
+        {
+          "line": 26369,
+          "text": "2026-10-28 00:27:09.839 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 26371,
+          "text": "2026-10-28 00:27:09.855 Df Runner[15785:13214e9] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=true nativeParticlesExcluded=false"
+        },
+        {
+          "line": 26374,
+          "text": "2026-10-28 00:27:09.856 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 26380,
+          "text": "2026-10-28 00:27:10.109 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 26460,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 26461,
+          "text": "2026-10-28 00:27:11.505 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x1111a6ee0> (error: (null))"
+        },
+        {
+          "line": 26533,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 26534,
+          "text": "2026-10-28 00:27:11.513 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x1111a6700> (error: (null))"
+        },
+        {
+          "line": 26606,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 26607,
+          "text": "2026-10-28 00:27:11.520 Df Runner[15785:13214e4] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x1111a6670> (error: (null))"
+        },
+        {
+          "line": 26679,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 26680,
+          "text": "2026-10-28 00:27:11.527 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x1111a5f50> (error: (null))"
+        },
+        {
+          "line": 26754,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 26755,
+          "text": "2026-10-28 00:27:11.534 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1111a4c00> (error: (null))"
+        },
+        {
+          "line": 26839,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 26841,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a6ca0> (error: (null))"
+        },
+        {
+          "line": 26925,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 26927,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a4690> (error: (null))"
+        },
+        {
+          "line": 27069,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 27071,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a6c10> (error: (null))"
+        },
+        {
+          "line": 27110,
+          "text": "2026-10-28 00:27:11.640 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 27112,
+          "text": "2026-10-28 00:27:11.655 Df Runner[15785:13214e4] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        },
+        {
+          "line": 27116,
+          "text": "2026-10-28 00:27:11.656 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 27119,
+          "text": "2026-10-28 00:27:11.891 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 27121,
+          "text": "2026-10-28 00:27:11.910 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 27201,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 27202,
+          "text": "2026-10-28 00:27:13.539 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x1111a65e0> (error: (null))"
+        },
+        {
+          "line": 27274,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 27275,
+          "text": "2026-10-28 00:27:13.547 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x1111a55c0> (error: (null))"
+        },
+        {
+          "line": 27347,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 27348,
+          "text": "2026-10-28 00:27:13.554 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x1111a5140> (error: (null))"
+        },
+        {
+          "line": 27420,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 27421,
+          "text": "2026-10-28 00:27:13.561 Df Runner[15785:13214e4] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x1111a5290> (error: (null))"
+        },
+        {
+          "line": 27495,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 27496,
+          "text": "2026-10-28 00:27:13.568 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1111a4c00> (error: (null))"
+        },
+        {
+          "line": 27580,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 27582,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a6a00> (error: (null))"
+        },
+        {
+          "line": 27666,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 27668,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a7600> (error: (null))"
+        },
+        {
+          "line": 27810,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 27812,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a4690> (error: (null))"
+        },
+        {
+          "line": 27851,
+          "text": "2026-10-28 00:27:13.673 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 27853,
+          "text": "2026-10-28 00:27:13.689 Df Runner[15785:13214e6] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 27857,
+          "text": "2026-10-28 00:27:13.690 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 27863,
+          "text": "2026-10-28 00:27:13.940 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 27942,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 27943,
+          "text": "2026-10-28 00:27:15.371 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x1111a69d0> (error: (null))"
+        },
+        {
+          "line": 28015,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 28016,
+          "text": "2026-10-28 00:27:15.380 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x1111a5c80> (error: (null))"
+        },
+        {
+          "line": 28088,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 28089,
+          "text": "2026-10-28 00:27:15.388 Df Runner[15785:13214e0] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x1111a6b50> (error: (null))"
+        },
+        {
+          "line": 28161,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 28162,
+          "text": "2026-10-28 00:27:15.396 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x1111a6e50> (error: (null))"
+        },
+        {
+          "line": 28236,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 28237,
+          "text": "2026-10-28 00:27:15.404 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1111a50e0> (error: (null))"
+        },
+        {
+          "line": 28321,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 28323,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a6d30> (error: (null))"
+        },
+        {
+          "line": 28407,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 28409,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a71b0> (error: (null))"
+        },
+        {
+          "line": 28551,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 28553,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a6730> (error: (null))"
+        },
+        {
+          "line": 28592,
+          "text": "2026-10-28 00:27:15.524 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 28596,
+          "text": "2026-10-28 00:27:15.527 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 28601,
+          "text": "2026-10-28 00:27:15.789 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 28680,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 28681,
+          "text": "2026-10-28 00:27:17.259 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x1111a6e50> (error: (null))"
+        },
+        {
+          "line": 28753,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 28754,
+          "text": "2026-10-28 00:27:17.267 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x1111a67f0> (error: (null))"
+        },
+        {
+          "line": 28826,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 28827,
+          "text": "2026-10-28 00:27:17.275 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x1111a51a0> (error: (null))"
+        },
+        {
+          "line": 28899,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 28900,
+          "text": "2026-10-28 00:27:17.283 Df Runner[15785:1321c70] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x1111a6d30> (error: (null))"
+        },
+        {
+          "line": 28974,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 28975,
+          "text": "2026-10-28 00:27:17.291 Df Runner[15785:1321c70] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1111a71b0> (error: (null))"
+        },
+        {
+          "line": 29059,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 29061,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a5770> (error: (null))"
+        },
+        {
+          "line": 29145,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 29147,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a5860> (error: (null))"
+        },
+        {
+          "line": 29289,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 29291,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a54d0> (error: (null))"
+        },
+        {
+          "line": 29329,
+          "text": "2026-10-28 00:27:17.411 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 29331,
+          "text": "2026-10-28 00:27:17.422 Df Runner[15785:13214ed] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: explicit material upsert queued baked refresh"
+        },
+        {
+          "line": 29332,
+          "text": "2026-10-28 00:27:17.431 Df Runner[15785:13214ed] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: captured 256x221 RGBA footprint, softness=0.0"
+        },
+        {
+          "line": 29337,
+          "text": "2026-10-28 00:27:17.673 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 29416,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 29417,
+          "text": "2026-10-28 00:27:19.074 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x10b796cd0> (error: (null))"
+        },
+        {
+          "line": 29489,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 29490,
+          "text": "2026-10-28 00:27:19.083 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x10c3b3e40> (error: (null))"
+        },
+        {
+          "line": 29562,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 29563,
+          "text": "2026-10-28 00:27:19.092 Df Runner[15785:13214e4] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x10c3b0ff0> (error: (null))"
+        },
+        {
+          "line": 29635,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 29636,
+          "text": "2026-10-28 00:27:19.100 Df Runner[15785:13214e4] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x10c3b1980> (error: (null))"
+        },
+        {
+          "line": 29710,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 29711,
+          "text": "2026-10-28 00:27:19.108 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x10c3b3de0> (error: (null))"
+        },
+        {
+          "line": 29795,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 29797,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x10c3b3c90> (error: (null))"
+        },
+        {
+          "line": 29881,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 29883,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x10c3b1050> (error: (null))"
+        },
+        {
+          "line": 30025,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 30027,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x10c3b19b0> (error: (null))"
+        },
+        {
+          "line": 30065,
+          "text": "2026-10-28 00:27:19.223 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 30067,
+          "text": "2026-10-28 00:27:19.239 Df Runner[15785:13214e0] [com.jasonholtdigital.dart3d:scene] debugView channel=depth wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 30071,
+          "text": "2026-10-28 00:27:19.240 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 30077,
+          "text": "2026-10-28 00:27:19.490 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 30157,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 30158,
+          "text": "2026-10-28 00:27:20.900 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x1111a5c50> (error: (null))"
+        },
+        {
+          "line": 30230,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 30231,
+          "text": "2026-10-28 00:27:20.909 Df Runner[15785:13214ed] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x1111a7030> (error: (null))"
+        },
+        {
+          "line": 30303,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 30304,
+          "text": "2026-10-28 00:27:20.917 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x1111a7b70> (error: (null))"
+        },
+        {
+          "line": 30376,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 30377,
+          "text": "2026-10-28 00:27:20.925 Df Runner[15785:13214ed] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x1111a7210> (error: (null))"
+        },
+        {
+          "line": 30451,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 30452,
+          "text": "2026-10-28 00:27:20.933 Df Runner[15785:13214ed] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1111a55c0> (error: (null))"
+        },
+        {
+          "line": 30536,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 30538,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a63d0> (error: (null))"
+        },
+        {
+          "line": 30622,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 30624,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a5440> (error: (null))"
+        },
+        {
+          "line": 30766,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 30768,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a6700> (error: (null))"
+        },
+        {
+          "line": 30805,
+          "text": "2026-10-28 00:27:21.039 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 30807,
+          "text": "2026-10-28 00:27:21.055 Df Runner[15785:1321c70] [com.jasonholtdigital.dart3d:scene] debugView channel=baseColor wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 30811,
+          "text": "2026-10-28 00:27:21.057 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 30817,
+          "text": "2026-10-28 00:27:21.308 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 30897,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 30898,
+          "text": "2026-10-28 00:27:22.745 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x1111a79f0> (error: (null))"
+        },
+        {
+          "line": 30970,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 30971,
+          "text": "2026-10-28 00:27:22.754 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x1111a46c0> (error: (null))"
+        },
+        {
+          "line": 31043,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 31044,
+          "text": "2026-10-28 00:27:22.763 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x1111a4870> (error: (null))"
+        },
+        {
+          "line": 31116,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 31117,
+          "text": "2026-10-28 00:27:22.771 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x1111a6790> (error: (null))"
+        },
+        {
+          "line": 31191,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 31192,
+          "text": "2026-10-28 00:27:22.780 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1111a6d30> (error: (null))"
+        },
+        {
+          "line": 31276,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 31278,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a6d90> (error: (null))"
+        },
+        {
+          "line": 31362,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 31364,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a66a0> (error: (null))"
+        },
+        {
+          "line": 31506,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 31508,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a46c0> (error: (null))"
+        },
+        {
+          "line": 31546,
+          "text": "2026-10-28 00:27:22.907 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 31548,
+          "text": "2026-10-28 00:27:22.922 Df Runner[15785:13214ed] [com.jasonholtdigital.dart3d:scene] debugView channel=metallic wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 31552,
+          "text": "2026-10-28 00:27:22.924 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 31558,
+          "text": "2026-10-28 00:27:23.173 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 31638,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 31639,
+          "text": "2026-10-28 00:27:24.569 Df Runner[15785:13214e4] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x1111a5800> (error: (null))"
+        },
+        {
+          "line": 31711,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 31712,
+          "text": "2026-10-28 00:27:24.579 Df Runner[15785:13214ed] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x1111a6070> (error: (null))"
+        },
+        {
+          "line": 31784,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 31785,
+          "text": "2026-10-28 00:27:24.587 Df Runner[15785:13214ed] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x1111a6700> (error: (null))"
+        },
+        {
+          "line": 31857,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 31858,
+          "text": "2026-10-28 00:27:24.595 Df Runner[15785:13214ed] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x1111a7270> (error: (null))"
+        },
+        {
+          "line": 31932,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 31933,
+          "text": "2026-10-28 00:27:24.603 Df Runner[15785:13214ed] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1111a65e0> (error: (null))"
+        },
+        {
+          "line": 32017,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 32019,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a6a00> (error: (null))"
+        },
+        {
+          "line": 32103,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 32105,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a7990> (error: (null))"
+        },
+        {
+          "line": 32247,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 32249,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a4000> (error: (null))"
+        },
+        {
+          "line": 32287,
+          "text": "2026-10-28 00:27:24.722 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 32288,
+          "text": "2026-10-28 00:27:24.739 Df Runner[15785:13214e0] [com.jasonholtdigital.dart3d:scene] debugView channel=roughness wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 32293,
+          "text": "2026-10-28 00:27:24.740 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 32298,
+          "text": "2026-10-28 00:27:24.989 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 32377,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 32378,
+          "text": "2026-10-28 00:27:26.397 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x1111a5200> (error: (null))"
+        },
+        {
+          "line": 32450,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 32451,
+          "text": "2026-10-28 00:27:26.406 Df Runner[15785:13214e4] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x1111a7d80> (error: (null))"
+        },
+        {
+          "line": 32523,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 32524,
+          "text": "2026-10-28 00:27:26.415 Df Runner[15785:13214e4] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x1111a5200> (error: (null))"
+        },
+        {
+          "line": 32596,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 32597,
+          "text": "2026-10-28 00:27:26.423 Df Runner[15785:13214e4] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x1111a4e10> (error: (null))"
+        },
+        {
+          "line": 32671,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 32672,
+          "text": "2026-10-28 00:27:26.431 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1111a4d80> (error: (null))"
+        },
+        {
+          "line": 32756,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 32758,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a65b0> (error: (null))"
+        },
+        {
+          "line": 32842,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 32844,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a6880> (error: (null))"
+        },
+        {
+          "line": 32986,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 32988,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a66a0> (error: (null))"
+        },
+        {
+          "line": 33027,
+          "text": "2026-10-28 00:27:26.539 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 33029,
+          "text": "2026-10-28 00:27:26.555 Df Runner[15785:13214e4] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        },
+        {
+          "line": 33032,
+          "text": "2026-10-28 00:27:26.556 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 33038,
+          "text": "2026-10-28 00:27:26.808 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 33121,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 33122,
+          "text": "2026-10-28 00:27:31.784 Df Runner[15785:1321c70] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x1111a54a0> (error: (null))"
+        },
+        {
+          "line": 33194,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 33195,
+          "text": "2026-10-28 00:27:31.792 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x1111a5aa0> (error: (null))"
+        },
+        {
+          "line": 33267,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 33268,
+          "text": "2026-10-28 00:27:31.800 Df Runner[15785:1321c70] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x1111a7f00> (error: (null))"
+        },
+        {
+          "line": 33340,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 33341,
+          "text": "2026-10-28 00:27:31.807 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x1111a6670> (error: (null))"
+        },
+        {
+          "line": 33415,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 33416,
+          "text": "2026-10-28 00:27:31.814 Df Runner[15785:13214e4] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1111a54a0> (error: (null))"
+        },
+        {
+          "line": 33500,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 33502,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a6160> (error: (null))"
+        },
+        {
+          "line": 33586,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 33588,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a6670> (error: (null))"
+        },
+        {
+          "line": 33730,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 33732,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a7bd0> (error: (null))"
+        },
+        {
+          "line": 33771,
+          "text": "2026-10-28 00:27:31.923 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 33773,
+          "text": "2026-10-28 00:27:31.939 Df Runner[15785:13214e9] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 33777,
+          "text": "2026-10-28 00:27:31.941 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 33783,
+          "text": "2026-10-28 00:27:32.189 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 33863,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 33864,
+          "text": "2026-10-28 00:27:33.597 Df Runner[15785:1321c70] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x1111a6700> (error: (null))"
+        },
+        {
+          "line": 33936,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 33937,
+          "text": "2026-10-28 00:27:33.606 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x1111a6e80> (error: (null))"
+        },
+        {
+          "line": 34009,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 34010,
+          "text": "2026-10-28 00:27:33.615 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x1111a7420> (error: (null))"
+        },
+        {
+          "line": 34082,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 34083,
+          "text": "2026-10-28 00:27:33.623 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x1111a6160> (error: (null))"
+        },
+        {
+          "line": 34157,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 34158,
+          "text": "2026-10-28 00:27:33.632 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1111a7990> (error: (null))"
+        },
+        {
+          "line": 34242,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 34244,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a65e0> (error: (null))"
+        },
+        {
+          "line": 34328,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 34330,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a7060> (error: (null))"
+        },
+        {
+          "line": 34472,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 34474,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a6c10> (error: (null))"
+        },
+        {
+          "line": 34512,
+          "text": "2026-10-28 00:27:33.860 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 34521,
+          "text": "2026-10-28 00:27:33.912 Df Runner[15785:13214e6] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: captured 256x221 RGBA footprint, softness=0.0"
+        },
+        {
+          "line": 34524,
+          "text": "2026-10-28 00:27:34.123 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 34603,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 34604,
+          "text": "2026-10-28 00:27:35.499 Df Runner[15785:1323bb6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x10c3b2b80> (error: (null))"
+        },
+        {
+          "line": 34676,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 34677,
+          "text": "2026-10-28 00:27:35.508 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x10c3b0ff0> (error: (null))"
+        },
+        {
+          "line": 34749,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 34750,
+          "text": "2026-10-28 00:27:35.517 Df Runner[15785:1321c70] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x10c3b1bf0> (error: (null))"
+        },
+        {
+          "line": 34822,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 34823,
+          "text": "2026-10-28 00:27:35.524 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x10c3b0b40> (error: (null))"
+        },
+        {
+          "line": 34897,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 34898,
+          "text": "2026-10-28 00:27:35.533 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x10c3b2430> (error: (null))"
+        },
+        {
+          "line": 34982,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 34984,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x10c3b3de0> (error: (null))"
+        },
+        {
+          "line": 35068,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 35070,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x10c3b2ac0> (error: (null))"
+        },
+        {
+          "line": 35212,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 35214,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a4000> (error: (null))"
+        },
+        {
+          "line": 35253,
+          "text": "2026-10-28 00:27:35.639 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 35255,
+          "text": "2026-10-28 00:27:35.655 Df Runner[15785:13214e9] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        },
+        {
+          "line": 35258,
+          "text": "2026-10-28 00:27:35.656 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 35264,
+          "text": "2026-10-28 00:27:35.909 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 35343,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 35344,
+          "text": "2026-10-28 00:27:37.283 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x1111a7420> (error: (null))"
+        },
+        {
+          "line": 35416,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 35417,
+          "text": "2026-10-28 00:27:37.291 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x1111a49c0> (error: (null))"
+        },
+        {
+          "line": 35489,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 35490,
+          "text": "2026-10-28 00:27:37.299 Df Runner[15785:13214e9] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x1111a66d0> (error: (null))"
+        },
+        {
+          "line": 35562,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 35563,
+          "text": "2026-10-28 00:27:37.305 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x1111a43f0> (error: (null))"
+        },
+        {
+          "line": 35637,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 35638,
+          "text": "2026-10-28 00:27:37.312 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1111a46c0> (error: (null))"
+        },
+        {
+          "line": 35722,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 35724,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a5470> (error: (null))"
+        },
+        {
+          "line": 35808,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 35810,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a65e0> (error: (null))"
+        },
+        {
+          "line": 35952,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 35954,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a66a0> (error: (null))"
+        },
+        {
+          "line": 35993,
+          "text": "2026-10-28 00:27:37.423 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 35995,
+          "text": "2026-10-28 00:27:37.439 Df Runner[15785:13214e6] [com.jasonholtdigital.dart3d:scene] debugView channel=depth wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 35999,
+          "text": "2026-10-28 00:27:37.440 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 36006,
+          "text": "2026-10-28 00:27:37.689 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 36085,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 36086,
+          "text": "2026-10-28 00:27:39.028 Df Runner[15785:1323bb6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x1112e2f70> (error: (null))"
+        },
+        {
+          "line": 36158,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 36159,
+          "text": "2026-10-28 00:27:39.037 Df Runner[15785:13214e4] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x1112e12c0> (error: (null))"
+        },
+        {
+          "line": 36231,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 36232,
+          "text": "2026-10-28 00:27:39.045 Df Runner[15785:13214e4] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x1112e1a40> (error: (null))"
+        },
+        {
+          "line": 36304,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 36305,
+          "text": "2026-10-28 00:27:39.053 Df Runner[15785:1321c70] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x1112e0960> (error: (null))"
+        },
+        {
+          "line": 36379,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 36380,
+          "text": "2026-10-28 00:27:39.061 Df Runner[15785:13214e4] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1112e12c0> (error: (null))"
+        },
+        {
+          "line": 36464,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 36466,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1112e2ca0> (error: (null))"
+        },
+        {
+          "line": 36550,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 36552,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1112e3390> (error: (null))"
+        },
+        {
+          "line": 36694,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 36696,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1112e2460> (error: (null))"
+        },
+        {
+          "line": 36734,
+          "text": "2026-10-28 00:27:39.173 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 36739,
+          "text": "2026-10-28 00:27:39.189 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 36742,
+          "text": "2026-10-28 00:27:39.422 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 36744,
+          "text": "2026-10-28 00:27:39.439 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 36824,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 36825,
+          "text": "2026-10-28 00:27:40.783 Df Runner[15785:1323bb6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x1112e1260> (error: (null))"
+        },
+        {
+          "line": 36897,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 36898,
+          "text": "2026-10-28 00:27:40.792 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x1112e0c90> (error: (null))"
+        },
+        {
+          "line": 36970,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 36971,
+          "text": "2026-10-28 00:27:40.800 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x1112e1800> (error: (null))"
+        },
+        {
+          "line": 37043,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 37044,
+          "text": "2026-10-28 00:27:40.807 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x1112e1e00> (error: (null))"
+        },
+        {
+          "line": 37118,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 37119,
+          "text": "2026-10-28 00:27:40.816 Df Runner[15785:1323bb6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1112e12c0> (error: (null))"
+        },
+        {
+          "line": 37203,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 37205,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1112e1200> (error: (null))"
+        },
+        {
+          "line": 37289,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 37291,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1112e13b0> (error: (null))"
+        },
+        {
+          "line": 37433,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 37435,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1112e0c00> (error: (null))"
+        },
+        {
+          "line": 37473,
+          "text": "2026-10-28 00:27:40.923 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 37475,
+          "text": "2026-10-28 00:27:40.939 Df Runner[15785:1321c70] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: explicit material upsert queued baked refresh"
+        },
+        {
+          "line": 37476,
+          "text": "2026-10-28 00:27:40.944 Df Runner[15785:1321c70] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: captured 256x221 RGBA footprint, softness=0.0"
+        },
+        {
+          "line": 37480,
+          "text": "2026-10-28 00:27:41.173 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 37560,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 37561,
+          "text": "2026-10-28 00:27:42.597 Df Runner[15785:1321c70] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextField with results: <XCTElementQueryResults: 0x1111a6ee0> (error: (null))"
+        },
+        {
+          "line": 37633,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 37634,
+          "text": "2026-10-28 00:27:42.606 Df Runner[15785:1321c70] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x1111a7f00> (error: (null))"
+        },
+        {
+          "line": 37706,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 37707,
+          "text": "2026-10-28 00:27:42.615 Df Runner[15785:13214e6] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type SearchField with results: <XCTElementQueryResults: 0x1111a4870> (error: (null))"
+        },
+        {
+          "line": 37779,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 37780,
+          "text": "2026-10-28 00:27:42.623 Df Runner[15785:13214e4] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type TextView with results: <XCTElementQueryResults: 0x1111a7630> (error: (null))"
+        },
+        {
+          "line": 37854,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 37855,
+          "text": "2026-10-28 00:27:42.632 Df Runner[15785:13214ec] [com.apple.dt.xctest:Default] Replying to query \u21aa\ufe0e Descendants matching type Window with results: <XCTElementQueryResults: 0x1111a7600> (error: (null))"
+        },
+        {
+          "line": 37939,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 37941,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a6ac0> (error: (null))"
+        },
+        {
+          "line": 38025,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 38027,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a7600> (error: (null))"
+        },
+        {
+          "line": 38169,
+          "text": ")} (error: (null))"
+        },
+        {
+          "line": 38171,
+          "text": "    \u21aa\ufe0e Element at index 0 with results: <XCTElementQueryResults: 0x1111a6730> (error: (null))"
+        },
+        {
+          "line": 38209,
+          "text": "2026-10-28 00:27:42.740 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>"
+        },
+        {
+          "line": 38211,
+          "text": "2026-10-28 00:27:42.755 Df Runner[15785:1321c70] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        },
+        {
+          "line": 38214,
+          "text": "2026-10-28 00:27:42.756 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        },
+        {
+          "line": 38220,
+          "text": "2026-10-28 00:27:43.008 I  Runner[15785:13214cf] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>"
+        }
+      ]
+    },
+    "/private/tmp/dart3d-w34-ios-baked-catcher-20261028/r1/parent/before/native-relevant.log": {
+      "sha256": "a7e514a1ec28478140ef363f0c3e82f9f45302a05bd4c36bb0bd42c08219334a",
+      "lineCount": 9,
+      "matches": [
+        {
+          "line": 1,
+          "text": "2026-10-28 00:25:13.459 E  Runner[12785:131e37b] [com.apple.scenekit:SceneKit] Error: Scene <SCNScene: 0x10f439a40> is modified within a rendering callback of another scene (<SCNScene: 0x103dd6040>). This is not allowed and may lead to crash"
+        },
+        {
+          "line": 2,
+          "text": "2026-10-28 00:25:14.019 E  Runner[12785:131e37b] [com.apple.scenekit:SceneKit] Error: missing value for attachment \"d3CatcherRegion\" [vertex: 3 fragment: -1]"
+        },
+        {
+          "line": 3,
+          "text": "2026-10-28 00:25:14.020 Df Runner[12785:131e37b] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: captured 256x221 RGBA footprint, softness=0.0"
+        },
+        {
+          "line": 4,
+          "text": "2026-10-28 00:25:49.640 Df Runner[12785:131e378] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 5,
+          "text": "2026-10-28 00:25:49.661 Df Runner[12785:131e378] [com.jasonholtdigital.dart3d:scene] debugView: this implementation unit covers PBR, unlit meshes and sprites; material family SCNLightingModelConstant is unsupported"
+        },
+        {
+          "line": 6,
+          "text": "2026-10-28 00:25:54.338 Df Runner[12785:131e378] [com.jasonholtdigital.dart3d:scene] debugView channel=metallic wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 7,
+          "text": "2026-10-28 00:26:11.622 Df Runner[12785:131e37a] [com.jasonholtdigital.dart3d:scene] debugView channel=roughness wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 8,
+          "text": "2026-10-28 00:26:13.538 Df Runner[12785:131e37b] [com.jasonholtdigital.dart3d:scene] debugView channel=baseColor wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 9,
+          "text": "2026-10-28 00:26:15.355 Df Runner[12785:131f2ac] [com.jasonholtdigital.dart3d:scene] debugView channel=depth wireframe=false nativeParticlesExcluded=true"
+        }
+      ]
+    },
+    "/private/tmp/dart3d-w34-ios-baked-catcher-20261028/r1/parent/after/native-relevant.log": {
+      "sha256": "8d4759687dac284e065bc6c17456c8ae9c1d46cc3eb3a75a658a11cbf1b3dbf3",
+      "lineCount": 26,
+      "matches": [
+        {
+          "line": 1,
+          "text": "2026-10-28 00:26:46.754 E  Runner[15785:13214ea] [com.apple.scenekit:SceneKit] Error: Scene <SCNScene: 0x111065a40> is modified within a rendering callback of another scene (<SCNScene: 0x1069de040>). This is not allowed and may lead to crash"
+        },
+        {
+          "line": 2,
+          "text": "2026-10-28 00:26:46.796 E  Runner[15785:13214ea] [com.apple.scenekit:SceneKit] Error: missing value for attachment \"d3CatcherRegion\" [vertex: 3 fragment: -1]"
+        },
+        {
+          "line": 3,
+          "text": "2026-10-28 00:26:46.797 Df Runner[15785:13214ea] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: captured 256x221 RGBA footprint, softness=0.0"
+        },
+        {
+          "line": 4,
+          "text": "2026-10-28 00:26:53.788 Df Runner[15785:13214ec] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 5,
+          "text": "2026-10-28 00:26:55.822 Df Runner[15785:13214ec] [com.jasonholtdigital.dart3d:scene] debugView channel=depth wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 6,
+          "text": "2026-10-28 00:27:02.572 Df Runner[15785:13214ed] [com.jasonholtdigital.dart3d:scene] debugView channel=baseColor wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 7,
+          "text": "2026-10-28 00:27:04.389 Df Runner[15785:13214e6] [com.jasonholtdigital.dart3d:scene] debugView channel=metallic wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 8,
+          "text": "2026-10-28 00:27:06.222 Df Runner[15785:13214e6] [com.jasonholtdigital.dart3d:scene] debugView channel=roughness wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 9,
+          "text": "2026-10-28 00:27:08.039 Df Runner[15785:13214ed] [com.jasonholtdigital.dart3d:scene] debugView channel=roughness wireframe=true nativeParticlesExcluded=true"
+        },
+        {
+          "line": 10,
+          "text": "2026-10-28 00:27:09.855 Df Runner[15785:13214e9] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=true nativeParticlesExcluded=false"
+        },
+        {
+          "line": 11,
+          "text": "2026-10-28 00:27:11.655 Df Runner[15785:13214e4] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        },
+        {
+          "line": 12,
+          "text": "2026-10-28 00:27:13.689 Df Runner[15785:13214e6] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 13,
+          "text": "2026-10-28 00:27:17.422 Df Runner[15785:13214ed] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: explicit material upsert queued baked refresh"
+        },
+        {
+          "line": 14,
+          "text": "2026-10-28 00:27:17.431 Df Runner[15785:13214ed] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: captured 256x221 RGBA footprint, softness=0.0"
+        },
+        {
+          "line": 15,
+          "text": "2026-10-28 00:27:19.239 Df Runner[15785:13214e0] [com.jasonholtdigital.dart3d:scene] debugView channel=depth wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 16,
+          "text": "2026-10-28 00:27:21.055 Df Runner[15785:1321c70] [com.jasonholtdigital.dart3d:scene] debugView channel=baseColor wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 17,
+          "text": "2026-10-28 00:27:22.922 Df Runner[15785:13214ed] [com.jasonholtdigital.dart3d:scene] debugView channel=metallic wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 18,
+          "text": "2026-10-28 00:27:24.739 Df Runner[15785:13214e0] [com.jasonholtdigital.dart3d:scene] debugView channel=roughness wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 19,
+          "text": "2026-10-28 00:27:26.555 Df Runner[15785:13214e4] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        },
+        {
+          "line": 20,
+          "text": "2026-10-28 00:27:31.939 Df Runner[15785:13214e9] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 21,
+          "text": "2026-10-28 00:27:33.912 Df Runner[15785:13214e6] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: captured 256x221 RGBA footprint, softness=0.0"
+        },
+        {
+          "line": 22,
+          "text": "2026-10-28 00:27:35.655 Df Runner[15785:13214e9] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        },
+        {
+          "line": 23,
+          "text": "2026-10-28 00:27:37.439 Df Runner[15785:13214e6] [com.jasonholtdigital.dart3d:scene] debugView channel=depth wireframe=false nativeParticlesExcluded=true"
+        },
+        {
+          "line": 24,
+          "text": "2026-10-28 00:27:40.939 Df Runner[15785:1321c70] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: explicit material upsert queued baked refresh"
+        },
+        {
+          "line": 25,
+          "text": "2026-10-28 00:27:40.944 Df Runner[15785:1321c70] [com.jasonholtdigital.dart3d:scene] shadowCatcher 8444939141786894336: captured 256x221 RGBA footprint, softness=0.0"
+        },
+        {
+          "line": 26,
+          "text": "2026-10-28 00:27:42.755 Df Runner[15785:1321c70] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false"
+        }
+      ]
+    },
+    "/private/tmp/dart3d-w34-ios-baked-catcher-20261028/r1/parent/before/run.log": {
+      "sha256": "765916cdb7bcd0098f835c5b5f62b46a186276ca63e96dd9962e9401e1d124cf",
+      "lineCount": 20,
+      "matches": [
+        {
+          "line": 3,
+          "text": "Xcode build done.                                            6.8s"
+        },
+        {
+          "line": 20,
+          "text": "Application finished."
+        }
+      ]
+    },
+    "/private/tmp/dart3d-w34-ios-baked-catcher-20261028/r1/parent/after/run.log": {
+      "sha256": "54094de56d482265941cc6a636445fd4135029fce9f9c6e8d7f2defa886e5e52",
+      "lineCount": 20,
+      "matches": [
+        {
+          "line": 3,
+          "text": "Xcode build done.                                           14.3s"
+        },
+        {
+          "line": 20,
+          "text": "Application finished."
+        }
+      ]
+    },
+    "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/docs/artifacts/e9-w34-dev-reload/baked-catcher-ios/focused-tests.log": {
+      "sha256": "696b3ad92d1e723c85ed907151f4a3cdc75fb4eca36317945a242a59f54bea53",
+      "lineCount": 31,
+      "matches": [
+        {
+          "line": 31,
+          "text": "00:06 +29: All tests passed!"
+        }
+      ]
+    },
+    "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/docs/artifacts/e9-w34-dev-reload/baked-catcher-ios/package-tests.log": {
+      "sha256": "d124ce415f3f9799ce5d8d2d766a9332d6c099a106b0c7af6d0b556ce969149b",
+      "lineCount": 417,
+      "matches": [
+        {
+          "line": 277,
+          "text": "00:04 +274: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/physics_events_queries_test.dart: query reply decode malformed hit entries are skipped, not fatal"
+        },
+        {
+          "line": 417,
+          "text": "00:05 +393: All tests passed!"
+        }
+      ]
+    },
+    "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/docs/artifacts/e9-w34-dev-reload/baked-catcher-ios/example-tests.log": {
+      "sha256": "09626fb6438d9878473b6c10860098b03c8b3541b39799bf6cee195a5e1ee946",
+      "lineCount": 367,
+      "matches": [
+        {
+          "line": 366,
+          "text": "00:18 +336: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dev_reload_test.dart: CLI SIGTERM exits cleanly and releases its listener"
+        },
+        {
+          "line": 367,
+          "text": "00:19 +337: All tests passed!"
+        }
+      ]
+    },
+    "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/docs/artifacts/e9-w34-dev-reload/baked-catcher-ios/package-analyze.log": {
+      "sha256": "31d274bc69f05897eeaab4f322f231b6f9f8acb02212b244a8818e4e9bb29f47",
+      "lineCount": 2,
+      "matches": [
+        {
+          "line": 2,
+          "text": "No issues found! (ran in 1.2s)"
+        }
+      ]
+    },
+    "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/docs/artifacts/e9-w34-dev-reload/baked-catcher-ios/example-analyze.log": {
+      "sha256": "893a078b6156eb47bbd4ab8181f344daf2b4746270bcfbbe63aad3b945210fd9",
+      "lineCount": 2,
+      "matches": [
+        {
+          "line": 2,
+          "text": "No issues found! (ran in 1.6s)"
+        }
+      ]
+    },
+    "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/docs/artifacts/e9-w34-dev-reload/baked-catcher-ios/swift-typecheck.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lineCount": 0,
+      "matches": []
+    }
+  }
+}

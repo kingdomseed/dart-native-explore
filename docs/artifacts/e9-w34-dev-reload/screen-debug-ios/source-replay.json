@@ -1,0 +1,27 @@
+{
+  "head": "2f38e4e33f0b1cb678bc408a42d069c796cefc12",
+  "ownedCount": 13,
+  "snapshotCount": 66,
+  "ownedSource": {
+    "dart3d/lib/src/scene_view.dart": "f9fb35f6ece40de301b650074d9f0ef3efe495a80ed1b3633b028930b9c1cd33",
+    "dart3d/lib/src/protocol.dart": "e0aaf572a53441d2621356d7c346ea7922369d636033b97e3c08bbe9f98b0526",
+    "dart3d/lib/dart3d.dart": "cc20f05348ddb1d39e13ceab4e3431d4dec142b39080808e986af41ef56b4905",
+    "dart3d/ios/Classes/SceneViewHost.swift": "586716a81f2f17a5283fcdc7cb854a7d3baaed71604e583a778e048197a30ece",
+    "dart3d/ios/Classes/FsceneRealizer.swift": "aaa2479c04c2c943be25b1d3078535cdf0dc3fe99065bbdba4d66659a84ef00b",
+    "dart3d/ios/Classes/ToneMapping.swift": "45aebc06f6fd24673dbd8d0d092364c86f9b0d20c4710b5bc258084168faaa43",
+    "dart3d/ios/Classes/RenderTargets.swift": "30378f403f4a2bcf3391b3b020a8b00e1f21c9362beefc22f1627fb050073520",
+    "dart3d/ios/Classes/ScreenDebugPresentation.swift": "2d445abfc6103271232aabe721fe0edeaf80f2aaba650443edfe6353ba6b229c",
+    "dart3d/example/lib/w34_debug_main.dart": "6d3331ddc041452decf1ea9ee481c62259015b5174f16fbca7479e83c99dba74",
+    "dart3d/example/lib/w34_debug_scene.dart": "134798967c98da69283446ae7ef003622652aa0590a3e5c3c774327ce3357088",
+    "dart3d/example/test/w34_debug_scene_test.dart": "18b343f154b2ae6e4cf6f4e5bc7ed84610ad89886b26e054b003a93de94022da",
+    "docs/debug-views.md": "f0d9e12bbd59d9e7958174447b177e7da4646ab0ecfb624fbb73f61189bfc030",
+    "docs/program-v2.md": "92a83fc5b87bd3f76f15152487c407e0d563cdd73cdb90d1e3ad035f58ebc5ca"
+  },
+  "unownedPreservedCount": 1926,
+  "ownedPatchSha256": "7e795e648e078b41ddb3f0927340ceaaa5cd650749cd47fedee70aec1f4bb2aa",
+  "sourceArchiveSha256": "d4483396e722be6b078c6d41f1393dd0895042a63a321cc42f59823ec4f337f3",
+  "forwardExact": true,
+  "reverseExact": true,
+  "locksPreserved": true,
+  "scratchRemoved": true
+}

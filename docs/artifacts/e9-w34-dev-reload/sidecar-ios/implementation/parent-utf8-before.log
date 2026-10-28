@@ -1,0 +1,7 @@
+00:00 +0: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/dev_reload_test.dart
+00:00 +0: invalid UTF-8 retains the scene and a later file save recovers
+00:30 +0 -1: invalid UTF-8 retains the scene and a later file save recovers [E]
+  TimeoutException after 0:00:30.000000: Test timed out after 30 seconds. See https://pub.dev/packages/test#timeouts
+  dart:isolate  _RawReceivePort._handleMessage
+  
+00:30 +0 -1: Some tests failed.

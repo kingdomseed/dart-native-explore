@@ -23,7 +23,13 @@ import 'scene_model.dart';
 /// |     |                 | absent fields keep the node's previous values  |
 /// |  5  | `command`       | utf8 JSON op (see below)                            |
 /// |  6  | `viewConfig`    | utf8 JSON `{allowsCameraControl, showsStatistics,   |
-/// |     |                 |  backgroundColor, antialiasingMode}`                |
+/// |     |                 |  backgroundColor, antialiasingMode, quality,         |
+/// |     |                 |  debugView}`                                        |
+///
+/// `debugView` is always `{channel:<SceneDebugChannel name>,wireframe:<bool>}`,
+/// including explicit off `{channel:"none",wireframe:false}`. Missing debugView
+/// is backward-compatible off. Present malformed values are protocol failures.
+/// It configures screen presentation only and is never a document field.
 ///
 /// `command` ops come in two groups. Structural edits between snapshots —
 /// `addNode`, `removeNode`, `updateNode`, `upsertResource`,

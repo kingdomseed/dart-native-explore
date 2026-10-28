@@ -1,0 +1,31 @@
+00:00 +0: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart
+test/w34_debug_scene_test.dart:31:21: Error: The getter 'alphaMode' isn't defined for the type 'MaterialResource'.
+ - 'MaterialResource' is from 'package:scene/src/specs.dart' ('../../../../../../.pub-cache/hosted/pub.dev/scene-0.3.0/lib/src/specs.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'alphaMode'.
+    expect(material.alphaMode, 'blend');
+                    ^^^^^^^^^
+test/w34_debug_scene_test.dart:49:57: Error: The getter 'alphaMode' isn't defined for the type 'MaterialResource'.
+ - 'MaterialResource' is from 'package:scene/src/specs.dart' ('../../../../../../.pub-cache/hosted/pub.dev/scene-0.3.0/lib/src/specs.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'alphaMode'.
+      (opaque.resources[opaqueId]! as MaterialResource).alphaMode,
+                                                        ^^^^^^^^^
+lib/w34_debug_scene.dart:78:11: Error: No named parameter with the name 'alphaMode'.
+          alphaMode: 'blend',
+          ^^^^^^^^^
+00:00 +0 -1: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart [E]
+  Failed to load "/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart":
+  Compilation failed for testPath=/Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart: test/w34_debug_scene_test.dart:31:21: Error: The getter 'alphaMode' isn't defined for the type 'MaterialResource'.
+   - 'MaterialResource' is from 'package:scene/src/specs.dart' ('../../../../../../.pub-cache/hosted/pub.dev/scene-0.3.0/lib/src/specs.dart').
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'alphaMode'.
+      expect(material.alphaMode, 'blend');
+                      ^^^^^^^^^
+  test/w34_debug_scene_test.dart:49:57: Error: The getter 'alphaMode' isn't defined for the type 'MaterialResource'.
+   - 'MaterialResource' is from 'package:scene/src/specs.dart' ('../../../../../../.pub-cache/hosted/pub.dev/scene-0.3.0/lib/src/specs.dart').
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'alphaMode'.
+        (opaque.resources[opaqueId]! as MaterialResource).alphaMode,
+                                                          ^^^^^^^^^
+  lib/w34_debug_scene.dart:78:11: Error: No named parameter with the name 'alphaMode'.
+            alphaMode: 'blend',
+            ^^^^^^^^^
+  .
+00:00 +0 -1: Some tests failed.

@@ -1,0 +1,10 @@
+--- worker/dart3d/ios/Classes/ScreenDebugPresentation.swift
++++ actual-failed/dart3d/ios/Classes/ScreenDebugPresentation.swift
+@@ -135,7 +135,6 @@
+                     weights: pose.morpher?.weights ?? current.weights,
+                     mode: current.calculationMode, normals: current.unifiesNormals)
+             }
+-            // Sample current native light state without starting a second animation owner.
+             let light = source.light == nil ? nil : pose.light?.copy() as? SCNLight
+             light?.removeAllAnimations()
+             rows.append(ScreenDebugFrame.Node(

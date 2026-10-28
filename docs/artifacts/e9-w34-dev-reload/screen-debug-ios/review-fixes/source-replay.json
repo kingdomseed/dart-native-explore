@@ -1,0 +1,28 @@
+{
+  "head": "2f38e4e33f0b1cb678bc408a42d069c796cefc12",
+  "baselineArchiveSha256": "d4483396e722be6b078c6d41f1393dd0895042a63a321cc42f59823ec4f337f3",
+  "snapshotCount": 66,
+  "changedPaths": [
+    "dart3d/example/lib/w34_debug_main.dart",
+    "dart3d/example/lib/w34_debug_scene.dart",
+    "dart3d/example/test/w34_debug_scene_test.dart",
+    "dart3d/ios/Classes/RenderTargets.swift",
+    "dart3d/ios/Classes/SceneViewHost.swift",
+    "dart3d/ios/Classes/ScreenDebugPresentation.swift",
+    "docs/debug-views.md"
+  ],
+  "sourceArchiveSha256": "678e0e7edf41ccf5bae32c2f356938c0f96190d244731bacffc83114e45e234e",
+  "correctionPatchSha256": "5da9cc023336a4af2c2129c6ca894181ef4fac0b8da12b5d1daad7ae6f8bad30",
+  "forwardExact": true,
+  "reverseExact": true,
+  "unownedPreservedCount": 1926,
+  "locksPreserved": {
+    "dart3d/example/ios/Podfile.lock": "47d5269141917cc2cfad542d6e2c60dc8c3f364e5700ba1354f44208a9e31522",
+    "dart3d/pubspec.lock": "868933c6c9bdd80476a9d1b6d380078eb8ecf45960820d8414beebd55a0b555f",
+    "dart3d/example/pubspec.lock": "4ab8d1150fe7606c532dccb84d07eb0cc4062b5d4b2481c07fd27c135241936c",
+    "dart3d/example/lib/dartnative_plugin_registrant.dart": "c0f873e11de99a1485dd67fd82bc563a61f3c66cc8280b705019ce48cfdbe09f",
+    "dart3d/example/dn_plugins.lock": "73c5209e393e2c670769b2dfe4d09d72b79870c5218ede82e2a6d9c659c0f2a6",
+    "probe/pubspec.lock": "1606c33221efeb86ab121be4ef9ef82377f400de9ca7ab838b7822971f285121"
+  },
+  "scratchRemoved": true
+}

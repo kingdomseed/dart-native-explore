@@ -1,0 +1,940 @@
+--- /dev/null
++++ b/dart3d/example/tool/w34_reload_host.dart
+@@ -0,0 +1,165 @@
++import 'dart:async';
++import 'dart:io';
++
++class W34ReloadHost {
++  W34ReloadHost._(this.source, this._server, this.log);
++
++  final File source;
++  final HttpServer _server;
++  final void Function(String) log;
++  final _done = Completer<void>();
++  StreamSubscription<FileSystemEvent>? _watch;
++  StreamSubscription<HttpRequest>? _requests;
++  StreamSubscription<dynamic>? _messages;
++  WebSocket? _socket;
++  String? _lastSent;
++  bool _claimed = false;
++  bool _closed = false;
++  Future<void>? _closing;
++
++  String get url => 'ws://127.0.0.1:${_server.port}';
++  Future<void> get done => _done.future;
++
++  static Future<W34ReloadHost> start({
++    required String sourcePath,
++    required int port,
++    required void Function(String) log,
++  }) async {
++    final file = File(sourcePath).absolute;
++    final parent = Directory(file.parent.resolveSymbolicLinksSync());
++    final source = File.fromUri(parent.uri.resolve(file.uri.pathSegments.last));
++    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, port);
++    final host = W34ReloadHost._(source, server, log);
++    try {
++      host._watch = parent
++          .watch(recursive: false)
++          .listen(
++            (event) {
++              if (host._closed) return;
++              final destination = event is FileSystemMoveEvent
++                  ? event.destination
++                  : null;
++              if (event.path == source.path ||
++                  event.path == parent.path ||
++                  destination == source.path) {
++                host._send();
++              }
++            },
++            onError: host._fail,
++            onDone: () => host._fail('watch closed'),
++          );
++      // Subscribe before reading so saves cannot fall into a startup gap.
++      source.readAsStringSync();
++      host._requests = server.listen(
++        host._accept,
++        onError: host._fail,
++        onDone: () => host._fail('server closed'),
++      );
++      return host;
++    } catch (_) {
++      await host.close();
++      rethrow;
++    }
++  }
++
++  Future<void> _accept(HttpRequest request) async {
++    if (_closed || _claimed) {
++      request.response.statusCode = HttpStatus.conflict;
++      await request.response.close();
++      return;
++    }
++    _claimed = true;
++    late final WebSocket socket;
++    try {
++      socket = await WebSocketTransformer.upgrade(request);
++    } on WebSocketException catch (error) {
++      _fail(error);
++      return;
++    } on IOException catch (error) {
++      _fail(error);
++      return;
++    }
++    if (_closed) {
++      await socket.close();
++      return;
++    }
++    _socket = socket;
++    _messages = socket.listen(
++      (_) {},
++      onError: _fail,
++      onDone: () => _fail('peer closed'),
++    );
++    log('connected ${DateTime.now().toIso8601String()}');
++    _send();
++  }
++
++  void _send() {
++    if (_closed) return;
++    late final String text;
++    try {
++      text = source.readAsStringSync();
++    } on FileSystemException catch (error) {
++      log('file error $error');
++      return;
++    }
++    final socket = _socket;
++    if (socket == null || text == _lastSent) return;
++    try {
++      socket.add(text);
++      _lastSent = text;
++      log('send ${DateTime.now().toIso8601String()} chars=${text.length}');
++    } on IOException catch (error) {
++      _fail(error);
++    }
++  }
++
++  void _fail(Object error) {
++    if (_closed) return;
++    log('error $error; restart required');
++    unawaited(close());
++  }
++
++  Future<void> close() {
++    _closed = true;
++    return _closing ??= _close();
++  }
++
++  Future<void> _close() async {
++    await _watch?.cancel();
++    await _socket?.close();
++    await _messages?.cancel();
++    await _server.close(force: true);
++    await _requests?.cancel();
++    _done.complete();
++  }
++}
++
++Future<void> main(List<String> args) async {
++  if (args.length != 2 || int.tryParse(args[1]) == null) {
++    stderr.writeln('Usage: dart run tool/w34_reload_host.dart SOURCE PORT');
++    exitCode = 64;
++    return;
++  }
++  W34ReloadHost? host;
++  StreamSubscription<ProcessSignal>? interrupt;
++  StreamSubscription<ProcessSignal>? terminate;
++  try {
++    host = await W34ReloadHost.start(
++      sourcePath: args[0],
++      port: int.parse(args[1]),
++      log: stdout.writeln,
++    );
++    final running = host;
++    interrupt = ProcessSignal.sigint.watch().listen((_) => running.close());
++    terminate = ProcessSignal.sigterm.watch().listen((_) => running.close());
++    stdout.writeln('listening ${host.url} source=${host.source.path}');
++    await host.done;
++  } on IOException catch (error) {
++    stderr.writeln('host error $error');
++    exitCode = 1;
++  } finally {
++    await host?.close();
++    await interrupt?.cancel();
++    await terminate?.cancel();
++  }
++}
+--- /dev/null
++++ b/dart3d/example/tool/fixtures/w34_reload.fscene
+@@ -0,0 +1,128 @@
++{
++  "fscene": 5,
++  "documentId": "48HJ89964WM2JAHB5GPJWBSG64",
++  "stage": {
++    "environmentRef": "env:01VK6D000000A"
++  },
++  "resources": {
++    "mat:01VK6D0000000": {
++      "kind": "material",
++      "type": "physicallyBased",
++      "name": "w34.color",
++      "properties": {
++        "baseColor": {
++          "c": [0.7, 0.08, 0.03, 1.0]
++        },
++        "roughness": {
++          "d": 0.8
++        },
++        "metallic": {
++          "d": 0.0
++        }
++      }
++    },
++    "geo:01VK6D0000002": {
++      "kind": "geometry",
++      "procedural": {
++        "shape": "cuboid",
++        "extents": [1.7999999523162842, 1.7999999523162842, 1.7999999523162842]
++      }
++    },
++    "env:01VK6D000000A": {
++      "kind": "environment",
++      "name": "w34.environment",
++      "environment": {
++        "type": "empty"
++      },
++      "environmentIntensity": 0.0,
++      "exposure": 1.0,
++      "toneMapping": "linear",
++      "effects": {}
++    }
++  },
++  "nodes": {
++    "n:01VK6D0000004": {
++      "name": "w34.cube",
++      "transform": {
++        "trs": {
++          "t": [0.0, 0.0, 0.0],
++          "r": [0.0, 0.19866932928562164, 0.0, 0.9800665974617004],
++          "s": [1.0, 1.0, 1.0]
++        }
++      },
++      "components": [
++        {
++          "type": "mesh",
++          "properties": {
++            "geometry": {
++              "rref": "geo:01VK6D0000002"
++            },
++            "material": {
++              "rref": "mat:01VK6D0000000"
++            }
++          }
++        }
++      ]
++    },
++    "n:01VK6D0000006": {
++      "name": "w34.light",
++      "transform": {
++        "trs": {
++          "t": [0.0, 0.0, 0.0],
++          "r": [0.0, 0.0, 0.0, 1.0],
++          "s": [1.0, 1.0, 1.0]
++        }
++      },
++      "components": [
++        {
++          "type": "directionalLight",
++          "properties": {
++            "color": {
++              "c": [1.0, 1.0, 1.0, 1.0]
++            },
++            "intensity": {
++              "d": 2.0
++            },
++            "castsShadow": {
++              "b": false
++            }
++          }
++        }
++      ]
++    },
++    "n:01VK6D0000008": {
++      "name": "w34.camera",
++      "transform": {
++        "trs": {
++          "t": [0.0, 0.0, -7.0],
++          "r": [0.0, 0.0, 0.0, 1.0],
++          "s": [1.0, 1.0, 1.0]
++        }
++      },
++      "components": [
++        {
++          "type": "camera",
++          "properties": {
++            "projection": {
++              "s": "perspective"
++            },
++            "fovRadiansY": {
++              "d": 0.8
++            },
++            "near": {
++              "d": 0.1
++            },
++            "far": {
++              "d": 30.0
++            }
++          }
++        }
++      ]
++    }
++  },
++  "roots": [
++    "n:01VK6D0000004",
++    "n:01VK6D0000006",
++    "n:01VK6D0000008"
++  ]
++}
+--- /dev/null
++++ b/dart3d/example/lib/w34_reload_probe.dart
+@@ -0,0 +1,97 @@
++import 'dart:async';
++import 'dart:io';
++
++import 'package:dart3d/dart3d.dart';
++
++class W34ReloadProbe {
++  W34ReloadProbe({required this.controller, required this.status});
++
++  final SceneController controller;
++  final void Function(String) status;
++  final _client = HttpClient();
++  StreamSubscription<dynamic>? _messages;
++  WebSocket? _socket;
++  bool _stopped = false;
++
++  Future<void> connect(String url) async {
++    status('connecting $url');
++    late final WebSocket socket;
++    try {
++      socket = await WebSocket.connect(url, customClient: _client);
++    } on IOException catch (error) {
++      if (!_stopped) status('connection error $error; restart required');
++      _client.close(force: true);
++      return;
++    }
++    if (_stopped) {
++      await socket.close();
++      return;
++    }
++    _socket = socket;
++    status('connected $url');
++    _messages = socket.listen(
++      _receive,
++      onError: (Object error) {
++        if (_stopped) return;
++        status('socket error $error; restart required');
++        unawaited(stop());
++      },
++      onDone: () {
++        if (_stopped) return;
++        status('socket closed; restart required');
++        unawaited(stop());
++      },
++    );
++  }
++
++  void _receive(dynamic message) {
++    if (_stopped) return;
++    if (message is! String) {
++      status('error expected WebSocket text');
++      return;
++    }
++    final requested = DateTime.now().toIso8601String();
++    late final SceneDocument next;
++    try {
++      next = readFsceneLogged(message, log: status);
++    } on FormatException catch (error) {
++      status('decode error $error');
++      return;
++    } on TypeError catch (error) {
++      status('decode error $error');
++      return;
++    } on ArgumentError catch (error) {
++      status('decode error $error');
++      return;
++    } on FsceneFormatException catch (error) {
++      status('decode error $error');
++      return;
++    } on FsceneVersionException catch (error) {
++      status('decode error $error');
++      return;
++    } on FsceneUnsupportedFeatureException catch (error) {
++      status('decode error $error');
++      return;
++    }
++    if (controller.document == null) {
++      controller.loadDocument(next);
++      status('loadDocument request=$requested');
++    } else {
++      final operations = controller.applyDiff(
++        diffScene(controller.document!, next),
++        next,
++      );
++      status(
++        'applyDiff request=$requested '
++        'ops=${operations.map((op) => op['op']).toList()}',
++      );
++    }
++  }
++
++  Future<void> stop() async {
++    _stopped = true;
++    _client.close(force: true);
++    await _messages?.cancel();
++    await _socket?.close();
++  }
++}
+--- /dev/null
++++ b/dart3d/example/lib/w34_reload_main.dart
+@@ -0,0 +1,74 @@
++import 'dart:async';
++
++import 'package:dart3d/dart3d.dart';
++import 'package:dartnative/dartnative.dart';
++
++import 'dartnative_plugin_registrant.dart';
++import 'w34_reload_probe.dart';
++
++void main() {
++  const url = String.fromEnvironment('DART3D_RELOAD_URL');
++  if (url.isEmpty) {
++    throw ArgumentError('DART3D_RELOAD_URL is required for this dev target');
++  }
++  DartNativePluginRegistrant.registerAll();
++  runApp(const _ReloadScreen(url: url));
++}
++
++class _ReloadScreen extends StatefulWidget {
++  const _ReloadScreen({required this.url});
++  final String url;
++
++  @override
++  State<_ReloadScreen> createState() => _ReloadScreenState();
++}
++
++class _ReloadScreenState extends State<_ReloadScreen> {
++  final _controller = SceneController();
++  late final W34ReloadProbe _probe;
++  String _status = 'waiting for authored text';
++
++  @override
++  void initState() {
++    super.initState();
++    _probe = W34ReloadProbe(
++      controller: _controller,
++      status: (message) {
++        dnLog('w34 $message');
++        if (mounted) setState(() => _status = message);
++      },
++    );
++    unawaited(_probe.connect(widget.url));
++  }
++
++  @override
++  void dispose() {
++    unawaited(_probe.stop());
++    _controller.dispose();
++    super.dispose();
++  }
++
++  @override
++  Widget build(BuildContext context) => Scaffold(
++    brightness: Brightness.dark,
++    backgroundColor: const Color(0xFF111111),
++    body: Column(
++      crossAxisAlignment: CrossAxisAlignment.stretch,
++      children: [
++        Expanded(
++          child: SceneView(controller: _controller, quality: SceneQuality.high),
++        ),
++        SizedBox(
++          height: 100,
++          child: Padding(
++            padding: const EdgeInsets.all(12),
++            child: Text(
++              _status,
++              style: const TextStyle(color: Color(0xFFFFFFFF), fontSize: 12),
++            ),
++          ),
++        ),
++      ],
++    ),
++  );
++}
+--- /dev/null
++++ b/dart3d/example/test/w34_reload_transport_test.dart
+@@ -0,0 +1,461 @@
++import 'dart:async';
++import 'dart:convert';
++import 'dart:io';
++import 'dart:typed_data';
++
++import 'package:dart3d/dart3d.dart';
++import 'package:dart3d/src/protocol.dart';
++import 'package:dart3d/src/scene_view.dart';
++import 'package:test/test.dart';
++
++import 'package:dart3d_example/w34_reload_probe.dart';
++import '../tool/w34_reload_host.dart';
++
++class RecordingElement extends SceneViewElement {
++  RecordingElement(SceneController controller)
++    : super(SceneViewLeaf(controller: controller));
++
++  final sent = <({int tag, Uint8List data})>[];
++
++  @override
++  void sendMutation(int tag, Uint8List bytes) =>
++      sent.add((tag: tag, data: Uint8List.fromList(bytes)));
++
++  List<Map<String, dynamic>> get commands => [
++    for (final mutation in sent.where((m) => m.tag == D3Protocol.command))
++      ..._flatten(
++        jsonDecode(utf8.decode(mutation.data)) as Map<String, dynamic>,
++      ),
++  ];
++
++  List<Map<String, dynamic>> _flatten(Map<String, dynamic> op) =>
++      op['op'] == 'batch'
++      ? (op['ops'] as List).cast<Map<String, dynamic>>()
++      : [op];
++}
++
++class Messages {
++  final values = <String>[];
++  final events = StreamController<String>.broadcast(sync: true);
++
++  void add(String value) {
++    values.add(value);
++    events.add(value);
++  }
++
++  Future<String> next(String prefix) => events.stream
++      .firstWhere((message) => message.startsWith(prefix))
++      .timeout(const Duration(seconds: 8));
++}
++
++void main() {
++  late Directory directory;
++  late File source;
++  late String initial;
++  late SceneController controller;
++  late RecordingElement element;
++  late Messages status;
++  late Messages hostLog;
++  W34ReloadHost? host;
++  W34ReloadProbe? probe;
++
++  setUp(() async {
++    directory = Directory(
++      (await Directory.systemTemp.createTemp(
++        'w34-transport-',
++      )).resolveSymbolicLinksSync(),
++    );
++    source = File('${directory.path}/authored.fscene');
++    initial = File('tool/fixtures/w34_reload.fscene').readAsStringSync();
++    source.writeAsStringSync(initial);
++    controller = SceneController();
++    element = RecordingElement(controller);
++    controller.attachElement(element);
++    status = Messages();
++    hostLog = Messages();
++  });
++
++  tearDown(() async {
++    await probe?.stop();
++    await host?.close();
++    controller.detachElement(element);
++    controller.dispose();
++    await status.events.close();
++    await hostLog.events.close();
++    await directory.delete(recursive: true);
++    host = null;
++    probe = null;
++  });
++
++  Future<void> start() async {
++    host = await W34ReloadHost.start(
++      sourcePath: source.path,
++      port: 0,
++      log: hostLog.add,
++    );
++    probe = W34ReloadProbe(controller: controller, status: status.add);
++    final loaded = status.next('loadDocument');
++    await probe!.connect(host!.url);
++    await loaded;
++  }
++
++  Future<void> save(String text, {String expected = 'applyDiff'}) async {
++    final applied = status.next(expected);
++    source.writeAsStringSync(text, flush: true);
++    await applied;
++  }
++
++  Map<String, dynamic> document() =>
++      jsonDecode(writeFsceneWithExtensions(controller.document!))
++          as Map<String, dynamic>;
++
++  String edit({bool blue = false, double exposure = 1}) {
++    final value = jsonDecode(initial) as Map<String, dynamic>;
++    final resources = value['resources'] as Map;
++    if (blue) {
++      resources['mat:01VK6D0000000']['properties']['baseColor']['c'] = [
++        0.03,
++        0.08,
++        0.7,
++        1.0,
++      ];
++    }
++    resources['env:01VK6D000000A']['exposure'] = exposure;
++    return jsonEncode(value);
++  }
++
++  test(
++    'real watch and socket load once, diff color/exposure, restore fixed camera',
++    () async {
++      await start();
++      expect(
++        element.sent.where((m) => m.tag == D3Protocol.loadScene),
++        hasLength(1),
++      );
++      final camera = document()['nodes']['n:01VK6D0000008'];
++      element.sent.clear();
++
++      await save(edit(blue: true));
++      expect(element.commands.map((op) => op['op']), [
++        'upsertResource',
++        'updateNode',
++      ]);
++      expect(element.commands.first['id'], 'mat:01VK6D0000000');
++      expect(
++        document()['resources']['mat:01VK6D0000000']['properties']['baseColor'],
++        {
++          'c': [0.03, 0.08, 0.7, 1.0],
++        },
++      );
++      expect(document()['nodes']['n:01VK6D0000008'], camera);
++      element.sent.clear();
++
++      await save(edit(blue: true, exposure: .2));
++      expect(element.commands.map((op) => op['op']), [
++        'upsertResource',
++        'updateStage',
++      ]);
++      expect(element.commands.first['id'], 'env:01VK6D000000A');
++      expect(document()['resources']['env:01VK6D000000A']['exposure'], .2);
++      expect(document()['nodes']['n:01VK6D0000008'], camera);
++      element.sent.clear();
++
++      await save(initial);
++      expect(element.commands.map((op) => op['op']), [
++        'upsertResource',
++        'upsertResource',
++        'updateNode',
++        'updateStage',
++      ]);
++      expect(
++        document(),
++        jsonDecode(writeFsceneWithExtensions(readFsceneLogged(initial))),
++      );
++      expect(element.sent.where((m) => m.tag == D3Protocol.loadScene), isEmpty);
++    },
++  );
++
++  test(
++    'authored decode errors retain the same document and later saves recover',
++    () async {
++      await start();
++      final accepted = controller.document;
++      element.sent.clear();
++      final wrong = initial.replaceFirst('"d": 0.8', '"d": "wrong"');
++      final shortColor = initial.replaceFirst(
++        '[0.7, 0.08, 0.03, 1.0]',
++        '[0.7]',
++      );
++      for (final invalid in ['{', wrong, shortColor, '[]']) {
++        await save(invalid, expected: 'decode error');
++        expect(controller.document, same(accepted));
++        expect(element.sent, isEmpty);
++      }
++      await save(edit(blue: true));
++      expect(element.commands.map((op) => op['op']), [
++        'upsertResource',
++        'updateNode',
++      ]);
++    },
++  );
++
++  test(
++    'actual rename save reloads; unrelated sibling save emits no mutation',
++    () async {
++      await start();
++      element.sent.clear();
++      final applied = status.next('applyDiff');
++      final replacement = File('${directory.path}/replacement.tmp');
++      replacement.writeAsStringSync(edit(blue: true), flush: true);
++      replacement.renameSync(source.path);
++      await applied;
++      expect(element.commands.map((op) => op['op']), [
++        'upsertResource',
++        'updateNode',
++      ]);
++      element.sent.clear();
++      final sentCount = hostLog.values
++          .where((m) => m.startsWith('send '))
++          .length;
++      File(
++        '${directory.path}/unrelated.fscene',
++      ).writeAsStringSync('{unrelated');
++      await Future<void>.delayed(const Duration(milliseconds: 800));
++      expect(element.sent, isEmpty);
++      expect(
++        hostLog.values.where((m) => m.startsWith('send ')),
++        hasLength(sentCount),
++      );
++    },
++  );
++
++  test(
++    'missing source during rename surfaces error then recovers on real event',
++    () async {
++      await start();
++      element.sent.clear();
++      final error = hostLog.next('file error');
++      source.renameSync('${directory.path}/moved.fscene');
++      await error;
++      expect(element.sent, isEmpty);
++      await save(edit(blue: true));
++      expect(element.commands.map((op) => op['op']), [
++        'upsertResource',
++        'updateNode',
++      ]);
++    },
++  );
++
++  test(
++    'stop before controller disposal prevents later file-save callbacks',
++    () async {
++      await start();
++      await probe!.stop();
++      controller.detachElement(element);
++      controller.dispose();
++      // Teardown owns a fresh unattached controller after this lifetime check.
++      controller = SceneController();
++      element.sent.clear();
++      final count = status.values.length;
++      source.writeAsStringSync(edit(blue: true));
++      await host!.done.timeout(const Duration(seconds: 5));
++      await Future<void>.delayed(const Duration(milliseconds: 800));
++      expect(element.sent, isEmpty);
++      expect(status.values, hasLength(count));
++    },
++  );
++
++  test('peer disconnect terminates host and releases listening port', () async {
++    host = await W34ReloadHost.start(
++      sourcePath: source.path,
++      port: 0,
++      log: hostLog.add,
++    );
++    final uri = Uri.parse(host!.url);
++    final peer = await WebSocket.connect(host!.url);
++    final messages = peer.listen((_) {});
++    await peer.close();
++    await host!.done.timeout(const Duration(seconds: 5));
++    await messages.cancel();
++    expect(hostLog.values, contains('error peer closed; restart required'));
++    final rebound = await HttpServer.bind(
++      InternetAddress.loopbackIPv4,
++      uri.port,
++    );
++    await rebound.close(force: true);
++  });
++
++  test(
++    'host close surfaces receiver disconnect and releases resources',
++    () async {
++      await start();
++      final closed = status.next('socket closed');
++      await host!.close();
++      await closed;
++      expect(status.values.last, contains('restart required'));
++    },
++  );
++
++  test(
++    'occupied port and missing source surface actual startup failures',
++    () async {
++      final occupied = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
++      final port = occupied.port;
++      try {
++        await expectLater(
++          W34ReloadHost.start(
++            sourcePath: source.path,
++            port: port,
++            log: hostLog.add,
++          ),
++          throwsA(isA<SocketException>()),
++        );
++      } finally {
++        await occupied.close(force: true);
++      }
++      source.deleteSync();
++      await expectLater(
++        W34ReloadHost.start(
++          sourcePath: source.path,
++          port: port,
++          log: hostLog.add,
++        ),
++        throwsA(isA<FileSystemException>()),
++      );
++      final rebound = await HttpServer.bind(InternetAddress.loopbackIPv4, port);
++      await rebound.close(force: true);
++    },
++  );
++
++  test(
++    'one consumer only; refused second peer does not disrupt first',
++    () async {
++      await start();
++      await expectLater(
++        WebSocket.connect(host!.url),
++        throwsA(isA<WebSocketException>()),
++      );
++      await save(edit(blue: true));
++      expect(controller.document, isNotNull);
++    },
++  );
++
++  test('CLI SIGTERM closes its watcher/server and exits', () async {
++    final executable = File(Platform.resolvedExecutable);
++    // dn test runs under flutter_tester; this process needs the host SDK Dart.
++    final dart = executable.uri.pathSegments.last == 'flutter_tester'
++        ? executable.uri.resolve('../../../dart-sdk/bin/dart').toFilePath()
++        : executable.path;
++    final process = await Process.start(dart, [
++      'run',
++      'tool/w34_reload_host.dart',
++      source.path,
++      '0',
++    ]);
++    final errors = process.stderr.transform(utf8.decoder).join();
++    final lines = StreamIterator(
++      process.stdout.transform(utf8.decoder).transform(const LineSplitter()),
++    );
++    try {
++      do {
++        expect(
++          await lines.moveNext().timeout(const Duration(seconds: 8)),
++          isTrue,
++        );
++      } while (!lines.current.startsWith('listening '));
++      final url = lines.current.split(' ')[1];
++      expect(lines.current, startsWith('listening ws://127.0.0.1:'));
++      expect(process.kill(ProcessSignal.sigterm), isTrue);
++      expect(await process.exitCode.timeout(const Duration(seconds: 5)), 0);
++      expect(await errors, isEmpty);
++      final rebound = await HttpServer.bind(
++        InternetAddress.loopbackIPv4,
++        Uri.parse(url).port,
++      );
++      await rebound.close(force: true);
++    } finally {
++      process.kill(ProcessSignal.sigterm);
++      await process.exitCode;
++      await lines.cancel();
++    }
++  });
++
++  test(
++    'one refused connection surfaces error with no controller mutation',
++    () async {
++      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
++      final port = server.port;
++      await server.close(force: true);
++      probe = W34ReloadProbe(controller: controller, status: status.add);
++      await probe!.connect('ws://127.0.0.1:$port');
++      expect(status.values.last, startsWith('connection error'));
++      expect(controller.document, isNull);
++      expect(element.sent, isEmpty);
++    },
++  );
++
++  test(
++    'stop during real pending handshake cannot reach disposed controller',
++    () async {
++      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
++      final request = Completer<HttpRequest>();
++      final requests = server.listen(request.complete);
++      try {
++        probe = W34ReloadProbe(controller: controller, status: status.add);
++        final connecting = probe!.connect('ws://127.0.0.1:${server.port}');
++        final pending = await request.future.timeout(
++          const Duration(seconds: 5),
++        );
++        await probe!.stop();
++        controller.detachElement(element);
++        controller.dispose();
++        controller = SceneController();
++        await connecting.timeout(const Duration(seconds: 5));
++        await pending.response.close();
++        expect(controller.document, isNull);
++        expect(element.sent, isEmpty);
++        expect(status.values, hasLength(1));
++      } finally {
++        await server.close(force: true);
++        await requests.cancel();
++      }
++    },
++  );
++
++  test(
++    'receiver rejects binary messages and accepts subsequent text',
++    () async {
++      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
++      final upgraded = Completer<WebSocket>();
++      final requests = server.listen((request) async {
++        upgraded.complete(await WebSocketTransformer.upgrade(request));
++      });
++      WebSocket? peer;
++      StreamSubscription<dynamic>? messages;
++      try {
++        probe = W34ReloadProbe(controller: controller, status: status.add);
++        await probe!.connect('ws://127.0.0.1:${server.port}');
++        peer = await upgraded.future;
++        messages = peer.listen((_) {});
++        final error = status.next('error expected WebSocket text');
++        peer.add([1, 2, 3]);
++        await error;
++        expect(controller.document, isNull);
++        expect(element.sent, isEmpty);
++        final loaded = status.next('loadDocument');
++        peer.add(initial);
++        await loaded;
++        expect(
++          element.sent.where((m) => m.tag == D3Protocol.loadScene),
++          hasLength(1),
++        );
++      } finally {
++        await probe?.stop();
++        await peer?.close();
++        await messages?.cancel();
++        await server.close(force: true);
++        await requests.cancel();
++      }
++    },
++  );
++}

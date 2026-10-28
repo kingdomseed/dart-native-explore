@@ -1,0 +1,9 @@
+Page: com.jasonholtdigital.dart3dExample
+App: com.jasonholtdigital.dart3dExample
+Snapshot: 6 nodes
+@e1 [application] "Dart3d Example"
+@e2 [navigation-bar] "dartnative_ios.DartNativeView"
+@e3 [other] "w34.quad"
+@e4 [other] "w34.camera"
+@e5 [text] "loadDocument"
+@e6 [toolbar] "Toolbar"

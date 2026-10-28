@@ -1,0 +1,14 @@
+[
+  {
+    "reverse": false,
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "reverse": true,
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

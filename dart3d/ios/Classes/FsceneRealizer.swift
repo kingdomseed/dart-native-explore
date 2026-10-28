@@ -2433,6 +2433,7 @@ enum FsceneRealizer {
                 } else {
                     mode = .live
                     m.lightingModel = .shadowOnly
+                    m.shaderModifiers = [.fragment: "#pragma transparent\n#pragma body\n"]
                     if authoredMode != "live" {
                         host.logOnce("w24.catcher.mode.\(authoredMode)",
                             "shadowCatcher mode '\(authoredMode)' unknown; "
@@ -2496,11 +2497,11 @@ enum FsceneRealizer {
                     float d3SpriteSourcePremultiplied;
                     #pragma transparent
                     #pragma body
-                    float4 c = _surface.diffuse * d3SpriteTint
+                    float4 d3SampledSpriteColor = _surface.diffuse * d3SpriteTint
                         * in.d3SpriteColor;
                     float weight = d3SpriteSourcePremultiplied > 0.5
-                        ? d3SpriteTint.a * in.d3SpriteColor.a : c.a;
-                    _output.color = float4(c.rgb * weight, c.a);
+                        ? d3SpriteTint.a * in.d3SpriteColor.a : d3SampledSpriteColor.a;
+                    _output.color = float4(d3SampledSpriteColor.rgb * weight, d3SampledSpriteColor.a);
                     """]
                 if props["baseColorTexture"] != nil {
                     applyTextureSlot(m, materialKey: key,
@@ -8418,5 +8419,122 @@ enum FsceneRealizer {
             guard let m, m.count == 16 else { return nil }
             return D3Wire.matrix(m)
         }
+    }
+}
+
+extension FsceneRealizer {
+    static func screenDebugMaterialSignature(_ material: SCNMaterial) -> NSArray {
+        var values: [Any] = [material.lightingModel.rawValue, material.name ?? "",
+            material.shaderModifiers ?? [:], material.blendMode.rawValue,
+            material.transparencyMode.rawValue, material.transparency,
+            material.isDoubleSided, material.cullMode.rawValue,
+            material.readsFromDepthBuffer, material.writesToDepthBuffer,
+            material.colorBufferWriteMask.rawValue, material.fillMode.rawValue]
+        var properties = [material.diffuse, material.metalness, material.roughness,
+                         material.normal, material.transparent, material.emission,
+                         material.ambientOcclusion, material.clearCoat,
+                         material.clearCoatRoughness, material.clearCoatNormal,
+                         material.multiply, material.reflective, material.specular]
+        for key in ["d3BaseColorFactor", "d3SheenColorTex", "d3SheenRoughTex",
+                    "d3SpriteTint", "d3SpriteSourcePremultiplied", "d3CatcherRegion"] {
+            let value = material.value(forKey: key)
+            if let property = value as? SCNMaterialProperty { properties.append(property) }
+            else { values.append(value ?? NSNull()) }
+        }
+        for property in properties {
+            values.append(contentsOf: [property.contents ?? NSNull(),
+                property.intensity, NSValue(scnMatrix4: property.contentsTransform),
+                property.mappingChannel, property.wrapS.rawValue,
+                property.wrapT.rawValue, property.minificationFilter.rawValue,
+                property.magnificationFilter.rawValue, property.mipFilter.rawValue,
+                property.maxAnisotropy, property.textureComponents.rawValue])
+        }
+        return values as NSArray
+    }
+
+    static func makeScreenDebugMaterial(_ source: SCNMaterial,
+        channel: ScreenDebugOptions.Channel, host: SceneViewHost) -> SCNMaterial {
+        let material = source.copy() as! SCNMaterial
+        let sprite = source.name == "d3.sprite"
+        let bakedCatcher = source.lightingModel == .constant
+            && source.name?.hasPrefix("d3.shadowCatcher:") == true
+        let liveCatcher = source.lightingModel == .shadowOnly
+            && source.name?.hasPrefix("d3.shadowCatcher:") == true
+        let unlit = !bakedCatcher && source.lightingModel == .constant
+            && source.value(forKey: "d3BaseColorFactor") != nil
+        let pbr = source.lightingModel == .physicallyBased
+        guard pbr || unlit || sprite || bakedCatcher || liveCatcher else {
+            host.logOnce("debugView.family.\(source.lightingModel.rawValue)",
+                "debugView: this implementation unit covers PBR, unlit meshes, sprites, baked and live catchers; "
+                + "material family \(source.lightingModel.rawValue) is unsupported")
+            return material
+        }
+        for key in ["d3BaseColorFactor", "d3SheenColorTex", "d3SheenRoughTex",
+                    "d3SpriteTint", "d3SpriteSourcePremultiplied", "d3CatcherRegion"] {
+            if let value = source.value(forKey: key) {
+                if let current = value as? SCNMaterialProperty {
+                    let property = SCNMaterialProperty()
+                    property.contents = current.contents
+                    property.contentsTransform = current.contentsTransform
+                    property.mappingChannel = current.mappingChannel
+                    property.intensity = current.intensity
+                    property.wrapS = current.wrapS
+                    property.wrapT = current.wrapT
+                    property.minificationFilter = current.minificationFilter
+                    property.magnificationFilter = current.magnificationFilter
+                    property.mipFilter = current.mipFilter
+                    property.maxAnisotropy = current.maxAnisotropy
+                    property.textureComponents = current.textureComponents
+                    material.setValue(property, forKey: key)
+                } else { material.setValue(value, forKey: key) }
+            }
+        }
+        let rgb: String
+        switch channel {
+        case .none: return material
+        case .normals:
+            if !pbr { material.normal.contents = UIColor.white }
+            rgb = "0.5 * normalize(_surface.normal) + 0.5"
+        case .metallic:
+            rgb = pbr ? "float3(saturate(_surface.metalness))" : "float3(1.0, 0.0, 1.0)"
+        case .roughness:
+            rgb = pbr ? "float3(saturate(_surface.roughness))" : "float3(1.0, 0.0, 1.0)"
+        case .baseColor:
+            if bakedCatcher || liveCatcher {
+                rgb = "float3(1.0, 0.0, 1.0)"
+            } else if sprite {
+                rgb = """
+                    saturate(d3SpriteSourcePremultiplied > 0.5
+                        ? (_surface.diffuse.a > 0.0
+                            ? d3SampledSpriteColor.rgb / _surface.diffuse.a : float3(0.0))
+                        : d3SampledSpriteColor.rgb)
+                    """
+            } else { rgb = "saturate(_surface.diffuse.rgb)" }
+        case .depth:
+            rgb = "float3(max(-_surface.position.z, 0.0) / (1.0 + max(-_surface.position.z, 0.0)))"
+        }
+        // Transparent modifiers expect premultiplied RGB once.
+        let coverage = bakedCatcher || liveCatcher || sprite || (source.blendMode == .alpha && !source.writesToDepthBuffer)
+            ? " * _output.color.a" : ""
+        var modifiers = source.shaderModifiers ?? [:]
+        if bakedCatcher {
+            modifiers[.fragment] = "#pragma transparent\n#pragma body\n"
+                + (modifiers[.fragment] ?? "")
+        }
+        if unlit {
+            modifiers[.geometry] = """
+                #pragma varyings
+                float4 d3DebugUnlitColor;
+                #pragma body
+                out.d3DebugUnlitColor = _geometry.color;
+                _geometry.color = float4(1.0);
+                """
+            modifiers[.surface] = (modifiers[.surface] ?? "")
+                + "\n_surface.diffuse *= in.d3DebugUnlitColor;\n"
+        }
+        modifiers[.fragment] = (modifiers[.fragment] ?? "")
+            + "\n_output.color.rgb = (\(rgb))\(coverage);\n"
+        material.shaderModifiers = modifiers
+        return material
     }
 }

@@ -1,0 +1,417 @@
+Waiting for another dn command to release the startup lock...
+00:00 +0: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/instance_bounds_test.dart
+00:00 +0: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) dash (0,0) terminates and renders solid
+00:00 +1: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/instance_bounds_test.dart: instance bounds payload-backed transforms decode for world bounds
+00:00 +2: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) a dash pattern over the span budget renders solid
+00:00 +3: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/instance_bounds_test.dart: instance bounds D3InstancesSpec.bounds reads a supplied transforms payload
+00:00 +4: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere subdivisions clamp to kD3MaxIcosphereSubdivisions
+00:00 +5: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere subdivisions clamp to kD3MaxIcosphereSubdivisions
+00:00 +6: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere subdivisions clamp to kD3MaxIcosphereSubdivisions
+00:00 +7: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere subdivisions clamp to kD3MaxIcosphereSubdivisions
+00:00 +8: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere subdivisions clamp to kD3MaxIcosphereSubdivisions
+00:00 +9: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere edge cache stays injective at the cap (Euler V)
+00:00 +10: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere edge cache stays injective at the cap (Euler V)
+00:00 +11: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere edge cache stays injective at the cap (Euler V)
+00:00 +12: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere edge cache stays injective at the cap (Euler V)
+00:00 +13: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere edge cache stays injective at the cap (Euler V)
+00:00 +14: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere edge cache stays injective at the cap (Euler V)
+00:00 +15: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere edge cache stays injective at the cap (Euler V)
+00:00 +16: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere edge cache stays injective at the cap (Euler V)
+00:00 +17: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere edge cache stays injective at the cap (Euler V)
+00:00 +18: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) icosphere edge cache stays injective at the cap (Euler V)
+00:00 +19: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/particles_test.dart: simulation fixed-step accumulation emits at the authored rate
+00:00 +20: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) segment counts clamp to kD3MaxProcSegments; indices are 32-bit
+00:00 +21: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) segment counts clamp to kD3MaxProcSegments; indices are 32-bit
+00:00 +22: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) segment counts clamp to kD3MaxProcSegments; indices are 32-bit
+00:00 +23: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) segment counts clamp to kD3MaxProcSegments; indices are 32-bit
+00:00 +24: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) segment counts clamp to kD3MaxProcSegments; indices are 32-bit
+00:00 +25: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) segment counts clamp to kD3MaxProcSegments; indices are 32-bit
+00:00 +26: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) segment counts clamp to kD3MaxProcSegments; indices are 32-bit
+00:00 +27: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) segment counts clamp to kD3MaxProcSegments; indices are 32-bit
+00:00 +28: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) segment counts clamp to kD3MaxProcSegments; indices are 32-bit
+00:00 +29: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) segment counts clamp to kD3MaxProcSegments; indices are 32-bit
+00:00 +30: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) segment counts clamp to kD3MaxProcSegments; indices are 32-bit
+00:00 +31: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) segment counts clamp to kD3MaxProcSegments; indices are 32-bit
+00:00 +32: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) segment counts clamp to kD3MaxProcSegments; indices are 32-bit
+00:00 +33: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) segment counts clamp to kD3MaxProcSegments; indices are 32-bit
+00:00 +34: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) segment counts clamp to kD3MaxProcSegments; indices are 32-bit
+00:00 +35: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: caps (hang/OOM guards) segment counts clamp to kD3MaxProcSegments; indices are 32-bit
+00:00 +36: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/render_textures_views_test.dart: render texture manifest the resource encodes kind/width/height with defaults omitted
+00:00 +37: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/render_textures_views_test.dart: render texture manifest the resource encodes kind/width/height with defaults omitted
+00:00 +38: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/render_textures_views_test.dart: render texture manifest the resource encodes kind/width/height with defaults omitted
+00:00 +39: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/render_textures_views_test.dart: render texture manifest the resource encodes kind/width/height with defaults omitted
+00:00 +40: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/render_textures_views_test.dart: render texture manifest the resource encodes kind/width/height with defaults omitted
+00:00 +41: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/render_textures_views_test.dart: render texture manifest the resource encodes kind/width/height with defaults omitted
+00:00 +42: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/render_textures_views_test.dart: render texture manifest the resource encodes kind/width/height with defaults omitted
+00:00 +43: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/render_textures_views_test.dart: render texture manifest the resource encodes kind/width/height with defaults omitted
+00:00 +44: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: mesh builder transform leaves normals alone under pure translation
+00:00 +45: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/render_textures_views_test.dart: render texture manifest update:'manual' emits the key; non-defaults round out
+00:00 +46: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: mesh builder transform uses the inverse transpose under non-uniform scale
+00:00 +47: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/render_textures_views_test.dart: views manifest a view entry carries camera/target tokens, defaults omitted
+00:00 +48: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/render_textures_views_test.dart: views manifest a view entry carries camera/target tokens, defaults omitted
+00:00 +49: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/render_textures_views_test.dart: views manifest a view entry carries camera/target tokens, defaults omitted
+00:00 +50: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/render_textures_views_test.dart: views manifest a view entry carries camera/target tokens, defaults omitted
+00:00 +51: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference translation never tilts baked normals; colors stamp
+00:00 +52: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference translation never tilts baked normals; colors stamp
+00:00 +53: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/render_textures_views_test.dart: views manifest a null target omits the key — the screen-target shape
+00:00 +54: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +55: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +56: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +57: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +58: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +59: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +60: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +61: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +62: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +63: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +64: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +65: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +66: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +67: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +68: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +69: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +70: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +71: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +72: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +73: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +74: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +75: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +76: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +77: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +78: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +79: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +80: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +81: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +82: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +83: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +84: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +85: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:00 +86: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +87: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +88: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +89: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +90: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +91: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +92: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +93: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +94: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +95: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +96: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +97: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +98: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +99: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +100: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +101: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +102: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +103: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +104: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +105: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +106: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +107: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +108: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +109: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +110: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +111: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +112: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +113: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +114: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +115: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +116: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +117: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +118: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +119: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +120: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +121: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +122: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +123: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +124: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +125: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +126: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +127: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +128: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +129: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:01 +130: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: instance bake reference bake truncates to the vertex budget
+00:02 +131: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_cameras_picking_test.dart: BVH & Render-Geometry Raycast + ScenePointer (5 targets) raycastDocument & ScenePointer pick 5 distinct targets (procedural, payload, d3:procMesh, skinned, d3:instances)
+00:02 +132: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_cameras_picking_test.dart: BVH & Render-Geometry Raycast + ScenePointer (5 targets) raycastDocument & ScenePointer pick 5 distinct targets (procedural, payload, d3:procMesh, skinned, d3:instances)
+00:02 +133: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_cameras_picking_test.dart: BVH & Render-Geometry Raycast + ScenePointer (5 targets) raycastDocument & ScenePointer pick 5 distinct targets (procedural, payload, d3:procMesh, skinned, d3:instances)
+00:02 +134: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_cameras_picking_test.dart: BVH & Render-Geometry Raycast + ScenePointer (5 targets) raycastDocument & ScenePointer pick 5 distinct targets (procedural, payload, d3:procMesh, skinned, d3:instances)
+00:02 +135: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: sweeps and billboards billboard bounds cover any rotation (half-diagonal)
+00:02 +136: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_cameras_picking_test.dart: BVH & Render-Geometry Raycast + ScenePointer (5 targets) raycastDocumentAll returns sorted intersections and decodes all 7 vertex layouts
+00:02 +137: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: sweeps and billboards tube/ribbon bounds include Catmull-Rom overshoot
+00:02 +138: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: sweeps and billboards path point getters return defensive copies
+00:02 +139: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w26_geometry_fixes_test.dart: icosphere UV seam no triangle interpolates across the u seam
+00:02 +140: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/animation_skins_morphs_test.dart: spec encoders encodeSkinSpec emits the manifest skins entry shape
+00:02 +141: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u2_geometry_raycast_test.dart: procMesh ring raycast misses the hole and hits the annulus
+00:02 +142: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u2_geometry_raycast_test.dart: procMesh ring raycast misses the hole and hits the annulus
+00:02 +143: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u2_geometry_raycast_test.dart: procMesh ring raycast misses the hole and hits the annulus
+00:02 +144: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u2_geometry_raycast_test.dart: procMesh ring raycast misses the hole and hits the annulus
+00:02 +145: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u2_geometry_raycast_test.dart: procMesh ring raycast misses the hole and hits the annulus
+00:02 +146: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/animation_skins_morphs_test.dart: diff emission unchanged skin/animations emit nothing
+00:02 +147: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u2_geometry_raycast_test.dart: procMesh extrude raycast reaches its end cap
+00:02 +148: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u2_geometry_raycast_test.dart: procMesh extrude raycast reaches its end cap
+00:02 +149: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u2_geometry_raycast_test.dart: procMesh extrude raycast reaches its end cap
+00:02 +150: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/animation_skins_morphs_test.dart: diff emission a keyframe byte change re-emits only that animation
+00:02 +151: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u2_geometry_raycast_test.dart: procMesh extrude raycasts both convex profile windings
+00:02 +152: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u2_geometry_raycast_test.dart: procMesh extrude raycasts both convex profile windings
+00:02 +153: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u2_geometry_raycast_test.dart: procMesh extrude raycasts both convex profile windings
+00:02 +154: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/animation_skins_morphs_test.dart: diff emission every op survives the commandBytes JSON round-trip
+00:02 +155: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u2_geometry_raycast_test.dart: inline wedge instances are hit at their transformed position
+00:02 +156: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u2_geometry_raycast_test.dart: inline wedge instances are hit at their transformed position
+00:02 +157: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u2_geometry_raycast_test.dart: inline wedge instances are hit at their transformed position
+00:02 +158: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/animation_skins_morphs_test.dart: command batching (#33 review: one mutation per call) SceneController sends each command call as one mutation
+00:02 +159: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/animation_skins_morphs_test.dart: anim command encoding switch batch: outgoing stop at weight 0, incoming plays at 1 (#33)
+00:02 +160: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/animation_skins_morphs_test.dart: anim command encoding play / pause / stop verbs
+00:02 +161: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/animation_skins_morphs_test.dart: anim command encoding knobs: time seek, timeScale, weight, loop
+00:02 +162: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/animation_skins_morphs_test.dart: anim command encoding setMorphWeights carries node + weight list
+00:02 +163: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/animation_skins_morphs_test.dart: weights channel decode targetCount is values ~/ times; trailing floats drop
+00:02 +164: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/animation_skins_morphs_test.dart: SceneAnimation handle duration is the maximum channel end time
+00:02 +165: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/animation_skins_morphs_test.dart: skinned vertex packer writes 26 f32 per vertex in the upstream order
+00:02 +166: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/animation_skins_morphs_test.dart: skinned vertex packer a mismatched channel length throws
+00:02 +167: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/pr14_review_test.dart: 4122294463 — only the dart3d shape vocabulary is an extension a known W26 shape is kept
+00:02 +168: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/subtree_stream_test.dart: placeholder spec carries the instance member on the wire
+00:02 +169: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/subtree_stream_test.dart: placeholder spec carries the instance member on the wire
+00:02 +170: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/subtree_stream_test.dart: placeholder spec carries the instance member on the wire
+00:02 +171: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/pr14_review_test.dart: 4122294474 — extension resources survive prefab composition upstream composeScene alone loses them (the reported bug)
+00:02 +172: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/subtree_stream_test.dart: loadSubtree emits the canonical batch
+00:02 +173: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/subtree_stream_test.dart: loadSubtree emits the canonical batch
+00:02 +174: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/subtree_stream_test.dart: loadSubtree emits the canonical batch
+00:02 +175: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/pr14_review_test.dart: 4122294474 — extension resources survive prefab composition a streamed subtree upserts the extension resource
+00:02 +176: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/subtree_stream_test.dart: priorRoots not re-produced get a removeNode first
+00:02 +177: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/pr14_review_test.dart: 4122712642 — concurrent composes share a cached prefab both outputs carry the real extension resource
+00:02 +178: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/pr14_review_test.dart: 4122712642 — concurrent composes share a cached prefab both outputs carry the real extension resource
+00:02 +179: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/pr14_review_test.dart: 4122712642 — concurrent composes share a cached prefab both outputs carry the real extension resource
+00:02 +180: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/pr14_review_test.dart: 4122712642 — concurrent composes share a cached prefab both outputs carry the real extension resource
+00:02 +181: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/pr14_review_test.dart: 4122712642 — concurrent composes share a cached prefab both outputs carry the real extension resource
+00:02 +182: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/pr14_review_test.dart: 4122712642 — concurrent composes share a cached prefab both outputs carry the real extension resource
+00:02 +183: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/pr14_review_test.dart: 4122712642 — concurrent composes share a cached prefab both outputs carry the real extension resource
+00:02 +184: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/pr14_review_test.dart: 4122712642 — concurrent composes share a cached prefab both outputs carry the real extension resource
+00:02 +185: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/pr14_review_test.dart: 4122712642 — concurrent composes share a cached prefab a document without eager instances is returned as is
+00:02 +186: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/pr14_review_test.dart: 4123065167 — authored cuboids are never mistaken for sentinels a (-1, -1, 0.5) cuboid survives composition untouched
+00:02 +187: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/pr14_review_test.dart: 4122294480 — singular transforms keep usable normals diag(1,1,0) on an XY triangle keeps (0,0,1)
+00:02 +188: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/pr14_review_test.dart: 4122294480 — singular transforms keep usable normals a rotated flattening rotates the surviving normal
+00:02 +189: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/pr14_review_test.dart: 4122294480 — singular transforms keep usable normals rank-1 collapse falls back to the source normal
+00:02 +190: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/pr14_review_test.dart: 4122294480 — singular transforms keep usable normals invertible transforms are unchanged (inverse-transpose)
+00:02 +191: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_bvh_endpoint_test.dart: TriangleMeshBvh.raycastClosest includes a hit exactly at maxT and agrees with raycastAll
+00:02 +192: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_bvh_endpoint_test.dart: TriangleMeshBvh.raycastClosest misses when the hit lies beyond maxT
+00:02 +193: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_bvh_endpoint_test.dart: TriangleMeshBvh.raycastClosest keeps the first triangle when hits have equal distance
+00:02 +194: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: canonical op order removeNode → upsertPayload → upsertResource → addNode → updateNode, contiguous and in batch order
+00:02 +195: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: canonical op order the full batch, in order
+00:02 +196: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: node ops removeNode carries the removed node token
+00:02 +197: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: node ops addNode carries node token, parent, and manifest-shape spec
+00:02 +198: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: node ops updateNode carries flags + spec; reparented reads parent
+00:02 +199: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: node ops a skin-only NodeChange emits an updateNode with the skin flag and no parent
+00:02 +200: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: resource and payload re-diff a geometry spec change produces upsertResource
+00:02 +201: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: resource and payload re-diff a payload byte change produces upsertPayload with base64
+00:02 +202: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: resource and payload re-diff upsertPayload carries the chunk spec for runtime-minted payloads
+00:02 +203: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: resource and payload re-diff an unchanged texture/payload pair emits no ops
+00:02 +204: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: spec fidelity encodeNodeCommandSpec output equals the manifest node entry
+00:02 +205: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: edge cases an empty diff emits an empty batch
+00:02 +206: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/structural_commands_test.dart: edge cases every op survives the commandBytes JSON round-trip
+00:02 +207: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_texture_atlas_test.dart: public atlas API maps padded tiles from the top left in row order
+00:02 +208: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_texture_atlas_test.dart: nonsquare atlas uses separate width and height with zero gutter
+00:02 +209: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_texture_atlas_test.dart: material maps serialize as existing scene texture references
+00:02 +210: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_texture_atlas_test.dart: optional maps are omitted and each material uses its supplied id
+00:02 +211: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_texture_atlas_test.dart: RGBA pixels fill content and gutters, leaving the last cell clear
+00:02 +212: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_texture_atlas_test.dart: unpadded pixels retain straight alpha and top-left row order
+00:03 +213: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/environment_ibl_test.dart: environment manifest studio EnvironmentResource + stage.environmentRef encode per spec
+00:03 +214: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/texture_material_test.dart: image payload manifest entries rgba8 payloads carry format/width/height/length
+00:03 +215: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/texture_material_test.dart: image payload manifest entries rgba8 payloads carry format/width/height/length
+00:03 +216: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/texture_material_test.dart: image payload manifest entries rgba8 payloads carry format/width/height/length
+00:03 +217: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/texture_material_test.dart: image payload manifest entries rgba8 payloads carry format/width/height/length
+00:03 +218: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/environment_ibl_test.dart: updateStage op an identical stage emits no updateStage op
+00:03 +219: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/texture_material_test.dart: image payload manifest entries the byte-less deferred payload is still in the manifest
+00:03 +220: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/environment_ibl_test.dart: environment effects an effects-only env edit emits upsertResource + updateStage
+00:03 +221: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/texture_material_test.dart: image payload manifest entries the image payload descriptor round-trips through writeFscene
+00:03 +222: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/texture_material_test.dart: image payload manifest entries the image payload descriptor round-trips through writeFscene
+00:03 +223: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/texture_material_test.dart: image payload manifest entries the image payload descriptor round-trips through writeFscene
+00:03 +224: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/environment_ibl_test.dart: payload environment the equirect chunk lists in payloads and the resource points at it
+00:03 +225: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/environment_ibl_test.dart: payload environment the equirect chunk lists in payloads and the resource points at it
+00:03 +226: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/environment_ibl_test.dart: payload environment the equirect chunk lists in payloads and the resource points at it
+00:03 +227: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/environment_ibl_test.dart: payload environment the equirect chunk lists in payloads and the resource points at it
+00:03 +228: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/environment_ibl_test.dart: payload environment the generated equirect decodes to the spec band layout
+00:03 +229: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_node_highlights_test.dart: one mutation atomically clears one node and sets another
+00:03 +230: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w19_character_controller_test.dart: W19 characterController codec & moveCharacter reply characterControllerComponent encodes upstream KinematicCharacterControllerCodec fields
+00:03 +231: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w19_character_controller_test.dart: W19 characterController codec & moveCharacter reply characterControllerComponent encodes upstream KinematicCharacterControllerCodec fields
+00:03 +232: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w19_character_controller_test.dart: W19 characterController codec & moveCharacter reply characterControllerComponent encodes upstream KinematicCharacterControllerCodec fields
+00:03 +233: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w19_character_controller_test.dart: W19 characterController codec & moveCharacter reply characterControllerComponent encodes upstream KinematicCharacterControllerCodec fields
+00:03 +234: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w19_character_controller_test.dart: W19 characterController codec & moveCharacter reply characterControllerComponent encodes upstream KinematicCharacterControllerCodec fields
+00:03 +235: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_node_highlights_test.dart: initial explicit load then highlight flush in order without reload
+00:03 +236: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_node_highlights_test.dart: initial explicit load then highlight flush in order without reload
+00:03 +237: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_node_highlights_test.dart: initial explicit load then highlight flush in order without reload
+00:03 +238: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_node_highlights_test.dart: a later explicit load remains after the queued highlight
+00:03 +239: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_node_highlights_test.dart: command-built scenes flush highlights before the implicit load
+00:03 +240: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_node_highlights_test.dart: recreated views receive authored content without highlight replay
+00:03 +241: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_node_highlights_test.dart: detached highlights precede the implicit reconstruction load
+00:03 +242: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_node_highlights_test.dart: highlight set and clear leave authored serialization unchanged
+00:03 +243: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_node_highlights_test.dart: the existing JSON encoder rejects non-finite components before send
+00:03 +244: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_node_highlights_test.dart: dispose sends no clear to an attached view
+00:03 +245: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_sprite_material_test.dart: public adapter has white alpha defaults and caller-owned fresh resources
+00:03 +246: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_sprite_material_test.dart: alpha image ref survives real writer/reader
+00:03 +247: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_camera_regression_test.dart: camera regressions toNodeTransform and applyToScene preserve composed forward
+00:03 +248: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_camera_regression_test.dart: camera regressions toNodeTransform and applyToScene preserve composed forward
+00:03 +249: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_camera_regression_test.dart: camera regressions toNodeTransform and applyToScene preserve composed forward
+00:03 +250: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_camera_regression_test.dart: camera regressions toNodeTransform and applyToScene preserve composed forward
+00:03 +251: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u3_sprite_material_test.dart: padded atlas supplies rect without changing geometry facing or allocating IDs
+00:03 +252: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_camera_regression_test.dart: camera regressions direct orbit distance writes clamp and update the camera
+00:03 +253: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_camera_regression_test.dart: camera regressions damped orbit distance converges and direct writes replace its goal
+00:03 +254: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_camera_regression_test.dart: camera regressions follow targetPose offsets use composition-convention rotation
+00:03 +255: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_camera_regression_test.dart: camera regressions follow target node canonicalizes an X-reflected world pose
+00:03 +256: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_camera_regression_test.dart: camera regressions follow target node resolves a reflected parent world pose
+00:03 +257: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_camera_regression_test.dart: camera regressions parented camera writes representable local TRS and keeps world pose
+00:03 +258: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_camera_regression_test.dart: camera regressions parented camera refuses a required local shear without mutation
+00:03 +259: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_camera_regression_test.dart: camera regressions singular parent rejects camera writes without mutation
+00:03 +260: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_camera_regression_test.dart: camera regressions projection defaults and extraction match native camera fields
+00:03 +261: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_camera_regression_test.dart: camera regressions both native orthographic scale property names are extracted
+00:04 +262: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_billboard_picking_test.dart: spherical billboard raycast uses its camera-facing basis
+00:04 +263: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_billboard_picking_test.dart: spherical billboard raycast uses its camera-facing basis
+00:04 +264: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_billboard_picking_test.dart: spherical billboard raycast uses its camera-facing basis
+00:04 +265: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_billboard_picking_test.dart: spherical billboard raycast uses its camera-facing basis
+00:04 +266: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_billboard_picking_test.dart: spherical billboard raycast uses its camera-facing basis
+00:04 +267: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_billboard_picking_test.dart: spherical billboard raycast uses its camera-facing basis
+00:04 +268: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_billboard_picking_test.dart: spherical billboard raycast uses its camera-facing basis
+00:04 +269: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/physics_events_queries_test.dart: query reply decode raycast hits decode with optional normals; miss is []
+00:04 +270: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_billboard_picking_test.dart: axisY billboard raycast uses its camera-facing basis
+00:04 +271: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/physics_events_queries_test.dart: query reply decode shapecast replies share the raycast hit shape
+00:04 +272: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_billboard_picking_test.dart: screen billboard raycast uses its camera-facing basis
+00:04 +273: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_billboard_picking_test.dart: screen billboard raycast uses its camera-facing basis
+00:04 +274: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/physics_events_queries_test.dart: query reply decode malformed hit entries are skipped, not fatal
+00:04 +275: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_billboard_picking_test.dart: no camera keeps the fixed XY billboard raycast
+00:04 +276: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/physics_events_queries_test.dart: pending-query routing a reply completes its pending completer with the map
+00:04 +277: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_billboard_picking_test.dart: camera override replaces the document primary for raycasting
+00:04 +278: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/physics_events_queries_test.dart: pending-query routing an error reply completes the completer with an error
+00:04 +279: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/physics_events_queries_test.dart: pending-query routing an error reply completes the completer with an error
+00:04 +280: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_billboard_picking_test.dart: instanced billboard ignores instance rotation and scale
+00:04 +281: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_billboard_picking_test.dart: instanced billboard ignores instance rotation and scale
+00:04 +282: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/physics_events_queries_test.dart: pending-query routing d3FailPendingQueries errors every pending query and clears
+00:04 +283: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_billboard_picking_test.dart: instanced billboard BVH bounds follow the camera-facing plane
+00:04 +284: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_billboard_picking_test.dart: ScenePointer pointAlong and pointAt carry their camera overrides
+00:04 +285: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u1_billboard_picking_test.dart: SceneController mesh queries and pick pass the effective camera
+00:04 +286: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/doc_extensions_test.dart: viewport decode malformed full decodes to a full-target view
+00:04 +287: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/doc_extensions_test.dart: viewport decode malformed [0, 0, 100] decodes to a full-target view
+00:04 +288: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/doc_extensions_test.dart: viewport decode malformed [0, null, 100, 100] decodes to a full-target view
+00:04 +289: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/doc_extensions_test.dart: viewport decode malformed [0, 0, 100, 100] decodes to a full-target view
+00:04 +290: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/doc_extensions_test.dart: viewport decode malformed {l: 0} decodes to a full-target view
+00:04 +291: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/doc_extensions_test.dart: viewport decode a malformed viewport no longer rejects the whole scene
+00:04 +292: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/doc_extensions_test.dart: viewport decode a well-formed viewport still decodes
+00:04 +293: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/doc_extensions_test.dart: serializeScene + writeFsceneWithExtensions viewport survives the persisted round-trip
+00:04 +294: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_controller_test.dart: malformed raw animation upsert is rejected before dispatch or mirror change
+00:04 +295: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_controller_test.dart: malformed raw animation upsert is rejected before dispatch or mirror change
+00:04 +296: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_controller_test.dart: malformed raw animation upsert is rejected before dispatch or mirror change
+00:04 +297: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_controller_test.dart: malformed raw animation upsert is rejected before dispatch or mirror change
+00:04 +298: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_controller_test.dart: malformed raw animation upsert is rejected before dispatch or mirror change
+00:04 +299: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_controller_test.dart: malformed raw animation upsert is rejected before dispatch or mirror change
+00:04 +300: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_controller_test.dart: malformed raw animation upsert is rejected before dispatch or mirror change
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:04 +301: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_controller_test.dart: malformed raw animation upsert is rejected before dispatch or mirror change
+00:04 +302: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_controller_test.dart: controller preserves authored clip through controls and same-ID diff/clear/remove
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:04 +303: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_controller_test.dart: controller forwards late binary payloads and same-ID replacements
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:04 +304: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_controller_test.dart: malformed nested animation metadata leaves earlier mirror and dispatch untouched
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:04 +305: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_controller_test.dart: available curves validate against preceding payload updates in a raw batch
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:04 +306: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_controller_test.dart: strict native capability check refuses unfinished property playback without changing document
+00:04 +307: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_controller_test.dart: unrelated extended host survives actual lazy async and nested subtree loads
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:04 +308: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/lut_effects_test.dart: lut chunk-ref detection chunk/id/bare tokens are payload refs, asset paths are not
+00:04 +309: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/lut_effects_test.dart: resolveLutAssets an asset-path ref becomes a bytes payload + chunk: token
+00:04 +310: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/lut_effects_test.dart: resolveLutAssets the manifest carries the chunk token and the bytes spec
+00:04 +311: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/lut_effects_test.dart: resolveLutAssets a resolver miss leaves the path for the bundle fallback
+00:04 +312: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/lut_effects_test.dart: resolveLutAssets an already-chunk ref is left alone
+00:04 +313: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/lut_effects_test.dart: resolveLutAssets non-environment resources are untouched
+00:04 +314: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/lut_effects_test.dart: resolveLutAssetsAsync resolves like the sync form
+00:04 +315: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/lut_effects_test.dart: lut diff path a LUT-bearing env edit ships the chunk op before the resource
+00:04 +316: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: binary curve replacement accepts timeline first
+00:04 +317: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: binary curve replacement accepts timeline first
+00:04 +318: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: binary curve replacement accepts timeline first
+00:04 +319: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: binary curve replacement accepts timeline first
+00:04 +320: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: binary curve replacement accepts timeline first
+00:04 +321: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: binary curve replacement accepts timeline first
+00:04 +322: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: binary curve replacement accepts timeline first
+00:04 +323: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: binary curve replacement accepts timeline first
+00:04 +324: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: binary curve replacement accepts timeline first
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:04 +325: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: binary curve replacement accepts values first
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:04 +326: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: runtime invalid curve cannot leave an earlier removal unsent
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:04 +327: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: corrective diff can encode an intermediate curve and retain its clip
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:04 +328: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: full document load still rejects an invalid completed curve before dispatch
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:04 +329: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: runtime floats payload metadata survives serialization and correction
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:04 +330: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: runtime bytes payload metadata survives serialization and correction
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:04 +331: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: corrective diff sends changed {encoding: bytes} with identical payload bytes
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:04 +332: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_payload_arrival_test.dart: corrective diff sends changed {length: 7} with identical payload bytes
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:04 +333: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: literal wire and paired reader preserve all property kinds without mutating feature sets
+00:04 +334: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: literal wire and paired reader preserve all property kinds without mutating feature sets
+00:04 +335: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: literal wire and paired reader preserve all property kinds without mutating feature sets
+00:04 +336: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: literal wire and paired reader preserve all property kinds without mutating feature sets
+00:04 +337: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: literal wire and paired reader preserve all property kinds without mutating feature sets
+00:04 +338: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/component_capabilities_test.dart: unrealizedFeatureWarnings an uncomposed eager instance is a missing prefabInstances
+00:04 +339: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: mixed ordinary four kinds retain literal properties and payload IDs
+00:04 +340: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/component_capabilities_test.dart: unrealizedFeatureWarnings strict gate accepts a decoded prefab/streaming document
+00:04 +341: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: lists and serialized payload bytes detach; descriptor includes pending values timeline
+00:04 +342: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: lists and serialized payload bytes detach; descriptor includes pending values timeline
+00:04 +343: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: lists and serialized payload bytes detach; descriptor includes pending values timeline
+00:04 +344: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: property-only changes and reference-ID changes emit upsert with absent or equal bytes
+00:04 +345: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: mirror same-ID replacement, clear and removal use paired entry codec
+00:04 +346: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: raw structural errors and unknown ordinary property are rejected
+00:04 +347: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: available f32 curves reject domain, shape, encoding and timeline errors
+00:04 +348: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: binary JSON plus BLOB attaches bytes to typed clip
+00:04 +349: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: binary JSON plus GZBL attaches bytes to typed clip
+00:04 +350: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: host property clips survive sync and async eager composition; prefab properties reject
+00:04 +351: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: pending curves preserve late arrival and replacement bytes for native validation
+00:04 +352: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: property reference ID alone changes upsert with equal and missing bytes
+00:04 +353: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: property bytes alone change upsert; ordinary reference IDs remain significant
+00:04 +354: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: nested property prefab rejects when loaded without modifying any input
+00:04 +355: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: metadata rejects unexpected fields and duplicate endpoints while distinct node categories coexist
+00:04 +356: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: all available f32 timeline and value constraints run through the wire ingress
+00:04 +357: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: binary deferred payload remains pending and validates when its bytes arrive
+00:04 +358: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: property timeline ID alone changes upsert even with equal or absent bytes
+00:04 +359: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: available color groups reject malformed arity even while timeline bytes are pending
+00:04 +360: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/u4_property_animation_test.dart: binary attachment validates delivered BLOB and GZBL curves before returning document
+00:04 +361: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/payload_geometry_test.dart: VertexPack.unskinned vertex count is bytes/72 and fields land in order
+00:04 +362: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/payload_geometry_test.dart: VertexPack.unskinned uv1s packs the second UV set; omitted still zero-fills
+00:04 +363: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/payload_geometry_test.dart: VertexPack.unskinned omitted channels get the upstream neutral fill
+00:04 +364: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/payload_geometry_test.dart: VertexPack.unskinned mismatched channel length is an authoring error
+00:04 +365: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/payload_geometry_test.dart: VertexPack.unskinned bounds computed from packed positions match the BoundsSpec
+00:04 +366: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/payload_geometry_test.dart: manifest encoding payloads carry encoding/layout/format and geometry ref tokens
+00:04 +367: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/payload_geometry_test.dart: manifest encoding index payload element count is bytes/format-width
+00:04 +368: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/payload_geometry_test.dart: manifest encoding payloadBytes frames id + chunk; byte-less payloads refuse
+00:05 +369: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w17_sky_environment_test.dart: W17 physical sky generator & skyEnvironment sun disc peak sits at sunDirection and tracks sun movement
+00:05 +370: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w17_sky_environment_test.dart: W17 physical sky generator & skyEnvironment equirect generator places sun peak at the expected UV texel
+00:05 +371: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w17_sky_environment_test.dart: W17 physical sky generator & skyEnvironment zenith is Rayleigh blue, horizon is brighter, and nadir fades to groundColor
+00:05 +372: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w17_sky_environment_test.dart: W17 physical sky generator & skyEnvironment low-sun sky warms the horizon compared to midday sky
+00:05 +373: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w17_sky_environment_test.dart: W17 physical sky generator & skyEnvironment progressive prefilter steps (64x32, 128x64, 256x128) converge with conserved flux
+00:05 +374: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/w17_sky_environment_test.dart: W17 physical sky generator & skyEnvironment deriveSunLightFromSky matches upstream SunLight direction, color, and intensity
+00:05 +375: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/scene_codec_fixture_test.dart: manifest wire shape the manifest carries the upstream top-level blocks
+00:05 +376: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/scene_codec_fixture_test.dart: manifest wire shape the physics vocabulary encodes in upstream shape
+00:05 +377: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/parity_probes_test.dart: manifest encoding concaveMesh collider emits the tagged-union shape map
+00:05 +378: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/parity_probes_test.dart: manifest encoding concaveMesh collider emits the tagged-union shape map
+00:05 +379: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/parity_probes_test.dart: manifest encoding concaveMesh collider emits the tagged-union shape map
+00:05 +380: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/parity_probes_test.dart: manifest encoding concaveMesh collider emits the tagged-union shape map
+00:05 +381: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/scene_codec_fixture_test.dart: upstream codec round-trip decodeDocument accepts the manifest tree; the capability pass finds nothing unrealized
+00:05 +382: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/parity_probes_test.dart: manifest encoding material doubleSided encodes as a BoolValue
+00:05 +383: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/scene_codec_fixture_test.dart: diff/encode path on the decoded document a fresh-install diff emits the full manifest batch
+00:05 +384: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/scene_codec_fixture_test.dart: diff/encode path on the decoded document a fresh-install diff emits the full manifest batch
+00:05 +385: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/scene_codec_fixture_test.dart: diff/encode path on the decoded document a fresh-install diff emits the full manifest batch
+00:05 +386: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/scene_codec_fixture_test.dart: diff/encode path on the decoded document a fresh-install diff emits the full manifest batch
+00:05 +387: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/parity_probes_test.dart: round-trip and command spec encodeNodeCommandSpec carries allowsResting for addNode
+00:05 +388: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/scene_codec_fixture_test.dart: diff/encode path on the decoded document updateStage and updateViews carry the prefixed ref tokens
+00:05 +389: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/scene_codec_fixture_test.dart: diff/encode path on the decoded document every id the ops reference lives in the document
+00:05 +390: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/scene_codec_fixture_test.dart: diff/encode path on the decoded document ops JSON-encode cleanly and specs match the manifest
+00:05 +391: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/scene_codec_fixture_test.dart: payload chunks travel the binary channel the with-bytes document emits upsertPayload ops carrying the chunk spec
+00:05 +392: /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/test/scene_codec_fixture_test.dart: payload chunks travel the binary channel loadScene/payload frames are what the wire sends
+00:05 +393: All tests passed!

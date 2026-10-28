@@ -247,6 +247,14 @@ final class SceneViewHost: SCNView {
     var views: [ViewRec] = []
     var screenViews: [ViewRec] = []
 
+    var screenDebugOptions = ScreenDebugOptions()
+    let screenDebugAttachments = ScreenDebugAttachments()
+    let screenDebugHostWire = ScreenDebugWireframe()
+    var mainScreenDebug: ScreenDebugPresentation?
+    var mainScreenDebugBacking: UIView?
+    var mainScreenDebugOptions = ScreenDebugOptions()
+    var mainScreenWires: [ScreenDebugWireframe] = []
+
     /// W24 split-screen — render-queue state: one rec per screen view
     /// while `multiScreenMode` is on (≥2 screen views or any
     /// `viewport` rect). The sibling `SCNView` objects live in
@@ -282,6 +290,7 @@ final class SceneViewHost: SCNView {
     /// proxy the render queue is halfway through rewriting.
     var siblingPoseSnapshot:
         (gen: Int, poses: [Int: (SCNMatrix4, SCNCamera)],
+         debug: ScreenDebugFrame?, options: ScreenDebugOptions,
          outline: OutlineViewsFrame?)?
     let siblingPoseLock = NSLock()
 
@@ -356,6 +365,9 @@ final class SceneViewHost: SCNView {
         let proxy: SCNNode
     }
     private var blendCasters: [BlendCaster] = []
+    var blendCasterProxyIdentities: Set<ObjectIdentifier> {
+        Set(blendCasters.map { ObjectIdentifier($0.proxy) })
+    }
     /// Set by every drained message that can add, remove or re-material
     /// a mesh; cleared by the reconcile at the end of the drain.
     private var blendCastersDirty = false
@@ -489,6 +501,23 @@ final class SceneViewHost: SCNView {
     /// resolve pass of its own with the host's settings, its bloom
     /// chain sized for the sibling's own viewport.
     func applySiblingResolve() {
+        if mainScreenDebugOptions.channel != .none {
+            for (i, sibling) in mainScreenSubviews.enumerated() {
+                guard let device = sibling.view.device ?? MTLCreateSystemDefaultDevice(),
+                      let pass = ToneMapTechnique.make(device: device, outline: mainOutlineViewsEnabled) else {
+                    d3Log("debugView: identity resolve unavailable; numeric output is unverified")
+                    continue
+                }
+                ToneMapTechnique.configure(pass, StageResolve(diagnostic: true))
+                if mainOutlineViewsEnabled, let old = sibling.view.technique { retireOutlineProbe(old) }
+                sibling.view.technique = pass
+                if let installed = sibling.view.technique {
+                    ToneMapTechnique.configure(installed, StageResolve(diagnostic: true))
+                    if mainOutlineViewsEnabled { mainOutlineBindings[i]?.bind(installed, frame: nil) }
+                }
+            }
+            return
+        }
         guard let (look, hostChain) = siblingResolve else { return }
         for (i, sibling) in mainScreenSubviews.enumerated() {
             let size = sibling.view.bounds.size
@@ -1348,6 +1377,26 @@ final class SceneViewHost: SCNView {
     func applyViewConfig(_ data: Data) {
         guard let json = try? JSONSerialization.jsonObject(with: data)
                 as? [String: Any] else { return }
+        let debug: ScreenDebugOptions
+        do { debug = try ScreenDebugOptions.decode(json["debugView"]) }
+        catch {
+            logOnce("viewConfig.debugView.malformed", "viewConfig: \(error.localizedDescription); ignoring malformed configuration")
+            return
+        }
+        if screenDebugOptions != debug {
+            let changesPresentation = (screenDebugOptions.channel == .none)
+                != (debug.channel == .none)
+            screenDebugOptions = debug
+            d3Log("debugView channel=\(debug.channel.rawValue) wireframe=\(debug.wireframe) "
+                + "nativeParticlesExcluded=\(debug.channel != .none)")
+            screenDebugHostWire.apply(debug.wireframe && debug.channel == .none, to: self)
+            if debug.channel == .none { screenDebugAttachments.clear() }
+            if changesPresentation {
+                updateScreenSubviews()
+                applyScreenViewCamera()
+                updateContinuousRendering()
+            }
+        }
         if let v = json["allowsCameraControl"] as? Bool {
             allowsCameraControl = v
             // W24: in split mode the flag lives on sibling 0 (the
@@ -3166,6 +3215,12 @@ final class SceneViewHost: SCNView {
     /// pick (`restoreDocumentPov`) — the split-mode blank pass must
     /// not outlive the views that justified it.
     func applyScreenViewCamera() {
+        if screenDebugOptions.channel != .none {
+            if let first = screenViews.first, let camera = nodesById[first.cameraKey] {
+                pointOfView = camera
+            } else { restoreDocumentPov() }
+            return
+        }
         guard let v = screenViews.first else {
             restoreDocumentPov()
             return
@@ -5146,6 +5201,7 @@ final class SceneViewHost: SCNView {
     /// env leaves both contents slots untouched until its payload
     /// lands, so the replaced document's look must not linger.
     func beginSceneReset() {
+        screenDebugAttachments.clear()
         guard let scene else { return }
         jointLock.lock()
         for (id, rec) in joints where rec.behavior != nil {

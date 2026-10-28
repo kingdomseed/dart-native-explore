@@ -47,6 +47,7 @@ struct StageToneMap: Equatable {
 /// (after) and the grading LUT (last, on the encoded colour).
 struct StageResolve {
     var toneMap = StageToneMap()
+    var diagnostic = false
     /// Nil adds no bloom.
     var bloom: StageEffects.Bloom?
     /// Nil leaves the colour ungraded.
@@ -350,6 +351,9 @@ enum ToneMapTechnique {
         float4 packed = colorSampler.sample(s, in.uv);
         float3 color = d3_scene_radiance(saturate(packed.rgb),
                                          params.d3Mode.z) * params.d3Bloom.z;
+        if (params.d3Mode.x < -0.5) {
+            return float4(saturate(color), packed.a);
+        }
         if (params.d3Bloom.x > 0.0) {
             color += d3BloomSum.sample(smooth, in.uv).rgb * params.d3Bloom.x;
         }
@@ -579,7 +583,7 @@ enum ToneMapTechnique {
         let lutSize = resolve.lut.map { $0.height } ?? 0
         let hasLut = lutSize >= 2
         let grading = resolve.grading
-        set("d3Mode", Double(resolve.toneMap.modeIndex ?? 0),
+        set("d3Mode", resolve.diagnostic ? -1 : Double(resolve.toneMap.modeIndex ?? 0),
             hasLut ? Double(lutSize) : 0, whitePoint * packGain,
             grading == nil ? 0 : 1)
         technique.setObject(

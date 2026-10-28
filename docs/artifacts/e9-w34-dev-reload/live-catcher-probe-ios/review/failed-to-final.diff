@@ -1,0 +1,11 @@
+--- failed/dart3d/ios/Classes/ScreenDebugPresentation.swift
++++ final/dart3d/ios/Classes/ScreenDebugPresentation.swift
+@@ -135,7 +135,7 @@
+                     weights: pose.morpher?.weights ?? current.weights,
+                     mode: current.calculationMode, normals: current.unifiesNormals)
+             }
+-            let light = source.light == nil ? nil : pose.light?.copy() as? SCNLight
++            let light = source.light?.copy() as? SCNLight
+             light?.removeAllAnimations()
+             rows.append(ScreenDebugFrame.Node(
+                 identity: key, parent: parent, transform: pose.transform,

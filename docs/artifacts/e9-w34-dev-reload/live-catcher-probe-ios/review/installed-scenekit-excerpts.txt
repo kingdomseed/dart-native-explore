@@ -1,0 +1,389 @@
+
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNShadable.h
+98:      2. surface  (SCNShaderModifierEntryPointSurface)
+99:      3. lighting (SCNShaderModifierEntryPointLightingModel)
+100:      4. fragment (SCNShaderModifierEntryPointFragment)
+101:  See below for a detailed explanation of these entry points and the context they provide.
+102:  
+103:  Shader modifiers can be written in either GLSL or the Metal Shading Language. Metal shaders won't run on iOS 8 and macOS 10.10 or earlier.
+104:  
+113:      | }
+114:      |
+115:      | [#pragma transparent | opaque]
+116:      | [#pragma body]
+117:      |
+118:      | // the shader modifier code snippet itself
+119:      | vec3 myColor = myGrayAmount;
+120:      | _output.color.rgb += myColor;
+121:  
+122:      Metal Shading Language
+123:      | #pragma arguments
+124:      | float myGrayAmount; // Custom Metal uniforms declarations require a #pragma and are of the form `[type name]`
+130:      | }
+131:      |
+132:      | [#pragma transparent | opaque]
+133:      | [#pragma body]
+134:      |
+135:      | // the shader modifier code snippet itself
+136:      | float3 myColor = myGrayAmount;
+137:      | _output.color.rgb += myColor;
+138:  
+139:  The `#pragma body` directive
+140:      Is only needed if you declared functions that must not be included in the shader code itself.
+141:  
+142:  The `#pragma transparent` directive
+143:      Forces the rendering to be blended using the following equation:
+144:          _output.color.rgb + (1 - _output.color.a) * dst.rgb;
+145:      where `dst` represents the current fragment color. The rgb components must be premultiplied.
+146:  
+147:  The `#pragma opaque` directive
+148:      Forces the rendering to be opaque. It then ignores the alpha component of the fragment.
+149:  
+159:          Metal Shading Language
+160:          | #pragma body
+161:          | out.myVec = _geometry.normal.xyz * 0.5h + 0.5h;
+162:  
+163:      3. Finally read the varying values from the fragment shader (surface and/or fragment shader modifier):
+164:  
+165:          Metal Shading Language
+166:          | _output.color.rgb = saturate(in.myVec);
+167:  
+168:   SceneKit declares the following built-in uniforms:
+169:  
+170:      GLSL                                        | Metal Shading Language                                |
+178:      mat4  u_inverseProjectionTransform          | float4x4 scn_frame.inverseProjectionTransform         |
+179:      --------------------------------------------┼-------------------------------------------------------┤
+180:      mat4  u_normalTransform                     | float4x4 scn_node.normalTransform                     | See SCNNormalTransform
+181:      mat4  u_modelTransform                      | float4x4 scn_node.modelTransform                      | See SCNModelTransform
+182:      mat4  u_inverseModelTransform               | float4x4 scn_node.inverseModelTransform               |
+183:      mat4  u_modelViewTransform                  | float4x4 scn_node.modelViewTransform                  | See SCNModelViewTransform
+184:      mat4  u_inverseModelViewTransform           | float4x4 scn_node.inverseModelViewTransform           |
+369:  
+370:  | struct SCNShaderGeometry {
+371:  |    float4 position;
+372:  |    float3 normal;
+373:  |    float4 tangent;
+374:  |    float4 color;
+375:  |    float2 texcoords[kSCNTexcoordCount];
+376:  | } _geometry;
+381:  kSCNTexcoordCount is a constant integer set to the number of texture coordinates used.
+382:  
+383:  All the geometric fields (position, normal and tangent) are in model space. You can use one of the provided automatic uniforms
+384:  such as u_modelTransform or u_modelViewTransform if you want to operate in another space (but the results must stay in the model space, otherwise remaining computations won't be correct).
+385:  The texture coordinates are the raw values found in the mesh, they have not been transformed yet by their optional contentsTransform. The contentsTransform if any is applied after the geometry shader modifier.
+386:  
+387:  Example: Simple sinusoidal deformation
+390:      | uniform float Amplitude = 0.1;
+391:      |
+392:      | _geometry.position.xyz += _geometry.normal * (Amplitude * _geometry.position.y * _geometry.position.x) * sin(u_time);
+393:  
+394:      Metal Shading Language
+395:      | #pragma arguments
+396:      | float Amplitude;
+397:      |
+398:      | _geometry.position.xyz += _geometry.normal * (Amplitude * _geometry.position.y * _geometry.position.x) * sin(scn_frame.time);
+399:  
+400:  */
+401: SCN_EXPORT SCNShaderModifierEntryPoint const SCNShaderModifierEntryPointGeometry API_AVAILABLE(macos(10.9));
+402: 
+409:  | struct SCNShaderSurface {
+410:  |    float3 view;                       // Direction from the point on the surface toward the camera (V)
+411:  |    float3 position;                   // Position of the fragment
+412:  |    float3 normal;                     // Normal of the fragment (N)
+413:  |    float3 geometryNormal;             // Geometric normal of the fragment (normal map is ignored)
+414:  |    float3 tangent;                    // Tangent of the fragment
+415:  |    float3 bitangent;                  // Bitangent of the fragment
+416:  |    float4 ambient;                    // Ambient property of the fragment
+417:  |    float2 ambientTexcoord;            // Ambient texture coordinates
+460:      | uniform float Blend = 0.3;
+461:      |
+462:      | vec2 position = fract(_surface.diffuseTexcoord * Scale);
+463:      | float f1 = clamp(position.y / Blend, 0.0, 1.0);
+464:      | float f2 = clamp((position.y - Width) / Blend, 0.0, 1.0);
+465:      | f1 = f1 * (1.0 - f2);
+466:      | f1 = f1 * f1 * 2.0 * (3. * 2. * f1);
+467:      | _surface.diffuse = mix(vec4(1.0), vec4(0.0), f1);
+468:  
+473:      | float Blend;
+474:      |
+475:      | float2 position = fract(_surface.diffuseTexcoord * Scale);
+476:      | float f1 = clamp(position.y / Blend, 0.0, 1.0);
+477:      | float f2 = clamp((position.y - Width) / Blend, 0.0, 1.0);
+478:      | f1 = f1 * (1.0 - f2);
+479:      | f1 = f1 * f1 * 2.0 * (3. * 2. * f1);
+480:      | _surface.diffuse = mix(float4(1.0), float4(0.0), f1);
+481:  
+517:      | uniform float WrapFactor = 0.5;
+518:      |
+519:      | float dotProduct = (WrapFactor + max(0.0, dot(_surface.normal,_light.direction))) / (1 + WrapFactor);
+520:      | _lightingContribution.diffuse += (dotProduct * _light.intensity.rgb);
+521:      | vec3 halfVector = normalize(_light.direction + _surface.view);
+522:      | dotProduct = max(0.0, pow(max(0.0, dot(_surface.normal, halfVector)), _surface.shininess));
+523:      | _lightingContribution.specular += (dotProduct * _light.intensity.rgb);
+524:  
+525:      Metal Shading Language
+526:      | #pragma arguments
+527:      | float WrapFactor;
+528:      |
+529:      | float dotProduct = (WrapFactor + max(0.0, dot(_surface.normal,_light.direction))) / (1 + WrapFactor);
+530:      | _lightingContribution.diffuse += (dotProduct * _light.intensity.rgb);
+531:      | float3 halfVector = normalize(_light.direction + _surface.view);
+532:      | dotProduct = max(0.0, pow(max(0.0, dot(_surface.normal, halfVector)), _surface.shininess));
+533:      | _lightingContribution.specular += (dotProduct * _light.intensity.rgb);
+534:  */
+535: SCN_EXPORT SCNShaderModifierEntryPoint const SCNShaderModifierEntryPointLightingModel API_AVAILABLE(macos(10.9));
+536: 
+537: /*!
+538:  @constant SCNShaderModifierEntryPointFragment
+539:  @abstract This is the last entry point in the fragment shader, where you can alter the final color returned by the shader.
+540:  @discussion You can alter the final color by reading and writing to the output color via the output structure below.
+541:  
+542:  Structures available from the SCNShaderModifierEntryPointFragment entry point:
+543:  
+544:  | All the structures available from the SCNShaderModifierEntryPointSurface entry point
+545:  |
+546:  | Access: ReadOnly
+556:  | struct SCNShaderOutput {
+557:  |    float4 color;
+558:  | } _output;
+559:  |
+560:  | Access: ReadWrite
+561:  | Stages: Fragment shader only
+562:  
+564:  
+565:      GLSL
+566:      | _output.color.rgb = vec3(1.0) - _output.color.rgb;
+567:  
+568:      Metal Shading Language
+569:      | _output.color.rgb = 1.0 - _output.color.rgb;
+570:  */
+571: SCN_EXPORT SCNShaderModifierEntryPoint const SCNShaderModifierEntryPointFragment API_AVAILABLE(macos(10.9));
+572: 
+573: NS_ASSUME_NONNULL_END
+
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNMaterial.h
+269:  @property transparency
+270:  @abstract Specifies the receiver's transparency value. Defaults to 1.0. Animatable.
+271:  @discussion The color of the transparent property is multiplied by this property. The result is then used to produce the final transparency according to the rule defined by the transparencyMode property.
+272:  */
+273: @property(nonatomic) CGFloat transparency;
+274: 
+275: /*!
+304: 
+305: /*! 
+306:  @property transparencyMode
+307:  @abstract Determines the transparency mode of the receiver. See above for the transparency modes. Defaults to SCNTransparencyModeDefault.
+308:  */
+309: @property(nonatomic) SCNTransparencyMode transparencyMode;
+310: 
+311: /*! 
+312:  @property locksAmbientWithDiffuse
+313:  @abstract Makes the ambient property automatically match the diffuse property. Defaults to YES. Animatable.
+
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNLight.h
+61: 
+62: SCN_EXPORT
+63: @interface SCNLight : NSObject <SCNAnimatable, NSCopying, NSSecureCoding>
+64: 
+65: /*! 
+66:  @method light
+67:  @abstract Creates and returns a light instance.
+91: 
+92: /*!
+93:  @property intensity
+94:  @abstract Specifies the receiver's intensity.
+95:  @discussion This intensity is used to modulate the light color. When used with a physically-based material, this corresponds to the luminous flux of the light, expressed in lumens (lm). Defaults to 1000. Animatable.
+96:  */
+97: @property(nonatomic) CGFloat intensity API_AVAILABLE(macos(10.12), ios(10.0), tvos(10.0));
+98: 
+99: /*!
+100:  @property name
+101:  @abstract Determines the name of the receiver.
+107: 
+108: /*! 
+109:  @property castsShadow
+110:  @abstract Determines whether the receiver casts a shadow. Defaults to NO.
+111:  @discussion Shadows are only supported by spot and directional lights.
+112:  */
+113: @property(nonatomic) BOOL castsShadow;
+114: 
+115: /*! 
+116:  @property shadowColor
+117:  @abstract Specifies the color (CGColorRef or NSColor) of the shadow casted by the receiver. Defaults to black. Animatable.
+252: 
+253: /*!
+254:  @property IESProfileURL
+255:  @abstract Specifies the IES file from which the shape, direction, and intensity of illumination is determined. Defaults to nil.
+256:  */
+257: @property(nonatomic, retain, nullable) NSURL *IESProfileURL API_AVAILABLE(macos(10.12), ios(10.0), tvos(10.0));
+258: 
+259: 
+260: #pragma mark - Light probes parameters
+261: 
+
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNNode.h
+41: /*! @enum SCNMovabilityHint
+42:  @abstract The available modes of movability.
+43:  @discussion Movable nodes are not captured when computing light probes.
+44:  */
+45: typedef NS_ENUM(NSInteger, SCNMovabilityHint) {
+46:     SCNMovabilityHintFixed,
+47:     SCNMovabilityHintMovable,
+86: 
+87: /*!
+88:  @method clone
+89:  @abstract Returns a copy of the receiver. The returned instance is autoreleased.
+90:  @discussion The copy is recursive: every child node will be cloned, too. For a non-recursive copy, use copy instead.
+91:  The copied nodes will share their attached objects (light, geometry, camera, ...) with the original instances;
+92:  if you want, for example, to change the materials of the copy independently of the original object, you'll
+93:  have to copy the geometry of the node separately.
+94:  */
+95: - (instancetype)clone;
+96: 
+97: /*
+98:  @method flattenedClone
+99:  @abstract Returns a clone of the node containing a geometry that concatenates all the geometries contained in the node hierarchy.
+100:  The returned clone is autoreleased.
+101:  */
+102: - (instancetype)flattenedClone API_AVAILABLE(macos(10.9));
+103: 
+104: 
+113: 
+114: /*!
+115:  @property light
+116:  @abstract Determines the light attached to the receiver.
+117:  */
+118: @property(nonatomic, retain, nullable) SCNLight *light;
+119: 
+120: /*!
+121:  @property camera
+122:  @abstract Determines the camera attached to the receiver.
+241: 
+242: /*!
+243:  @property castsShadow
+244:  @abstract Determines if the node is rendered in shadow maps. Defaults to YES.
+245:  */
+246: @property(nonatomic) BOOL castsShadow API_AVAILABLE(macos(10.10));
+247: 
+248: /*!
+249:  @property movabilityHint
+250:  @abstract Communicates to SceneKit’s rendering system about how you want to move content in your scene; it does not affect your ability to change the node’s position or add animations or physics to the node. Defaults to SCNMovabilityHintFixed.
+436: 
+437: /*!
+438:  @property presentationNode
+439:  @abstract Returns the presentation node.
+440:  @discussion Returns a copy of the node containing all the properties as they were at the start of the current transaction, with any active animations applied.
+441:              This gives a close approximation to the version of the node that is currently displayed.
+442:              The effect of attempting to modify the returned node in any way is undefined. The returned node has no parent and no child nodes.
+443:  */
+444: @property(nonatomic, readonly) SCNNode *presentationNode;
+445: 
+446: 
+447: #pragma mark - Pause
+448: 
+486:  @abstract Defines what logical 'categories' the receiver belongs too. Defaults to 1.
+487:  @discussion Categories can be used to
+488:                 1. exclude nodes from the influence of a given light (see SCNLight.categoryBitMask)
+489:                 2. include/exclude nodes from render passes (see SCNTechnique.h)
+490:                 3. specify which nodes to use when hit-testing (see SCNHitTestOptionCategoryBitMask)
+491:  */
+492: @property(nonatomic) NSUInteger categoryBitMask API_AVAILABLE(macos(10.10));
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNMaterial.h
+78:      <ambient> — The 'ambient' property of the SCNMaterial instance
+79:      <diffuse> — The 'diffuse' property of the SCNMaterial instance
+80: 
+81:  SCNLightingModelShadowOnly:
+82:     Produces a shaded surface that only renders received shadows.
+83:     Use this lighting model in combination with a multiply blend mode to compose shadows over the background.
+84:     The typical use case is to use on a plane that receive shadows in a AR application.
+85:     The shadow intensity can be adjusted using the alpha of the lights's shadow color.
+86:  */
+87: 
+88: typedef NSString * SCNLightingModel NS_STRING_ENUM;
+89: SCN_EXPORT SCNLightingModel const SCNLightingModelPhong;
+90: SCN_EXPORT SCNLightingModel const SCNLightingModelBlinn;
+91: SCN_EXPORT SCNLightingModel const SCNLightingModelLambert;
+92: SCN_EXPORT SCNLightingModel const SCNLightingModelConstant;
+93: SCN_EXPORT SCNLightingModel const SCNLightingModelPhysicallyBased API_AVAILABLE(macos(10.12), ios(10.0), tvos(10.0));
+94: SCN_EXPORT SCNLightingModel const SCNLightingModelShadowOnly API_AVAILABLE(macos(10.15), ios(13.0), tvos(13.0), watchos(6.0));
+196: 
+197: /*! 
+198:  @property multiply
+199:  @abstract The multiply property specifies a color or an image used to multiply the output fragments with. The computed fragments are multiplied with the multiply value to produce the final fragments. This property may be used for shadow maps, to fade out or tint 3d objects.
+200:  */
+201: @property(nonatomic, readonly) SCNMaterialProperty *multiply;
+202: 
+203: /*! 
+204:  @property normal
+205:  @abstract The normal property specifies the surface orientation. 
+206:  @discussion When an image is set on the normal property the material is automatically lit per pixel. Setting a color has no effect.
+207:  */
+208: @property(nonatomic, readonly) SCNMaterialProperty *normal;
+209: 
+
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNShadable.h
+408:  
+409:  | struct SCNShaderSurface {
+410:  |    float3 view;                       // Direction from the point on the surface toward the camera (V)
+411:  |    float3 position;                   // Position of the fragment
+412:  |    float3 normal;                     // Normal of the fragment (N)
+413:  |    float3 geometryNormal;             // Geometric normal of the fragment (normal map is ignored)
+414:  |    float3 tangent;                    // Tangent of the fragment
+415:  |    float3 bitangent;                  // Bitangent of the fragment
+416:  |    float4 ambient;                    // Ambient property of the fragment
+417:  |    float2 ambientTexcoord;            // Ambient texture coordinates
+418:  |    float4 diffuse;                    // Diffuse property of the fragment. Alpha contains the opacity.
+419:  |    float2 diffuseTexcoord;            // Diffuse texture coordinates
+420:  |    float4 specular;                   // Specular property of the fragment
+421:  |    float2 specularTexcoord;           // Specular texture coordinates
+422:  |    float4 emission;                   // Emission property of the fragment
+423:  |    float2 emissionTexcoord;           // Emission texture coordinates
+424:  |    float4 multiply;                   // Multiply property of the fragment
+425:  |    float2 multiplyTexcoord;           // Multiply texture coordinates
+426:  |    float4 transparent;                // Transparent property of the fragment
+427:  |    float2 transparentTexcoord;        // Transparent texture coordinates
+428:  |    float4 reflective;                 // Reflective property of the fragment
+429:  |    float  metalness;                  // Metalness property of the fragment
+430:  |    float2 metalnessTexcoord;          // Metalness texture coordinates
+431:  |    float  roughness;                  // Roughness property of the fragment
+432:  |    float2 roughnessTexcoord;          // Roughness texture coordinates
+433:  |    float  clearCoat;                  // Clear Coat property of the fragment.           Available since macOS 10.15, iOS 13, tvOS 13 and watchOS 6.
+434:  |    float2 clearCoatTexcoord;          // Clear Coat texture coordinates.                Available since macOS 10.15, iOS 13, tvOS 13 and watchOS 6.
+435:  |    float  clearCoatRoughness;         // Clear Coat Roughness property of the fragment. Available since macOS 10.15, iOS 13, tvOS 13 and watchOS 6.
+436:  |    float2 clearCoatRoughnessTexcoord; // Clear Coat Roughness texture coordinates.      Available since macOS 10.15, iOS 13, tvOS 13 and watchOS 6.
+437:  |    float3 clearCoatNormal;            // Clear Coat Normal property of the fragment.    Available since macOS 10.15, iOS 13, tvOS 13 and watchOS 6.
+438:  |    float2 clearCoatNormalTexcoord;    // Clear Coat Normnal texture coordinates.        Available since macOS 10.15, iOS 13, tvOS 13 and watchOS 6.
+439:  |    float4 selfIllumination;           // Self Illumination property of the fragment.    Available since macOS 10.13, iOS 11, tvOS 11 and watchOS 4. Available as `emission` in previous versions.
+440:  |    float2 selfIlluminationTexcoord;   // Self Illumination texture coordinates.         Available since macOS 10.13, iOS 11, tvOS 11 and watchOS 4. Available as `emissionTexcoord` in previous versions.
+441:  |    float  ambientOcclusion;           // Ambient Occlusion property of the fragment.    Available since macOS 10.13, iOS 11, tvOS 11 and watchOS 4. Available as `multiply` in previous versions.
+442:  |    float2 ambientOcclusionTexcoord;   // Ambient Occlusion texture coordinates.         Available since macOS 10.13, iOS 11, tvOS 11 and watchOS 4. Available as `multiplyTexcoord` in previous versions.
+443:  |    float  shininess;                  // Shininess property of the fragment
+444:  |    float  fresnel;                    // Fresnel property of the fragment
+445:  | } _surface;
+446:  |
+447:  | Access: ReadWrite
+448:  | Stages: Fragment shader only
+449:  
+450:  All geometric fields are in view space.
+451:  All the other properties will be colors (texture have already been sampled at this stage) or floats. You can however do an extra sampling of standard textures if you want.
+452:  In this case the naming pattern is u_<property>Texture. For example u_diffuseTexture or u_reflectiveTexture. Note that you have to be sure that the material do have a texture
+453:  set for this property, otherwise you'll trigger a shader compilation error.
+
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/System/Library/Frameworks/SceneKit.framework/Headers/SCNNode.h
+87: /*!
+88:  @method clone
+89:  @abstract Returns a copy of the receiver. The returned instance is autoreleased.
+90:  @discussion The copy is recursive: every child node will be cloned, too. For a non-recursive copy, use copy instead.
+91:  The copied nodes will share their attached objects (light, geometry, camera, ...) with the original instances;
+92:  if you want, for example, to change the materials of the copy independently of the original object, you'll
+93:  have to copy the geometry of the node separately.
+94:  */
+95: - (instancetype)clone;
+437: /*!
+438:  @property presentationNode
+439:  @abstract Returns the presentation node.
+440:  @discussion Returns a copy of the node containing all the properties as they were at the start of the current transaction, with any active animations applied.
+441:              This gives a close approximation to the version of the node that is currently displayed.
+442:              The effect of attempting to modify the returned node in any way is undefined. The returned node has no parent and no child nodes.
+443:  */
+444: @property(nonatomic, readonly) SCNNode *presentationNode;

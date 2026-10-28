@@ -1,0 +1,58 @@
+--- a/dart3d/example/test/w34_reload_transport_test.dart
++++ b/dart3d/example/test/w34_reload_transport_test.dart
+@@ -53,6 +53,7 @@
+   late File source;
+   late String initial;
+   late SceneController controller;
++  SceneController? controllerToDispose;
+   late RecordingElement element;
+   late Messages status;
+   late Messages hostLog;
+@@ -69,6 +70,7 @@
+     initial = File('tool/fixtures/w34_reload.fscene').readAsStringSync();
+     source.writeAsStringSync(initial);
+     controller = SceneController();
++    controllerToDispose = controller;
+     element = RecordingElement(controller);
+     controller.attachElement(element);
+     status = Messages();
+@@ -78,8 +80,8 @@
+   tearDown(() async {
+     await probe?.stop();
+     await host?.close();
+-    controller.detachElement(element);
+-    controller.dispose();
++    controllerToDispose?.detachElement(element);
++    controllerToDispose?.dispose();
+     await status.events.close();
+     await hostLog.events.close();
+     await directory.delete(recursive: true);
+@@ -253,8 +255,7 @@
+       await probe!.stop();
+       controller.detachElement(element);
+       controller.dispose();
+-      // Teardown owns a fresh unattached controller after this lifetime check.
+-      controller = SceneController();
++      controllerToDispose = null;
+       element.sent.clear();
+       final count = status.values.length;
+       source.writeAsStringSync(edit(blue: true));
+@@ -409,7 +410,7 @@
+         await probe!.stop();
+         controller.detachElement(element);
+         controller.dispose();
+-        controller = SceneController();
++        controllerToDispose = null;
+         await connecting.timeout(const Duration(seconds: 5));
+         await pending.response.close();
+         expect(controller.document, isNull);
+--- a/dart3d/example/tool/w34_reload_host.dart
++++ b/dart3d/example/tool/w34_reload_host.dart
+@@ -48,7 +48,6 @@
+             onError: host._fail,
+             onDone: () => host._fail('watch closed'),
+           );
+-      // Subscribe before reading so saves cannot fall into a startup gap.
+       source.readAsStringSync();
+       host._requests = server.listen(
+         host._accept,

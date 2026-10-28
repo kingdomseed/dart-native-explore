@@ -1,0 +1,20 @@
+{
+  "head": "2f38e4e33f0b1cb678bc408a42d069c796cefc12",
+  "imported66Unchanged": true,
+  "reviewerInitialOutsideOverlayPreserved": 1873,
+  "completeReviewerSourceCount": 1939,
+  "noUnexpectedOrMissingSourcePaths": true,
+  "allParentInitialSourceBytesUnchanged": true,
+  "parentInitialSourceCount": 3108,
+  "allSixLocksUnchanged": true,
+  "diffCheckExit": 0,
+  "sourceEditsAfterImport": false,
+  "retained": [
+    "imported final66 in prepared checkout",
+    "accepted66 and final66 reconstructions",
+    "reports and offline receipts/scripts/inspection images"
+  ],
+  "removed": [
+    "two own replay scratch directories"
+  ]
+}

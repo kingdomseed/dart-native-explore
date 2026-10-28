@@ -1,0 +1,41 @@
+{
+  "evidence_manifest_entries_verified": 44,
+  "parent_source58_readonly_recheck": true,
+  "parent_six_locks_readonly_recheck": true,
+  "worker_archive_and_patch_verified": true,
+  "video_sha256": "0693e2aeb703caf8a6eb7d3e3d960ddc6dd8e119be189cea9e6c5550bf0d1512",
+  "video_frames_strict_decoded": 1767,
+  "video_duration": "29.161667",
+  "video_time_base": "1/600",
+  "runtime_log": {
+    "connections": 1,
+    "loads": 1,
+    "diffs": 2,
+    "rejections": 1,
+    "finished": true,
+    "native_pids": [
+      "7464"
+    ],
+    "native_hellos": 1,
+    "host_connections": 1,
+    "host_sends": [
+      "2397",
+      "2397",
+      "2397",
+      "2397"
+    ],
+    "http_byte_counts": [
+      "2472",
+      "2472",
+      "3",
+      "2472"
+    ]
+  },
+  "pixel_recomputation_matches": true,
+  "raw_decode_temp_files_created": false,
+  "inspected_decode_previews_removed": {
+    "video-first.png": "f1855f5132c78f08c5975484afc72520826e196bec4a6f8d5752d4767accb47c",
+    "video-final.png": "bf047a1d1854ed6ceb40c4c714d8d7630c8c0a57f80824e084a849fb64d29dd7",
+    "video-contact.png": "dec6e2d77bf46fc1d275bb93ac4ed95de81b00d0a1e73477277bc49aec81b915"
+  }
+}

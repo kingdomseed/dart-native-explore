@@ -1,0 +1,67 @@
+{
+  "source": "T3 device_list after closing the owned simulator",
+  "iosDevices": [
+    {
+      "id": "B5931F92-8F6F-4440-9B4C-146CDD28B60C",
+      "name": "iPhone 18 Pro",
+      "booted": false
+    },
+    {
+      "id": "C24F3C6D-A3A9-4FB7-978E-36E67EF55354",
+      "name": "iPhone 17 Pro",
+      "booted": false
+    },
+    {
+      "id": "E8329980-5289-4492-9118-4FD22E0F6D49",
+      "name": "iPad Pro 13-inch (M5)",
+      "booted": false
+    },
+    {
+      "id": "C7392174-8544-4D2E-8D69-BC65243623A8",
+      "name": "iPad Pro 11-inch (M5)",
+      "booted": false
+    },
+    {
+      "id": "D6F19A58-92BE-4CA9-AC3A-0E3863CFB35F",
+      "name": "iPhone 17 Pro Max",
+      "booted": false
+    },
+    {
+      "id": "55F96B85-B747-4627-A743-9BA36CDF84EE",
+      "name": "iPhone 17e",
+      "booted": false
+    },
+    {
+      "id": "7455A4C0-D6D8-4EE9-89A6-C19864BE1610",
+      "name": "TomeKeeper PR216 verification",
+      "booted": false
+    },
+    {
+      "id": "1EACF90D-BF25-4633-BA69-BA8957248835",
+      "name": "iPhone 17",
+      "booted": false
+    },
+    {
+      "id": "1ABA64E0-85AE-41A3-A0A7-338490F5B80C",
+      "name": "TomeKeeper PR215 Verifier 20260909",
+      "booted": false
+    },
+    {
+      "id": "AB41AB42-E7BE-4697-9F47-697E6FEFDFA5",
+      "name": "iPad Pro 13-inch (M5)",
+      "booted": false
+    },
+    {
+      "id": "ED3469B7-7038-4C16-A08D-9C5288114ABF",
+      "name": "iPad Pro 11-inch (M5)",
+      "booted": false
+    },
+    {
+      "id": "52D41F83-4231-4B21-974C-B608862CFD5F",
+      "name": "iPad Air 11-inch (M4)",
+      "booted": false
+    }
+  ],
+  "open": [],
+  "note": "General inventory only; no targeted A142 operation."
+}

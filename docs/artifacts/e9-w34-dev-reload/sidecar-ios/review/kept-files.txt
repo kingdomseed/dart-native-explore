@@ -1,0 +1,15 @@
+artifact-sha256.txt
+checkout-before.json
+final-git-status.txt
+final-preservation.json
+image-recomputation.json
+import-replay.json
+kept-files.txt
+offline-verification.json
+recompute.py
+report.md
+saved-inputs.json
+source-after-import.json
+video-probe.json
+video-strict-decode.log
+worker-parent.diff

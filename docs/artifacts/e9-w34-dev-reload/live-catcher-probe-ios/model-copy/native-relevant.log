@@ -1,0 +1,12 @@
+2026-10-28 00:50:20.278 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:50:22.860 Df Runner[41819:13365df] [com.jasonholtdigital.dart3d:scene] debugView channel=depth wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:50:46.010 Df Runner[41819:13365e6] [com.jasonholtdigital.dart3d:scene] debugView channel=baseColor wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:50:47.810 Df Runner[41819:13365da] [com.jasonholtdigital.dart3d:scene] debugView channel=metallic wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:50:49.544 Df Runner[41819:13365e6] [com.jasonholtdigital.dart3d:scene] debugView channel=roughness wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:50:51.260 Df Runner[41819:13365e2] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:50:54.794 Df Runner[41819:13365da] [com.jasonholtdigital.dart3d:scene] debugView channel=depth wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:50:58.360 Df Runner[41819:13365e6] [com.jasonholtdigital.dart3d:scene] debugView channel=depth wireframe=true nativeParticlesExcluded=true
+2026-10-28 00:51:07.194 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=true nativeParticlesExcluded=false
+2026-10-28 00:51:09.027 Df Runner[41819:13365db] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false
+2026-10-28 00:51:10.777 Df Runner[41819:13365e6] [com.jasonholtdigital.dart3d:scene] debugView channel=normals wireframe=false nativeParticlesExcluded=true
+2026-10-28 00:51:17.977 Df Runner[41819:1336cc8] [com.jasonholtdigital.dart3d:scene] debugView channel=none wireframe=false nativeParticlesExcluded=false

@@ -1,0 +1,11 @@
+listening ws://127.0.0.1:49334/scene source=/private/tmp/dart3d-e9-assets-runtime-20261027/r1/fixture/quad.fscene
+connected
+send chars=2397
+payload path=pixels.fsceneb bytes=2472
+send chars=2397
+payload path=pixels.fsceneb bytes=2472
+send chars=2397
+payload path=pixels.fsceneb bytes=3
+send chars=2397
+payload path=pixels.fsceneb bytes=2472
+error peer closed; restart required

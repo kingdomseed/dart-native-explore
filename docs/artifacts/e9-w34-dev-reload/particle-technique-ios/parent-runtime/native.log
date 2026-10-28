@@ -1,0 +1,2031 @@
+getpwuid_r did not find a match for uid 501
+Filtering the log data using "subsystem == "com.jasonholtdigital.dart3d" OR (process == "Runner" AND (composedMessage CONTAINS[c] "shader" OR composedMessage CONTAINS[c] "metal" OR composedMessage CONTAINS[c] "error" OR composedMessage CONTAINS[c] "exception" OR composedMessage CONTAINS[c] "technique"))"
+Timestamp               Ty Process[PID:TID]
+2026-10-27 21:46:07.663 Db Runner[56848:12923f6] [com.apple.BaseBoard:Common] [rdar://100354962] Fixing incorrect property returned by protocol_copyPropertyList2() for "error": required --> optional
+2026-10-27 21:46:07.665 Db Runner[56848:12923f6] [com.apple.FrontBoard:SceneExtension] registering method "error" from extension FBSSceneTransitionContextCore on class "FBSSceneTransitionContext"
+2026-10-27 21:46:07.665 Db Runner[56848:12923f6] [com.apple.FrontBoard:SceneExtension] registering method "setError:" from extension FBSSceneTransitionContextCore on class "FBSSceneTransitionContext"
+2026-10-27 21:46:09.144 Db Runner[56848:12923bc] [com.apple.defaults:User Defaults] found no value for key ReportValidationErrors in CFPrefsSearchListSource<0x101cd1d60> (Domain: com.apple.Accessibility, Container: (null) Non-launch persona: 0)
+2026-10-27 21:46:09.144 Db Runner[56848:12923bc] [com.apple.Accessibility:AXSupportCommon] CF Read: domain = com.apple.Accessibility, preference = ReportValidationErrors, appID = (null) result = (null) (-1 - empty, 0 - false, 1 - true)
+2026-10-27 21:46:09.144 Db Runner[56848:12923bc] [com.apple.defaults:User Defaults] found no value for key ReportValidationErrors in CFPrefsPlistSource<0x101cd1fe0> (Domain: com.apple.Accessibility, User: kCFPreferencesCurrentUser, ByHost: No, Container: /Users/jasonholt/Library/Developer/CoreSimulator/Devices/C24F3C6D-A3A9-4FB7-978E-36E67EF55354/data, Contents Need Refresh: No (Cached: 115, Newest: 115, Index: 220)
+2026-10-27 21:46:09.567 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1000) error:0 data:<private>
+2026-10-27 21:46:09.648 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>
+2026-10-27 21:46:09.855 Db Runner[56848:12923bc] [com.apple.defaults:User Defaults] setting new value 0 for key METAL_DEVICE_WRAPPER_TYPE in CFPrefsSource<0x1014b5520> (Domain: Volatile, User: , ByHost: No, Container: , Contents Need Refresh: No (Sentinel)
+2026-10-27 21:46:09.856 Db Runner[56848:12923bc] [com.apple.defaults:User Defaults] looked up value 0 for key METAL_DEVICE_WRAPPER_TYPE in CFPrefsSource<0x1014b5520> (Domain: Volatile, User: , ByHost: No, Container: , Contents Need Refresh: No (Sentinel) via CFPrefsSearchListSource<0x101cd0780> (Domain: com.jasonholtdigital.dart3dExample, Container: (null) Non-launch persona: 0)
+2026-10-27 21:46:09.856 Db Runner[56848:12923bc] [com.apple.defaults:User Defaults] found no value for key MetalForceCaptureEnabled in CFPrefsSearchListSource<0x101cd0780> (Domain: com.jasonholtdigital.dart3dExample, Container: (null) Non-launch persona: 0)
+2026-10-27 21:46:09.856 Db Runner[56848:12923bc] [com.apple.defaults:User Defaults] found no value for key MetalForceHudEnabled in CFPrefsSearchListSource<0x101cd0780> (Domain: com.jasonholtdigital.dart3dExample, Container: (null) Non-launch persona: 0)
+2026-10-27 21:46:09.857 Db Runner[56848:12923bc] [com.apple.defaults:User Defaults] CFPrefsManagedSource<0x106a9d400> (Domain: com.apple.metal, User: kCFPreferencesCurrentUser, ByHost: Yes, Container: (null), Contents Need Refresh: No (Cached: 315, Newest: 315, Index: 781) loaded: an empty base plist and no additional changes from the base plist
+2026-10-27 21:46:09.857 Db Runner[56848:12923bc] [com.apple.defaults:User Defaults] CFPrefsManagedSource<0x106a9d4a0> (Domain: com.apple.metal, User: kCFPreferencesAnyUser, ByHost: Yes, Container: (null), Contents Need Refresh: No (Cached: 315, Newest: 315, Index: 782) loaded: an empty base plist and no additional changes from the base plist
+2026-10-27 21:46:09.857 Db Runner[56848:12923bc] [com.apple.defaults:User Defaults] CFPrefsPlistSource<0x106a9d540> (Domain: com.apple.metal, User: kCFPreferencesCurrentUser, ByHost: No, Container: (null), Contents Need Refresh: No (Cached: 0, Newest: 0, Index: 784) loaded: an empty base plist and no additional changes from the base plist
+2026-10-27 21:46:09.857 Db Runner[56848:12923bc] [com.apple.defaults:User Defaults] CFPrefsPlistSource<0x106a9d680> (Domain: com.apple.metal, User: kCFPreferencesCurrentUser, ByHost: No, Container: /Users/jasonholt/Library/Developer/CoreSimulator/Devices/C24F3C6D-A3A9-4FB7-978E-36E67EF55354/data, Contents Need Refresh: No (Cached: 0, Newest: 0, Index: 784) loaded: an empty base plist and no additional changes from the base plist
+2026-10-27 21:46:09.857 Db Runner[56848:12923bc] [com.apple.defaults:User Defaults] CFPrefsPlistSource<0x106a9d720> (Domain: com.apple.metal, User: kCFPreferencesCurrentUser, ByHost: Yes, Container: (null), Contents Need Refresh: No (Cached: 0, Newest: 0, Index: 784) loaded: an empty base plist and no additional changes from the base plist
+2026-10-27 21:46:09.857 Db Runner[56848:12923bc] [com.apple.defaults:User Defaults] found no value for key MetalSimulatorEnabled in CFPrefsSearchListSource<0x106a9d360> (Domain: com.apple.metal, Container: (null) Non-launch persona: 0)
+2026-10-27 21:46:09.863 Df Runner[56848:12923bc] [com.apple.xpc:connection] [0x106b6f200] activating connection: mach=true listener=false peer=false name=com.apple.metal.simulator
+2026-10-27 21:46:09.865 Df Runner[56848:12923bc] [com.apple.xpc:connection] [0x106b6f340] activating connection: mach=true listener=false peer=false name=com.apple.metal.simulator
+2026-10-27 21:46:09.865 Df Runner[56848:12923bc] [com.apple.xpc:connection] [0x106b6f480] activating connection: mach=true listener=false peer=false name=com.apple.metal.simulator
+2026-10-27 21:46:09.870 Db Runner[56848:12923bc] [com.apple.defaults:User Defaults] found no value for key MetalSimulatorEnabled in CFPrefsSearchListSource<0x106a9d360> (Domain: com.apple.metal, Container: (null) Non-launch persona: 0)
+2026-10-27 21:46:09.870 Db Runner[56848:12923f0] [com.apple.defaults:User Defaults] found no value for key MetalPerformancePerFrameSignpostsEnabled in CFPrefsSearchListSource<0x101cd0780> (Domain: com.jasonholtdigital.dart3dExample, Container: (null) Non-launch persona: 0)
+2026-10-27 21:46:09.870 Db Runner[56848:12923f0] [com.apple.defaults:User Defaults] found no value for key MetalPerformanceShaderCompilerStatsSignposts in CFPrefsSearchListSource<0x101cd0780> (Domain: com.jasonholtdigital.dart3dExample, Container: (null) Non-launch persona: 0)
+2026-10-27 21:46:09.874 Db Runner[56848:12923bc] [com.apple.defaults:User Defaults] setting new value 6 for key METAL_ERROR_MODE in CFPrefsSource<0x1014b5520> (Domain: Volatile, User: , ByHost: No, Container: , Contents Need Refresh: No (Sentinel)
+2026-10-27 21:46:09.876 Db Runner[56848:12923bc] [com.apple.defaults:User Defaults] looked up value 6 for key METAL_ERROR_MODE in CFPrefsSource<0x1014b5520> (Domain: Volatile, User: , ByHost: No, Container: , Contents Need Refresh: No (Sentinel) via CFPrefsSearchListSource<0x101cd0780> (Domain: com.jasonholtdigital.dart3dExample, Container: (null) Non-launch persona: 0)
+2026-10-27 21:46:09.876 Db Runner[56848:12923bc] [com.apple.defaults:User Defaults] setting new value 4 for key METAL_DEBUG_ERROR_MODE in CFPrefsSource<0x1014b5520> (Domain: Volatile, User: , ByHost: No, Container: , Contents Need Refresh: No (Sentinel)
+2026-10-27 21:46:09.876 Db Runner[56848:12923bc] [com.apple.defaults:User Defaults] looked up value 4 for key METAL_DEBUG_ERROR_MODE in CFPrefsSource<0x1014b5520> (Domain: Volatile, User: , ByHost: No, Container: , Contents Need Refresh: No (Sentinel) via CFPrefsSearchListSource<0x101cd0780> (Domain: com.jasonholtdigital.dart3dExample, Container: (null) Non-launch persona: 0)
+2026-10-27 21:46:09.876 Db Runner[56848:12923bc] [com.apple.defaults:User Defaults] setting new value 4 for key METAL_WARNING_MODE in CFPrefsSource<0x1014b5520> (Domain: Volatile, User: , ByHost: No, Container: , Contents Need Refresh: No (Sentinel)
+2026-10-27 21:46:09.876 Db Runner[56848:12923bc] [com.apple.defaults:User Defaults] looked up value 4 for key METAL_WARNING_MODE in CFPrefsSource<0x1014b5520> (Domain: Volatile, User: , ByHost: No, Container: , Contents Need Refresh: No (Sentinel) via CFPrefsSearchListSource<0x101cd0780> (Domain: com.jasonholtdigital.dart3dExample, Container: (null) Non-launch persona: 0)
+2026-10-27 21:46:09.876 Db Runner[56848:12923bc] [com.apple.defaults:User Defaults] setting new value 4 for key METAL_ERROR_CHECK_EXTENDED_MODE in CFPrefsSource<0x1014b5520> (Domain: Volatile, User: , ByHost: No, Container: , Contents Need Refresh: No (Sentinel)
+2026-10-27 21:46:09.876 Db Runner[56848:12923bc] [com.apple.defaults:User Defaults] looked up value 4 for key METAL_ERROR_CHECK_EXTENDED_MODE in CFPrefsSource<0x1014b5520> (Domain: Volatile, User: , ByHost: No, Container: , Contents Need Refresh: No (Sentinel) via CFPrefsSearchListSource<0x101cd0780> (Domain: com.jasonholtdigital.dart3dExample, Container: (null) Non-launch persona: 0)
+2026-10-27 21:46:09.881 Db Runner[56848:12923bc] [com.apple.CFBundle:resources] Resource lookup at CFBundle 0x101f77aa0 </Library/Developer/CoreSimulator/Volumes/iOS_24A5380i/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 27.0.simruntime/Contents/Resources/RuntimeRoot/System/Library/Frameworks/SceneKit.framework> (not loaded)
+	Request       : default type: metallib
+	Result        : file:///Library/Developer/CoreSimulator/Volumes/iOS_24A5380i/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS%2027.0.simruntime/Contents/Resources/RuntimeRoot/System/Library/Frameworks/SceneKit.framework/default.metallib
+2026-10-27 21:46:09.886 Db Runner[56848:12923bc] [com.apple.CFBundle:resources] Resource lookup at CFBundle 0x1014b2ce0 </Users/jasonholt/Library/Developer/CoreSimulator/Devices/C24F3C6D-A3A9-4FB7-978E-36E67EF55354/data/Containers/Bundle/Application/1234A8E8-FC7E-4DC1-BE2A-949E173B2366/Runner.app> (executable, loaded)
+	Request       : scenekit type: metallib
+	Result        : None
+2026-10-27 21:46:09.889 Db Runner[56848:12923bc] [com.apple.CFBundle:resources] Resource lookup at CFBundle 0x1014b2ce0 </Users/jasonholt/Library/Developer/CoreSimulator/Devices/C24F3C6D-A3A9-4FB7-978E-36E67EF55354/data/Containers/Bundle/Application/1234A8E8-FC7E-4DC1-BE2A-949E173B2366/Runner.app> (executable, loaded)
+	Request       : default type: metallib
+	Result        : None
+2026-10-27 21:46:10.620 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1001) error:0 data:<private>
+2026-10-27 21:46:10.650 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>
+2026-10-27 21:46:10.651 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>
+2026-10-27 21:46:10.862 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (3031) error:0 data:<private>
+2026-10-27 21:46:10.872 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] protocol hello: Dart v1.0
+2026-10-27 21:46:10.879 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] texture 33553177869549576: awaiting payload
+2026-10-27 21:46:10.879 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] texture 33553177869549572: awaiting payload
+2026-10-27 21:46:10.889 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] geometry 33553177869549570: awaiting payload
+2026-10-27 21:46:10.895 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] particleEmitter on node 33553177869549577: seed/fixedStep/maxFrameTime/maxParticles have no SceneKit counterpart — the render clock drives the sim
+2026-10-27 21:46:10.898 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] mesh node 'w34.particle-probe.occluder': geometry unresolved
+2026-10-27 21:46:10.898 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] mesh node 'w34.particle-probe.quad': geometry unresolved
+2026-10-27 21:46:10.909 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] node 33553177869549579: body=nil shape=false pos=0.25 cat=- mask=-
+2026-10-27 21:46:10.909 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] node 33553177869549580: body=nil shape=false pos=0.0 cat=- mask=-
+2026-10-27 21:46:10.909 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] node 33553177869549577: body=nil shape=false pos=-0.85 cat=- mask=-
+2026-10-27 21:46:10.909 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] node 33553177869549574: body=nil shape=false pos=0.35 cat=- mask=-
+2026-10-27 21:46:10.909 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] node 33553177869549581: body=nil shape=false pos=0.1 cat=- mask=-
+2026-10-27 21:46:10.914 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe request mode=off wire=false frozen=false binding=notYetObserved
+2026-10-27 21:46:10.928 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] texture 33553177869549576: 16x16 rgba8 (1024 B in 12.26 ms)
+2026-10-27 21:46:10.928 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] texture 33553177869549572: 64x64 rgba8 (16384 B in 0.02 ms)
+2026-10-27 21:46:10.933 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] geometry 33553177869549570: decoded 4 verts in 0.95ms
+2026-10-27 21:46:10.935 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] node 33553177869549577: body=nil shape=false pos=-0.85 cat=- mask=-
+2026-10-27 21:46:10.935 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] node 33553177869549580: body=nil shape=false pos=0.0 cat=- mask=-
+2026-10-27 21:46:10.935 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] node 33553177869549579: body=nil shape=false pos=0.25 cat=- mask=-
+2026-10-27 21:46:10.935 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] node 33553177869549574: body=nil shape=false pos=0.35 cat=- mask=-
+2026-10-27 21:46:10.935 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] node 33553177869549581: body=nil shape=false pos=0.1 cat=- mask=-
+2026-10-27 21:46:10.949 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe bound renderer=ObjectIdentifier(0x0000000101e3c000) scene=Optional(ObjectIdentifier(0x0000000101dfe040)) node=ObjectIdentifier(0x0000000106b6d2c0) system=ObjectIdentifier(0x0000000106993c00) systemCount=1 mesh=ObjectIdentifier(0x0000000106b6da40) elements=1 primitives=[2] normalTextureType=Optional(MTLSimTexture) population=unavailable positions=unavailable callbacks=notInstalled
+2026-10-27 21:46:10.949 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied requested=off technique=Optional(ObjectIdentifier(0x0000000109b71950)) passes=Optional(["d3_resolve"]) reverseZ=true depthFunc=greaterEqual
+2026-10-27 21:46:10.949 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied shader library=Optional(ObjectIdentifier(0x0000000101fe10c0)) functions=["d3_bloom_up_fragment", "d3_bloom_down_fragment", "d3_resolve_fragment", "d3_bloom_bright_fragment", "d3_resolve_vertex"]
+2026-10-27 21:46:10.949 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied simulation requestedWire=false actualWire=false debugOptions=0 requestedFrozen=false system=ObjectIdentifier(0x0000000106993c00) attached=true speedFactor=1.0 birthRate=8.0 savedSimulation=nil
+2026-10-27 21:46:10.949 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied source imageType=Optional(MTLSimTexture) tint=kCGColorSpaceModelRGB 0.45 0.9 0.65 1 contentHeadroom=undefined population=unavailable positions=unavailable pipeline=unobserved
+2026-10-27 21:46:11.961 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] sim tick 517.934,65 dyn=0 awake=0 []
+2026-10-27 21:46:12.954 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 517.935,65 dyn=0 awake=0 []
+2026-10-27 21:46:13.952 Df Runner[56848:12923ee] [com.jasonholtdigital.dart3d:scene] sim tick 517.936,65 dyn=0 awake=0 []
+2026-10-27 21:46:14.952 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 517.937,65 dyn=0 awake=0 []
+2026-10-27 21:46:15.294 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query  found matching snapshots: {(
+    Application, pid: 56848
+)} (error: (null))
+2026-10-27 21:46:15.294 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query  with results: <XCTElementQueryResults: 0x10c645650> (error: (null))
+2026-10-27 21:46:15.317 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:46:15.317 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window with results: <XCTElementQueryResults: 0x10c6471e0> (error: (null))
+2026-10-27 21:46:15.323 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:46:15.323 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c645b90> (error: (null))
+2026-10-27 21:46:15.328 Df Runner[56848:12923f6] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:46:15.328 Df Runner[56848:12923f6] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c647de0> (error: (null))
+2026-10-27 21:46:15.342 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] App element pid: 56848 (App element pid: 56848) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4326129664.4"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.342 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4326129664.4 (AX element pid: 56848, elementOrHash.elementID: 4326129664.4) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 2;
+    "XC_kAXXCAttributeElementBaseType" = UIWindow;
+    "XC_kAXXCAttributeElementType" = UIWindow;
+    "XC_kAXXCAttributeTraits" = 0;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.342 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Window (AX element pid: 56848, elementOrHash.elementID: 4326129664.4) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4404683776.5"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.342 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4404683776.5 (AX element pid: 56848, elementOrHash.elementID: 4404683776.5) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UITransitionView;
+    "XC_kAXXCAttributeElementType" = UITransitionView;
+    "XC_kAXXCAttributeTraits" = 0;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.342 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4404683776.5) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4405664000.6"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.342 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4405664000.6 (AX element pid: 56848, elementOrHash.elementID: 4405664000.6) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIDropShadowView;
+    "XC_kAXXCAttributeElementType" = UIDropShadowView;
+    "XC_kAXXCAttributeTraits" = 0;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.342 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4405664000.6) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4404680704.7"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.342 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4404680704.7 (AX element pid: 56848, elementOrHash.elementID: 4404680704.7) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UILayoutContainerView;
+    "XC_kAXXCAttributeElementType" = UILayoutContainerView;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.343 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4404680704.7) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4316626944.8",
+        "AX element pid: 56848, elementOrHash.elementID: 4328037376.9",
+        "AX element pid: 56848, elementOrHash.elementID: 4404681216.10"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.343 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4316626944.8 (AX element pid: 56848, elementOrHash.elementID: 4316626944.8) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 21;
+    "XC_kAXXCAttributeElementBaseType" = UINavigationBar;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNResidentNavigationBar";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.343 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4328037376.9 (AX element pid: 56848, elementOrHash.elementID: 4328037376.9) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UINavigationTransitionView;
+    "XC_kAXXCAttributeElementType" = UINavigationTransitionView;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.343 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4404681216.10 (AX element pid: 56848, elementOrHash.elementID: 4404681216.10) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 24;
+    "XC_kAXXCAttributeElementBaseType" = "_UIFloatingBarContainerView";
+    "XC_kAXXCAttributeElementType" = "_UIFloatingBarContainerView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.344 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] NavigationBar (AX element pid: 56848, elementOrHash.elementID: 4316626944.8) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.344 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4328037376.9) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4327327040.11"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.344 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4327327040.11 (AX element pid: 56848, elementOrHash.elementID: 4327327040.11) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIViewControllerWrapperView;
+    "XC_kAXXCAttributeElementType" = UIViewControllerWrapperView;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.344 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Toolbar (AX element pid: 56848, elementOrHash.elementID: 4404681216.10) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4404681728.12"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.344 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4404681728.12 (AX element pid: 56848, elementOrHash.elementID: 4404681728.12) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = "_TtGC5UIKitP10$18563c79c22FloatingBarHostingViewVS_20FloatingBarContainer_";
+    "XC_kAXXCAttributeElementType" = "_TtGC5UIKitP10$18563c79c22FloatingBarHostingViewVS_20FloatingBarContainer_";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.344 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4327327040.11) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4327326592.13"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.344 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4327326592.13 (AX element pid: 56848, elementOrHash.elementID: 4327326592.13) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = UIView;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.345 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4404681728.12) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.345 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4327326592.13) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4457300480.14"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.345 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457300480.14 (AX element pid: 56848, elementOrHash.elementID: 4457300480.14) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNAutoRoundView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.345 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4457300480.14) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4457302016.15"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.345 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457302016.15 (AX element pid: 56848, elementOrHash.elementID: 4457302016.15) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNAutoRoundView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.345 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4457302016.15) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4457302528.16"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.345 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457302528.16 (AX element pid: 56848, elementOrHash.elementID: 4457302528.16) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNAutoRoundView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.345 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4457302528.16) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4326670336.17",
+        "AX element pid: 56848, elementOrHash.elementID: 4457306112.18"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.346 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4326670336.17 (AX element pid: 56848, elementOrHash.elementID: 4326670336.17) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dart3d.SceneViewHost";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.346 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457306112.18 (AX element pid: 56848, elementOrHash.elementID: 4457306112.18) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNAutoRoundView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.346 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4326670336.17) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4326416448.19"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.346 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4326416448.19 (AX element pid: 56848, elementOrHash.elementID: 4326416448.19) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNScene;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.346 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4457306112.18) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4457306624.20"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.346 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457306624.20 (AX element pid: 56848, elementOrHash.elementID: 4457306624.20) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNAutoRoundView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.346 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4326416448.19) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4407622656.21"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.346 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4407622656.21 (AX element pid: 56848, elementOrHash.elementID: 4407622656.21) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.347 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4457306624.20) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4457308160.22",
+        "AX element pid: 56848, elementOrHash.elementID: 4457308672.23",
+        "AX element pid: 56848, elementOrHash.elementID: 4457309696.24",
+        "AX element pid: 56848, elementOrHash.elementID: 4457313792.25"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.347 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457308160.22 (AX element pid: 56848, elementOrHash.elementID: 4457308160.22) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 48;
+    "XC_kAXXCAttributeElementBaseType" = UILabel;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNLabel";
+    "XC_kAXXCAttributeTraits" = 8589934656;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.347 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457308672.23 (AX element pid: 56848, elementOrHash.elementID: 4457308672.23) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 48;
+    "XC_kAXXCAttributeElementBaseType" = UILabel;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNLabel";
+    "XC_kAXXCAttributeTraits" = 8589934656;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.347 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457309696.24 (AX element pid: 56848, elementOrHash.elementID: 4457309696.24) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNAutoRoundView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.347 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457313792.25 (AX element pid: 56848, elementOrHash.elementID: 4457313792.25) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNAutoRoundView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.347 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4407622656.21) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4407614016.26",
+        "AX element pid: 56848, elementOrHash.elementID: 4407612096.27",
+        "AX element pid: 56848, elementOrHash.elementID: 4407610816.28",
+        "AX element pid: 56848, elementOrHash.elementID: 4407611776.29",
+        "AX element pid: 56848, elementOrHash.elementID: 4407616256.30"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.347 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4407614016.26 (AX element pid: 56848, elementOrHash.elementID: 4407614016.26) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.348 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4407612096.27 (AX element pid: 56848, elementOrHash.elementID: 4407612096.27) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.348 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4407610816.28 (AX element pid: 56848, elementOrHash.elementID: 4407610816.28) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.348 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4407611776.29 (AX element pid: 56848, elementOrHash.elementID: 4407611776.29) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.348 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4407616256.30 (AX element pid: 56848, elementOrHash.elementID: 4407616256.30) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.348 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] StaticText (AX element pid: 56848, elementOrHash.elementID: 4457308160.22) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.348 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] StaticText (AX element pid: 56848, elementOrHash.elementID: 4457308672.23) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.348 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4457309696.24) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4457546496.31",
+        "AX element pid: 56848, elementOrHash.elementID: 4457547264.32"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.348 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457546496.31 (AX element pid: 56848, elementOrHash.elementID: 4457546496.31) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 9;
+    "XC_kAXXCAttributeElementBaseType" = UIButton;
+    "XC_kAXXCAttributeElementType" = UIButton;
+    "XC_kAXXCAttributeTraits" = 8589934593;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.349 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457547264.32 (AX element pid: 56848, elementOrHash.elementID: 4457547264.32) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 9;
+    "XC_kAXXCAttributeElementBaseType" = UIButton;
+    "XC_kAXXCAttributeElementType" = UIButton;
+    "XC_kAXXCAttributeTraits" = 8589934593;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.349 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4457313792.25) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4457548032.33",
+        "AX element pid: 56848, elementOrHash.elementID: 4457548800.34"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.349 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457548032.33 (AX element pid: 56848, elementOrHash.elementID: 4457548032.33) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 9;
+    "XC_kAXXCAttributeElementBaseType" = UIButton;
+    "XC_kAXXCAttributeElementType" = UIButton;
+    "XC_kAXXCAttributeTraits" = 8589934593;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.349 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457548800.34 (AX element pid: 56848, elementOrHash.elementID: 4457548800.34) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 9;
+    "XC_kAXXCAttributeElementBaseType" = UIButton;
+    "XC_kAXXCAttributeElementType" = UIButton;
+    "XC_kAXXCAttributeTraits" = 8589934593;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.349 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4407614016.26) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.349 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4407612096.27) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.349 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4407610816.28) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.349 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4407611776.29) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.350 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4407616256.30) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.350 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Button (AX element pid: 56848, elementOrHash.elementID: 4457546496.31) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4327916864.35"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.350 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4327916864.35 (AX element pid: 56848, elementOrHash.elementID: 4327916864.35) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 48;
+    "XC_kAXXCAttributeElementBaseType" = UILabel;
+    "XC_kAXXCAttributeElementType" = UILabel;
+    "XC_kAXXCAttributeTraits" = 8589934656;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.350 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Button (AX element pid: 56848, elementOrHash.elementID: 4457547264.32) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4327981056.36"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.350 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4327981056.36 (AX element pid: 56848, elementOrHash.elementID: 4327981056.36) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 48;
+    "XC_kAXXCAttributeElementBaseType" = UILabel;
+    "XC_kAXXCAttributeElementType" = UILabel;
+    "XC_kAXXCAttributeTraits" = 8589934656;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.350 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Button (AX element pid: 56848, elementOrHash.elementID: 4457548032.33) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4327985088.37"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.350 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4327985088.37 (AX element pid: 56848, elementOrHash.elementID: 4327985088.37) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 48;
+    "XC_kAXXCAttributeElementBaseType" = UILabel;
+    "XC_kAXXCAttributeElementType" = UILabel;
+    "XC_kAXXCAttributeTraits" = 8589934656;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.351 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Button (AX element pid: 56848, elementOrHash.elementID: 4457548800.34) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4327991360.38"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.351 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4327991360.38 (AX element pid: 56848, elementOrHash.elementID: 4327991360.38) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 48;
+    "XC_kAXXCAttributeElementBaseType" = UILabel;
+    "XC_kAXXCAttributeElementType" = UILabel;
+    "XC_kAXXCAttributeTraits" = 8589934656;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:15.351 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] StaticText (AX element pid: 56848, elementOrHash.elementID: 4327916864.35) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.351 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] StaticText (AX element pid: 56848, elementOrHash.elementID: 4327981056.36) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.351 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] StaticText (AX element pid: 56848, elementOrHash.elementID: 4327985088.37) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.351 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] StaticText (AX element pid: 56848, elementOrHash.elementID: 4327991360.38) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:15.351 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Keyboard (First Match) found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:46:15.352 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Keyboard (First Match) with results: <XCTElementQueryResults: 0x10c6451d0> (error: (null))
+2026-10-27 21:46:15.952 Df Runner[56848:12923f6] [com.jasonholtdigital.dart3d:scene] sim tick 517.938,65 dyn=0 awake=0 []
+2026-10-27 21:46:16.952 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 517.939,65 dyn=0 awake=0 []
+2026-10-27 21:46:17.953 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 517.940,65 dyn=0 awake=0 []
+2026-10-27 21:46:18.952 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 517.941,65 dyn=0 awake=0 []
+2026-10-27 21:46:19.953 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.942,65 dyn=0 awake=0 []
+2026-10-27 21:46:20.952 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.943,65 dyn=0 awake=0 []
+2026-10-27 21:46:21.952 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.944,65 dyn=0 awake=0 []
+2026-10-27 21:46:22.952 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 517.945,65 dyn=0 awake=0 []
+2026-10-27 21:46:23.953 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.946,65 dyn=0 awake=0 []
+2026-10-27 21:46:24.952 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] sim tick 517.947,65 dyn=0 awake=0 []
+2026-10-27 21:46:25.953 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.948,65 dyn=0 awake=0 []
+2026-10-27 21:46:26.953 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.949,65 dyn=0 awake=0 []
+2026-10-27 21:46:27.952 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.950,65 dyn=0 awake=0 []
+2026-10-27 21:46:28.952 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.951,65 dyn=0 awake=0 []
+2026-10-27 21:46:29.953 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 517.952,65 dyn=0 awake=0 []
+2026-10-27 21:46:30.953 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.953,65 dyn=0 awake=0 []
+2026-10-27 21:46:31.952 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] sim tick 517.954,65 dyn=0 awake=0 []
+2026-10-27 21:46:32.952 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.955,65 dyn=0 awake=0 []
+2026-10-27 21:46:33.953 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.956,65 dyn=0 awake=0 []
+2026-10-27 21:46:34.953 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 517.957,65 dyn=0 awake=0 []
+2026-10-27 21:46:35.953 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] sim tick 517.958,65 dyn=0 awake=0 []
+2026-10-27 21:46:36.953 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.959,65 dyn=0 awake=0 []
+2026-10-27 21:46:37.953 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.960,65 dyn=0 awake=0 []
+2026-10-27 21:46:38.953 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.961,65 dyn=0 awake=0 []
+2026-10-27 21:46:39.953 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 517.962,65 dyn=0 awake=0 []
+2026-10-27 21:46:40.953 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 517.963,65 dyn=0 awake=0 []
+2026-10-27 21:46:41.953 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 517.964,65 dyn=0 awake=0 []
+2026-10-27 21:46:42.953 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.965,65 dyn=0 awake=0 []
+2026-10-27 21:46:43.953 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 517.966,65 dyn=0 awake=0 []
+2026-10-27 21:46:44.953 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 517.967,65 dyn=0 awake=0 []
+2026-10-27 21:46:45.953 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] sim tick 517.968,65 dyn=0 awake=0 []
+2026-10-27 21:46:46.953 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] sim tick 517.969,65 dyn=0 awake=0 []
+2026-10-27 21:46:47.954 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 517.970,65 dyn=0 awake=0 []
+2026-10-27 21:46:48.954 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] sim tick 517.971,65 dyn=0 awake=0 []
+2026-10-27 21:46:49.953 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 517.972,65 dyn=0 awake=0 []
+2026-10-27 21:46:50.954 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.973,65 dyn=0 awake=0 []
+2026-10-27 21:46:51.953 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 517.974,65 dyn=0 awake=0 []
+2026-10-27 21:46:52.954 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 517.975,65 dyn=0 awake=0 []
+2026-10-27 21:46:53.954 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 517.976,65 dyn=0 awake=0 []
+2026-10-27 21:46:54.954 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.977,65 dyn=0 awake=0 []
+2026-10-27 21:46:55.954 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.978,65 dyn=0 awake=0 []
+2026-10-27 21:46:56.281 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query  found matching snapshots: {(
+    Application, pid: 56848
+)} (error: (null))
+2026-10-27 21:46:56.281 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query  with results: <XCTElementQueryResults: 0x10c645140> (error: (null))
+2026-10-27 21:46:56.328 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:46:56.328 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window with results: <XCTElementQueryResults: 0x10c645950> (error: (null))
+2026-10-27 21:46:56.334 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:46:56.334 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c645b60> (error: (null))
+2026-10-27 21:46:56.340 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:46:56.340 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c6456e0> (error: (null))
+2026-10-27 21:46:56.356 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] App element pid: 56848 (App element pid: 56848) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4326129664.4"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.356 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4326129664.4 (AX element pid: 56848, elementOrHash.elementID: 4326129664.4) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 2;
+    "XC_kAXXCAttributeElementBaseType" = UIWindow;
+    "XC_kAXXCAttributeElementType" = UIWindow;
+    "XC_kAXXCAttributeTraits" = 0;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.356 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Window (AX element pid: 56848, elementOrHash.elementID: 4326129664.4) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4404683776.5"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.356 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4404683776.5 (AX element pid: 56848, elementOrHash.elementID: 4404683776.5) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UITransitionView;
+    "XC_kAXXCAttributeElementType" = UITransitionView;
+    "XC_kAXXCAttributeTraits" = 0;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.356 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4404683776.5) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4405664000.6"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.356 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4405664000.6 (AX element pid: 56848, elementOrHash.elementID: 4405664000.6) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIDropShadowView;
+    "XC_kAXXCAttributeElementType" = UIDropShadowView;
+    "XC_kAXXCAttributeTraits" = 0;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.356 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4405664000.6) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4404680704.7"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.356 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4404680704.7 (AX element pid: 56848, elementOrHash.elementID: 4404680704.7) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UILayoutContainerView;
+    "XC_kAXXCAttributeElementType" = UILayoutContainerView;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.357 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4404680704.7) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4316626944.8",
+        "AX element pid: 56848, elementOrHash.elementID: 4328037376.9",
+        "AX element pid: 56848, elementOrHash.elementID: 4404681216.10"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.357 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4316626944.8 (AX element pid: 56848, elementOrHash.elementID: 4316626944.8) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 21;
+    "XC_kAXXCAttributeElementBaseType" = UINavigationBar;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNResidentNavigationBar";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.357 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4328037376.9 (AX element pid: 56848, elementOrHash.elementID: 4328037376.9) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UINavigationTransitionView;
+    "XC_kAXXCAttributeElementType" = UINavigationTransitionView;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.357 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4404681216.10 (AX element pid: 56848, elementOrHash.elementID: 4404681216.10) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 24;
+    "XC_kAXXCAttributeElementBaseType" = "_UIFloatingBarContainerView";
+    "XC_kAXXCAttributeElementType" = "_UIFloatingBarContainerView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.358 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] NavigationBar (AX element pid: 56848, elementOrHash.elementID: 4316626944.8) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.358 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4328037376.9) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4327327040.11"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.358 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4327327040.11 (AX element pid: 56848, elementOrHash.elementID: 4327327040.11) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIViewControllerWrapperView;
+    "XC_kAXXCAttributeElementType" = UIViewControllerWrapperView;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.358 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Toolbar (AX element pid: 56848, elementOrHash.elementID: 4404681216.10) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4404681728.12"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.358 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4404681728.12 (AX element pid: 56848, elementOrHash.elementID: 4404681728.12) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = "_TtGC5UIKitP10$18563c79c22FloatingBarHostingViewVS_20FloatingBarContainer_";
+    "XC_kAXXCAttributeElementType" = "_TtGC5UIKitP10$18563c79c22FloatingBarHostingViewVS_20FloatingBarContainer_";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.358 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4327327040.11) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4327326592.13"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.358 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4327326592.13 (AX element pid: 56848, elementOrHash.elementID: 4327326592.13) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = UIView;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.358 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4404681728.12) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.359 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4327326592.13) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4457300480.14"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.359 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457300480.14 (AX element pid: 56848, elementOrHash.elementID: 4457300480.14) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNAutoRoundView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.359 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4457300480.14) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4457302016.15"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.359 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457302016.15 (AX element pid: 56848, elementOrHash.elementID: 4457302016.15) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNAutoRoundView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.359 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4457302016.15) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4457302528.16"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.359 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457302528.16 (AX element pid: 56848, elementOrHash.elementID: 4457302528.16) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNAutoRoundView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.359 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4457302528.16) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4326670336.17",
+        "AX element pid: 56848, elementOrHash.elementID: 4457306112.18"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.359 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4326670336.17 (AX element pid: 56848, elementOrHash.elementID: 4326670336.17) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dart3d.SceneViewHost";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.360 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457306112.18 (AX element pid: 56848, elementOrHash.elementID: 4457306112.18) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNAutoRoundView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.360 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4326670336.17) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4326416448.19"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.360 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4326416448.19 (AX element pid: 56848, elementOrHash.elementID: 4326416448.19) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNScene;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.360 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4457306112.18) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4457306624.20"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.360 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457306624.20 (AX element pid: 56848, elementOrHash.elementID: 4457306624.20) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNAutoRoundView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.360 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4326416448.19) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4407622656.21"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.360 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4407622656.21 (AX element pid: 56848, elementOrHash.elementID: 4407622656.21) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.360 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4457306624.20) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4457308160.22",
+        "AX element pid: 56848, elementOrHash.elementID: 4457308672.23",
+        "AX element pid: 56848, elementOrHash.elementID: 4457309696.24",
+        "AX element pid: 56848, elementOrHash.elementID: 4457313792.25"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.361 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457308160.22 (AX element pid: 56848, elementOrHash.elementID: 4457308160.22) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 48;
+    "XC_kAXXCAttributeElementBaseType" = UILabel;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNLabel";
+    "XC_kAXXCAttributeTraits" = 8589934656;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.361 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457308672.23 (AX element pid: 56848, elementOrHash.elementID: 4457308672.23) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 48;
+    "XC_kAXXCAttributeElementBaseType" = UILabel;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNLabel";
+    "XC_kAXXCAttributeTraits" = 8589934656;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.361 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457309696.24 (AX element pid: 56848, elementOrHash.elementID: 4457309696.24) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNAutoRoundView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.361 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457313792.25 (AX element pid: 56848, elementOrHash.elementID: 4457313792.25) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = UIView;
+    "XC_kAXXCAttributeElementType" = "dartnative_ios.DNAutoRoundView";
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.361 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4407622656.21) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4407614016.26",
+        "AX element pid: 56848, elementOrHash.elementID: 4407612096.27",
+        "AX element pid: 56848, elementOrHash.elementID: 4407610816.28",
+        "AX element pid: 56848, elementOrHash.elementID: 4407611776.29",
+        "AX element pid: 56848, elementOrHash.elementID: 4407616256.30"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.361 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4407614016.26 (AX element pid: 56848, elementOrHash.elementID: 4407614016.26) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.361 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4407612096.27 (AX element pid: 56848, elementOrHash.elementID: 4407612096.27) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.361 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4407610816.28 (AX element pid: 56848, elementOrHash.elementID: 4407610816.28) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.361 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4407611776.29 (AX element pid: 56848, elementOrHash.elementID: 4407611776.29) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.362 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4407616256.30 (AX element pid: 56848, elementOrHash.elementID: 4407616256.30) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 0;
+    "XC_kAXXCAttributeElementBaseType" = NSObject;
+    "XC_kAXXCAttributeElementType" = SCNNode;
+    "XC_kAXXCAttributeTraits" = 8589934592;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.362 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] StaticText (AX element pid: 56848, elementOrHash.elementID: 4457308160.22) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.362 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] StaticText (AX element pid: 56848, elementOrHash.elementID: 4457308672.23) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.362 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4457309696.24) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4457546496.31",
+        "AX element pid: 56848, elementOrHash.elementID: 4457547264.32"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.362 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457546496.31 (AX element pid: 56848, elementOrHash.elementID: 4457546496.31) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 9;
+    "XC_kAXXCAttributeElementBaseType" = UIButton;
+    "XC_kAXXCAttributeElementType" = UIButton;
+    "XC_kAXXCAttributeTraits" = 8589934593;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.362 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457547264.32 (AX element pid: 56848, elementOrHash.elementID: 4457547264.32) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 9;
+    "XC_kAXXCAttributeElementBaseType" = UIButton;
+    "XC_kAXXCAttributeElementType" = UIButton;
+    "XC_kAXXCAttributeTraits" = 8589934593;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.362 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4457313792.25) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4457548032.33",
+        "AX element pid: 56848, elementOrHash.elementID: 4457548800.34"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.363 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457548032.33 (AX element pid: 56848, elementOrHash.elementID: 4457548032.33) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 9;
+    "XC_kAXXCAttributeElementBaseType" = UIButton;
+    "XC_kAXXCAttributeElementType" = UIButton;
+    "XC_kAXXCAttributeTraits" = 8589934593;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.363 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4457548800.34 (AX element pid: 56848, elementOrHash.elementID: 4457548800.34) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 9;
+    "XC_kAXXCAttributeElementBaseType" = UIButton;
+    "XC_kAXXCAttributeElementType" = UIButton;
+    "XC_kAXXCAttributeTraits" = 8589934593;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.363 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4407614016.26) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.363 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4407612096.27) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.363 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4407610816.28) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.363 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4407611776.29) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.363 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Other (AX element pid: 56848, elementOrHash.elementID: 4407616256.30) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.363 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Button (AX element pid: 56848, elementOrHash.elementID: 4457546496.31) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4327916864.35"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.363 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4327916864.35 (AX element pid: 56848, elementOrHash.elementID: 4327916864.35) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 48;
+    "XC_kAXXCAttributeElementBaseType" = UILabel;
+    "XC_kAXXCAttributeElementType" = UILabel;
+    "XC_kAXXCAttributeTraits" = 8589934656;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.364 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Button (AX element pid: 56848, elementOrHash.elementID: 4457547264.32) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4327981056.36"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.364 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4327981056.36 (AX element pid: 56848, elementOrHash.elementID: 4327981056.36) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 48;
+    "XC_kAXXCAttributeElementBaseType" = UILabel;
+    "XC_kAXXCAttributeElementType" = UILabel;
+    "XC_kAXXCAttributeTraits" = 8589934656;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.364 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Button (AX element pid: 56848, elementOrHash.elementID: 4457548032.33) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4327985088.37"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.364 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4327985088.37 (AX element pid: 56848, elementOrHash.elementID: 4327985088.37) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 48;
+    "XC_kAXXCAttributeElementBaseType" = UILabel;
+    "XC_kAXXCAttributeElementType" = UILabel;
+    "XC_kAXXCAttributeTraits" = 8589934656;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.364 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] Button (AX element pid: 56848, elementOrHash.elementID: 4457548800.34) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+        "AX element pid: 56848, elementOrHash.elementID: 4327991360.38"
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.364 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] AX element pid: 56848, elementOrHash.elementID: 4327991360.38 (AX element pid: 56848, elementOrHash.elementID: 4327991360.38) faulted in {
+    "XC_kAXXCAttributeAutomationType" = 48;
+    "XC_kAXXCAttributeElementBaseType" = UILabel;
+    "XC_kAXXCAttributeElementType" = UILabel;
+    "XC_kAXXCAttributeTraits" = 8589934656;
+}: (no error) for elementType using XC_kAXXCAttributeElementType, XC_kAXXCAttributeElementBaseType, XC_kAXXCAttributeTraits, XC_kAXXCAttributeAutomationType
+2026-10-27 21:46:56.364 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] StaticText (AX element pid: 56848, elementOrHash.elementID: 4327916864.35) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.364 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] StaticText (AX element pid: 56848, elementOrHash.elementID: 4327981056.36) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.364 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] StaticText (AX element pid: 56848, elementOrHash.elementID: 4327985088.37) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.365 Df Runner[56848:12923bc] [com.apple.dt.xctest:Default] StaticText (AX element pid: 56848, elementOrHash.elementID: 4327991360.38) faulted in {
+    "XC_kAXXCAttributeChildren" =     (
+    );
+}: (no error) for children using XC_kAXXCAttributeChildren
+2026-10-27 21:46:56.365 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Keyboard (First Match) found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:46:56.365 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Keyboard (First Match) with results: <XCTElementQueryResults: 0x10c646550> (error: (null))
+2026-10-27 21:46:56.374 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:46:56.374 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window with results: <XCTElementQueryResults: 0x10c646fd0> (error: (null))
+2026-10-27 21:46:56.379 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:46:56.379 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c646fd0> (error: (null))
+2026-10-27 21:46:56.385 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:46:56.385 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c646310> (error: (null))
+2026-10-27 21:46:56.393 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button found matching snapshots: {(
+    Button,
+    Button,
+    Button,
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.394 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button with results: <XCTElementQueryResults: 0x10c646310> (error: (null))
+2026-10-27 21:46:56.403 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Link found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:46:56.403 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Link with results: <XCTElementQueryResults: 0x10c6474e0> (error: (null))
+2026-10-27 21:46:56.409 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type TextField found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:46:56.409 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type TextField with results: <XCTElementQueryResults: 0x10c646fd0> (error: (null))
+2026-10-27 21:46:56.415 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type SecureTextField found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:46:56.416 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x10c647c60> (error: (null))
+2026-10-27 21:46:56.422 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type SearchField found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:46:56.422 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type SearchField with results: <XCTElementQueryResults: 0x10c647690> (error: (null))
+2026-10-27 21:46:56.429 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type TextView found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:46:56.429 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type TextView with results: <XCTElementQueryResults: 0x10c645b60> (error: (null))
+2026-10-27 21:46:56.436 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Switch found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:46:56.436 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Switch with results: <XCTElementQueryResults: 0x10c646250> (error: (null))
+2026-10-27 21:46:56.442 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Slider found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:46:56.442 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Slider with results: <XCTElementQueryResults: 0x10c646b80> (error: (null))
+2026-10-27 21:46:56.448 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type SegmentedControl found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:46:56.448 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type SegmentedControl with results: <XCTElementQueryResults: 0x10c646310> (error: (null))
+2026-10-27 21:46:56.454 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Cell found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:46:56.454 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Cell with results: <XCTElementQueryResults: 0x10c646070> (error: (null))
+2026-10-27 21:46:56.460 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type CollectionView found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:46:56.460 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type CollectionView with results: <XCTElementQueryResults: 0x10c645710> (error: (null))
+2026-10-27 21:46:56.466 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Table found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:46:56.466 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Table with results: <XCTElementQueryResults: 0x10c645dd0> (error: (null))
+2026-10-27 21:46:56.473 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type ScrollView found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:46:56.473 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type ScrollView with results: <XCTElementQueryResults: 0x10c646b50> (error: (null))
+2026-10-27 21:46:56.479 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Picker found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:46:56.479 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Picker with results: <XCTElementQueryResults: 0x10c6465b0> (error: (null))
+2026-10-27 21:46:56.485 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Stepper found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:46:56.485 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Stepper with results: <XCTElementQueryResults: 0x10c646c40> (error: (null))
+2026-10-27 21:46:56.491 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type TabBar found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:46:56.491 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type TabBar with results: <XCTElementQueryResults: 0x10c646250> (error: (null))
+2026-10-27 21:46:56.497 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type MenuItem found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:46:56.497 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type MenuItem with results: <XCTElementQueryResults: 0x10c6476f0> (error: (null))
+2026-10-27 21:46:56.503 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText found matching snapshots: {(
+    StaticText,
+    StaticText,
+    StaticText,
+    StaticText,
+    StaticText,
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:56.503 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText with results: <XCTElementQueryResults: 0x10c6467c0> (error: (null))
+2026-10-27 21:46:56.510 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Image found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:46:56.510 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Image with results: <XCTElementQueryResults: 0x10c647690> (error: (null))
+2026-10-27 21:46:56.516 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.516 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c6464f0> (error: (null))
+2026-10-27 21:46:56.521 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.521 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c646d30> (error: (null))
+2026-10-27 21:46:56.535 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.535 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c646b50> (error: (null))
+2026-10-27 21:46:56.543 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.543 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c646c40> (error: (null))
+2026-10-27 21:46:56.551 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.551 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c647690> (error: (null))
+2026-10-27 21:46:56.559 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.559 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c646b50> (error: (null))
+2026-10-27 21:46:56.567 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.567 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c647810> (error: (null))
+2026-10-27 21:46:56.577 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.577 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c647d20> (error: (null))
+2026-10-27 21:46:56.588 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.588 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c646c40> (error: (null))
+2026-10-27 21:46:56.596 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.596 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c645140> (error: (null))
+2026-10-27 21:46:56.602 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 1 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.602 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 1 with results: <XCTElementQueryResults: 0x10c647ae0> (error: (null))
+2026-10-27 21:46:56.608 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 1 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.608 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 1 with results: <XCTElementQueryResults: 0x10c6469d0> (error: (null))
+2026-10-27 21:46:56.618 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 1 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.618 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 1 with results: <XCTElementQueryResults: 0x10c646d30> (error: (null))
+2026-10-27 21:46:56.625 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 1 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.625 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 1 with results: <XCTElementQueryResults: 0x10c645950> (error: (null))
+2026-10-27 21:46:56.633 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 1 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.633 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 1 with results: <XCTElementQueryResults: 0x10c646df0> (error: (null))
+2026-10-27 21:46:56.641 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 1 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.641 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 1 with results: <XCTElementQueryResults: 0x10c647690> (error: (null))
+2026-10-27 21:46:56.648 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 1 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.648 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 1 with results: <XCTElementQueryResults: 0x10c646490> (error: (null))
+2026-10-27 21:46:56.656 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 1 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.656 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 1 with results: <XCTElementQueryResults: 0x10c646850> (error: (null))
+2026-10-27 21:46:56.664 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 1 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.664 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 1 with results: <XCTElementQueryResults: 0x10c6469d0> (error: (null))
+2026-10-27 21:46:56.672 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 1 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.673 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 1 with results: <XCTElementQueryResults: 0x10c647ae0> (error: (null))
+2026-10-27 21:46:56.678 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 2 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.678 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 2 with results: <XCTElementQueryResults: 0x10c647690> (error: (null))
+2026-10-27 21:46:56.684 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 2 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.684 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 2 with results: <XCTElementQueryResults: 0x10c646850> (error: (null))
+2026-10-27 21:46:56.694 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 2 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.694 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 2 with results: <XCTElementQueryResults: 0x10c647690> (error: (null))
+2026-10-27 21:46:56.702 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 2 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.702 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 2 with results: <XCTElementQueryResults: 0x10c646850> (error: (null))
+2026-10-27 21:46:56.710 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 2 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.710 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 2 with results: <XCTElementQueryResults: 0x10c645950> (error: (null))
+2026-10-27 21:46:56.718 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 2 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.718 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 2 with results: <XCTElementQueryResults: 0x10c646fd0> (error: (null))
+2026-10-27 21:46:56.726 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 2 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.726 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 2 with results: <XCTElementQueryResults: 0x10c646a00> (error: (null))
+2026-10-27 21:46:56.734 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 2 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.734 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 2 with results: <XCTElementQueryResults: 0x10c646310> (error: (null))
+2026-10-27 21:46:56.742 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 2 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.742 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 2 with results: <XCTElementQueryResults: 0x10c647ed0> (error: (null))
+2026-10-27 21:46:56.750 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 2 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.750 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 2 with results: <XCTElementQueryResults: 0x10c646310> (error: (null))
+2026-10-27 21:46:56.756 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 3 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.756 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 3 with results: <XCTElementQueryResults: 0x10c647d20> (error: (null))
+2026-10-27 21:46:56.762 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 3 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.762 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 3 with results: <XCTElementQueryResults: 0x10c6469d0> (error: (null))
+2026-10-27 21:46:56.772 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 3 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.772 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 3 with results: <XCTElementQueryResults: 0x10c646c40> (error: (null))
+2026-10-27 21:46:56.781 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 3 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.781 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 3 with results: <XCTElementQueryResults: 0x10c6464f0> (error: (null))
+2026-10-27 21:46:56.791 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 3 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.791 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 3 with results: <XCTElementQueryResults: 0x10c647ae0> (error: (null))
+2026-10-27 21:46:56.799 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 3 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.799 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 3 with results: <XCTElementQueryResults: 0x10c6464f0> (error: (null))
+2026-10-27 21:46:56.807 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 3 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.807 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 3 with results: <XCTElementQueryResults: 0x10c647ae0> (error: (null))
+2026-10-27 21:46:56.814 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 3 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.814 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 3 with results: <XCTElementQueryResults: 0x10c6464f0> (error: (null))
+2026-10-27 21:46:56.822 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 3 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.822 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 3 with results: <XCTElementQueryResults: 0x10c647ae0> (error: (null))
+2026-10-27 21:46:56.831 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 3 found matching snapshots: {(
+    Button
+)} (error: (null))
+2026-10-27 21:46:56.831 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Button
+    ↪︎ Element at index 3 with results: <XCTElementQueryResults: 0x10c646850> (error: (null))
+2026-10-27 21:46:56.836 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 0 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:56.837 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c647690> (error: (null))
+2026-10-27 21:46:56.842 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 0 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:56.842 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c647d20> (error: (null))
+2026-10-27 21:46:56.866 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 0 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:56.866 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c646fd0> (error: (null))
+2026-10-27 21:46:56.873 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 0 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:56.874 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c646160> (error: (null))
+2026-10-27 21:46:56.881 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 0 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:56.881 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c646a00> (error: (null))
+2026-10-27 21:46:56.889 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 0 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:56.889 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c6469d0> (error: (null))
+2026-10-27 21:46:56.896 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 0 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:56.896 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c647d20> (error: (null))
+2026-10-27 21:46:56.904 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 0 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:56.904 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c646d30> (error: (null))
+2026-10-27 21:46:56.913 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 0 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:56.913 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c6469d0> (error: (null))
+2026-10-27 21:46:56.921 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 0 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:56.921 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c647810> (error: (null))
+2026-10-27 21:46:56.927 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 1 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:56.927 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 1 with results: <XCTElementQueryResults: 0x10c646b50> (error: (null))
+2026-10-27 21:46:56.933 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 1 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:56.933 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 1 with results: <XCTElementQueryResults: 0x10c646df0> (error: (null))
+2026-10-27 21:46:56.942 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 1 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:56.943 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 1 with results: <XCTElementQueryResults: 0x10c647810> (error: (null))
+2026-10-27 21:46:56.950 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 1 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:56.950 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 1 with results: <XCTElementQueryResults: 0x10c6456e0> (error: (null))
+2026-10-27 21:46:56.954 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.979,65 dyn=0 awake=0 []
+2026-10-27 21:46:56.958 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 1 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:56.958 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 1 with results: <XCTElementQueryResults: 0x10c646310> (error: (null))
+2026-10-27 21:46:56.966 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 1 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:56.966 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 1 with results: <XCTElementQueryResults: 0x10c645950> (error: (null))
+2026-10-27 21:46:56.973 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 1 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:56.973 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 1 with results: <XCTElementQueryResults: 0x10c6456e0> (error: (null))
+2026-10-27 21:46:56.981 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 1 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:56.981 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 1 with results: <XCTElementQueryResults: 0x10c646850> (error: (null))
+2026-10-27 21:46:56.989 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 1 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:56.989 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 1 with results: <XCTElementQueryResults: 0x10c646b20> (error: (null))
+2026-10-27 21:46:56.997 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 1 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:56.998 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 1 with results: <XCTElementQueryResults: 0x10c646310> (error: (null))
+2026-10-27 21:46:57.003 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 2 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.003 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 2 with results: <XCTElementQueryResults: 0x10c6456e0> (error: (null))
+2026-10-27 21:46:57.009 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 2 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.009 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 2 with results: <XCTElementQueryResults: 0x10c646b50> (error: (null))
+2026-10-27 21:46:57.019 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 2 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.019 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 2 with results: <XCTElementQueryResults: 0x10c646fd0> (error: (null))
+2026-10-27 21:46:57.027 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 2 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.027 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 2 with results: <XCTElementQueryResults: 0x10c647810> (error: (null))
+2026-10-27 21:46:57.035 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 2 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.035 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 2 with results: <XCTElementQueryResults: 0x10c645950> (error: (null))
+2026-10-27 21:46:57.043 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 2 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.043 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 2 with results: <XCTElementQueryResults: 0x10c647d20> (error: (null))
+2026-10-27 21:46:57.051 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 2 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.051 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 2 with results: <XCTElementQueryResults: 0x10c646310> (error: (null))
+2026-10-27 21:46:57.058 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 2 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.059 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 2 with results: <XCTElementQueryResults: 0x10c647d20> (error: (null))
+2026-10-27 21:46:57.066 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 2 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.066 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 2 with results: <XCTElementQueryResults: 0x10c646850> (error: (null))
+2026-10-27 21:46:57.075 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 2 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.075 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 2 with results: <XCTElementQueryResults: 0x10c646c40> (error: (null))
+2026-10-27 21:46:57.081 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 3 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.081 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 3 with results: <XCTElementQueryResults: 0x10c646850> (error: (null))
+2026-10-27 21:46:57.087 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 3 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.087 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 3 with results: <XCTElementQueryResults: 0x10c645140> (error: (null))
+2026-10-27 21:46:57.097 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 3 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.098 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 3 with results: <XCTElementQueryResults: 0x10c646160> (error: (null))
+2026-10-27 21:46:57.106 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 3 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.106 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 3 with results: <XCTElementQueryResults: 0x10c6479f0> (error: (null))
+2026-10-27 21:46:57.113 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 3 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.114 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 3 with results: <XCTElementQueryResults: 0x10c647810> (error: (null))
+2026-10-27 21:46:57.121 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 3 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.122 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 3 with results: <XCTElementQueryResults: 0x10c645140> (error: (null))
+2026-10-27 21:46:57.130 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 3 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.130 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 3 with results: <XCTElementQueryResults: 0x10c646fd0> (error: (null))
+2026-10-27 21:46:57.138 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 3 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.138 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 3 with results: <XCTElementQueryResults: 0x10c646b50> (error: (null))
+2026-10-27 21:46:57.146 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 3 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.146 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 3 with results: <XCTElementQueryResults: 0x10c6456e0> (error: (null))
+2026-10-27 21:46:57.154 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 3 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.154 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 3 with results: <XCTElementQueryResults: 0x10c646160> (error: (null))
+2026-10-27 21:46:57.160 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 4 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.160 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 4 with results: <XCTElementQueryResults: 0x10c646490> (error: (null))
+2026-10-27 21:46:57.166 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 4 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.166 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 4 with results: <XCTElementQueryResults: 0x10c646160> (error: (null))
+2026-10-27 21:46:57.176 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 4 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.176 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 4 with results: <XCTElementQueryResults: 0x10c647ae0> (error: (null))
+2026-10-27 21:46:57.184 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 4 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.184 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 4 with results: <XCTElementQueryResults: 0x10c647d20> (error: (null))
+2026-10-27 21:46:57.193 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 4 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.193 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 4 with results: <XCTElementQueryResults: 0x10c645950> (error: (null))
+2026-10-27 21:46:57.201 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 4 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.201 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 4 with results: <XCTElementQueryResults: 0x10c646a00> (error: (null))
+2026-10-27 21:46:57.209 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 4 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.209 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 4 with results: <XCTElementQueryResults: 0x10c646160> (error: (null))
+2026-10-27 21:46:57.217 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 4 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.217 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 4 with results: <XCTElementQueryResults: 0x10c647ae0> (error: (null))
+2026-10-27 21:46:57.225 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 4 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.225 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 4 with results: <XCTElementQueryResults: 0x10c646c40> (error: (null))
+2026-10-27 21:46:57.233 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 4 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.234 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 4 with results: <XCTElementQueryResults: 0x10c646df0> (error: (null))
+2026-10-27 21:46:57.240 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 5 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.240 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 5 with results: <XCTElementQueryResults: 0x10c646490> (error: (null))
+2026-10-27 21:46:57.246 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 5 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.246 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 5 with results: <XCTElementQueryResults: 0x10c6456e0> (error: (null))
+2026-10-27 21:46:57.256 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 5 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.256 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 5 with results: <XCTElementQueryResults: 0x10c646a00> (error: (null))
+2026-10-27 21:46:57.264 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 5 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.264 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 5 with results: <XCTElementQueryResults: 0x10c646d30> (error: (null))
+2026-10-27 21:46:57.272 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 5 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.273 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 5 with results: <XCTElementQueryResults: 0x10c647810> (error: (null))
+2026-10-27 21:46:57.281 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 5 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.281 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 5 with results: <XCTElementQueryResults: 0x10c647690> (error: (null))
+2026-10-27 21:46:57.289 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 5 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.289 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 5 with results: <XCTElementQueryResults: 0x10c646490> (error: (null))
+2026-10-27 21:46:57.297 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 5 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.297 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 5 with results: <XCTElementQueryResults: 0x10c646a00> (error: (null))
+2026-10-27 21:46:57.305 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 5 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.305 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 5 with results: <XCTElementQueryResults: 0x10c647810> (error: (null))
+2026-10-27 21:46:57.313 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 5 found matching snapshots: {(
+    StaticText
+)} (error: (null))
+2026-10-27 21:46:57.314 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type StaticText
+    ↪︎ Element at index 5 with results: <XCTElementQueryResults: 0x10c646490> (error: (null))
+2026-10-27 21:46:57.954 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 517.980,65 dyn=0 awake=0 []
+2026-10-27 21:46:58.954 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] sim tick 517.981,65 dyn=0 awake=0 []
+2026-10-27 21:46:59.954 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 517.982,65 dyn=0 awake=0 []
+2026-10-27 21:47:00.954 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] sim tick 517.983,65 dyn=0 awake=0 []
+2026-10-27 21:47:01.954 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.984,65 dyn=0 awake=0 []
+2026-10-27 21:47:02.954 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 517.985,65 dyn=0 awake=0 []
+2026-10-27 21:47:03.002 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type TextField found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:47:03.002 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type TextField with results: <XCTElementQueryResults: 0x10c6464f0> (error: (null))
+2026-10-27 21:47:03.009 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type SecureTextField found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:47:03.009 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x10c646fd0> (error: (null))
+2026-10-27 21:47:03.016 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type SearchField found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:47:03.016 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type SearchField with results: <XCTElementQueryResults: 0x10c646160> (error: (null))
+2026-10-27 21:47:03.023 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type TextView found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:47:03.024 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type TextView with results: <XCTElementQueryResults: 0x10c6479f0> (error: (null))
+2026-10-27 21:47:03.030 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:47:03.030 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window with results: <XCTElementQueryResults: 0x10c647810> (error: (null))
+2026-10-27 21:47:03.036 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:47:03.036 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c647690> (error: (null))
+2026-10-27 21:47:03.042 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:47:03.042 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c6464f0> (error: (null))
+2026-10-27 21:47:03.054 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:47:03.054 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c647ae0> (error: (null))
+2026-10-27 21:47:03.372 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>
+2026-10-27 21:47:03.403 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>
+2026-10-27 21:47:03.405 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe request mode=off wire=false frozen=true binding=notYetObserved
+2026-10-27 21:47:03.426 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied requested=off technique=Optional(ObjectIdentifier(0x0000000109b71950)) passes=Optional(["d3_resolve"]) reverseZ=true depthFunc=greaterEqual
+2026-10-27 21:47:03.427 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied shader library=Optional(ObjectIdentifier(0x0000000101fe10c0)) functions=["d3_bloom_up_fragment", "d3_bloom_down_fragment", "d3_resolve_fragment", "d3_bloom_bright_fragment", "d3_resolve_vertex"]
+2026-10-27 21:47:03.443 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied simulation requestedWire=false actualWire=false debugOptions=0 requestedFrozen=true system=ObjectIdentifier(0x0000000106993c00) attached=true speedFactor=0.0 birthRate=0.0 savedSimulation=Optional((speed: 1.0, birth: 8.0))
+2026-10-27 21:47:03.449 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied source imageType=Optional(MTLSimTexture) tint=kCGColorSpaceModelRGB 0.45 0.9 0.65 1 contentHeadroom=undefined population=unavailable positions=unavailable pipeline=unobserved
+2026-10-27 21:47:03.625 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>
+2026-10-27 21:47:03.646 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>
+2026-10-27 21:47:03.971 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] sim tick 517.986,67 dyn=0 awake=0 []
+2026-10-27 21:47:04.971 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 517.987,67 dyn=0 awake=0 []
+2026-10-27 21:47:05.971 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.988,67 dyn=0 awake=0 []
+2026-10-27 21:47:06.971 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.989,67 dyn=0 awake=0 []
+2026-10-27 21:47:07.971 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.990,67 dyn=0 awake=0 []
+2026-10-27 21:47:08.972 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 517.991,67 dyn=0 awake=0 []
+2026-10-27 21:47:09.972 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 517.992,67 dyn=0 awake=0 []
+2026-10-27 21:47:10.971 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] sim tick 517.993,67 dyn=0 awake=0 []
+2026-10-27 21:47:11.971 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 517.994,67 dyn=0 awake=0 []
+2026-10-27 21:47:12.971 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] sim tick 517.995,67 dyn=0 awake=0 []
+2026-10-27 21:47:13.971 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] sim tick 517.996,67 dyn=0 awake=0 []
+2026-10-27 21:47:14.971 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 517.997,67 dyn=0 awake=0 []
+2026-10-27 21:47:15.809 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type TextField found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:47:15.809 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type TextField with results: <XCTElementQueryResults: 0x10c6479f0> (error: (null))
+2026-10-27 21:47:15.816 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type SecureTextField found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:47:15.816 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x10c644ea0> (error: (null))
+2026-10-27 21:47:15.822 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type SearchField found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:47:15.822 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type SearchField with results: <XCTElementQueryResults: 0x10c6464f0> (error: (null))
+2026-10-27 21:47:15.829 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type TextView found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:47:15.829 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type TextView with results: <XCTElementQueryResults: 0x10c647ae0> (error: (null))
+2026-10-27 21:47:15.835 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:47:15.836 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window with results: <XCTElementQueryResults: 0x10c644e70> (error: (null))
+2026-10-27 21:47:15.841 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:47:15.841 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c646d30> (error: (null))
+2026-10-27 21:47:15.847 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:47:15.847 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c6458c0> (error: (null))
+2026-10-27 21:47:15.858 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:47:15.858 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c647810> (error: (null))
+2026-10-27 21:47:15.956 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>
+2026-10-27 21:47:15.971 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe request mode=constant wire=false frozen=true binding=notYetObserved
+2026-10-27 21:47:15.989 Df Runner[56848:12923ef] (Metal) Metal compiler process merging enabled (new scheduler only)
+2026-10-27 21:47:16.060 A  Runner[56848:12923ec] (Metal) Metal Compiling Shader
+2026-10-27 21:47:16.208 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>
+2026-10-27 21:47:16.405 Db Runner[56848:12923ef] [com.apple.defaults:User Defaults] CFPrefsManagedSource<0x101cd0fa0> (Domain: com.apple.Metal, User: kCFPreferencesCurrentUser, ByHost: Yes, Container: (null), Contents Need Refresh: No (Cached: 35, Newest: 35, Index: 1285) loaded: an empty base plist and no additional changes from the base plist
+2026-10-27 21:47:16.405 Db Runner[56848:12923ef] [com.apple.defaults:User Defaults] CFPrefsManagedSource<0x101cd19a0> (Domain: com.apple.Metal, User: kCFPreferencesAnyUser, ByHost: Yes, Container: (null), Contents Need Refresh: No (Cached: 35, Newest: 35, Index: 1286) loaded: an empty base plist and no additional changes from the base plist
+2026-10-27 21:47:16.405 Db Runner[56848:12923ef] [com.apple.defaults:User Defaults] CFPrefsPlistSource<0x101cd2bc0> (Domain: com.apple.Metal, User: kCFPreferencesCurrentUser, ByHost: No, Container: (null), Contents Need Refresh: No (Cached: 0, Newest: 0, Index: 1288) loaded: an empty base plist and no additional changes from the base plist
+2026-10-27 21:47:16.405 Db Runner[56848:12923ef] [com.apple.defaults:User Defaults] CFPrefsPlistSource<0x101cd35c0> (Domain: com.apple.Metal, User: kCFPreferencesCurrentUser, ByHost: No, Container: /Users/jasonholt/Library/Developer/CoreSimulator/Devices/C24F3C6D-A3A9-4FB7-978E-36E67EF55354/data, Contents Need Refresh: No (Cached: 0, Newest: 0, Index: 1288) loaded: an empty base plist and no additional changes from the base plist
+2026-10-27 21:47:16.405 Db Runner[56848:12923ef] [com.apple.defaults:User Defaults] CFPrefsPlistSource<0x106a9fca0> (Domain: com.apple.Metal, User: kCFPreferencesCurrentUser, ByHost: Yes, Container: (null), Contents Need Refresh: No (Cached: 0, Newest: 0, Index: 1288) loaded: an empty base plist and no additional changes from the base plist
+2026-10-27 21:47:16.405 Db Runner[56848:12923ef] [com.apple.defaults:User Defaults] found no value for key forceDeviceName in CFPrefsSearchListSource<0x101cd21c0> (Domain: com.apple.Metal, Container: (null) Non-launch persona: 0)
+2026-10-27 21:47:16.414 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe library=ObjectIdentifier(0x0000000101fe3b80) device=Apple iOS simulator GPU functions=["w34_particle_probe_fragment", "w34_particle_probe_vertex"] vertex=Optional(1) fragment=Optional(2)
+2026-10-27 21:47:16.417 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe techniqueCreated=ObjectIdentifier(0x000000010c7f43c0) libraryAttached=true pipeline=unobserved meshWitness=required bindingErrors=captureSceneKitConsoleDiagnostics
+2026-10-27 21:47:16.417 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied requested=constant technique=Optional(ObjectIdentifier(0x000000010c7f43c0)) passes=Optional(["w34_particle_scene"]) reverseZ=true depthFunc=greaterEqual
+2026-10-27 21:47:16.417 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied shader library=Optional(ObjectIdentifier(0x0000000101fe3b80)) functions=["w34_particle_probe_fragment", "w34_particle_probe_vertex"]
+2026-10-27 21:47:16.417 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied simulation requestedWire=false actualWire=false debugOptions=0 requestedFrozen=true system=ObjectIdentifier(0x0000000106993c00) attached=true speedFactor=0.0 birthRate=0.0 savedSimulation=Optional((speed: 1.0, birth: 8.0))
+2026-10-27 21:47:16.417 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied source imageType=Optional(MTLSimTexture) tint=kCGColorSpaceModelRGB 0.45 0.9 0.65 1 contentHeadroom=undefined population=unavailable positions=unavailable pipeline=unobserved
+2026-10-27 21:47:16.417 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 517.998,67 dyn=0 awake=0 []
+2026-10-27 21:47:16.419 A  Runner[56848:12923ed] (Metal) Metal Compiling Shader
+2026-10-27 21:47:16.437 A  Runner[56848:12923ed] (Metal) Metal Compiling Shader
+2026-10-27 21:47:16.650 A  Runner[56848:12923ed] (Metal) Metal Compiling Shader
+2026-10-27 21:47:17.671 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] sim tick 518.000,37 dyn=0 awake=0 []
+2026-10-27 21:47:18.671 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.001,37 dyn=0 awake=0 []
+2026-10-27 21:47:19.671 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.002,37 dyn=0 awake=0 []
+2026-10-27 21:47:20.671 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.003,37 dyn=0 awake=0 []
+2026-10-27 21:47:21.672 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] sim tick 518.004,37 dyn=0 awake=0 []
+2026-10-27 21:47:22.671 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.005,37 dyn=0 awake=0 []
+2026-10-27 21:47:23.671 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.006,37 dyn=0 awake=0 []
+2026-10-27 21:47:24.672 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.007,37 dyn=0 awake=0 []
+2026-10-27 21:47:25.672 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] sim tick 518.008,37 dyn=0 awake=0 []
+2026-10-27 21:47:26.672 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.009,37 dyn=0 awake=0 []
+2026-10-27 21:47:27.672 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.010,37 dyn=0 awake=0 []
+2026-10-27 21:47:28.672 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.011,37 dyn=0 awake=0 []
+2026-10-27 21:47:29.672 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] sim tick 518.012,37 dyn=0 awake=0 []
+2026-10-27 21:47:30.672 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.013,37 dyn=0 awake=0 []
+2026-10-27 21:47:31.672 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.014,37 dyn=0 awake=0 []
+2026-10-27 21:47:32.672 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.015,37 dyn=0 awake=0 []
+2026-10-27 21:47:33.672 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.016,37 dyn=0 awake=0 []
+2026-10-27 21:47:34.672 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.017,37 dyn=0 awake=0 []
+2026-10-27 21:47:35.672 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.018,37 dyn=0 awake=0 []
+2026-10-27 21:47:36.672 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.019,37 dyn=0 awake=0 []
+2026-10-27 21:47:37.672 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.020,37 dyn=0 awake=0 []
+2026-10-27 21:47:38.672 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.021,37 dyn=0 awake=0 []
+2026-10-27 21:47:39.672 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.022,37 dyn=0 awake=0 []
+2026-10-27 21:47:40.672 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.023,37 dyn=0 awake=0 []
+2026-10-27 21:47:41.672 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] sim tick 518.024,37 dyn=0 awake=0 []
+2026-10-27 21:47:42.672 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.025,37 dyn=0 awake=0 []
+2026-10-27 21:47:43.672 Df Runner[56848:12923ed] [com.jasonholtdigital.dart3d:scene] sim tick 518.026,37 dyn=0 awake=0 []
+2026-10-27 21:47:44.672 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.027,37 dyn=0 awake=0 []
+2026-10-27 21:47:45.672 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.028,37 dyn=0 awake=0 []
+2026-10-27 21:47:46.672 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.029,37 dyn=0 awake=0 []
+2026-10-27 21:47:46.918 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type TextField found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:47:46.918 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type TextField with results: <XCTElementQueryResults: 0x10c646b80> (error: (null))
+2026-10-27 21:47:46.925 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type SecureTextField found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:47:46.925 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x10c646790> (error: (null))
+2026-10-27 21:47:46.933 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type SearchField found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:47:46.933 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type SearchField with results: <XCTElementQueryResults: 0x10c645f50> (error: (null))
+2026-10-27 21:47:46.942 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type TextView found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:47:46.942 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type TextView with results: <XCTElementQueryResults: 0x10c646850> (error: (null))
+2026-10-27 21:47:46.948 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:47:46.948 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window with results: <XCTElementQueryResults: 0x10c646b80> (error: (null))
+2026-10-27 21:47:46.953 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:47:46.953 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c645f80> (error: (null))
+2026-10-27 21:47:46.959 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:47:46.959 Df Runner[56848:12923ed] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c6456e0> (error: (null))
+2026-10-27 21:47:46.975 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:47:46.975 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c645f80> (error: (null))
+2026-10-27 21:47:47.106 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>
+2026-10-27 21:47:47.121 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe request mode=off wire=false frozen=true binding=notYetObserved
+2026-10-27 21:47:47.130 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied requested=off technique=Optional(ObjectIdentifier(0x0000000109b71950)) passes=Optional(["d3_resolve"]) reverseZ=true depthFunc=greaterEqual
+2026-10-27 21:47:47.130 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied shader library=Optional(ObjectIdentifier(0x0000000101fe10c0)) functions=["d3_bloom_up_fragment", "d3_bloom_down_fragment", "d3_resolve_fragment", "d3_bloom_bright_fragment", "d3_resolve_vertex"]
+2026-10-27 21:47:47.130 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied simulation requestedWire=false actualWire=false debugOptions=0 requestedFrozen=true system=ObjectIdentifier(0x0000000106993c00) attached=true speedFactor=0.0 birthRate=0.0 savedSimulation=Optional((speed: 1.0, birth: 8.0))
+2026-10-27 21:47:47.130 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied source imageType=Optional(MTLSimTexture) tint=kCGColorSpaceModelRGB 0.45 0.9 0.65 1 contentHeadroom=undefined population=unavailable positions=unavailable pipeline=unobserved
+2026-10-27 21:47:47.360 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>
+2026-10-27 21:47:47.705 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.030,40 dyn=0 awake=0 []
+2026-10-27 21:47:48.705 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.031,40 dyn=0 awake=0 []
+2026-10-27 21:47:49.705 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.032,40 dyn=0 awake=0 []
+2026-10-27 21:47:50.705 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.033,40 dyn=0 awake=0 []
+2026-10-27 21:47:51.705 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.034,40 dyn=0 awake=0 []
+2026-10-27 21:47:52.705 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.035,40 dyn=0 awake=0 []
+2026-10-27 21:47:53.705 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.036,40 dyn=0 awake=0 []
+2026-10-27 21:47:54.705 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.037,40 dyn=0 awake=0 []
+2026-10-27 21:47:55.705 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 518.038,40 dyn=0 awake=0 []
+2026-10-27 21:47:56.705 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 518.039,40 dyn=0 awake=0 []
+2026-10-27 21:47:57.705 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.040,40 dyn=0 awake=0 []
+2026-10-27 21:47:58.705 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.041,40 dyn=0 awake=0 []
+2026-10-27 21:47:59.705 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.042,40 dyn=0 awake=0 []
+2026-10-27 21:48:00.705 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.043,40 dyn=0 awake=0 []
+2026-10-27 21:48:01.705 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 518.044,40 dyn=0 awake=0 []
+2026-10-27 21:48:02.705 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.045,40 dyn=0 awake=0 []
+2026-10-27 21:48:03.705 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.046,40 dyn=0 awake=0 []
+2026-10-27 21:48:04.705 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.047,40 dyn=0 awake=0 []
+2026-10-27 21:48:05.705 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.048,40 dyn=0 awake=0 []
+2026-10-27 21:48:06.705 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.049,40 dyn=0 awake=0 []
+2026-10-27 21:48:07.705 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.050,40 dyn=0 awake=0 []
+2026-10-27 21:48:08.705 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.051,40 dyn=0 awake=0 []
+2026-10-27 21:48:09.705 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.052,40 dyn=0 awake=0 []
+2026-10-27 21:48:10.705 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.053,40 dyn=0 awake=0 []
+2026-10-27 21:48:11.705 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 518.054,40 dyn=0 awake=0 []
+2026-10-27 21:48:12.705 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 518.055,40 dyn=0 awake=0 []
+2026-10-27 21:48:13.705 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.056,40 dyn=0 awake=0 []
+2026-10-27 21:48:14.705 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.057,40 dyn=0 awake=0 []
+2026-10-27 21:48:15.706 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.058,40 dyn=0 awake=0 []
+2026-10-27 21:48:16.706 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.059,40 dyn=0 awake=0 []
+2026-10-27 21:48:17.705 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.060,40 dyn=0 awake=0 []
+2026-10-27 21:48:18.705 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.061,40 dyn=0 awake=0 []
+2026-10-27 21:48:19.705 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.062,40 dyn=0 awake=0 []
+2026-10-27 21:48:20.705 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.063,40 dyn=0 awake=0 []
+2026-10-27 21:48:21.705 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.064,40 dyn=0 awake=0 []
+2026-10-27 21:48:22.705 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.065,40 dyn=0 awake=0 []
+2026-10-27 21:48:23.705 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 518.066,40 dyn=0 awake=0 []
+2026-10-27 21:48:24.705 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 518.067,40 dyn=0 awake=0 []
+2026-10-27 21:48:25.705 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.068,40 dyn=0 awake=0 []
+2026-10-27 21:48:26.705 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.069,40 dyn=0 awake=0 []
+2026-10-27 21:48:27.705 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 518.070,40 dyn=0 awake=0 []
+2026-10-27 21:48:28.705 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 518.071,40 dyn=0 awake=0 []
+2026-10-27 21:48:29.705 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.072,40 dyn=0 awake=0 []
+2026-10-27 21:48:30.705 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.073,40 dyn=0 awake=0 []
+2026-10-27 21:48:31.706 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 518.074,40 dyn=0 awake=0 []
+2026-10-27 21:48:32.705 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 518.075,40 dyn=0 awake=0 []
+2026-10-27 21:48:33.705 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.076,40 dyn=0 awake=0 []
+2026-10-27 21:48:34.705 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.077,40 dyn=0 awake=0 []
+2026-10-27 21:48:35.705 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.078,40 dyn=0 awake=0 []
+2026-10-27 21:48:36.705 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 518.079,40 dyn=0 awake=0 []
+2026-10-27 21:48:37.705 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.080,40 dyn=0 awake=0 []
+2026-10-27 21:48:38.705 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.081,40 dyn=0 awake=0 []
+2026-10-27 21:48:39.705 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 518.082,40 dyn=0 awake=0 []
+2026-10-27 21:48:40.705 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.083,40 dyn=0 awake=0 []
+2026-10-27 21:48:41.705 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 518.084,40 dyn=0 awake=0 []
+2026-10-27 21:48:42.705 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.085,40 dyn=0 awake=0 []
+2026-10-27 21:48:43.709 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.086,40 dyn=0 awake=0 []
+2026-10-27 21:48:44.705 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.087,40 dyn=0 awake=0 []
+2026-10-27 21:48:45.708 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.088,40 dyn=0 awake=0 []
+2026-10-27 21:48:46.705 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.089,40 dyn=0 awake=0 []
+2026-10-27 21:48:47.705 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.090,40 dyn=0 awake=0 []
+2026-10-27 21:48:48.705 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.091,40 dyn=0 awake=0 []
+2026-10-27 21:48:49.705 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.092,40 dyn=0 awake=0 []
+2026-10-27 21:48:50.582 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type TextField found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:48:50.582 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type TextField with results: <XCTElementQueryResults: 0x10c6469d0> (error: (null))
+2026-10-27 21:48:50.588 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type SecureTextField found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:48:50.588 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x10c6460d0> (error: (null))
+2026-10-27 21:48:50.595 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type SearchField found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:48:50.595 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type SearchField with results: <XCTElementQueryResults: 0x10c645170> (error: (null))
+2026-10-27 21:48:50.601 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type TextView found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:48:50.601 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type TextView with results: <XCTElementQueryResults: 0x10c6461f0> (error: (null))
+2026-10-27 21:48:50.607 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:48:50.607 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window with results: <XCTElementQueryResults: 0x10c644990> (error: (null))
+2026-10-27 21:48:50.614 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:48:50.614 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c645770> (error: (null))
+2026-10-27 21:48:50.619 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:48:50.619 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c646430> (error: (null))
+2026-10-27 21:48:50.649 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:48:50.649 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c645b60> (error: (null))
+2026-10-27 21:48:50.705 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 518.093,40 dyn=0 awake=0 []
+2026-10-27 21:48:50.805 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>
+2026-10-27 21:48:50.816 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>
+2026-10-27 21:48:50.823 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe request mode=off wire=true frozen=true binding=notYetObserved
+2026-10-27 21:48:50.829 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied requested=off technique=Optional(ObjectIdentifier(0x0000000109b71950)) passes=Optional(["d3_resolve"]) reverseZ=true depthFunc=greaterEqual
+2026-10-27 21:48:50.829 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied shader library=Optional(ObjectIdentifier(0x0000000101fe10c0)) functions=["d3_bloom_up_fragment", "d3_bloom_down_fragment", "d3_resolve_fragment", "d3_bloom_bright_fragment", "d3_resolve_vertex"]
+2026-10-27 21:48:50.830 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied simulation requestedWire=true actualWire=true debugOptions=32 requestedFrozen=true system=ObjectIdentifier(0x0000000106993c00) attached=true speedFactor=0.0 birthRate=0.0 savedSimulation=Optional((speed: 1.0, birth: 8.0))
+2026-10-27 21:48:50.831 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied source imageType=Optional(MTLSimTexture) tint=kCGColorSpaceModelRGB 0.45 0.9 0.65 1 contentHeadroom=undefined population=unavailable positions=unavailable pipeline=unobserved
+2026-10-27 21:48:51.056 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>
+2026-10-27 21:48:51.075 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>
+2026-10-27 21:48:51.839 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.094,53 dyn=0 awake=0 []
+2026-10-27 21:48:52.839 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.095,53 dyn=0 awake=0 []
+2026-10-27 21:48:53.839 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.096,53 dyn=0 awake=0 []
+2026-10-27 21:48:54.838 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.097,53 dyn=0 awake=0 []
+2026-10-27 21:48:55.838 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.098,53 dyn=0 awake=0 []
+2026-10-27 21:48:56.839 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.099,53 dyn=0 awake=0 []
+2026-10-27 21:48:57.839 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.100,53 dyn=0 awake=0 []
+2026-10-27 21:48:58.193 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type TextField found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:48:58.193 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type TextField with results: <XCTElementQueryResults: 0x10c6468e0> (error: (null))
+2026-10-27 21:48:58.200 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type SecureTextField found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:48:58.200 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x10c6456e0> (error: (null))
+2026-10-27 21:48:58.207 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type SearchField found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:48:58.207 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type SearchField with results: <XCTElementQueryResults: 0x10c645f50> (error: (null))
+2026-10-27 21:48:58.214 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type TextView found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:48:58.214 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type TextView with results: <XCTElementQueryResults: 0x10c647390> (error: (null))
+2026-10-27 21:48:58.220 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:48:58.220 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window with results: <XCTElementQueryResults: 0x10c646880> (error: (null))
+2026-10-27 21:48:58.226 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:48:58.226 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c6463d0> (error: (null))
+2026-10-27 21:48:58.231 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:48:58.232 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c6465e0> (error: (null))
+2026-10-27 21:48:58.243 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:48:58.243 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c645a70> (error: (null))
+2026-10-27 21:48:58.322 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>
+2026-10-27 21:48:58.338 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe request mode=off wire=false frozen=true binding=notYetObserved
+2026-10-27 21:48:58.338 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied requested=off technique=Optional(ObjectIdentifier(0x0000000109b71950)) passes=Optional(["d3_resolve"]) reverseZ=true depthFunc=greaterEqual
+2026-10-27 21:48:58.338 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied shader library=Optional(ObjectIdentifier(0x0000000101fe10c0)) functions=["d3_bloom_up_fragment", "d3_bloom_down_fragment", "d3_resolve_fragment", "d3_bloom_bright_fragment", "d3_resolve_vertex"]
+2026-10-27 21:48:58.338 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied simulation requestedWire=false actualWire=false debugOptions=0 requestedFrozen=true system=ObjectIdentifier(0x0000000106993c00) attached=true speedFactor=0.0 birthRate=0.0 savedSimulation=Optional((speed: 1.0, birth: 8.0))
+2026-10-27 21:48:58.338 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied source imageType=Optional(MTLSimTexture) tint=kCGColorSpaceModelRGB 0.45 0.9 0.65 1 contentHeadroom=undefined population=unavailable positions=unavailable pipeline=unobserved
+2026-10-27 21:48:58.338 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>
+2026-10-27 21:48:58.574 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>
+2026-10-27 21:48:58.593 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>
+2026-10-27 21:48:58.838 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.101,53 dyn=0 awake=0 []
+2026-10-27 21:48:59.846 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.102,53 dyn=0 awake=0 []
+2026-10-27 21:49:00.839 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.103,53 dyn=0 awake=0 []
+2026-10-27 21:49:01.838 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.104,53 dyn=0 awake=0 []
+2026-10-27 21:49:02.838 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.105,53 dyn=0 awake=0 []
+2026-10-27 21:49:03.838 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.106,53 dyn=0 awake=0 []
+2026-10-27 21:49:04.839 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.107,53 dyn=0 awake=0 []
+2026-10-27 21:49:05.839 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.108,53 dyn=0 awake=0 []
+2026-10-27 21:49:06.403 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type TextField found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:49:06.403 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type TextField with results: <XCTElementQueryResults: 0x10c6469d0> (error: (null))
+2026-10-27 21:49:06.409 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type SecureTextField found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:49:06.409 Df Runner[56848:12923ec] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type SecureTextField with results: <XCTElementQueryResults: 0x10c646700> (error: (null))
+2026-10-27 21:49:06.416 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type SearchField found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:49:06.416 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type SearchField with results: <XCTElementQueryResults: 0x10c645170> (error: (null))
+2026-10-27 21:49:06.422 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type TextView found matching snapshots: {(
+)} (error: (null))
+2026-10-27 21:49:06.422 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type TextView with results: <XCTElementQueryResults: 0x10c645ec0> (error: (null))
+2026-10-27 21:49:06.429 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:49:06.429 Df Runner[56848:129258e] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window with results: <XCTElementQueryResults: 0x10c646fa0> (error: (null))
+2026-10-27 21:49:06.434 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:49:06.434 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c645170> (error: (null))
+2026-10-27 21:49:06.440 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:49:06.440 Df Runner[56848:12923ef] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c645320> (error: (null))
+2026-10-27 21:49:06.450 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 found matching snapshots: {(
+    Window (Main)
+)} (error: (null))
+2026-10-27 21:49:06.450 Df Runner[56848:12923f2] [com.apple.dt.xctest:Default] Replying to query ↪︎ Descendants matching type Window
+    ↪︎ Element at index 0 with results: <XCTElementQueryResults: 0x10c646430> (error: (null))
+2026-10-27 21:49:06.539 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (4002) error:0 data:<private>
+2026-10-27 21:49:06.555 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe request mode=off wire=false frozen=false binding=notYetObserved
+2026-10-27 21:49:06.555 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>
+2026-10-27 21:49:06.561 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied requested=off technique=Optional(ObjectIdentifier(0x0000000109b71950)) passes=Optional(["d3_resolve"]) reverseZ=true depthFunc=greaterEqual
+2026-10-27 21:49:06.561 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied shader library=Optional(ObjectIdentifier(0x0000000101fe10c0)) functions=["d3_bloom_up_fragment", "d3_bloom_down_fragment", "d3_resolve_fragment", "d3_bloom_bright_fragment", "d3_resolve_vertex"]
+2026-10-27 21:49:06.561 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied simulation requestedWire=false actualWire=false debugOptions=0 requestedFrozen=false system=ObjectIdentifier(0x0000000106993c00) attached=true speedFactor=1.0 birthRate=8.0 savedSimulation=nil
+2026-10-27 21:49:06.561 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] W34ParticleProbe applied source imageType=Optional(MTLSimTexture) tint=kCGColorSpaceModelRGB 0.45 0.9 0.65 1 contentHeadroom=undefined population=unavailable positions=unavailable pipeline=unobserved
+2026-10-27 21:49:06.791 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>
+2026-10-27 21:49:06.810 I  Runner[56848:12923bc] [com.apple.Accessibility:AXRuntimeNotifications] Did post notification. notification:  (1025) error:0 data:<private>
+2026-10-27 21:49:06.839 Df Runner[56848:12923f2] [com.jasonholtdigital.dart3d:scene] sim tick 518.109,53 dyn=0 awake=0 []
+2026-10-27 21:49:07.839 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.110,53 dyn=0 awake=0 []
+2026-10-27 21:49:08.839 Df Runner[56848:12923ef] [com.jasonholtdigital.dart3d:scene] sim tick 518.111,53 dyn=0 awake=0 []
+2026-10-27 21:49:09.839 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 518.112,53 dyn=0 awake=0 []
+2026-10-27 21:49:10.839 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 518.113,53 dyn=0 awake=0 []
+2026-10-27 21:49:11.839 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 518.114,53 dyn=0 awake=0 []
+2026-10-27 21:49:12.839 Df Runner[56848:129258e] [com.jasonholtdigital.dart3d:scene] sim tick 518.115,53 dyn=0 awake=0 []
+2026-10-27 21:49:13.839 Df Runner[56848:12923ec] [com.jasonholtdigital.dart3d:scene] sim tick 518.116,53 dyn=0 awake=0 []
+

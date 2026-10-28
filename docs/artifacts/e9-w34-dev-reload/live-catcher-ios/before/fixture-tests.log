@@ -1,0 +1,19 @@
+00:00 +0: loading /Users/jasonholt/.t3/worktrees/dart-native-explore/t3-9d86c4eb/dart3d/example/test/w34_debug_scene_test.dart
+00:00 +0: live fixture retains the real receiver and typed U4 float curves
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +1: live light controls emit public transforms, components and U4 commands
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +2: live geometry fits above its two extra control rows
+dart3d: document requires feature 'd3:propertyAnimation' that dart3d natives do not realize yet; scene may be degraded
+00:00 +3: baked receiver and both caster positions fit the portrait scene area
+00:00 +4: baked fixture loads the real transformed U2 receiver and one caster
+00:00 +5: caster motion emits transforms, explicit same-ID refresh survives reload
+00:00 +6: material fixture records unlit and both native-colored sprite draws
+00:00 +7: material controls emit current textures, tint, native color and coverage
+00:00 +8: consumer fixture retains bone slots across rig removal and re-add
+00:00 +9: viewport control uses public view replacement and preserves authored target
+00:00 +10: indexed mapped quad carries diagonal, tangent frame and nonwhite color
+00:00 +11: authored target shares screen camera but excludes its sampling monitor
+00:00 +12: factor and coverage controls emit current authored edits and survive reload
+00:00 +13: All tests passed!

@@ -1,0 +1,128 @@
+{
+  "fscene": 5,
+  "documentId": "48HJ89964WM2JAHB5GPJWBSG64",
+  "stage": {
+    "environmentRef": "env:01VK6D000000A"
+  },
+  "resources": {
+    "mat:01VK6D0000000": {
+      "kind": "material",
+      "type": "physicallyBased",
+      "name": "w34.color",
+      "properties": {
+        "baseColor": {
+          "c": [0.7, 0.08, 0.03, 1.0]
+        },
+        "roughness": {
+          "d": 0.8
+        },
+        "metallic": {
+          "d": 0.0
+        }
+      }
+    },
+    "geo:01VK6D0000002": {
+      "kind": "geometry",
+      "procedural": {
+        "shape": "cuboid",
+        "extents": [1.7999999523162842, 1.7999999523162842, 1.7999999523162842]
+      }
+    },
+    "env:01VK6D000000A": {
+      "kind": "environment",
+      "name": "w34.environment",
+      "environment": {
+        "type": "empty"
+      },
+      "environmentIntensity": 0.0,
+      "exposure": 1.0,
+      "toneMapping": "linear",
+      "effects": {}
+    }
+  },
+  "nodes": {
+    "n:01VK6D0000004": {
+      "name": "w34.cube",
+      "transform": {
+        "trs": {
+          "t": [0.0, 0.0, 0.0],
+          "r": [0.0, 0.19866932928562164, 0.0, 0.9800665974617004],
+          "s": [1.0, 1.0, 1.0]
+        }
+      },
+      "components": [
+        {
+          "type": "mesh",
+          "properties": {
+            "geometry": {
+              "rref": "geo:01VK6D0000002"
+            },
+            "material": {
+              "rref": "mat:01VK6D0000000"
+            }
+          }
+        }
+      ]
+    },
+    "n:01VK6D0000006": {
+      "name": "w34.light",
+      "transform": {
+        "trs": {
+          "t": [0.0, 0.0, 0.0],
+          "r": [0.0, 0.0, 0.0, 1.0],
+          "s": [1.0, 1.0, 1.0]
+        }
+      },
+      "components": [
+        {
+          "type": "directionalLight",
+          "properties": {
+            "color": {
+              "c": [1.0, 1.0, 1.0, 1.0]
+            },
+            "intensity": {
+              "d": 2.0
+            },
+            "castsShadow": {
+              "b": false
+            }
+          }
+        }
+      ]
+    },
+    "n:01VK6D0000008": {
+      "name": "w34.camera",
+      "transform": {
+        "trs": {
+          "t": [0.0, 0.0, -7.0],
+          "r": [0.0, 0.0, 0.0, 1.0],
+          "s": [1.0, 1.0, 1.0]
+        }
+      },
+      "components": [
+        {
+          "type": "camera",
+          "properties": {
+            "projection": {
+              "s": "perspective"
+            },
+            "fovRadiansY": {
+              "d": 0.8
+            },
+            "near": {
+              "d": 0.1
+            },
+            "far": {
+              "d": 30.0
+            }
+          }
+        }
+      ]
+    }
+  },
+  "roots": [
+    "n:01VK6D0000004",
+    "n:01VK6D0000006",
+    "n:01VK6D0000008"
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "62005": {
+    "events": 8,
+    "currentConsumers": 7,
+    "channels": [
+      "none"
+    ],
+    "wireframes": [
+      "false"
+    ],
+    "compositionProfiles": [
+      "lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]"
+    ]
+  },
+  "65876": {
+    "events": 3,
+    "currentConsumers": 2,
+    "channels": [
+      "none"
+    ],
+    "wireframes": [
+      "false"
+    ],
+    "compositionProfiles": [
+      "lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]"
+    ]
+  },
+  "67157": {
+    "events": 8,
+    "currentConsumers": 7,
+    "channels": [
+      "none"
+    ],
+    "wireframes": [
+      "false"
+    ],
+    "compositionProfiles": [
+      "lightingModel=SCNLightingModelShadowOnly blendMode=3 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[]"
+    ]
+  },
+  "70854": {
+    "events": 8,
+    "currentConsumers": 7,
+    "channels": [
+      "none"
+    ],
+    "wireframes": [
+      "false"
+    ],
+    "compositionProfiles": [
+      "lightingModel=SCNLightingModelShadowOnly blendMode=0 transparencyMode=0 transparency=1.0 doubleSided=true depthRead=true depthWrite=true diffuse={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} transparent={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} multiply={type=UIDeviceRGBColor intensity=1.0 rgba=[1.0,1.0,1.0,1.0]} modifiers=[\"SCNShaderModifierEntryPointFragment\"]"
+    ]
+  }
+}

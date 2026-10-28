@@ -1,0 +1,23 @@
+{
+  "path": "/private/tmp/dart3d-w34-ios-live-catcher-probe-20261028/r1/parent/model-copy/journey.mp4",
+  "sha256": "f614ba1a3342f1d63b6b50c74181050054abad5f61548475cd9dd801339501b8",
+  "probe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "width": 1206,
+        "height": 2622,
+        "nb_frames": "8047",
+        "nb_read_frames": "8047"
+      }
+    ],
+    "format": {
+      "duration": "76.636667"
+    }
+  },
+  "decodeCommand": "ffmpeg -v error -i journey.mp4 -fps_mode passthrough -f null -",
+  "decodeExitCode": 0,
+  "warningLines": 3475,
+  "warnings": "Duplicate-DTS muxer warnings retained in parent artifact root. No warning-free-decode claim."
+}

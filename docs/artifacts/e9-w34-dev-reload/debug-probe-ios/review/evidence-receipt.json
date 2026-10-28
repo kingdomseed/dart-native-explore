@@ -1,0 +1,113 @@
+{
+  "00-off-r2.png": {
+    "manifestSHA256": "01a6ed9bc114a88de27c340085715ed8403450b6dc4bc0b8f7f1e9de3caf80fd",
+    "matchesPrivate": true
+  },
+  "01-mapped-r2.png": {
+    "manifestSHA256": "a24590548f9d79d4489705bea8c142fda1088221629e4b8b3301a9032b6fa7d7",
+    "matchesPrivate": true
+  },
+  "01-mapped-steady-r2.png": {
+    "manifestSHA256": "a24590548f9d79d4489705bea8c142fda1088221629e4b8b3301a9032b6fa7d7",
+    "matchesPrivate": true
+  },
+  "02-geometry-r2.png": {
+    "manifestSHA256": "9f8b9e62d2e54a7d4a4c7580dd5435f7414eef5377811ccbec36c6e9b2c51d79",
+    "matchesPrivate": true
+  },
+  "03-transfer-r2.png": {
+    "manifestSHA256": "7b13f7c997e09de925b221676c441fc0db9f93036018aeeba644b245cfb061dc",
+    "matchesPrivate": true
+  },
+  "04-mapped-return-r2.png": {
+    "manifestSHA256": "5242fbf832e74a6ceb37ad5b644b76dded8fce3e336d9aa371aa1726b50c80a8",
+    "matchesPrivate": true
+  },
+  "05-off-restored-r2.png": {
+    "manifestSHA256": "f026009313d7c2dae4e5dff540ed23c3cc667a37b27a8aa5e2b3d770f7afcd1c",
+    "matchesPrivate": true
+  },
+  "06-wire-on-r2.png": {
+    "manifestSHA256": "ba6644626e10852ac8d131d559b53003a980a2c4feb3f556acb4c2e8170019c0",
+    "matchesPrivate": true
+  },
+  "07-wire-off-restored-r2.png": {
+    "manifestSHA256": "f026009313d7c2dae4e5dff540ed23c3cc667a37b27a8aa5e2b3d770f7afcd1c",
+    "matchesPrivate": true
+  },
+  "README.md": {
+    "manifestSHA256": "da8f8dbaa2af2fbdbdbe92b6e47fe96473577957565aaa56ea2769b57f9f38ca",
+    "matchesPrivate": false
+  },
+  "analyze.dart": {
+    "manifestSHA256": "fd1b709dfed70528ccf75ff8903e874a0f8909c38d50f9b93633be4967848d12",
+    "matchesPrivate": true
+  },
+  "cleanup-check.txt": {
+    "manifestSHA256": "3d122f2b1b4867f572d07386f8e942a005cb51199a53eceae34d7b5536eafdf3",
+    "matchesPrivate": true
+  },
+  "device-after.json": {
+    "manifestSHA256": "8681748d565b13fdabecb098101fa38e17ac2eb8a728c77eead3447603d9408e",
+    "matchesPrivate": true
+  },
+  "native-r2.log": {
+    "manifestSHA256": "50646cd8cc8f1e6debbb8e4a9f328064b56c8f3a261505f6f5ed2eb0bbc630a9",
+    "matchesPrivate": true
+  },
+  "parent-r2-artifact-sha256.txt": {
+    "manifestSHA256": "b1f618b5c92f8d52ef5bf1c8a17522dfdced44d7093b543896fc8bf6d222da78",
+    "matchesPrivate": true
+  },
+  "parent-r2-source-sha256.txt": {
+    "manifestSHA256": "1ac929bdc6bbf635d2448f68b0d2406b63cc2cb0dd3da0b4d4a2925f692c6193",
+    "matchesPrivate": true
+  },
+  "pixel-analysis.json": {
+    "manifestSHA256": "415c235db40855e398ef98a73f547ed987714a450fbb8775631febdb45769763",
+    "matchesPrivate": true
+  },
+  "restored-locks.txt": {
+    "manifestSHA256": "b4b8793a56192691a59c7fceae2e6d915c1bafac9dedd9494a183887936860e5",
+    "matchesPrivate": true
+  },
+  "restored58.txt": {
+    "manifestSHA256": "554d6a8e98bab6d0423fbd9e635f1ee0fa6806f3eccf9d4da522eb3c4c2521c1",
+    "matchesPrivate": true
+  },
+  "run-r2.log": {
+    "manifestSHA256": "ff689b71fd0ce168fc4b8166a3cff48d15ae2cdaf5dd0ea88583ab5b4e7edd69",
+    "matchesPrivate": true
+  },
+  "source61-after-run.txt": {
+    "manifestSHA256": "aceaceb606aa4e91854d629100a39a91cc6e00e03794bbac5cba1ac494918d39",
+    "matchesPrivate": true
+  },
+  "video-contact-sheet.png": {
+    "manifestSHA256": "1f1decf37286cdbf2ac2c02750b2a3369ebab091b2e153b4786e96925893277b",
+    "matchesPrivate": true
+  },
+  "video-decode-progress.txt": {
+    "manifestSHA256": "d779015eaa725eae1c6e2b7d86884462e6ca51b1373b417fc70f36a762bc263f",
+    "matchesPrivate": true
+  },
+  "video-decode-stderr.txt": {
+    "manifestSHA256": "ebfc4d9a37915d4cd5381cae9082bb0729192cdd70fe9dbb98bba0cd771f6ea0",
+    "matchesPrivate": true
+  },
+  "video-sha256.txt": {
+    "manifestSHA256": "4c66eb675a3562c6225ca008b9686aa7049bd7cb088f870a02b941e5cce0c995",
+    "matchesPrivate": true
+  },
+  "video-sheet-times.txt": {
+    "manifestSHA256": "82756fcc71b70cc14f0571629fd04e91f47a8a74c93a73f69743b8ba105fde90",
+    "matchesPrivate": true
+  },
+  "privateVideo": {
+    "SHA256": "aa518d452e3572fdefb968b05bd52fb92c78c769ceae18c48e262f332f168380"
+  },
+  "savedSourceAndLockReceiptPathSetsMatch": true,
+  "allNativeLogLinesScanned": 1707,
+  "allSavedDeviceRecordsUnbooted": true,
+  "savedOpenDevices": []
+}
