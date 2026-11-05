@@ -619,21 +619,20 @@ Evidence: [E5 manifest](artifacts/e5-u2-geometry-shadows/README.md) and
 pending the tablet gate. Review videos are published in
 [the E5 media release](https://github.com/kingdomseed/dart-native-explore/releases/tag/media-e5-u2).
 
-## E5b / E5c / E9 — unmerged, evidence not yet in this repo (2026-10-28)
+## E5b / E5c / E9 — committed drafts, units open (2026-11-05)
 
-Bounded slices of U3, U4 and W34 were implemented and verified on the
-E5 head (`2f38e4e`) in the uncommitted worktree `t3-9d86c4eb`, with
-per-slice verdicts in `.audit/e5b-u3-decisions.tsv` (worktree
-`t3-852ea54b`). None of it is on a branch or in a PR yet; this section
-is the index until each unit lands with its own evidence directory.
-Status per `docs/program-v2.md` *Where we are* (2026-10-28):
+Drafts #66 (`8afa133`), #67 (`5394d49`) and #68 (`005be60`) carry
+U3, U4 and W34 after E5 #65 (`89a4f17`). The receipts below retain
+their recorded source/surface scope; committing the stack does not
+recertify every slice on the new heads. See `docs/program-v2.md`
+*Where we are* for the continuation order.
 
-| Slice | Evidence (in that worktree) | State |
+| Slice | Evidence (recorded slice) | State |
 |---|---|---|
 | U3 iOS tone operators | `docs/artifacts/e5b-u3-tone-mapping/` (probe worktrees) | Bounded PASS — five existing operators visibly distinct; no native change |
 | U3 `TextureAtlas` (Dart) | `dart3d/test/u3_texture_atlas_test.dart` | Bounded PASS — CPU utility only |
 | U3 sprite material | `docs/artifacts/e5b-u3-sprite/`, `e5b-u3-sprite-dart/` | Bounded PASS — Dart + iOS render-target regression; Android `NOT_RUN` |
-| U3 highlight state + outline | `docs/artifacts/e5b-u3-outline-state/`, `e5b-u3-outline-probe/` | State PASS (source + basic iOS); outline rendering **FAIL on first target** (267 contour pixels absent, mask current); Xcode capture took the wrong command buffer — cause unobserved |
+| U3 highlight state + outline | `docs/artifacts/e5b-u3-outline-state/`, `e5b-u3-outline-probe/` | State PASS (recorded source + basic iOS); historical pre-`8afa133` first-target FAIL (267 contour pixels absent, mask current; Xcode capture took the wrong command buffer). Current candidate `8afa133` is **UNVERIFIED**, not a fixed PASS or a reproduced FAIL |
 | U4 property animation | `docs/artifacts/e5c-u4-property-animation/` | Dart + iOS slices PASS (materials, alpha/sheen, owners, snapshots, lights); Android source/JVM PASS; Android live `NOT_RUN` |
 | W34 dev reload | `docs/artifacts/e9-w34-dev-reload/` (host-loopback, sidecar) | Bounded iOS PASS; direct in-app watch rejected; Android `NOT_RUN` |
 | W34 debug views | `docs/artifacts/e9-w34-dev-reload/` (screen-debug, material-families, baked/live catchers, channel transitions) | Bounded iOS PASS per slice; native particles unsupported by operator decision 2026-10-27; Android `NOT_RUN` |

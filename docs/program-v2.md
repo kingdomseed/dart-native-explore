@@ -38,7 +38,7 @@ goes into the backlog, not into a branch.
    guides and a CHANGELOG, written for someone who has never seen the
    repo (R8).
 
-## Where we are (2026-10-28)
+## Where we are (2026-11-05)
 
 **On `main` (`4a75520`).** Track S through S0h/S0j as recorded below,
 plus Track E's first four units: E1 Filament 1.77.3 + GPU instancing
@@ -48,33 +48,31 @@ E4/W19 character controller (#64). Open follow-ups from those units:
 to live here is in the Track S checkboxes and `docs/artifacts/s0*/`.
 
 **In review: E5/U2** — [PR #65](https://github.com/kingdomseed/dart-native-explore/pull/65)
-(draft, branch `e5-u2-geometry-shadows`, head `2f38e4e`). Wedge/Ring/
+(draft, branch `e5-u2-geometry-shadows`, head `89a4f17`). Wedge/Ring/
 Extrude, spot shadows and baked shadow catchers are implemented on
 both natives; T1, A142 Vulkan+GL T2 and iOS-sim T2/T3 pass; the
 operator approved the screenshots/video on 2026-10-27 (T4). The only
 open gate is Fire/Wacom T2, `NOT_RUN` because the tablets were not
 connected (`docs/verification-matrix.md` §E5). It also closes #59.
 
-**Implemented but uncommitted: E5b, E5c and E9 slices.** The
-2026-10-27/28 swarm built on the E5 head in the worktree
-`t3-9d86c4eb` (branch `t3/sprite-material-fixture`): 28 modified files
-plus new Dart/native sources, tests, example scenes and evidence under
-`docs/artifacts/e5b-*`, `e5c-*` and `e9-*` — none of it committed, no
-PRs. The decision log is `.audit/e5b-u3-decisions.tsv` in worktree
-`t3-852ea54b` (85 rows). Bounded slices accepted there, each with
-scoped Codex review; no unit is closed:
+**Committed drafts: E5b, E5c and E9 slices.** The stack is
+#65 (`89a4f17`, base `main`) → #66 E5b (`8afa133`, base E5) →
+#67 E5c (`5394d49`, base E5b) → #68 E9 (`005be60`, base E5c).
+Sources, tests and bounded evidence under `docs/artifacts/e5b-*`,
+`e5c-*` and `e9-*` are committed. These drafts package existing
+slices; they do not close the units or certify new heads at runtime:
 
 - **E5b/U3** — iOS five-tone fixture PASS (existing operators, no
   native change); Dart `TextureAtlas` utility PASS; sprite material
   (Dart + bounded iOS render-target regression) PASS; highlight
-  *state* foundation PASS on source and basic iOS. **Blocker:**
-  iOS selection-outline *rendering* fails its first-target gate —
-  the first Set target has 205 current mask pixels but all 267
-  expected contour pixels are absent, output identical to Off;
-  later targets pass. The 2026-10-28 Xcode GPU capture took the
-  main-view command buffer, not the target's, so the cause is still
-  unobserved (`docs/artifacts/e5b-u3-outline-probe/ios-xcode-command-capture/`
-  in that worktree). Android outline/sprite rendering: `NOT_RUN`.
+  *state* foundation PASS on source and basic iOS. **Current outline
+  candidate `UNVERIFIED`:** `8afa133` changes first-target setup/binding,
+  but has no updated runtime receipt. The historical pre-`8afa133`
+  first-target FAIL (205 current mask pixels, 267 missing contour pixels)
+  and wrong-command-buffer capture remain in
+  `docs/artifacts/e5b-u3-outline-probe/ios-xcode-command-capture/`;
+  neither that failure nor the fix commit's title proves today's
+  result. Android outline/sprite rendering: `NOT_RUN`.
 - **E5c/U4** — property-animation contract and Dart layer PASS; iOS
   slices PASS (basic owners, materials, alpha + sheen corrections,
   ownership, snapshots/late textures, point/spot/area lights);
@@ -88,13 +86,9 @@ scoped Codex review; no unit is closed:
   particles are unsupported (see the E9 row). Android debug views
   and reload, latency, T2/T4: open.
 
-This state breaks the operating rule that program state lives in
-this file and the verification matrix, not in agent-local folders:
-130 worktrees exist and 120 are dirty, almost all single-purpose
-probe leftovers at the E2/E4/E5 heads. Only `t3-9d86c4eb` (accepted
-stack) and `t3-852ea54b` (outline probe + audit log) carry work that
-must survive; the rest need operator-approved cleanup, not silent
-deletion.
+The former uncommitted-worktree inventory is historical. Recovery
+preserved the accepted stack and other source variants; further
+cleanup requires separate operator approval.
 
 **Upstream moved.** flutter_scene 0.24.0 / scene 0.4.0 published
 2026-10-05; latest is 0.24.3 / 0.4.1 (checked 2026-10-28 via
@@ -115,17 +109,15 @@ from look-dev — the DartNative set's spec and reference renders — is on
    smoke on the PR #65 head, record it in the verification matrix,
    undraft; the operator merges. (Confirm each device's foreground
    app before any `adb` input, per `AGENTS.md` §Devices.)
-2. **Package the uncommitted stack.** Split `t3-9d86c4eb`'s tree
-   into one branch/PR per unit (E5b, E5c, E9) on the new `main`,
-   with their evidence; copy the audit log's verdicts into the PRs.
-   Triage and, with operator approval, remove the remaining probe
-   worktrees. Nothing new starts until the accepted slices are
-   committed — they currently exist in exactly one working tree.
-3. **Close E5b's outline blocker.** Read-only first-technique
-   investigation: capture the *target's* command buffer (the Xcode
-   capture took the main view's), find why the first Set draw
-   produces no contour, fix at the owning layer, then run the U3
-   T3 row on A142 Vulkan+GL and iOS (Android is `NOT_RUN` today).
+2. **Review the packaged stack.** Continue E5b #66, E5c #67 and E9 #68
+   with their evidence and review verdicts, preserving their stacked
+   bases until the preceding unit lands. Packaging is complete;
+   verification and operator merges remain.
+3. **Verify E5b's current outline candidate.** Replay the first-target
+   case on `8afa133` before resuming the historical investigation.
+   If it fails, investigate the target's own rendering path and fix
+   at the owning layer. Complete the U3 T3 row on A142 Vulkan+GL and
+   iOS (Android rendering is `NOT_RUN`).
 4. **Finish E5c/E9 device gates.** Android live proof for U4;
    Android debug views + reload for E9; then each unit's T2/T3/T4.
 5. **S1 renderer spike** (≤ 3 days, still not run) — it alone
@@ -201,25 +193,26 @@ off). Evidence for everything below: `docs/artifacts/ios-debt-2026-10/`.
 - **E5 on the Fire and Wacom tablets** (2026-10-28): T2 `NOT_RUN` on
   the final E5 source; the tablets were not connected. PR #65 stays
   draft until it runs.
-- **Android device proof for the uncommitted E5b/E5c/E9 slices**
+- **Android device proof for the E5b/E5c/E9 draft slices**
   (2026-10-28): U3 outline/sprite rendering, U4 live values, and W34
   debug views + reload are iOS-simulator and source/JVM evidence
   only; the A142 was unavailable (account screen) during those runs
   and was not driven. Their T2/T3 Android halves are owed before
   any of the three units merges.
-- **iOS selection outline, first target** (2026-10-28): the first
-  outlined target renders no contour (267 expected pixels absent)
-  although its mask is current; the Xcode GPU capture took the
-  main-view command buffer, so the failing pass is unobserved.
+- **iOS selection outline, first target:** the historical pre-`8afa133`
+  run (2026-10-28) had 267 expected contour pixels absent despite a
+  current mask; its Xcode capture took the main-view command buffer.
+  The changed candidate's first-target result is `UNVERIFIED`;
+  replay it before treating the historical failure as current.
 
 **Review.** Through #57, PRs were reviewed by an Opus reviewer agent
 (Codex code review was out of quota; verdicts are in the PR comments,
 and Codex's inline comments on #44–#49 got theirs on 2026-10-05). For
-E1–E5 and the uncommitted E5b/E5c/E9 slices, scoped Codex reviews ran
+E1–E5 and the then-uncommitted E5b/E5c/E9 slices, scoped Codex reviews ran
 again (2026-10-18 → 2026-10-28); their PASS/CHANGES_REQUIRED verdicts
-are recorded per slice in the PRs and, for the uncommitted stack, in
-`.audit/e5b-u3-decisions.tsv` (worktree `t3-852ea54b`) — to be copied
-into those units' PRs when packaged.
+are recorded per slice in the PRs and, for the then-uncommitted stack,
+in `.audit/e5b-u3-decisions.tsv` (worktree `t3-852ea54b`). Reconcile
+those historical verdicts with the current draft PRs.
 
 ## Decisions (made here, change only with the operator)
 
@@ -257,7 +250,7 @@ stayed empty. The new gate is smaller and mandatory.
 | Tier | When | Required evidence |
 |---|---|---|
 | **T1 — CI** | every PR | `dn analyze` + `dn test` in **every Dart package the PR changes** (`dart3d/`, `dart3d/example/`, and each new package such as `dart3d_audio/` or the dice app gets its own CI step when it is created). Target (R3): add Android `compileReleaseKotlin` and iOS `swiftc -typecheck` jobs. |
-| **T2 — device smoke** | every PR touching `dart3d/android/**`, `dart3d/ios/**`, or the wire vocabulary | On A142 **Vulkan and GL**, on the Fire tablet (KFTUWI, Mali-G52), on the Wacom tablet (DTHA116, Mali-G57, the weak-GPU/large-memory case; baseline in `docs/artifacts/s0-three-device-baseline/`), and on the iOS sim (one simulator, re-enabled 2026-10-05; see *Verification debt*): app boots, harness (booted with `--dart-define=DART3D_SCENE=harness`; it has no UI entry) runs to completion, dice roll and settle, zero FATAL/crash in logs. One screenshot per surface + log excerpt, committed under `docs/artifacts/<unit>/`. |
+| **T2 — device smoke** | final native/wire candidate of every unit; later heads follow the reuse rule below | On A142 **Vulkan and GL**, on the Fire tablet (KFTUWI, Mali-G52), on the Wacom tablet (DTHA116, Mali-G57, the weak-GPU/large-memory case; baseline in `docs/artifacts/s0-three-device-baseline/`), and on the iOS sim (one simulator, re-enabled 2026-10-05; see *Verification debt*): app boots, harness (booted with `--dart-define=DART3D_SCENE=harness`; it has no UI entry) runs to completion, dice roll and settle, zero FATAL/crash in logs. One screenshot per surface + log excerpt, committed under `docs/artifacts/<unit>/`. |
 | **T3 — feature lanes** | every unit | The unit's own live checks, same evidence rules: the subset of its old "Verify, live" block that exercises new behavior, or for units new in v2, the checks listed under **New-unit T3** below. |
 | **T4 — review** | units that change what users see | Operator reviews screenshots (video optional) in the PR before merge. |
 | **Perf** | only units that claim a perf number | The measured number, device, and method, committed. |
@@ -266,8 +259,9 @@ Rules:
 
 - Evidence lives in the repo (`docs/artifacts/<unit>/`, small PNGs + text
   logs; videos via release assets), never only in `/tmp`.
-- If a device is unavailable, the PR says so explicitly and stays **draft**
-  until T2 runs. No merge without T2 for native changes.
+- If a required T2 device is unavailable, the PR says so explicitly and
+  stays **draft** until T2 runs. Full unit/release hardware acceptance
+  remains required; evidence reuse cannot fill a missing gate.
 - Every automated review thread (Codex / Devin Review) gets a verdict
   (fixed / won't-fix + reason / deferred + issue) in the PR before merge.
   Check the **inline** threads (`gh api --paginate …/pulls/<n>/comments`), not only
@@ -288,7 +282,17 @@ Rules:
   *Verification debt*. All of that debt is paid on
   device before R5; a change whose iOS behavior cannot be reasoned about
   from the Android run waits for iOS instead of merging.
-- A new head after verification needs T1 + T2 again, **and T3 again for every lane whose covered behavior the new diff can affect** (when in doubt, re-run it). Only diffs that provably can't touch a lane (docs, unrelated platform) may reuse its evidence, and the PR says which lanes were reused and why.
+- During iteration, run checks for the behavior the diff can affect.
+  Complete T1 and full T2 on the final native/wire unit candidate,
+  plus its required T3/T4. If behavior, wire data, assets, build settings
+  or deployment permissions change after verification, rerun T1/T2 on
+  the final changed candidate and T3 for affected lanes. Unaffected
+  feature lanes may reuse their evidence with source and scope stated.
+- Later docs/comment-only heads may reuse the candidate's evidence
+  after a semantic diff check confirms covered behavior is unchanged.
+  State the reused source and scope. Android INTERNET permission is
+  configuration, not comment-only; missing gates such as E5's
+  Fire/Wacom T2 remain open.
 - `docs/verification-matrix.md` gets a row per merged unit, pointing at
   its evidence.
 
@@ -459,12 +463,12 @@ Rules:
 | E3 ✅ | **W17 sky / environment** (done) | Native Preetham Rayleigh/Mie `physical` sky equirect generator (1k in 91.5 ms VK / 129.2 ms GL on A142), `skyEnvironment` relighting + `sunLight` directional light, and rate-limited 3-step progressive IBL prefiltering (`max=22.3 ms` <= 33 ms during 60-step sun sweep on A142; step 1→2→3 MAE `1.03% → 0.31% → 0.05%`; `docs/artifacts/e3-w17-sky/`). | M–L | done |
 | E4 ✅ | **W19 character controller** | Upstream `CharacterController` codec (D4); Android `CharacterVirtual` + `CustomCharacterContactListener` in Kotlin with pinned Jolt JNI 6.0.0 landing-width and reference-lifetime extensions; iOS sweep-and-slide. | L | done |
 | E5 🚧 | **U2 geometry + shadow breadth** (new) | Wedge/Ring/Extrude; spot-light shadows (point shadows are the 0.24 delta, V3); shadow-catcher bake mode. Implemented both natives in PR #65 (draft); T4 approved 2026-10-27; only Fire/Wacom T2 outstanding (`docs/artifacts/e5-u2-geometry-shadows/`). | M | PR #65 |
-| E5b 🚧 | **U3 rendering extras** (new) | Selection outline, iOS tone-mapper selection, sprites + texture atlas. Slices implemented uncommitted on the E5 head (see *Where we are*): tone fixture, `TextureAtlas`, sprite material and highlight state accepted bounded; iOS outline rendering blocked on the first-target failure; Android rendering `NOT_RUN`. | M | E2 ✅, E5 packaging |
-| E5c 🚧 | **U4 animation property resolver** (new) | Animate non-transform properties (material, light, camera params). Implemented uncommitted on the E5 head: Dart contract + iOS slices + Android source/JVM accepted bounded; Android live proof `NOT_RUN`. | M | E5 packaging |
+| E5b 🚧 | **U3 rendering extras** (new) | Selection outline, iOS tone-mapper selection, sprites + texture atlas. Committed in draft #66: tone fixture, `TextureAtlas`, sprite material and highlight state accepted bounded; current iOS outline candidate `8afa133` is `UNVERIFIED` (historical first-target FAIL predates it); Android rendering `NOT_RUN`. | M | E2 ✅, E5 |
+| E5c 🚧 | **U4 animation property resolver** (new) | Animate non-transform properties (material, light, camera params). Committed in draft #67: Dart contract + iOS slices + Android source/JVM accepted bounded; Android live proof `NOT_RUN`. | M | E5 |
 | E6 | **W28 shader contract** | Prototype first. Scope after S1: one translator (Filament only) or two (Filament + SceneKit modifiers). | XL | S1 |
 | E7 | **W27 decals** | `d3:decal` modeled on upstream 0.24 `DecalNode` (D4); rides W28. | L | E6 |
 | E8 | **W20 environment volumes** | Filament: one IndirectLight per scene → camera-in-volume switching is the ceiling; accept `SCNFloor` mirror on iOS if S1 = no-go. | XL | E3, E6 |
-| E9 🚧 | **W34 debug views + dev reload** | Reload: host watcher + loopback delivery (direct in-app iOS file-watch rejected by probe, 2026-10-27); Android via host watcher + `adb reverse` push (release-only engine). Debug channels cover mesh/material draws; native particles are unsupported, as approved by the operator on 2026-10-27. iOS slices implemented uncommitted on the E5 head; Android halves open. Shader hot reload lives in W28, not here. | M–L | E5 packaging |
+| E9 🚧 | **W34 debug views + dev reload** | Reload: host watcher + loopback delivery (direct in-app iOS file-watch rejected by probe, 2026-10-27); Android via host watcher + `adb reverse` push (release-only engine). Debug channels cover mesh/material draws; native particles are unsupported, as approved by the operator on 2026-10-27. Slices committed in draft #68; Android halves open. Shader hot reload lives in W28, not here. | M–L | E5 |
 | E10 | **W33a external textures / W33b semantics** | Android: ACQUIRED `Stream` (NATIVE is deprecated); iOS: AVPlayer as material contents. W33c blocked (D6). | M + M | — |
 | E11 | **W32 audio → `dart3d_audio`** | D5. iOS SCNAudio/AVAudioEngine; Android Oboe. | L | — |
 | E12 | **W31 splats** | Needs E1. CPU sort + index re-upload on Android unless a C++ path is accepted. Target count set by a measurement, not assumed. | XL | E1 |

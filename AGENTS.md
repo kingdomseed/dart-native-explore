@@ -39,21 +39,16 @@ named `mythic_scene` or anything infringing on `flutter_scene` naming.
   `--dart-define=DN_LICENSE_KEY=dnk_...`.
 - Lapsed subscription: shipped apps keep working; only new builds stop.
 
-## Program state
+## Program navigation
 
-- Active plan: `docs/program-v2.md` (tracks S/E/P/R/V, verification tiers
-  T1–T4, decisions D1–D9). Start at its **Where we are** section (updated
-  2026-10-28: E1–E4 on `main`, E5 in draft PR #65 awaiting Fire/Wacom T2,
-  E5b/E5c/E9 slices implemented but uncommitted in worktree
-  `t3-9d86c4eb`). Why it was reset: `docs/program-audit-2026-09-28.md`.
-- The old program files (`PLAN.md`, `docs/dart3d-completion-program.md`,
-  `docs/extended-surface-program.md`, `docs/full-engine-program.md`) were
-  removed 2026-10-28 — program-v2 is the sole plan; recover the old files
-  from git history if ever needed.
+- Resume in the active worktree named by the current handoff.
+- Use `docs/program-v2.md` for agreed scope and T1–T4 gates;
+  `docs/verification-matrix.md` records proof. Treat source snapshots
+  and dated receipts as historical evidence; use current Git/PR state
+  for delivery status. Why the reset: `docs/program-audit-2026-09-28.md`.
 - Parity: milestone flutter_scene 0.23.0 / scene 0.3.0 (bdero/flutter_scene
   `0dc6ee80`); final goal flutter_scene 0.24 / scene 0.4 (Track V), after
-  the existing work is finished. Upstream 0.24.0/0.4.0 shipped 2026-10-05
-  (latest 0.24.3/0.4.1); the V0 re-diff is due.
+  the existing work is finished. V0 selects the exact released pin.
 
 ## Repo layout
 
